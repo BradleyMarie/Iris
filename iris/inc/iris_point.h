@@ -14,18 +14,18 @@ Abstract:
 
 #include <iris.h>
 
-#ifndef _VECTOR_IRIS_
-#define _VECTOR_IRIS_
+#ifndef _POINT_IRIS_
+#define _POINT_IRIS_
 
 //
 // Types
 //
 
-typedef struct _POINT {
+typedef struct _POINT3 {
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
-} POINT, *PPOINT;
+} POINT3, *PPOINT3;
 
 //
 // Functions
@@ -34,7 +34,7 @@ typedef struct _POINT {
 SFORCEINLINE
 VOID
 PointInitialize(
-    __out PPOINT Point,
+    __out PPOINT3 Point,
     __in FLOAT X,
     __in FLOAT Y,
     __in FLOAT Z
@@ -56,7 +56,7 @@ PointInitialize(
 SFORCEINLINE
 VOID
 PointInitializeScaled(
-    __out PPOINT Point,
+    __out PPOINT3 Point,
     __in FLOAT X,
     __in FLOAT Y,
     __in FLOAT Z,
@@ -78,17 +78,15 @@ PointInitializeScaled(
 
     Scalar = (FLOAT)1.0 / W;
 
-    Point->X = X * W;
-    Point->Y = Y * W;
-    Point->Z = Z * W;
+	PointInitialize(Point, X * W, Y * W, Z * W);
 }
 
 SFORCEINLINE
 VOID
 PointSubtract(
-    __in PPOINT Minuend,
-    __in PPOINT Subtrahend,
-    __out PVECTOR Difference
+    __in PPOINT3 Minuend,
+    __in PPOINT3 Subtrahend,
+    __out PVECTOR3 Difference
     )
 {
     FLOAT X;
@@ -109,9 +107,9 @@ PointSubtract(
 SFORCEINLINE
 VOID
 PointVectorSubtract(
-    __in PPOINT Minuend,
-    __in PVECTOR Subtrahend,
-    __out PPOINT Difference
+    __in PPOINT3 Minuend,
+    __in PVECTOR3 Subtrahend,
+    __out PPOINT3 Difference
     )
 {
     FLOAT X;
@@ -132,9 +130,9 @@ PointVectorSubtract(
 SFORCEINLINE
 VOID
 PointVectorAdd(
-    __in PPOINT Addend0,
-    __in PVECTOR Addend1,
-    __out PPOINT Sum
+    __in PPOINT3 Addend0,
+    __in PVECTOR3 Addend1,
+    __out PPOINT3 Sum
     )
 {
     FLOAT X;
@@ -156,14 +154,14 @@ SFORCEINLINE
 VOID
 PointMatrixMultiply(
     __in PMATRIX Matrix,
-    __in PPOINT Point,
-    __out PPOINT Product
+    __in PPOINT3 Point,
+    __out PPOINT3 Product
     )
 {
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
-    FLOAT W
+	FLOAT W;
 
     ASSERT(Matrix != NULL);
     ASSERT(Point != NULL);
@@ -192,4 +190,4 @@ PointMatrixMultiply(
     PointInitializeScaled(Product, X, Y, Z, W);
 }
 
-#endif // _VECTOR_IRIS_
+#endif // _POINT_IRIS_

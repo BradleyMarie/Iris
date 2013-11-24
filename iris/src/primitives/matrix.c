@@ -254,7 +254,7 @@ MatrixpInvert(
                 MatrixpScaledSubtractRow(&TemporaryMatrix,
                                          R,
                                          Index,
-										                     TemporaryMatrix.M[Index][Lead]);
+                                         TemporaryMatrix.M[Index][Lead]);
 
                 MatrixpScaledSubtractRow(Inverse, 
                                          R, 
@@ -493,7 +493,7 @@ MatrixInitializeScalar(
                       (FLOAT)1.0,
                       &Matrix->Inverse);
 
-	return ISTATUS_SUCCESS;
+    return ISTATUS_SUCCESS;
 }
 
 __success(return == ISTATUS_SUCCESS)
@@ -501,11 +501,11 @@ ISTATUS
 MatrixpInitializeRotation(
     __out PINVERTIBLE_MATRIX Matrix,
     __in FLOAT Theta,
-    __in PVECTOR Axis
+    __in PVECTOR3 Axis
     )
 {
-    VECTOR NormalizedAxis;
-	ISTATUS Status;
+    VECTOR3 NormalizedAxis;
+    ISTATUS Status;
     FLOAT Sin;
     FLOAT Cos;
     FLOAT Ic;
@@ -578,7 +578,7 @@ MatrixInitializeRotation(
     __in FLOAT Z
     )
 {
-    VECTOR Axis;
+    VECTOR3 Axis;
 
     ASSERT(Matrix != NULL);
     ASSERT(IsNormalFloat(Theta));

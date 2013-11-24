@@ -21,11 +21,11 @@ Abstract:
 // Types
 //
 
-typedef struct _VECTOR {
+typedef struct _VECTOR3 {
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
-} VECTOR, *PVECTOR;
+} VECTOR3, *PVECTOR3;
 
 //
 // Defines
@@ -45,7 +45,7 @@ typedef VECTOR_AXIS *PVECTOR_AXIS;
 SFORCEINLINE
 VOID
 VectorInitialize(
-    __out PVECTOR Vector,
+    __out PVECTOR3 Vector,
     __in FLOAT X,
     __in FLOAT Y,
     __in FLOAT Z
@@ -67,9 +67,9 @@ VectorInitialize(
 SFORCEINLINE
 VOID
 VectorAdd(
-    __in PVECTOR Addend0,
-    __in PVECTOR Addend1,
-    __out PVECTOR Sum
+    __in PVECTOR3 Addend0,
+    __in PVECTOR3 Addend1,
+    __out PVECTOR3 Sum
     )
 {
     FLOAT X;
@@ -90,9 +90,9 @@ VectorAdd(
 SFORCEINLINE
 VOID
 VectorSubtract(
-    __in PVECTOR Minuend,
-    __in PVECTOR Subtrahend,
-    __out PVECTOR Difference
+    __in PVECTOR3 Minuend,
+    __in PVECTOR3 Subtrahend,
+    __out PVECTOR3 Difference
     )
 {
     FLOAT X;
@@ -113,9 +113,9 @@ VectorSubtract(
 SFORCEINLINE
 VOID
 VectorScale(
-    __in PVECTOR Vector,
+    __in PVECTOR3 Vector,
     __in FLOAT Scalar,
-    __out PVECTOR ScaledVector
+    __out PVECTOR3 ScaledVector
     )
 {
     FLOAT X;
@@ -137,9 +137,9 @@ VectorScale(
 SFORCEINLINE
 VOID
 VectorShrink(
-    __in PVECTOR Vector,
+    __in PVECTOR3 Vector,
     __in FLOAT Factor,
-    __out PVECTOR ShrunkVector
+    __out PVECTOR3 ShrunkVector
     )
 {
     FLOAT Scalar;
@@ -164,8 +164,8 @@ VectorShrink(
 SFORCEINLINE
 FLOAT
 VectorDotProduct(
-    __in PVECTOR Operand0,
-    __in PVECTOR Operand1
+    __in PVECTOR3 Operand0,
+    __in PVECTOR3 Operand1
     )
 {
     FLOAT X;
@@ -185,9 +185,9 @@ VectorDotProduct(
 SFORCEINLINE
 VOID
 VectorCrossProduct(
-    __in PVECTOR Operand0,
-    __in PVECTOR Operand1,
-    __out PVECTOR Product
+    __in PVECTOR3 Operand0,
+    __in PVECTOR3 Operand1,
+    __out PVECTOR3 Product
     )
 {
     FLOAT X;
@@ -208,7 +208,7 @@ VectorCrossProduct(
 SFORCEINLINE
 FLOAT
 VectorLength(
-    __in PVECTOR Vector
+    __in PVECTOR3 Vector
     )
 {
     FLOAT DotProduct;
@@ -223,8 +223,8 @@ VectorLength(
 SFORCEINLINE
 VOID
 VectorNormalize(
-    __in PVECTOR Vector,
-    __out PVECTOR NormalizedVector
+    __in PVECTOR3 Vector,
+    __out PVECTOR3 NormalizedVector
     )
 {
     FLOAT Length;
@@ -241,7 +241,7 @@ VectorNormalize(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
-    __in PVECTOR Vector
+    __in PVECTOR3 Vector
     )
 {
     if (AbsFloat(Vector->X) > AbsFloat(Vector->Y) &&
@@ -262,7 +262,7 @@ VectorDominantAxis(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDiminishedAxis(
-    __in PVECTOR Vector
+    __in PVECTOR3 Vector
     )
 {
     if (AbsFloat(Vector->X) < AbsFloat(Vector->Y) &&
@@ -284,8 +284,8 @@ SFORCEINLINE
 VOID
 VectorMatrixMultiply(
     __in PMATRIX Matrix,
-    __in PVECTOR Vector,
-    __out PVECTOR Product
+    __in PVECTOR3 Vector,
+    __out PVECTOR3 Product
     )
 {
     FLOAT X;
@@ -315,8 +315,8 @@ SFORCEINLINE
 VOID
 VectorMatrixTransposedMultiply(
     __in PMATRIX Matrix,
-    __in PVECTOR Vector,
-    __out PVECTOR Product
+    __in PVECTOR3 Vector,
+    __out PVECTOR3 Product
     )
 {
     FLOAT X;

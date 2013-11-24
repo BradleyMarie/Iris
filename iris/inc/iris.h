@@ -26,5 +26,6 @@ Abstract:
 #include "iris_matrix.h"
 #include "iris_vector.h"
 #include "iris_point.h"
+#include "iris_ray.h"
 
 #endif // _IRIS_HEADER_
