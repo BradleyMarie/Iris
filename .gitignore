@@ -1,6 +1,7 @@
 # Object files
 *.o
 *.ko
+*.obj
 
 # Libraries
 *.lib
@@ -12,7 +13,27 @@
 *.so.*
 *.dylib
 
+# Symbols
+*.pdb
+
 # Executables
 *.exe
 *.out
 *.app
+
+# Build files
+CMakeCache.txt
+*.cmake
+*.filters
+*.vcxproj
+*.sln
+*.lastbuildstate
+*.sdf
+*.suo
+
+# Log files
+*.tlog
+*.log
+
+# Directories
+CMakeFiles/

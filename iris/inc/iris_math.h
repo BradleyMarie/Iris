@@ -26,9 +26,11 @@ Abstract:
 #define MinFloat(number) minf(number)
 #define FmaFloat(m0, m1, a0) fmaf(m0, m1, a0)
 #define AbsFloat(number) fabsf(number)
-#define CosFloat(numner) cosf(number)
+#define CosFloat(number) cosf(number)
 #define SinFloat(number) sinf(number)
 #define IsNaNFloat(number) isnan(number)
 #define IsInfFloat(number) isinf(number)
+#define IsNormalFloat(number) isnormal(number)
+#define IsFiniteFloat(number) isfinite(number)
 
 #endif // _MATH_IRIS_

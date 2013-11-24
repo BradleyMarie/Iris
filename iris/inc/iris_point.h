@@ -41,12 +41,12 @@ PointInitialize(
     )
 {
     ASSERT(Point != NULL);
-    ASSERT(!IsNaNFloat(X));
-    ASSERT(!IsInfFloat(X));
-    ASSERT(!IsNaNFloat(Y));
-    ASSERT(!IsInfFloat(Y));
-    ASSERT(!IsNaNFloat(Z));
-    ASSERT(!IsInfFloat(Z));
+    ASSERT(IsNormalFloat(X));
+    ASSERT(IsFiniteFloat(X));
+    ASSERT(IsNormalFloat(Y));
+    ASSERT(IsFiniteFloat(Y));
+    ASSERT(IsNormalFloat(Z));
+    ASSERT(IsFiniteFloat(Z));
 
     Point->X = X;
     Point->Y = Y;
@@ -66,15 +66,15 @@ PointInitializeScaled(
     FLOAT Scalar;
 
     ASSERT(Point != NULL);
-    ASSERT(!IsNaNFloat(X));
-    ASSERT(!IsInfFloat(X));
-    ASSERT(!IsNaNFloat(Y));
-    ASSERT(!IsInfFloat(Y));
-    ASSERT(!IsNaNFloat(Z));
-    ASSERT(!IsInfFloat(Z));
+    ASSERT(IsNormalFloat(X));
+    ASSERT(IsFiniteFloat(X));
+    ASSERT(IsNormalFloat(Y));
+    ASSERT(IsFiniteFloat(Y));
+    ASSERT(IsNormalFloat(Z));
+    ASSERT(IsFiniteFloat(Z));
     ASSERT(W != (FLOAT)0.0);
-    ASSERT(!IsNaNFloat(W));
-    ASSERT(!IsInfFloat(W));
+    ASSERT(IsNormalFloat(W));
+    ASSERT(IsFiniteFloat(W));
 
     Scalar = (FLOAT)1.0 / W;
 
@@ -163,6 +163,7 @@ PointMatrixMultiply(
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
+    FLOAT W
 
     ASSERT(Matrix != NULL);
     ASSERT(Point != NULL);
@@ -170,17 +171,25 @@ PointMatrixMultiply(
 
     X = Matrix->M[0][0] * Point->X + 
         Matrix->M[0][1] * Point->Y + 
-        Matrix->M[0][2] * Point->Z;
+        Matrix->M[0][2] * Point->Z +
+        Matrix->M[0][3];
 
     Y = Matrix->M[1][0] * Point->X + 
         Matrix->M[1][1] * Point->Y + 
-        Matrix->M[1][2] * Point->Z;
+        Matrix->M[1][2] * Point->Z +
+        Matrix->M[1][3];
 
     Z = Matrix->M[2][0] * Point->X + 
         Matrix->M[2][1] * Point->Y + 
-        Matrix->M[2][2] * Point->Z;
+        Matrix->M[2][2] * Point->Z +
+        Matrix->M[2][3];
 
-    PointInitialize(Product, X, Y, Z);
+    W = Matrix->M[3][0] * Point->X + 
+        Matrix->M[3][1] * Point->Y + 
+        Matrix->M[3][2] * Point->Z + 
+        Matrix->M[3][3];
+
+    PointInitializeScaled(Product, X, Y, Z, W);
 }
 
 #endif // _VECTOR_IRIS_

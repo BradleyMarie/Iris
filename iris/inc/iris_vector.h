@@ -52,12 +52,12 @@ VectorInitialize(
     )
 {
     ASSERT(Vector != NULL);
-    ASSERT(!IsNaNFloat(X));
-    ASSERT(!IsInfFloat(X));
-    ASSERT(!IsNaNFloat(Y));
-    ASSERT(!IsInfFloat(Y));
-    ASSERT(!IsNaNFloat(Z));
-    ASSERT(!IsInfFloat(Z));
+    ASSERT(IsNormalFloat(X));
+    ASSERT(IsFiniteFloat(X));
+    ASSERT(IsNormalFloat(Y));
+    ASSERT(IsFiniteFloat(Y));
+    ASSERT(IsNormalFloat(Z));
+    ASSERT(IsFiniteFloat(Z));
 
     Vector->X = X;
     Vector->Y = Y;
@@ -123,8 +123,8 @@ VectorScale(
     FLOAT Z;
 
     ASSERT(Vector != NULL);
-    ASSERT(!IsNaNFloat(Factor));
-    ASSERT(!IsInfFloat(Factor));
+	ASSERT(IsNormalFloat(Scalar));
+	ASSERT(IsFiniteFloat(Scalar));
     ASSERT(ScaledVector != NULL);
 
     X = Vector->X * Scalar;
@@ -148,8 +148,8 @@ VectorShrink(
     FLOAT Z;
 
     ASSERT(Vector != NULL);
-    ASSERT(!IsNaNFloat(Factor));
-    ASSERT(!IsInfFloat(Factor));
+    ASSERT(IsNormalFloat(Factor));
+    ASSERT(IsFiniteFloat(Factor));
     ASSERT(Factor != (FLOAT)0.0);
     ASSERT(ShrunkVector != NULL);
 
@@ -221,9 +221,9 @@ VectorLength(
 }
 
 SFORCEINLINE
-FLOAT
+VOID
 VectorNormalize(
-    __in PVECTOR Vector
+    __in PVECTOR Vector,
     __out PVECTOR NormalizedVector
     )
 {

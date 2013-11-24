@@ -57,12 +57,14 @@ MatrixInitialize(
     __in FLOAT M33
     );
 
-VOID
+__success(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixInitializeIdentity(
     __out PINVERTIBLE_MATRIX Matrix
     );
 
-VOID
+__success(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixInitializeTranslation(
     __out PINVERTIBLE_MATRIX Matrix,
     __in FLOAT X,
