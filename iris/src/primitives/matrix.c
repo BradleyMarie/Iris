@@ -254,7 +254,7 @@ MatrixpInvert(
                 MatrixpScaledSubtractRow(&TemporaryMatrix,
                                          R,
                                          Index,
-										 TemporaryMatrix.M[Index][Lead]);
+										                     TemporaryMatrix.M[Index][Lead]);
 
                 MatrixpScaledSubtractRow(Inverse, 
                                          R, 
@@ -392,15 +392,15 @@ MatrixInitializeTranslation(
                       (FLOAT)1.0,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
-                               X,
+                      X,
                       (FLOAT)0.0,
                       (FLOAT)1.0,
                       (FLOAT)0.0,
-                               Y,
+                      Y,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
                       (FLOAT)1.0,
-                               Z,
+                      Z,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
@@ -411,15 +411,15 @@ MatrixInitializeTranslation(
                       (FLOAT)1.0,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
-                              -X,
+                      -X,
                       (FLOAT)0.0,
                       (FLOAT)1.0,
                       (FLOAT)0.0,
-                              -Y,
+                      -Y,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
                       (FLOAT)1.0,
-                              -Z,
+                      -Z,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
                       (FLOAT)0.0,
@@ -434,7 +434,132 @@ MatrixInitializeScalar(
     __in FLOAT X,
     __in FLOAT Y,
     __in FLOAT Z
-    );
+    )
+{
+    ASSERT(Matrix != NULL);
+    ASSERT(!IsNaNFloat(Theta));
+    ASSERT(!IsInfFloat(Theta));    
+    ASSERT(!IsNaNFloat(X));
+    ASSERT(!IsInfFloat(X));
+    ASSRRT(X != (FLOAT)0.0);
+    ASSERT(!IsNaNFloat(Y));
+    ASSERT(!IsInfFloat(Y));
+    ASSRRT(Y != (FLOAT)0.0);
+    ASSERT(!IsNaNFloat(Z));
+    ASSERT(!IsInfFloat(Z));
+    ASSRRT(Z != (FLOAT)0.0);
+
+    MatrixpInitialize(&Matrix->Matrix, 
+                      X,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      Y,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      Z,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)1.0,
+                      &Matrix->Inverse);
+
+    MatrixpInitialize(&Matrix->Matrix, 
+                      (FLOAT)1.0 / X,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)1.0 / Y,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)1.0 / Z,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)0.0,
+                      (FLOAT)1.0,
+                      &Matrix->Inverse);
+}
+
+__success(return == ISTATUS_SUCCESS)
+ISTATUS
+MatrixpInitializeRotation(
+    __out PINVERTIBLE_MATRIX Matrix,
+    __in FLOAT Theta,
+    __in PVECTOR Axis
+    )
+{
+    VECTOR NormalizedAxis;
+    FLOAT VectorLength;
+    ISTATUS Status;
+    FLOAT Sin;
+    FLOAT Cos;
+    FLOAT Ic;
+    FLOAT M00;
+    FLOAT M01;
+    FLOAT M02;
+    FLOAT M10;
+    FLOAT M11;
+    FLOAT M12;
+    FLOAT M20;
+    FLOAT M21;
+    FLOAT M22;
+
+    ASSERT(Matrix != NULL);
+    ASSERT(!IsNaNFloat(Theta));
+    ASSERT(!IsInfFloat(Theta));
+    ASSERT(Axis != NULL);
+
+    if (VectorLength(Axis) == (FLOAT)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
+    VectorNormalize(Axis, &NormalizedAxis);
+
+    Sin = SinFloat(Theta * PI_FLOAT / (FLOAT)180.0);
+    Cos = CosFloat(Theta * PI_FLOAT / (FLOAT)180.0);
+    Ic = 1.0f - Cos;
+
+    M00 = NormalizedAxis.X * NormalizedAxis.X * Ic + C;
+    M01 = NormalizedAxis.X * NormalizedAxis.Y * Ic - NormalizedAxis.Z * S;
+    M02 = NormalizedAxis.X * NormalizedAxis.Z * Ic + NormalizedAxis.Y * S;
+
+    M10 = NormalizedAxis.Y * NormalizedAxis.X * Ic + NormalizedAxis.Z * S;
+    M11 = NormalizedAxis.Y * NormalizedAxis.Y * Ic + C;
+    M12 = NormalizedAxis.Y * NormalizedAxis.X * Ic - NormalizedAxis.X * S;
+    
+    M20 = NormalizedAxis.Z * NormalizedAxis.X * Ic - NormalizedAxis.Y * S;
+    M21 = NormalizedAxis.Z * NormalizedAxis.Y * Ic + NormalizedAxis.X * S;
+    M22 = NormalizedAxis.Z * NormalizedAxis.Z * Ic + C;
+
+    Status = MatrixInitialize(Matrix, 
+                              M00, 
+                              M01, 
+                              M02, 
+                              (FLOAT)0.0, 
+                              M10,
+                              M11,
+                              M12,
+                              (FLOAT)0.0,
+                              M20,
+                              M21,
+                              M22,
+                              (FLOAT)0.0
+                              (FLOAT)0.0
+                              (FLOAT)0.0
+                              (FLOAT)0.0
+                              (FLOAT)1.0);
+
+    return Status;
+}
 
 __success(return == ISTATUS_SUCCESS)
 ISTATUS
@@ -444,7 +569,25 @@ MatrixInitializeRotation(
     __in FLOAT X,
     __in FLOAT Y,
     __in FLOAT Z
-    );
+    )
+{
+    VECTOR Axis;
+
+    ASSERT(Matrix != NULL);
+    ASSERT(!IsNaNFloat(Theta));
+    ASSERT(!IsInfFloat(Theta));
+    ASSERT(!IsNaNFloat(X));
+    ASSERT(!IsInfFloat(X));
+    ASSERT(!IsNaNFloat(Y));
+    ASSERT(!IsInfFloat(Y));
+    ASSERT(!IsNaNFloat(Z));
+    ASSERT(!IsInfFloat(Z));
+    ASSERT(X == (FLOAT)0.0 && Y == (FLOAT)0.0 && Z == (FLOAT)0.0);
+
+    VectorInitialize(&Axis, X, Y, Z);
+
+    return MatrixpInitializeRotation(Matrix, Theta, &Axis);
+}
 
 __success(return == ISTATUS_SUCCESS)
 ISTATUS

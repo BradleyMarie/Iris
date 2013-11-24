@@ -221,6 +221,24 @@ VectorLength(
 }
 
 SFORCEINLINE
+FLOAT
+VectorNormalize(
+    __in PVECTOR Vector
+    __out PVECTOR NormalizedVector
+    )
+{
+    FLOAT Length;
+
+    ASSERT(Vector != NULL);
+
+    Length = VectorDotProduct(Vector, Vector);
+
+    ASSERT(Length != (FLOAT)0.0);
+
+    VectorShrink(Vector, Length, NormalizedVector);
+}
+
+SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
     __in PVECTOR Vector
