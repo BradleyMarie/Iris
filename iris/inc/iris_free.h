@@ -22,26 +22,23 @@ typedef struct _IRIS_OBJECT_VTABLE {
     SIZE_T ObjectSize;
 } IRIS_OBJECT_VTABLE, *PIRIS_OBJECT_VTABLE;
 
+_Struct_size_bytes_(ObjectVTable->ObjectSize)
 typedef struct _IRIS_OBJECT_HEADER {
     PIRIS_OBJECT_VTABLE ObjectVTable;
-} IRIS_OBJECT_VTABLE, *PIRIS_OBJECT_VTABLE;
+} IRIS_OBJECT_HEADER, *PIRIS_OBJECT_HEADER;
 
 SFORCEINLINE
 VOID
 IrisFree(
-    _Pre_maybenull_ _Post_invalid_ PVOID IrisObject
+    _Pre_maybenull_ _Post_invalid_ PIRIS_OBJECT_HEADER IrisObject
     )
 {
-    PIRIS_OBJECT_VTABLE Object;
-
     if (IrisObject == NULL)
     {
         return;
     }
 
-    Object = (PIRIS_OBJECT_VTABLE) IrisObject;
-
-    Object->FreeRoutine(IrisObject);
+    IrisObject->ObjectVTable.FreeRoutine(IrisObject);
 }
 
 #endif // _IRIS_FREE_
