@@ -44,6 +44,20 @@ ShapeHitInitialize(
     ShapeHit->AdditionalDataSize = 0;
 }
 
+SFORCEINLINE
+VOID
+ShapeHitDestroy(
+    _Inout_ PSHAPE_HIT ShapeHit
+    )
+{
+    ASSERT(ShapeHit != NULL);
+
+    free(ShapeHit->AdditionalData);
+
+    ShapeHit->AdditionalData = NULL;
+    ShapeHit->AdditionalDataSize = 0;
+}
+
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
@@ -57,7 +71,6 @@ ShapeHitSet(
 {
     PVOID NewBuffer;
 
-    ASSERT(ShapeHit != NULL);
     ASSERT(ShapeHit != NULL);
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));

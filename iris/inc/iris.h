@@ -22,10 +22,12 @@ Abstract:
 #include "iris_assert.h"
 #include "iris_types.h"
 #include "iris_error.h"
+#include "iris_free.h"
 #include "iris_math.h"
 #include "iris_matrix.h"
 #include "iris_vector.h"
 #include "iris_point.h"
 #include "iris_ray.h"
+#include "iris_shapehitlist.h"
 
 #endif // _IRIS_HEADER_

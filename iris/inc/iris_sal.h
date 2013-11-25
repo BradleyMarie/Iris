@@ -28,10 +28,14 @@ Abstract:
 #define _In_reads_(size) const
 #define _In_reads_bytes_opt_(size) const
 
+#define _Field_size_(size) 
 #define _Field_size_bytes_opt_(size) 
 
 #define _Inout_
 #define _Inout_updates_(size)
+
+#define _Pre_maybenull_
+#define _Post_invalid_
 
 #define _Out_
 #define _Out_writes_(size)

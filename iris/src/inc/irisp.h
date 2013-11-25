@@ -19,5 +19,6 @@ Abstract:
 #include <string.h>
 
 #include "iris_shapehit.h"
+#include "iris_shapehitlist.h"
 
 #endif // _IRIS_INTERNAL_HEADER_
