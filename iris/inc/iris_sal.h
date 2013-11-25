@@ -14,7 +14,7 @@ Abstract:
 
 --*/
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 #include <sal.h>
 
@@ -23,18 +23,21 @@ Abstract:
 #ifndef _SAL_IRIS_
 #define _SAL_IRIS_
 
-#define __in const
-#define __in_range(min, max) const
-#define __in_ecount(size) const
+#define _In_ const
+#define _In_range_(low, hi) const
+#define _In_reads_(size) const
+#define _In_reads_bytes_opt_(size) const
 
-#define __inout
-#define __inout_ecount(size)
+#define _Field_size_bytes_opt_(size) 
 
-#define __out
-#define __out_ecount(size)
+#define _Inout_
+#define _Inout_updates_(size)
 
-#define __success(expr)
+#define _Out_
+#define _Out_writes_(size)
+
+#define _Success_(expr)
 
 #endif // _SAL_IRIS_
 
-#endif // WIN32
+#endif // _MSC_VER

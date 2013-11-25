@@ -15,7 +15,7 @@ Abstract:
 #ifndef _ANNOTATIONS_IRIS_
 #define _ANNOTATIONS_IRIS_
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #define FORCEINLINE __forceinline
 #else
 #define FORCEINLINE inline

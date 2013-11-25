@@ -35,92 +35,92 @@ typedef struct _INVERTIBLE_MATRIX {
 // Function definitions
 //
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitialize(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT M00,
-    __in FLOAT M01,
-    __in FLOAT M02,
-    __in FLOAT M03,
-    __in FLOAT M10,
-    __in FLOAT M11,
-    __in FLOAT M12,
-    __in FLOAT M13,
-    __in FLOAT M20,
-    __in FLOAT M21,
-    __in FLOAT M22,
-    __in FLOAT M23,
-    __in FLOAT M30,
-    __in FLOAT M31,
-    __in FLOAT M32,
-    __in FLOAT M33
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT M00,
+    _In_ FLOAT M01,
+    _In_ FLOAT M02,
+    _In_ FLOAT M03,
+    _In_ FLOAT M10,
+    _In_ FLOAT M11,
+    _In_ FLOAT M12,
+    _In_ FLOAT M13,
+    _In_ FLOAT M20,
+    _In_ FLOAT M21,
+    _In_ FLOAT M22,
+    _In_ FLOAT M23,
+    _In_ FLOAT M30,
+    _In_ FLOAT M31,
+    _In_ FLOAT M32,
+    _In_ FLOAT M33
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeIdentity(
-    __out PINVERTIBLE_MATRIX Matrix
+    _Out_ PINVERTIBLE_MATRIX Matrix
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeTranslation(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeScalar(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeRotation(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Theta,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Theta,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeFrustum(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Left,
-    __in FLOAT Right,
-    __in FLOAT Bottom,
-    __in FLOAT Top,
-    __in FLOAT Near,
-    __in FLOAT Far
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Left,
+    _In_ FLOAT Right,
+    _In_ FLOAT Bottom,
+    _In_ FLOAT Top,
+    _In_ FLOAT Near,
+    _In_ FLOAT Far
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeOrothographic(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Left,
-    __in FLOAT Right,
-    __in FLOAT Bottom,
-    __in FLOAT Top,
-    __in FLOAT Near,
-    __in FLOAT Far
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Left,
+    _In_ FLOAT Right,
+    _In_ FLOAT Bottom,
+    _In_ FLOAT Top,
+    _In_ FLOAT Near,
+    _In_ FLOAT Far
     );
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixMultiply(
-    __in PINVERTIBLE_MATRIX Multiplicand0,
-    __in PINVERTIBLE_MATRIX Multiplicand1,
-    __out PINVERTIBLE_MATRIX Product
+    _In_ PINVERTIBLE_MATRIX Multiplicand0,
+    _In_ PINVERTIBLE_MATRIX Multiplicand1,
+    _Out_ PINVERTIBLE_MATRIX Product
     );
 
 #endif // _MATRIX_IRIS_

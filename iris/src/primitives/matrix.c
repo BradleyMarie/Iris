@@ -12,14 +12,14 @@ Abstract:
 
 --*/
 
-#include <iris.h>
+#include <irisp.h>
 
 STATIC
 VOID
 MatrixpDivideRow(
-    __inout PMATRIX Matrix,
-    __in_range(0, 3) SIZE_T Row,
-    __in FLOAT Divisor
+    _Inout_ PMATRIX Matrix,
+    _In_range_(0, 3) SIZE_T Row,
+    _In_ FLOAT Divisor
     )
 {
     FLOAT Scalar;
@@ -42,10 +42,10 @@ MatrixpDivideRow(
 STATIC
 VOID
 MatrixpScaledSubtractRow(
-    __inout PMATRIX Matrix,
-    __in_range(0, 3) SIZE_T ConstantRow,
-    __in_range(0, 3) SIZE_T ModifiedRow,
-    __in FLOAT Scalar
+    _Inout_ PMATRIX Matrix,
+    _In_range_(0, 3) SIZE_T ConstantRow,
+    _In_range_(0, 3) SIZE_T ModifiedRow,
+    _In_ FLOAT Scalar
     )
 {
     ASSERT(Matrix != NULL);
@@ -65,9 +65,9 @@ MatrixpScaledSubtractRow(
 STATIC
 VOID
 MatrixpSwapRows(
-    __inout PMATRIX Matrix,
-    __in_range(0, 3) SIZE_T Row0,
-    __in_range(0, 3) SIZE_T Row1
+    _Inout_ PMATRIX Matrix,
+    _In_range_(0, 3) SIZE_T Row0,
+    _In_range_(0, 3) SIZE_T Row1
     )
 {
     SIZE_T Index;
@@ -90,24 +90,24 @@ MatrixpSwapRows(
 STATIC
 VOID
 MatrixpInitialize(
-    __out PMATRIX Matrix,
-    __in FLOAT M00,
-    __in FLOAT M01,
-    __in FLOAT M02,
-    __in FLOAT M03,
-    __in FLOAT M10,
-    __in FLOAT M11,
-    __in FLOAT M12,
-    __in FLOAT M13,
-    __in FLOAT M20,
-    __in FLOAT M21,
-    __in FLOAT M22,
-    __in FLOAT M23,
-    __in FLOAT M30,
-    __in FLOAT M31,
-    __in FLOAT M32,
-    __in FLOAT M33,
-    __in PMATRIX Inverse
+    _Out_ PMATRIX Matrix,
+    _In_ FLOAT M00,
+    _In_ FLOAT M01,
+    _In_ FLOAT M02,
+    _In_ FLOAT M03,
+    _In_ FLOAT M10,
+    _In_ FLOAT M11,
+    _In_ FLOAT M12,
+    _In_ FLOAT M13,
+    _In_ FLOAT M20,
+    _In_ FLOAT M21,
+    _In_ FLOAT M22,
+    _In_ FLOAT M23,
+    _In_ FLOAT M30,
+    _In_ FLOAT M31,
+    _In_ FLOAT M32,
+    _In_ FLOAT M33,
+    _In_ PMATRIX Inverse
     )
 {
     ASSERT(Matrix != NULL);
@@ -168,7 +168,7 @@ MatrixpInitialize(
 STATIC
 VOID
 MatrixpInitializeIdentity(
-    __out PMATRIX Matrix
+    _Out_ PMATRIX Matrix
     )
 {
     ASSERT(Matrix != NULL);
@@ -193,12 +193,12 @@ MatrixpInitializeIdentity(
                       Matrix);
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 MatrixpInvert(
-    __inout PMATRIX Matrix,
-    __out PMATRIX Inverse
+    _Inout_ PMATRIX Matrix,
+    _Out_ PMATRIX Inverse
     )
 {
     MATRIX TemporaryMatrix;
@@ -269,26 +269,26 @@ MatrixpInvert(
     return ISTATUS_SUCCESS;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitialize(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT M00,
-    __in FLOAT M01,
-    __in FLOAT M02,
-    __in FLOAT M03,
-    __in FLOAT M10,
-    __in FLOAT M11,
-    __in FLOAT M12,
-    __in FLOAT M13,
-    __in FLOAT M20,
-    __in FLOAT M21,
-    __in FLOAT M22,
-    __in FLOAT M23,
-    __in FLOAT M30,
-    __in FLOAT M31,
-    __in FLOAT M32,
-    __in FLOAT M33
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT M00,
+    _In_ FLOAT M01,
+    _In_ FLOAT M02,
+    _In_ FLOAT M03,
+    _In_ FLOAT M10,
+    _In_ FLOAT M11,
+    _In_ FLOAT M12,
+    _In_ FLOAT M13,
+    _In_ FLOAT M20,
+    _In_ FLOAT M21,
+    _In_ FLOAT M22,
+    _In_ FLOAT M23,
+    _In_ FLOAT M30,
+    _In_ FLOAT M31,
+    _In_ FLOAT M32,
+    _In_ FLOAT M33
     )
 {
     MATRIX TemporaryInverse;
@@ -361,10 +361,10 @@ MatrixInitialize(
     return ISTATUS_SUCCESS;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeIdentity(
-    __out PINVERTIBLE_MATRIX Matrix
+    _Out_ PINVERTIBLE_MATRIX Matrix
     )
 {
     ASSERT(Matrix != NULL);
@@ -375,13 +375,13 @@ MatrixInitializeIdentity(
     return ISTATUS_SUCCESS;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeTranslation(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     )
 {
     ASSERT(Matrix != NULL);
@@ -433,13 +433,13 @@ MatrixInitializeTranslation(
     return ISTATUS_SUCCESS;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeScalar(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     )
 {
     ASSERT(Matrix != NULL);
@@ -496,12 +496,12 @@ MatrixInitializeScalar(
     return ISTATUS_SUCCESS;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixpInitializeRotation(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Theta,
-    __in PVECTOR3 Axis
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Theta,
+    _In_ PVECTOR3 Axis
     )
 {
     VECTOR3 NormalizedAxis;
@@ -568,14 +568,14 @@ MatrixpInitializeRotation(
     return Status;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeRotation(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Theta,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Theta,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     )
 {
     VECTOR3 Axis;
@@ -595,16 +595,16 @@ MatrixInitializeRotation(
     return MatrixpInitializeRotation(Matrix, Theta, &Axis);
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeFrustum(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Left,
-    __in FLOAT Right,
-    __in FLOAT Bottom,
-    __in FLOAT Top,
-    __in FLOAT Near,
-    __in FLOAT Far
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Left,
+    _In_ FLOAT Right,
+    _In_ FLOAT Bottom,
+    _In_ FLOAT Top,
+    _In_ FLOAT Near,
+    _In_ FLOAT Far
     )
 {
     ISTATUS Status;
@@ -651,16 +651,16 @@ MatrixInitializeFrustum(
     return Status;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixInitializeOrothographic(
-    __out PINVERTIBLE_MATRIX Matrix,
-    __in FLOAT Left,
-    __in FLOAT Right,
-    __in FLOAT Bottom,
-    __in FLOAT Top,
-    __in FLOAT Near,
-    __in FLOAT Far
+    _Out_ PINVERTIBLE_MATRIX Matrix,
+    _In_ FLOAT Left,
+    _In_ FLOAT Right,
+    _In_ FLOAT Bottom,
+    _In_ FLOAT Top,
+    _In_ FLOAT Near,
+    _In_ FLOAT Far
     )
 {
     ISTATUS Status;
@@ -708,12 +708,12 @@ MatrixInitializeOrothographic(
     return Status;
 }
 
-__success(return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixMultiply(
-    __in PINVERTIBLE_MATRIX Multiplicand0,
-    __in PINVERTIBLE_MATRIX Multiplicand1,
-    __out PINVERTIBLE_MATRIX Product
+    _In_ PINVERTIBLE_MATRIX Multiplicand0,
+    _In_ PINVERTIBLE_MATRIX Multiplicand1,
+    _Out_ PINVERTIBLE_MATRIX Product
     )
 {
     ISTATUS Status;

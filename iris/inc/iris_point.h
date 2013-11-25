@@ -34,10 +34,10 @@ typedef struct _POINT3 {
 SFORCEINLINE
 VOID
 PointInitialize(
-    __out PPOINT3 Point,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z
+    _Out_ PPOINT3 Point,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z
     )
 {
     ASSERT(Point != NULL);
@@ -56,11 +56,11 @@ PointInitialize(
 SFORCEINLINE
 VOID
 PointInitializeScaled(
-    __out PPOINT3 Point,
-    __in FLOAT X,
-    __in FLOAT Y,
-    __in FLOAT Z,
-    __in FLOAT W
+    _Out_ PPOINT3 Point,
+    _In_ FLOAT X,
+    _In_ FLOAT Y,
+    _In_ FLOAT Z,
+    _In_ FLOAT W
     )
 {
     FLOAT Scalar;
@@ -84,9 +84,9 @@ PointInitializeScaled(
 SFORCEINLINE
 VOID
 PointSubtract(
-    __in PPOINT3 Minuend,
-    __in PPOINT3 Subtrahend,
-    __out PVECTOR3 Difference
+    _In_ PPOINT3 Minuend,
+    _In_ PPOINT3 Subtrahend,
+    _Out_ PVECTOR3 Difference
     )
 {
     FLOAT X;
@@ -107,9 +107,9 @@ PointSubtract(
 SFORCEINLINE
 VOID
 PointVectorSubtract(
-    __in PPOINT3 Minuend,
-    __in PVECTOR3 Subtrahend,
-    __out PPOINT3 Difference
+    _In_ PPOINT3 Minuend,
+    _In_ PVECTOR3 Subtrahend,
+    _Out_ PPOINT3 Difference
     )
 {
     FLOAT X;
@@ -130,9 +130,9 @@ PointVectorSubtract(
 SFORCEINLINE
 VOID
 PointVectorAdd(
-    __in PPOINT3 Addend0,
-    __in PVECTOR3 Addend1,
-    __out PPOINT3 Sum
+    _In_ PPOINT3 Addend0,
+    _In_ PVECTOR3 Addend1,
+    _Out_ PPOINT3 Sum
     )
 {
     FLOAT X;
@@ -153,9 +153,9 @@ PointVectorAdd(
 SFORCEINLINE
 VOID
 PointMatrixMultiply(
-    __in PMATRIX Matrix,
-    __in PPOINT3 Point,
-    __out PPOINT3 Product
+    _In_ PMATRIX Matrix,
+    _In_ PPOINT3 Point,
+    _Out_ PPOINT3 Product
     )
 {
     FLOAT X;

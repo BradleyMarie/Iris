@@ -8,15 +8,15 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the types used by Iris. This module 
+    This file contains the definitions for the types used by Iris. This module
     should only be needed when compiling for non-Windows systems.
 
-    N.B. The on non-Windows systems, Iris uses the C boolean type, for its  
+    N.B. The on non-Windows systems, Iris uses the C boolean type, for its
          BOOL type.
 
 --*/
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 #include <windows.h>
 
@@ -38,7 +38,7 @@ typedef uint16_t UINT16;
 typedef UINT16 *PUINT16;
 
 typedef uint32_t UINT32;
-typedef UINT32 *PINT32;
+typedef UINT32 *PUINT32;
 
 typedef uint64_t UINT64;
 typedef UINT64 *PUINT64;
@@ -69,4 +69,4 @@ typedef BOOL *PBOOL;
 
 #endif // _TYPES_IRIS_
 
-#endif // WIN32
+#endif // _MSC_VER

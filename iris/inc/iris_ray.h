@@ -34,9 +34,9 @@ typedef struct _RAY {
 SFORCEINLINE
 VOID
 RayInitialize(
-    __out PRAY Ray,
-    __in PPOINT3 Origin,
-    __in PVECTOR3 Direction
+    _Out_ PRAY Ray,
+    _In_ PPOINT3 Origin,
+    _In_ PVECTOR3 Direction
     )
 {
     ASSERT(Ray != NULL);
@@ -45,14 +45,15 @@ RayInitialize(
 
     Ray->Origin = *Origin;
     Ray->Direction = *Direction;
+	Ray->Time = (FLOAT)0.0;
 }
 
 SFORCEINLINE
 VOID
 RayEndpoint(
-    __in PRAY Ray,
-    __in FLOAT Distance,
-    __out PPOINT3 Endpoint
+    _In_ PRAY Ray,
+    _In_ FLOAT Distance,
+    _Out_ PPOINT3 Endpoint
     )
 {
     VECTOR3 Vector;
@@ -70,9 +71,9 @@ RayEndpoint(
 SFORCEINLINE
 VOID
 RayMatrixMultiply(
-	__in PMATRIX Multiplicand0,
-    __in PRAY Multiplicand1,
-    __out PRAY Product
+	_In_ PMATRIX Multiplicand0,
+    _In_ PRAY Multiplicand1,
+    _Out_ PRAY Product
     )
 {
     ASSERT(Multiplicand0 != NULL);
