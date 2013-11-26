@@ -29,5 +29,7 @@ Abstract:
 #include "iris_point.h"
 #include "iris_ray.h"
 #include "iris_shapehitlist.h"
+#include "iris_geometry.h"
+#include "iris_shape.h"
 
 #endif // _IRIS_HEADER_
