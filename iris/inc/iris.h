@@ -22,7 +22,6 @@ Abstract:
 #include "iris_assert.h"
 #include "iris_types.h"
 #include "iris_error.h"
-#include "iris_free.h"
 #include "iris_math.h"
 #include "iris_matrix.h"
 #include "iris_vector.h"

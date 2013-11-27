@@ -19,10 +19,37 @@ ISTATUS
 ModelGeometryCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _In_ PVOID GeometryHitList,
+    _Out_ PGEOMETRY_HIT GeometryHit,
     _Inout_ PSHAPE_HIT_LIST ShapeHitList
     )
 {
+    PMODEL_GEOMETRY ModelGeometry;
+    SIZE_T InitialListSize;
+    ISTATUS Status;
+    RAY ModelRay;
+
+    ASSERT(Context != NULL);
+    ASSERT(Ray != NULL);
+    ASSERT(GeometryHit != NULL);
+    ASSERT(ShapeHitList != NULL);
+
+    ModelGeometry = (PMODEL_GEOMETRY) Context;
+
+    InitialListSize = ShapeHitList->ListSize;
+    
+    RayMatrixMultiply(ModelGeometry->WorldToModel, Ray, &ModelRay);
+
+    Status = ModelGeometry->Shape->VTable->TraceRoutine(Context,
+                                                        &ModelRay,
+                                                        ShapeHitList);
+
+	if (InitialListSize != ShapeHitList->ListSize)
+    {
+        GeometryHitSetModel(GeometryHit,
+                            ModelGeometry->WorldToModel->Inverse,
+                            &ModelRay);
+    }
+
     return ISTATUS_SUCCESS;
 }
 

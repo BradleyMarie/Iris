@@ -31,8 +31,8 @@ ShapeHitListAdd(
     _Inout_ PSHAPE_HIT_LIST ShapeHitList,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_opt_(AdditionalDataSize) PVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSize
+    _In_ SIZE_T AdditionalDataSize,
+    _Outptr_opt_result_bytebuffer_(AdditionalDataSize) PVOID *AdditionalData
     )
 {
     PSHAPE_HIT NextHit;
@@ -84,8 +84,13 @@ ShapeHitListAdd(
     Status = ShapeHitSet(NextHit,
                          Distance,
                          FaceHit,
-                         AdditionalData,
-                         AdditionalDataSize);
+                         AdditionalDataSize,
+                         AdditionalData);
+
+    if (Status == ISTATUS_SUCCESS)
+    {
+        ShapeHitList->ListSize++;
+    }
 
     return Status;
 }

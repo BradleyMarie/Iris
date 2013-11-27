@@ -65,8 +65,8 @@ ShapeHitSet(
     _Inout_ PSHAPE_HIT ShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_opt_(AdditionalDataSize) PVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSize
+    _In_ SIZE_T AdditionalDataSize,
+    _Outptr_opt_result_bytebuffer_(AdditionalDataSize) PVOID *AdditionalData
     )
 {
     PVOID NewBuffer;
@@ -93,7 +93,7 @@ ShapeHitSet(
 
     if (AdditionalDataSize != 0)
     {
-        memcpy(ShapeHit->AdditionalData, AdditionalData, AdditionalDataSize);
+        *AdditionalData = ShapeHit->AdditionalData;
     }
 
     return ISTATUS_SUCCESS;

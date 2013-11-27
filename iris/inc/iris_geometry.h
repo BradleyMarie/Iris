@@ -12,14 +12,16 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SHAPE_
-#define _IRIS_SHAPE_
+#ifndef _IRIS_GEOMETRY_
+#define _IRIS_GEOMETRY_
 
 #include <iris.h>
 
 //
 // Types
 //
+
+typedef struct _SHAPE SHAPE, *PSHAPE;
 
 typedef struct _GEOMETRY_VTABLE {
     PVOID GeometryTraceRoutine;
@@ -59,4 +61,4 @@ GeometryInitializePremultipliedGeometry(
     _In_ PSHAPE Shape
     );
 
-#endif // _IRIS_SHAPE_
+#endif // _IRIS_GEOMETRY_

@@ -32,7 +32,7 @@ typedef struct _SHAPE_VTABLE {
 
 typedef struct _SHAPE {
     PSHAPE_VTABLE VTable;
-} SHAPE, *PSHAPE;
+};
 
 //
 // Function definitions

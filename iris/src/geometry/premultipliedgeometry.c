@@ -19,10 +19,33 @@ ISTATUS
 PremultipliedGeometryCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _In_ PVOID GeometryHitList,
+    _Out_ PGEOMETRY_HIT GeometryHit,
     _Inout_ PSHAPE_HIT_LIST ShapeHitList
     )
 {
+    PPREMULTIPLIED_GEOMETRY PremultipliedGeometry;
+    SIZE_T InitialListSize;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(Ray != NULL);
+    ASSERT(GeometryHit != NULL);
+    ASSERT(ShapeHitList != NULL);
+
+    PremultipliedGeometry = (PPREMULTIPLIED_GEOMETRY) Context;
+
+    InitialListSize = ShapeHitList->ListSize;
+
+    Status = PremultipliedGeometry->Shape->VTable->TraceRoutine(Context,
+                                                                Ray,
+                                                                ShapeHitList);
+
+	if (InitialListSize != ShapeHitList->ListSize)
+    {
+		GeometryHitSetPremultiplied(GeometryHit, 
+                                    PremultipliedGeometry->ModelToWorld);
+    }
+
     return ISTATUS_SUCCESS;
 }
 
@@ -30,7 +53,7 @@ STATIC GEOMETRY_VTABLE PremultipliedVTable = { PremultipliedGeometryCallback };
 
 VOID
 GeometryInitializePremultipliedGeometry(
-    _Out_ PREMULTIPLIED_GEOMETRY Geometry,
+    _Out_ PPREMULTIPLIED_GEOMETRY Geometry,
     _In_ PMATRIX ModelToWorld,
     _In_ PSHAPE Shape
     )

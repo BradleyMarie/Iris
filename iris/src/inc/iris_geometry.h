@@ -23,7 +23,7 @@ Abstract:
 
 typedef ISTATUS (*PGEOMTRACE_ROUTINE)(_In_ PVOID Context, 
                                       _In_ PRAY Ray,
-                                      _In_ PVOID GeometryHitList,
+                                      _Out_ PGEOMETRY_HIT GeometryHit,
                                       _Inout_ PSHAPE_HIT_LIST ShapeHitList);
 
 //
@@ -34,7 +34,7 @@ ISTATUS
 GeometryTraceShapeCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _In_ PVOID GeometryHitList,
+    _Out_ PVOID GeometryHitList,
     _Inout_ PSHAPE_HIT_LIST ShapeHitList
     );
 
@@ -47,7 +47,7 @@ ISTATUS
 GeometryTrace(
     _In_ PGEOMETRY Geometry,
     _In_ PRAY Ray,
-    _In_ PVOID GeometryHitList,
+    _Out_ PGEOMETRY_HIT GeometryHit,
     _Inout_ PSHAPE_HIT_LIST ShapeHitList
     )
 {
@@ -55,12 +55,12 @@ GeometryTrace(
 
     ASSERT(Geometry != NULL);
     ASSERT(Ray != NULL);
-    ASSERT(GeometryHitList != NULL);
+    ASSERT(GeometryHit != NULL);
     ASSERT(ShapeHitList != NULL);
 
     TraceRoutine = Geometry->VTable->GeometryTraceRoutine;
 
-    return TraceRoutine(Geometry, Ray, GeometryHitList, ShapeHitList);
+    return TraceRoutine(Geometry, Ray, GeometryHit, ShapeHitList);
 }
 
 #endif // _IRIS_GEOMETRY_INTERNAL_
