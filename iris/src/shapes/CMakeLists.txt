@@ -1,3 +1,3 @@
 add_library(iris-shapes
-    shapehitlist.c
+    shapehitcollection.c
     shape.c)

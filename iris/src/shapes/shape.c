@@ -17,7 +17,7 @@ Abstract:
 VOID
 ShapeInitializeVTable(
     _Out_ PSHAPE_VTABLE VTable,
-    _In_ PTRACE_ROUTINE TraceRoutine
+    _In_ PSHAPE_TRACE_ROUTINE TraceRoutine
     )
 {
     VTable->GeometryRoutines.GeometryTraceRoutine = GeometryTraceShapeCallback;

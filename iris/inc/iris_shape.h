@@ -21,13 +21,19 @@ Abstract:
 // Types
 //
 
-typedef ISTATUS (*PTRACE_ROUTINE)(_In_ PVOID Context, 
-                                  _In_ PRAY Ray,
-                                  _Inout_ PSHAPE_HIT_LIST ShapeHitList);
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+(*PSHAPE_TRACE_ROUTINE)(
+    _In_ PVOID Context, 
+    _In_ PRAY Ray,
+    _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+    );
 
 typedef struct _SHAPE_VTABLE {
     GEOMETRY_VTABLE GeometryRoutines;
-    PTRACE_ROUTINE TraceRoutine;
+    PSHAPE_TRACE_ROUTINE TraceRoutine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 
 typedef struct _SHAPE {
@@ -41,7 +47,7 @@ typedef struct _SHAPE {
 VOID
 ShapeInitializeVTable(
     _Out_ PSHAPE_VTABLE VTable,
-    _In_ PTRACE_ROUTINE TraceRoutine
+    _In_ PSHAPE_TRACE_ROUTINE TraceRoutine
     );
 
 #endif // _IRIS_SHAPE_

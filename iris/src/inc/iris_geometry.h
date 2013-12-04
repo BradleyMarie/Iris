@@ -21,10 +21,16 @@ Abstract:
 // Types
 //
 
-typedef ISTATUS (*PGEOMTRACE_ROUTINE)(_In_ PVOID Context, 
-                                      _In_ PRAY Ray,
-                                      _Out_ PGEOMETRY_HIT GeometryHit,
-                                      _Inout_ PSHAPE_HIT_LIST ShapeHitList);
+typedef 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+(*PGEOMTRACE_ROUTINE)(
+	_In_ PVOID Context, 
+	_In_ PRAY Ray,
+	_Out_ PGEOMETRY_HIT GeometryHit,
+	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+	);
 
 //
 // Function declarations
@@ -35,7 +41,7 @@ GeometryTraceShapeCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
     _Out_ PVOID GeometryHitList,
-    _Inout_ PSHAPE_HIT_LIST ShapeHitList
+	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
     );
 
 //
@@ -48,7 +54,7 @@ GeometryTrace(
     _In_ PGEOMETRY Geometry,
     _In_ PRAY Ray,
     _Out_ PGEOMETRY_HIT GeometryHit,
-    _Inout_ PSHAPE_HIT_LIST ShapeHitList
+	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
     )
 {
     PGEOMTRACE_ROUTINE TraceRoutine;
@@ -56,11 +62,11 @@ GeometryTrace(
     ASSERT(Geometry != NULL);
     ASSERT(Ray != NULL);
     ASSERT(GeometryHit != NULL);
-    ASSERT(ShapeHitList != NULL);
+	ASSERT(ShapeHitCollection != NULL);
 
     TraceRoutine = Geometry->VTable->GeometryTraceRoutine;
 
-    return TraceRoutine(Geometry, Ray, GeometryHit, ShapeHitList);
+	return TraceRoutine(Geometry, Ray, GeometryHit, ShapeHitCollection);
 }
 
 #endif // _IRIS_GEOMETRY_INTERNAL_

@@ -20,31 +20,13 @@ PremultipliedGeometryCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
     _Out_ PGEOMETRY_HIT GeometryHit,
-    _Inout_ PSHAPE_HIT_LIST ShapeHitList
+	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
     )
 {
-    PPREMULTIPLIED_GEOMETRY PremultipliedGeometry;
-    SIZE_T InitialListSize;
-    ISTATUS Status;
-
     ASSERT(Context != NULL);
     ASSERT(Ray != NULL);
     ASSERT(GeometryHit != NULL);
-    ASSERT(ShapeHitList != NULL);
-
-    PremultipliedGeometry = (PPREMULTIPLIED_GEOMETRY) Context;
-
-    InitialListSize = ShapeHitList->ListSize;
-
-    Status = PremultipliedGeometry->Shape->VTable->TraceRoutine(Context,
-                                                                Ray,
-                                                                ShapeHitList);
-
-	if (InitialListSize != ShapeHitList->ListSize)
-    {
-		GeometryHitSetPremultiplied(GeometryHit, 
-                                    PremultipliedGeometry->ModelToWorld);
-    }
+	ASSERT(ShapeHitCollection != NULL);
 
     return ISTATUS_SUCCESS;
 }
