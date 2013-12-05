@@ -30,7 +30,17 @@ Abstract:
 #define SinFloat(number) sinf(number)
 #define IsNaNFloat(number) isnan(number)
 #define IsInfFloat(number) isinf(number)
+
+#if __STDC_VERSION__ >= 199901L
+
 #define IsNormalFloat(number) isnormal(number)
 #define IsFiniteFloat(number) isfinite(number)
+
+#else
+
+#define IsNormalFloat(number) TRUE
+#define IsFiniteFloat(number) TRUE
+
+#endif
 
 #endif // _MATH_IRIS_

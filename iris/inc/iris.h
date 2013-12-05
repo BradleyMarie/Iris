@@ -31,5 +31,6 @@ Abstract:
 #include "iris_shapehitcollection.h"
 #include "iris_geometry.h"
 #include "iris_shape.h"
+#include "iris_geometryhit.h"
 
 #endif // _IRIS_HEADER_

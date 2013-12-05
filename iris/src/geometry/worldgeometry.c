@@ -18,13 +18,11 @@ ISTATUS
 GeometryTraceShapeCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _Out_ PGEOMETRY_HIT GeometryHit,
 	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
     )
 {
     ASSERT(Context != NULL);
     ASSERT(Ray != NULL);
-    ASSERT(GeometryHit != NULL);
 	ASSERT(ShapeHitCollection != NULL);
 
     return ISTATUS_SUCCESS;

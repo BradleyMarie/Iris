@@ -70,6 +70,7 @@ IrisMemoryAllocatorAllocate(
 {
     PIRIS_MEMORY_ALLOCATION IrisAllocation;
     PVOID ResizedAllocation;
+	PVOID Allocation;
 
     ASSERT(Allocator != NULL);
 
@@ -101,12 +102,14 @@ IrisMemoryAllocatorAllocate(
     }
     else
     {
-		IrisAllocation = malloc(sizeof(IRIS_MEMORY_ALLOCATION)+ SizeInBytes);
+		Allocation = malloc(sizeof(IRIS_MEMORY_ALLOCATION)+ SizeInBytes);
 
-        if (ResizedAllocation == NULL)
+        if (Allocation == NULL)
         {
             return NULL;
         }
+
+		IrisAllocation = (PIRIS_MEMORY_ALLOCATION) Allocation;
 
         Allocator->AllocationListTail->NewerAllocation = IrisAllocation;
         IrisAllocation->OlderAllocation = Allocator->AllocationListTail;

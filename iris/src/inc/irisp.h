@@ -18,8 +18,8 @@ Abstract:
 #include <iris.h>
 
 #include "iris_allocator.h"
-#include "iris_shapehitcollection.h"
 #include "iris_geometryhit.h"
+#include "iris_shapehitcollection.h"
 #include "iris_geometry.h"
 
 #endif // _IRIS_INTERNAL_HEADER_

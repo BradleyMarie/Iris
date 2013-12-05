@@ -24,11 +24,11 @@ Abstract:
 typedef UINT8 GEOMETRY_TYPE;
 typedef GEOMETRY_TYPE *PGEOMETRY_TYPE;
 
-typedef struct _GEOMETRY_HIT {
+struct _SHARED_GEOMETRY_HIT {
     GEOMETRY_TYPE Type;
     PMATRIX ModelToWorld;
     RAY ModelRay;
-} GEOMETRY_HIT, *PGEOMETRY_HIT;
+};
 
 //
 // Defines
@@ -44,8 +44,8 @@ typedef struct _GEOMETRY_HIT {
 
 SFORCEINLINE
 VOID
-GeometryHitSetWorld(
-    _Out_ PGEOMETRY_HIT GeometryHit
+SharedGeometryHitSetWorld(
+    _Out_ PSHARED_GEOMETRY_HIT GeometryHit
     )
 {
     ASSERT(GeometryHit != NULL);
@@ -55,8 +55,8 @@ GeometryHitSetWorld(
 
 SFORCEINLINE
 VOID
-GeometryHitSetPremultiplied(
-    _Out_ PGEOMETRY_HIT GeometryHit,
+SharedGeometryHitSetPremultiplied(
+    _Out_ PSHARED_GEOMETRY_HIT GeometryHit,
     _In_ PMATRIX ModelToWorld
     )
 {
@@ -69,8 +69,8 @@ GeometryHitSetPremultiplied(
 
 SFORCEINLINE
 VOID
-GeometryHitSetModel(
-    _Out_ PGEOMETRY_HIT GeometryHit,
+SharedGeometryHitSetModel(
+    _Out_ PSHARED_GEOMETRY_HIT GeometryHit,
     _In_ PMATRIX ModelToWorld,
     _In_ PRAY ModelRay
     )

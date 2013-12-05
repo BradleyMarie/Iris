@@ -26,7 +26,11 @@ extern SHAPE_HIT_COLLECTION_VTABLE InternalShapeHitCollectionVTable;
 typedef struct _SHAPE_HIT_COLLECTION_INTERNAL {
     PSHAPE_HIT_COLLECTION_VTABLE VTable;
     IRIS_MEMORY_ALLOCATOR Allocator; 
-    PSHAPE_HIT *ShapeHitList;
+    _Field_size_(GeometryListCapacity) PSHARED_GEOMETRY_HIT GeometryHitList;
+    SIZE_T GeometryListCapacity;
+    SIZE_T GeometryListSize;
+    BOOL GeometryAllocationNeeded;
+    _Field_size_(ListCapacity) PSHAPE_HIT *ShapeHitList;
     SIZE_T ListCapacity;
     SIZE_T ListSize;
 } SHAPE_HIT_COLLECTION_INTERNAL, *PSHAPE_HIT_COLLECTION_INTERNAL;
@@ -48,9 +52,26 @@ ShapeHitCollectionDestroy(
     _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     )
 {
-	ASSERT(ShapeHitCollection != NULL);
+    ASSERT(ShapeHitCollection != NULL);
 
     IrisMemoryAllocatorDestroy(&ShapeHitCollection->Allocator);
+}
+
+SFORCEINLINE
+PSHARED_GEOMETRY_HIT
+ShapeHitCollectionNextGeometryHit(
+    _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
+    )
+{
+    PSHARED_GEOMETRY_HIT GeometryHitList;
+
+    ASSERT(ShapeHitCollection != NULL);
+
+    ShapeHitCollection->GeometryAllocationNeeded = TRUE;
+
+    GeometryHitList = ShapeHitCollection->GeometryHitList;
+
+    return GeometryHitList + ShapeHitCollection->GeometryListSize;
 }
 
 SFORCEINLINE
