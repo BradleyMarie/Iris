@@ -18,12 +18,26 @@ ISTATUS
 GeometryTraceShapeCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-	_Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+    _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     )
 {
+    PSHARED_GEOMETRY_HIT GeometryHit;
+    ISTATUS Status;
+    PSHAPE Shape;
+
     ASSERT(Context != NULL);
     ASSERT(Ray != NULL);
-	ASSERT(ShapeHitCollection != NULL);
+    ASSERT(ShapeHitCollection != NULL);
 
-    return ISTATUS_SUCCESS;
+    Shape = (PSHAPE) Context;
+
+    GeometryHit = ShapeHitCollectionNextGeometryHit(ShapeHitCollection);
+
+    GeometryHit->Type = GEOMETRY_TYPE_WORLD;
+
+    Status = ShapeTraceShape(Shape, 
+                             Ray, 
+                             (PSHAPE_HIT_COLLECTION) ShapeHitCollection);
+
+    return Status;
 }

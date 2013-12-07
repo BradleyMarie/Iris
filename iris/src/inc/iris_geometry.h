@@ -28,7 +28,7 @@ ISTATUS
 (*PGEOMETRY_TRACE_ROUTINE)(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+    _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     );
 
 //
@@ -39,7 +39,7 @@ ISTATUS
 GeometryTraceShapeCallback(
     _In_ PVOID Context, 
     _In_ PRAY Ray,
-    _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+    _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     );
 
 //
@@ -51,7 +51,7 @@ ISTATUS
 GeometryTrace(
     _In_ PGEOMETRY Geometry,
     _In_ PRAY Ray,
-    _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection
+    _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     )
 {
     PGEOMETRY_TRACE_ROUTINE TraceRoutine;

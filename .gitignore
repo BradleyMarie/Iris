@@ -30,6 +30,7 @@ CMakeCache.txt
 *.lastbuildstate
 *.sdf
 *.suo
+*.cache
 
 # Log files
 *.tlog
