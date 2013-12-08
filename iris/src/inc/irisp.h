@@ -17,7 +17,9 @@ Abstract:
 
 #include <iris.h>
 
-#include "iris_allocator.h"
+#include "iris_pointerlist.h"
+#include "iris_dynamicallocator.h"
+#include "iris_staticallocator.h"
 #include "iris_geometryhit.h"
 #include "iris_shapehitcollection.h"
 #include "iris_shape.h"

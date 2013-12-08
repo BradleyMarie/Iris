@@ -14,142 +14,77 @@ Abstract:
 
 #include <irisp.h>
 
-//
-// Defines
-//
-
-#define GEOMETRY_HIT_LIST_GROWTH_FACTOR 2
-#define GEOMETRY_HIT_LIST_INITIAL_SIZE 5 
-#define SHAPE_HIT_LIST_GROWTH_FACTOR 2
-#define SHAPE_HIT_LIST_INITIAL_SIZE 5
-
-//
-// Functions
-//
-
 _Check_return_ 
 _Ret_maybenull_
 STATIC
 PSHAPE_HIT 
 ShapeHitCollectionAllocateHitInternal(
-    _In_ PVOID Context, 
+    _In_ PVOID Context,
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
     _In_ SIZE_T AdditionalDataSize
     )
 {
+    PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
     PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection;
     PGEOMETRY_HIT GeometryHit;
+    PSHAPE_HIT ShapeHit;
     SIZE_T AllocationSize;
     PVOID Allocation;
+    PVOID *Entry;
 
     ASSERT(Context != NULL);
+    ASSERT(IsNormalFloat(Distance));
+    ASSERT(IsFiniteFloat(Distance));
 
     ShapeHitCollection = (PSHAPE_HIT_COLLECTION_INTERNAL) Context;
+
+	ASSERT(ShapeHitCollection->CurrentGeometryHit != NULL);
 
     AllocationSize = sizeof(GEOMETRY_HIT) + AdditionalDataSize;
 
-    Allocation = IrisMemoryAllocatorAllocate(&ShapeHitCollection->Allocator,
-                                             AllocationSize);
+    GeometryHitAllocator = &ShapeHitCollection->GeometryHitAllocator;
+
+    Allocation = IrisStaticMemoryAllocatorAllocate(GeometryHitAllocator);
 
     GeometryHit = (PGEOMETRY_HIT) Allocation;
 
-    GeometryHit->SharedGeometryHit = ShapeHitCollection->GeometryHitList;
-    
-    GeometryHit->SharedGeometryHit += ShapeHitCollection->GeometryListSize;
+    GeometryHit->SharedGeometryHit = ShapeHitCollection->CurrentGeometryHit;
 
-    if (ShapeHitCollection->GeometryAllocationNeeded == FALSE)
+    if (AdditionalDataSize != 0)
     {
-        ASSERT(ShapeHitCollection->GeometryListSize > 0);
-        
-        GeometryHit->SharedGeometryHit -= 1;
+        AdditionalDataAllocator = &ShapeHitCollection->AdditionalDataAllocator;
+
+        Allocation = IrisDynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
+                                                        AdditionalDataSize);   
+    }
+    else
+    {
+        Allocation = NULL;
     }
 
-    return &GeometryHit->ShapeHit;
-}
+    ShapeHit = &GeometryHit->ShapeHit;
 
-_Check_return_ 
-_Success_(return == ISTATUS_SUCCESS) 
-STATIC
-ISTATUS 
-ShapeHitCollectionAddHitInternal(
-    _In_ PVOID Context, 
-    _In_ PSHAPE_HIT ShapeHit
-    )
-{
-    PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection;
-    PSHARED_GEOMETRY_HIT NewGeometryHitList;
-    SIZE_T NewGeometryHitCapacityInBytes;
-    SIZE_T NewGeometryHitCapacity;
-    PSHAPE_HIT *NewShapeHitList;
-    SIZE_T GeometryHitCapacity;
-    SIZE_T GeometryHitSize;
-    SIZE_T NewListCapacity;
-	PVOID Allocation;
+    ShapeHit->Distance = Distance;
+    ShapeHit->FaceHit = FaceHit;
+    ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSize;
+    ShapeHit->AdditionalData = Allocation;
 
-    ASSERT(Context != NULL);
-    ASSERT(ShapeHit != NULL);
+    Entry = IrisPointerListGetNextPointer(&ShapeHitCollection->GeometryHitList);
 
-    ShapeHitCollection = (PSHAPE_HIT_COLLECTION_INTERNAL) Context;
-
-    if (ShapeHitCollection->GeometryAllocationNeeded == TRUE)
+    if (Entry == NULL)
     {
-        GeometryHitCapacity = ShapeHitCollection->GeometryListCapacity;
-        GeometryHitSize = ShapeHitCollection->GeometryListSize;
-
-        if (GeometryHitCapacity == GeometryHitSize)
-        {
-            NewGeometryHitCapacity = GeometryHitCapacity *
-                                     GEOMETRY_HIT_LIST_GROWTH_FACTOR;
-
-            NewGeometryHitList = ShapeHitCollection->GeometryHitList;
-
-            NewGeometryHitCapacityInBytes = NewGeometryHitCapacity * 
-                                            sizeof(SHARED_GEOMETRY_HIT);
-
-            Allocation = realloc(NewGeometryHitList,
-                                 NewGeometryHitCapacityInBytes);
-
-            if (Allocation == NULL)
-            {
-                return ISTATUS_ALLOCATION_FAILED;
-            }
-
-			NewGeometryHitList = (PSHARED_GEOMETRY_HIT) Allocation;
-
-            ShapeHitCollection->GeometryHitList = NewGeometryHitList;
-            ShapeHitCollection->GeometryListCapacity = NewGeometryHitCapacity;
-        }
-
-        ShapeHitCollection->GeometryAllocationNeeded = FALSE;
-        GeometryHitSize++;
+        return NULL;
     }
 
-    if (ShapeHitCollection->ListSize == ShapeHitCollection->ListCapacity)
-    {
-        NewListCapacity = ShapeHitCollection->ListCapacity *
-                          SHAPE_HIT_LIST_GROWTH_FACTOR;
+    *Entry = (PVOID) GeometryHit;
 
-        Allocation = realloc(ShapeHitCollection->ShapeHitList,
-                             NewListCapacity * sizeof(PSHAPE_HIT));
-
-        if (Allocation == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-		NewShapeHitList = (PSHAPE_HIT*) Allocation;
-
-        ShapeHitCollection->ShapeHitList = NewShapeHitList;
-        ShapeHitCollection->ListCapacity = NewListCapacity;
-    }
-
-    ShapeHitCollection->ShapeHitList[ShapeHitCollection->ListSize] = ShapeHit;
-
-    return ISTATUS_SUCCESS;
+    return ShapeHit;
 }
 
 STATIC SHAPE_HIT_COLLECTION_VTABLE InternalShapeHitCollectionVTable = {
-    ShapeHitCollectionAllocateHitInternal,
-    ShapeHitCollectionAddHitInternal
+    ShapeHitCollectionAllocateHitInternal
 };
 
 _Check_return_
@@ -159,50 +94,36 @@ ShapeHitCollectionInitialize(
     _Out_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     )
 {
-    SIZE_T GeometryInitialListSizeInBytes;
-    PSHARED_GEOMETRY_HIT GeometryHits;
-    SIZE_T InitialListSizeInBytes;
-    PSHAPE_HIT *ShapeHitList;
-	PVOID Allocation;
+    PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    ISTATUS Status;
 
     ASSERT(ShapeHitCollection != NULL);
 
-    InitialListSizeInBytes = sizeof(PSHAPE_HIT) * 
-                             SHAPE_HIT_LIST_INITIAL_SIZE;
+    Status = IrisPointerListInitialize(&ShapeHitCollection->GeometryHitList);
 
-    Allocation = malloc(InitialListSizeInBytes);
-
-    if (Allocation == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
     }
 
-	ShapeHitList = (PSHAPE_HIT*) Allocation;
+    GeometryHitAllocator = &ShapeHitCollection->GeometryHitAllocator;
 
-    GeometryInitialListSizeInBytes = sizeof(SHARED_GEOMETRY_HIT) * 
-                                     GEOMETRY_HIT_LIST_INITIAL_SIZE;
+    Status = IrisStaticMemoryAllocatorInitialize(GeometryHitAllocator,
+                                                 sizeof(GEOMETRY_HIT));
 
-    Allocation = malloc(GeometryInitialListSizeInBytes);
-
-    if (Allocation == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
-        free(ShapeHitList);
-        return ISTATUS_ALLOCATION_FAILED;
+        IrisPointerListDestroy(&ShapeHitCollection->GeometryHitList);
+        return Status;
     }
 
-	GeometryHits = (PSHARED_GEOMETRY_HIT) Allocation;
+    AdditionalDataAllocator = &ShapeHitCollection->AdditionalDataAllocator;
 
-    ShapeHitCollection->ShapeHitList = ShapeHitList;
-    ShapeHitCollection->ListCapacity = SHAPE_HIT_LIST_INITIAL_SIZE;
-    ShapeHitCollection->ListSize = 0;
-    ShapeHitCollection->GeometryHitList = GeometryHits;
-    ShapeHitCollection->GeometryListCapacity = GEOMETRY_HIT_LIST_INITIAL_SIZE;
-    ShapeHitCollection->GeometryListSize = 0;
-    ShapeHitCollection->GeometryAllocationNeeded = FALSE;
+    IrisDynamicMemoryAllocatorInitialize(AdditionalDataAllocator);
 
-    IrisMemoryAllocatorInitialize(&ShapeHitCollection->Allocator);
-
-    ShapeHitCollection->VTable = &InternalShapeHitCollectionVTable;
+    ShapeHitCollection->CurrentGeometryHit = NULL;
+    ShapeHitCollection->VTable = &InternalShapeHitCollectionVTable;    
 
 	return ISTATUS_SUCCESS;
 }

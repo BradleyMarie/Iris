@@ -22,26 +22,11 @@ PremultipliedGeometryCallback(
     _Inout_ PSHAPE_HIT_COLLECTION_INTERNAL ShapeHitCollection
     )
 {
-    PSHARED_GEOMETRY_HIT GeometryHit;
-    PPREMULTIPLIED_GEOMETRY Geometry;
-    ISTATUS Status;
+	ASSERT(Context != NULL);
+	ASSERT(Ray != NULL);
+	ASSERT(ShapeHitCollection != NULL);
 
-    ASSERT(Context != NULL);
-    ASSERT(Ray != NULL);
-    ASSERT(ShapeHitCollection != NULL);
-
-    Geometry = (PPREMULTIPLIED_GEOMETRY) Context;
-
-    GeometryHit = ShapeHitCollectionNextGeometryHit(ShapeHitCollection);
-
-    GeometryHit->ModelToWorld = Geometry->ModelToWorld;
-    GeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
-
-    Status = ShapeTraceShape(Geometry->Shape, 
-                             Ray, 
-                             (PSHAPE_HIT_COLLECTION) ShapeHitCollection);
-
-    return Status;
+	return ISTATUS_SUCCESS;
 }
 
 STATIC GEOMETRY_VTABLE PremultipliedVTable = { PremultipliedGeometryCallback };

@@ -25,22 +25,14 @@ typedef
 _Check_return_ 
 _Ret_maybenull_ 
 PSHAPE_HIT 
-(*SHAPE_HIT_COLLECTION_ALLOCATE_HIT)(
+(*SHAPE_HIT_COLLECTION_ADD_HIT)(
     _In_ PVOID Context, 
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
     _In_ SIZE_T AdditionalDataSize
     );
 
-typedef 
-_Check_return_ 
-_Success_(return == ISTATUS_SUCCESS) 
-ISTATUS 
-(*SHAPE_HIT_COLLECTION_ADD_HIT)(
-    _In_ PVOID Context, 
-    _In_ PSHAPE_HIT ShapeHit
-    );
-
 typedef struct _SHAPE_HIT_COLLECTION_VTABLE {
-    SHAPE_HIT_COLLECTION_ALLOCATE_HIT AllocateHitRoutine;
     SHAPE_HIT_COLLECTION_ADD_HIT AddHitRoutine;
 } SHAPE_HIT_COLLECTION_VTABLE, *PSHAPE_HIT_COLLECTION_VTABLE;
 
@@ -48,43 +40,33 @@ typedef struct _SHAPE_HIT_COLLECTION {
     PSHAPE_HIT_COLLECTION_VTABLE VTable;
 } SHAPE_HIT_COLLECTION, *PSHAPE_HIT_COLLECTION;
 
+//
+// Functions
+//
+
 _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
 PSHAPE_HIT
-ShapeHitCollectionAllocateHit(
+ShapeHitCollectionAddHit(
     _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection,
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
     _In_ SIZE_T AdditionalDataSize
     )
 {
     PSHAPE_HIT Hit;
 
     ASSERT(ShapeHitCollection != NULL);
+    ASSERT(IsNormalFloat(Distance));
+    ASSERT(IsFiniteFloat(Distance));
 
-    Hit = ShapeHitCollection->VTable->AllocateHitRoutine(ShapeHitCollection, 
-                                                         AdditionalDataSize);
+    Hit = ShapeHitCollection->VTable->AddHitRoutine(ShapeHitCollection,
+                                                    Distance,
+                                                    FaceHit,
+                                                    AdditionalDataSize);
 
     return Hit;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS
-ShapeHitCollectionAddHit(
-    _Inout_ PSHAPE_HIT_COLLECTION ShapeHitCollection,
-    _In_ PSHAPE_HIT ShapeHit
-    )
-{
-    ISTATUS Status;
-
-    ASSERT(ShapeHitCollection != NULL);
-    ASSERT(ShapeHit != NULL);
-
-    Status = ShapeHitCollection->VTable->AddHitRoutine(ShapeHitCollection, 
-                                                       ShapeHit);
-
-    return Status;
 }
 
 #endif // _IRIS_SHAPE_HIT_COLLECTION_
