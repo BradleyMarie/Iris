@@ -15,13 +15,20 @@ Abstract:
 #ifndef _IRIS_GEOMETRY_HIT_
 #define _IRIS_GEOMETRY_HIT_
 
+//
+// Types
+//
+
 typedef struct _SHARED_GEOMETRY_HIT SHARED_GEOMETRY_HIT, *PSHARED_GEOMETRY_HIT;
 
-_Struct_size_bytes_(sizeof(GEOMETRY_HIT) + ShapeHitData.AdditionalSizeInBytes)
 typedef struct _GEOMETRY_HIT {
     PSHARED_GEOMETRY_HIT SharedGeometryHit;
     SHAPE_HIT ShapeHit;
 } GEOMETRY_HIT, *PGEOMETRY_HIT;
+
+//
+// Functions
+//
 
 VOID
 GeometryHitComputeModelViewer(

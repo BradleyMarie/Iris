@@ -45,6 +45,7 @@ Abstract:
 #define _Out_writes_(size)
 
 #define _Outptr_result_buffer_(size)
+#define _Outptr_result_maybenull_
 #define _Outptr_opt_result_bytebuffer_(size)
 #define _Outptr_opt_result_bytebuffer_maybenull_(size)
 

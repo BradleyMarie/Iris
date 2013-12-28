@@ -27,9 +27,7 @@ Abstract:
 #include "iris_vector.h"
 #include "iris_point.h"
 #include "iris_ray.h"
-#include "iris_shapehit.h"
-#include "iris_shapehitcollection.h"
-#include "iris_geometry.h"
+#include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_geometryhit.h"
 

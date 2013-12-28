@@ -21,8 +21,6 @@ Abstract:
 #include "iris_dynamicallocator.h"
 #include "iris_staticallocator.h"
 #include "iris_geometryhit.h"
-#include "iris_shapehitcollection.h"
-#include "iris_shape.h"
-#include "iris_geometry.h"
+#include "iris_shapehitallocator.h"
 
 #endif // _IRIS_INTERNAL_HEADER_
