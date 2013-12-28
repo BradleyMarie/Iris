@@ -75,35 +75,41 @@ IrisStaticMemoryAllocatorAllocate(
     _Inout_ PIRIS_STATIC_MEMORY_ALLOCATOR Allocator
     )
 {
-    PVOID *EntryPointer;
-    PVOID Entry;
+    SIZE_T PointerListSize;
+    PVOID Allocation;
+    ISTATUS Status;
 
     ASSERT(Allocator != NULL);
 
-    EntryPointer = IrisPointerListGetNextPointer(&Allocator->PointerList);
+    PointerListSize = IrisPointerListGetSize(&Allocator->PointerList);
 
-    if (EntryPointer == NULL)
+    if (Allocator->CurrentSize == PointerListSize)
     {
-        return NULL;
-    }
+        Allocation = malloc(Allocator->AllocationSize);
 
-    Entry = *EntryPointer;
-
-    if (Entry == NULL)
-    {
-        Entry = malloc(Allocator->AllocationSize);
-
-        if (Entry == NULL)
+        if (Allocation == NULL)
         {
             return NULL;
         }
 
-        *EntryPointer = Entry;
+        Status = IrisPointerListAddPointer(&Allocator->PointerList,
+                                           Allocation);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            free(Allocation);
+            return NULL;
+        }
+    }
+    else
+    {
+        Allocation = IrisPointerListRetrieveAtIndex(&Allocator->PointerList,
+                                                    Allocator->CurrentSize);
     }
 
     Allocator->CurrentSize++;
 
-    return Entry;
+    return Allocation;
 }
 
 SFORCEINLINE

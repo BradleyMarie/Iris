@@ -22,5 +22,9 @@ Abstract:
 #include "iris_staticallocator.h"
 #include "iris_geometryhit.h"
 #include "iris_shapehitallocator.h"
+#include "iris_sharedgeometryhitallocator.h"
+#include "iris_sceneobject.h"
+#include "iris_sceneobjecttracer.h"
+#include "iris_scene.h"
 
 #endif // _IRIS_INTERNAL_HEADER_

@@ -4,7 +4,7 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    iris_shapehitallocator.h
+    shapehitallocator.c
 
 Abstract:
 

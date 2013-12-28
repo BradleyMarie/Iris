@@ -22,8 +22,8 @@ Abstract:
 typedef struct _SHARED_GEOMETRY_HIT SHARED_GEOMETRY_HIT, *PSHARED_GEOMETRY_HIT;
 
 typedef struct _GEOMETRY_HIT {
-    PSHARED_GEOMETRY_HIT SharedGeometryHit;
     SHAPE_HIT ShapeHit;
+    PSHARED_GEOMETRY_HIT SharedGeometryHit;
 } GEOMETRY_HIT, *PGEOMETRY_HIT;
 
 //

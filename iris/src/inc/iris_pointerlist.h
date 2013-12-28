@@ -69,15 +69,15 @@ IrisPointerListInitialize(
 _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
-PVOID*
-IrisPointerListGetNextPointer(
-    _Inout_ PIRIS_POINTER_LIST PointerList
+ISTATUS
+IrisPointerListAddPointer(
+    _Inout_ PIRIS_POINTER_LIST PointerList,
+    _In_ PVOID Pointer
     )
 {
     SIZE_T NewCapacityInBytes;
     SIZE_T NewCapacity;
     PVOID *ResizedList;
-    SIZE_T Index;
 
     ASSERT(PointerList != NULL);
 
@@ -92,21 +92,16 @@ IrisPointerListGetNextPointer(
 
         if (ResizedList == NULL)
         {
-            return NULL;
-        }
-
-        for (Index = PointerList->PointerListSize; 
-             Index < NewCapacity;
-             Index++)
-        {
-            ResizedList[Index] = NULL;
+            return ISTATUS_ALLOCATION_FAILED;
         }
 
         PointerList->PointerList = ResizedList;
         PointerList->PointerListCapacity = NewCapacity;
     }
 
-    return PointerList->PointerList + PointerList->PointerListSize++;
+    PointerList->PointerList[PointerList->PointerListSize++] = Pointer;
+
+    return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
@@ -120,6 +115,17 @@ IrisPointerListRetrieveAtIndex(
     ASSERT(Index < PointerList->PointerListSize);
 
     return PointerList->PointerList[Index];
+}
+
+SFORCEINLINE
+PVOID*
+IrisPointerListGetStorage(
+    _Inout_ PIRIS_POINTER_LIST PointerList
+    )
+{
+    ASSERT(PointerList != NULL);
+
+    return PointerList->PointerList;
 }
 
 SFORCEINLINE
