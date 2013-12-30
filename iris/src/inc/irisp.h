@@ -26,5 +26,6 @@ Abstract:
 #include "iris_sceneobject.h"
 #include "iris_sceneobjecttracer.h"
 #include "iris_scene.h"
+#include "iris_raytracer.h"
 
 #endif // _IRIS_INTERNAL_HEADER_

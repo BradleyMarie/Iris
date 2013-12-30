@@ -1,2 +1,3 @@
 add_library(iris-scene
-    sceneobjecttracer.c)
+    sceneobjecttracer.c
+    sceneobject.c)

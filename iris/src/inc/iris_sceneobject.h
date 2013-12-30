@@ -40,7 +40,8 @@ SceneObjectTraceObject(
     _In_ PRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitList
+    _Outptr_result_maybenull_ PSHAPE_HIT *HitListBegin,
+    _Outptr_result_maybenull_ PSHAPE_HIT *HitListEnd
     )
 {
     PSHARED_GEOMETRY_HIT SharedGeometryHit;
@@ -53,7 +54,8 @@ SceneObjectTraceObject(
     ASSERT(WorldRay != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
-    ASSERT(HitList != NULL);
+    ASSERT(HitListBegin != NULL);
+    ASSERT(HitListEnd != NULL);
 
     SharedGeometryHit = SharedGeometryHitAllocatorAllocateHit(SharedGeometryHitAllocator);
 
@@ -88,28 +90,31 @@ SceneObjectTraceObject(
     Status = ShapeTraceShape(SceneObject->Shape,
                              TraceRay,
                              ShapeHitAllocator,
-                             HitList);
+                             HitListBegin);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (HitList == NULL)
+    if (HitListBegin == NULL)
     {
         SharedGeometryHitAllocatorFreeLastHit(SharedGeometryHitAllocator);
         return ISTATUS_SUCCESS;
     }
 
-    ShapeHit = *HitList;
+    ShapeHit = *HitListBegin;
+    *HitListEnd = NULL;
 
     while (ShapeHit != NULL)
     {
+        *HitListEnd = ShapeHit;
+
         GeometryHit = (PGEOMETRY_HIT) ShapeHit;
 
         GeometryHit->SharedGeometryHit = SharedGeometryHit;
 
-        ShapeHit = ShapeHit->FartherHit;
+        ShapeHit = ShapeHit->NextHit;
     }
 
     return ISTATUS_SUCCESS;

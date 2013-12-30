@@ -23,7 +23,8 @@ SceneObjectTracerTrace(
     _In_ PRAY WorldRay
     )
 {
-    PSHAPE_HIT ShapeHit;
+    PSHAPE_HIT HitListBegin;
+    PSHAPE_HIT HitListEnd;
     ISTATUS Status;
 
     ASSERT(Tracer != NULL);
@@ -33,21 +34,18 @@ SceneObjectTracerTrace(
                                     WorldRay,
                                     Tracer->ShapeHitAllocator,
                                     Tracer->SharedGeometryHitAllocator,
-                                    &ShapeHit);
+                                    &HitListBegin,
+                                    &HitListEnd);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    while (ShapeHit != NULL)
+    if (HitListBegin != NULL)
     {
-        Status = IrisPointerListAddPointer(Tracer->HitList, ShapeHit);
-
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
+        HitListEnd->NextHit = Tracer->HitList;
+        Tracer->HitList = HitListBegin;   
     }
 
     return ISTATUS_SUCCESS;

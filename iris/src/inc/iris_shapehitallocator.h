@@ -34,7 +34,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-ShapeHitCollectionInitialize(
+ShapeHitAllocatorInitialize(
     _Out_ PSHAPE_HIT_ALLOCATOR ShapeHitCollection
     )
 {

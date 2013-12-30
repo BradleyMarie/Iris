@@ -23,16 +23,18 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
 ISTATUS 
 SceneTraceScene(
     _In_ PSCENE Scene,
     _In_ PRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _Inout_ PIRIS_POINTER_LIST HitList
+    _Outptr_result_maybenull_ PSHAPE_HIT *HitList
     )
 {
     SCENE_OBJECT_TRACER Tracer;
+    ISTATUS Status;
 
     ASSERT(Scene != NULL);
     ASSERT(WorldRay != NULL);
@@ -42,10 +44,18 @@ SceneTraceScene(
 
     SceneObjectTracerInitialize(&Tracer,
                                 SharedGeometryHitAllocator,
-                                ShapeHitAllocator,
-                                HitList);
+                                ShapeHitAllocator);
 
-    return Scene->VTable->TraceRoutine(Scene, WorldRay, &Tracer);    
+    Status = Scene->VTable->TraceRoutine(Scene, WorldRay, &Tracer);  
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *HitList = SceneObjectTracerGetHitList(&Tracer);
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _SCENE_IRIS_INTERNAL_

@@ -26,7 +26,7 @@ typedef struct _SHAPE SHAPE, *PSHAPE;
 typedef struct _SHAPE_HIT_ALLOCATOR SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
 
 typedef struct _SHAPE_HIT {
-    struct _SHAPE_HIT *FartherHit;
+    struct _SHAPE_HIT *NextHit;
     PSHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
@@ -43,7 +43,7 @@ _Ret_maybenull_
 PSHAPE_HIT
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitCollection,
-    _In_ PSHAPE_HIT FartherHit,
+    _In_ PSHAPE_HIT NextHit,
     _In_ PSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,

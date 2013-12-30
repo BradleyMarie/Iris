@@ -19,7 +19,7 @@ _Ret_maybenull_
 PSHAPE_HIT
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PSHAPE_HIT FartherHit,
+    _In_ PSHAPE_HIT NextHit,
     _In_ PSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
@@ -64,6 +64,7 @@ ShapeHitAllocatorAllocate(
     ShapeHit = &GeometryHit->ShapeHit;
 
     ShapeHit->Distance = Distance;
+    ShapeHit->NextHit = NextHit;
     ShapeHit->FaceHit = FaceHit;
     ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSize;
     ShapeHit->AdditionalData = Allocation;

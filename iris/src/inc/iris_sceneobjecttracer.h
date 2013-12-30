@@ -24,7 +24,7 @@ Abstract:
 struct _SCENE_OBJECT_TRACER {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    PIRIS_POINTER_LIST HitList;
+    PSHAPE_HIT HitList;
 };
 
 //
@@ -36,18 +36,29 @@ VOID
 SceneObjectTracerInitialize(
     _Out_ PSCENE_OBJECT_TRACER Tracer,
     _In_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _In_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PIRIS_POINTER_LIST HitList
+    _In_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator
     )
 {
     ASSERT(Tracer != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
     ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(HitList != NULL);
 
     Tracer->SharedGeometryHitAllocator = SharedGeometryHitAllocator;
     Tracer->ShapeHitAllocator = ShapeHitAllocator;
-    Tracer->HitList = HitList;
+    Tracer->HitList = NULL;
+}
+
+_Check_return_
+_Ret_maybenull_
+SFORCEINLINE
+PSHAPE_HIT
+SceneObjectTracerGetHitList(
+    _In_ PSCENE_OBJECT_TRACER Tracer
+    )
+{
+    ASSERT(Tracer != NULL);
+
+    return Tracer->HitList;
 }
 
 #endif // _SCENE_OBJECT_TRACER_IRIS_INTERNAL_
