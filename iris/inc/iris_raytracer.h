@@ -42,7 +42,8 @@ RayTracerTraceScene(
     _In_ PRAY WorldRay,
     _In_ PSCENE Scene,
     _In_ BOOL SortResults,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitList 
+    _Outptr_result_buffer_(HitListSize) PGEOMETRY_HIT **HitList,
+    _Out_ PSIZE_T HitListSize
     );
 
 VOID

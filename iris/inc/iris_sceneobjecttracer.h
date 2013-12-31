@@ -30,7 +30,7 @@ typedef struct _SCENE_OBJECT_TRACER SCENE_OBJECT_TRACER, *PSCENE_OBJECT_TRACER;
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SceneObjectTracerTrace(
+SceneObjectTracerTraceObject(
     _Inout_ PSCENE_OBJECT_TRACER Tracer,
     _In_ PSCENE_OBJECT SceneObject,
     _In_ PRAY WorldRay

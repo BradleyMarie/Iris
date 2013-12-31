@@ -81,7 +81,7 @@ ShapeHitAllocatorDestroy(
 
 SFORCEINLINE
 VOID
-ShapeHitAllocatorClear(
+ShapeHitAllocatorFreeAll(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator
     )
 {

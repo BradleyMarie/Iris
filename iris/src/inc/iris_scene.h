@@ -30,32 +30,26 @@ SceneTraceScene(
     _In_ PRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitList
+    _Inout_ PGEOMETRY_HIT_ALLOCATOR GeometryHitAllocator,
+    _Inout_ PIRIS_POINTER_LIST HitList
     )
 {
     SCENE_OBJECT_TRACER Tracer;
-    ISTATUS Status;
 
     ASSERT(Scene != NULL);
     ASSERT(WorldRay != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
+    ASSERT(GeometryHitAllocator != NULL);
     ASSERT(HitList != NULL);
 
     SceneObjectTracerInitialize(&Tracer,
                                 SharedGeometryHitAllocator,
-                                ShapeHitAllocator);
+								GeometryHitAllocator,
+                                ShapeHitAllocator,
+                                HitList);
 
-    Status = Scene->VTable->TraceRoutine(Scene, WorldRay, &Tracer);  
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    *HitList = SceneObjectTracerGetHitList(&Tracer);
-
-    return ISTATUS_SUCCESS;
+    return Scene->VTable->TraceRoutine(Scene, WorldRay, &Tracer);
 }
 
 #endif // _SCENE_IRIS_INTERNAL_

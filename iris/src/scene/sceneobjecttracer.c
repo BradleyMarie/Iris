@@ -17,14 +17,15 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SceneObjectTracerTrace(
+SceneObjectTracerTraceObject(
     _Inout_ PSCENE_OBJECT_TRACER Tracer,
     _In_ PSCENE_OBJECT SceneObject,
     _In_ PRAY WorldRay
     )
 {
-    PSHAPE_HIT HitListBegin;
-    PSHAPE_HIT HitListEnd;
+    PSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PGEOMETRY_HIT GeometryHit;
+    PSHAPE_HIT ShapeHitList;
     ISTATUS Status;
 
     ASSERT(Tracer != NULL);
@@ -34,18 +35,27 @@ SceneObjectTracerTrace(
                                     WorldRay,
                                     Tracer->ShapeHitAllocator,
                                     Tracer->SharedGeometryHitAllocator,
-                                    &HitListBegin,
-                                    &HitListEnd);
+                                    &SharedGeometryHit,
+                                    &ShapeHitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (HitListBegin != NULL)
+    while (ShapeHitList != NULL)
     {
-        HitListEnd->NextHit = Tracer->HitList;
-        Tracer->HitList = HitListBegin;   
+        GeometryHit = GeometryHitAllocatorAllocate(Tracer->GeometryHitAllocator,
+                                                   SharedGeometryHit,
+                                                   ShapeHitList);
+
+        if (GeometryHit == NULL)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        Status = IrisPointerListAddPointer(Tracer->HitList,
+                                           GeometryHit);
     }
 
     return ISTATUS_SUCCESS;

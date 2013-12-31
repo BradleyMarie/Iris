@@ -40,13 +40,11 @@ SceneObjectTraceObject(
     _In_ PRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitListBegin,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitListEnd
+    _Outptr_result_maybenull_ PSHARED_GEOMETRY_HIT *SharedGeometryHit,
+    _Outptr_result_maybenull_ PSHAPE_HIT *ShapeHitList
     )
 {
-    PSHARED_GEOMETRY_HIT SharedGeometryHit;
-    PGEOMETRY_HIT GeometryHit;
-    PSHAPE_HIT ShapeHit;
+    PSHARED_GEOMETRY_HIT GeometryHit;
     ISTATUS Status;
     PRAY TraceRay;
 
@@ -54,68 +52,56 @@ SceneObjectTraceObject(
     ASSERT(WorldRay != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
-    ASSERT(HitListBegin != NULL);
-    ASSERT(HitListEnd != NULL);
+    ASSERT(SharedGeometryHit != NULL);
+    ASSERT(ShapeHitList != NULL);
 
-    SharedGeometryHit = SharedGeometryHitAllocatorAllocateHit(SharedGeometryHitAllocator);
+    GeometryHit = SharedGeometryHitAllocatorAllocate(SharedGeometryHitAllocator);
 
-    if (SharedGeometryHit == NULL)
+    if (GeometryHit == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
     if (SceneObject->Transformation == NULL)
     {
-        SharedGeometryHit->Type = GEOMETRY_TYPE_WORLD;
+        GeometryHit->Type = GEOMETRY_TYPE_WORLD;
         TraceRay = WorldRay;
     }
 	else if (SceneObject->Premultiplied)
     {
-        SharedGeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
-        SharedGeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
+        GeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
+        GeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
         TraceRay = WorldRay;
     }
     else
     {
-        SharedGeometryHit->Type = GEOMETRY_TYPE_MODEL;
-        SharedGeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
+        GeometryHit->Type = GEOMETRY_TYPE_MODEL;
+        GeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
 
         RayMatrixMultiply(&SceneObject->Transformation->Matrix,
                           WorldRay,
-                          &SharedGeometryHit->ModelRay);
+                          &GeometryHit->ModelRay);
 
-        TraceRay = &SharedGeometryHit->ModelRay;
+        TraceRay = &GeometryHit->ModelRay;
     }
 
     Status = ShapeTraceShape(SceneObject->Shape,
                              TraceRay,
                              ShapeHitAllocator,
-                             HitListBegin);
+                             ShapeHitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (HitListBegin == NULL)
+    if (*ShapeHitList == NULL)
     {
-        SharedGeometryHitAllocatorFreeLastHit(SharedGeometryHitAllocator);
+        SharedGeometryHitAllocatorFreeLastAllocation(SharedGeometryHitAllocator);
         return ISTATUS_SUCCESS;
     }
 
-    ShapeHit = *HitListBegin;
-    *HitListEnd = NULL;
-
-    while (ShapeHit != NULL)
-    {
-        *HitListEnd = ShapeHit;
-
-        GeometryHit = (PGEOMETRY_HIT) ShapeHit;
-
-        GeometryHit->SharedGeometryHit = SharedGeometryHit;
-
-        ShapeHit = ShapeHit->NextHit;
-    }
+    *SharedGeometryHit = GeometryHit;
 
     return ISTATUS_SUCCESS;
 }

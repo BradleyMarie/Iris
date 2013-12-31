@@ -55,7 +55,7 @@ _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
 PSHARED_GEOMETRY_HIT
-SharedGeometryHitAllocatorAllocateHit(
+SharedGeometryHitAllocatorAllocate(
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR Allocator
     )
 {
@@ -75,7 +75,7 @@ _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
 VOID
-SharedGeometryHitAllocatorFreeLastHit(
+SharedGeometryHitAllocatorFreeLastAllocation(
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR Allocator
     )
 {
@@ -92,7 +92,7 @@ _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
 VOID
-SharedGeometryHitAllocatorFreeAllHits(
+SharedGeometryHitAllocatorFreeAll(
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR Allocator
     )
 {

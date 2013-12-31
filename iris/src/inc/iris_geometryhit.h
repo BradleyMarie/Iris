@@ -38,4 +38,28 @@ struct _SHARED_GEOMETRY_HIT {
 #define GEOMETRY_TYPE_PREMULTIPLIED 0x1
 #define GEOMETRY_TYPE_MODEL         0x2
 
+//
+// Function Definitions
+//
+
+SFORCEINLINE
+VOID
+GeometryHitInitialize(
+    _Out_ PGEOMETRY_HIT GeometryHit,
+    _In_ PSHARED_GEOMETRY_HIT SharedGeometryHit,
+    _In_ PSHAPE_HIT ShapeHit
+    )
+{
+    ASSERT(GeometryHit != NULL);
+    ASSERT(SharedGeometryHit != NULL);
+    ASSERT(ShapeHit != NULL);
+
+    GeometryHit->SharedGeometryHit = SharedGeometryHit;
+    GeometryHit->Shape = ShapeHit->Shape;
+    GeometryHit->Distance = ShapeHit->Distance;
+    GeometryHit->FaceHit = ShapeHit->FaceHit;
+    GeometryHit->AdditionalData = ShapeHit->AdditionalData;
+    GeometryHit->AdditionalDataSizeInBytes = ShapeHit->AdditionalDataSizeInBytes;
+}
+
 #endif // _IRIS_GEOMETRY_HIT_INTERNAL_

@@ -28,7 +28,6 @@ ShapeHitAllocatorAllocate(
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
-    PGEOMETRY_HIT GeometryHit;
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
@@ -41,7 +40,7 @@ ShapeHitAllocatorAllocate(
 
     Allocation = IrisStaticMemoryAllocatorAllocate(GeometryHitAllocator);
 
-    GeometryHit = (PGEOMETRY_HIT) Allocation;
+	ShapeHit = (PSHAPE_HIT) Allocation;
 
     if (AdditionalDataSize != 0)
     {
@@ -60,8 +59,6 @@ ShapeHitAllocatorAllocate(
     {
         Allocation = NULL;
     }
-
-    ShapeHit = &GeometryHit->ShapeHit;
 
     ShapeHit->Distance = Distance;
     ShapeHit->NextHit = NextHit;

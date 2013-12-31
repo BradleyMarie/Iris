@@ -37,5 +37,9 @@ CMakeCache.txt
 *.tlog
 *.log
 
+# Project files
+*.sublime-project
+*.sublime-workspace
+
 # Directories
 CMakeFiles/

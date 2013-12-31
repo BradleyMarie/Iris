@@ -22,8 +22,12 @@ Abstract:
 typedef struct _SHARED_GEOMETRY_HIT SHARED_GEOMETRY_HIT, *PSHARED_GEOMETRY_HIT;
 
 typedef struct _GEOMETRY_HIT {
-    SHAPE_HIT ShapeHit;
     PSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PSHAPE Shape;
+    FLOAT Distance;
+    INT32 FaceHit;
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PVOID AdditionalData;
+    SIZE_T AdditionalDataSizeInBytes;
 } GEOMETRY_HIT, *PGEOMETRY_HIT;
 
 //
