@@ -41,7 +41,7 @@ SceneObjectTraceObject(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
     _Outptr_result_maybenull_ PCSHARED_GEOMETRY_HIT *SharedGeometryHit,
-    _Outptr_result_maybenull_ PCSHAPE_HIT *ShapeHitList
+    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
     PSHARED_GEOMETRY_HIT GeometryHit;

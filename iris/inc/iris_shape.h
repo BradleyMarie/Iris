@@ -29,7 +29,7 @@ ISTATUS
     _In_ PCVOID Context, 
     _In_ PCRAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PCSHAPE_HIT *HitList
+    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     );
 
 typedef struct _SHAPE_VTABLE {
@@ -54,7 +54,7 @@ ShapeTraceShape(
     _In_ PCSHAPE Shape, 
     _In_ PCRAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PCSHAPE_HIT *HitList
+    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
     ISTATUS Status;
@@ -62,12 +62,12 @@ ShapeTraceShape(
     ASSERT(Shape != NULL);
     ASSERT(Ray != NULL);
     ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(HitList != NULL);
+    ASSERT(ShapeHitList != NULL);
 
     Status = Shape->VTable->TraceRoutine(Shape, 
                                          Ray,
                                          ShapeHitAllocator,
-                                         HitList);
+                                         ShapeHitList);
 
     return Status;
 }

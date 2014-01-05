@@ -23,8 +23,15 @@ Abstract:
 
 typedef struct _SHAPE_HIT_ALLOCATOR {
     IRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    IRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    IRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
 } SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
+
+typedef struct _FULL_SHAPE_HIT {
+    SHAPE_HIT_LIST ShapeHitList;
+    SHAPE_HIT ShapeHit;
+} FULL_SHAPE_HIT, *PFULL_SHAPE_HIT;
+
+typedef CONST FULL_SHAPE_HIT *PCFULL_SHAPE_HIT;
 
 //
 // Functions
@@ -39,15 +46,15 @@ ShapeHitAllocatorInitialize(
     )
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
     ISTATUS Status;
 
     ASSERT(ShapeHitCollection != NULL);
 
-    GeometryHitAllocator = &ShapeHitCollection->GeometryHitAllocator;
+    ShapeHitAllocator = &ShapeHitCollection->ShapeHitAllocator;
 
-    Status = IrisStaticMemoryAllocatorInitialize(GeometryHitAllocator,
-                                                 sizeof(GEOMETRY_HIT));
+    Status = IrisStaticMemoryAllocatorInitialize(ShapeHitAllocator,
+                                                 sizeof(FULL_SHAPE_HIT));
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -64,37 +71,37 @@ ShapeHitAllocatorInitialize(
 SFORCEINLINE
 VOID
 ShapeHitAllocatorDestroy(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator
+    _Inout_ PSHAPE_HIT_ALLOCATOR Allocator
     )
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
 
-    ASSERT(ShapeHitAllocator != NULL);
+    ASSERT(Allocator != NULL);
 
-    AdditionalDataAllocator = &ShapeHitAllocator->AdditionalDataAllocator;
-    GeometryHitAllocator = &ShapeHitAllocator->GeometryHitAllocator;
+    AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
+    ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
     IrisDynamicMemoryAllocatorDestroy(AdditionalDataAllocator);
-    IrisStaticMemoryAllocatorDestroy(GeometryHitAllocator);
+    IrisStaticMemoryAllocatorDestroy(ShapeHitAllocator);
 }
 
 SFORCEINLINE
 VOID
 ShapeHitAllocatorFreeAll(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator
+    _Inout_ PSHAPE_HIT_ALLOCATOR Allocator
     )
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
 
-    ASSERT(ShapeHitAllocator != NULL);
+    ASSERT(Allocator != NULL);
 
-    AdditionalDataAllocator = &ShapeHitAllocator->AdditionalDataAllocator;
-    GeometryHitAllocator = &ShapeHitAllocator->GeometryHitAllocator;
+    AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
+    ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
     IrisDynamicMemoryAllocatorFreeAll(AdditionalDataAllocator);
-    IrisStaticMemoryAllocatorFreeAll(GeometryHitAllocator);
+    IrisStaticMemoryAllocatorFreeAll(ShapeHitAllocator);
 }
 
 #endif // _IRIS_SHAPE_HIT_ALLOCATOR_INTERNAL_

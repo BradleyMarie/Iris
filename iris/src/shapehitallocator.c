@@ -16,10 +16,10 @@ Abstract:
 
 _Check_return_
 _Ret_maybenull_
-PSHAPE_HIT
+PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PCSHAPE_HIT NextHit,
+    _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
+    _In_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
@@ -28,32 +28,37 @@ ShapeHitAllocatorAllocate(
     )
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;
+    PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
+    PSHAPE_HIT_LIST ShapeHitList;
+    PFULL_SHAPE_HIT FullShapeHit;
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
     ASSERT(AdditionalData == NULL || AdditionalDataSizeInBytes == 0);
-    ASSERT(ShapeHitAllocator != NULL);
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
+    ASSERT(Allocator != NULL);
     ASSERT(Shape != NULL);
 
-    GeometryHitAllocator = &ShapeHitAllocator->GeometryHitAllocator;
+    ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(GeometryHitAllocator);
+    Allocation = IrisStaticMemoryAllocatorAllocate(ShapeHitAllocator);
 
-	ShapeHit = (PSHAPE_HIT) Allocation;
+    FullShapeHit = (PFULL_SHAPE_HIT) Allocation;
+
+    ShapeHitList = &FullShapeHit->ShapeHitList;
+	ShapeHit = &FullShapeHit->ShapeHit;
 
 	if (AdditionalDataSizeInBytes != 0)
     {
-        AdditionalDataAllocator = &ShapeHitAllocator->AdditionalDataAllocator;
+        AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
 
         Allocation = IrisDynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
                                                         AdditionalDataSizeInBytes);
 
         if (Allocation == NULL)
         {
-            IrisStaticMemoryAllocatorFreeLastAllocation(GeometryHitAllocator);
+            IrisStaticMemoryAllocatorFreeLastAllocation(ShapeHitAllocator);
             return NULL;
         }
 
@@ -64,11 +69,14 @@ ShapeHitAllocatorAllocate(
         Allocation = NULL;
     }
 
+    ShapeHit->Shape = Shape;
     ShapeHit->Distance = Distance;
-    ShapeHit->NextHit = NextHit;
     ShapeHit->FaceHit = FaceHit;
 	ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
     ShapeHit->AdditionalData = Allocation;
 
-    return ShapeHit;
+    ShapeHitList->NextShapeHit = NextShapeHit;
+    ShapeHitList->ShapeHit = ShapeHit;
+
+    return ShapeHitList;
 }

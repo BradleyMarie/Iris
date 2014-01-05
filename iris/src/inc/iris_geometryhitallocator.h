@@ -54,7 +54,7 @@ GeometryHitAllocatorInitialize(
 _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
-PGEOMETRY_HIT
+PCGEOMETRY_HIT
 GeometryHitAllocatorAllocate(
     _Inout_ PGEOMETRY_HIT_ALLOCATOR Allocator,
     _In_ PCSHARED_GEOMETRY_HIT SharedGeometryHit,

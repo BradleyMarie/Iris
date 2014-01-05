@@ -31,7 +31,7 @@ SceneTraceScene(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
     _Inout_ PGEOMETRY_HIT_ALLOCATOR GeometryHitAllocator,
-    _Inout_ PIRIS_POINTER_LIST HitList
+    _Inout_ PIRIS_CONSTANT_POINTER_LIST HitList
     )
 {
     SCENE_OBJECT_TRACER Tracer;

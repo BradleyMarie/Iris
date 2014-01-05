@@ -23,9 +23,9 @@ SceneObjectTracerTraceObject(
     _In_ PCRAY WorldRay
     )
 {
-    PSHARED_GEOMETRY_HIT SharedGeometryHit;
-    PGEOMETRY_HIT GeometryHit;
-    PSHAPE_HIT ShapeHitList;
+	PSHARED_GEOMETRY_HIT SharedGeometryHit;
+	PSHAPE_HIT_LIST ShapeHitList;
+    PCGEOMETRY_HIT GeometryHit;
     ISTATUS Status;
 
     ASSERT(Tracer != NULL);
@@ -47,15 +47,15 @@ SceneObjectTracerTraceObject(
     {
         GeometryHit = GeometryHitAllocatorAllocate(Tracer->GeometryHitAllocator,
                                                    SharedGeometryHit,
-                                                   ShapeHitList);
+                                                   ShapeHitList->ShapeHit);
 
         if (GeometryHit == NULL)
         {
             return ISTATUS_ALLOCATION_FAILED;
         }
 
-        Status = IrisPointerListAddPointer(Tracer->HitList,
-                                           GeometryHit);
+        Status = IrisConstantPointerListAddPointer(Tracer->HitList,
+                                                   GeometryHit);
     }
 
     return ISTATUS_SUCCESS;

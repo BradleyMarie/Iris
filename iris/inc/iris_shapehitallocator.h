@@ -28,7 +28,6 @@ typedef struct _SHAPE_HIT_ALLOCATOR SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
 typedef CONST SHAPE_HIT_ALLOCATOR *PCSHAPE_HIT_ALLOCATOR;
 
 typedef struct _SHAPE_HIT {
-    CONST struct _SHAPE_HIT *NextHit;
     PCSHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
@@ -38,16 +37,23 @@ typedef struct _SHAPE_HIT {
 
 typedef CONST SHAPE_HIT *PCSHAPE_HIT;
 
+typedef struct _SHAPE_HIT_LIST {
+    struct _SHAPE_HIT_LIST *NextShapeHit;
+    PCSHAPE_HIT ShapeHit;
+} SHAPE_HIT_LIST, *PSHAPE_HIT_LIST;
+
+typedef CONST SHAPE_HIT_LIST *PCSHAPE_HIT_LIST;
+
 //
 // Functions
 //
 
 _Check_return_
 _Ret_maybenull_
-PSHAPE_HIT
+PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitCollection,
-    _In_ PCSHAPE_HIT NextHit,
+    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
+    _In_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
