@@ -23,7 +23,8 @@ ShapeHitAllocatorAllocate(
     _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_ SIZE_T AdditionalDataSize
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_ SIZE_T AdditionalDataSizeInBytes
     )
 {
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
@@ -31,10 +32,11 @@ ShapeHitAllocatorAllocate(
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
+    ASSERT(AdditionalData == NULL || AdditionalDataSizeInBytes == 0);
     ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(Shape != NULL);
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
+    ASSERT(Shape != NULL);
 
     GeometryHitAllocator = &ShapeHitAllocator->GeometryHitAllocator;
 
@@ -42,18 +44,20 @@ ShapeHitAllocatorAllocate(
 
 	ShapeHit = (PSHAPE_HIT) Allocation;
 
-    if (AdditionalDataSize != 0)
+	if (AdditionalDataSizeInBytes != 0)
     {
         AdditionalDataAllocator = &ShapeHitAllocator->AdditionalDataAllocator;
 
         Allocation = IrisDynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
-                                                        AdditionalDataSize);
+                                                        AdditionalDataSizeInBytes);
 
         if (Allocation == NULL)
         {
             IrisStaticMemoryAllocatorFreeLastAllocation(GeometryHitAllocator);
             return NULL;
-        }  
+        }
+
+        memcpy(Allocation, AdditionalData, AdditionalDataSizeInBytes);
     }
     else
     {
@@ -63,7 +67,7 @@ ShapeHitAllocatorAllocate(
     ShapeHit->Distance = Distance;
     ShapeHit->NextHit = NextHit;
     ShapeHit->FaceHit = FaceHit;
-    ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSize;
+	ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
     ShapeHit->AdditionalData = Allocation;
 
     return ShapeHit;

@@ -32,7 +32,7 @@ typedef struct _SHAPE_HIT {
     PCSHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
-    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PVOID AdditionalData;
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;
     SIZE_T AdditionalDataSizeInBytes;
 } SHAPE_HIT, *PSHAPE_HIT;
 
@@ -51,7 +51,8 @@ ShapeHitAllocatorAllocate(
     _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_ SIZE_T AdditionalDataSize
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_ SIZE_T AdditionalDataSizeInBytes
     );
 
 #endif // _IRIS_SHAPE_HIT_ALLOCATOR_
