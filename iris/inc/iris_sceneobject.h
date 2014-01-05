@@ -22,6 +22,7 @@ Abstract:
 //
 
 typedef struct _SCENE_OBJECT SCENE_OBJECT, *PSCENE_OBJECT;
+typedef CONST SCENE_OBJECT *PCSCENE_OBJECT;
 
 //
 // Functions
@@ -31,8 +32,8 @@ _Check_return_
 _Ret_maybenull_
 PSCENE_OBJECT
 SceneObjectAllocate(
-    _In_ PSHAPE Shape,
-    _In_ PINVERTIBLE_MATRIX Transformation,
+    _In_ PCSHAPE Shape,
+    _In_ PCINVERTIBLE_MATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
 

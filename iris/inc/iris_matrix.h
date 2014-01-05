@@ -23,13 +23,17 @@ Abstract:
 
 typedef struct _MATRIX {
     FLOAT M[4][4];
-    struct _MATRIX *Inverse;
+    CONST struct _MATRIX *Inverse;
 } MATRIX, *PMATRIX;
+
+typedef CONST MATRIX *PCMATRIX;
 
 typedef struct _INVERTIBLE_MATRIX {
     MATRIX Matrix;
     MATRIX Inverse;
 } INVERTIBLE_MATRIX, *PINVERTIBLE_MATRIX;
+
+typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
 
 //
 // Function definitions
@@ -118,8 +122,8 @@ MatrixInitializeOrothographic(
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixMultiply(
-    _In_ PINVERTIBLE_MATRIX Multiplicand0,
-    _In_ PINVERTIBLE_MATRIX Multiplicand1,
+    _In_ PCINVERTIBLE_MATRIX Multiplicand0,
+    _In_ PCINVERTIBLE_MATRIX Multiplicand1,
     _Out_ PINVERTIBLE_MATRIX Product
     );
 

@@ -197,7 +197,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 MatrixpInvert(
-    _Inout_ PMATRIX Matrix,
+    _In_ PCMATRIX Matrix,
     _Out_ PMATRIX Inverse
     )
 {
@@ -210,6 +210,7 @@ MatrixpInvert(
     ASSERT(Inverse != NULL);
 
     MatrixpInitializeIdentity(Inverse);
+    TemporaryMatrix = *Matrix;
 
     Lead = 0;
 
@@ -711,8 +712,8 @@ MatrixInitializeOrothographic(
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixMultiply(
-    _In_ PINVERTIBLE_MATRIX Multiplicand0,
-    _In_ PINVERTIBLE_MATRIX Multiplicand1,
+    _In_ PCINVERTIBLE_MATRIX Multiplicand0,
+    _In_ PCINVERTIBLE_MATRIX Multiplicand1,
     _Out_ PINVERTIBLE_MATRIX Product
     )
 {

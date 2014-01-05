@@ -26,18 +26,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSHAPE_TRACE_ROUTINE)(
-    _In_ PVOID Context, 
-    _In_ PRAY Ray,
+    _In_ PCVOID Context, 
+    _In_ PCRAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitList
+    _Outptr_result_maybenull_ PCSHAPE_HIT *HitList
     );
 
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE TraceRoutine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 
+typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
+
 struct _SHAPE {
-    PSHAPE_VTABLE VTable;
+    PCSHAPE_VTABLE VTable;
 };
 
 //
@@ -49,10 +51,10 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 ShapeTraceShape(
-    _In_ PSHAPE Shape, 
-    _In_ PRAY Ray,
+    _In_ PCSHAPE Shape, 
+    _In_ PCRAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT *HitList
+    _Outptr_result_maybenull_ PCSHAPE_HIT *HitList
     )
 {
     ISTATUS Status;

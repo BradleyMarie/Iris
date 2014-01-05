@@ -85,18 +85,19 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerTraceScene(
-    _In_ PRAYTRACER RayTracer,
-    _In_ PRAY WorldRay,
-    _In_ PSCENE Scene,
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ PCRAY WorldRay,
+    _In_ PCSCENE Scene,
     _In_ BOOL SortResults,
-    _Outptr_result_buffer_(HitListSize) PGEOMETRY_HIT **HitList,
+    _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
     _Out_ PSIZE_T HitListSize
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
     PGEOMETRY_HIT_ALLOCATOR GeometryHitAllocator;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    PIRIS_POINTER_LIST PointerList;
+	PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+	PIRIS_POINTER_LIST PointerList;
+	PGEOMETRY_HIT *MutableHitList;
     ISTATUS Status;
 
     ASSERT(RayTracer != NULL);
@@ -116,17 +117,22 @@ RayTracerTraceScene(
 
     Status = SceneTraceScene(Scene, 
                              WorldRay,
-							 ShapeHitAllocator,
+                             ShapeHitAllocator,
                              SharedGeometryHitAllocator,
                              GeometryHitAllocator,
                              PointerList);
 
-    //
-    // TODO: Sort Hits
-    //
+	MutableHitList = (PGEOMETRY_HIT*)IrisPointerListGetStorage(PointerList);
+	*HitListSize = IrisPointerListGetSize(PointerList);
+	*HitList = MutableHitList;
 
-    *HitList = (PGEOMETRY_HIT*) IrisPointerListGetStorage(PointerList);
-    *HitListSize = IrisPointerListGetSize(PointerList);
+    if (SortResults != FALSE)
+    {
+		qsort(MutableHitList,
+              *HitListSize,
+              sizeof(PGEOMETRY_HIT),
+              GeometryHitCompare);
+    }
 
     return Status;
 }

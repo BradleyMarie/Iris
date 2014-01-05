@@ -27,6 +27,8 @@ typedef struct _VECTOR3 {
     FLOAT Z;
 } VECTOR3, *PVECTOR3;
 
+typedef CONST VECTOR3* PCVECTOR3;
+
 //
 // Defines
 //
@@ -67,8 +69,8 @@ VectorInitialize(
 SFORCEINLINE
 VOID
 VectorAdd(
-    _In_ PVECTOR3 Addend0,
-    _In_ PVECTOR3 Addend1,
+    _In_ PCVECTOR3 Addend0,
+    _In_ PCVECTOR3 Addend1,
     _Out_ PVECTOR3 Sum
     )
 {
@@ -90,8 +92,8 @@ VectorAdd(
 SFORCEINLINE
 VOID
 VectorSubtract(
-    _In_ PVECTOR3 Minuend,
-    _In_ PVECTOR3 Subtrahend,
+    _In_ PCVECTOR3 Minuend,
+    _In_ PCVECTOR3 Subtrahend,
     _Out_ PVECTOR3 Difference
     )
 {
@@ -113,7 +115,7 @@ VectorSubtract(
 SFORCEINLINE
 VOID
 VectorScale(
-    _In_ PVECTOR3 Vector,
+    _In_ PCVECTOR3 Vector,
     _In_ FLOAT Scalar,
     _Out_ PVECTOR3 ScaledVector
     )
@@ -137,7 +139,7 @@ VectorScale(
 SFORCEINLINE
 VOID
 VectorShrink(
-    _In_ PVECTOR3 Vector,
+    _In_ PCVECTOR3 Vector,
     _In_ FLOAT Factor,
     _Out_ PVECTOR3 ShrunkVector
     )
@@ -164,8 +166,8 @@ VectorShrink(
 SFORCEINLINE
 FLOAT
 VectorDotProduct(
-    _In_ PVECTOR3 Operand0,
-    _In_ PVECTOR3 Operand1
+    _In_ PCVECTOR3 Operand0,
+    _In_ PCVECTOR3 Operand1
     )
 {
     FLOAT X;
@@ -185,8 +187,8 @@ VectorDotProduct(
 SFORCEINLINE
 VOID
 VectorCrossProduct(
-    _In_ PVECTOR3 Operand0,
-    _In_ PVECTOR3 Operand1,
+    _In_ PCVECTOR3 Operand0,
+    _In_ PCVECTOR3 Operand1,
     _Out_ PVECTOR3 Product
     )
 {
@@ -208,7 +210,7 @@ VectorCrossProduct(
 SFORCEINLINE
 FLOAT
 VectorLength(
-    _In_ PVECTOR3 Vector
+    _In_ PCVECTOR3 Vector
     )
 {
     FLOAT DotProduct;
@@ -223,7 +225,7 @@ VectorLength(
 SFORCEINLINE
 VOID
 VectorNormalize(
-    _In_ PVECTOR3 Vector,
+    _In_ PCVECTOR3 Vector,
     _Out_ PVECTOR3 NormalizedVector
     )
 {
@@ -241,7 +243,7 @@ VectorNormalize(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
-    _In_ PVECTOR3 Vector
+    _In_ PCVECTOR3 Vector
     )
 {
     if (AbsFloat(Vector->X) > AbsFloat(Vector->Y) &&
@@ -262,7 +264,7 @@ VectorDominantAxis(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDiminishedAxis(
-    _In_ PVECTOR3 Vector
+    _In_ PCVECTOR3 Vector
     )
 {
     if (AbsFloat(Vector->X) < AbsFloat(Vector->Y) &&
@@ -283,8 +285,8 @@ VectorDiminishedAxis(
 SFORCEINLINE
 VOID
 VectorMatrixMultiply(
-    _In_ PMATRIX Matrix,
-    _In_ PVECTOR3 Vector,
+    _In_ PCMATRIX Matrix,
+    _In_ PCVECTOR3 Vector,
     _Out_ PVECTOR3 Product
     )
 {
@@ -314,8 +316,8 @@ VectorMatrixMultiply(
 SFORCEINLINE
 VOID
 VectorMatrixTransposedMultiply(
-    _In_ PMATRIX Matrix,
-    _In_ PVECTOR3 Vector,
+    _In_ PCMATRIX Matrix,
+    _In_ PCVECTOR3 Vector,
     _Out_ PVECTOR3 Product
     )
 {

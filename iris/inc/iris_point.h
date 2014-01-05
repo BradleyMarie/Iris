@@ -27,6 +27,8 @@ typedef struct _POINT3 {
     FLOAT Z;
 } POINT3, *PPOINT3;
 
+typedef CONST POINT3 *PCPOINT3;
+
 //
 // Functions
 //
@@ -84,8 +86,8 @@ PointInitializeScaled(
 SFORCEINLINE
 VOID
 PointSubtract(
-    _In_ PPOINT3 Minuend,
-    _In_ PPOINT3 Subtrahend,
+    _In_ PCPOINT3 Minuend,
+    _In_ PCPOINT3 Subtrahend,
     _Out_ PVECTOR3 Difference
     )
 {
@@ -107,8 +109,8 @@ PointSubtract(
 SFORCEINLINE
 VOID
 PointVectorSubtract(
-    _In_ PPOINT3 Minuend,
-    _In_ PVECTOR3 Subtrahend,
+    _In_ PCPOINT3 Minuend,
+    _In_ PCVECTOR3 Subtrahend,
     _Out_ PPOINT3 Difference
     )
 {
@@ -130,8 +132,8 @@ PointVectorSubtract(
 SFORCEINLINE
 VOID
 PointVectorAdd(
-    _In_ PPOINT3 Addend0,
-    _In_ PVECTOR3 Addend1,
+    _In_ PCPOINT3 Addend0,
+    _In_ PCVECTOR3 Addend1,
     _Out_ PPOINT3 Sum
     )
 {
@@ -153,8 +155,8 @@ PointVectorAdd(
 SFORCEINLINE
 VOID
 PointMatrixMultiply(
-    _In_ PMATRIX Matrix,
-    _In_ PPOINT3 Point,
+    _In_ PCMATRIX Matrix,
+    _In_ PCPOINT3 Point,
     _Out_ PPOINT3 Product
     )
 {

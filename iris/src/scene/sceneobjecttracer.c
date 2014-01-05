@@ -19,8 +19,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SceneObjectTracerTraceObject(
     _Inout_ PSCENE_OBJECT_TRACER Tracer,
-    _In_ PSCENE_OBJECT SceneObject,
-    _In_ PRAY WorldRay
+    _In_ PCSCENE_OBJECT SceneObject,
+    _In_ PCRAY WorldRay
     )
 {
     PSHARED_GEOMETRY_HIT SharedGeometryHit;

@@ -24,4 +24,6 @@ Abstract:
 #define STATIC static
 #define SFORCEINLINE STATIC FORCEINLINE
 
+#define CONST const
+
 #endif // _ANNOTATIONS_IRIS_

@@ -57,8 +57,8 @@ SFORCEINLINE
 PGEOMETRY_HIT
 GeometryHitAllocatorAllocate(
     _Inout_ PGEOMETRY_HIT_ALLOCATOR Allocator,
-    _In_ PSHARED_GEOMETRY_HIT SharedGeometryHit,
-    _In_ PSHAPE_HIT ShapeHit
+    _In_ PCSHARED_GEOMETRY_HIT SharedGeometryHit,
+    _In_ PCSHAPE_HIT ShapeHit
     )
 {
     PIRIS_STATIC_MEMORY_ALLOCATOR GeometryHitAllocator;

@@ -26,7 +26,7 @@ typedef GEOMETRY_TYPE *PGEOMETRY_TYPE;
 
 struct _SHARED_GEOMETRY_HIT {
     GEOMETRY_TYPE Type;
-    PMATRIX ModelToWorld;
+    PCMATRIX ModelToWorld;
     RAY ModelRay;
 };
 
@@ -46,8 +46,8 @@ SFORCEINLINE
 VOID
 GeometryHitInitialize(
     _Out_ PGEOMETRY_HIT GeometryHit,
-    _In_ PSHARED_GEOMETRY_HIT SharedGeometryHit,
-    _In_ PSHAPE_HIT ShapeHit
+    _In_ PCSHARED_GEOMETRY_HIT SharedGeometryHit,
+    _In_ PCSHAPE_HIT ShapeHit
     )
 {
     ASSERT(GeometryHit != NULL);
@@ -60,6 +60,25 @@ GeometryHitInitialize(
     GeometryHit->FaceHit = ShapeHit->FaceHit;
     GeometryHit->AdditionalData = ShapeHit->AdditionalData;
     GeometryHit->AdditionalDataSizeInBytes = ShapeHit->AdditionalDataSizeInBytes;
+}
+
+SFORCEINLINE
+COMPARISON_RESULT
+GeometryHitCompare(
+    _In_ PCVOID GeometryHit0,
+    _In_ PCVOID GeometryHit1
+    )
+{
+    PGEOMETRY_HIT Hit0;
+    PGEOMETRY_HIT Hit1;
+
+    ASSERT(GeometryHit0 != NULL);
+    ASSERT(GeometryHit1 != NULL);
+
+    Hit0 = (PGEOMETRY_HIT) GeometryHit0;
+    Hit1 = (PGEOMETRY_HIT) GeometryHit1;
+
+    return (Hit0->Distance <= Hit1->Distance) ? -1 : 1;
 }
 
 #endif // _IRIS_GEOMETRY_HIT_INTERNAL_

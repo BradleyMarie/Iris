@@ -22,8 +22,8 @@ Abstract:
 //
 
 struct _SCENE_OBJECT {
-    PSHAPE Shape;
-    PINVERTIBLE_MATRIX Transformation;
+    PCSHAPE Shape;
+    PCINVERTIBLE_MATRIX ModelToWorld;
     BOOL Premultiplied;
 };
 
@@ -36,17 +36,17 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 SceneObjectTraceObject(
-    _In_ PSCENE_OBJECT SceneObject, 
-    _In_ PRAY WorldRay,
+    _In_ PCSCENE_OBJECT SceneObject, 
+    _In_ PCRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
-    _Outptr_result_maybenull_ PSHARED_GEOMETRY_HIT *SharedGeometryHit,
-    _Outptr_result_maybenull_ PSHAPE_HIT *ShapeHitList
+    _Outptr_result_maybenull_ PCSHARED_GEOMETRY_HIT *SharedGeometryHit,
+    _Outptr_result_maybenull_ PCSHAPE_HIT *ShapeHitList
     )
 {
     PSHARED_GEOMETRY_HIT GeometryHit;
     ISTATUS Status;
-    PRAY TraceRay;
+    PCRAY TraceRay;
 
     ASSERT(SceneObject != NULL);
     ASSERT(WorldRay != NULL);
@@ -62,23 +62,23 @@ SceneObjectTraceObject(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (SceneObject->Transformation == NULL)
+    if (SceneObject->ModelToWorld == NULL)
     {
         GeometryHit->Type = GEOMETRY_TYPE_WORLD;
         TraceRay = WorldRay;
     }
-	else if (SceneObject->Premultiplied)
+	else if (SceneObject->Premultiplied != FALSE)
     {
         GeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
-        GeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
+        GeometryHit->ModelToWorld = &SceneObject->ModelToWorld->Matrix;
         TraceRay = WorldRay;
     }
     else
     {
         GeometryHit->Type = GEOMETRY_TYPE_MODEL;
-        GeometryHit->ModelToWorld = &SceneObject->Transformation->Matrix;
+        GeometryHit->ModelToWorld = &SceneObject->ModelToWorld->Matrix;
 
-        RayMatrixMultiply(&SceneObject->Transformation->Matrix,
+        RayMatrixMultiply(&SceneObject->ModelToWorld->Inverse,
                           WorldRay,
                           &GeometryHit->ModelRay);
 

@@ -19,8 +19,8 @@ _Ret_maybenull_
 PSHAPE_HIT
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PSHAPE_HIT NextHit,
-    _In_ PSHAPE Shape,
+    _In_ PCSHAPE_HIT NextHit,
+    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_ SIZE_T AdditionalDataSize

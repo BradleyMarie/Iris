@@ -8,65 +8,36 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the types used by Iris. This module
-    should only be needed when compiling for non-Windows systems.
-
-    N.B. The on non-Windows systems, Iris uses the C boolean type, for its
-         BOOL type.
+    This file contains the definitions for the types used by Iris.
 
 --*/
 
 #ifdef _MSC_VER
-
-#include <windows.h>
-
+#include "iris_types_windows.h"
 #else
-
-#include <stdint.h>
-#include <stdbool.h>
+#include "iris_types_others.h"
+#endif // _MSC_VER
 
 #ifndef _TYPES_IRIS_
 #define _TYPES_IRIS_
 
-typedef float FLOAT;
-typedef FLOAT *PFLOAT;
+typedef CONST FLOAT *PCFLOAT;
+typedef CONST UINT8 *PCUINT8;
+typedef CONST UINT16 *PCUINT16;
+typedef CONST UINT32 *PCUINT32;
+typedef CONST UINT64 *PCUINT64;
 
-typedef uint8_t UINT8;
-typedef UINT8 *PUINT8;
+typedef CONST INT8 *PCINT8;
+typedef CONST INT16 *PCINT16;
+typedef CONST INT32 *PCINT32;
+typedef CONST INT64 *PCINT64;
 
-typedef uint16_t UINT16;
-typedef UINT16 *PUINT16;
+typedef CONST SIZE_T *PCSIZE_T;
 
-typedef uint32_t UINT32;
-typedef UINT32 *PUINT32;
+typedef CONST VOID *PCVOID;
 
-typedef uint64_t UINT64;
-typedef UINT64 *PUINT64;
+typedef CONST BOOL *PCBOOL;
 
-typedef int8_t INT8;
-typedef INT8 *PINT8;
-
-typedef int16_t INT16;
-typedef INT16 *PINT16;
-
-typedef int32_t INT32;
-typedef INT32 *PINT32;
-
-typedef int64_t INT64;
-typedef INT64 *PINT64;
-
-typedef size_t SIZE_T;
-typedef SIZE_T *PSIZE_T;
-
-#define VOID void
-typedef VOID *PVOID;
-
-typedef bool BOOL;
-typedef BOOL *PBOOL;
-
-#define TRUE true
-#define FALSE false
+typedef int COMPARISON_RESULT;
 
 #endif // _TYPES_IRIS_
-
-#endif // _MSC_VER

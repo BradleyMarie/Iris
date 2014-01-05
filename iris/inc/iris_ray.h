@@ -27,6 +27,8 @@ typedef struct _RAY {
     FLOAT Time;
 } RAY, *PRAY;
 
+typedef CONST RAY *PCRAY;
+
 //
 // Functions
 //
@@ -35,8 +37,8 @@ SFORCEINLINE
 VOID
 RayInitialize(
     _Out_ PRAY Ray,
-    _In_ PPOINT3 Origin,
-    _In_ PVECTOR3 Direction
+    _In_ PCPOINT3 Origin,
+    _In_ PCVECTOR3 Direction
     )
 {
     ASSERT(Ray != NULL);
@@ -51,7 +53,7 @@ RayInitialize(
 SFORCEINLINE
 VOID
 RayEndpoint(
-    _In_ PRAY Ray,
+    _In_ PCRAY Ray,
     _In_ FLOAT Distance,
     _Out_ PPOINT3 Endpoint
     )
@@ -71,8 +73,8 @@ RayEndpoint(
 SFORCEINLINE
 VOID
 RayMatrixMultiply(
-	_In_ PMATRIX Multiplicand0,
-    _In_ PRAY Multiplicand1,
+	_In_ PCMATRIX Multiplicand0,
+    _In_ PCRAY Multiplicand1,
     _Out_ PRAY Product
     )
 {

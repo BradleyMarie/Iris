@@ -23,10 +23,10 @@ Abstract:
 #ifndef _SAL_IRIS_
 #define _SAL_IRIS_
 
-#define _In_ const
-#define _In_range_(low, hi) const
-#define _In_reads_(size) const
-#define _In_reads_bytes_opt_(size) const
+#define _In_
+#define _In_range_(low, hi)
+#define _In_reads_(size)
+#define _In_reads_bytes_opt_(size)
 
 #define _Field_size_(size) 
 #define _Field_size_bytes_opt_(size) 

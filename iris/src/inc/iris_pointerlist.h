@@ -107,7 +107,7 @@ IrisPointerListAddPointer(
 SFORCEINLINE
 PVOID
 IrisPointerListRetrieveAtIndex(
-    _Inout_ PIRIS_POINTER_LIST PointerList,
+    _In_ PIRIS_POINTER_LIST PointerList,
     _In_ SIZE_T Index
     )
 {
@@ -120,7 +120,7 @@ IrisPointerListRetrieveAtIndex(
 SFORCEINLINE
 PVOID*
 IrisPointerListGetStorage(
-    _Inout_ PIRIS_POINTER_LIST PointerList
+    _In_ PIRIS_POINTER_LIST PointerList
     )
 {
     ASSERT(PointerList != NULL);
@@ -131,7 +131,7 @@ IrisPointerListGetStorage(
 SFORCEINLINE
 SIZE_T
 IrisPointerListGetSize(
-    _Inout_ PIRIS_POINTER_LIST PointerList
+    _In_ PIRIS_POINTER_LIST PointerList
     )
 {
     ASSERT(PointerList != NULL);

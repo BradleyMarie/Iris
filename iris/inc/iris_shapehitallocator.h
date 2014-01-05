@@ -22,17 +22,21 @@ Abstract:
 //
 
 typedef struct _SHAPE SHAPE, *PSHAPE;
+typedef CONST SHAPE *PCSHAPE;
 
 typedef struct _SHAPE_HIT_ALLOCATOR SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
+typedef CONST SHAPE_HIT_ALLOCATOR *PCSHAPE_HIT_ALLOCATOR;
 
 typedef struct _SHAPE_HIT {
-    struct _SHAPE_HIT *NextHit;
-    PSHAPE Shape;
+    CONST struct _SHAPE_HIT *NextHit;
+    PCSHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PVOID AdditionalData;
     SIZE_T AdditionalDataSizeInBytes;
 } SHAPE_HIT, *PSHAPE_HIT;
+
+typedef CONST SHAPE_HIT *PCSHAPE_HIT;
 
 //
 // Functions
@@ -43,8 +47,8 @@ _Ret_maybenull_
 PSHAPE_HIT
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitCollection,
-    _In_ PSHAPE_HIT NextHit,
-    _In_ PSHAPE Shape,
+    _In_ PCSHAPE_HIT NextHit,
+    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_ SIZE_T AdditionalDataSize

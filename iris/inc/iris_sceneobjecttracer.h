@@ -22,6 +22,7 @@ Abstract:
 //
 
 typedef struct _SCENE_OBJECT_TRACER SCENE_OBJECT_TRACER, *PSCENE_OBJECT_TRACER;
+typedef CONST SCENE_OBJECT_TRACER *PCSCENE_OBJECT_TRACER;
 
 //
 // Functions
@@ -32,8 +33,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SceneObjectTracerTraceObject(
     _Inout_ PSCENE_OBJECT_TRACER Tracer,
-    _In_ PSCENE_OBJECT SceneObject,
-    _In_ PRAY WorldRay
+    _In_ PCSCENE_OBJECT SceneObject,
+    _In_ PCRAY WorldRay
     );
 
 #endif // _SCENE_OBJECT_TRACER_IRIS_

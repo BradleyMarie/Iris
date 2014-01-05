@@ -26,8 +26,8 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 SceneTraceScene(
-    _In_ PSCENE Scene,
-    _In_ PRAY WorldRay,
+    _In_ PCSCENE Scene,
+    _In_ PCRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
     _Inout_ PGEOMETRY_HIT_ALLOCATOR GeometryHitAllocator,

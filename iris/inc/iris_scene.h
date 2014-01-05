@@ -26,8 +26,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSCENE_TRACE_ROUTINE)(
-    _In_ PVOID Context, 
-    _In_ PRAY WorldRay,
+    _In_ PCVOID Context, 
+    _In_ PCRAY WorldRay,
     _Inout_ PSCENE_OBJECT_TRACER Tracer
     );
 
@@ -35,8 +35,12 @@ typedef struct _SCENE_VTABLE {
     PSCENE_TRACE_ROUTINE TraceRoutine;
 } SCENE_VTABLE, *PSCENE_VTABLE;
 
+typedef CONST SCENE_VTABLE *PCSCENE_VTABLE;
+
 typedef struct _SCENE {
-    PSCENE_VTABLE VTable;
+    PCSCENE_VTABLE VTable;
 } SCENE, *PSCENE;
+
+typedef CONST SCENE *PCSCENE;
 
 #endif // _SCENE_IRIS_
