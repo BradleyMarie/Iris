@@ -25,6 +25,6 @@ typedef struct _NORMAL {
     PVOID Shader;
 } NORMAL, *PNORMAL;
 
-typedef CONST NORMAL *PNORMAL;
+typedef CONST NORMAL *PCNORMAL;
 
 #endif // _NORMAL_IRIS_TOOLKIT_

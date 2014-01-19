@@ -1,3 +1,5 @@
+include(GenerateExportHeader)
+
 include_directories(../iris/inc inc src/inc)
 
 add_library(iristoolkit SHARED
