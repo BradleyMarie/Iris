@@ -30,6 +30,7 @@ typedef CONST RAYTRACER *PCRAYTRACER;
 
 _Check_return_
 _Ret_maybenull_
+IRISAPI
 PRAYTRACER
 RayTracerAllocate(
     VOID
@@ -37,6 +38,7 @@ RayTracerAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 RayTracerTraceScene(
     _Inout_ PRAYTRACER RayTracer,

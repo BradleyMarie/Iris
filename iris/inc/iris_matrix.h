@@ -40,6 +40,7 @@ typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
 //
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitialize(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -62,12 +63,14 @@ MatrixInitialize(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeIdentity(
     _Out_ PINVERTIBLE_MATRIX Matrix
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeTranslation(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -77,6 +80,7 @@ MatrixInitializeTranslation(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeScalar(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -86,6 +90,7 @@ MatrixInitializeScalar(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeRotation(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -96,6 +101,7 @@ MatrixInitializeRotation(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeFrustum(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -108,6 +114,7 @@ MatrixInitializeFrustum(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixInitializeOrothographic(
     _Out_ PINVERTIBLE_MATRIX Matrix,
@@ -120,6 +127,7 @@ MatrixInitializeOrothographic(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 MatrixMultiply(
     _In_ PCINVERTIBLE_MATRIX Multiplicand0,

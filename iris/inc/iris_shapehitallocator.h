@@ -50,6 +50,7 @@ typedef CONST SHAPE_HIT_LIST *PCSHAPE_HIT_LIST;
 
 _Check_return_
 _Ret_maybenull_
+IRISAPI
 PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,

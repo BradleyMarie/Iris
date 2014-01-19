@@ -30,6 +30,7 @@ typedef CONST SCENE_OBJECT_TRACER *PCSCENE_OBJECT_TRACER;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
 SceneObjectTracerTraceObject(
     _Inout_ PSCENE_OBJECT_TRACER Tracer,

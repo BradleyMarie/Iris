@@ -30,6 +30,7 @@ typedef CONST SCENE_OBJECT *PCSCENE_OBJECT;
 
 _Check_return_
 _Ret_maybenull_
+IRISAPI
 PSCENE_OBJECT
 SceneObjectAllocate(
     _In_ PCSHAPE Shape,
@@ -37,6 +38,7 @@ SceneObjectAllocate(
     _In_ BOOL Premultiplied
     );
 
+IRISAPI
 VOID
 SceneObjectFree(
     _Pre_maybenull_ _Post_invalid_ PSCENE_OBJECT SceneObject

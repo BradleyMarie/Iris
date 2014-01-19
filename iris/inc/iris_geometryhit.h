@@ -37,6 +37,7 @@ typedef CONST GEOMETRY_HIT *PCGEOMETRY_HIT;
 // Functions
 //
 
+IRISAPI
 VOID
 SharedGeometryHitComputeModelViewer(
     _In_ PCSHARED_GEOMETRY_HIT GeometryHit,
@@ -44,6 +45,7 @@ SharedGeometryHitComputeModelViewer(
     _Out_ PVECTOR3 ModelViewer
     );
 
+IRISAPI
 VOID
 SharedGeometryHitComputeModelHit(
     _In_ PCSHARED_GEOMETRY_HIT GeometryHit,
@@ -51,6 +53,7 @@ SharedGeometryHitComputeModelHit(
     _Out_ PPOINT3 ModelHitPoint
     );
 
+IRISAPI
 PCMATRIX
 SharedGeometryHitGetModelToWorld(
     _In_ PCSHARED_GEOMETRY_HIT GeometryHit
