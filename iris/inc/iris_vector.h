@@ -125,8 +125,8 @@ VectorScale(
     FLOAT Z;
 
     ASSERT(Vector != NULL);
-	ASSERT(IsNormalFloat(Scalar));
-	ASSERT(IsFiniteFloat(Scalar));
+    ASSERT(IsNormalFloat(Scalar));
+    ASSERT(IsFiniteFloat(Scalar));
     ASSERT(ScaledVector != NULL);
 
     X = Vector->X * Scalar;
