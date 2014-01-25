@@ -14,3 +14,9 @@ generate_export_header(iristoolkit
     EXPORT_MACRO_NAME IRISTOOLKITAPI
     EXPORT_FILE_NAME inc/iristoolkit_api.h
     STATIC_DEFINE IRISTOOLKIT_BUILT_AS_STATIC)
+
+option(ENABLE_CSG "Enable constructive solid geometry" OFF)
+
+if (ENABLE_CSG)
+    add_definitions(-DENABLE_CSG_SUPPORT)
+endif()

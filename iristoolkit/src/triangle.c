@@ -121,11 +121,15 @@ TriangleTraceTriangle(
     DotProduct = VectorDotProduct(&Ray->Direction, &Triangle->SurfaceNormal);
     Distance = VectorDotProduct(&Temp, &Triangle->SurfaceNormal) / -DotProduct;
 
+#if !defined(ENABLE_CSG_SUPPORT)
+
     if (Distance < (FLOAT) 0.0)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
     }
+
+#endif // !defined(ENABLE_CSG_SUPPORT)
 
     RayEndpoint(Ray, Distance, &Hit);
     PointSubtract(&Hit, &Triangle->Vertex0, &P);
@@ -199,7 +203,8 @@ TriangleTraceTriangle(
 //
 
 STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
-    { TriangleTraceTriangle, free },
+    { TriangleTraceTriangle },
+    free,
     TriangleGetShader,
     TriangleGetNormal
 };

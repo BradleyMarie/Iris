@@ -41,6 +41,7 @@ PCNORMAL
 
 typedef struct _DRAWING_SHAPE_VTABLE {
     SHAPE_VTABLE ShapeVTable;
+    PFREE_ROUTINE FreeRoutine;
     PDRAWING_SHAPE_GET_SHADER_ROUTINE GetShaderRoutine;
     PDRAWING_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
 } DRAWING_SHAPE_VTABLE, *PDRAWING_SHAPE_VTABLE;
@@ -52,5 +53,23 @@ typedef struct _DRAWING_SHAPE {
 } DRAWING_SHAPE, *PDRAWING_SHAPE;
 
 typedef CONST DRAWING_SHAPE *PCDRAWING_SHAPE;
+
+//
+// Functions
+//
+
+SFORCEINLINE
+VOID
+DrawingShapeFree(
+    _Pre_maybenull_ _Post_invalid_ PDRAWING_SHAPE Shape
+    )
+{
+    if (Shape == NULL)
+    {
+        return;
+    }
+
+    Shape->DrawingShapeVTable->FreeRoutine(Shape);
+}
 
 #endif // _DRAWING_SHAPE_IRIS_TOOLKIT_

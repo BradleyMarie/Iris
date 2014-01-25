@@ -99,14 +99,17 @@ SphereTraceSphere(
     
     FLOAT ScalarProjectionCenterToRayOntoRay;
     FLOAT LengthSquaredCenterToOrigin;
-    FLOAT LengthSquaredRayDirection;
     FLOAT LengthSquaredToChord;
     VECTOR3 CenterToRayOrigin;
     FLOAT HalfLengthOfChord;
     PCSPHERE Sphere;
     UINT32 Face0;
+#if !defined(ENABLE_CSG_SUPPORT)
+    FLOAT Distance;
+#else 
     UINT32 Face1;
-
+#endif // !defined(ENABLE_CSG_SUPPORT)
+    
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
     ASSERT(Context != NULL);
@@ -114,7 +117,7 @@ SphereTraceSphere(
 
     Sphere = (PCSPHERE) Context;
 
-    VectorSubtract(&Sphere->Center, &Ray->Origin, &CenterToRayOrigin);
+    PointSubtract(&Sphere->Center, &Ray->Origin, &CenterToRayOrigin);
 
     ScalarProjectionCenterToRayOntoRay = VectorDotProduct(&Ray->Direction,
                                                           &CenterToRayOrigin);
@@ -133,22 +136,46 @@ SphereTraceSphere(
 
     HalfLengthOfChord = SqrtFloat(Sphere->RadiusSquared - LengthSquaredToChord);
 
-    if (ScalarProjectionCenterToRayOntoRay > HalfLengthOfChord)
+    if (ScalarProjectionCenterToRayOntoRay < -HalfLengthOfChord)
     {
-        Face0 = SPHERE_FRONT_FACE;
-        Face1 = SPHERE_BACK_FACE;
-    }
-    else if (ScalarProjectionCenterToRayOntoRay < (FLOAT) 0.0)
-    {
+#if defined(ENABLE_CSG_SUPPORT)
         Face0 = SPHERE_BACK_FACE;
         Face1 = SPHERE_FRONT_FACE;
+#else
+        return ISTATUS_SUCCESS;
+#endif // defined(ENABLE_CSG_SUPPORT)
+    }
+    else if (ScalarProjectionCenterToRayOntoRay > HalfLengthOfChord)
+    {
+        Face0 = SPHERE_FRONT_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
+        Face1 = SPHERE_BACK_FACE;
+#else
+        Distance = ScalarProjectionCenterToRayOntoRay - HalfLengthOfChord;
+#endif // defined(ENABLE_CSG_SUPPORT)
     }
     else
     {
         Face0 = SPHERE_BACK_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
         Face1 = SPHERE_BACK_FACE;
+#else
+        Distance = ScalarProjectionCenterToRayOntoRay + HalfLengthOfChord;
+#endif // defined(ENABLE_CSG_SUPPORT)
     }
 
+#if !defined(ENABLE_CSG_SUPPORT)
+
+    *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
+                                              NULL,
+                                              (PCSHAPE) Context,
+                                              Distance,
+                                              Face0,
+                                              NULL,
+                                              0);
+
+#else
+    
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
                                               (PCSHAPE) Context,
@@ -170,6 +197,8 @@ SphereTraceSphere(
                                               NULL,
                                               0);
 
+#endif // defined(ENABLE_CSG_SUPPORT)
+
     return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
 }
 
@@ -178,7 +207,8 @@ SphereTraceSphere(
 //
 
 STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
-    { SphereTraceSphere, free },
+    { SphereTraceSphere },
+    free,
     SphereGetShader,
     SphereGetNormal
 };

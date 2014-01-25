@@ -34,7 +34,6 @@ ISTATUS
 
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE TraceRoutine;
-    PFREE_ROUTINE FreeRoutine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 
 typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
@@ -71,20 +70,6 @@ ShapeTraceShape(
                                          ShapeHitList);
 
     return Status;
-}
-
-SFORCEINLINE
-VOID
-ShapeFreeShape(
-    _Pre_maybenull_ _Post_invalid_ PSHAPE Shape
-    )
-{
-    if (Shape == NULL)
-    {
-        return;
-    }
-
-    Shape->VTable->FreeRoutine(Shape);
 }
 
 #endif // _IRIS_SHAPE_

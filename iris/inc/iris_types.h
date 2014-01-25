@@ -40,10 +40,4 @@ typedef CONST BOOL *PCBOOL;
 
 typedef int COMPARISON_RESULT;
 
-typedef
-VOID
-(*PFREE_ROUTINE)(
-    _Pre_maybenull_ _Post_invalid_ PVOID Pointer
-    );
-
 #endif // _TYPES_IRIS_

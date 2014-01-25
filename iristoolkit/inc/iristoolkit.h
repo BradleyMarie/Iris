@@ -18,6 +18,7 @@ Abstract:
 #include <iris.h>
 
 #include "iristoolkit_api.h"
+#include "iristoolkit_types.h"
 #include "iristoolkit_normal.h"
 #include "iristoolkit_shader.h"
 #include "iristoolkit_drawingshape.h"
