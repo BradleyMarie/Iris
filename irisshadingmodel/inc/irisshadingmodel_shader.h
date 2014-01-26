@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    iristoolkit_shader.h
+    irisshadingmodel_shader.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SHADER_IRIS_TOOLKIT_
-#define _SHADER_IRIS_TOOLKIT_
+#ifndef _SHADER_IRIS_SHADING_MODEL_
+#define _SHADER_IRIS_SHADING_MODEL_
 
-#include <iristoolkit.h>
+#include <irisshadingmodel.h>
 
 //
 // Types
@@ -27,4 +27,4 @@ typedef struct _SHADER {
 
 typedef CONST SHADER *PCSHADER;
 
-#endif // _SHADER_IRIS_TOOLKIT_
+#endif // _SHADER_IRIS_SHADING_MODEL_

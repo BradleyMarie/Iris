@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    iristoolkit_shape.h
+    irisshadingmodel_shape.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _DRAWING_SHAPE_IRIS_TOOLKIT_
-#define _DRAWING_SHAPE_IRIS_TOOLKIT_
+#ifndef _DRAWING_SHAPE_IRIS_SHADING_MODEL_
+#define _DRAWING_SHAPE_IRIS_SHADING_MODEL_
 
-#include <iristoolkit.h>
+#include <irisshadingmodel.h>
 
 //
 // Types
@@ -72,4 +72,4 @@ DrawingShapeFree(
     Shape->DrawingShapeVTable->FreeRoutine(Shape);
 }
 
-#endif // _DRAWING_SHAPE_IRIS_TOOLKIT_
+#endif // _DRAWING_SHAPE_IRIS_SHADING_MODEL_

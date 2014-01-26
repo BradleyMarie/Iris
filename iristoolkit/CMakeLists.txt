@@ -1,13 +1,14 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc inc src/inc)
+include_directories(../iris/inc ../irisshadingmodel/inc inc src/inc)
 
 add_library(iristoolkit SHARED
     src/triangle.c
     src/sphere.c)
 
 target_link_libraries(iristoolkit 
-    iris)
+    iris 
+    irisshadingmodel)
 
 generate_export_header(iristoolkit
     BASE_NAME iristoolkit
