@@ -103,12 +103,11 @@ SphereTraceSphere(
     VECTOR3 CenterToRayOrigin;
     FLOAT HalfLengthOfChord;
     PCSPHERE Sphere;
-    UINT32 Face0;
-#if !defined(ENABLE_CSG_SUPPORT)
     FLOAT Distance;
-#else 
+    UINT32 Face0;
+#if defined(ENABLE_CSG_SUPPORT)
     UINT32 Face1;
-#endif // !defined(ENABLE_CSG_SUPPORT)
+#endif // defined(ENABLE_CSG_SUPPORT)
     
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
@@ -176,10 +175,12 @@ SphereTraceSphere(
 
 #else
     
+    Distance = ScalarProjectionCenterToRayOntoRay - HalfLengthOfChord;
+
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
                                               (PCSHAPE) Context,
-                                              ScalarProjectionCenterToRayOntoRay - HalfLengthOfChord,
+                                              Distance,
                                               Face0,
                                               NULL,
                                               0);
@@ -189,10 +190,12 @@ SphereTraceSphere(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    Distance = ScalarProjectionCenterToRayOntoRay + HalfLengthOfChord;
+
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               *ShapeHitList,
                                               (PCSHAPE) Context,
-                                              ScalarProjectionCenterToRayOntoRay + HalfLengthOfChord,
+                                              Distance,
                                               Face1,
                                               NULL,
                                               0);

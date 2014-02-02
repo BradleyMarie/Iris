@@ -21,8 +21,29 @@ Abstract:
 // Types
 //
 
+typedef
+VOID
+(*PTRANSLUCENT_SHADING_ROUTINE)(
+    _In_ PCVOID Context,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVOID AdditionalData,
+    _Out_ PFLOAT Alpha
+    );
+
+typedef
+VOID
+(*PEMISSIVE_SHADING_ROUTINE)(
+    _In_ PCVOID Context,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVOID AdditionalData,
+    _Out_ PCOLOR3 Emissive
+    );
+
 typedef struct _SHADER {
-    PVOID Shader;
+    PEMISSIVE_SHADING_ROUTINE EmissiveRoutine;
+    PTRANSLUCENT_SHADING_ROUTINE TranslucentRoutine;
 } SHADER, *PSHADER;
 
 typedef CONST SHADER *PCSHADER;
