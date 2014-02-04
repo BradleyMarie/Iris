@@ -49,6 +49,7 @@ RayTracerTraceScene(
     _Out_ PSIZE_T HitListSize
     );
 
+IRISAPI
 VOID
 RayTracerFree(
     _Pre_maybenull_ _Post_invalid_ PRAYTRACER RayTracer

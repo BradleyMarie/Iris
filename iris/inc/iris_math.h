@@ -22,8 +22,6 @@ Abstract:
 #define INV_PI_FLOAT (FLOAT)0.3183098861837906715377675267450287240689
 
 #define SqrtFloat(number) sqrtf(number)
-#define MaxFloat(number) maxf(number)
-#define MinFloat(number) minf(number)
 #define FmaFloat(m0, m1, a0) fmaf(m0, m1, a0)
 #define AbsFloat(number) fabsf(number)
 #define CosFloat(number) cosf(number)
@@ -36,11 +34,15 @@ Abstract:
 
 #define IsNormalFloat(number) isnormal(number)
 #define IsFiniteFloat(number) isfinite(number)
+#define MaxFloat(number0, number1) fmaxf(number0, number1)
+#define MinFloat(number0, number1) fminf(number0, number1)
 
 #else
 
 #define IsNormalFloat(number) TRUE
 #define IsFiniteFloat(number) TRUE
+#define MaxFloat(number0, number1) ((number0 < number1) ? number1 : number0)
+#define MinFloat(number0, number1) ((number0 < number1) ? number0 : number1)
 
 #endif
 

@@ -197,7 +197,7 @@ Color4Over(
     Red = Over->Red * Over->Alpha + Under->Red * AlphaScalar;
     Green = Over->Green * Over->Alpha + Under->Green * AlphaScalar;
     Blue = Over->Blue * Over->Alpha + Under->Blue * AlphaScalar;
-    Alpha = Over->Alpha + AlphaScalar;
+    Alpha = MinFloat(Over->Alpha + AlphaScalar, (FLOAT) 1.0);
 
     Color4InitializeFromComponents(Blended, Red, Green, Blue, Alpha);
 }
