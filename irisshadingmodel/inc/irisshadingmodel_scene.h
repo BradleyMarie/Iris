@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SCENE_IRIS_
-#define _SCENE_IRIS_
+#ifndef _SCENE_IRIS_SHADING_MODEL_
+#define _SCENE_IRIS_SHADING_MODEL_
 
-#include <iris.h>
+#include <irisshadingmodel.h>
 
 //
 // Types
@@ -43,4 +43,4 @@ typedef struct _SCENE {
 
 typedef CONST SCENE *PCSCENE;
 
-#endif // _SCENE_IRIS_
+#endif // _SCENE_IRIS_SHADING_MODEL_

@@ -43,9 +43,20 @@ ISTATUS
 RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCRAY WorldRay,
-    _In_ PCGEOMETRY Geometry,
+    _In_ PCGEOMETRY Geometry
+    );
+
+IRISAPI
+VOID
+RayTracerClearResults(
+    _Inout_ PRAYTRACER RayTracer
+    );
+
+IRISAPI
+VOID
+RayTracerGetResults(
+    _Inout_ PRAYTRACER RayTracer,
     _In_ BOOL SortResults,
-    _In_ BOOL ClearHitList,
     _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
     _Out_ PSIZE_T HitListSize
     );
