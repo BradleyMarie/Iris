@@ -40,11 +40,12 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerTraceScene(
+RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCRAY WorldRay,
-    _In_ PCSCENE Scene,
+    _In_ PCGEOMETRY Geometry,
     _In_ BOOL SortResults,
+    _In_ BOOL ClearHitList,
     _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
     _Out_ PSIZE_T HitListSize
     );

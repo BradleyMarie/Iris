@@ -4,16 +4,16 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    iris_sceneobject.h
+    iris_geometry.h
 
 Abstract:
 
-    This file contains the internal definitions for the SCENE_OBJECT type.
+    This file contains the internal definitions for the GEOMETRY type.
 
 --*/
 
-#ifndef _SCENE_OBJECT_IRIS_INTERNAL_
-#define _SCENE_OBJECT_IRIS_INTERNAL_
+#ifndef _GEOMETRY_IRIS_INTERNAL_
+#define _GEOMETRY_IRIS_INTERNAL_
 
 #include <irisp.h>
 
@@ -21,7 +21,7 @@ Abstract:
 // Types
 //
 
-struct _SCENE_OBJECT {
+struct _GEOMETRY {
     PCSHAPE Shape;
     PCINVERTIBLE_MATRIX ModelToWorld;
     BOOL Premultiplied;
@@ -35,8 +35,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-SceneObjectTraceObject(
-    _In_ PCSCENE_OBJECT SceneObject, 
+GeometryTraceGeometry(
+    _In_ PCGEOMETRY Geometry, 
     _In_ PCRAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
@@ -48,7 +48,7 @@ SceneObjectTraceObject(
     ISTATUS Status;
     PCRAY TraceRay;
 
-    ASSERT(SceneObject != NULL);
+    ASSERT(Geometry != NULL);
     ASSERT(WorldRay != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
@@ -62,30 +62,30 @@ SceneObjectTraceObject(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (SceneObject->ModelToWorld == NULL)
+    if (Geometry->ModelToWorld == NULL)
     {
         GeometryHit->Type = GEOMETRY_TYPE_WORLD;
         TraceRay = WorldRay;
     }
-	else if (SceneObject->Premultiplied != FALSE)
+    else if (Geometry->Premultiplied != FALSE)
     {
         GeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
-        GeometryHit->ModelToWorld = &SceneObject->ModelToWorld->Matrix;
+        GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
         TraceRay = WorldRay;
     }
     else
     {
         GeometryHit->Type = GEOMETRY_TYPE_MODEL;
-        GeometryHit->ModelToWorld = &SceneObject->ModelToWorld->Matrix;
+        GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
 
-        RayMatrixMultiply(&SceneObject->ModelToWorld->Inverse,
+        RayMatrixMultiply(&Geometry->ModelToWorld->Inverse,
                           WorldRay,
                           &GeometryHit->ModelRay);
 
         TraceRay = &GeometryHit->ModelRay;
     }
 
-    Status = ShapeTraceShape(SceneObject->Shape,
+    Status = ShapeTraceShape(Geometry->Shape,
                              TraceRay,
                              ShapeHitAllocator,
                              ShapeHitList);
@@ -106,4 +106,4 @@ SceneObjectTraceObject(
     return ISTATUS_SUCCESS;
 }
 
-#endif // _SCENE_OBJECT_IRIS_INTERNAL_
+#endif // _GEOMETRY_IRIS_INTERNAL_

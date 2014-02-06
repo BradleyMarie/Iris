@@ -31,9 +31,7 @@ Abstract:
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_geometryhit.h"
-#include "iris_sceneobject.h"
-#include "iris_sceneobjecttracer.h"
-#include "iris_scene.h"
+#include "iris_geometry.h"
 #include "iris_raytracer.h"
 
 #endif // _IRIS_HEADER_

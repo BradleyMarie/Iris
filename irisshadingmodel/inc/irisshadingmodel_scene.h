@@ -28,7 +28,7 @@ ISTATUS
 (*PSCENE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
     _In_ PCRAY WorldRay,
-    _Inout_ PSCENE_OBJECT_TRACER Tracer
+    _Inout_ PRAYTRACER Tracer
     );
 
 typedef struct _SCENE_VTABLE {

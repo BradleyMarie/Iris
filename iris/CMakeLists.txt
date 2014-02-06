@@ -6,8 +6,7 @@ add_library(iris SHARED
     src/geometryhit.c
     src/matrix.c
     src/raytracer.c
-    src/sceneobject.c
-    src/sceneobjecttracer.c
+    src/geometry.c
     src/shapehitallocator.c)
 
 generate_export_header(iris

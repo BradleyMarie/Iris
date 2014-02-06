@@ -83,12 +83,14 @@ RayTracerAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
-RayTracerTraceScene(
+RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCRAY WorldRay,
-    _In_ PCSCENE Scene,
+    _In_ PCGEOMETRY Geometry,
     _In_ BOOL SortResults,
+    _In_ BOOL ClearHitList,
     _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
     _Out_ PSIZE_T HitListSize
     )
@@ -96,30 +98,62 @@ RayTracerTraceScene(
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
 	PGEOMETRY_HIT_ALLOCATOR GeometryHitAllocator;
 	PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
 	PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    PSHAPE_HIT_LIST ShapeHitList;
+    PCGEOMETRY_HIT GeometryHit;
     ISTATUS Status;
 
     ASSERT(RayTracer != NULL);
     ASSERT(WorldRay != NULL);
-    ASSERT(Scene != NULL);
+    ASSERT(Geometry != NULL);
     ASSERT(HitList != NULL);
+    ASSERT(HitListSize != NULL);
 
     SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
     GeometryHitAllocator = &RayTracer->GeometryHitAllocator;
     ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
     PointerList = &RayTracer->HitList;
 
-    SharedGeometryHitAllocatorFreeAll(SharedGeometryHitAllocator);
-    GeometryHitAllocatorFreeAll(GeometryHitAllocator);
-    ShapeHitAllocatorFreeAll(ShapeHitAllocator);
-    IrisConstantPointerListClear(PointerList);
+    if (ClearHitList != FALSE)
+    {
+        SharedGeometryHitAllocatorFreeAll(SharedGeometryHitAllocator);
+        GeometryHitAllocatorFreeAll(GeometryHitAllocator);
+        ShapeHitAllocatorFreeAll(ShapeHitAllocator);
+        IrisConstantPointerListClear(PointerList);
+    }
 
-    Status = SceneTraceScene(Scene, 
-                             WorldRay,
-                             ShapeHitAllocator,
-                             SharedGeometryHitAllocator,
-                             GeometryHitAllocator,
-                             PointerList);
+    Status = GeometryTraceGeometry(Geometry,
+                                   WorldRay,
+                                   ShapeHitAllocator,
+                                   SharedGeometryHitAllocator,
+                                   &SharedGeometryHit,
+                                   &ShapeHitList);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    while (ShapeHitList != NULL)
+    {
+        GeometryHit = GeometryHitAllocatorAllocate(GeometryHitAllocator,
+                                                   SharedGeometryHit,
+                                                   ShapeHitList->ShapeHit);
+
+        if (GeometryHit == NULL)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        Status = IrisConstantPointerListAddPointer(PointerList,
+                                                   GeometryHit);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+    }
 
 	*HitListSize = IrisConstantPointerListGetSize(PointerList);
 	*HitList = (PCGEOMETRY_HIT*)IrisConstantPointerListGetStorage(PointerList);
@@ -129,7 +163,7 @@ RayTracerTraceScene(
 		IrisConstantPointerListSort(PointerList, GeometryHitCompare);
     }
 
-    return Status;
+    return ISTATUS_SUCCESS;
 }
 
 VOID
