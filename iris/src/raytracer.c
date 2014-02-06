@@ -87,9 +87,7 @@ ISTATUS
 RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCRAY WorldRay,
-    _In_ PCGEOMETRY Geometry,
-    _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
-    _Out_ PSIZE_T HitListSize
+    _In_ PCGEOMETRY Geometry
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
@@ -104,8 +102,6 @@ RayTracerTraceGeometry(
     ASSERT(RayTracer != NULL);
     ASSERT(WorldRay != NULL);
     ASSERT(Geometry != NULL);
-    ASSERT(HitList != NULL);
-    ASSERT(HitListSize != NULL);
 
     SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
     GeometryHitAllocator = &RayTracer->GeometryHitAllocator;
