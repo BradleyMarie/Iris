@@ -4,7 +4,7 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    iris_scene.h
+    irisshadingmodel_scene.h
 
 Abstract:
 
@@ -25,22 +25,62 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
+(*PSCENE_ADD_OBJECT_ROUTINE)(
+    _Inout_ PVOID Context,
+    _In_ PSCENE_OBJECT SceneObject
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
 (*PSCENE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
     _In_ PCRAY WorldRay,
-    _Inout_ PRAYTRACER Tracer
+    _Inout_ PSCENE_TRACER SceneTracer
     );
 
 typedef struct _SCENE_VTABLE {
+    PSCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
     PSCENE_TRACE_ROUTINE TraceRoutine;
+    PFREE_ROUTINE FreeRoutine;
 } SCENE_VTABLE, *PSCENE_VTABLE;
 
 typedef CONST SCENE_VTABLE *PCSCENE_VTABLE;
 
 typedef struct _SCENE {
-    PCSCENE_VTABLE VTable;
+    PCSCENE_VTABLE SceneVTable;
 } SCENE, *PSCENE;
 
 typedef CONST SCENE *PCSCENE;
+
+//
+// Functions
+//
+
+IRISSHADINGMODELAPI
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+SceneAddObject(
+    _Inout_ PSCENE Scene,
+    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_ BOOL Premultiplied
+    );
+
+SFORCEINLINE
+VOID
+SceneFree(
+    _Pre_maybenull_ _Post_invalid_ PSCENE Scene
+    )
+{
+    if (Scene == NULL)
+    {
+        return;
+    }
+
+    Scene->SceneVTable->FreeRoutine(Scene);
+}
 
 #endif // _SCENE_IRIS_SHADING_MODEL_

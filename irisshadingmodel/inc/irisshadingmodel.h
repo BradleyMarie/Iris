@@ -28,6 +28,8 @@ Abstract:
 #include "irisshadingmodel_rayshader.h"
 #include "irisshadingmodel_shader.h"
 #include "irisshadingmodel_drawingshape.h"
+#include "irisshadingmodel_sceneobject.h"
+#include "irisshadingmodel_scenetracer.h"
 #include "irisshadingmodel_scene.h"
 
 #endif // _IRIS_SHADING_MODEL_HEADER_

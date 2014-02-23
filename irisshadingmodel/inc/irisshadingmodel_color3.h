@@ -219,4 +219,16 @@ Color3IsBlack(
     return Result;
 }
 
+SFORCEINLINE
+VOID
+Color3InitializeBlack(
+    _Out_ PCOLOR3 Color
+    )
+{
+    Color3InitializeFromComponents(Color,
+                                   (FLOAT) 0.0,
+                                   (FLOAT) 0.0,
+                                   (FLOAT) 0.0);
+}
+
 #endif // _COLOR3_IRIS_SHADING_MODEL_

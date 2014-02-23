@@ -26,15 +26,16 @@ ISTATUS
 (*PSHADE_RAY_ROUTINE)(
     _In_ PVOID Context,
     _In_ PCRAY WorldRay,
-    _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
-    _Out_ PSIZE_T HitListSize
+    _In_reads_(HitListSize) PCGEOMETRY_HIT *HitList,
+    _In_ PSIZE_T HitListSize,
+    _Out_ PCOLOR3 Color
     );
 
 typedef struct _RAYSHADER_HEADER RAYSHADER_HEADER, *PRAYSHADER_HEADER;
 typedef CONST RAYSHADER_HEADER *PCRAYSHADER_HEADER;
 
 typedef struct _RAYSHADER {
-    PRAYSHADER_HEADER Header;
+    PRAYSHADER_HEADER RayShaderHeader;
 } RAYSHADER, *PRAYSHADER;
 
 typedef CONST RAYSHADER *PCRAYSHADER;
@@ -53,7 +54,7 @@ RayShaderHeaderAllocate(
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PFREE_ROUTINE RaytracerFreeRoutine
+    _In_opt_ PFREE_ROUTINE RayShaderFreeRoutine
     );
 
 _Check_return_

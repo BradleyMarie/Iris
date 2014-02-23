@@ -3,7 +3,12 @@ include(GenerateExportHeader)
 include_directories(../iris/inc inc src/inc)
 
 add_library(irisshadingmodel SHARED
-    src/surfacenormal.c)
+    src/surfacenormal.c
+    src/scene.c
+    src/sceneobject.c
+    src/scenetracer.c
+    src/visibilitytester.c
+    src/rayshader.c)
 
 target_link_libraries(irisshadingmodel 
     iris)
