@@ -54,12 +54,8 @@ RayShaderHeaderAllocate(
     ASSERT(Rng != NULL);
     ASSERT(IsNormalFloat(MinimumContinueProbability));
     ASSERT(IsFiniteFloat(MinimumContinueProbability));
-    ASSERT((FLOAT) 0.0 < MinimumContinueProbability);
-    ASSERT(MinimumContinueProbability < (FLOAT) 1.0);
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT((FLOAT) 0.0 < MaximumContinueProbability);
-    ASSERT(MaximumContinueProbability < (FLOAT) 1.0);
     ASSERT(MinimumContinueProbability < MaximumContinueProbability);
     ASSERT(ShadeRayRoutine != NULL);
 
@@ -77,6 +73,12 @@ RayShaderHeaderAllocate(
         free(RayShaderHeader);
         return NULL;
     }
+
+    MinimumContinueProbability = MaxFloat(MinimumContinueProbability, (FLOAT) 0.0);
+    MinimumContinueProbability = MinFloat(MinimumContinueProbability, (FLOAT) 1.0);
+
+    MaximumContinueProbability = MaxFloat(MaximumContinueProbability, (FLOAT) 0.0);
+    MaximumContinueProbability = MinFloat(MaximumContinueProbability, (FLOAT) 1.0);
 
     DoRouletteTermination = MinimumContinueProbability != (FLOAT) 1.0 && 
                             MaximumContinueProbability != (FLOAT) 1.0;
@@ -108,8 +110,8 @@ RayShaderTraceRayMontecarlo(
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
+    SIZE_T NumberOfHits;
     FLOAT NextRandom;
-    SIZE_T HitCount;
     ISTATUS Status;
 
     ASSERT(IsNormalFloat(PreferredContinueProbability));
@@ -162,9 +164,9 @@ RayShaderTraceRayMontecarlo(
     RayTracerGetResults(RayTracer,
                         TRUE,
                         &HitList,
-                        &HitCount);
+                        &NumberOfHits);
 
-    if (HitCount == 0)
+    if (NumberOfHits == 0)
     {
         Color3InitializeBlack(Color);
         return ISTATUS_SUCCESS;
@@ -173,7 +175,7 @@ RayShaderTraceRayMontecarlo(
     Status = Header->ShadeRayRoutine(RayShader,
                                      &NormalizedWorldRay,
                                      HitList,
-                                     HitCount,
+                                     NumberOfHits,
                                      Color);
 
     if (Status != ISTATUS_SUCCESS)
