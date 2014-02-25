@@ -48,6 +48,34 @@ typedef CONST TRANSLUCENT_SHADER *PCTRANSLUCENT_SHADER;
 // Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+TranslucentShaderShade(
+    _In_ PCTRANSLUCENT_SHADER TranslucentShader,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
+    _Out_ PFLOAT Alpha
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(TranslucentShader != NULL);
+    ASSERT(WorldHitPoint != NULL);
+    ASSERT(ModelHitPoint != NULL);
+    ASSERT(Alpha != NULL);
+
+    Status = TranslucentShader->TranslucentShaderVTable->TranslucentRoutine(TranslucentShader,
+                                                                            WorldHitPoint,
+                                                                            ModelHitPoint,
+                                                                            AdditionalData,
+                                                                            Alpha);
+
+    return Status;
+}
+
 SFORCEINLINE
 VOID
 TranslucentShaderFree(

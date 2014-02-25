@@ -27,12 +27,12 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCOLOR3 Direct
+    _Out_ PCOLOR3 Indirect
     );
 
 typedef struct _INDIRECT_SHADER_VTABLE {
@@ -51,6 +51,45 @@ typedef CONST INDIRECT_SHADER *PCINDIRECT_SHADER;
 //
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+IndirectShaderShade(
+    _In_ PCINDIRECT_SHADER IndirectShader,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PSURFACE_NORMAL SurfaceNormal,
+    _Inout_ PRANDOM Rng,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _Inout_opt_ PRAYTRACER RayTracer,
+    _Out_ PCOLOR3 Indirect
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(IndirectShader != NULL);
+    ASSERT(WorldHitPoint != NULL);
+    ASSERT(ModelHitPoint != NULL);
+    ASSERT(SurfaceNormal != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Indirect != NULL);
+
+    Status = IndirectShader->IndirectShaderVTable->IndirectRoutine(IndirectShader,
+                                                                   WorldHitPoint,
+                                                                   ModelHitPoint,
+                                                                   AdditionalData,
+                                                                   SurfaceNormal,
+                                                                   Rng,
+                                                                   VisibilityTester,
+                                                                   RayTracer,
+                                                                   Indirect);
+
+    return Status;
+}
 
 SFORCEINLINE
 VOID

@@ -35,6 +35,7 @@ Abstract:
 #define _Struct_size_bytes_(size) 
 
 #define _Inout_
+#define _Inout_opt_
 #define _Inout_updates_(size)
 
 #define _Pre_maybenull_

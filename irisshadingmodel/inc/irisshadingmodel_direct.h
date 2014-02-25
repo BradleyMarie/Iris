@@ -27,7 +27,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -50,6 +50,43 @@ typedef CONST DIRECT_SHADER *PCDIRECT_SHADER;
 //
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+DirectShaderShade(
+    _In_ PCDIRECT_SHADER DirectShader,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PSURFACE_NORMAL SurfaceNormal,
+    _Inout_ PRANDOM Rng,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _Out_ PCOLOR3 Direct
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(DirectShader != NULL);
+    ASSERT(WorldHitPoint != NULL);
+    ASSERT(ModelHitPoint != NULL);
+    ASSERT(SurfaceNormal != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Direct != NULL);
+
+    Status = DirectShader->DirectShaderVTable->DirectRoutine(DirectShader,
+                                                             WorldHitPoint,
+                                                             ModelHitPoint,
+                                                             AdditionalData,
+                                                             SurfaceNormal,
+                                                             Rng,
+                                                             VisibilityTester,
+                                                             Direct);
+
+    return Status;
+}
 
 SFORCEINLINE
 VOID

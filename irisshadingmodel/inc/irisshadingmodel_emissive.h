@@ -27,7 +27,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     );
 
@@ -47,6 +47,34 @@ typedef CONST EMISSIVE_SHADER *PCEMISSIVE_SHADER;
 //
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+EmissiveShaderShade(
+    _In_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
+    _Out_ PCOLOR3 Emissive
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(EmissiveShader != NULL);
+    ASSERT(WorldHitPoint != NULL);
+    ASSERT(ModelHitPoint != NULL);
+    ASSERT(Emissive != NULL);
+
+    Status = EmissiveShader->EmissiveShaderVTable->EmissiveRoutine(EmissiveShader,
+                                                                   WorldHitPoint,
+                                                                   ModelHitPoint,
+                                                                   AdditionalData,
+                                                                   Emissive);
+
+    return Status;
+}
 
 SFORCEINLINE
 VOID

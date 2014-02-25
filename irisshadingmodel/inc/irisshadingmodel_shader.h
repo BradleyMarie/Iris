@@ -22,11 +22,10 @@ Abstract:
 //
 
 typedef struct _SHADER {
-    PEMISSIVE_SHADER EmissiveShader;
-    PDIRECT_SHADER DirectShader;
-    PINDIRECT_SHADER IndirectShader;
-    PTRANSLUCENT_SHADER TranslucentShader;
-    PFREE_ROUTINE FreeRoutine;
+    PCEMISSIVE_SHADER EmissiveShader;
+    PCDIRECT_SHADER DirectShader;
+    PCINDIRECT_SHADER IndirectShader;
+    PCTRANSLUCENT_SHADER TranslucentShader;
 } SHADER, *PSHADER;
 
 typedef CONST SHADER *PCSHADER;
@@ -34,6 +33,34 @@ typedef CONST SHADER *PCSHADER;
 //
 // Functions
 //
+
+_Check_return_
+_Ret_maybenull_
+SFORCEINLINE
+PSHADER
+ShaderAllocate(
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
+    )
+{
+    PSHADER Shader;
+
+    Shader = malloc(sizeof(SHADER));
+
+    if (Shader == NULL)
+    {
+        return NULL;
+    }
+
+    Shader->EmissiveShader = EmissiveShader;
+    Shader->DirectShader = DirectShader;
+    Shader->IndirectShader = IndirectShader;
+    Shader->TranslucentShader = TranslucentShader;
+
+    return NULL;
+}
 
 SFORCEINLINE
 VOID
@@ -46,7 +73,7 @@ ShaderFree(
         return;
     }
 
-    Shader->FreeRoutine(Shader);
+    free(Shader);
 }
 
 #endif // _SHADER_IRIS_SHADING_MODEL_
