@@ -53,7 +53,7 @@ IRISSHADINGMODELAPI
 VOID
 SuraceNormalGetNormalizedModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Out_ PVECTOR3 NormalizedWorldNormal
+    _Out_ PVECTOR3 NormalizedModelNormal
     );
 
 #endif // _SURFACE_NORMAL_IRIS_SHADING_MODEL_

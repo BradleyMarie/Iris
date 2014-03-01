@@ -40,6 +40,7 @@ typedef CONST LIST_SCENE *PCLIST_SCENE;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS 
 ListSceneAddObject(
     _Inout_ PVOID Context,
@@ -82,6 +83,7 @@ ListSceneAddObject(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS 
 ListSceneTrace(
     _In_ PCVOID Context, 
@@ -119,6 +121,7 @@ ListSceneTrace(
     return ISTATUS_SUCCESS;
 }
 
+STATIC
 VOID
 ListSceneFree(
     _Pre_maybenull_ _Post_invalid_ PVOID Scene
