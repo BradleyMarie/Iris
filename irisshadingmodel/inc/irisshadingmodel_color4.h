@@ -202,4 +202,19 @@ Color4Over(
     Color4InitializeFromComponents(Blended, Red, Green, Blue, Alpha);
 }
 
+SFORCEINLINE
+VOID
+Color4InitializeTransparent(
+    _Out_ PCOLOR4 Color
+    )
+{
+    ASSERT(Color != NULL);
+
+    Color4InitializeFromComponents(Color,
+                                   (FLOAT) 0.0,
+                                   (FLOAT) 0.0,
+                                   (FLOAT) 0.0,
+                                   (FLOAT) 0.0);
+}
+
 #endif // _COLOR4_IRIS_SHADING_MODEL_

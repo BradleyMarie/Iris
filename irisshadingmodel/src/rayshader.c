@@ -26,6 +26,7 @@ struct _RAYSHADER_HEADER {
     BOOL DoRouletteTermination;
     PRAYTRACER RayTracer;
     PCSCENE Scene;
+    FLOAT Epsilon;
     PRANDOM Rng;
 };
 
@@ -40,6 +41,7 @@ PRAYSHADER_HEADER
 RayShaderHeaderAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
+    _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
@@ -52,8 +54,10 @@ RayShaderHeaderAllocate(
 
     ASSERT(Scene != NULL);
     ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(MinimumContinueProbability));
-    ASSERT(IsFiniteFloat(MinimumContinueProbability));
+    ASSERT(IsNormalFloat(Epsilon));
+    ASSERT(IsFiniteFloat(Epsilon));
+    ASSERT(IsNormalFloat(MaximumContinueProbability));
+    ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(MinimumContinueProbability < MaximumContinueProbability);
@@ -87,6 +91,7 @@ RayShaderHeaderAllocate(
     RayShaderHeader->MaximumContinueProbability = MaximumContinueProbability;
     RayShaderHeader->DoRouletteTermination = DoRouletteTermination;
     RayShaderHeader->RayShaderFreeRoutine = RayShaderFreeRoutine;
+    RayShaderHeader->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
     RayShaderHeader->ShadeRayRoutine = ShadeRayRoutine;
     RayShaderHeader->RayTracer = RayTracer;
     RayShaderHeader->Scene = Scene;
@@ -106,13 +111,17 @@ RayShaderTraceRayMontecarlo(
     _Out_ PCOLOR3 Color
     )
 {
+    PCGEOMETRY_HIT GeometryHit;
     PRAYSHADER_HEADER Header;
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
+    COLOR4 BlendedColor;
     SIZE_T NumberOfHits;
     FLOAT NextRandom;
+    COLOR4 HitColor;
     ISTATUS Status;
+    SIZE_T Index;
 
     ASSERT(IsNormalFloat(PreferredContinueProbability));
     ASSERT(IsFiniteFloat(PreferredContinueProbability));
@@ -172,16 +181,33 @@ RayShaderTraceRayMontecarlo(
         return ISTATUS_SUCCESS;
     }
 
-    Status = Header->ShadeRayRoutine(RayShader,
-                                     &NormalizedWorldRay,
-                                     HitList,
-                                     NumberOfHits,
-                                     Color);
+    Color4InitializeTransparent(&BlendedColor);
 
-    if (Status != ISTATUS_SUCCESS)
+    for (Index = 0; 
+         Index < NumberOfHits || BlendedColor.Alpha < (FLOAT) 1.0; 
+         Index++)
     {
-        return Status;
+        GeometryHit = HitList[Index];
+
+        if (GeometryHit->Distance <= Header->Epsilon)
+        {
+            continue;
+        }
+
+        Status = Header->ShadeRayRoutine(RayShader,
+                                         &NormalizedWorldRay,
+                                         GeometryHit,
+                                         &HitColor);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+
+        Color4Over(&BlendedColor, &HitColor, &BlendedColor);
     }
+
+    Color3InitializeFromColor4(Color, &BlendedColor);
 
     if (Header->DoRouletteTermination != FALSE)
     {

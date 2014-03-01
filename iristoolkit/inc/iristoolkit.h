@@ -21,5 +21,6 @@ Abstract:
 #include "iristoolkit_api.h"
 #include "iristoolkit_triangle.h"
 #include "iristoolkit_sphere.h"
+#include "iristoolkit_pathtracer.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

@@ -5,7 +5,8 @@ include_directories(../iris/inc ../irisshadingmodel/inc inc src/inc)
 add_library(iristoolkit SHARED
     src/triangle.c
     src/sphere.c
-    src/listscene.c)
+    src/listscene.c
+    src/pathtracer.c)
 
 target_link_libraries(iristoolkit 
     iris 

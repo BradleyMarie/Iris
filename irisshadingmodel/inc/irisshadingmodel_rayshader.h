@@ -22,13 +22,14 @@ Abstract:
 //
 
 typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSHADE_RAY_ROUTINE)(
     _In_ PVOID Context,
     _In_ PCRAY WorldRay,
-    _In_reads_(HitListSize) PCGEOMETRY_HIT *HitList,
-    _In_ PSIZE_T HitListSize,
-    _Out_ PCOLOR3 Color
+    _In_ PCGEOMETRY_HIT Hit,
+    _Out_ PCOLOR4 Color
     );
 
 typedef struct _RAYSHADER_HEADER RAYSHADER_HEADER, *PRAYSHADER_HEADER;
@@ -51,6 +52,7 @@ PRAYSHADER_HEADER
 RayShaderHeaderAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
+    _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
