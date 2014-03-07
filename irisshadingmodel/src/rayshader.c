@@ -111,15 +111,26 @@ RayShaderTraceRayMontecarlo(
     _Out_ PCOLOR3 Color
     )
 {
+    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    SURFACE_NORMAL SurfaceNormal;
+    PCDRAWING_SHAPE DrawingShape;
     PCGEOMETRY_HIT GeometryHit;
     PRAYSHADER_HEADER Header;
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
+    PCMATRIX ModelToWorld;
+    PCVOID AdditionalData;
     PRAYTRACER RayTracer;
     COLOR4 BlendedColor;
     SIZE_T NumberOfHits;
+    VECTOR3 ModelViewer;
     FLOAT NextRandom;
+    PCSHADER Shader;
+    PCNORMAL Normal;
+    POINT3 WorldHit;
+    POINT3 ModelHit;
     COLOR4 HitColor;
+    FLOAT Distance;
     ISTATUS Status;
     SIZE_T Index;
 
@@ -188,15 +199,53 @@ RayShaderTraceRayMontecarlo(
          Index++)
     {
         GeometryHit = HitList[Index];
+        SharedGeometryHit = GeometryHit->SharedGeometryHit;
+        Distance = GeometryHit->Distance;
 
-        if (GeometryHit->Distance <= Header->Epsilon)
+        if (Distance <= Header->Epsilon)
         {
             continue;
         }
 
+        RayEndpoint(WorldRay, Distance, &WorldHit);
+
+        SharedGeometryHitComputeModelViewer(SharedGeometryHit,
+                                            &WorldRay->Direction,
+                                            &ModelViewer);
+
+        SharedGeometryHitComputeModelHit(SharedGeometryHit,
+                                         &WorldHit,
+                                         &ModelHit);
+
+        ModelToWorld = SharedGeometryHitGetModelToWorld(SharedGeometryHit);
+
+        AdditionalData = GeometryHit->AdditionalData;
+
+        DrawingShape = (PCDRAWING_SHAPE) GeometryHit->Shape;
+
+        Normal = DrawingShapeGetNormal(DrawingShape,
+                                       GeometryHit->FaceHit);
+
+        SurfaceNormalInitialize(&SurfaceNormal,
+                                Normal,
+                                &WorldHit,
+                                &ModelHit,
+                                ModelToWorld,
+                                AdditionalData);
+
+        Shader = DrawingShapeGetShader(DrawingShape,
+                                       GeometryHit->FaceHit);
+
         Status = Header->ShadeRayRoutine(RayShader,
-                                         &NormalizedWorldRay,
-                                         GeometryHit,
+                                         Distance,
+                                         &NormalizedWorldRay.Direction,
+                                         &WorldHit,
+                                         &ModelViewer,
+                                         &ModelHit,
+                                         ModelToWorld,
+                                         AdditionalData,
+                                         Shader,
+                                         &SurfaceNormal,
                                          &HitColor);
 
         if (Status != ISTATUS_SUCCESS)

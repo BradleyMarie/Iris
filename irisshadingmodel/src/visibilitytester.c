@@ -17,7 +17,7 @@ Abstract:
 struct _VISIBILITY_TESTER {
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
-    PSCENE Scene;
+    PCSCENE Scene;
 };
 
 _Check_return_

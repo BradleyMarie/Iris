@@ -18,6 +18,13 @@ Abstract:
 #include <irisshadingmodel.h>
 
 //
+// Forward declarations
+//
+
+typedef struct _SHADER SHADER, *PSHADER;
+typedef CONST SHADER *PCSHADER;
+
+//
 // Types
 //
 
@@ -27,8 +34,15 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSHADE_RAY_ROUTINE)(
     _In_ PVOID Context,
-    _In_ PCRAY WorldRay,
-    _In_ PCGEOMETRY_HIT Hit,
+    _In_ FLOAT Distance,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCPOINT3 WorldHit,
+    _In_ PCVECTOR3 ModelViewer,
+    _In_ PCPOINT3 ModelHit,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ PCVOID AdditionalData,
+    _In_ PCSHADER Shader,
+    _In_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PCOLOR4 Color
     );
 

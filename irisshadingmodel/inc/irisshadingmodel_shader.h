@@ -21,14 +21,12 @@ Abstract:
 // Types
 //
 
-typedef struct _SHADER {
+struct _SHADER {
     PCEMISSIVE_SHADER EmissiveShader;
     PCDIRECT_SHADER DirectShader;
     PCINDIRECT_SHADER IndirectShader;
     PCTRANSLUCENT_SHADER TranslucentShader;
-} SHADER, *PSHADER;
-
-typedef CONST SHADER *PCSHADER;
+};
 
 //
 // Functions

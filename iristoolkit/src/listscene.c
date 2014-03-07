@@ -129,7 +129,7 @@ ListSceneFree(
 {
     PLIST_SCENE ListScene;
 
-    if (ListScene == NULL)
+    if (Scene == NULL)
     {
         return;
     }
