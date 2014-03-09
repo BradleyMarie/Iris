@@ -19,6 +19,7 @@ Abstract:
 #include <irisshadingmodel.h>
 
 #include "iristoolkit_api.h"
+#include "iristoolkit_framebuffer.h"
 #include "iristoolkit_triangle.h"
 #include "iristoolkit_sphere.h"
 #include "iristoolkit_pathtracer.h"

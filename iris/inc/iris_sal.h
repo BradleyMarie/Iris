@@ -31,6 +31,8 @@ Abstract:
 
 #define _Field_size_(size) 
 #define _Field_size_bytes_opt_(size) 
+#define _Field_size_full_(size) 
+#define _Field_size_full_opt_(size) 
 
 #define _Struct_size_bytes_(size) 
 
