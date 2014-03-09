@@ -233,7 +233,7 @@ CheckedAddUInt64(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    if (SIZE_T_MAX - Addend0 < Addend1)
+    if (UINT64_MAX - Addend0 < Addend1)
     {
         return ISTATUS_INTEGER_OVERFLOW;
     }
@@ -258,7 +258,7 @@ CheckedAddUInt32(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    if (SIZE_T_MAX - Addend0 < Addend1)
+    if (UINT32_MAX - Addend0 < Addend1)
     {
         return ISTATUS_INTEGER_OVERFLOW;
     }
@@ -283,7 +283,7 @@ CheckedAddUInt16(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    if (SIZE_T_MAX - Addend0 < Addend1)
+    if (UINT16_MAX - Addend0 < Addend1)
     {
         return ISTATUS_INTEGER_OVERFLOW;
     }
@@ -308,7 +308,7 @@ CheckedAddUInt8(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    if (SIZE_T_MAX - Addend0 < Addend1)
+    if (UINT8_MAX - Addend0 < Addend1)
     {
         return ISTATUS_INTEGER_OVERFLOW;
     }
