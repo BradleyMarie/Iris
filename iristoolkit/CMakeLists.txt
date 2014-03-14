@@ -8,7 +8,8 @@ add_library(iristoolkit SHARED
     src/listscene.c
     src/tracer.c
     src/framebuffer.c
-    src/constantnormal.c)
+    src/constantnormal.c
+    src/constantemissiveshader.c)
 
 target_link_libraries(iristoolkit 
     iris 

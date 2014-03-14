@@ -25,5 +25,6 @@ Abstract:
 #include "iristoolkit_sphere.h"
 #include "iristoolkit_tracer.h"
 #include "iristoolkit_constantnormal.h"
+#include "iristoolkit_constantemissiveshader.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

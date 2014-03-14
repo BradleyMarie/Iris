@@ -22,6 +22,8 @@ Abstract:
 //
 
 typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PTRANSLUCENT_SHADING_ROUTINE)(
     _In_ PCVOID Context,

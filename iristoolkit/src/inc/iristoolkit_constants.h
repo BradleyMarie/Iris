@@ -27,7 +27,7 @@ VerifyNormalType(
     UINT8 Type
     )
 {
-    return (NormalType <= IRIS_TOOLKIT_NORMAL_MODEL_PRENORMALIZED) ? TRUE : FALSE;
+    return (Type <= IRIS_TOOLKIT_NORMAL_MODEL_PRENORMALIZED) ? TRUE : FALSE;
 }
 
 SFORCEINLINE
@@ -36,7 +36,7 @@ IsPrenormalizedNormal(
     UINT8 Type
     )
 {
-    return ((NormalType & IRIS_TOOLKIT_NORMAL_IS_PRENORMALIZED_MASK) != 0) ? TRUE : FALSE;
+    return ((Type & IRIS_TOOLKIT_NORMAL_IS_PRENORMALIZED_MASK) != 0) ? TRUE : FALSE;
 }
 
 SFORCEINLINE
@@ -45,7 +45,7 @@ IsModelNormal(
     UINT8 Type
     )
 {
-    return ((NormalType & IRIS_TOOLKIT_NORMAL_IS_MODEL_MASK) != 0) ? TRUE : FALSE;
+    return ((Type & IRIS_TOOLKIT_NORMAL_IS_MODEL_MASK) != 0) ? TRUE : FALSE;
 }
 
 #endif // _CONSTANTS_IRIS_TOOLKIT_INTERNAL_

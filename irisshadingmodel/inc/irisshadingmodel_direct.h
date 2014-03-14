@@ -21,7 +21,9 @@ Abstract:
 // Types
 //
 
-typedef 
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PDIRECT_SHADING_ROUTINE)(
     _In_ PCVOID Context,
