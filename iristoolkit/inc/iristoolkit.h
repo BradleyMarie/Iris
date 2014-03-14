@@ -20,8 +20,10 @@ Abstract:
 
 #include "iristoolkit_api.h"
 #include "iristoolkit_framebuffer.h"
+#include "iristoolkit_constants.h"
 #include "iristoolkit_triangle.h"
 #include "iristoolkit_sphere.h"
-#include "iristoolkit_pathtracer.h"
+#include "iristoolkit_tracer.h"
+#include "iristoolkit_constantnormal.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

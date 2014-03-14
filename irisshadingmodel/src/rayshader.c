@@ -112,6 +112,7 @@ RayShaderTraceRayMontecarlo(
     )
 {
     PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PSURFACE_NORMAL SurfaceNormalPointer;
     SURFACE_NORMAL SurfaceNormal;
     PCDRAWING_SHAPE DrawingShape;
     PCGEOMETRY_HIT GeometryHit;
@@ -199,7 +200,6 @@ RayShaderTraceRayMontecarlo(
          Index++)
     {
         GeometryHit = HitList[Index];
-        SharedGeometryHit = GeometryHit->SharedGeometryHit;
         Distance = GeometryHit->Distance;
 
         if (Distance <= Header->Epsilon)
@@ -207,7 +207,19 @@ RayShaderTraceRayMontecarlo(
             continue;
         }
 
+        DrawingShape = (PCDRAWING_SHAPE) GeometryHit->Shape;
+
+        Shader = DrawingShapeGetShader(DrawingShape,
+                                       GeometryHit->FaceHit);
+
+        if (Shader == NULL)
+        {
+            continue;
+        }
+
         RayEndpoint(WorldRay, Distance, &WorldHit);
+
+        SharedGeometryHit = GeometryHit->SharedGeometryHit;
 
         SharedGeometryHitComputeModelViewer(SharedGeometryHit,
                                             &WorldRay->Direction,
@@ -221,20 +233,24 @@ RayShaderTraceRayMontecarlo(
 
         AdditionalData = GeometryHit->AdditionalData;
 
-        DrawingShape = (PCDRAWING_SHAPE) GeometryHit->Shape;
-
         Normal = DrawingShapeGetNormal(DrawingShape,
                                        GeometryHit->FaceHit);
 
-        SurfaceNormalInitialize(&SurfaceNormal,
-                                Normal,
-                                &WorldHit,
-                                &ModelHit,
-                                ModelToWorld,
-                                AdditionalData);
+        if (Normal != NULL)
+        {
+            SurfaceNormalInitialize(&SurfaceNormal,
+                                    Normal,
+                                    &WorldHit,
+                                    &ModelHit,
+                                    ModelToWorld,
+                                    AdditionalData);
 
-        Shader = DrawingShapeGetShader(DrawingShape,
-                                       GeometryHit->FaceHit);
+            SurfaceNormalPointer = &SurfaceNormal;
+        }
+        else
+        {
+            SurfaceNormalPointer = NULL;
+        }
 
         Status = Header->ShadeRayRoutine(RayShader,
                                          Distance,
@@ -245,7 +261,7 @@ RayShaderTraceRayMontecarlo(
                                          ModelToWorld,
                                          AdditionalData,
                                          Shader,
-                                         &SurfaceNormal,
+                                         SurfaceNormalPointer,
                                          &HitColor);
 
         if (Status != ISTATUS_SUCCESS)

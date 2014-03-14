@@ -6,8 +6,9 @@ add_library(iristoolkit SHARED
     src/triangle.c
     src/sphere.c
     src/listscene.c
-    src/pathtracer.c
-    src/framebuffer.c)
+    src/tracer.c
+    src/framebuffer.c
+    src/constantnormal.c)
 
 target_link_libraries(iristoolkit 
     iris 

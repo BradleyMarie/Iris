@@ -17,4 +17,6 @@ Abstract:
 
 #include <iristoolkit.h>
 
+#include "iristoolkit_constants.h"
+
 #endif // _IRIS_TOOLKIT_INTERNAL_HEADER_

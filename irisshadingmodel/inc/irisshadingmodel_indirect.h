@@ -31,7 +31,7 @@ ISTATUS
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRAYTRACER RayTracer,
+    _Inout_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect
     );
 
@@ -64,7 +64,7 @@ IndirectShaderShade(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
-    _Inout_opt_ PRAYTRACER RayTracer,
+    _Inout_opt_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect
     )
 {
