@@ -383,7 +383,7 @@ TracerAllocateInternal(
                                             VisibilityTester,
                                             CurrentDepth + 1);
 
-        if (NextRayShader == NULL)
+        if (NextTracer == NULL)
         {
             free(Tracer);
             return NULL;
@@ -423,7 +423,7 @@ TracerAllocateInternal(
     Tracer->NextRayShader = NextRayShader;
     Tracer->Rng = Rng;
 
-    return (PRAYSHADER) Tracer;
+    return Tracer;
 }
 
 //

@@ -94,15 +94,26 @@ ConstantNormalAllocate(
     )
 {
     PCONSTANT_NORMAL ConstantNormal;
-    BOOL ValidType;
+    PCNORMAL_VTABLE NormalVTable;
 
     ASSERT(Normal != NULL);
 
-    ValidType = VerifyNormalType(NormalType);
-
-    if (ValidType == FALSE)
+    switch (NormalType)
     {
-        return NULL;
+        case IRIS_TOOLKIT_NORMAL_WORLD:
+            NormalVTable = &ConstantNormalWorldHeader;
+            break;
+        case IRIS_TOOLKIT_NORMAL_MODEL:
+            NormalVTable = &ConstantNormalModelHeader;
+            break;
+        case IRIS_TOOLKIT_NORMAL_WORLD_PRENORMALIZED:
+            NormalVTable = &ConstantNormalPrenormalizedWorldHeader;
+            break;
+        case IRIS_TOOLKIT_NORMAL_MODEL_PRENORMALIZED:
+            NormalVTable = &ConstantNormalPrenormalizedModelHeader;
+            break;
+        default:
+            return NULL;
     }
 
     ConstantNormal = (PCONSTANT_NORMAL) malloc(sizeof(CONSTANT_NORMAL));
@@ -112,25 +123,7 @@ ConstantNormalAllocate(
         return NULL;
     }
 
-    switch (NormalType)
-    {
-        case IRIS_TOOLKIT_NORMAL_WORLD:
-            ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalWorldHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_MODEL:
-            ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalModelHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_WORLD_PRENORMALIZED:
-            ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalPrenormalizedWorldHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_MODEL_PRENORMALIZED:
-            ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalPrenormalizedModelHeader;
-            break;
-        default:
-            ASSERT(FALSE);
-            break;
-    }
-
+    ConstantNormal->NormalHeader.NormalVTable = NormalVTable;
     ConstantNormal->Normal = *Normal;
 
     return (PNORMAL) ConstantNormal;

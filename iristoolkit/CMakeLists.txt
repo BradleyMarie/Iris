@@ -9,7 +9,8 @@ add_library(iristoolkit SHARED
     src/tracer.c
     src/framebuffer.c
     src/constantnormal.c
-    src/constantemissiveshader.c)
+    src/constantemissiveshader.c
+    src/camera.c)
 
 target_link_libraries(iristoolkit 
     iris 

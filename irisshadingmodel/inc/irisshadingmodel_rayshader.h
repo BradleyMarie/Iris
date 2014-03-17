@@ -100,7 +100,7 @@ RayShaderTraceRay(
     _Out_ PCOLOR3 Color
     )
 {
-    RayShaderTraceRayMontecarlo(RayShader, WorldRay, (FLOAT) 1.0, Color);
+    return RayShaderTraceRayMontecarlo(RayShader, WorldRay, (FLOAT) 1.0, Color);
 }
 
 #endif // _RAYSHADER_IRIS_SHADING_MODEL_

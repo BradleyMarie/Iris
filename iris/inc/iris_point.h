@@ -154,6 +154,34 @@ PointVectorAdd(
 
 SFORCEINLINE
 VOID
+PointVectorAddShrunk(
+    _In_ PCPOINT3 Point,
+    _In_ PCVECTOR3 Vector,
+    _In_ FLOAT Factor,
+    _Out_ PPOINT3 Sum
+    )
+{
+    FLOAT Divisor;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(IsZeroFloat(Factor) == FALSE);
+    ASSERT(Point != NULL);
+    ASSERT(Vector != NULL);
+    ASSERT(Sum != NULL);
+
+    Divisor = (FLOAT) 1.0 / Factor;
+
+    X = FmaFloat(Divisor, Vector->X, Point->X);
+    Y = FmaFloat(Divisor, Vector->Y, Point->Y);
+    Z = FmaFloat(Divisor, Vector->Z, Point->Z);
+
+    PointInitialize(Sum, X, Y, Z);
+}
+
+SFORCEINLINE
+VOID
 PointMatrixMultiply(
     _In_ PCMATRIX Matrix,
     _In_ PCPOINT3 Point,
