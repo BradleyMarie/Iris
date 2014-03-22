@@ -8,8 +8,13 @@ AssertException::AssertException(char const* description, char const* filename, 
 {
 	using namespace std;
 
+#if defined(_MSC_VER)
+    strcpy_s(m_description, ASSERT_EXCEPTION_DESCRIPTION_LENGTH, description);
+    strcpy_s(m_filename, ASSERT_EXCEPTION_FILENAME_LENGTH, filename);
+#else
     strcpy(m_description, description);
     strcpy(m_filename, filename);
+#endif // defined(_MSC_VER)
 }
 
 AssertException::~AssertException() throw()

@@ -88,7 +88,7 @@ TEST(VectorSubtract)
 
     VectorSubtract(&Vector1, &Vector2, &Vector2);
 
-    CHECK_EQUAL(Vector2, Vector3);
+    CHECK_EQUAL(Vector3, Vector2);
 }
 
 TEST(VectorAdd)
@@ -101,7 +101,7 @@ TEST(VectorAdd)
 
     VectorAdd(&Vector1, &Vector2, &Vector2);
 
-    CHECK_EQUAL(Vector2, Vector3);
+    CHECK_EQUAL(Vector3, Vector2);
 }
 
 TEST(VectorNormalize)
@@ -117,7 +117,7 @@ TEST(VectorNormalize)
 
     VectorNormalize(&Vector1, &Vector1);
 
-    CHECK_EQUAL(Vector1, Vector2);
+    CHECK_EQUAL(Vector2, Vector1);
 }
 
 TEST(VectorCrossProduct)
@@ -130,5 +130,5 @@ TEST(VectorCrossProduct)
 
     VectorCrossProduct(&Vector1, &Vector2, &Vector2);
 
-    CHECK_EQUAL(Vector2, Vector3);
+    CHECK_EQUAL(Vector3, Vector2);
 }

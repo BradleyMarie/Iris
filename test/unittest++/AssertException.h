@@ -3,6 +3,8 @@
 
 #include <exception>
 
+#define ASSERT_EXCEPTION_DESCRIPTION_LENGTH 512
+#define ASSERT_EXCEPTION_FILENAME_LENGTH 512
 
 namespace UnitTest {
 
@@ -18,8 +20,8 @@ public:
     int LineNumber() const;
 
 private:
-    char m_description[512];
-    char m_filename[256];
+    char m_description[ASSERT_EXCEPTION_DESCRIPTION_LENGTH];
+    char m_filename[ASSERT_EXCEPTION_FILENAME_LENGTH];
     int m_lineNumber;
 };
 
