@@ -45,7 +45,7 @@ ShaderAllocate(
 {
     PSHADER Shader;
 
-    Shader = malloc(sizeof(SHADER));
+    Shader = (PSHADER) malloc(sizeof(SHADER));
 
     if (Shader == NULL)
     {

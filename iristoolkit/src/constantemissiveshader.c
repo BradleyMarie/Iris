@@ -30,6 +30,8 @@ typedef CONST CONSTANT_EMISSIVE_SHADER *PCCONSTANT_EMISSIVE_SHADER;
 //
 
 STATIC
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ConstantEmissiveShaderShade(
     _In_ PCVOID Context,
@@ -49,6 +51,8 @@ ConstantEmissiveShaderShade(
     ConstantEmissiveShader = (PCONSTANT_EMISSIVE_SHADER) Context;
 
     *Emissive = ConstantEmissiveShader->Color;
+
+    return ISTATUS_SUCCESS;
 }
 
 //

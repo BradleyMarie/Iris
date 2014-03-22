@@ -1,0 +1,44 @@
+include_directories(../iris/inc 
+    ../irisshadingmodel/inc 
+    ../iristoolkit/inc
+    unittest++
+    src/inc)
+
+set(unittest-common-sources
+    unittest++/AssertException.cpp
+    unittest++/Checks.cpp
+    unittest++/CurrentTest.cpp
+    unittest++/DeferredTestReporter.cpp
+    unittest++/DeferredTestResult.cpp
+    unittest++/MemoryOutStream.cpp
+    unittest++/ReportAssert.cpp
+    unittest++/Test.cpp
+    unittest++/TestDetails.cpp
+    unittest++/TestList.cpp
+    unittest++/TestReporter.cpp
+    unittest++/TestReporterStdout.cpp
+    unittest++/TestResults.cpp
+    unittest++/TestRunner.cpp
+    unittest++/TimeConstraint.cpp
+    unittest++/XmlTestReporter.cpp)
+
+if(WIN32)
+    set(unittest-platform-sources
+        unittest++/win32/TimeHelpers.cpp)
+ELSE()
+    set(unittest-platform-sources 
+        unittest++/posix/SignalTranslator.cpp
+        unittest++/posix/TimeHelpers.cpp)
+ENDIF(WIN32)
+
+add_executable(iris-test
+    ${unittest-common-sources}
+    ${unittest-platform-sources}
+    src/main.cpp
+    src/utility.cpp
+    src/vector.cpp)
+
+target_link_libraries(iris-test 
+    iris 
+    irisshadingmodel
+    iristoolkit)

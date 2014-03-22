@@ -54,12 +54,12 @@ VectorInitialize(
     )
 {
     ASSERT(Vector != NULL);
-    ASSERT(IsNormalFloat(X));
-    ASSERT(IsFiniteFloat(X));
-    ASSERT(IsNormalFloat(Y));
-    ASSERT(IsFiniteFloat(Y));
-    ASSERT(IsNormalFloat(Z));
-    ASSERT(IsFiniteFloat(Z));
+    ASSERT(IsNormalFloat(X) != FALSE);
+    ASSERT(IsFiniteFloat(X) != FALSE);
+    ASSERT(IsNormalFloat(Y) != FALSE);
+    ASSERT(IsFiniteFloat(Y) != FALSE);
+    ASSERT(IsNormalFloat(Z) != FALSE);
+    ASSERT(IsFiniteFloat(Z) != FALSE);
 
     Vector->X = X;
     Vector->Y = Y;
@@ -125,8 +125,8 @@ VectorScale(
     FLOAT Z;
 
     ASSERT(Vector != NULL);
-    ASSERT(IsNormalFloat(Scalar));
-    ASSERT(IsFiniteFloat(Scalar));
+    ASSERT(IsNormalFloat(Scalar) != FALSE);
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
     ASSERT(ScaledVector != NULL);
 
     X = Vector->X * Scalar;
@@ -134,33 +134,6 @@ VectorScale(
     Z = Vector->Z * Scalar;
 
     VectorInitialize(ScaledVector, X, Y, Z);
-}
-
-SFORCEINLINE
-VOID
-VectorShrink(
-    _In_ PCVECTOR3 Vector,
-    _In_ FLOAT Factor,
-    _Out_ PVECTOR3 ShrunkVector
-    )
-{
-    FLOAT Scalar;
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
-
-    ASSERT(Vector != NULL);
-    ASSERT(IsNormalFloat(Factor));
-    ASSERT(IsFiniteFloat(Factor));
-    ASSERT(Factor != (FLOAT)0.0);
-    ASSERT(ShrunkVector != NULL);
-
-    Scalar = (FLOAT)1.0 / Factor;
-    X = Vector->X * Scalar;
-    Y = Vector->Y * Scalar;
-    Z = Vector->Z * Scalar;
-
-    VectorInitialize(ShrunkVector, X, Y, Z);
 }
 
 SFORCEINLINE
@@ -229,15 +202,18 @@ VectorNormalize(
     _Out_ PVECTOR3 NormalizedVector
     )
 {
+    FLOAT Scalar;
     FLOAT Length;
 
     ASSERT(Vector != NULL);
 
-    Length = VectorDotProduct(Vector, Vector);
+    Length = VectorLength(Vector);
 
-    ASSERT(Length != (FLOAT)0.0);
+    ASSERT(IsZeroFloat(Length) == FALSE);
 
-    VectorShrink(Vector, Length, NormalizedVector);
+    Scalar = (FLOAT) 1.0 / Length;
+
+    VectorScale(Vector, Scalar, NormalizedVector);
 }
 
 SFORCEINLINE
@@ -246,12 +222,20 @@ VectorDominantAxis(
     _In_ PCVECTOR3 Vector
     )
 {
-    if (AbsFloat(Vector->X) > AbsFloat(Vector->Y) &&
-        AbsFloat(Vector->X) > AbsFloat(Vector->Z))
+    FLOAT AbsoluteValueX;
+    FLOAT AbsoluteValueY;
+    FLOAT AbsoluteValueZ;
+
+    AbsoluteValueX = AbsFloat(Vector->X);
+    AbsoluteValueY = AbsFloat(Vector->Y);
+    AbsoluteValueZ = AbsFloat(Vector->Z);
+
+    if (AbsoluteValueX > AbsoluteValueY &&
+        AbsoluteValueX > AbsoluteValueZ)
     {
         return VECTOR_X_AXIS;
     }
-    else if (AbsFloat(Vector->Y) > AbsFloat(Vector->Z))
+    else if (AbsoluteValueY > AbsoluteValueZ)
     {
         return VECTOR_Y_AXIS;
     }
@@ -267,12 +251,20 @@ VectorDiminishedAxis(
     _In_ PCVECTOR3 Vector
     )
 {
-    if (AbsFloat(Vector->X) < AbsFloat(Vector->Y) &&
-        AbsFloat(Vector->X) < AbsFloat(Vector->Z))
+    FLOAT AbsoluteValueX;
+    FLOAT AbsoluteValueY;
+    FLOAT AbsoluteValueZ;
+
+    AbsoluteValueX = AbsFloat(Vector->X);
+    AbsoluteValueY = AbsFloat(Vector->Y);
+    AbsoluteValueZ = AbsFloat(Vector->Z);
+
+    if (AbsoluteValueX < AbsoluteValueY &&
+        AbsoluteValueX < AbsoluteValueZ)
     {
         return VECTOR_X_AXIS;
     }
-    else if (AbsFloat(Vector->Y) < AbsFloat(Vector->Z))
+    else if (AbsoluteValueY < AbsoluteValueZ)
     {
         return VECTOR_Y_AXIS;
     }
