@@ -184,7 +184,7 @@ RayTracerGetResults(
     PointerList = &RayTracer->HitList;
 
     *HitListSize = IrisConstantPointerListGetSize(PointerList);
-    *HitList = (PCGEOMETRY_HIT*)IrisConstantPointerListGetStorage(PointerList);
+    *HitList = (PCGEOMETRY_HIT*) IrisConstantPointerListGetStorage(PointerList);
 
     if (SortResults != FALSE)
     {

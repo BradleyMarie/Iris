@@ -58,16 +58,31 @@ typedef CONST SCENE *PCSCENE;
 // Functions
 //
 
-IRISSHADINGMODELAPI
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
 ISTATUS 
 SceneAddObject(
     _Inout_ PSCENE Scene,
     _In_ PCDRAWING_SHAPE DrawingShape,
-    _In_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_opt_ PCINVERTIBLE_MATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS 
+SceneAddWorldObject(
+    _Inout_ PSCENE Scene,
+    _In_ PCDRAWING_SHAPE DrawingShape
+    )
+{
+    ASSERT(Scene != NULL);
+    ASSERT(DrawingShape != NULL);
+
+    return SceneAddObject(Scene, DrawingShape, NULL, TRUE);
+}
 
 SFORCEINLINE
 VOID

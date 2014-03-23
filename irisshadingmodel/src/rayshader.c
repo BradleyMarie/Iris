@@ -60,7 +60,7 @@ RayShaderHeaderAllocate(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability < MaximumContinueProbability);
+    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
     ASSERT(ShadeRayRoutine != NULL);
 
     RayShaderHeader = (PRAYSHADER_HEADER) malloc(sizeof(RAYSHADER_HEADER));

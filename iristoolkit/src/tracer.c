@@ -359,7 +359,7 @@ TracerAllocateInternal(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability < MaximumContinueProbability);
+    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
     ASSERT(TracerShadeRoutine != NULL);
     ASSERT(VisibilityTester != NULL);
 
@@ -397,7 +397,8 @@ TracerAllocateInternal(
         NextTracer = NULL;
     }
 
-    if (CurrentDepth <= RussianRouletteStartDepth)
+    if (CurrentDepth <= RussianRouletteStartDepth ||
+        RussianRouletteStartDepth == 0)
     {
         MinimumContinueProbability = (FLOAT) 1.0;
         MinimumContinueProbability = (FLOAT) 1.0;
@@ -454,7 +455,7 @@ PathTracerAllocate(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability < MaximumContinueProbability);
+    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
 
     VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
 
@@ -506,7 +507,7 @@ RecursiveRayTracerAllocate(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(IsNormalFloat(MaximumContinueProbability));
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability < MaximumContinueProbability);
+    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
 
     VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
 

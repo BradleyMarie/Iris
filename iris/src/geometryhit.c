@@ -15,6 +15,34 @@ Abstract:
 
 #include <irisp.h>
 
+//
+// Static Variables
+//
+
+STATIC
+CONST
+MATRIX IdentityMatrix = { (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          &IdentityMatrix };
+
+//
+// Functions
+//
+
 VOID
 SharedGeometryHitComputeModelViewer(
     _In_ PCSHARED_GEOMETRY_HIT GeometryHit,
@@ -73,6 +101,11 @@ SharedGeometryHitGetModelToWorld(
     )
 {
     ASSERT(GeometryHit != NULL);
+
+    if (GeometryHit->Type == GEOMETRY_TYPE_WORLD)
+    {
+        return &IdentityMatrix;
+    }
 
     return GeometryHit->ModelToWorld;
 }

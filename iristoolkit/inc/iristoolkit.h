@@ -27,5 +27,6 @@ Abstract:
 #include "iristoolkit_constantnormal.h"
 #include "iristoolkit_constantemissiveshader.h"
 #include "iristoolkit_camera.h"
+#include "iristoolkit_listscene.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

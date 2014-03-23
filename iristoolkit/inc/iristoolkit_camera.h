@@ -30,6 +30,7 @@ PinholeCameraRender(
     _In_ PCPOINT3 ImagePlaneStartingLocation,
     _In_ PCVECTOR3 PixelXDimensions,
     _In_ PCVECTOR3 PixelYDimensions,
+    _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,

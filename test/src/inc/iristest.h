@@ -17,6 +17,7 @@ Abstract:
 
 #include <UnitTest++.h>
 #include <iostream>
+#include <cstdio>
 #include <cmath>
 
 extern "C" {
@@ -24,6 +25,7 @@ extern "C" {
 }
 
 #include "utility.h"
+#include "pfm.h"
 
 using namespace std;
 

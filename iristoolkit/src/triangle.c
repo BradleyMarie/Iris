@@ -237,6 +237,24 @@ TriangleAllocate(
     ASSERT(Vertex1 != NULL);
     ASSERT(Vertex2 != NULL);
 
+    if (FrontShader == NULL &&
+        FrontNormal != NULL)
+    {
+        return NULL;
+    }
+
+    if (BackShader == NULL &&
+        BackNormal != NULL)
+    {
+        return NULL;
+    }
+
+    if (FrontShader == NULL &&
+        BackShader == NULL)
+    {
+        return NULL;
+    }
+
     PointSubtract(Vertex1, Vertex0, &B);
     PointSubtract(Vertex2, Vertex0, &C);
 

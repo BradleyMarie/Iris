@@ -36,10 +36,12 @@ add_executable(iris-test
     ${unittest-platform-sources}
     src/main.cpp
     src/utility.cpp
+    src/pfm.cpp
     src/vector.cpp
     src/matrix.cpp
     src/point.cpp
-    src/ray.cpp)
+    src/ray.cpp
+    src/render.cpp)
 
 target_link_libraries(iris-test 
     iris 

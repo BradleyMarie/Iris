@@ -19,7 +19,7 @@ _Ret_maybenull_
 PGEOMETRY
 GeometryAllocate(
     _In_ PCSHAPE Shape,
-    _In_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_opt_ PCINVERTIBLE_MATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
 {

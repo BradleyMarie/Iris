@@ -22,6 +22,7 @@ PinholeCameraRender(
     _In_ PCPOINT3 ImagePlaneStartingLocation,
     _In_ PCVECTOR3 PixelXDimensions,
     _In_ PCVECTOR3 PixelYDimensions,
+    _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,
@@ -35,6 +36,7 @@ PinholeCameraRender(
     SIZE_T FramebufferRowIndex;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
+    SIZE_T LastRowToRender;
     VECTOR3 Direction;
     POINT3 RowStart;
     ISTATUS Status;
@@ -42,9 +44,21 @@ PinholeCameraRender(
     COLOR3 Color;
     RAY WorldRay;
 
+    if (RowsToRender == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
     FramebufferGetDimensions(Framebuffer, 
                              &FramebufferRows,
                              &FramebufferColumns);
+
+    LastRowToRender = StartingRow + RowsToRender;
+
+    if (FramebufferRows < LastRowToRender)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     PointVectorAddShrunk(ImagePlaneStartingLocation,
                          PixelXDimensions,
@@ -56,8 +70,8 @@ PinholeCameraRender(
                          (FLOAT) 1.0 + (FLOAT) AdditionalYSamplesPerPixel,
                          &RowStart);
 
-    for (FramebufferRowIndex = 0;
-         FramebufferRowIndex < FramebufferRows;
+    for (FramebufferRowIndex = StartingRow;
+         FramebufferRowIndex < LastRowToRender;
          FramebufferRowIndex++)
     {
         Origin = RowStart;

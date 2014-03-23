@@ -27,7 +27,7 @@ SFORCEINLINE
 PSCENE_OBJECT 
 SceneObjectAllocate(
     _In_ PCDRAWING_SHAPE DrawingShape,
-    _In_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_opt_ PCINVERTIBLE_MATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
 {
@@ -35,7 +35,6 @@ SceneObjectAllocate(
     PSHAPE Shape;
 
     ASSERT(DrawingShape != NULL);
-    ASSERT(ModelToWorld != NULL);
 
     Shape = (PSHAPE) DrawingShape;
 
