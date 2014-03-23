@@ -132,3 +132,52 @@ TEST(VectorCrossProduct)
 
     CHECK_EQUAL(Vector3, Vector2);
 }
+
+TEST(VectorMatrixMultiply)
+{
+    INVERTIBLE_MATRIX Matrix;
+    VECTOR3 Vector1, Vector2;
+
+    MatrixInitializeScalar(&Matrix,
+                           (FLOAT) 1.0,
+                           (FLOAT) 2.0, 
+                           (FLOAT) 3.0);
+
+    VectorInitialize(&Vector1, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    VectorInitialize(&Vector2, (FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
+
+    VectorMatrixMultiply(&Matrix.Matrix, &Vector1, &Vector1);
+
+    CHECK_EQUAL(Vector2, Vector1);
+}
+
+TEST(VectorMatrixTransposedMultiply)
+{
+    INVERTIBLE_MATRIX Matrix;
+    VECTOR3 Vector1, Vector2;
+
+    MatrixInitialize(&Matrix,
+                     (FLOAT) 1.0,
+                     (FLOAT) 2.0, 
+                     (FLOAT) 3.0,
+                     (FLOAT) 4.0,
+                     (FLOAT) 4.0,
+                     (FLOAT) 2.0,
+                     (FLOAT) 3.0,
+                     (FLOAT) 6.0,
+                     (FLOAT) 2.0,
+                     (FLOAT) 2.0,
+                     (FLOAT) 1.0,
+                     (FLOAT) 4.0,
+                     (FLOAT) 2.0,
+                     (FLOAT) 9.0,
+                     (FLOAT) 6.0,
+                     (FLOAT) 4.0);
+
+    VectorInitialize(&Vector1, (FLOAT) 1.0, (FLOAT) 3.0, (FLOAT) 4.0);
+    VectorInitialize(&Vector2, (FLOAT) 21.0, (FLOAT) 16.0, (FLOAT) 16.0);
+
+    VectorMatrixTransposedMultiply(&Matrix.Matrix, &Vector1, &Vector1);
+
+    CHECK_EQUAL(Vector2, Vector1);
+}

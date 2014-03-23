@@ -74,13 +74,13 @@ PointInitializeScaled(
     ASSERT(IsFiniteFloat(Y));
     ASSERT(IsNormalFloat(Z));
     ASSERT(IsFiniteFloat(Z));
-    ASSERT(W != (FLOAT)0.0);
+    ASSERT(IsZeroFloat(W) == FALSE);
     ASSERT(IsNormalFloat(W));
     ASSERT(IsFiniteFloat(W));
 
-    Scalar = (FLOAT)1.0 / W;
+    Scalar = (FLOAT) 1.0 / W;
 
-	PointInitialize(Point, X * W, Y * W, Z * W);
+	PointInitialize(Point, X * Scalar, Y * Scalar, Z * Scalar);
 }
 
 SFORCEINLINE

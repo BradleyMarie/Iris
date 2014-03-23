@@ -105,5 +105,21 @@ bool operator==(
 std::ostream & 
 operator<<(
     std::ostream & OStream, 
-    const MATRIX & Matrix
-    );
+    const RAY & Ray
+    )
+{
+    OStream << "((" << Ray.Origin.X << ", " << Ray.Origin.Y << ", " << Ray.Origin.Z << ")";
+    OStream << " ,(" << Ray.Direction.X << ", " << Ray.Direction.Y << ", " << Ray.Direction.Z << "))";
+
+    return OStream;
+}
+
+bool operator==(
+    const RAY & Ray1, 
+    const RAY & Ray2
+    )
+{
+    return Ray1.Origin == Ray2.Origin && 
+           Ray1.Direction == Ray2.Direction && 
+           Ray1.Time == Ray2.Time;
+}

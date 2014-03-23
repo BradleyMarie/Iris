@@ -37,7 +37,9 @@ add_executable(iris-test
     src/main.cpp
     src/utility.cpp
     src/vector.cpp
-    src/matrix.cpp)
+    src/matrix.cpp
+    src/point.cpp
+    src/ray.cpp)
 
 target_link_libraries(iris-test 
     iris 

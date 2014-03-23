@@ -44,7 +44,12 @@ bool operator==(
 std::ostream & 
 operator<<(
     std::ostream & OStream, 
-    const MATRIX & Matrix
+    const RAY & Ray
+    );
+
+bool operator==(
+    const RAY & Ray1, 
+    const RAY & Ray2
     );
 
 #endif // _IRIS_TEST_UTILITY_HEADER_

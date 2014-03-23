@@ -47,7 +47,7 @@ RayInitialize(
 
     Ray->Origin = *Origin;
     Ray->Direction = *Direction;
-	Ray->Time = (FLOAT)0.0;
+	Ray->Time = (FLOAT) 0.0;
 }
 
 SFORCEINLINE

@@ -587,7 +587,7 @@ MatrixInitializeScalar(
                       (FLOAT) 1.0,
                       &Matrix->Inverse);
 
-    MatrixpInitialize(&Matrix->Matrix, 
+    MatrixpInitialize(&Matrix->Inverse, 
                       (FLOAT) 1.0 / X,
                       (FLOAT) 0.0,
                       (FLOAT) 0.0,
@@ -604,7 +604,7 @@ MatrixInitializeScalar(
                       (FLOAT) 0.0,
                       (FLOAT) 0.0,
                       (FLOAT) 1.0,
-                      &Matrix->Inverse);
+                      &Matrix->Matrix);
 
     return ISTATUS_SUCCESS;
 }
