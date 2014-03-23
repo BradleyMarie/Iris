@@ -17,7 +17,7 @@ Abstract:
 STATIC
 VOID
 MatrixpDivideRow(
-    _Inout_ PMATRIX Matrix,
+    _Inout_ FLOAT Matrix[4][4],
     _In_range_(0, 3) SIZE_T Row,
     _In_ FLOAT Divisor
     )
@@ -29,20 +29,20 @@ MatrixpDivideRow(
     ASSERT(Row <= 3);
     ASSERT(IsNormalFloat(Divisor));
     ASSERT(IsFiniteFloat(Divisor));
-    ASSERT(Divisor != (FLOAT)0.0);
+    ASSERT(IsZeroFloat(Divisor) == FALSE);
 
-    Scalar = (FLOAT)1.0 / Divisor;
+    Scalar = (FLOAT) 1.0 / Divisor;
 
-    Matrix->M[Row][0] *= Divisor;
-    Matrix->M[Row][1] *= Divisor;
-    Matrix->M[Row][2] *= Divisor;
-    Matrix->M[Row][3] *= Divisor;
+    Matrix[Row][0] *= Divisor;
+    Matrix[Row][1] *= Divisor;
+    Matrix[Row][2] *= Divisor;
+    Matrix[Row][3] *= Divisor;
 }
 
 STATIC
 VOID
 MatrixpScaledSubtractRow(
-    _Inout_ PMATRIX Matrix,
+    _Inout_ FLOAT Matrix[4][4],
     _In_range_(0, 3) SIZE_T ConstantRow,
     _In_range_(0, 3) SIZE_T ModifiedRow,
     _In_ FLOAT Scalar
@@ -56,16 +56,16 @@ MatrixpScaledSubtractRow(
     ASSERT(IsNormalFloat(Scalar));
     ASSERT(IsFiniteFloat(Scalar));
 
-    Matrix->M[ModifiedRow][0] -= Matrix->M[ConstantRow][0] * Scalar;
-    Matrix->M[ModifiedRow][1] -= Matrix->M[ConstantRow][1] * Scalar;
-    Matrix->M[ModifiedRow][2] -= Matrix->M[ConstantRow][2] * Scalar;
-    Matrix->M[ModifiedRow][3] -= Matrix->M[ConstantRow][3] * Scalar;
+    Matrix[ModifiedRow][0] -= Matrix[ConstantRow][0] * Scalar;
+    Matrix[ModifiedRow][1] -= Matrix[ConstantRow][1] * Scalar;
+    Matrix[ModifiedRow][2] -= Matrix[ConstantRow][2] * Scalar;
+    Matrix[ModifiedRow][3] -= Matrix[ConstantRow][3] * Scalar;
 }
 
 STATIC
 VOID
 MatrixpSwapRows(
-    _Inout_ PMATRIX Matrix,
+    _Inout_ FLOAT Matrix[4][4],
     _In_range_(0, 3) SIZE_T Row0,
     _In_range_(0, 3) SIZE_T Row1
     )
@@ -81,9 +81,9 @@ MatrixpSwapRows(
 
     for (Index = 0; Index < 4; Index++)
     {
-        Temp = Matrix->M[Row0][Index];
-        Matrix->M[Row0][Index] = Matrix->M[Row1][Index];
-        Matrix->M[Row1][Index] = Temp;
+        Temp = Matrix[Row0][Index];
+        Matrix[Row0][Index] = Matrix[Row1][Index];
+        Matrix[Row1][Index] = Temp;
     }
 }
 
@@ -174,22 +174,22 @@ MatrixpInitializeIdentity(
     ASSERT(Matrix != NULL);
 
     MatrixpInitialize(Matrix, 
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       Matrix);
 }
 
@@ -197,74 +197,153 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 MatrixpInvert(
-    _In_ PCMATRIX Matrix,
-    _Out_ PMATRIX Inverse
+    _Out_ FLOAT Inverse[4][4],
+    _In_ FLOAT M00,
+    _In_ FLOAT M01,
+    _In_ FLOAT M02,
+    _In_ FLOAT M03,
+    _In_ FLOAT M10,
+    _In_ FLOAT M11,
+    _In_ FLOAT M12,
+    _In_ FLOAT M13,
+    _In_ FLOAT M20,
+    _In_ FLOAT M21,
+    _In_ FLOAT M22,
+    _In_ FLOAT M23,
+    _In_ FLOAT M30,
+    _In_ FLOAT M31,
+    _In_ FLOAT M32,
+    _In_ FLOAT M33
     )
 {
-    MATRIX TemporaryMatrix;
-    SIZE_T Index;
-    SIZE_T Lead;
-    SIZE_T R;
+    FLOAT Matrix[4][4];
+    SIZE_T ColumnIndex;
+    SIZE_T CurrentRow;
+    SIZE_T RowIndex;
 
-    ASSERT(Matrix != NULL);
     ASSERT(Inverse != NULL);
+    ASSERT(IsNormalFloat(M00));
+    ASSERT(IsFiniteFloat(M00));
+    ASSERT(IsNormalFloat(M01));
+    ASSERT(IsFiniteFloat(M01));
+    ASSERT(IsNormalFloat(M02));
+    ASSERT(IsFiniteFloat(M02));
+    ASSERT(IsNormalFloat(M03));
+    ASSERT(IsFiniteFloat(M03));
+    ASSERT(IsNormalFloat(M10));
+    ASSERT(IsFiniteFloat(M10));
+    ASSERT(IsNormalFloat(M11));
+    ASSERT(IsFiniteFloat(M11));
+    ASSERT(IsNormalFloat(M12));
+    ASSERT(IsFiniteFloat(M12));
+    ASSERT(IsNormalFloat(M13));
+    ASSERT(IsFiniteFloat(M13));
+    ASSERT(IsNormalFloat(M20));
+    ASSERT(IsFiniteFloat(M20));
+    ASSERT(IsNormalFloat(M21));
+    ASSERT(IsFiniteFloat(M21));
+    ASSERT(IsNormalFloat(M22));
+    ASSERT(IsFiniteFloat(M22));
+    ASSERT(IsNormalFloat(M23));
+    ASSERT(IsFiniteFloat(M23));
+    ASSERT(IsNormalFloat(M30));
+    ASSERT(IsFiniteFloat(M30));
+    ASSERT(IsNormalFloat(M31));
+    ASSERT(IsFiniteFloat(M31));
+    ASSERT(IsNormalFloat(M32));
+    ASSERT(IsFiniteFloat(M32));
+    ASSERT(IsNormalFloat(M33));
+    ASSERT(IsFiniteFloat(M33));
 
-    MatrixpInitializeIdentity(Inverse);
-    TemporaryMatrix = *Matrix;
+    Inverse[0][0] = (FLOAT) 1.0;
+    Inverse[0][1] = (FLOAT) 0.0;
+    Inverse[0][2] = (FLOAT) 0.0;
+    Inverse[0][3] = (FLOAT) 0.0;
+    Inverse[1][0] = (FLOAT) 0.0;
+    Inverse[1][1] = (FLOAT) 1.0;
+    Inverse[1][2] = (FLOAT) 0.0;
+    Inverse[1][3] = (FLOAT) 0.0;
+    Inverse[2][0] = (FLOAT) 0.0;
+    Inverse[2][1] = (FLOAT) 0.0;
+    Inverse[2][2] = (FLOAT) 1.0;
+    Inverse[2][3] = (FLOAT) 0.0;
+    Inverse[3][0] = (FLOAT) 0.0;
+    Inverse[3][1] = (FLOAT) 0.0;
+    Inverse[3][2] = (FLOAT) 0.0;
+    Inverse[3][3] = (FLOAT) 1.0;
 
-    Lead = 0;
+    Matrix[0][0] = M00;
+    Matrix[0][1] = M01;
+    Matrix[0][2] = M02;
+    Matrix[0][3] = M03;
+    Matrix[1][0] = M10;
+    Matrix[1][1] = M11;
+    Matrix[1][2] = M12;
+    Matrix[1][3] = M13;
+    Matrix[2][0] = M20;
+    Matrix[2][1] = M21;
+    Matrix[2][2] = M22;
+    Matrix[2][3] = M23;
+    Matrix[3][0] = M30;
+    Matrix[3][1] = M31;
+    Matrix[3][2] = M32;
+    Matrix[3][3] = M33;
 
-    for (R = 0; R < 4; R++)
+    for (CurrentRow = 0, ColumnIndex = 0; 
+         CurrentRow < 4 && ColumnIndex < 4; 
+         CurrentRow++, ColumnIndex++)
     {
-        if (R <= Lead)
+        for (ColumnIndex = ColumnIndex;
+             ColumnIndex < 4;
+             ColumnIndex++)
         {
-            break;
-        }
-
-        Index = R;
-
-        while (TemporaryMatrix.M[Index][Lead] == (FLOAT)0.0)
-        {
-            Index++;
-
-            if (Index == 4)
+            for (RowIndex = CurrentRow;
+                 RowIndex < 4;
+                 RowIndex++)
             {
-                Index = R;
-                Lead++;
-
-                if (Lead == 4)
+                if (IsZeroFloat(Matrix[RowIndex][ColumnIndex]) == FALSE)
                 {
-                    return ISTATUS_ARITHMETIC_ERROR;
+                    break;
                 }
             }
-        }
 
-        if (Index != R)
-        {
-            MatrixpSwapRows(&TemporaryMatrix, Index, R);
-            MatrixpSwapRows(Inverse, Index, R);
-        }
-
-        MatrixpDivideRow(&TemporaryMatrix, R, TemporaryMatrix.M[R][Lead]);
-        MatrixpDivideRow(Inverse, R, TemporaryMatrix.M[R][Lead]);
-
-        for (Index = 0; Index < 4; Index++)
-        {
-            if (Index != R)
+            if (IsZeroFloat(Matrix[RowIndex][ColumnIndex]) == FALSE)
             {
-                MatrixpScaledSubtractRow(&TemporaryMatrix,
-                                         R,
-                                         Index,
-                                         TemporaryMatrix.M[Index][Lead]);
-
-                MatrixpScaledSubtractRow(Inverse, 
-                                         R, 
-                                         Index,
-                                         TemporaryMatrix.M[Index][Lead]);
+                break;
             }
         }
 
-        Lead++;
+        if (ColumnIndex == 4)
+        {
+            return ISTATUS_ARITHMETIC_ERROR;
+        }
+
+        if (RowIndex != CurrentRow)
+        {
+            MatrixpSwapRows(Matrix, RowIndex, CurrentRow);
+            MatrixpSwapRows(Inverse, RowIndex, CurrentRow);
+        }
+
+        MatrixpDivideRow(Inverse, CurrentRow, Matrix[CurrentRow][ColumnIndex]);
+        MatrixpDivideRow(Matrix, CurrentRow, Matrix[CurrentRow][ColumnIndex]);
+
+        for (RowIndex = 0; RowIndex < 4; RowIndex++)
+        {
+            if (RowIndex == CurrentRow)
+            {
+                continue;
+            }
+
+            MatrixpScaledSubtractRow(Inverse, 
+                                     CurrentRow, 
+                                     RowIndex,
+                                     Matrix[RowIndex][ColumnIndex]);
+
+            MatrixpScaledSubtractRow(Matrix,
+                                     CurrentRow,
+                                     RowIndex,
+                                     Matrix[RowIndex][ColumnIndex]);
+        }
     }
 
     return ISTATUS_SUCCESS;
@@ -292,8 +371,7 @@ MatrixInitialize(
     _In_ FLOAT M33
     )
 {
-    MATRIX TemporaryInverse;
-    MATRIX TemporaryMatrix;
+    FLOAT Inverse[4][4];
     ISTATUS Status;
 
     ASSERT(Matrix != NULL);
@@ -330,7 +408,30 @@ MatrixInitialize(
     ASSERT(IsNormalFloat(M33));
     ASSERT(IsFiniteFloat(M33));
 
-    MatrixpInitialize(&TemporaryMatrix,
+    Status = MatrixpInvert(Inverse,
+                           M00,
+                           M01,
+                           M02,
+                           M03,
+                           M10,
+                           M11,
+                           M12,
+                           M13,
+                           M20,
+                           M21,
+                           M22,
+                           M23,
+                           M30,
+                           M31,
+                           M32,
+                           M33);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    MatrixpInitialize(&Matrix->Matrix,
                       M00,
                       M01,
                       M02,
@@ -347,17 +448,26 @@ MatrixInitialize(
                       M31,
                       M32,
                       M33,
-                      NULL);
+                      &Matrix->Inverse);
 
-    Status = MatrixpInvert(&TemporaryMatrix, &TemporaryInverse);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Matrix->Inverse = TemporaryInverse;
-    Matrix->Matrix = TemporaryMatrix;
+    MatrixpInitialize(&Matrix->Inverse,
+                      Inverse[0][0],
+                      Inverse[0][1],
+                      Inverse[0][2],
+                      Inverse[0][3],
+                      Inverse[1][0],
+                      Inverse[1][1],
+                      Inverse[1][2],
+                      Inverse[1][3],
+                      Inverse[2][0],
+                      Inverse[2][1],
+                      Inverse[2][2],
+                      Inverse[2][3],
+                      Inverse[3][0],
+                      Inverse[3][1],
+                      Inverse[3][2],
+                      Inverse[3][3],
+                      &Matrix->Matrix);
 
     return ISTATUS_SUCCESS;
 }
@@ -394,41 +504,41 @@ MatrixInitializeTranslation(
     ASSERT(IsFiniteFloat(Z));
 
     MatrixpInitialize(&Matrix->Matrix, 
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
                       X,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
                       Y,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       Z,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       &Matrix->Inverse);
 
     MatrixpInitialize(&Matrix->Inverse, 
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
                       -X,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
+                      (FLOAT) 0.0,
                       -Y,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       -Z,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       &Matrix->Matrix);
 
     return ISTATUS_SUCCESS;
@@ -451,47 +561,49 @@ MatrixInitializeScalar(
     ASSERT(IsNormalFloat(Z));
     ASSERT(IsFiniteFloat(Z));
 
-    if (X == (FLOAT)0.0 || Y == (FLOAT)0.0 || Z == (FLOAT)0.0)
+    if (IsZeroFloat(X) != FALSE ||
+        IsZeroFloat(Y) != FALSE ||
+        IsZeroFloat(Z) != FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT;
     }
 
     MatrixpInitialize(&Matrix->Matrix, 
                       X,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
                       Y,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
                       Z,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       &Matrix->Inverse);
 
     MatrixpInitialize(&Matrix->Matrix, 
-                      (FLOAT)1.0 / X,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0 / Y,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0 / Z,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)0.0,
-                      (FLOAT)1.0,
+                      (FLOAT) 1.0 / X,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0 / Y,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0 / Z,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 0.0,
+                      (FLOAT) 1.0,
                       &Matrix->Inverse);
 
     return ISTATUS_SUCCESS;
@@ -507,6 +619,7 @@ MatrixpInitializeRotation(
 {
     VECTOR3 NormalizedAxis;
     ISTATUS Status;
+    FLOAT Length;
     FLOAT Sin;
     FLOAT Cos;
     FLOAT Ic;
@@ -525,15 +638,17 @@ MatrixpInitializeRotation(
     ASSERT(IsFiniteFloat(Theta));
     ASSERT(Axis != NULL);
 
-    if (VectorLength(Axis) == (FLOAT)0.0)
+    Length = VectorLength(Axis);
+
+    if (IsZeroFloat(Length) != FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT;
     }
 
     VectorNormalize(Axis, &NormalizedAxis);
 
-    Sin = SinFloat(Theta * PI_FLOAT / (FLOAT)180.0);
-    Cos = CosFloat(Theta * PI_FLOAT / (FLOAT)180.0);
+    Sin = SinFloat(Theta * PI_FLOAT / (FLOAT) 180.0);
+    Cos = CosFloat(Theta * PI_FLOAT / (FLOAT) 180.0);
     Ic = 1.0f - Cos;
 
     M00 = NormalizedAxis.X * NormalizedAxis.X * Ic + Cos;
@@ -552,19 +667,19 @@ MatrixpInitializeRotation(
                               M00, 
                               M01, 
                               M02, 
-                              (FLOAT)0.0, 
+                              (FLOAT) 0.0, 
                               M10,
                               M11,
                               M12,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
                               M20,
                               M21,
                               M22,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)1.0);
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 1.0);
 
     return Status;
 }
@@ -633,21 +748,21 @@ MatrixInitializeFrustum(
 
     Status = MatrixInitialize(Matrix,
                               Sx,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
                               Tx,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
                               Sy,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
                               Ty,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
                               Sz,
                               Tz,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)1.0);
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 1.0);
 
     return Status;
 }
@@ -679,32 +794,32 @@ MatrixInitializeOrothographic(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Sx = ((FLOAT)2.0 * Near) / (Right - Left);
-    Sy = ((FLOAT)2.0 * Near) / (Top - Bottom);
+    Sx = ((FLOAT) 2.0 * Near) / (Right - Left);
+    Sy = ((FLOAT) 2.0 * Near) / (Top - Bottom);
 
     A = (Right + Left) / (Right - Left);
     B = (Top + Bottom) / (Top - Bottom);
 
     C = -(Far + Near) / (Far - Near);
-    D = (FLOAT)-2.0 * Far * Near / (Far - Near);
+    D = (FLOAT) -2.0 * Far * Near / (Far - Near);
 
     Status = MatrixInitialize(Matrix,
                               Sx,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
                               A,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
                               Sy,
                               B,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
                               C,
                               D,
-                              (FLOAT)0.0,
-                              (FLOAT)0.0,
-                              (FLOAT)-1.0,
-                              (FLOAT)0.0);
+                              (FLOAT) 0.0,
+                              (FLOAT) 0.0,
+                              (FLOAT) -1.0,
+                              (FLOAT) 0.0);
 
     return Status;
 }
