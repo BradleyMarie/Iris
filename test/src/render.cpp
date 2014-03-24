@@ -19,14 +19,16 @@ TEST(RenderConstantRedSphere)
     PEMISSIVE_SHADER ConstantShader;
     PRAYSHADER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
-    PDRAWING_SHAPE Sphere;
+    VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
+    PDRAWING_SHAPE Sphere;
     SHADER SphereShader;
     POINT3 SphereCenter;
     COLOR3 SphereColor;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    VECTOR3 Up;
 
     PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
@@ -59,6 +61,27 @@ TEST(RenderConstantRedSphere)
                                                                (PRANDOM) Scene,
                                                                (FLOAT) 0.0005,
                                                                0);
+
+    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -2.0);
+    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+
+    Status = PinholeCameraRender(&PinholeLocation,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 &CameraDirection,
+                                 &Up,
+                                 0,
+                                 500,
+                                 0,
+                                 0,
+                                 FALSE,
+                                 NULL,
+                                 RecursiveRayTracer,
+                                 Framebuffer);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     Success = WritePfm(Framebuffer, "RenderConstantRedSphere.pfm");
 }

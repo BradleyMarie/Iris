@@ -41,6 +41,17 @@ WritePfm(
     FLOAT Scale;
     FILE *File;
 
+#if defined(_MSC_VER)
+
+    errno_t error = fopen_s(&File, FileName.c_str(), "wb");
+
+    if(error != 0)
+    {
+        return false;
+    }
+
+#else
+
     File = fopen(FileName.c_str(), "wb");
 
     if (File == NULL)
@@ -48,11 +59,15 @@ WritePfm(
         return false;
     }
 
+#endif // defined(_MSC_VER)
+
     FramebufferGetDimensions(FrameBuffer, &Height, &Width);
 
-    Scale = (IsLittleEndian()) ? (FLOAT) 1.0 : (FLOAT) -1.0;
+    Scale = (IsLittleEndian()) ? (FLOAT) -1.0 : (FLOAT) 1.0;
 
-    fprintf(File, "PF\n%zu %zu\n%lf\n", Width, Height, Scale);
+    fprintf(File, "PF\n");
+    fprintf(File, "%u %u\n", Width, Height);
+    fprintf(File, "%lf\n", Scale);
 
     for (ColumnIndex = 0; ColumnIndex < Height; ColumnIndex++)
     {

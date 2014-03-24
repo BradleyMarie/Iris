@@ -80,7 +80,7 @@ PointInitializeScaled(
 
     Scalar = (FLOAT) 1.0 / W;
 
-	PointInitialize(Point, X * Scalar, Y * Scalar, Z * Scalar);
+    PointInitialize(Point, X * Scalar, Y * Scalar, Z * Scalar);
 }
 
 SFORCEINLINE
@@ -154,28 +154,50 @@ PointVectorAdd(
 
 SFORCEINLINE
 VOID
-PointVectorAddShrunk(
+PointVectorAddScaled(
     _In_ PCPOINT3 Point,
     _In_ PCVECTOR3 Vector,
-    _In_ FLOAT Factor,
+    _In_ FLOAT Scalar,
     _Out_ PPOINT3 Sum
     )
 {
-    FLOAT Divisor;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(IsZeroFloat(Factor) == FALSE);
     ASSERT(Point != NULL);
     ASSERT(Vector != NULL);
     ASSERT(Sum != NULL);
 
-    Divisor = (FLOAT) 1.0 / Factor;
+    X = FmaFloat(Scalar, Vector->X, Point->X);
+    Y = FmaFloat(Scalar, Vector->Y, Point->Y);
+    Z = FmaFloat(Scalar, Vector->Z, Point->Z);
 
-    X = FmaFloat(Divisor, Vector->X, Point->X);
-    Y = FmaFloat(Divisor, Vector->Y, Point->Y);
-    Z = FmaFloat(Divisor, Vector->Z, Point->Z);
+    PointInitialize(Sum, X, Y, Z);
+}
+
+SFORCEINLINE
+VOID
+PointVectorSubtractScaled(
+    _In_ PCPOINT3 Point,
+    _In_ PCVECTOR3 Vector,
+    _In_ FLOAT Scalar,
+    _Out_ PPOINT3 Sum
+    )
+{
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(Point != NULL);
+    ASSERT(Vector != NULL);
+    ASSERT(Sum != NULL);
+
+    Scalar = -Scalar;
+
+    X = FmaFloat(Scalar, Vector->X, Point->X);
+    Y = FmaFloat(Scalar, Vector->Y, Point->Y);
+    Z = FmaFloat(Scalar, Vector->Z, Point->Z);
 
     PointInitialize(Sum, X, Y, Z);
 }
@@ -191,7 +213,7 @@ PointMatrixMultiply(
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
-	FLOAT W;
+    FLOAT W;
 
     ASSERT(Matrix != NULL);
     ASSERT(Point != NULL);

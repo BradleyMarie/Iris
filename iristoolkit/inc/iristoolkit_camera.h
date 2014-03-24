@@ -27,9 +27,11 @@ IRISTOOLKITAPI
 ISTATUS
 PinholeCameraRender(
     _In_ PCPOINT3 PinholeLocation,
-    _In_ PCPOINT3 ImagePlaneStartingLocation,
-    _In_ PCVECTOR3 PixelXDimensions,
-    _In_ PCVECTOR3 PixelYDimensions,
+    _In_ FLOAT ImagePlaneDistance,
+    _In_ FLOAT ImagePlaneHeight,
+    _In_ FLOAT ImagePlaneWidth,
+    _In_ PCVECTOR3 CameraDirection,
+    _In_ PCVECTOR3 Up,
     _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,

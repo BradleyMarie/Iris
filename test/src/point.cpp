@@ -84,7 +84,7 @@ TEST(PointVectorAdd)
     CHECK_EQUAL(Point2, Point1);
 }
 
-TEST(PointVectorAddShrunk)
+TEST(PointVectorAddScaled)
 {
     POINT3 Point1, Point2;
     VECTOR3 Vector;
@@ -93,7 +93,21 @@ TEST(PointVectorAddShrunk)
     PointInitialize(&Point2, (FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
     VectorInitialize(&Vector, (FLOAT) 4.0, (FLOAT) 4.0, (FLOAT) 4.0);
 
-    PointVectorAddShrunk(&Point1, &Vector, (FLOAT) 2.0, &Point1);
+    PointVectorAddScaled(&Point1, &Vector, (FLOAT) 0.5, &Point1);
+
+    CHECK_EQUAL(Point2, Point1);
+}
+
+TEST(PointVectorSubtractScaled)
+{
+    POINT3 Point1, Point2;
+    VECTOR3 Vector;
+
+    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    PointInitialize(&Point2, (FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
+    VectorInitialize(&Vector, (FLOAT) -4.0, (FLOAT) -4.0, (FLOAT) -4.0);
+
+    PointVectorSubtractScaled(&Point1, &Vector, (FLOAT) 0.5, &Point1);
 
     CHECK_EQUAL(Point2, Point1);
 }
