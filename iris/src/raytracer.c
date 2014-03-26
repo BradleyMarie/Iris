@@ -138,6 +138,8 @@ RayTracerTraceGeometry(
         {
             return Status;
         }
+
+        ShapeHitList = ShapeHitList->NextShapeHit;
     }
 
     return ISTATUS_SUCCESS;

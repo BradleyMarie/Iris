@@ -58,11 +58,11 @@ TEST(RenderConstantRedSphere)
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene,
+                                                               (PRANDOM) Scene, // HACK
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -2.0);
+    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -4.0);
     VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
     VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 

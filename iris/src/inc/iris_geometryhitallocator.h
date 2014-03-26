@@ -71,6 +71,11 @@ GeometryHitAllocatorAllocate(
 
     Allocation = IrisStaticMemoryAllocatorAllocate(GeometryHitAllocator);
 
+    if (Allocation == NULL)
+    {
+        return NULL;
+    }
+
     GeometryHit = (PGEOMETRY_HIT) Allocation;
 
     GeometryHitInitialize(GeometryHit, SharedGeometryHit, ShapeHit);

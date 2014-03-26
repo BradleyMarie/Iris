@@ -238,18 +238,6 @@ TriangleAllocate(
     ASSERT(Vertex2 != NULL);
 
     if (FrontShader == NULL &&
-        FrontNormal != NULL)
-    {
-        return NULL;
-    }
-
-    if (BackShader == NULL &&
-        BackNormal != NULL)
-    {
-        return NULL;
-    }
-
-    if (FrontShader == NULL &&
         BackShader == NULL)
     {
         return NULL;

@@ -145,6 +145,8 @@ PathTracerShadeHit(
         Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
     }
 
+    Color4InitializeFromColor3(Color, &ColorWithoutAlpha, Alpha);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -283,6 +285,8 @@ RecursiveRayTracerShadeHit(
 
         Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
     }
+
+    Color4InitializeFromColor3(Color, &ColorWithoutAlpha, Alpha);
 
     return ISTATUS_SUCCESS;
 }

@@ -44,6 +44,11 @@ ShapeHitAllocatorAllocate(
 
     Allocation = IrisStaticMemoryAllocatorAllocate(ShapeHitAllocator);
 
+    if (Allocation == NULL)
+    {
+        return NULL;
+    }
+
     FullShapeHit = (PFULL_SHAPE_HIT) Allocation;
 
     ShapeHitList = &FullShapeHit->ShapeHitList;

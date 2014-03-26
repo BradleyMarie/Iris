@@ -102,7 +102,7 @@ StaticPinholeCameraRender(
                                 FramebufferRowIndex,
                                 FramebufferColumnIndex);
 
-            PointVectorAdd(&Origin, PixelYDimensions, &Origin);   
+            PointVectorAdd(&Origin, PixelXDimensions, &Origin);   
         }
 
         PointVectorAdd(&RowStart, PixelYDimensions, &RowStart);
@@ -201,10 +201,10 @@ PinholeCameraRender(
                 -ImagePlaneHeight,
                 &ImagePlaneHeightVector);
 
-    PointVectorSubtractScaled(PinholeLocation,
-                              &NormalizedCameraDirection,
-                              ImagePlaneDistance,
-                              &ImagePlaneCorner);
+    PointVectorAddScaled(PinholeLocation,
+                         &NormalizedCameraDirection,
+                         ImagePlaneDistance,
+                         &ImagePlaneCorner);
 
     PointVectorSubtractScaled(&ImagePlaneCorner,
                               &ImagePlaneWidthVector,

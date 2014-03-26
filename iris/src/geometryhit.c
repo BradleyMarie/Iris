@@ -58,14 +58,18 @@ SharedGeometryHitComputeModelViewer(
     {
         case GEOMETRY_TYPE_WORLD:
             *ModelViewer = *WorldViewer;
+            break;
         case GEOMETRY_TYPE_PREMULTIPLIED:
             VectorMatrixTransposedMultiply(GeometryHit->ModelToWorld->Inverse,
                                            WorldViewer,
                                            ModelViewer);
+            break;
         case GEOMETRY_TYPE_MODEL:
             *ModelViewer = GeometryHit->ModelRay.Direction;
+            break;
         default:
             ASSERT(FALSE);
+            break;
     }
 }
 
@@ -84,14 +88,18 @@ SharedGeometryHitComputeModelHit(
     {
         case GEOMETRY_TYPE_WORLD:
             *ModelHitPoint = *WorldHitPoint;
+            break;
         case GEOMETRY_TYPE_PREMULTIPLIED:
             PointMatrixMultiply(GeometryHit->ModelToWorld,
                                 WorldHitPoint,
                                 ModelHitPoint);
+            break;
         case GEOMETRY_TYPE_MODEL:
             *ModelHitPoint = GeometryHit->ModelRay.Origin;
+            break;
         default:
             ASSERT(FALSE);
+            break;
     }
 }
 

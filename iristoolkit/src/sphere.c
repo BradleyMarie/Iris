@@ -97,10 +97,10 @@ SphereTraceSphere(
     )
 {
     
-    FLOAT ScalarProjectionCenterToRayOntoRay;
-    FLOAT LengthSquaredCenterToOrigin;
+    FLOAT ScalarProjectionOriginToCenterOntoRay;
+    FLOAT LengthSquaredOriginToCenter;
     FLOAT LengthSquaredToChord;
-    VECTOR3 CenterToRayOrigin;
+    VECTOR3 RayOriginToCenter;
     FLOAT HalfLengthOfChord;
     PCSPHERE Sphere;
     FLOAT Distance;
@@ -116,55 +116,84 @@ SphereTraceSphere(
 
     Sphere = (PCSPHERE) Context;
 
-    PointSubtract(&Sphere->Center, &Ray->Origin, &CenterToRayOrigin);
+    PointSubtract(&Sphere->Center, &Ray->Origin, &RayOriginToCenter);
 
-    ScalarProjectionCenterToRayOntoRay = VectorDotProduct(&Ray->Direction,
-                                                          &CenterToRayOrigin);
+    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(&Ray->Direction,
+                                                             &RayOriginToCenter);
 
-    LengthSquaredCenterToOrigin = VectorDotProduct(&CenterToRayOrigin, 
-                                                   &CenterToRayOrigin);
+#if !defined(ENABLE_CSG_SUPPORT)
+    if (ScalarProjectionOriginToCenterOntoRay < (FLOAT) 0.0)
+    {
+        //
+        // Sphere is behind the ray
+        //
+        
+        *ShapeHitList = NULL;
+        return ISTATUS_SUCCESS;
+    }
+#endif
 
-    LengthSquaredToChord = ScalarProjectionCenterToRayOntoRay * 
-                           ScalarProjectionCenterToRayOntoRay -
-                           LengthSquaredCenterToOrigin;
+    LengthSquaredOriginToCenter = VectorDotProduct(&RayOriginToCenter, 
+                                                   &RayOriginToCenter);
+
+    LengthSquaredToChord = LengthSquaredOriginToCenter -
+                           ScalarProjectionOriginToCenterOntoRay * 
+                           ScalarProjectionOriginToCenterOntoRay;
 
     if (LengthSquaredToChord >= Sphere->RadiusSquared)
     {
+        //
+        // Misses sphere completely
+        //
+        
+        *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     HalfLengthOfChord = SqrtFloat(Sphere->RadiusSquared - LengthSquaredToChord);
 
-    if (ScalarProjectionCenterToRayOntoRay < -HalfLengthOfChord)
+    if (ScalarProjectionOriginToCenterOntoRay < -HalfLengthOfChord)
     {
+        //
+        // Sphere is behind the ray
+        //
+
 #if defined(ENABLE_CSG_SUPPORT)
         Face0 = SPHERE_BACK_FACE;
         Face1 = SPHERE_FRONT_FACE;
 #else
+        *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
-    else if (ScalarProjectionCenterToRayOntoRay > HalfLengthOfChord)
+    else if (ScalarProjectionOriginToCenterOntoRay > HalfLengthOfChord)
     {
+        //
+        // Hits sphere
+        //
+
         Face0 = SPHERE_FRONT_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
         Face1 = SPHERE_BACK_FACE;
 #else
-        Distance = ScalarProjectionCenterToRayOntoRay - HalfLengthOfChord;
+        Distance = ScalarProjectionOriginToCenterOntoRay - HalfLengthOfChord;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
     else
     {
+        //
+        // Inside Sphere
+        //
+
         Face0 = SPHERE_BACK_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
         Face1 = SPHERE_BACK_FACE;
 #else
-        Distance = ScalarProjectionCenterToRayOntoRay + HalfLengthOfChord;
+        Distance = ScalarProjectionOriginToCenterOntoRay + HalfLengthOfChord;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
 #if !defined(ENABLE_CSG_SUPPORT)
-
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
                                               (PCSHAPE) Context,
@@ -175,7 +204,7 @@ SphereTraceSphere(
 
 #else
     
-    Distance = ScalarProjectionCenterToRayOntoRay - HalfLengthOfChord;
+    Distance = ScalarProjectionOriginToCenterOntoRay - HalfLengthOfChord;
 
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
@@ -190,7 +219,7 @@ SphereTraceSphere(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Distance = ScalarProjectionCenterToRayOntoRay + HalfLengthOfChord;
+    Distance = ScalarProjectionOriginToCenterOntoRay + HalfLengthOfChord;
 
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               *ShapeHitList,
@@ -238,20 +267,8 @@ SphereAllocate(
     ASSERT(Center != NULL);
 
     if (Radius == (FLOAT) 0.0 ||
-        !IsNormalFloat(Radius) ||
-        !IsFiniteFloat(Radius))
-    {
-        return NULL;
-    }
-
-    if (FrontShader == NULL &&
-        FrontNormal != NULL)
-    {
-        return NULL;
-    }
-
-    if (BackShader == NULL &&
-        BackNormal != NULL)
+        IsNormalFloat(Radius) == FALSE ||
+        IsFiniteFloat(Radius) == FALSE)
     {
         return NULL;
     }
