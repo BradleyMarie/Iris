@@ -96,19 +96,23 @@ SphereTraceSphere(
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    
+    FLOAT NegatedScalarProjectionOriginToCenterOntoRay;
     FLOAT ScalarProjectionOriginToCenterOntoRay;
-    FLOAT LengthSquaredOriginToCenter;
-    FLOAT LengthSquaredToChord;
-    VECTOR3 RayOriginToCenter;
-    FLOAT HalfLengthOfChord;
+    FLOAT LengthSquaredCenterToOrigin;
+    VECTOR3 CenterToRayOrigin;
+    FLOAT LengthOfRaySquared;
+    FLOAT Discriminant;
+    FLOAT Distance0;
     PCSPHERE Sphere;
-    FLOAT Distance;
     UINT32 Face0;
+
 #if defined(ENABLE_CSG_SUPPORT)
+
     UINT32 Face1;
+    FLOAT Distance1;
+
 #endif // defined(ENABLE_CSG_SUPPORT)
-    
+
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
     ASSERT(Context != NULL);
@@ -116,100 +120,78 @@ SphereTraceSphere(
 
     Sphere = (PCSPHERE) Context;
 
-    PointSubtract(&Sphere->Center, &Ray->Origin, &RayOriginToCenter);
+    PointSubtract(&Ray->Origin, &Sphere->Center, &CenterToRayOrigin);
 
     ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(&Ray->Direction,
-                                                             &RayOriginToCenter);
+                                                             &CenterToRayOrigin);
 
-#if !defined(ENABLE_CSG_SUPPORT)
-    if (ScalarProjectionOriginToCenterOntoRay < (FLOAT) 0.0)
-    {
-        //
-        // Sphere is behind the ray
-        //
-        
-        *ShapeHitList = NULL;
-        return ISTATUS_SUCCESS;
-    }
-#endif
+    LengthOfRaySquared = VectorDotProduct(&Ray->Direction, &Ray->Direction);
 
-    LengthSquaredOriginToCenter = VectorDotProduct(&RayOriginToCenter, 
-                                                   &RayOriginToCenter);
+    LengthSquaredCenterToOrigin = VectorDotProduct(&CenterToRayOrigin, 
+                                                   &CenterToRayOrigin);
 
-    LengthSquaredToChord = LengthSquaredOriginToCenter -
-                           ScalarProjectionOriginToCenterOntoRay * 
-                           ScalarProjectionOriginToCenterOntoRay;
+    Discriminant = ScalarProjectionOriginToCenterOntoRay * 
+                   ScalarProjectionOriginToCenterOntoRay -
+                   LengthOfRaySquared *
+                   (LengthSquaredCenterToOrigin - Sphere->RadiusSquared);
 
-    if (LengthSquaredToChord >= Sphere->RadiusSquared)
+    if (Discriminant < (FLOAT) 0.0)
     {
         //
         // Misses sphere completely
         //
-        
+
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    HalfLengthOfChord = SqrtFloat(Sphere->RadiusSquared - LengthSquaredToChord);
-
-    if (ScalarProjectionOriginToCenterOntoRay < -HalfLengthOfChord)
+    if (IsZeroFloat(Discriminant) != FALSE)
     {
         //
-        // Sphere is behind the ray
+        // Hits One Point
         //
 
-#if defined(ENABLE_CSG_SUPPORT)
-        Face0 = SPHERE_BACK_FACE;
-        Face1 = SPHERE_FRONT_FACE;
-#else
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
+    }
+
+    //
+    // Hits two points
+    //
+
+    NegatedScalarProjectionOriginToCenterOntoRay = -ScalarProjectionOriginToCenterOntoRay;
+
+    Discriminant = SqrtFloat(Discriminant);
+
+    Distance0 = (NegatedScalarProjectionOriginToCenterOntoRay - Discriminant) /
+                LengthOfRaySquared;
+
+    if (LengthSquaredCenterToOrigin < Sphere->RadiusSquared)
+    {
+        Face0 = SPHERE_BACK_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
+        Face1 = SPHERE_BACK_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
-    else if (ScalarProjectionOriginToCenterOntoRay > HalfLengthOfChord)
+    else if (Distance0 > (FLOAT) 0.0)
     {
-        //
-        // Hits sphere
-        //
-
         Face0 = SPHERE_FRONT_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
         Face1 = SPHERE_BACK_FACE;
-#else
-        Distance = ScalarProjectionOriginToCenterOntoRay - HalfLengthOfChord;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
     else
     {
-        //
-        // Inside Sphere
-        //
-
         Face0 = SPHERE_BACK_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
-        Face1 = SPHERE_BACK_FACE;
-#else
-        Distance = ScalarProjectionOriginToCenterOntoRay + HalfLengthOfChord;
+        Face1 = SPHERE_FRONT_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
-#if !defined(ENABLE_CSG_SUPPORT)
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
                                               (PCSHAPE) Context,
-                                              Distance,
-                                              Face0,
-                                              NULL,
-                                              0);
-
-#else
-    
-    Distance = ScalarProjectionOriginToCenterOntoRay - HalfLengthOfChord;
-
-    *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                              NULL,
-                                              (PCSHAPE) Context,
-                                              Distance,
+                                              Distance0,
                                               Face0,
                                               NULL,
                                               0);
@@ -219,19 +201,27 @@ SphereTraceSphere(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Distance = ScalarProjectionOriginToCenterOntoRay + HalfLengthOfChord;
+#if defined(ENABLE_CSG_SUPPORT)
+
+    Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
+                LengthOfRaySquared;
 
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               *ShapeHitList,
                                               (PCSHAPE) Context,
-                                              Distance,
+                                              Distance1,
                                               Face1,
                                               NULL,
                                               0);
 
+    if (*ShapeHitList == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
 #endif // defined(ENABLE_CSG_SUPPORT)
 
-    return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
+    return ISTATUS_SUCCESS;
 }
 
 //
