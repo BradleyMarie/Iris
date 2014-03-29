@@ -10,7 +10,8 @@ add_library(iristoolkit SHARED
     src/framebuffer.c
     src/constantnormal.c
     src/constantemissiveshader.c
-    src/camera.c)
+    src/camera.c
+    src/interpolatedtriangle.c)
 
 target_link_libraries(iristoolkit 
     iris 

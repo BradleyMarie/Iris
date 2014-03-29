@@ -167,6 +167,8 @@ PointVectorAddScaled(
 
     ASSERT(Point != NULL);
     ASSERT(Vector != NULL);
+    ASSERT(IsNormalFloat(Scalar) != FALSE);
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
     ASSERT(Sum != NULL);
 
     X = FmaFloat(Scalar, Vector->X, Point->X);
@@ -191,6 +193,8 @@ PointVectorSubtractScaled(
 
     ASSERT(Point != NULL);
     ASSERT(Vector != NULL);
+    ASSERT(IsNormalFloat(Scalar) != FALSE);
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
     ASSERT(Sum != NULL);
 
     Scalar = -Scalar;

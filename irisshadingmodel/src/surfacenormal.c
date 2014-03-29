@@ -14,19 +14,23 @@ Abstract:
 
 #include <irisshadingmodelp.h>
 
-VOID
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SuraceNormalGetWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 WorldNormal
     )
 {
+    ISTATUS Status;
+
     ASSERT(SurfaceNormal != NULL);
     ASSERT(WorldNormal != NULL);
 
     if (SurfaceNormal->WorldNormalValid != FALSE)
     {
         *WorldNormal = SurfaceNormal->WorldNormal;
-        return;
+        return ISTATUS_SUCCESS;
     }
 
     if (SurfaceNormal->ModelNormalValid != FALSE)
@@ -37,11 +41,16 @@ SuraceNormalGetWorldNormal(
     }
     else
     {
-        NormalComputeNormal(SurfaceNormal->Normal,
-                            SurfaceNormal->WorldHit,
-                            SurfaceNormal->ModelHit,
-                            SurfaceNormal->AdditionalData,
-                            WorldNormal);
+        Status = NormalComputeNormal(SurfaceNormal->Normal,
+                                     SurfaceNormal->WorldHit,
+                                     SurfaceNormal->ModelHit,
+                                     SurfaceNormal->AdditionalData,
+                                     WorldNormal);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
 
         if (SurfaceNormal->IsModelNormal != FALSE)
         {
@@ -56,21 +65,27 @@ SuraceNormalGetWorldNormal(
 
     SurfaceNormal->WorldNormal = *WorldNormal;
     SurfaceNormal->WorldNormalValid = TRUE;
+
+    return ISTATUS_SUCCESS;
 }
 
-VOID
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SuraceNormalGetModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 ModelNormal
     )
 {
+    ISTATUS Status;
+
     ASSERT(SurfaceNormal != NULL);
     ASSERT(ModelNormal != NULL);
 
     if (SurfaceNormal->ModelNormalValid != FALSE)
     {
         *ModelNormal = SurfaceNormal->ModelNormal;
-        return;
+        return ISTATUS_SUCCESS;
     }
 
     if (SurfaceNormal->WorldNormalValid != FALSE)
@@ -81,11 +96,16 @@ SuraceNormalGetModelNormal(
     }
     else
     {
-        NormalComputeNormal(SurfaceNormal->Normal,
-                            SurfaceNormal->WorldHit,
-                            SurfaceNormal->ModelHit,
-                            SurfaceNormal->AdditionalData,
-                            ModelNormal);
+        Status = NormalComputeNormal(SurfaceNormal->Normal,
+                                     SurfaceNormal->WorldHit,
+                                     SurfaceNormal->ModelHit,
+                                     SurfaceNormal->AdditionalData,
+                                     ModelNormal);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
 
         if (SurfaceNormal->IsModelNormal == FALSE)
         {
@@ -100,24 +120,35 @@ SuraceNormalGetModelNormal(
 
     SurfaceNormal->ModelNormal = *ModelNormal;
     SurfaceNormal->ModelNormalValid = TRUE;
+
+    return ISTATUS_SUCCESS;
 }
 
-VOID
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SuraceNormalGetNormalizedWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedWorldNormal
     )
 {
+    ISTATUS Status;
+
     ASSERT(SurfaceNormal != NULL);
     ASSERT(NormalizedWorldNormal != NULL);
 
     if (SurfaceNormal->NormalizedWorldNormalValid != FALSE)
     {
         *NormalizedWorldNormal = SurfaceNormal->NormalizedWorldNormal;
-        return;
+        return ISTATUS_SUCCESS;
     }
 
-    SuraceNormalGetWorldNormal(SurfaceNormal, NormalizedWorldNormal);
+    Status = SuraceNormalGetWorldNormal(SurfaceNormal, NormalizedWorldNormal);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     if (SurfaceNormal->PrenormalizedTerm == PRENORMALIZED_NONE)
     {
@@ -126,24 +157,35 @@ SuraceNormalGetNormalizedWorldNormal(
 
     SurfaceNormal->NormalizedWorldNormal = *NormalizedWorldNormal;
     SurfaceNormal->NormalizedWorldNormalValid = TRUE;
+
+    return ISTATUS_SUCCESS;
 }
 
-VOID
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SuraceNormalGetNormalizedModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedModelNormal
     )
 {
+    ISTATUS Status;
+
     ASSERT(SurfaceNormal != NULL);
     ASSERT(NormalizedModelNormal != NULL);
 
     if (SurfaceNormal->NormalizedModelNormalValid != FALSE)
     {
         *NormalizedModelNormal = SurfaceNormal->NormalizedModelNormal;
-        return;
+        return ISTATUS_SUCCESS;
     }
 
-    SuraceNormalGetModelNormal(SurfaceNormal, NormalizedModelNormal);
+    Status = SuraceNormalGetModelNormal(SurfaceNormal, NormalizedModelNormal);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     if (SurfaceNormal->PrenormalizedTerm == PRENORMALIZED_NONE)
     {
@@ -152,4 +194,6 @@ SuraceNormalGetNormalizedModelNormal(
 
     SurfaceNormal->NormalizedModelNormal = *NormalizedModelNormal;
     SurfaceNormal->NormalizedModelNormalValid = TRUE;
+
+    return ISTATUS_SUCCESS;
 }

@@ -139,47 +139,47 @@ TriangleTraceTriangle(
         default:
             ASSERT(FALSE);
         case VECTOR_X_AXIS:
-            BarycentricCoordinates.B1 = (P.Z * Triangle->C.Y - 
-                                         P.Y * Triangle->C.Z) /
-                                        (Triangle->B.Z * Triangle->C.Y - 
-                                         Triangle->B.Y * Triangle->C.Z);
+            BarycentricCoordinates.Coordinates[1] = (P.Z * Triangle->C.Y - 
+                                                     P.Y * Triangle->C.Z) /
+                                                    (Triangle->B.Z * Triangle->C.Y - 
+                                                     Triangle->B.Y * Triangle->C.Z);
 
-            BarycentricCoordinates.B2 = (P.Z * Triangle->B.Y - 
-                                         P.Y * Triangle->B.Z) /
-                                        (Triangle->C.Z * Triangle->B.Y - 
-                                         Triangle->C.Y * Triangle->B.Z);
+            BarycentricCoordinates.Coordinates[2] = (P.Z * Triangle->B.Y - 
+                                                     P.Y * Triangle->B.Z) /
+                                                    (Triangle->C.Z * Triangle->B.Y - 
+                                                     Triangle->C.Y * Triangle->B.Z);
             break;
         case VECTOR_Y_AXIS:
-            BarycentricCoordinates.B1 = (P.X * Triangle->C.Z - 
-                                         P.Z * Triangle->C.X) /
-                                        (Triangle->B.X * Triangle->C.Z - 
-                                         Triangle->B.Z * Triangle->C.X);
+            BarycentricCoordinates.Coordinates[1] = (P.X * Triangle->C.Z - 
+                                                     P.Z * Triangle->C.X) /
+                                                    (Triangle->B.X * Triangle->C.Z - 
+                                                     Triangle->B.Z * Triangle->C.X);
 
-            BarycentricCoordinates.B2 = (P.X * Triangle->B.Z - 
-                                         P.Z * Triangle->B.X) /
-                                        (Triangle->C.X * Triangle->B.Z - 
-                                         Triangle->C.Z * Triangle->B.X);
+            BarycentricCoordinates.Coordinates[2] = (P.X * Triangle->B.Z - 
+                                                     P.Z * Triangle->B.X) /
+                                                    (Triangle->C.X * Triangle->B.Z - 
+                                                     Triangle->C.Z * Triangle->B.X);
             break;
         case VECTOR_Z_AXIS:
-            BarycentricCoordinates.B1 = (P.Y * Triangle->C.X - 
-                                         P.X * Triangle->C.Y) /
-                                        (Triangle->B.Y * Triangle->C.X - 
-                                         Triangle->B.X * Triangle->C.Y);
+            BarycentricCoordinates.Coordinates[1] = (P.Y * Triangle->C.X - 
+                                                     P.X * Triangle->C.Y) /
+                                                    (Triangle->B.Y * Triangle->C.X - 
+                                                     Triangle->B.X * Triangle->C.Y);
 
-            BarycentricCoordinates.B2 = (P.Y * Triangle->B.X - 
-                                         P.X * Triangle->B.Y) /
-                                        (Triangle->C.Y * Triangle->B.X - 
-                                         Triangle->C.X * Triangle->B.Y);
+            BarycentricCoordinates.Coordinates[2] = (P.Y * Triangle->B.X - 
+                                                     P.X * Triangle->B.Y) /
+                                                    (Triangle->C.Y * Triangle->B.X - 
+                                                     Triangle->C.X * Triangle->B.Y);
             break;
     }
 
-    BarycentricCoordinates.B0 = (FLOAT) 1.0 - 
-                                BarycentricCoordinates.B1 - 
-                                BarycentricCoordinates.B2;
+    BarycentricCoordinates.Coordinates[0] = (FLOAT) 1.0 - 
+                                            BarycentricCoordinates.Coordinates[1] - 
+                                            BarycentricCoordinates.Coordinates[2];
 
-    if (BarycentricCoordinates.B0 < (FLOAT) 0.0 || 
-        BarycentricCoordinates.B1 < (FLOAT) 0.0 || 
-        BarycentricCoordinates.B2 < (FLOAT) 0.0)
+    if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
+        BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
+        BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -202,7 +202,7 @@ TriangleTraceTriangle(
 // Static variables
 //
 
-STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
+CONST STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
     { TriangleTraceTriangle },
     free,
     TriangleGetShader,

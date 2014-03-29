@@ -228,7 +228,7 @@ SphereTraceSphere(
 // Static variables
 //
 
-STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
+CONST STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
     { SphereTraceSphere },
     free,
     SphereGetShader,

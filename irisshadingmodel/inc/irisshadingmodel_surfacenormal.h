@@ -28,29 +28,37 @@ typedef CONST SURFACE_NORMAL *PCSURFACE_NORMAL;
 // Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
-VOID
+ISTATUS
 SuraceNormalGetWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 WorldNormal
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
-VOID
+ISTATUS
 SuraceNormalGetModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 ModelNormal
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
-VOID
+ISTATUS
 SuraceNormalGetNormalizedWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedWorldNormal
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
-VOID
+ISTATUS
 SuraceNormalGetNormalizedModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedModelNormal

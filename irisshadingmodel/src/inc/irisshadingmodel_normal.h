@@ -21,8 +21,10 @@ Abstract:
 // Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-VOID
+ISTATUS
 NormalComputeNormal(
     _In_ PCNORMAL Normal, 
     _In_ PCPOINT3 WorldHitPoint,
@@ -31,6 +33,8 @@ NormalComputeNormal(
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
+    ISTATUS Status;
+
     ASSERT(WorldHitPoint != NULL);
     ASSERT(ModelHitPoint != NULL);
     ASSERT(SurfaceNormal != NULL);
@@ -38,18 +42,20 @@ NormalComputeNormal(
     
     if (Normal->NormalVTable->IsModelNormal != FALSE)
     {
-        Normal->NormalVTable->ComputeNormalRoutine(Normal,
-                                                   ModelHitPoint,
-                                                   AdditionalData,
-                                                   SurfaceNormal);
+        Status = Normal->NormalVTable->ComputeNormalRoutine(Normal,
+                                                            ModelHitPoint,
+                                                            AdditionalData,
+                                                            SurfaceNormal);
     }
     else
     {
-        Normal->NormalVTable->ComputeNormalRoutine(Normal,
-                                                   WorldHitPoint,
-                                                   AdditionalData,
-                                                   SurfaceNormal);
+        Status = Normal->NormalVTable->ComputeNormalRoutine(Normal,
+                                                            WorldHitPoint,
+                                                            AdditionalData,
+                                                            SurfaceNormal);
     }
+
+    return Status;
 }
 
 #endif // _NORMAL_IRIS_SHADING_MODEL_INTERNAL_

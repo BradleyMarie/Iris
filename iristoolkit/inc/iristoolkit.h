@@ -28,5 +28,6 @@ Abstract:
 #include "iristoolkit_constantemissiveshader.h"
 #include "iristoolkit_camera.h"
 #include "iristoolkit_listscene.h"
+#include "iristoolkit_interpolatedtriangle.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

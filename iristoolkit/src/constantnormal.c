@@ -29,8 +29,10 @@ typedef CONST CONSTANT_NORMAL *PCCONSTANT_NORMAL;
 // Static functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 STATIC
-VOID
+ISTATUS
 ConstantNormalComputeNormal(
     _In_ PCVOID Context, 
     _In_ PCPOINT3 HitPoint,
@@ -47,34 +49,36 @@ ConstantNormalComputeNormal(
     ConstantNormal = (PCONSTANT_NORMAL) Context;
 
     *SurfaceNormal = ConstantNormal->Normal;
+
+    return ISTATUS_SUCCESS;
 }
 
 //
 // Static variables
 //
 
-STATIC NORMAL_VTABLE ConstantNormalWorldHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalWorldHeader = {
     ConstantNormalComputeNormal,
     free,
     FALSE,
     FALSE
 };
 
-STATIC NORMAL_VTABLE ConstantNormalModelHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalModelHeader = {
     ConstantNormalComputeNormal,
     free,
     TRUE,
     FALSE
 };
 
-STATIC NORMAL_VTABLE ConstantNormalPrenormalizedWorldHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedWorldHeader = {
     ConstantNormalComputeNormal,
     free,
     FALSE,
     TRUE
 };
 
-STATIC NORMAL_VTABLE ConstantNormalPrenormalizedModelHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedModelHeader = {
     ConstantNormalComputeNormal,
     free,
     TRUE,

@@ -91,6 +91,32 @@ VectorAdd(
 
 SFORCEINLINE
 VOID
+VectorAddScaled(
+    _In_ PCVECTOR3 Addend0,
+    _In_ PCVECTOR3 Addend1,
+    _In_ FLOAT Scalar,
+    _Out_ PVECTOR3 Sum
+    )
+{
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(Addend0 != NULL);
+    ASSERT(Addend1 != NULL);
+    ASSERT(IsNormalFloat(Scalar) != FALSE);
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
+    ASSERT(Sum != NULL);
+
+    X = FmaFloat(Scalar, Addend1->X, Addend0->X);
+    Y = FmaFloat(Scalar, Addend1->Y, Addend0->Y);
+    Z = FmaFloat(Scalar, Addend1->Z, Addend0->Z);
+
+    VectorInitialize(Sum, X, Y, Z);
+}
+
+SFORCEINLINE
+VOID
 VectorSubtract(
     _In_ PCVECTOR3 Minuend,
     _In_ PCVECTOR3 Subtrahend,

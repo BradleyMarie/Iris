@@ -80,6 +80,32 @@ Color3Add(
 
 SFORCEINLINE
 VOID
+Color3AddScaled(
+    _In_ PCCOLOR3 Addend0,
+    _In_ PCCOLOR3 Addend1,
+    _In_ FLOAT Scalar,
+    _Out_ PCOLOR3 Sum
+    )
+{
+    FLOAT Red;
+    FLOAT Green;
+    FLOAT Blue;
+
+    ASSERT(Addend0 != NULL);
+    ASSERT(Addend1 != NULL);
+    ASSERT(IsNormalFloat(Scalar) != FALSE);
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
+    ASSERT(Sum != NULL);
+
+    Red = FmaFloat(Scalar, Addend1->Red, Addend0->Red);
+    Green = FmaFloat(Scalar, Addend1->Green, Addend0->Green);
+    Blue = FmaFloat(Scalar, Addend1->Blue, Addend0->Blue);
+
+    Color3InitializeFromComponents(Sum, Red, Green, Blue);
+}
+
+SFORCEINLINE
+VOID
 Color3Subtract(
     _In_ PCCOLOR3 Minuend,
     _In_ PCCOLOR3 Subtrahend,

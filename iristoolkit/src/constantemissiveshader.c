@@ -29,9 +29,9 @@ typedef CONST CONSTANT_EMISSIVE_SHADER *PCCONSTANT_EMISSIVE_SHADER;
 // Static functions
 //
 
-STATIC
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS
 ConstantEmissiveShaderShade(
     _In_ PCVOID Context,
@@ -59,7 +59,7 @@ ConstantEmissiveShaderShade(
 // Static variables
 //
 
-STATIC EMISSIVE_SHADER_VTABLE ConstantEmissiveShaderVTable = {
+CONST STATIC EMISSIVE_SHADER_VTABLE ConstantEmissiveShaderVTable = {
     ConstantEmissiveShaderShade,
     free
 };
