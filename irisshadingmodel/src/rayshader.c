@@ -196,7 +196,7 @@ RayShaderTraceRayMontecarlo(
     Color4InitializeTransparent(&BlendedColor);
 
     for (Index = 0; 
-         Index < NumberOfHits || BlendedColor.Alpha < (FLOAT) 1.0; 
+         Index < NumberOfHits && BlendedColor.Alpha < (FLOAT) 1.0; 
          Index++)
     {
         GeometryHit = HitList[Index];

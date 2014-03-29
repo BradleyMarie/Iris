@@ -34,7 +34,7 @@ ShapeHitAllocatorAllocate(
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
-    ASSERT(AdditionalData == NULL || AdditionalDataSizeInBytes == 0);
+    ASSERT(AdditionalData == NULL || AdditionalDataSizeInBytes != 0);
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
     ASSERT(Allocator != NULL);
