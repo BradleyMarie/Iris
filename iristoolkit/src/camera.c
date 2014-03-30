@@ -181,10 +181,10 @@ PinholeCameraRender(
 
     VectorNormalize(Up, &NormalizedUpVector);
 
-    VectorCrossProduct(Up,
-                       &NormalizedCameraDirection,
+    VectorCrossProduct(&NormalizedCameraDirection,
+                       Up,
                        &ImagePlaneWidthVector);
-    
+
     VectorNormalize(&ImagePlaneWidthVector, &ImagePlaneWidthVector);
 
     VectorCrossProduct(CameraDirection,
@@ -194,11 +194,11 @@ PinholeCameraRender(
     VectorNormalize(&ImagePlaneHeightVector, &ImagePlaneHeightVector);
 
     VectorScale(&ImagePlaneWidthVector,
-                -ImagePlaneWidth,
+                ImagePlaneWidth,
                 &ImagePlaneWidthVector);
 
     VectorScale(&ImagePlaneHeightVector,
-                -ImagePlaneHeight,
+                ImagePlaneHeight,
                 &ImagePlaneHeightVector);
 
     PointVectorAddScaled(PinholeLocation,

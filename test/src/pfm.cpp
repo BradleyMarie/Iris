@@ -69,12 +69,12 @@ WritePfm(
     fprintf(File, "%u %u\n", Width, Height);
     fprintf(File, "%lf\n", Scale);
 
-    for (ColumnIndex = 0; ColumnIndex < Height; ColumnIndex++)
+    for (RowIndex = 0; RowIndex < Height; RowIndex++)
     {
-        for (RowIndex = 0; RowIndex < Width; RowIndex++)
+        for (ColumnIndex = 0; ColumnIndex < Width; ColumnIndex++)
         {
             FramebufferGetPixel(FrameBuffer,
-                                RowIndex,
+                                Height - RowIndex - 1,
                                 ColumnIndex,
                                 &PixelColor);
 
