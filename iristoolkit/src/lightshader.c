@@ -16,6 +16,7 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
 ISTATUS
 LightShaderShadeLight(
     _In_ PCLIGHT_SHADER LightShader,

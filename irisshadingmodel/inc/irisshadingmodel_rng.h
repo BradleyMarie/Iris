@@ -22,6 +22,7 @@ Abstract:
 //
 
 typedef
+_Ret_range_(Minimum, Maximum)
 FLOAT
 (*PGENERATE_FLOAT_ROUTINE)(
     _In_ PVOID Context,
@@ -30,6 +31,7 @@ FLOAT
     );
 
 typedef
+_Ret_range_(Minimum, Maximum)
 SIZE_T
 (*PGENERATE_INDEX_ROUTINE)(
     _In_ PVOID Context,
@@ -55,6 +57,7 @@ typedef CONST RANDOM *PCRANDOM;
 // Functions
 //
 
+_Ret_range_(Minimum, Maximum)
 SFORCEINLINE
 FLOAT
 RandomGenerateFloat(
@@ -82,6 +85,7 @@ RandomGenerateFloat(
     return Result;
 }
 
+_Ret_range_(Minimum, Maximum) 
 SFORCEINLINE
 SIZE_T
 RandomGenerateIndex(

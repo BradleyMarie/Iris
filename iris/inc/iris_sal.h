@@ -53,6 +53,8 @@ Abstract:
 #define _Outptr_opt_result_bytebuffer_(size)
 #define _Outptr_opt_result_bytebuffer_maybenull_(size)
 
+#define _Ret_range_(min, max)
+
 #define _Success_(expr)
 #define _Check_return_
 #define _Ret_maybenull_
