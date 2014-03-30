@@ -29,5 +29,6 @@ Abstract:
 #include "iristoolkit_camera.h"
 #include "iristoolkit_listscene.h"
 #include "iristoolkit_interpolatedtriangle.h"
+#include "iristoolkit_lightshader.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_
