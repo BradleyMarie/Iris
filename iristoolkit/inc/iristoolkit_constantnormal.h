@@ -27,7 +27,7 @@ IRISTOOLKITAPI
 PNORMAL
 ConstantNormalAllocate(
     _In_ PCVECTOR3 Normal,
-    _In_ UINT8 NormalType
+    _In_ BOOL Normalize
     );
 
 #endif // _CONSTANT_NORMAL_IRIS_TOOLKIT_

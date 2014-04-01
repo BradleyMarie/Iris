@@ -57,31 +57,15 @@ ConstantNormalComputeNormal(
 // Static variables
 //
 
-CONST STATIC NORMAL_VTABLE ConstantNormalWorldHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalHeader = {
     ConstantNormalComputeNormal,
     free,
-    FALSE,
     FALSE
 };
 
-CONST STATIC NORMAL_VTABLE ConstantNormalModelHeader = {
+CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedHeader = {
     ConstantNormalComputeNormal,
     free,
-    TRUE,
-    FALSE
-};
-
-CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedWorldHeader = {
-    ConstantNormalComputeNormal,
-    free,
-    FALSE,
-    TRUE
-};
-
-CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedModelHeader = {
-    ConstantNormalComputeNormal,
-    free,
-    TRUE,
     TRUE
 };
 
@@ -94,31 +78,12 @@ _Ret_maybenull_
 PNORMAL
 ConstantNormalAllocate(
     _In_ PCVECTOR3 Normal,
-    _In_ UINT8 NormalType
+    _In_ BOOL Normalize
     )
 {
     PCONSTANT_NORMAL ConstantNormal;
-    PCNORMAL_VTABLE NormalVTable;
 
     ASSERT(Normal != NULL);
-
-    switch (NormalType)
-    {
-        case IRIS_TOOLKIT_NORMAL_WORLD:
-            NormalVTable = &ConstantNormalWorldHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_MODEL:
-            NormalVTable = &ConstantNormalModelHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_WORLD_PRENORMALIZED:
-            NormalVTable = &ConstantNormalPrenormalizedWorldHeader;
-            break;
-        case IRIS_TOOLKIT_NORMAL_MODEL_PRENORMALIZED:
-            NormalVTable = &ConstantNormalPrenormalizedModelHeader;
-            break;
-        default:
-            return NULL;
-    }
 
     ConstantNormal = (PCONSTANT_NORMAL) malloc(sizeof(CONSTANT_NORMAL));
 
@@ -127,8 +92,16 @@ ConstantNormalAllocate(
         return NULL;
     }
 
-    ConstantNormal->NormalHeader.NormalVTable = NormalVTable;
-    ConstantNormal->Normal = *Normal;
+    if (Normalize != FALSE)
+    {
+        ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalPrenormalizedHeader;
+        VectorNormalize(Normal, &ConstantNormal->Normal);
+    }
+    else
+    {
+        ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalHeader;
+        ConstantNormal->Normal = *Normal;
+    }
 
     return (PNORMAL) ConstantNormal;
 }

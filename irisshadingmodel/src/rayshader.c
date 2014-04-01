@@ -240,7 +240,6 @@ RayShaderTraceRayMontecarlo(
         {
             SurfaceNormalInitialize(&SurfaceNormal,
                                     Normal,
-                                    &WorldHit,
                                     &ModelHit,
                                     ModelToWorld,
                                     AdditionalData);

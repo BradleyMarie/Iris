@@ -17,7 +17,6 @@ Abstract:
 
 #include <irisshadingmodel.h>
 
-#include "irisshadingmodel_normal.h"
 #include "irisshadingmodel_surfacenormal.h"
 #include "irisshadingmodel_sceneobject.h"
 #include "irisshadingmodel_scenetracer.h"

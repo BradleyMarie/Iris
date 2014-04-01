@@ -396,17 +396,9 @@ CONST STATIC TRANSLUCENT_SHADER_VTABLE InterpolatedTriangleTranslucentShaderVTab
     free
 };
 
-CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalWorldHeader = {
+CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalHeader = {
     InterpolatedTriangleNormalComputeNormal,
     free,
-    FALSE,
-    FALSE
-};
-
-CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalModelHeader = {
-    InterpolatedTriangleNormalComputeNormal,
-    free,
-    TRUE,
     FALSE
 };
 
@@ -564,16 +556,6 @@ InterpolatedTriangleNormalAllocate(
         return NULL;
     }
 
-    if ((Normal0->NormalVTable->IsModelNormal == FALSE && 
-         Normal1->NormalVTable->IsModelNormal == FALSE && 
-         Normal2->NormalVTable->IsModelNormal == FALSE) ||
-        (Normal0->NormalVTable->IsModelNormal != FALSE && 
-         Normal1->NormalVTable->IsModelNormal != FALSE && 
-         Normal2->NormalVTable->IsModelNormal != FALSE))
-    {
-        return NULL;
-    }
-
     Normal = (PINTERPOLATED_TRIANGLE_NORMAL) malloc(sizeof(INTERPOLATED_TRIANGLE_NORMAL));
 
     if (Normal == NULL)
@@ -581,15 +563,7 @@ InterpolatedTriangleNormalAllocate(
         return NULL;
     }
 
-    if (Normal0->NormalVTable->IsModelNormal)
-    {
-        Normal->NormalHeader.NormalVTable = &InterpolatedTriangleNormalModelHeader;
-    }
-    else
-    {
-        Normal->NormalHeader.NormalVTable = &InterpolatedTriangleNormalWorldHeader;
-    }
-
+    Normal->NormalHeader.NormalVTable = &InterpolatedTriangleNormalHeader;
     Normal->Normals[0] = Normal0;
     Normal->Normals[1] = Normal1;
     Normal->Normals[2] = Normal2;

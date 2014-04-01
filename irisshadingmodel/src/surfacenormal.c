@@ -33,34 +33,23 @@ SuraceNormalGetWorldNormal(
         return ISTATUS_SUCCESS;
     }
 
-    if (SurfaceNormal->ModelNormalValid != FALSE)
+    Status = SuraceNormalGetModelNormal(SurfaceNormal, WorldNormal);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (SurfaceNormal->WorldToModel != NULL)
     {
         VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel,
-                                       &SurfaceNormal->ModelNormal,
+                                       WorldNormal,
                                        WorldNormal);
     }
-    else
+    else if (SurfaceNormal->Prenormalized != FALSE)
     {
-        Status = NormalComputeNormal(SurfaceNormal->Normal,
-                                     SurfaceNormal->WorldHit,
-                                     SurfaceNormal->ModelHit,
-                                     SurfaceNormal->AdditionalData,
-                                     WorldNormal);
-
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-
-        if (SurfaceNormal->IsModelNormal != FALSE)
-        {
-            SurfaceNormal->ModelNormal = *WorldNormal;
-            SurfaceNormal->ModelNormalValid = TRUE;
-
-            VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel,
-                                           WorldNormal,
-                                           WorldNormal);
-        }
+        SurfaceNormal->NormalizedWorldNormal = *WorldNormal;
+        SurfaceNormal->NormalizedWorldNormalValid = TRUE;
     }
 
     SurfaceNormal->WorldNormal = *WorldNormal;
@@ -88,38 +77,24 @@ SuraceNormalGetModelNormal(
         return ISTATUS_SUCCESS;
     }
 
-    if (SurfaceNormal->WorldNormalValid != FALSE)
+    Status = NormalComputeNormal(SurfaceNormal->Normal,
+                                 SurfaceNormal->ModelHit,
+                                 SurfaceNormal->AdditionalData,
+                                 ModelNormal);
+
+    if (Status != ISTATUS_SUCCESS)
     {
-        VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel->Inverse,
-                                       &SurfaceNormal->WorldNormal,
-                                       ModelNormal);
-    }
-    else
-    {
-        Status = NormalComputeNormal(SurfaceNormal->Normal,
-                                     SurfaceNormal->WorldHit,
-                                     SurfaceNormal->ModelHit,
-                                     SurfaceNormal->AdditionalData,
-                                     ModelNormal);
-
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-
-        if (SurfaceNormal->IsModelNormal == FALSE)
-        {
-            SurfaceNormal->WorldNormal = *ModelNormal;
-            SurfaceNormal->WorldNormalValid = TRUE;
-
-            VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel->Inverse,
-                                           ModelNormal,
-                                           ModelNormal);
-        }
+        return Status;
     }
 
     SurfaceNormal->ModelNormal = *ModelNormal;
     SurfaceNormal->ModelNormalValid = TRUE;
+
+    if (SurfaceNormal->Prenormalized != FALSE)
+    {
+        SurfaceNormal->NormalizedModelNormal = *ModelNormal;
+        SurfaceNormal->NormalizedModelNormalValid = TRUE;
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -145,15 +120,13 @@ SuraceNormalGetNormalizedWorldNormal(
 
     Status = SuraceNormalGetWorldNormal(SurfaceNormal, NormalizedWorldNormal);
 
-    if (Status != ISTATUS_SUCCESS)
+    if (Status != ISTATUS_SUCCESS ||
+        SurfaceNormal->NormalizedWorldNormalValid != FALSE)
     {
         return Status;
     }
 
-    if (SurfaceNormal->PrenormalizedTerm == PRENORMALIZED_NONE)
-    {
-        VectorNormalize(NormalizedWorldNormal, NormalizedWorldNormal);
-    }
+    VectorNormalize(NormalizedWorldNormal, NormalizedWorldNormal);
 
     SurfaceNormal->NormalizedWorldNormal = *NormalizedWorldNormal;
     SurfaceNormal->NormalizedWorldNormalValid = TRUE;
@@ -182,15 +155,13 @@ SuraceNormalGetNormalizedModelNormal(
 
     Status = SuraceNormalGetModelNormal(SurfaceNormal, NormalizedModelNormal);
 
-    if (Status != ISTATUS_SUCCESS)
+    if (Status != ISTATUS_SUCCESS ||
+        SurfaceNormal->NormalizedModelNormalValid != FALSE)
     {
         return Status;
     }
 
-    if (SurfaceNormal->PrenormalizedTerm == PRENORMALIZED_NONE)
-    {
-        VectorNormalize(NormalizedModelNormal, NormalizedModelNormal);
-    }
+    VectorNormalize(NormalizedModelNormal, NormalizedModelNormal);
 
     SurfaceNormal->NormalizedModelNormal = *NormalizedModelNormal;
     SurfaceNormal->NormalizedModelNormalValid = TRUE;

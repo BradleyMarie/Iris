@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PNORMAL_COMPUTE_NORMAL_ROUTINE)(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 HitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     );
@@ -35,7 +35,6 @@ ISTATUS
 typedef struct _NORMAL_VTABLE {
     PNORMAL_COMPUTE_NORMAL_ROUTINE ComputeNormalRoutine;
     PFREE_ROUTINE FreeRoutine;
-    BOOL IsModelNormal;
     BOOL Prenormalized;
 } NORMAL_VTABLE, *PNORMAL_VTABLE;
 
@@ -50,6 +49,31 @@ typedef CONST NORMAL *PCNORMAL;
 //
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+NormalComputeNormal(
+    _In_ PCNORMAL Normal, 
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVOID AdditionalData,
+    _Out_ PVECTOR3 SurfaceNormal
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(ModelHitPoint != NULL);
+    ASSERT(SurfaceNormal != NULL);
+    ASSERT(Normal != NULL);
+    
+    Status = Normal->NormalVTable->ComputeNormalRoutine(Normal,
+                                                        ModelHitPoint,
+                                                        AdditionalData,
+                                                        SurfaceNormal);
+
+    return Status;
+}
 
 SFORCEINLINE
 VOID
