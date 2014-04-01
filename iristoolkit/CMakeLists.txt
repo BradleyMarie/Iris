@@ -13,7 +13,8 @@ add_library(iristoolkit SHARED
     src/camera.c
     src/interpolatedtriangle.c
     src/lightshader.c
-    src/phong.c)
+    src/phong.c
+    src/spherenormal.c)
 
 target_link_libraries(iristoolkit 
     iris 

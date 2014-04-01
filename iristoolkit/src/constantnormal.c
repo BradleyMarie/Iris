@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    iristoolkit_constantnormal.h
+    constantnormal.c
 
 Abstract:
 
@@ -35,7 +35,7 @@ STATIC
 ISTATUS
 ConstantNormalComputeNormal(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 HitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -43,7 +43,7 @@ ConstantNormalComputeNormal(
     PCONSTANT_NORMAL ConstantNormal;
 
     ASSERT(Context != NULL);
-    ASSERT(HitPoint != NULL);
+    ASSERT(ModelHitPoint != NULL);
     ASSERT(SurfaceNormal != NULL);
 
     ConstantNormal = (PCONSTANT_NORMAL) Context;
@@ -83,7 +83,10 @@ ConstantNormalAllocate(
 {
     PCONSTANT_NORMAL ConstantNormal;
 
-    ASSERT(Normal != NULL);
+    if (Normal == FALSE)
+    {
+        return NULL;
+    }
 
     ConstantNormal = (PCONSTANT_NORMAL) malloc(sizeof(CONSTANT_NORMAL));
 
