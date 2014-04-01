@@ -21,7 +21,7 @@ Abstract:
 typedef struct _PHONG_SHADER {
     DIRECT_SHADER DirectShaderHeader;
     PLIGHT_SELECTION_ROUTINE LightSelectionRoutine;
-    _Field_size_(NumberOfLights) PPHONG_LIGHT *Lights;
+    _Field_size_(NumberOfLights) PCPHONG_LIGHT *Lights;
     SIZE_T NumberOfLights;
     COLOR3 Ambient;
     COLOR3 Diffuse;
@@ -74,7 +74,7 @@ typedef struct _POINT_PHONG_SPOT_LIGHT {
     COLOR3 Diffuse;
     COLOR3 Specular;
     BOOL CastsShadows;
-    PCVECTOR3 SpotLightDirection;
+    VECTOR3 WorldSpotLightDirection;
     FLOAT SpotLightExponent;
     FLOAT SpotLightCutoff;
 } POINT_PHONG_SPOT_LIGHT, *PPOINT_PHONG_SPOT_LIGHT;
@@ -91,7 +91,7 @@ typedef struct _ATTENUATED_POINT_PHONG_SPOT_LIGHT {
     FLOAT ConstantAttenuation;
     FLOAT LinearAttenuation;
     FLOAT QuadraticAttenuation;
-    PCVECTOR3 SpotLightDirection;
+    VECTOR3 WorldSpotLightDirection;
     FLOAT SpotLightExponent;
     FLOAT SpotLightCutoff;
 } ATTENUATED_POINT_PHONG_SPOT_LIGHT, *PATTENUATED_POINT_PHONG_SPOT_LIGHT;
@@ -495,6 +495,7 @@ AttenuatedPointPhongLightShade(
     COLOR3 ReflectedDiffuse;
     VECTOR3 NegatedViewer;
     FLOAT DistanceToLight;
+    FLOAT Attenuation;
     BOOL LightVisible;
     RAY RayToLight;
     ISTATUS Status;
@@ -594,6 +595,14 @@ AttenuatedPointPhongLightShade(
                         LightColor);
     }
 
+    Attenuation = AttenuatedPointPhongLight->ConstantAttenuation + 
+                  AttenuatedPointPhongLight->LinearAttenuation * DistanceToLight +
+                  AttenuatedPointPhongLight->QuadraticAttenuation * DistanceToLight * DistanceToLight;
+
+    Attenuation = (FLOAT) 1.0 / Attenuation;
+
+    Color3ScaleByScalar(LightColor, Attenuation, LightColor);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -617,8 +626,10 @@ PointPhongSpotLightShade(
 {
     PCPOINT_PHONG_SPOT_LIGHT PointPhongSpotLight;
     VECTOR3 NormalizedWorldSurfaceNormal;
+    VECTOR3 NormalizedWorldFromLight;
     VECTOR3 ViewerToLightHalfAngle;
     VECTOR3 NormalizedWorldToLight;
+    FLOAT SpotlightCoefficient;
     FLOAT SpecularCoefficient;
     FLOAT DiffuseCoefficient;
     COLOR3 ReflectedSpecular;
@@ -643,6 +654,34 @@ PointPhongSpotLightShade(
     ASSERT(LightColor != NULL);
 
     PointPhongSpotLight = (PCPOINT_PHONG_SPOT_LIGHT) Context;
+
+    if (PointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
+    {
+        VectorNegate(&NormalizedWorldToLight,
+                     &NormalizedWorldFromLight);
+
+        //
+        // WorldSpotLightDirection should already be normalized.
+        //
+
+        SpotlightCoefficient = VectorDotProduct(&PointPhongSpotLight->WorldSpotLightDirection,
+                                                &NormalizedWorldFromLight);
+
+        if (SpotlightCoefficient >= PointPhongSpotLight->SpotLightCutoff)
+        {
+            SpotlightCoefficient = PowFloat(SpotlightCoefficient,
+                                            PointPhongSpotLight->SpotLightExponent);
+        }
+        else
+        {
+            Color3InitializeBlack(LightColor);
+            return ISTATUS_SUCCESS;
+        }
+    }
+    else
+    {
+        SpotlightCoefficient = (FLOAT) 1.0;
+    }
 
     Color3ScaleByColor(Ambient,
                        &PointPhongSpotLight->Ambient,
@@ -724,6 +763,8 @@ PointPhongSpotLightShade(
                         LightColor);
     }
 
+    Color3ScaleByScalar(LightColor, SpotlightCoefficient, LightColor);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -747,14 +788,17 @@ AttenuatedPointPhongSpotLightShade(
 {
     PCATTENUATED_POINT_PHONG_SPOT_LIGHT AttenuatedPointPhongSpotLight;
     VECTOR3 NormalizedWorldSurfaceNormal;
+    VECTOR3 NormalizedWorldFromLight;
     VECTOR3 ViewerToLightHalfAngle;
     VECTOR3 NormalizedWorldToLight;
+    FLOAT SpotlightCoefficient;
     FLOAT SpecularCoefficient;
     FLOAT DiffuseCoefficient;
     COLOR3 ReflectedSpecular;
     COLOR3 ReflectedDiffuse;
     VECTOR3 NegatedViewer;
     FLOAT DistanceToLight;
+    FLOAT Attenuation;
     BOOL LightVisible;
     RAY RayToLight;
     ISTATUS Status;
@@ -773,6 +817,34 @@ AttenuatedPointPhongSpotLightShade(
     ASSERT(LightColor != NULL);
 
     AttenuatedPointPhongSpotLight = (PCATTENUATED_POINT_PHONG_SPOT_LIGHT) Context;
+
+    if (AttenuatedPointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
+    {
+        VectorNegate(&NormalizedWorldToLight,
+                     &NormalizedWorldFromLight);
+
+        //
+        // WorldSpotLightDirection should already be normalized.
+        //
+
+        SpotlightCoefficient = VectorDotProduct(&AttenuatedPointPhongSpotLight->WorldSpotLightDirection,
+                                                &NormalizedWorldFromLight);
+
+        if (SpotlightCoefficient >= AttenuatedPointPhongSpotLight->SpotLightCutoff)
+        {
+            SpotlightCoefficient = PowFloat(SpotlightCoefficient,
+                                            AttenuatedPointPhongSpotLight->SpotLightExponent);
+        }
+        else
+        {
+            Color3InitializeBlack(LightColor);
+            return ISTATUS_SUCCESS;
+        }
+    }
+    else
+    {
+        SpotlightCoefficient = (FLOAT) 1.0;
+    }
 
     Color3ScaleByColor(Ambient,
                        &AttenuatedPointPhongSpotLight->Ambient, 
@@ -854,6 +926,14 @@ AttenuatedPointPhongSpotLightShade(
                         LightColor);
     }
 
+    Attenuation = AttenuatedPointPhongSpotLight->ConstantAttenuation + 
+                  AttenuatedPointPhongSpotLight->LinearAttenuation * DistanceToLight +
+                  AttenuatedPointPhongSpotLight->QuadraticAttenuation * DistanceToLight * DistanceToLight;
+
+    Attenuation = (FLOAT) 1.0 / Attenuation;
+
+    Color3ScaleByScalar(LightColor, Attenuation * SpotlightCoefficient, LightColor);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -907,7 +987,35 @@ PhongDirectShaderAllocate(
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ FLOAT Shininess
-    );
+    )
+{
+    PPHONG_SHADER PhongShader;
+
+    if (Lights == NULL ||
+        NumberOfLights == 0 ||
+        LightSelectionRoutine == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL ||
+        IsFiniteFloat(Shininess) == FALSE ||
+        IsNormalFloat(Shininess) == FALSE)
+    {
+        return NULL;
+    }
+
+    PhongShader = (PPHONG_SHADER) malloc(sizeof(PHONG_SHADER));
+
+    PhongShader->DirectShaderHeader.DirectShaderVTable = &PhongShaderVTable;
+    PhongShader->LightSelectionRoutine = LightSelectionRoutine;
+    PhongShader->Lights = Lights;
+    PhongShader->NumberOfLights = NumberOfLights;
+    PhongShader->Ambient = *Ambient;
+    PhongShader->Diffuse = *Diffuse;
+    PhongShader->Specular = *Specular;
+    PhongShader->Shininess = Shininess;
+
+    return (PDIRECT_SHADER) PhongShader;
+}
 
 _Check_return_
 _Ret_maybenull_
@@ -919,7 +1027,31 @@ DirectionalPhongLightAllocate(
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ BOOL CastsShadows
-    );
+    )
+{
+    PDIRECTIONAL_PHONG_LIGHT PhongLight;
+
+    if (WorldDirectionToLight == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL)
+    {
+        return NULL;
+    }
+
+    PhongLight = (PDIRECTIONAL_PHONG_LIGHT) malloc(sizeof(DIRECTIONAL_PHONG_LIGHT));
+
+    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->Ambient = *Ambient;
+    PhongLight->Diffuse = *Diffuse;
+    PhongLight->Specular = *Specular;
+    PhongLight->CastsShadows = CastsShadows;
+
+    VectorNormalize(WorldDirectionToLight,
+                    &PhongLight->WorldDirectionToLight);
+
+    return (PPHONG_LIGHT) PhongLight;
+}
 
 _Check_return_
 _Ret_maybenull_
@@ -931,7 +1063,29 @@ PointPhongLightAllocate(
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ BOOL CastsShadows
-    );
+    )
+{
+    PPOINT_PHONG_LIGHT PhongLight;
+
+    if (WorldLocation == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL)
+    {
+        return NULL;
+    }
+
+    PhongLight = (PPOINT_PHONG_LIGHT) malloc(sizeof(POINT_PHONG_LIGHT));
+
+    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->Ambient = *Ambient;
+    PhongLight->Diffuse = *Diffuse;
+    PhongLight->Specular = *Specular;
+    PhongLight->CastsShadows = CastsShadows;
+
+    return (PPHONG_LIGHT) PhongLight;
+}
 
 _Check_return_
 _Ret_maybenull_
@@ -946,7 +1100,38 @@ AttenuatedPointPhongLightAllocate(
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
     _In_ FLOAT QuadraticAttenuation
-    );
+    )
+{
+    PATTENUATED_POINT_PHONG_LIGHT PhongLight;
+
+    if (WorldLocation == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL ||
+        IsNormalFloat(ConstantAttenuation) == FALSE ||
+        IsFiniteFloat(ConstantAttenuation) == FALSE ||
+        IsNormalFloat(LinearAttenuation) == FALSE ||
+        IsFiniteFloat(LinearAttenuation) == FALSE ||
+        IsNormalFloat(QuadraticAttenuation) == FALSE ||
+        IsFiniteFloat(QuadraticAttenuation) == FALSE)
+    {
+        return NULL;
+    }
+
+    PhongLight = (PATTENUATED_POINT_PHONG_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_LIGHT));
+
+    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->Ambient = *Ambient;
+    PhongLight->Diffuse = *Diffuse;
+    PhongLight->Specular = *Specular;
+    PhongLight->CastsShadows = CastsShadows;
+    PhongLight->ConstantAttenuation = ConstantAttenuation;
+    PhongLight->LinearAttenuation = LinearAttenuation;
+    PhongLight->QuadraticAttenuation = QuadraticAttenuation;
+
+    return (PPHONG_LIGHT) PhongLight;
+}
 
 _Check_return_
 _Ret_maybenull_
@@ -958,10 +1143,42 @@ PointPhongSpotLightAllocate(
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ BOOL CastsShadows,
-    _In_ PCVECTOR3 SpotLightDirection,
+    _In_ PCVECTOR3 WorldSpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
-    );
+    )
+{
+    PPOINT_PHONG_SPOT_LIGHT PhongLight;
+
+    if (WorldLocation == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL ||
+        WorldSpotLightDirection == NULL ||
+        IsNormalFloat(SpotLightExponent) == FALSE ||
+        IsFiniteFloat(SpotLightExponent) == FALSE ||
+        IsNormalFloat(SpotLightCutoff) == FALSE ||
+        IsFiniteFloat(SpotLightCutoff) == FALSE)
+    {
+        return NULL;
+    }
+
+    PhongLight = (PPOINT_PHONG_SPOT_LIGHT) malloc(sizeof(POINT_PHONG_SPOT_LIGHT));
+
+    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->Ambient = *Ambient;
+    PhongLight->Diffuse = *Diffuse;
+    PhongLight->Specular = *Specular;
+    PhongLight->CastsShadows = CastsShadows;
+    PhongLight->SpotLightExponent = SpotLightExponent;
+    PhongLight->SpotLightCutoff = SpotLightCutoff;
+
+    VectorNormalize(WorldSpotLightDirection,
+                    &PhongLight->WorldSpotLightDirection);
+
+    return (PPHONG_LIGHT) PhongLight;
+}
 
 _Check_return_
 _Ret_maybenull_
@@ -976,7 +1193,48 @@ AttenuatedPhongSpotLightAllocate(
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
     _In_ FLOAT QuadraticAttenuation,
-    _In_ PCVECTOR3 SpotLightDirection,
+    _In_ PCVECTOR3 WorldSpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
-    );
+    )
+{
+    PATTENUATED_POINT_PHONG_SPOT_LIGHT PhongLight;
+
+    if (WorldLocation == NULL ||
+        Ambient == NULL ||
+        Diffuse == NULL ||
+        Specular == NULL ||
+        IsNormalFloat(ConstantAttenuation) == FALSE ||
+        IsFiniteFloat(ConstantAttenuation) == FALSE ||
+        IsNormalFloat(LinearAttenuation) == FALSE ||
+        IsFiniteFloat(LinearAttenuation) == FALSE ||
+        IsNormalFloat(QuadraticAttenuation) == FALSE ||
+        IsFiniteFloat(QuadraticAttenuation) == FALSE ||
+        WorldSpotLightDirection == NULL ||
+        IsNormalFloat(SpotLightExponent) == FALSE ||
+        IsFiniteFloat(SpotLightExponent) == FALSE ||
+        IsNormalFloat(SpotLightCutoff) == FALSE ||
+        IsFiniteFloat(SpotLightCutoff) == FALSE)
+    {
+        return NULL;
+    }
+
+    PhongLight = (PATTENUATED_POINT_PHONG_SPOT_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_SPOT_LIGHT));
+
+    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->Ambient = *Ambient;
+    PhongLight->Diffuse = *Diffuse;
+    PhongLight->Specular = *Specular;
+    PhongLight->CastsShadows = CastsShadows;
+    PhongLight->ConstantAttenuation = ConstantAttenuation;
+    PhongLight->LinearAttenuation = LinearAttenuation;
+    PhongLight->QuadraticAttenuation = QuadraticAttenuation;
+    PhongLight->SpotLightExponent = SpotLightExponent;
+    PhongLight->SpotLightCutoff = SpotLightCutoff;
+
+    VectorNormalize(WorldSpotLightDirection,
+                    &PhongLight->WorldSpotLightDirection);
+
+    return (PPHONG_LIGHT) PhongLight;
+}
