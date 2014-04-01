@@ -25,18 +25,10 @@ typedef UINT8 GEOMETRY_TYPE;
 typedef GEOMETRY_TYPE *PGEOMETRY_TYPE;
 
 struct _SHARED_GEOMETRY_HIT {
-    GEOMETRY_TYPE Type;
     PCMATRIX ModelToWorld;
+    BOOL Premultiplied;
     RAY ModelRay;
 };
-
-//
-// Defines
-//
-
-#define GEOMETRY_TYPE_WORLD         0x0
-#define GEOMETRY_TYPE_PREMULTIPLIED 0x1
-#define GEOMETRY_TYPE_MODEL         0x2
 
 //
 // Function Definitions

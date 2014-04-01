@@ -16,30 +16,6 @@ Abstract:
 #include <irisp.h>
 
 //
-// Static Variables
-//
-
-STATIC
-CONST
-MATRIX IdentityMatrix = { (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          &IdentityMatrix };
-
-//
 // Functions
 //
 
@@ -54,22 +30,19 @@ SharedGeometryHitComputeModelViewer(
     ASSERT(WorldViewer != NULL);
     ASSERT(ModelViewer != NULL);
 
-    switch (GeometryHit->Type)
+    if (GeometryHit->ModelToWorld == NULL)
     {
-        case GEOMETRY_TYPE_WORLD:
-            *ModelViewer = *WorldViewer;
-            break;
-        case GEOMETRY_TYPE_PREMULTIPLIED:
-            VectorMatrixTransposedMultiply(GeometryHit->ModelToWorld->Inverse,
-                                           WorldViewer,
-                                           ModelViewer);
-            break;
-        case GEOMETRY_TYPE_MODEL:
-            *ModelViewer = GeometryHit->ModelRay.Direction;
-            break;
-        default:
-            ASSERT(FALSE);
-            break;
+        *ModelViewer = *WorldViewer;
+    }
+    else if (GeometryHit->Premultiplied != FALSE)
+    {
+        VectorMatrixTransposedMultiply(GeometryHit->ModelToWorld->Inverse,
+                                       WorldViewer,
+                                       ModelViewer);
+    }
+    else
+    {
+        *ModelViewer = GeometryHit->ModelRay.Direction;
     }
 }
 
@@ -84,22 +57,19 @@ SharedGeometryHitComputeModelHit(
     ASSERT(WorldHitPoint != NULL);
     ASSERT(ModelHitPoint != NULL);
 
-    switch (GeometryHit->Type)
+    if (GeometryHit->ModelToWorld == NULL)
     {
-        case GEOMETRY_TYPE_WORLD:
-            *ModelHitPoint = *WorldHitPoint;
-            break;
-        case GEOMETRY_TYPE_PREMULTIPLIED:
-            PointMatrixMultiply(GeometryHit->ModelToWorld,
-                                WorldHitPoint,
-                                ModelHitPoint);
-            break;
-        case GEOMETRY_TYPE_MODEL:
-            *ModelHitPoint = GeometryHit->ModelRay.Origin;
-            break;
-        default:
-            ASSERT(FALSE);
-            break;
+        *ModelHitPoint = *WorldHitPoint;
+    }
+    else if (GeometryHit->Premultiplied != FALSE)
+    {
+        PointMatrixMultiply(GeometryHit->ModelToWorld,
+                            WorldHitPoint,
+                            ModelHitPoint);
+    }
+    else
+    {
+        *ModelHitPoint = GeometryHit->ModelRay.Origin;
     }
 }
 
@@ -109,11 +79,6 @@ SharedGeometryHitGetModelToWorld(
     )
 {
     ASSERT(GeometryHit != NULL);
-
-    if (GeometryHit->Type == GEOMETRY_TYPE_WORLD)
-    {
-        return &IdentityMatrix;
-    }
 
     return GeometryHit->ModelToWorld;
 }

@@ -31,6 +31,30 @@ struct _RAYSHADER_HEADER {
 };
 
 //
+// Static Variables
+//
+
+STATIC
+CONST
+MATRIX IdentityMatrix = { (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          (FLOAT) 0.0,
+                          &IdentityMatrix };
+
+//
 // Functions
 //
 
@@ -249,6 +273,11 @@ RayShaderTraceRayMontecarlo(
         else
         {
             SurfaceNormalPointer = NULL;
+        }
+
+        if (ModelToWorld == NULL)
+        {
+            ModelToWorld = &IdentityMatrix;
         }
 
         Status = Header->ShadeRayRoutine(RayShader,

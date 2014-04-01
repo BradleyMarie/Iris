@@ -64,19 +64,19 @@ GeometryTraceGeometry(
 
     if (Geometry->ModelToWorld == NULL)
     {
-        GeometryHit->Type = GEOMETRY_TYPE_WORLD;
+        GeometryHit->ModelToWorld = NULL;
         TraceRay = WorldRay;
     }
     else if (Geometry->Premultiplied != FALSE)
     {
-        GeometryHit->Type = GEOMETRY_TYPE_PREMULTIPLIED;
         GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
+        GeometryHit->Premultiplied = TRUE;
         TraceRay = WorldRay;
     }
     else
     {
-        GeometryHit->Type = GEOMETRY_TYPE_MODEL;
         GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
+        GeometryHit->Premultiplied = FALSE;
 
         RayMatrixMultiply(&Geometry->ModelToWorld->Inverse,
                           WorldRay,
