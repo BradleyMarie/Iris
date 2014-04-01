@@ -48,6 +48,16 @@ VisibilityTesterTestVisibility(
     _Out_ PBOOL Visible
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
+ISTATUS
+VisibilityTesterTestVisibilityAnyDistance(
+    _In_ PVISIBILITY_TESTER Tester,
+    _In_ PCRAY WorldRay,
+    _Out_ PBOOL Visible
+    );
+
 IRISSHADINGMODELAPI
 VOID
 VisibilityTesterFree(

@@ -30,6 +30,8 @@ typedef struct _IRIS_CONSTANT_POINTER_LIST {
     SIZE_T PointerListSize;
 } IRIS_CONSTANT_POINTER_LIST, *PIRIS_CONSTANT_POINTER_LIST;
 
+typedef CONST IRIS_CONSTANT_POINTER_LIST *PCIRIS_CONSTANT_POINTER_LIST;
+
 //
 // Functions
 //
@@ -107,7 +109,7 @@ IrisConstantPointerListAddPointer(
 SFORCEINLINE
 PCVOID
 IrisConstantPointerListRetrieveAtIndex(
-    _In_ PIRIS_CONSTANT_POINTER_LIST PointerList,
+    _In_ PCIRIS_CONSTANT_POINTER_LIST PointerList,
     _In_ SIZE_T Index
     )
 {
@@ -120,7 +122,7 @@ IrisConstantPointerListRetrieveAtIndex(
 SFORCEINLINE
 PCVOID*
 IrisConstantPointerListGetStorage(
-    _In_ PIRIS_CONSTANT_POINTER_LIST PointerList
+    _In_ PCIRIS_CONSTANT_POINTER_LIST PointerList
     )
 {
     ASSERT(PointerList != NULL);
@@ -131,7 +133,7 @@ IrisConstantPointerListGetStorage(
 SFORCEINLINE
 SIZE_T
 IrisConstantPointerListGetSize(
-    _In_ PIRIS_CONSTANT_POINTER_LIST PointerList
+    _In_ PCIRIS_CONSTANT_POINTER_LIST PointerList
     )
 {
     ASSERT(PointerList != NULL);

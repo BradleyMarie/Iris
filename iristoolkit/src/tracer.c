@@ -272,6 +272,8 @@ RecursiveRayTracerShadeHit(
         Status = DirectShaderShade(DirectShader,
                                    WorldHit,
                                    ModelHit,
+                                   WorldViewer,
+                                   ModelViewer,
                                    AdditionalData,
                                    SurfaceNormal,
                                    Rng,

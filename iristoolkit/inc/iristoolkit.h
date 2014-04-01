@@ -30,5 +30,6 @@ Abstract:
 #include "iristoolkit_listscene.h"
 #include "iristoolkit_interpolatedtriangle.h"
 #include "iristoolkit_lightshader.h"
+#include "iristoolkit_phong.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

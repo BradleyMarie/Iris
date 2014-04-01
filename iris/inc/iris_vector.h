@@ -27,7 +27,7 @@ typedef struct _VECTOR3 {
     FLOAT Z;
 } VECTOR3, *PVECTOR3;
 
-typedef CONST VECTOR3* PCVECTOR3;
+typedef CONST VECTOR3 *PCVECTOR3;
 
 //
 // Defines
@@ -64,6 +64,27 @@ VectorInitialize(
     Vector->X = X;
     Vector->Y = Y;
     Vector->Z = Z;
+}
+
+SFORCEINLINE
+VOID
+VectorNegate(
+    _In_ PCVECTOR3 Vector,
+    _Out_ PVECTOR3 Negation
+    )
+{
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(Vector != NULL);
+    ASSERT(Negation != NULL);
+
+    X = -Vector->X;
+    Y = -Vector->Y;
+    Z = -Vector->Z;
+
+    VectorInitialize(Negation, X, Y, Z);
 }
 
 SFORCEINLINE
@@ -238,6 +259,28 @@ VectorNormalize(
     ASSERT(IsZeroFloat(Length) == FALSE);
 
     Scalar = (FLOAT) 1.0 / Length;
+
+    VectorScale(Vector, Scalar, NormalizedVector);
+}
+
+SFORCEINLINE
+VOID
+VectorNormalizeWithLength(
+    _In_ PCVECTOR3 Vector,
+    _Out_ PFLOAT OldLength,
+    _Out_ PVECTOR3 NormalizedVector
+    )
+{
+    FLOAT Scalar;
+
+    ASSERT(Vector != NULL);
+    ASSERT(OldLength != NULL);
+
+    *OldLength = VectorLength(Vector);
+
+    ASSERT(IsZeroFloat(*OldLength) == FALSE);
+
+    Scalar = (FLOAT) 1.0 / *OldLength;
 
     VectorScale(Vector, Scalar, NormalizedVector);
 }

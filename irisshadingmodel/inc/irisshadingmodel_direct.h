@@ -29,6 +29,8 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -61,6 +63,8 @@ DirectShaderShade(
     _In_ PCDIRECT_SHADER DirectShader,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -73,6 +77,8 @@ DirectShaderShade(
     ASSERT(DirectShader != NULL);
     ASSERT(WorldHitPoint != NULL);
     ASSERT(ModelHitPoint != NULL);
+    ASSERT(WorldViewer != NULL);
+    ASSERT(ModelViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -81,6 +87,8 @@ DirectShaderShade(
     Status = DirectShader->DirectShaderVTable->DirectRoutine(DirectShader,
                                                              WorldHitPoint,
                                                              ModelHitPoint,
+                                                             WorldViewer,
+                                                             ModelViewer,
                                                              AdditionalData,
                                                              SurfaceNormal,
                                                              Rng,

@@ -12,7 +12,8 @@ add_library(iristoolkit SHARED
     src/constantemissiveshader.c
     src/camera.c
     src/interpolatedtriangle.c
-    src/lightshader.c)
+    src/lightshader.c
+    src/phong.c)
 
 target_link_libraries(iristoolkit 
     iris 

@@ -30,6 +30,8 @@ ISTATUS
     _In_ PCVOID Light,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -37,34 +39,43 @@ ISTATUS
     _Out_ PCOLOR3 Direct
     );
 
-typedef struct _LIGHT_SHADER_VTABLE {
-    DIRECT_SHADER_VTABLE DirectShaderVTable;
-    PLIGHT_SHADING_ROUTINE LightRoutine;
-} LIGHT_SHADER_VTABLE, *PLIGHT_SHADER_VTABLE;
-
-typedef CONST LIGHT_SHADER_VTABLE *PCLIGHT_SHADER_VTABLE;
-
-typedef struct _LIGHT_SHADER {
-    PCLIGHT_SHADER_VTABLE LightShaderVTable;
-    _Field_size_(NumberOfLights) PCVOID *Lights;
-    SIZE_T NumberOfLights;
-} LIGHT_SHADER, *PLIGHT_SHADER;
-
-typedef CONST LIGHT_SHADER *PCLIGHT_SHADER;
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PLIGHT_SELECTION_ROUTINE)(
+    _In_opt_ PCVOID Context,
+    _In_reads_(NumberOfLights) PCVOID *Lights,
+    _In_ SIZE_T NumberOfLights,
+    _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PSURFACE_NORMAL SurfaceNormal,
+    _Inout_ PRANDOM Rng,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _Out_ PCOLOR3 Direct
+    );
 
 //
-// Direct lighting routines used to populate
-// the first entry of a LIGHT_SHADER_VTABLE
+// Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISTOOLKITAPI
 ISTATUS
 LightShaderEvaluateAllLights(
-    _In_ PCVOID Context,
+    _In_opt_ PCVOID Context,
+    _In_reads_(NumberOfLights) PCVOID *Lights,
+    _In_ SIZE_T NumberOfLights,
+    _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -74,12 +85,17 @@ LightShaderEvaluateAllLights(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISTOOLKITAPI
 ISTATUS
 LightShaderEvaluateOneLight(
-    _In_ PCVOID Context,
+    _In_opt_ PCVOID Context,
+    _In_reads_(NumberOfLights) PCVOID *Lights,
+    _In_ SIZE_T NumberOfLights,
+    _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
+    _In_ PCVECTOR3 WorldViewer,
+    _In_ PCVECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,

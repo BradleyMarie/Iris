@@ -62,6 +62,12 @@ RayTracerGetResults(
     );
 
 IRISAPI
+SIZE_T
+RayTracerGetHitCount(
+    _In_ PCRAYTRACER RayTracer
+    );
+
+IRISAPI
 VOID
 RayTracerFree(
     _Pre_maybenull_ _Post_invalid_ PRAYTRACER RayTracer

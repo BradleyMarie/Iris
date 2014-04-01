@@ -25,6 +25,7 @@ Abstract:
 #define AbsFloat(number) fabsf(number)
 #define CosFloat(number) cosf(number)
 #define SinFloat(number) sinf(number)
+#define PowFloat(base, exponent) powf(base, exponent)
 #define IsNaNFloat(number) isnan(number)
 #define IsInfFloat(number) isinf(number)
 #define IsZeroFloat(number) (number == (FLOAT) 0.0)

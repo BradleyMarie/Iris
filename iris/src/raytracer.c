@@ -194,6 +194,24 @@ RayTracerGetResults(
     }
 }
 
+IRISAPI
+SIZE_T
+RayTracerGetHitCount(
+    _In_ PCRAYTRACER RayTracer
+    )
+{
+    PCIRIS_CONSTANT_POINTER_LIST PointerList;
+    SIZE_T HitCount;
+
+    ASSERT(RayTracer != NULL);
+
+    PointerList = &RayTracer->HitList;
+
+    HitCount = IrisConstantPointerListGetSize(PointerList);
+
+    return HitCount;
+}
+
 VOID
 RayTracerFree(
     _Pre_maybenull_ _Post_invalid_ PRAYTRACER RayTracer

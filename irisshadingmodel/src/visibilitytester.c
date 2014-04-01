@@ -69,9 +69,9 @@ VisibilityTesterTestVisibility(
 {
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
-	PRAYTRACER RayTracer;
+    PRAYTRACER RayTracer;
     SIZE_T NumberOfHits;
-	ISTATUS Status;
+    ISTATUS Status;
     SIZE_T Index;
 
     ASSERT(Tester != NULL);
@@ -113,6 +113,49 @@ VisibilityTesterTestVisibility(
     }
 
     *Visible = TRUE;
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+VisibilityTesterTestVisibilityAnyDistance(
+    _In_ PVISIBILITY_TESTER Tester,
+    _In_ PCRAY WorldRay,
+    _Out_ PBOOL Visible
+    )
+{
+    PCGEOMETRY_HIT *HitList;
+    RAY NormalizedWorldRay;
+    PRAYTRACER RayTracer;
+    SIZE_T NumberOfHits;
+    ISTATUS Status;
+
+    ASSERT(Tester != NULL);
+    ASSERT(WorldRay != NULL);
+
+    VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
+    NormalizedWorldRay.Origin = WorldRay->Origin;
+
+    RayTracer = Tester->RayTracer;
+
+    RayTracerClearResults(RayTracer);
+
+    Status = SceneTrace(Tester->Scene,
+                        &NormalizedWorldRay,
+                        RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    RayTracerGetResults(RayTracer,
+                        FALSE,
+                        &HitList,
+                        &NumberOfHits);
+
+    *Visible = (NumberOfHits > 0) ? TRUE : FALSE;
     return ISTATUS_SUCCESS;
 }
 
