@@ -19,7 +19,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 LightShaderEvaluateAllLights(
     _In_opt_ PCVOID Context,
-    _In_reads_(NumberOfLights) PCVOID *Lights,
+    _In_reads_(NumberOfLights) PCVOID CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
     _In_ PCPOINT3 WorldHitPoint,
@@ -81,7 +81,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 LightShaderEvaluateOneLight(
     _In_opt_ PCVOID Context,
-    _In_reads_(NumberOfLights) PCVOID *Lights,
+    _In_reads_(NumberOfLights) PCVOID CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
     _In_ PCPOINT3 WorldHitPoint,

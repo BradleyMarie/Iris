@@ -412,3 +412,109 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     Success = WritePfm(Framebuffer, "RenderInterpolatedRedWorldTriangle.pfm");
 }
+
+TEST(RenderPhongWorldSphere)
+{
+    PRAYSHADER RecursiveRayTracer;
+    PDIRECT_SHADER PhongShader;
+    COLOR3 AmbientShaderColor;
+    COLOR3 DiffuseShaderColor;
+    PNORMAL SphereFrontNormal;
+    PFRAMEBUFFER Framebuffer;
+    COLOR3 DiffuseLightColor;
+    PPHONG_LIGHT PhongLight;
+    VECTOR3 CameraDirection;
+    VECTOR3 LightDirection;
+    POINT3 PinholeLocation;
+    PDRAWING_SHAPE Sphere;
+    SHADER SphereShader;
+    POINT3 SphereCenter;
+    ISTATUS Status;
+    PSCENE Scene;
+    COLOR3 Black;
+    bool Success;
+    VECTOR3 Up;
+
+    PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+
+    Color3InitializeFromComponents(&DiffuseLightColor, 
+                                   (FLOAT) 1.0, 
+                                   (FLOAT) 1.0, 
+                                   (FLOAT) 1.0);
+
+    Color3InitializeFromComponents(&AmbientShaderColor, 
+                                   (FLOAT) 0.2, 
+                                   (FLOAT) 0.2, 
+                                   (FLOAT) 0.2);
+
+    Color3InitializeFromComponents(&DiffuseShaderColor, 
+                                   (FLOAT) 0.8, 
+                                   (FLOAT) 0.8, 
+                                   (FLOAT) 0.8);
+
+    Color3InitializeBlack(&Black);
+
+    VectorInitialize(&LightDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+
+    PhongLight = DirectionalPhongLightAllocate(&LightDirection,
+                                               &Black,
+                                               &DiffuseLightColor,
+                                               &Black,
+                                               FALSE);
+
+    PhongShader = PhongDirectShaderAllocate(&PhongLight,
+                                            1,
+                                            LightShaderEvaluateAllLights,
+                                            &AmbientShaderColor,
+                                            &DiffuseShaderColor,
+                                            &Black,
+                                            (FLOAT) 0.0);
+
+    SphereShader.EmissiveShader = NULL;
+    SphereShader.DirectShader = PhongShader;
+    SphereShader.IndirectShader = NULL;
+    SphereShader.TranslucentShader = NULL;
+
+    SphereFrontNormal = SphereNormalAllocate(&SphereCenter, TRUE);
+
+    Sphere = SphereAllocate(&SphereCenter,
+                            (FLOAT) 1.0,
+                            &SphereShader,
+                            SphereFrontNormal,
+                            NULL,
+                            NULL);
+
+    Scene = ListSceneAllocate();
+
+    Status = SceneAddWorldObject(Scene, Sphere);
+
+    Framebuffer = FramebufferAllocate(&Black, 500, 500);
+
+    RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
+                                                               (PRANDOM) Scene, // HACK
+                                                               (FLOAT) 0.0005,
+                                                               0);
+
+    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
+    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+
+    Status = PinholeCameraRender(&PinholeLocation,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 &CameraDirection,
+                                 &Up,
+                                 0,
+                                 500,
+                                 0,
+                                 0,
+                                 FALSE,
+                                 NULL,
+                                 RecursiveRayTracer,
+                                 Framebuffer);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
+
+    Success = WritePfm(Framebuffer, "RenderPhongWorldSphere.pfm");
+}

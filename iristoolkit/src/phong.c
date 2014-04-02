@@ -21,7 +21,7 @@ Abstract:
 typedef struct _PHONG_SHADER {
     DIRECT_SHADER DirectShaderHeader;
     PLIGHT_SELECTION_ROUTINE LightSelectionRoutine;
-    _Field_size_(NumberOfLights) PCPHONG_LIGHT *Lights;
+    _Field_size_(NumberOfLights) PCPHONG_LIGHT CONST *Lights;
     SIZE_T NumberOfLights;
     COLOR3 Ambient;
     COLOR3 Diffuse;
@@ -980,7 +980,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDIRECT_SHADER
 PhongDirectShaderAllocate(
-    _In_reads_(NumberOfLights) PCPHONG_LIGHT *Lights,
+    _In_reads_(NumberOfLights) PCPHONG_LIGHT CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SELECTION_ROUTINE LightSelectionRoutine,
     _In_ PCOLOR3 Ambient,

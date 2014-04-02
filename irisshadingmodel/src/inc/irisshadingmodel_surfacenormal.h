@@ -47,24 +47,31 @@ SurfaceNormalInitialize(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCNORMAL Normal,
     _In_ PCPOINT3 ModelHit,
-    _In_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData
     )
 {
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Normal != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(ModelToWorld != NULL);
 
     SurfaceNormal->Normal = Normal;
     SurfaceNormal->ModelHit = ModelHit;
-    SurfaceNormal->WorldToModel = ModelToWorld->Inverse;
     SurfaceNormal->AdditionalData = AdditionalData;
     SurfaceNormal->WorldNormalValid = FALSE;
     SurfaceNormal->ModelNormalValid = FALSE;
     SurfaceNormal->NormalizedModelNormalValid = FALSE;
     SurfaceNormal->NormalizedWorldNormalValid = FALSE;
     SurfaceNormal->Prenormalized = Normal->NormalVTable->Prenormalized;
+
+    if (ModelToWorld != NULL)
+    {
+        SurfaceNormal->WorldToModel = ModelToWorld->Inverse;
+    }
+    else
+    {
+        SurfaceNormal->WorldToModel = NULL;   
+    }
 }
 
 #endif // _SURFACE_NORMAL_IRIS_SHADING_MODEL_INTERNAL_

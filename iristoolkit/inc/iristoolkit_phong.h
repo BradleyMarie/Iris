@@ -59,7 +59,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDIRECT_SHADER
 PhongDirectShaderAllocate(
-    _In_reads_(NumberOfLights) PCPHONG_LIGHT *Lights,
+    _In_reads_(NumberOfLights) PCPHONG_LIGHT CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SELECTION_ROUTINE LightSelectionRoutine,
     _In_ PCOLOR3 Ambient,

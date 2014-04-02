@@ -61,7 +61,7 @@ IrisDynamicMemoryAllocatorInitialize(
 
 _Check_return_
 _Ret_maybenull_
-_Post_writable_byte_size_(Size)
+_Post_writable_byte_size_(SizeInBytes)
 SFORCEINLINE
 PVOID
 IrisDynamicMemoryAllocatorAllocate(
@@ -74,10 +74,20 @@ IrisDynamicMemoryAllocatorAllocate(
     PIRIS_DYNAMIC_MEMORY_ALLOCATION IrisAllocation;
     SIZE_T AllocationSize;
     PVOID Allocation;
+    ISTATUS Status;
     PVOID Resized;
 
     ASSERT(Allocator != NULL);
     ASSERT(SizeInBytes != 0);
+
+    Status = CheckedAddSizeT(SizeInBytes, 
+                             sizeof(PIRIS_DYNAMIC_MEMORY_ALLOCATION),
+                             &AllocationSize);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return NULL;
+    }
 
     if (Allocator->NextAllocation != NULL)
     {
@@ -85,7 +95,7 @@ IrisDynamicMemoryAllocatorAllocate(
 
         if (IrisAllocation->SizeInBytes < SizeInBytes)
         {
-            Resized = realloc(IrisAllocation, SizeInBytes);
+            Resized = realloc(IrisAllocation, AllocationSize);
 
             if (Resized == NULL)
             {
@@ -106,14 +116,14 @@ IrisDynamicMemoryAllocatorAllocate(
             {
                 NewerAllocation->OlderAllocation = IrisAllocation;
             }
+
+            IrisAllocation->SizeInBytes = SizeInBytes;
         }
 
         Allocator->NextAllocation = IrisAllocation->OlderAllocation;
     }
     else
-    {
-        AllocationSize = sizeof(PIRIS_DYNAMIC_MEMORY_ALLOCATION) + SizeInBytes;
-        
+    {        
         Allocation = malloc(AllocationSize);
 
         if (Allocation == NULL)
@@ -128,14 +138,11 @@ IrisDynamicMemoryAllocatorAllocate(
         if (OlderAllocation != NULL)
         {
             OlderAllocation->NewerAllocation = IrisAllocation;
-            IrisAllocation->OlderAllocation = OlderAllocation;
-        }
-        else
-        {
-            IrisAllocation->OlderAllocation = NULL;
         }
 
+        IrisAllocation->OlderAllocation = OlderAllocation;
         IrisAllocation->NewerAllocation = NULL;
+        IrisAllocation->SizeInBytes = SizeInBytes;
 
         Allocator->AllocationListTail = IrisAllocation;
     }
