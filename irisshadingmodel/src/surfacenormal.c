@@ -17,7 +17,7 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SuraceNormalGetWorldNormal(
+SurfaceNormalGetWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 WorldNormal
     )
@@ -33,7 +33,7 @@ SuraceNormalGetWorldNormal(
         return ISTATUS_SUCCESS;
     }
 
-    Status = SuraceNormalGetModelNormal(SurfaceNormal, WorldNormal);
+    Status = SurfaceNormalGetModelNormal(SurfaceNormal, WorldNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -61,7 +61,7 @@ SuraceNormalGetWorldNormal(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SuraceNormalGetModelNormal(
+SurfaceNormalGetModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 ModelNormal
     )
@@ -102,7 +102,7 @@ SuraceNormalGetModelNormal(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SuraceNormalGetNormalizedWorldNormal(
+SurfaceNormalGetNormalizedWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedWorldNormal
     )
@@ -118,7 +118,7 @@ SuraceNormalGetNormalizedWorldNormal(
         return ISTATUS_SUCCESS;
     }
 
-    Status = SuraceNormalGetWorldNormal(SurfaceNormal, NormalizedWorldNormal);
+    Status = SurfaceNormalGetWorldNormal(SurfaceNormal, NormalizedWorldNormal);
 
     if (Status != ISTATUS_SUCCESS ||
         SurfaceNormal->NormalizedWorldNormalValid != FALSE)
@@ -137,7 +137,7 @@ SuraceNormalGetNormalizedWorldNormal(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SuraceNormalGetNormalizedModelNormal(
+SurfaceNormalGetNormalizedModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedModelNormal
     )
@@ -153,7 +153,7 @@ SuraceNormalGetNormalizedModelNormal(
         return ISTATUS_SUCCESS;
     }
 
-    Status = SuraceNormalGetModelNormal(SurfaceNormal, NormalizedModelNormal);
+    Status = SurfaceNormalGetModelNormal(SurfaceNormal, NormalizedModelNormal);
 
     if (Status != ISTATUS_SUCCESS ||
         SurfaceNormal->NormalizedModelNormalValid != FALSE)

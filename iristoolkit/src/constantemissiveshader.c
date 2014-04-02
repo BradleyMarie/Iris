@@ -77,7 +77,10 @@ ConstantEmissiveShaderAllocate(
 {
     PCONSTANT_EMISSIVE_SHADER ConstantEmissiveShader;
 
-    ASSERT(Color != NULL);
+    if (Color == NULL)
+    {
+        return NULL;
+    }
 
     ConstantEmissiveShader = (PCONSTANT_EMISSIVE_SHADER) malloc(sizeof(CONSTANT_EMISSIVE_SHADER));
 

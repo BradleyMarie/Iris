@@ -18,13 +18,24 @@ Abstract:
 #include <iristoolkit.h>
 
 //
+// Types
+//
+
+typedef struct _TRACER {
+    PFREE_ROUTINE FreeRoutine;
+    PRAYSHADER RayShader;
+} TRACER, *PTRACER;
+
+typedef CONST TRACER *PCTRACER;
+
+//
 // Prototypes
 //
 
 _Check_return_
 _Ret_maybenull_
 IRISTOOLKITAPI
-PRAYSHADER
+PTRACER
 PathTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -38,7 +49,7 @@ PathTracerAllocate(
 _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
-PRAYSHADER
+PTRACER
 NonRoulettePathTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -46,7 +57,7 @@ NonRoulettePathTracerAllocate(
     _In_ UINT8 MaximumRecursionDepth
     )
 {
-    PRAYSHADER PathTracer;
+    PTRACER PathTracer;
 
     ASSERT(Scene != NULL);
     ASSERT(Rng != NULL);
@@ -67,7 +78,7 @@ NonRoulettePathTracerAllocate(
 _Check_return_
 _Ret_maybenull_
 IRISTOOLKITAPI
-PRAYSHADER
+PTRACER
 RecursiveRayTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -81,7 +92,7 @@ RecursiveRayTracerAllocate(
 _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
-PRAYSHADER
+PTRACER
 RecursiveNonRouletteRayTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -89,7 +100,7 @@ RecursiveNonRouletteRayTracerAllocate(
     _In_ UINT8 MaximumRecursionDepth
     )
 {
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
 
     ASSERT(Scene != NULL);
     ASSERT(Rng != NULL);
@@ -105,6 +116,43 @@ RecursiveNonRouletteRayTracerAllocate(
                                                     MaximumRecursionDepth);
 
     return RecursiveRayTracer;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+TracerTraceRay(
+    _Inout_ PTRACER Tracer,
+    _In_ PCRAY WorldRay,
+    _Out_ PCOLOR3 Color
+    )
+{
+    COLOR3 AmountReflected;
+    ISTATUS Status;
+
+    Color3InitializeWhite(&AmountReflected);
+
+    Status = RayShaderTraceRayMontecarlo(Tracer->RayShader,
+                                         WorldRay,
+                                         &AmountReflected,
+                                         Color);
+
+    return Status;
+}
+
+SFORCEINLINE
+VOID
+TracerFree(
+    _Pre_maybenull_ _Post_invalid_ PTRACER Tracer
+    )
+{
+    if (Tracer == NULL)
+    {
+        return;
+    }
+
+    Tracer->FreeRoutine(Tracer);
 }
 
 #endif // _TRACER_IRIS_TOOLKIT_

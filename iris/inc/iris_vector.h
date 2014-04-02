@@ -405,4 +405,43 @@ VectorMatrixTransposedMultiply(
     VectorInitialize(Product, X, Y, Z);
 }
 
+SFORCEINLINE
+VOID
+VectorReflect(
+    _In_ PCVECTOR3 Incident,
+    _In_ PCVECTOR3 Normal,
+    _Out_ PVECTOR3 NormalizedReflected
+    )
+{
+    VECTOR3 Reflected;
+    FLOAT Scalar;
+
+    ASSERT(Incident != NULL);
+    ASSERT(Normal != NULL);
+    ASSERT(NormalizedReflected != NULL);
+
+    Scalar = (FLOAT) 2.0 * VectorDotProduct(Normal, Incident);
+
+    VectorScale(Normal, Scalar, &Reflected);
+    VectorSubtract(Incident, &Reflected, &Reflected);
+
+    VectorNormalize(&Reflected, NormalizedReflected);
+}
+
+SFORCEINLINE
+VOID
+VectorHalfAngle(
+    PCVECTOR3 Vector0,
+    PCVECTOR3 Vector1,
+    PVECTOR3 Result
+    )
+{
+    ASSERT(Vector0 != NULL);
+    ASSERT(Vector1 != NULL);
+    ASSERT(Result != NULL);
+
+    VectorAdd(Vector0, Vector1, Result);
+    VectorNormalize(Result, Result);
+}
+
 #endif // _VECTOR_IRIS_

@@ -38,7 +38,7 @@ PinholeCameraRender(
     _In_ SIZE_T AdditionalYSamplesPerPixel,
     _In_ BOOL Jitter,
     _Inout_opt_ PRANDOM Rng,
-    _Inout_ PRAYSHADER RayShader,
+    _Inout_ PTRACER RayTracer,
     _Inout_ PFRAMEBUFFER Framebuffer
     );
 

@@ -102,22 +102,6 @@ typedef CONST ATTENUATED_POINT_PHONG_SPOT_LIGHT *PCATTENUATED_POINT_PHONG_SPOT_L
 // Static Functions
 //
 
-SFORCEINLINE
-VOID
-VectorHalfAngle(
-    PCVECTOR3 Vector0,
-    PCVECTOR3 Vector1,
-    PVECTOR3 Result
-    )
-{
-    ASSERT(Vector0 != NULL);
-    ASSERT(Vector1 != NULL);
-    ASSERT(Result != NULL);
-
-    VectorAdd(Vector0, Vector1, Result);
-    VectorScale(Result, (FLOAT) 0.5, Result);
-}
-
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
@@ -284,8 +268,8 @@ DirectionalPhongLightShade(
         }
     }
 
-    Status = SuraceNormalGetNormalizedWorldNormal(SurfaceNormal,
-                                                  &NormalizedWorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &NormalizedWorldSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -414,8 +398,8 @@ PointPhongLightShade(
         }
     }
 
-    Status = SuraceNormalGetNormalizedWorldNormal(SurfaceNormal,
-                                                  &NormalizedWorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &NormalizedWorldSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -545,8 +529,8 @@ AttenuatedPointPhongLightShade(
         }
     }
 
-    Status = SuraceNormalGetNormalizedWorldNormal(SurfaceNormal,
-                                                  &NormalizedWorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &NormalizedWorldSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -713,8 +697,8 @@ PointPhongSpotLightShade(
         }
     }
 
-    Status = SuraceNormalGetNormalizedWorldNormal(SurfaceNormal,
-                                                  &NormalizedWorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &NormalizedWorldSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -876,8 +860,8 @@ AttenuatedPointPhongSpotLightShade(
         }
     }
 
-    Status = SuraceNormalGetNormalizedWorldNormal(SurfaceNormal,
-                                                  &NormalizedWorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &NormalizedWorldSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {

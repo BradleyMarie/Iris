@@ -229,6 +229,21 @@ Color3DivideByScalar(
 }
 
 SFORCEINLINE
+FLOAT
+Color3AverageComponents(
+    _In_ PCCOLOR3 Color
+    )
+{
+    FLOAT Average;
+
+    ASSERT(Color != NULL);
+
+    Average = (Color->Red + Color->Green + Color->Blue) / (FLOAT) 3.0;
+
+    return Average;
+}
+
+SFORCEINLINE
 BOOL
 Color3IsBlack(
     _In_ PCCOLOR3 Color
@@ -255,6 +270,18 @@ Color3InitializeBlack(
                                    (FLOAT) 0.0,
                                    (FLOAT) 0.0,
                                    (FLOAT) 0.0);
+}
+
+SFORCEINLINE
+VOID
+Color3InitializeWhite(
+    _Out_ PCOLOR3 Color
+    )
+{
+    Color3InitializeFromComponents(Color,
+                                   (FLOAT) 1.0,
+                                   (FLOAT) 1.0,
+                                   (FLOAT) 1.0);
 }
 
 #endif // _COLOR3_IRIS_SHADING_MODEL_

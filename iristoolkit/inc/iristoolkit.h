@@ -31,5 +31,6 @@ Abstract:
 #include "iristoolkit_lightshader.h"
 #include "iristoolkit_phong.h"
 #include "iristoolkit_spherenormal.h"
+#include "iristoolkit_perfectspecular.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_

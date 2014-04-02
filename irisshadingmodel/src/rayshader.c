@@ -18,16 +18,20 @@ Abstract:
 // Types
 //
 
-struct _RAYSHADER_HEADER {
-    PSHADE_RAY_ROUTINE ShadeRayRoutine;
-    PFREE_ROUTINE RayShaderFreeRoutine;
+struct _RAYSHADER {
+    BOOL DoRouletteTermination;
+    PCOLOR3 CurrentReflectanceEstimatePointer;
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
-    BOOL DoRouletteTermination;
-    PRAYTRACER RayTracer;
-    PCSCENE Scene;
-    FLOAT Epsilon;
     PRANDOM Rng;
+    PCSCENE Scene;
+    PRAYTRACER RayTracer;
+    FLOAT Epsilon;
+    UINT8 CurrentDepth;
+    PCVOID Context;
+    PRAYSHADER NextRayShader;
+    PSHADE_RAY_ROUTINE ShadeRayRoutine;
+    COLOR3 CurrentReflectanceEstimate;
 };
 
 //
@@ -55,73 +59,244 @@ MATRIX IdentityMatrix = { (FLOAT) 0.0,
                           &IdentityMatrix };
 
 //
-// Functions
+// Static Functions
 //
 
-_Check_return_
 _Ret_maybenull_
-IRISSHADINGMODELAPI
-PRAYSHADER_HEADER
-RayShaderHeaderAllocate(
+STATIC
+PRAYSHADER
+RayShaderAllocateInternal(
+    _In_opt_ PCVOID Context,
+    _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
+    _In_ PCOLOR3 CurrentReflectanceEstimatePointer,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
-    _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_opt_ PFREE_ROUTINE RayShaderFreeRoutine
+    _In_ UINT8 RussianRouletteStartDepth,
+    _In_ UINT8 MaximumRecursionDepth,
+    _In_ UINT8 CurrentDepth
     )
 {
-    PRAYSHADER_HEADER RayShaderHeader;
+    PCOLOR3 NextReflectanceEstimatePointer;
     BOOL DoRouletteTermination;
+    PRAYSHADER NextRayShader;
+    PRAYSHADER RayShader;
     PRAYTRACER RayTracer;
 
+    ASSERT(ShadeRayRoutine != NULL);
     ASSERT(Scene != NULL);
     ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Epsilon));
-    ASSERT(IsFiniteFloat(Epsilon));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
+    ASSERT(IsNormalFloat(Epsilon) != FALSE);
+    ASSERT(IsFiniteFloat(Epsilon) != FALSE);
+    ASSERT(IsNormalFloat(MinimumContinueProbability) != FALSE);
+    ASSERT(IsFiniteFloat(MinimumContinueProbability) != FALSE);
+    ASSERT(IsNormalFloat(MaximumContinueProbability) != FALSE);
+    ASSERT(IsFiniteFloat(MaximumContinueProbability) != FALSE);
+    ASSERT(CurrentDepth <= MaximumRecursionDepth);
     ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
-    ASSERT(ShadeRayRoutine != NULL);
+    ASSERT(MinimumContinueProbability >= (FLOAT) 0.0);
+    ASSERT(MinimumContinueProbability <= (FLOAT) 1.0);
+    ASSERT(MaximumContinueProbability >= (FLOAT) 0.0);
+    ASSERT(MaximumContinueProbability <= (FLOAT) 1.0);
+    ASSERT(Epsilon >= (FLOAT) 0.0);
 
-    RayShaderHeader = (PRAYSHADER_HEADER) malloc(sizeof(RAYSHADER_HEADER));
+    RayShader = (PRAYSHADER) malloc(sizeof(RAYSHADER));
 
-    if (RayShaderHeader == NULL)
+    if (RayShader == NULL)
     {
         return NULL;
+    }
+
+    if (CurrentReflectanceEstimatePointer == NULL)
+    {
+        NextReflectanceEstimatePointer = &RayShader->CurrentReflectanceEstimate;
+    }
+    else
+    {
+        NextReflectanceEstimatePointer = CurrentReflectanceEstimatePointer;
+    }
+
+    if (CurrentDepth < MaximumRecursionDepth)
+    {
+        NextRayShader = RayShaderAllocateInternal(Context,
+                                                  ShadeRayRoutine,
+                                                  Scene,
+                                                  Rng,
+                                                  Epsilon,
+                                                  NextReflectanceEstimatePointer,
+                                                  MinimumContinueProbability,
+                                                  MaximumContinueProbability,
+                                                  RussianRouletteStartDepth,
+                                                  MaximumRecursionDepth,
+                                                  CurrentDepth + 1);
+
+        if (NextRayShader == NULL)
+        {
+            free(RayShader);
+            return NULL;
+        }
+    }
+    else
+    {
+        NextRayShader = NULL;
     }
 
     RayTracer = RayTracerAllocate();
 
     if (RayTracer == NULL)
     {
-        free(RayShaderHeader);
+        RayShaderFree(NextRayShader);
+        free(RayShader);
         return NULL;
     }
 
-    MinimumContinueProbability = MaxFloat(MinimumContinueProbability, (FLOAT) 0.0);
-    MinimumContinueProbability = MinFloat(MinimumContinueProbability, (FLOAT) 1.0);
+    if (RussianRouletteStartDepth <= CurrentDepth)
+    {
+        DoRouletteTermination = MinimumContinueProbability != (FLOAT) 1.0;
+    }
+    else
+    {
+        DoRouletteTermination = FALSE;
+    }
 
-    MaximumContinueProbability = MaxFloat(MaximumContinueProbability, (FLOAT) 0.0);
-    MaximumContinueProbability = MinFloat(MaximumContinueProbability, (FLOAT) 1.0);
+    RayShader->DoRouletteTermination = DoRouletteTermination;
+    RayShader->CurrentReflectanceEstimatePointer = CurrentReflectanceEstimatePointer;
+    RayShader->MinimumContinueProbability = MinimumContinueProbability;
+    RayShader->MaximumContinueProbability = MaximumContinueProbability;
+    RayShader->Rng = Rng;
+    RayShader->Scene = Scene;
+    RayShader->RayTracer = RayTracer;
+    RayShader->Epsilon = Epsilon;
+    RayShader->CurrentDepth = CurrentDepth;
+    RayShader->Context = Context;
+    RayShader->NextRayShader = NextRayShader;
+    RayShader->ShadeRayRoutine = ShadeRayRoutine;
 
-    DoRouletteTermination = MinimumContinueProbability != (FLOAT) 1.0 && 
-                            MaximumContinueProbability != (FLOAT) 1.0;
+    Color3InitializeWhite(&RayShader->CurrentReflectanceEstimate);
 
-    RayShaderHeader->MinimumContinueProbability = MinimumContinueProbability;
-    RayShaderHeader->MaximumContinueProbability = MaximumContinueProbability;
-    RayShaderHeader->DoRouletteTermination = DoRouletteTermination;
-    RayShaderHeader->RayShaderFreeRoutine = RayShaderFreeRoutine;
-    RayShaderHeader->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
-    RayShaderHeader->ShadeRayRoutine = ShadeRayRoutine;
-    RayShaderHeader->RayTracer = RayTracer;
-    RayShaderHeader->Scene = Scene;
-    RayShaderHeader->Rng = Rng;
+    return RayShader;
+}
 
-    return RayShaderHeader;
+SFORCEINLINE
+VOID
+RayShaderRestoreReflectanceEstimate(
+    _Inout_ PRAYSHADER RayShader
+    )
+{
+    ASSERT(RayShader != NULL);
+
+    if (RayShader->DoRouletteTermination == FALSE)
+    {
+        return;
+    }
+
+    if (RayShader->CurrentDepth == 0)
+    {
+        Color3InitializeWhite(&RayShader->CurrentReflectanceEstimate);
+    }
+    else
+    {
+        *RayShader->CurrentReflectanceEstimatePointer = RayShader->CurrentReflectanceEstimate;
+    }
+}
+
+SFORCEINLINE
+VOID
+RayShaderSaveReflectanceEstimateAndComputeContinueProbability(
+    _Inout_ PRAYSHADER RayShader,
+    _In_ PCCOLOR3 ReflectanceHint,
+    _Out_ PFLOAT ContinueProbability
+    )
+{
+    PCOLOR3 CurrentReflectanceEstimate;
+    FLOAT LightReturnedFromPath;
+    FLOAT LightReturnedFromRay;
+
+    ASSERT(RayShader != NULL);
+    ASSERT(ReflectanceHint != NULL);
+    ASSERT(ContinueProbability != NULL);
+    ASSERT(RayShader->DoRouletteTermination != FALSE);
+    ASSERT(RayShader->MinimumContinueProbability <= RayShader->MaximumContinueProbability);
+    ASSERT(RayShader->MinimumContinueProbability >= (FLOAT) 0.0);
+    ASSERT(RayShader->MinimumContinueProbability <= (FLOAT) 1.0);
+    ASSERT(RayShader->MaximumContinueProbability >= (FLOAT) 0.0);
+    ASSERT(RayShader->MaximumContinueProbability <= (FLOAT) 1.0);
+
+    CurrentReflectanceEstimate = RayShader->CurrentReflectanceEstimatePointer;
+
+    if (RayShader->CurrentDepth == 0)
+    {
+        *CurrentReflectanceEstimate = *ReflectanceHint;
+    }
+    else
+    {
+        RayShader->CurrentReflectanceEstimate = *CurrentReflectanceEstimate;
+
+        Color3ScaleByColor(CurrentReflectanceEstimate,
+                           ReflectanceHint,
+                           CurrentReflectanceEstimate);
+    }
+
+    LightReturnedFromPath = Color3AverageComponents(CurrentReflectanceEstimate);
+    LightReturnedFromRay = Color3AverageComponents(ReflectanceHint);
+
+    *ContinueProbability = LightReturnedFromPath / LightReturnedFromRay;
+}
+
+//
+// Functions
+//
+
+_Ret_maybenull_
+PRAYSHADER
+RayShaderAllocate(
+    _In_opt_ PCVOID Context,
+    _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
+    _In_ PCSCENE Scene,
+    _In_ PRANDOM Rng,
+    _In_ FLOAT Epsilon,
+    _In_ FLOAT MinimumContinueProbability,
+    _In_ FLOAT MaximumContinueProbability,
+    _In_ UINT8 RussianRouletteStartDepth,
+    _In_ UINT8 MaximumRecursionDepth
+    )
+{
+    PRAYSHADER RayShader;
+
+    if (ShadeRayRoutine == NULL ||
+        Scene == NULL ||
+        Rng == NULL ||
+        IsNormalFloat(Epsilon) == FALSE ||
+        IsFiniteFloat(Epsilon) == FALSE ||
+        IsNormalFloat(MinimumContinueProbability) == FALSE ||
+        IsFiniteFloat(MinimumContinueProbability) == FALSE ||
+        IsNormalFloat(MaximumContinueProbability) == FALSE ||
+        IsFiniteFloat(MaximumContinueProbability) == FALSE ||
+        MinimumContinueProbability > MaximumContinueProbability ||
+        MinimumContinueProbability < (FLOAT) 0.0 ||
+        MinimumContinueProbability > (FLOAT) 1.0 ||
+        MaximumContinueProbability < (FLOAT) 0.0 ||
+        MaximumContinueProbability > (FLOAT) 1.0 ||
+        Epsilon < (FLOAT) 0.0)
+    {
+        return NULL;
+    }
+
+    RayShader = RayShaderAllocateInternal(Context,
+                                          ShadeRayRoutine,
+                                          Scene,
+                                          Rng,
+                                          Epsilon,
+                                          NULL,
+                                          MinimumContinueProbability,
+                                          MaximumContinueProbability,
+                                          RussianRouletteStartDepth,
+                                          MaximumRecursionDepth,
+                                          0);
+
+    return RayShader;
 }
 
 _Check_return_
@@ -131,7 +306,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ PCRAY WorldRay,
-    _In_ FLOAT PreferredContinueProbability,
+    _In_ PCCOLOR3 ReflectanceHint,
     _Out_ PCOLOR3 Color
     )
 {
@@ -140,7 +315,7 @@ RayShaderTraceRayMontecarlo(
     SURFACE_NORMAL SurfaceNormal;
     PCDRAWING_SHAPE DrawingShape;
     PCGEOMETRY_HIT GeometryHit;
-    PRAYSHADER_HEADER Header;
+    FLOAT ContinueProbability;
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PCMATRIX ModelToWorld;
@@ -159,32 +334,31 @@ RayShaderTraceRayMontecarlo(
     ISTATUS Status;
     SIZE_T Index;
 
-    ASSERT(IsNormalFloat(PreferredContinueProbability));
-    ASSERT(IsFiniteFloat(PreferredContinueProbability));
     ASSERT(RayShader != NULL);
     ASSERT(WorldRay != NULL);
+    ASSERT(ReflectanceHint != NULL);
     ASSERT(Color != NULL);
 
-    Header = RayShader->RayShaderHeader;
-
-    if (Header->DoRouletteTermination != FALSE)
+    if (RayShader->DoRouletteTermination != FALSE)
     {
-        PreferredContinueProbability = MinFloat(Header->MaximumContinueProbability, 
-                                                PreferredContinueProbability);
+        RayShaderSaveReflectanceEstimateAndComputeContinueProbability(RayShader,
+                                                                      ReflectanceHint,
+                                                                      &ContinueProbability);
 
-        PreferredContinueProbability = MaxFloat(Header->MinimumContinueProbability, 
-                                                PreferredContinueProbability);
-
-        if (PreferredContinueProbability == (FLOAT) 0.0)
+        if (ContinueProbability == (FLOAT) 0.0)
         {
+            RayShaderRestoreReflectanceEstimate(RayShader);
             Color3InitializeBlack(Color);
             return ISTATUS_SUCCESS;
         }
 
-        NextRandom = RandomGenerateFloat(Header->Rng, (FLOAT) 0.0, (FLOAT) 1.0);
+        NextRandom = RandomGenerateFloat(RayShader->Rng,
+                                         (FLOAT) 0.0,
+                                         (FLOAT) 1.0);
 
-        if (PreferredContinueProbability < NextRandom)
+        if (ContinueProbability < NextRandom)
         {
+            RayShaderRestoreReflectanceEstimate(RayShader);
             Color3InitializeBlack(Color);
             return ISTATUS_SUCCESS;
         }   
@@ -193,16 +367,17 @@ RayShaderTraceRayMontecarlo(
     VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
     NormalizedWorldRay.Origin = WorldRay->Origin;
 
-    RayTracer = Header->RayTracer;
+    RayTracer = RayShader->RayTracer;
 
     RayTracerClearResults(RayTracer);
 
-    Status = SceneTrace(Header->Scene,
+    Status = SceneTrace(RayShader->Scene,
                         &NormalizedWorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
+        RayShaderRestoreReflectanceEstimate(RayShader);
         return Status;
     }
 
@@ -213,6 +388,7 @@ RayShaderTraceRayMontecarlo(
 
     if (NumberOfHits == 0)
     {
+        RayShaderRestoreReflectanceEstimate(RayShader);
         Color3InitializeBlack(Color);
         return ISTATUS_SUCCESS;
     }
@@ -226,7 +402,7 @@ RayShaderTraceRayMontecarlo(
         GeometryHit = HitList[Index];
         Distance = GeometryHit->Distance;
 
-        if (Distance <= Header->Epsilon)
+        if (Distance <= RayShader->Epsilon)
         {
             continue;
         }
@@ -280,20 +456,23 @@ RayShaderTraceRayMontecarlo(
             ModelToWorld = &IdentityMatrix;
         }
 
-        Status = Header->ShadeRayRoutine(RayShader,
-                                         Distance,
-                                         &NormalizedWorldRay.Direction,
-                                         &WorldHit,
-                                         &ModelViewer,
-                                         &ModelHit,
-                                         ModelToWorld,
-                                         AdditionalData,
-                                         Shader,
-                                         SurfaceNormalPointer,
-                                         &HitColor);
+        Status = RayShader->ShadeRayRoutine(RayShader->Context,
+                                            RayShader->NextRayShader,
+                                            RayShader->CurrentDepth,
+                                            Distance,
+                                            &NormalizedWorldRay.Direction,
+                                            &WorldHit,
+                                            &ModelViewer,
+                                            &ModelHit,
+                                            ModelToWorld,
+                                            AdditionalData,
+                                            Shader,
+                                            SurfaceNormalPointer,
+                                            &HitColor);
 
         if (Status != ISTATUS_SUCCESS)
         {
+            RayShaderRestoreReflectanceEstimate(RayShader);
             return Status;
         }
 
@@ -302,11 +481,12 @@ RayShaderTraceRayMontecarlo(
 
     Color3InitializeFromColor4(Color, &BlendedColor);
 
-    if (Header->DoRouletteTermination != FALSE)
+    if (RayShader->DoRouletteTermination != FALSE)
     {
-        Color3DivideByScalar(Color, PreferredContinueProbability, Color);
+        Color3DivideByScalar(Color, ContinueProbability, Color);
     }
 
+    RayShaderRestoreReflectanceEstimate(RayShader);
     return ISTATUS_SUCCESS;
 }
 
@@ -316,22 +496,20 @@ RayShaderFree(
     _Pre_maybenull_ _Post_invalid_ PRAYSHADER RayShader
     )
 {
-    PRAYSHADER_HEADER Header;
-    PFREE_ROUTINE FreeRoutine;
+    PRAYSHADER NextRayShader;
 
     if (RayShader == NULL)
     {
         return;
     }
 
-    Header = RayShader->RayShaderHeader;
-    FreeRoutine = Header->RayShaderFreeRoutine;
+    NextRayShader = RayShader->NextRayShader;
 
-    RayTracerFree(Header->RayTracer);
-    free(Header);
-
-    if (FreeRoutine != NULL)
+    if (NextRayShader != NULL)
     {
-        FreeRoutine(RayShader);
+        RayShaderFree(NextRayShader);
     }
+
+    RayTracerFree(RayShader->RayTracer);
+    free(RayShader);
 }

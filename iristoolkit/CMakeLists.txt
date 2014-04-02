@@ -14,7 +14,8 @@ add_library(iristoolkit SHARED
     src/interpolatedtriangle.c
     src/lightshader.c
     src/phong.c
-    src/spherenormal.c)
+    src/spherenormal.c
+    src/perfectspecular.c)
 
 target_link_libraries(iristoolkit 
     iris 

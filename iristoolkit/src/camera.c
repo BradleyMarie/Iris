@@ -29,7 +29,7 @@ StaticPinholeCameraRender(
     _In_ SIZE_T AdditionalYSamplesPerPixel,
     _In_ BOOL Jitter,
     _Inout_opt_ PRANDOM Rng,
-    _Inout_ PRAYSHADER RayShader,
+    _Inout_ PTRACER RayTracer,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
@@ -51,7 +51,7 @@ StaticPinholeCameraRender(
     ASSERT(PixelYDimensions != NULL);
     ASSERT(RowsToRender != 0);
     ASSERT(Jitter == FALSE || Rng != NULL);
-    ASSERT(RayShader != NULL);
+    ASSERT(RayTracer != NULL);
     ASSERT(Framebuffer != NULL);
 
     FramebufferGetDimensions(Framebuffer, 
@@ -88,9 +88,9 @@ StaticPinholeCameraRender(
 
             RayInitialize(&WorldRay, &Origin, &Direction);
 
-            Status = RayShaderTraceRay(RayShader,
-                                       &WorldRay,
-                                       &Color);
+            Status = TracerTraceRay(RayTracer,
+                                    &WorldRay,
+                                    &Color);
 
             if (Status != ISTATUS_SUCCESS)
             {
@@ -127,7 +127,7 @@ PinholeCameraRender(
     _In_ SIZE_T AdditionalYSamplesPerPixel,
     _In_ BOOL Jitter,
     _Inout_opt_ PRANDOM Rng,
-    _Inout_ PRAYSHADER RayShader,
+    _Inout_ PTRACER RayTracer,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
@@ -155,7 +155,7 @@ PinholeCameraRender(
         Up == NULL ||
         RowsToRender == 0 ||
         (Jitter == TRUE && Rng == NULL) ||
-        RayShader == NULL ||
+        RayTracer == NULL ||
         Framebuffer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT;
@@ -234,7 +234,7 @@ PinholeCameraRender(
                                        AdditionalYSamplesPerPixel,
                                        Jitter,
                                        Rng,
-                                       RayShader,
+                                       RayTracer,
                                        Framebuffer);
 
     return Status;

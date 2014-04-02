@@ -32,7 +32,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
-SuraceNormalGetWorldNormal(
+SurfaceNormalGetWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 WorldNormal
     );
@@ -41,7 +41,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
-SuraceNormalGetModelNormal(
+SurfaceNormalGetModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 ModelNormal
     );
@@ -50,7 +50,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
-SuraceNormalGetNormalizedWorldNormal(
+SurfaceNormalGetNormalizedWorldNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedWorldNormal
     );
@@ -59,7 +59,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
-SuraceNormalGetNormalizedModelNormal(
+SurfaceNormalGetNormalizedModelNormal(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PVECTOR3 NormalizedModelNormal
     );

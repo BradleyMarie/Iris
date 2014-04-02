@@ -28,12 +28,17 @@ typedef CONST SHADER *PCSHADER;
 // Types
 //
 
+typedef struct _RAYSHADER RAYSHADER, *PRAYSHADER;
+typedef CONST RAYSHADER *PCRAYSHADER;
+
 typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSHADE_RAY_ROUTINE)(
-    _In_ PVOID Context,
+    _In_opt_ PCVOID Context,
+    _Inout_ PRAYSHADER NextRayShader,
+    _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
     _In_ PCVECTOR3 WorldViewer,
     _In_ PCPOINT3 WorldHit,
@@ -46,15 +51,6 @@ ISTATUS
     _Out_ PCOLOR4 Color
     );
 
-typedef struct _RAYSHADER_HEADER RAYSHADER_HEADER, *PRAYSHADER_HEADER;
-typedef CONST RAYSHADER_HEADER *PCRAYSHADER_HEADER;
-
-typedef struct _RAYSHADER {
-    PRAYSHADER_HEADER RayShaderHeader;
-} RAYSHADER, *PRAYSHADER;
-
-typedef CONST RAYSHADER *PCRAYSHADER;
-
 //
 // Functions
 //
@@ -62,15 +58,17 @@ typedef CONST RAYSHADER *PCRAYSHADER;
 _Check_return_
 _Ret_maybenull_
 IRISSHADINGMODELAPI
-PRAYSHADER_HEADER
-RayShaderHeaderAllocate(
+PRAYSHADER
+RayShaderAllocate(
+    _In_opt_ PCVOID Context,
+    _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
-    _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_opt_ PFREE_ROUTINE RayShaderFreeRoutine
+    _In_ UINT8 RussianRouletteStartDepth,
+    _In_ UINT8 MaximumRecursionDepth
     );
 
 _Check_return_
@@ -80,7 +78,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ PCRAY WorldRay,
-    _In_ FLOAT PreferredContinueProbability,
+    _In_ PCCOLOR3 ReflectanceHint,
     _Out_ PCOLOR3 Color
     );
 
@@ -100,7 +98,17 @@ RayShaderTraceRay(
     _Out_ PCOLOR3 Color
     )
 {
-    return RayShaderTraceRayMontecarlo(RayShader, WorldRay, (FLOAT) 1.0, Color);
+    COLOR3 AmountReflected;
+    ISTATUS Status;
+
+    Color3InitializeWhite(&AmountReflected);
+
+    Status = RayShaderTraceRayMontecarlo(RayShader,
+                                         WorldRay,
+                                         &AmountReflected,
+                                         Color);
+
+    return Status;
 }
 
 #endif // _RAYSHADER_IRIS_SHADING_MODEL_

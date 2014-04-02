@@ -18,14 +18,13 @@ Abstract:
 // Types
 //
 
-typedef struct _TRACER {
-    PRAYSHADER_HEADER Header;
+typedef struct _COMMON_TRACER {
+    TRACER TracerHeader;
     PVISIBILITY_TESTER VisibilityTester;
-    PRAYSHADER NextRayShader;
     PRANDOM Rng;
-} TRACER, *PTRACER;
+} COMMON_TRACER, *PCOMMON_TRACER;
 
-typedef CONST TRACER *PCTRACER;
+typedef CONST COMMON_TRACER *PCCOMMON_TRACER;
 
 //
 // Static
@@ -36,7 +35,9 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PathTracerShadeHit(
-    _In_ PVOID Context,
+    _In_opt_ PCVOID Context,
+    _Inout_ PRAYSHADER NextRayShader,
+    _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
     _In_ PCVECTOR3 WorldViewer,
     _In_ PCPOINT3 WorldHit,
@@ -55,7 +56,7 @@ PathTracerShadeHit(
     PCEMISSIVE_SHADER EmissiveShader;
     COLOR3 ColorWithoutAlpha;
     COLOR3 ComponentColor;
-    PTRACER Tracer;
+    PCOMMON_TRACER Tracer;
     ISTATUS Status;
     PRANDOM Rng;
     FLOAT Alpha;
@@ -72,7 +73,7 @@ PathTracerShadeHit(
     ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 
-    Tracer = (PTRACER) Context;
+    Tracer = (PCOMMON_TRACER) Context;
 
     TranslucentShader = Shader->TranslucentShader;
 
@@ -130,11 +131,13 @@ PathTracerShadeHit(
         Status = IndirectShaderShade(IndirectShader,
                                      WorldHit,
                                      ModelHit,
+                                     WorldViewer,
+                                     ModelViewer,
                                      AdditionalData,
                                      SurfaceNormal,
                                      Rng,
                                      VisibilityTester,
-                                     Tracer->NextRayShader,
+                                     NextRayShader,
                                      &ComponentColor);
 
         if (Status != ISTATUS_SUCCESS)
@@ -155,7 +158,9 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RecursiveRayTracerShadeHit(
-    _In_ PVOID Context,
+    _In_opt_ PCVOID Context,
+    _Inout_ PRAYSHADER NextRayShader,
+    _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
     _In_ PCVECTOR3 WorldViewer,
     _In_ PCPOINT3 WorldHit,
@@ -175,7 +180,7 @@ RecursiveRayTracerShadeHit(
     PCDIRECT_SHADER DirectShader;
     COLOR3 ColorWithoutAlpha;
     COLOR3 ComponentColor;
-    PTRACER Tracer;
+    PCOMMON_TRACER Tracer;
     ISTATUS Status;
     PRANDOM Rng;
     FLOAT Alpha;
@@ -192,7 +197,7 @@ RecursiveRayTracerShadeHit(
     ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 
-    Tracer = (PTRACER) Context;
+    Tracer = (PCOMMON_TRACER) Context;
 
     TranslucentShader = Shader->TranslucentShader;
 
@@ -250,11 +255,13 @@ RecursiveRayTracerShadeHit(
         Status = IndirectShaderShade(IndirectShader,
                                      WorldHit,
                                      ModelHit,
+                                     WorldViewer,
+                                     ModelViewer,
                                      AdditionalData,
                                      SurfaceNormal,
                                      Rng,
                                      VisibilityTester,
-                                     Tracer->NextRayShader,
+                                     NextRayShader,
                                      &ComponentColor);
 
         if (Status != ISTATUS_SUCCESS)
@@ -295,51 +302,26 @@ RecursiveRayTracerShadeHit(
 
 STATIC
 VOID
-TracerFreeInternal(
-    _Pre_maybenull_ _Post_invalid_ PTRACER Tracer,
-    _In_ BOOL FreeVisibilityTester
-    )
-{
-    PTRACER NextTracer;
-
-    if (Tracer == NULL)
-    {
-        return;
-    }
-
-    if (Tracer->NextRayShader != NULL)
-    {
-        NextTracer = (PTRACER) Tracer->NextRayShader;
-
-        TracerFreeInternal(NextTracer, 
-                           FreeVisibilityTester);
-    }
-    else if (FreeVisibilityTester != FALSE)
-    {
-        VisibilityTesterFree(Tracer->VisibilityTester);
-    }
-    
-    free(Tracer);
-}
-
-STATIC
-VOID
-TracerFree(
+CommonTracerFree(
     _Pre_maybenull_ _Post_invalid_ PVOID Context
     )
 {
-    PTRACER Tracer;
+    PCOMMON_TRACER Tracer;
 
-    Tracer = (PTRACER) Context;
+    ASSERT(Context != NULL);
 
-    TracerFreeInternal(Tracer, TRUE);
+    Tracer = (PCOMMON_TRACER) Context;
+
+    RayShaderFree(Tracer->TracerHeader.RayShader);
+    VisibilityTesterFree(Tracer->VisibilityTester);
+    free(Tracer);
 }
 
 _Check_return_
 _Ret_maybenull_
 STATIC
 PTRACER
-TracerAllocateInternal(
+CommonTracerAllocateInternal(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
@@ -347,15 +329,12 @@ TracerAllocateInternal(
     _In_ FLOAT MaximumContinueProbability,
     _In_ PSHADE_RAY_ROUTINE TracerShadeRoutine,
     _In_ UINT8 RussianRouletteStartDepth,
-    _In_ UINT8 MaximumRecursionDepth,
-    _In_ PVISIBILITY_TESTER VisibilityTester,
-    _In_ UINT8 CurrentDepth
+    _In_ UINT8 MaximumRecursionDepth
     )
 {
-    PRAYSHADER_HEADER Header;
-    PRAYSHADER NextRayShader;
-    PTRACER NextTracer;
-    PTRACER Tracer;
+    PVISIBILITY_TESTER VisibilityTester;
+    PCOMMON_TRACER Tracer;
+    PRAYSHADER RayShader;
 
     ASSERT(Scene != NULL);
     ASSERT(Rng != NULL);
@@ -367,70 +346,45 @@ TracerAllocateInternal(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
     ASSERT(TracerShadeRoutine != NULL);
-    ASSERT(VisibilityTester != NULL);
 
-    Tracer = (PTRACER) malloc(sizeof(TRACER));
+    Tracer = (PCOMMON_TRACER) malloc(sizeof(COMMON_TRACER));
 
     if (Tracer == NULL)
     {
         return NULL;
     }
 
-    if (CurrentDepth < MaximumRecursionDepth)
-    {
-        NextTracer = TracerAllocateInternal(Scene,
-                                            Rng,
-                                            Epsilon,
-                                            MinimumContinueProbability,
-                                            MaximumContinueProbability,
-                                            TracerShadeRoutine,
-                                            RussianRouletteStartDepth,
-                                            MaximumRecursionDepth,
-                                            VisibilityTester,
-                                            CurrentDepth + 1);
+    VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
 
-        if (NextTracer == NULL)
-        {
-            free(Tracer);
-            return NULL;
-        }
-
-        NextRayShader = (PRAYSHADER) NextTracer;
-    }
-    else
-    {
-        NextRayShader = NULL;
-        NextTracer = NULL;
-    }
-
-    if (CurrentDepth <= RussianRouletteStartDepth ||
-        RussianRouletteStartDepth == 0)
-    {
-        MinimumContinueProbability = (FLOAT) 1.0;
-        MinimumContinueProbability = (FLOAT) 1.0;
-    }
-
-    Header = RayShaderHeaderAllocate(Scene,
-                                     Rng,
-                                     Epsilon,
-                                     MinimumContinueProbability,
-                                     MaximumContinueProbability,
-                                     TracerShadeRoutine,
-                                     TracerFree);
-
-    if (Header == NULL)
+    if (VisibilityTester == NULL)
     {
         free(Tracer);
-        TracerFreeInternal(NextTracer, FALSE);
         return NULL;
     }
 
-    Tracer->Header = Header;
+    RayShader = RayShaderAllocate(Tracer,
+                                  TracerShadeRoutine,
+                                  Scene,
+                                  Rng,
+                                  Epsilon,
+                                  MinimumContinueProbability,
+                                  MaximumContinueProbability,
+                                  RussianRouletteStartDepth,
+                                  MaximumRecursionDepth);
+
+    if (RayShader == NULL)
+    {
+        VisibilityTesterFree(VisibilityTester);
+        free(Tracer);
+        return NULL;
+    }
+
+    Tracer->TracerHeader.FreeRoutine = TracerFree;
+    Tracer->TracerHeader.RayShader = RayShader;
     Tracer->VisibilityTester = VisibilityTester;
-    Tracer->NextRayShader = NextRayShader;
     Tracer->Rng = Rng;
 
-    return Tracer;
+    return (PTRACER) Tracer;
 }
 
 //
@@ -439,7 +393,7 @@ TracerAllocateInternal(
 
 _Check_return_
 _Ret_maybenull_
-PRAYSHADER
+PTRACER
 PathTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -449,8 +403,7 @@ PathTracerAllocate(
     _In_ UINT8 RussianRouletteStartDepth,
     _In_ UINT8 MaximumRecursionDepth
     )
-{
-    PVISIBILITY_TESTER VisibilityTester;
+{ 
     PTRACER PathTracer;
 
     ASSERT(Scene != NULL);
@@ -463,35 +416,21 @@ PathTracerAllocate(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
 
-    VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
+    PathTracer = CommonTracerAllocateInternal(Scene,
+                                              Rng,
+                                              Epsilon,
+                                              MinimumContinueProbability,
+                                              MaximumContinueProbability,
+                                              PathTracerShadeHit,
+                                              RussianRouletteStartDepth,
+                                              MaximumRecursionDepth);
 
-    if (VisibilityTester == NULL)
-    {
-        return NULL;
-    }
-
-    PathTracer = TracerAllocateInternal(Scene,
-                                        Rng,
-                                        Epsilon,
-                                        MinimumContinueProbability,
-                                        MaximumContinueProbability,
-                                        PathTracerShadeHit,
-                                        RussianRouletteStartDepth,
-                                        MaximumRecursionDepth,
-                                        VisibilityTester,
-                                        0);
-
-    if (PathTracer == NULL)
-    {
-        VisibilityTesterFree(VisibilityTester);
-    }
-
-    return (PRAYSHADER) PathTracer;
+    return (PTRACER) PathTracer;
 }
 
 _Check_return_
 _Ret_maybenull_
-PRAYSHADER
+PTRACER
 RecursiveRayTracerAllocate(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
@@ -502,7 +441,6 @@ RecursiveRayTracerAllocate(
     _In_ UINT8 MaximumRecursionDepth
     )
 {
-    PVISIBILITY_TESTER VisibilityTester;
     PTRACER RecursiveRayTracer;
 
     ASSERT(Scene != NULL);
@@ -515,29 +453,15 @@ RecursiveRayTracerAllocate(
     ASSERT(IsFiniteFloat(MaximumContinueProbability));
     ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
 
-    VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
+    RecursiveRayTracer = CommonTracerAllocateInternal(Scene,
+                                                      Rng,
+                                                      Epsilon,
+                                                      MinimumContinueProbability,
+                                                      MaximumContinueProbability,
+                                                      RecursiveRayTracerShadeHit,
+                                                      RussianRouletteStartDepth,
+                                                      MaximumRecursionDepth);
 
-    if (VisibilityTester == NULL)
-    {
-        return NULL;
-    }
-
-    RecursiveRayTracer = TracerAllocateInternal(Scene,
-                                                Rng,
-                                                Epsilon,
-                                                MinimumContinueProbability,
-                                                MaximumContinueProbability,
-                                                RecursiveRayTracerShadeHit,
-                                                RussianRouletteStartDepth,
-                                                MaximumRecursionDepth,
-                                                VisibilityTester,
-                                                0);
-
-    if (RecursiveRayTracer == NULL)
-    {
-        VisibilityTesterFree(VisibilityTester);
-    }
-
-    return (PRAYSHADER) RecursiveRayTracer;
+    return (PTRACER) RecursiveRayTracer;
 }
 

@@ -17,7 +17,7 @@ Abstract:
 TEST(RenderConstantRedWorldSphere)
 {
     PEMISSIVE_SHADER ConstantShader;
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -90,7 +90,7 @@ TEST(RenderConstantRedModelSphere)
 {
     INVERTIBLE_MATRIX IdentityMatrix;
     PEMISSIVE_SHADER ConstantShader;
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -165,7 +165,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 {
     INVERTIBLE_MATRIX IdentityMatrix;
     PEMISSIVE_SHADER ConstantShader;
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -239,7 +239,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 TEST(RenderConstantRedWorldTriangle)
 {
     PEMISSIVE_SHADER ConstantShader;
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -320,7 +320,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
     PEMISSIVE_SHADER ConstantShader0;
     PEMISSIVE_SHADER ConstantShader1;
     PEMISSIVE_SHADER ConstantShader2;
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -415,7 +415,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
 TEST(RenderPhongWorldSphere)
 {
-    PRAYSHADER RecursiveRayTracer;
+    PTRACER RecursiveRayTracer;
     PDIRECT_SHADER PhongShader;
     COLOR3 AmbientShaderColor;
     COLOR3 DiffuseShaderColor;
