@@ -152,7 +152,7 @@ RayShaderAllocateInternal(
         return NULL;
     }
 
-    if (RussianRouletteStartDepth < CurrentDepth &&
+    if (RussianRouletteStartDepth <= CurrentDepth &&
         RussianRouletteStartDepth != DISABLE_RUSSAIAN_ROULETTE_TERMINATION)
     {
         DoRouletteTermination = MinimumContinueProbability != (FLOAT) 1.0;
