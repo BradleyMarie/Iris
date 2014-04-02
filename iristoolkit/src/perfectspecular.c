@@ -85,7 +85,7 @@ PerfectSpecularShaderShade(
 
     Color3ScaleByColor(&OutputColor,
                        &PerfectSpecularIndirectShader->Reflectance,
-                       &OutputColor);
+                       Indirect);
 
     return ISTATUS_SUCCESS;
 }

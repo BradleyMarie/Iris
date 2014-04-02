@@ -518,3 +518,102 @@ TEST(RenderPhongWorldSphere)
 
     Success = WritePfm(Framebuffer, "RenderPhongWorldSphere.pfm");
 }
+
+TEST(RenderPerfectSpecularWorldSphere)
+{
+    PINDIRECT_SHADER PerfectSpecularShader;
+    PEMISSIVE_SHADER ConstantShader;
+    PTRACER RecursiveRayTracer;
+    PNORMAL SphereFrontNormal;
+    PFRAMEBUFFER Framebuffer;
+    VECTOR3 CameraDirection;
+    POINT3 PinholeLocation;
+    PDRAWING_SHAPE Sphere;
+    POINT3 SphereCenter2;
+    SHADER SphereShader2;
+    SHADER SphereShader;
+    POINT3 SphereCenter;
+    COLOR3 SphereColor;
+    COLOR3 Reflectance;
+    ISTATUS Status;
+    PSCENE Scene;
+    bool Success;
+    VECTOR3 Up;
+
+    PointInitialize(&SphereCenter, (FLOAT) 1.0, (FLOAT) 0.0, (FLOAT) -1.0);
+
+    Color3InitializeFromComponents(&SphereColor, 
+                                   (FLOAT) 1.0, 
+                                   (FLOAT) 0.0, 
+                                   (FLOAT) 0.0);
+
+    ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
+
+    SphereShader.EmissiveShader = ConstantShader;
+    SphereShader.DirectShader = NULL;
+    SphereShader.IndirectShader = NULL;
+    SphereShader.TranslucentShader = NULL;
+
+    Sphere = SphereAllocate(&SphereCenter,
+                            (FLOAT) 1.0,
+                            &SphereShader,
+                            NULL,
+                            NULL,
+                            NULL);
+
+    Scene = ListSceneAllocate();
+
+    Status = SceneAddWorldObject(Scene, Sphere);
+
+    PointInitialize(&SphereCenter2, (FLOAT) -1.0, (FLOAT) 0.0, (FLOAT) -1.0);
+
+    Color3InitializeWhite(&Reflectance);
+
+    PerfectSpecularShader = PerfectSpecularIndirectShaderAllocate(&Reflectance);
+
+    SphereShader2.EmissiveShader = NULL;
+    SphereShader2.DirectShader = NULL;
+    SphereShader2.IndirectShader = PerfectSpecularShader;
+    SphereShader2.TranslucentShader = NULL;
+
+    SphereFrontNormal = SphereNormalAllocate(&SphereCenter2, TRUE);
+
+    Sphere = SphereAllocate(&SphereCenter2,
+                            (FLOAT) 1.0,
+                            &SphereShader2,
+                            SphereFrontNormal,
+                            NULL,
+                            NULL);
+
+    Status = SceneAddWorldObject(Scene, Sphere);
+
+    Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
+
+    RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
+                                                               (PRANDOM) Scene, // HACK
+                                                               (FLOAT) 0.0005,
+                                                               1);
+
+    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
+    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+
+    Status = PinholeCameraRender(&PinholeLocation,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 &CameraDirection,
+                                 &Up,
+                                 0,
+                                 500,
+                                 0,
+                                 0,
+                                 FALSE,
+                                 NULL,
+                                 RecursiveRayTracer,
+                                 Framebuffer);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
+
+    Success = WritePfm(Framebuffer, "RenderPerfectSpecularWorldSphere.pfm");
+}
