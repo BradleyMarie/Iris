@@ -69,7 +69,7 @@ NonRoulettePathTracerAllocate(
                                     Epsilon,
                                     (FLOAT) 1.0,
                                     (FLOAT) 1.0,
-                                    0,
+                                    DISABLE_RUSSAIAN_ROULETTE_TERMINATION,
                                     MaximumRecursionDepth);
 
     return PathTracer;
@@ -112,7 +112,7 @@ RecursiveNonRouletteRayTracerAllocate(
                                                     Epsilon,
                                                     (FLOAT) 1.0,
                                                     (FLOAT) 1.0,
-                                                    0,
+                                                    DISABLE_RUSSAIAN_ROULETTE_TERMINATION,
                                                     MaximumRecursionDepth);
 
     return RecursiveRayTracer;

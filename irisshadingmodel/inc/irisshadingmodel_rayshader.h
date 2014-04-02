@@ -18,6 +18,12 @@ Abstract:
 #include <irisshadingmodel.h>
 
 //
+// Macros
+//
+
+#define DISABLE_RUSSAIAN_ROULETTE_TERMINATION 0
+
+//
 // Forward declarations
 //
 
