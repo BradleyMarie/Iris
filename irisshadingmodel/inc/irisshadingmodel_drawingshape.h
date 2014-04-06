@@ -24,8 +24,8 @@ Abstract:
 typedef
 _Check_return_
 _Ret_maybenull_
-PCSHADER 
-(*PDRAWING_SHAPE_GET_SHADER_ROUTINE)(
+PCTEXTURE
+(*PDRAWING_SHAPE_GET_TEXTURE_ROUTINE)(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
@@ -42,7 +42,7 @@ PCNORMAL
 typedef struct _DRAWING_SHAPE_VTABLE {
     SHAPE_VTABLE ShapeVTable;
     PFREE_ROUTINE FreeRoutine;
-    PDRAWING_SHAPE_GET_SHADER_ROUTINE GetShaderRoutine;
+    PDRAWING_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
     PDRAWING_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
 } DRAWING_SHAPE_VTABLE, *PDRAWING_SHAPE_VTABLE;
 
@@ -55,6 +55,38 @@ struct _DRAWING_SHAPE {
 //
 // Functions
 //
+
+SFORCEINLINE
+PCTEXTURE
+DrawingShapeGetTexture(
+    _In_ PCDRAWING_SHAPE Shape,
+    _In_ UINT32 FaceHit
+    )
+{
+    PCTEXTURE Texture;
+
+    ASSERT(Shape != NULL);
+
+    Texture = Shape->DrawingShapeVTable->GetTextureRoutine(Shape, FaceHit);
+    
+    return Texture;
+}
+
+SFORCEINLINE
+PCNORMAL
+DrawingShapeGetNormal(
+    _In_ PCDRAWING_SHAPE Shape,
+    _In_ UINT32 FaceHit
+    )
+{
+    PCNORMAL Normal;
+
+    ASSERT(Shape != NULL);
+
+    Normal = Shape->DrawingShapeVTable->GetNormalRoutine(Shape, FaceHit);
+    
+    return Normal;
+}
 
 SFORCEINLINE
 VOID

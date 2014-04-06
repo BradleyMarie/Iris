@@ -325,6 +325,7 @@ RayShaderTraceRayMontecarlo(
     COLOR4 BlendedColor;
     SIZE_T NumberOfHits;
     VECTOR3 ModelViewer;
+    PCTEXTURE Texture;
     FLOAT NextRandom;
     PCSHADER Shader;
     PCNORMAL Normal;
@@ -410,10 +411,10 @@ RayShaderTraceRayMontecarlo(
 
         DrawingShape = (PCDRAWING_SHAPE) GeometryHit->Shape;
 
-        Shader = DrawingShapeGetShader(DrawingShape,
-                                       GeometryHit->FaceHit);
+        Texture = DrawingShapeGetTexture(DrawingShape,
+                                         GeometryHit->FaceHit);
 
-        if (Shader == NULL)
+        if (Texture == NULL)
         {
             continue;
         }
@@ -422,17 +423,27 @@ RayShaderTraceRayMontecarlo(
 
         SharedGeometryHit = GeometryHit->SharedGeometryHit;
 
-        SharedGeometryHitComputeModelViewer(SharedGeometryHit,
-                                            &WorldRay->Direction,
-                                            &ModelViewer);
-
         SharedGeometryHitComputeModelHit(SharedGeometryHit,
                                          &WorldHit,
                                          &ModelHit);
 
-        ModelToWorld = SharedGeometryHitGetModelToWorld(SharedGeometryHit);
-
         AdditionalData = GeometryHit->AdditionalData;
+
+        Shader = TextureGetShader(Texture,
+                                  &WorldHit,
+                                  &ModelHit,
+                                  AdditionalData);
+
+        if (Shader == NULL)
+        {
+            continue;
+        }
+
+        SharedGeometryHitComputeModelViewer(SharedGeometryHit,
+                                            &WorldRay->Direction,
+                                            &ModelViewer);
+
+        ModelToWorld = SharedGeometryHitGetModelToWorld(SharedGeometryHit);
 
         Normal = DrawingShapeGetNormal(DrawingShape,
                                        GeometryHit->FaceHit);

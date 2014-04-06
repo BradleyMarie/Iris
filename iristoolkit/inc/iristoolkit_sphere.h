@@ -28,9 +28,9 @@ PDRAWING_SHAPE
 SphereAllocate(
     _In_ PCPOINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PCSHADER FrontShader,
+    _In_opt_ PCTEXTURE FrontTexture,
     _In_opt_ PCNORMAL FrontNormal,
-    _In_opt_ PCSHADER BackShader,
+    _In_opt_ PCTEXTURE BackTexture,
     _In_opt_ PCNORMAL BackNormal
     );
 

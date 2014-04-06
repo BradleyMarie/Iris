@@ -28,7 +28,7 @@ Abstract:
 
 typedef struct _TRIANGLE {
     DRAWING_SHAPE ShapeHeader;
-    PCSHADER Shaders[2];
+    PCTEXTURE Textures[2];
     PCNORMAL Normals[2];
     POINT3 Vertex0;
     VECTOR3 B;
@@ -46,8 +46,8 @@ typedef CONST TRIANGLE *PCTRIANGLE;
 _Check_return_
 _Ret_maybenull_
 STATIC
-PCSHADER 
-TriangleGetShader(
+PCTEXTURE 
+TriangleGetTexture(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit
     )
@@ -63,7 +63,7 @@ TriangleGetShader(
         return NULL;
     }
 
-    return Triangle->Shaders[FaceHit];
+    return Triangle->Textures[FaceHit];
 }
 
 _Check_return_
@@ -205,7 +205,7 @@ TriangleTraceTriangle(
 CONST STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
     { TriangleTraceTriangle },
     free,
-    TriangleGetShader,
+    TriangleGetTexture,
     TriangleGetNormal
 };
 
@@ -220,9 +220,9 @@ TriangleAllocate(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
-    _In_opt_ PCSHADER FrontShader,
+    _In_opt_ PCTEXTURE FrontTexture,
     _In_opt_ PCNORMAL FrontNormal,
-    _In_opt_ PCSHADER BackShader,
+    _In_opt_ PCTEXTURE BackTexture,
     _In_opt_ PCNORMAL BackNormal,
     _Out_opt_ PVECTOR3 FrontFaceSurfaceNormal 
     )
@@ -237,8 +237,8 @@ TriangleAllocate(
     ASSERT(Vertex1 != NULL);
     ASSERT(Vertex2 != NULL);
 
-    if (FrontShader == NULL &&
-        BackShader == NULL)
+    if (FrontTexture == NULL &&
+        BackTexture == NULL)
     {
         return NULL;
     }
@@ -276,8 +276,8 @@ TriangleAllocate(
         *FrontFaceSurfaceNormal = Triangle->SurfaceNormal;
     }
 
-    Triangle->Shaders[0] = FrontShader;
-    Triangle->Shaders[1] = BackShader;
+    Triangle->Textures[0] = FrontTexture;
+    Triangle->Textures[1] = BackTexture;
     Triangle->Normals[0] = FrontNormal;
     Triangle->Normals[1] = BackNormal;
 

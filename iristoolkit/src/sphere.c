@@ -27,7 +27,7 @@ Abstract:
 
 typedef struct _SPHERE {
     DRAWING_SHAPE ShapeHeader;
-    PCSHADER Shaders[2];
+    PCTEXTURE Textures[2];
     PCNORMAL Normals[2];
     POINT3 Center;
     FLOAT RadiusSquared;
@@ -42,8 +42,8 @@ typedef CONST SPHERE *PCSPHERE;
 _Check_return_
 _Ret_maybenull_
 STATIC
-PCSHADER 
-SphereGetShader(
+PCTEXTURE 
+SphereGetTexture(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit
     )
@@ -59,7 +59,7 @@ SphereGetShader(
         return NULL;
     }
 
-    return Sphere->Shaders[FaceHit];
+    return Sphere->Textures[FaceHit];
 }
 
 _Check_return_
@@ -231,7 +231,7 @@ SphereTraceSphere(
 CONST STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
     { SphereTraceSphere },
     free,
-    SphereGetShader,
+    SphereGetTexture,
     SphereGetNormal
 };
 
@@ -246,9 +246,9 @@ PDRAWING_SHAPE
 SphereAllocate(
     _In_ PCPOINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PCSHADER FrontShader,
+    _In_opt_ PCTEXTURE FrontTexture,
     _In_opt_ PCNORMAL FrontNormal,
-    _In_opt_ PCSHADER BackShader,
+    _In_opt_ PCTEXTURE BackTexture,
     _In_opt_ PCNORMAL BackNormal
     )
 {
@@ -263,8 +263,8 @@ SphereAllocate(
         return NULL;
     }
 
-    if (FrontShader == NULL &&
-        BackShader == NULL)
+    if (FrontTexture == NULL &&
+        BackTexture == NULL)
     {
         return NULL;
     }
@@ -281,8 +281,8 @@ SphereAllocate(
     Sphere->Center = *Center;
     Sphere->RadiusSquared = Radius * Radius;
 
-    Sphere->Shaders[0] = FrontShader;
-    Sphere->Shaders[1] = BackShader;
+    Sphere->Textures[0] = FrontTexture;
+    Sphere->Textures[1] = BackTexture;
     Sphere->Normals[0] = FrontNormal;
     Sphere->Normals[1] = BackNormal;
 

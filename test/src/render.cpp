@@ -22,9 +22,9 @@ TEST(RenderConstantRedWorldSphere)
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Sphere;
-    SHADER SphereShader;
     POINT3 SphereCenter;
     COLOR3 SphereColor;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
@@ -39,14 +39,11 @@ TEST(RenderConstantRedWorldSphere)
 
     ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
 
-    SphereShader.EmissiveShader = ConstantShader;
-    SphereShader.DirectShader = NULL;
-    SphereShader.IndirectShader = NULL;
-    SphereShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
     Sphere = SphereAllocate(&SphereCenter,
                             (FLOAT) 1.0,
-                            &SphereShader,
+                            Texture,
                             NULL,
                             NULL,
                             NULL);
@@ -95,9 +92,9 @@ TEST(RenderConstantRedModelSphere)
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Sphere;
-    SHADER SphereShader;
     POINT3 SphereCenter;
     COLOR3 SphereColor;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
@@ -114,14 +111,11 @@ TEST(RenderConstantRedModelSphere)
 
     ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
 
-    SphereShader.EmissiveShader = ConstantShader;
-    SphereShader.DirectShader = NULL;
-    SphereShader.IndirectShader = NULL;
-    SphereShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
     Sphere = SphereAllocate(&SphereCenter,
                             (FLOAT) 1.0,
-                            &SphereShader,
+                            Texture,
                             NULL,
                             NULL,
                             NULL);
@@ -170,9 +164,9 @@ TEST(RenderConstantRedPremultipliedSphere)
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Sphere;
-    SHADER SphereShader;
     POINT3 SphereCenter;
     COLOR3 SphereColor;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
@@ -189,14 +183,11 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
 
-    SphereShader.EmissiveShader = ConstantShader;
-    SphereShader.DirectShader = NULL;
-    SphereShader.IndirectShader = NULL;
-    SphereShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
     Sphere = SphereAllocate(&SphereCenter,
                             (FLOAT) 1.0,
-                            &SphereShader,
+                            Texture,
                             NULL,
                             NULL,
                             NULL);
@@ -244,11 +235,11 @@ TEST(RenderConstantRedWorldTriangle)
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Triangle;
-    SHADER TriangleShader;
     POINT3 TriangleVertex0;
     POINT3 TriangleVertex1;
     POINT3 TriangleVertex2;
     COLOR3 TriangleColor;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
@@ -265,15 +256,12 @@ TEST(RenderConstantRedWorldTriangle)
 
     ConstantShader = ConstantEmissiveShaderAllocate(&TriangleColor);
 
-    TriangleShader.EmissiveShader = ConstantShader;
-    TriangleShader.DirectShader = NULL;
-    TriangleShader.IndirectShader = NULL;
-    TriangleShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
     Triangle = TriangleAllocate(&TriangleVertex0,
                                 &TriangleVertex1,
                                 &TriangleVertex2,
-                                &TriangleShader,
+                                Texture,
                                 NULL,
                                 NULL,
                                 NULL,
@@ -325,10 +313,10 @@ TEST(RenderInterpolatedRedWorldTriangle)
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Triangle;
-    SHADER TriangleShader;
     POINT3 TriangleVertex0;
     POINT3 TriangleVertex1;
     POINT3 TriangleVertex2;
+    PTEXTURE Texture;
     COLOR3 Red;
     COLOR3 Green;
     COLOR3 Blue;
@@ -364,15 +352,15 @@ TEST(RenderInterpolatedRedWorldTriangle)
                                                                             ConstantShader1,
                                                                             ConstantShader2);
 
-    TriangleShader.EmissiveShader = InterpolatedEmissiveShader;
-    TriangleShader.DirectShader = NULL;
-    TriangleShader.IndirectShader = NULL;
-    TriangleShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(InterpolatedEmissiveShader,
+                                      NULL,
+                                      NULL,
+                                      NULL);
 
     Triangle = TriangleAllocate(&TriangleVertex0,
                                 &TriangleVertex1,
                                 &TriangleVertex2,
-                                &TriangleShader,
+                                Texture,
                                 NULL,
                                 NULL,
                                 NULL,
@@ -427,8 +415,8 @@ TEST(RenderPhongWorldSphere)
     VECTOR3 LightDirection;
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Sphere;
-    SHADER SphereShader;
     POINT3 SphereCenter;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     COLOR3 Black;
@@ -470,16 +458,13 @@ TEST(RenderPhongWorldSphere)
                                             &Black,
                                             (FLOAT) 0.0);
 
-    SphereShader.EmissiveShader = NULL;
-    SphereShader.DirectShader = PhongShader;
-    SphereShader.IndirectShader = NULL;
-    SphereShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(NULL, PhongShader, NULL, NULL);
 
     SphereFrontNormal = SphereNormalAllocate(&SphereCenter, TRUE);
 
     Sphere = SphereAllocate(&SphereCenter,
                             (FLOAT) 1.0,
-                            &SphereShader,
+                            Texture,
                             SphereFrontNormal,
                             NULL,
                             NULL);
@@ -530,11 +515,10 @@ TEST(RenderPerfectSpecularWorldSphere)
     POINT3 PinholeLocation;
     PDRAWING_SHAPE Sphere;
     POINT3 SphereCenter2;
-    SHADER SphereShader2;
-    SHADER SphereShader;
     POINT3 SphereCenter;
     COLOR3 SphereColor;
     COLOR3 Reflectance;
+    PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
@@ -549,14 +533,11 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
 
-    SphereShader.EmissiveShader = ConstantShader;
-    SphereShader.DirectShader = NULL;
-    SphereShader.IndirectShader = NULL;
-    SphereShader.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
     Sphere = SphereAllocate(&SphereCenter,
                             (FLOAT) 1.0,
-                            &SphereShader,
+                            Texture,
                             NULL,
                             NULL,
                             NULL);
@@ -571,16 +552,13 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     PerfectSpecularShader = PerfectSpecularIndirectShaderAllocate(&Reflectance);
 
-    SphereShader2.EmissiveShader = NULL;
-    SphereShader2.DirectShader = NULL;
-    SphereShader2.IndirectShader = PerfectSpecularShader;
-    SphereShader2.TranslucentShader = NULL;
+    Texture = ConstantTextureAllocate(NULL, NULL, PerfectSpecularShader, NULL);
 
     SphereFrontNormal = SphereNormalAllocate(&SphereCenter2, TRUE);
 
     Sphere = SphereAllocate(&SphereCenter2,
                             (FLOAT) 1.0,
-                            &SphereShader2,
+                            Texture,
                             SphereFrontNormal,
                             NULL,
                             NULL);

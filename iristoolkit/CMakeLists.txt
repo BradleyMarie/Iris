@@ -15,7 +15,8 @@ add_library(iristoolkit SHARED
     src/lightshader.c
     src/phong.c
     src/spherenormal.c
-    src/perfectspecular.c)
+    src/perfectspecular.c
+    src/constanttexture.c)
 
 target_link_libraries(iristoolkit 
     iris 
