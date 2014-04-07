@@ -315,6 +315,7 @@ RayShaderTraceRayMontecarlo(
     PSURFACE_NORMAL SurfaceNormalPointer;
     SURFACE_NORMAL SurfaceNormal;
     PCDRAWING_SHAPE DrawingShape;
+    TEXTURE_SHADER TextureShader;
     PCGEOMETRY_HIT GeometryHit;
     FLOAT ContinueProbability;
     PCGEOMETRY_HIT *HitList;
@@ -327,7 +328,6 @@ RayShaderTraceRayMontecarlo(
     VECTOR3 ModelViewer;
     PCTEXTURE Texture;
     FLOAT NextRandom;
-    PCSHADER Shader;
     PCNORMAL Normal;
     POINT3 WorldHit;
     POINT3 ModelHit;
@@ -429,16 +429,6 @@ RayShaderTraceRayMontecarlo(
 
         AdditionalData = GeometryHit->AdditionalData;
 
-        Shader = TextureGetShader(Texture,
-                                  &WorldHit,
-                                  &ModelHit,
-                                  AdditionalData);
-
-        if (Shader == NULL)
-        {
-            continue;
-        }
-
         SharedGeometryHitComputeModelViewer(SharedGeometryHit,
                                             &WorldRay->Direction,
                                             &ModelViewer);
@@ -468,19 +458,28 @@ RayShaderTraceRayMontecarlo(
             ModelToWorld = &IdentityMatrix;
         }
 
-        Status = RayShader->ShadeRayRoutine(RayShader->Context,
-                                            RayShader->NextRayShader,
-                                            RayShader->CurrentDepth,
-                                            Distance,
-                                            &NormalizedWorldRay.Direction,
-                                            &WorldHit,
-                                            &ModelViewer,
-                                            &ModelHit,
-                                            ModelToWorld,
-                                            AdditionalData,
-                                            Shader,
-                                            SurfaceNormalPointer,
-                                            &HitColor);
+        TextureShaderInitialize(&TextureShader,
+                                RayShader->ShadeRayRoutine,
+                                RayShader->Context,
+                                RayShader->NextRayShader,
+                                RayShader->CurrentDepth,
+                                Distance,
+                                &NormalizedWorldRay.Direction,
+                                &WorldHit,
+                                &ModelViewer,
+                                &ModelHit,
+                                ModelToWorld,
+                                AdditionalData,
+                                SurfaceNormalPointer,
+                                &HitColor);
+
+        Color4InitializeTransparent(&HitColor);
+
+        Status = TextureShade(Texture,
+                              &WorldHit,
+                              &ModelHit,
+                              AdditionalData,
+                              &TextureShader);
 
         if (Status != ISTATUS_SUCCESS)
         {

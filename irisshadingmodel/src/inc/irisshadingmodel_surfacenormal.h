@@ -15,7 +15,7 @@ Abstract:
 #ifndef _SURFACE_NORMAL_IRIS_SHADING_MODEL_INTERNAL_
 #define _SURFACE_NORMAL_IRIS_SHADING_MODEL_INTERNAL_
 
-#include <irisshadingmodel.h>
+#include <irisshadingmodelp.h>
 
 //
 // Types

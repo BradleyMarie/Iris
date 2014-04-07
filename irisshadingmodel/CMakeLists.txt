@@ -8,7 +8,8 @@ add_library(irisshadingmodel SHARED
     src/sceneobject.c
     src/scenetracer.c
     src/visibilitytester.c
-    src/rayshader.c)
+    src/rayshader.c
+    src/texture.c)
 
 target_link_libraries(irisshadingmodel 
     iris)

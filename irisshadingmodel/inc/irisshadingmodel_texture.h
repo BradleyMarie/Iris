@@ -21,19 +21,23 @@ Abstract:
 // Types
 //
 
+typedef struct _TEXTURE_SHADER TEXTURE_SHADER, *PTEXTURE_SHADER;
+typedef CONST TEXTURE_SHADER *PCTEXTURE_SHADER;
+
 typedef
 _Check_return_
-_Ret_maybenull_
-PCSHADER
-(*PGET_SHADER_ROUTINE)(
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PTEXTURE_SHADE_ROUTINE)(
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_opt_ PCVOID AdditionalData
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PTEXTURE_SHADER TextureShader
     );
 
 typedef struct _TEXTURE_VTABLE {
-    PGET_SHADER_ROUTINE GetShaderRoutine;
+    PTEXTURE_SHADE_ROUTINE TextureShadeRoutine;
     PFREE_ROUTINE FreeRoutine;
 } TEXTURE_VTABLE, *PTEXTURE_VTABLE;
 
@@ -52,26 +56,29 @@ typedef CONST TEXTURE *PCTEXTURE;
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-PCSHADER
-TextureGetShader(
+ISTATUS
+TextureShade(
     _In_ PCTEXTURE Texture,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_opt_ PCVOID AdditionalData
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PTEXTURE_SHADER TextureShader
     )
 {
-    PCSHADER Shader;
+    ISTATUS Status;
 
     ASSERT(Texture != NULL);
     ASSERT(WorldHitPoint != NULL);
     ASSERT(ModelHitPoint != NULL);
+    ASSERT(TextureShader != NULL);
 
-    Shader = Texture->TextureVTable->GetShaderRoutine(Texture,
-                                                      WorldHitPoint,
-                                                      ModelHitPoint,
-                                                      AdditionalData);
+    Status = Texture->TextureVTable->TextureShadeRoutine(Texture,
+                                                         WorldHitPoint,
+                                                         ModelHitPoint,
+                                                         AdditionalData,
+                                                         TextureShader);
 
-    return Shader;
+    return Status;
 }
 
 SFORCEINLINE
@@ -87,5 +94,18 @@ TextureFree(
 
     Texture->TextureVTable->FreeRoutine(Texture);
 }
+
+//
+// Prototypes
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
+ISTATUS
+TextureShaderShadeShader(
+    _Inout_ PTEXTURE_SHADER TextureShader,
+    _In_ PCSHADER Shader
+    );
 
 #endif // _TEXTURE_IRIS_SHADING_MODEL_

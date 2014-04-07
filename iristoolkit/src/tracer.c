@@ -36,7 +36,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PathTracerShadeHit(
     _In_opt_ PCVOID Context,
-    _Inout_ PRAYSHADER NextRayShader,
+    _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
     _In_ PCVECTOR3 WorldViewer,
@@ -159,7 +159,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RecursiveRayTracerShadeHit(
     _In_opt_ PCVOID Context,
-    _Inout_ PRAYSHADER NextRayShader,
+    _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
     _In_ PCVECTOR3 WorldViewer,

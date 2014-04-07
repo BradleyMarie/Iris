@@ -32,23 +32,29 @@ typedef CONST CONSTANT_TEXTURE *PCCONSTANT_TEXTURE;
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
-PCSHADER
+ISTATUS
 ConstantTextureGetShader(
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_opt_ PCVOID AdditionalData
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PTEXTURE_SHADER TextureShader
     )
 {
     PCCONSTANT_TEXTURE ConstantTexture;
+    ISTATUS Status;
 
     ASSERT(Context != NULL);
     ASSERT(WorldHitPoint != NULL);
     ASSERT(ModelHitPoint != NULL);
+    ASSERT(TextureShader != NULL);
 
     ConstantTexture = (PCCONSTANT_TEXTURE) Context;
 
-    return &ConstantTexture->Shader;
+    Status = TextureShaderShadeShader(TextureShader,
+                                      &ConstantTexture->Shader);
+
+    return Status;
 }
 
 //
