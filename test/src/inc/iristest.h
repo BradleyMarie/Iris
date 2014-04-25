@@ -26,6 +26,7 @@ extern "C" {
 
 #include "utility.h"
 #include "pfm.h"
+#include "checkerboard.h"
 
 using namespace std;
 

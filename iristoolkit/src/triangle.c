@@ -233,9 +233,12 @@ TriangleAllocate(
     VECTOR3 B;
     VECTOR3 C;
 
-    ASSERT(Vertex0 != NULL);
-    ASSERT(Vertex1 != NULL);
-    ASSERT(Vertex2 != NULL);
+    if (Vertex0 == NULL || 
+        Vertex1 == NULL ||
+        Vertex2 == NULL)
+    {
+        return NULL;
+    }
 
     if (FrontTexture == NULL &&
         BackTexture == NULL)

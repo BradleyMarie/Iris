@@ -37,6 +37,7 @@ add_executable(iris-test
     src/main.cpp
     src/utility.cpp
     src/pfm.cpp
+    src/checkerboard.cpp
     src/vector.cpp
     src/matrix.cpp
     src/point.cpp

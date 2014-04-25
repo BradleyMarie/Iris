@@ -33,5 +33,6 @@ Abstract:
 #include "iristoolkit_spherenormal.h"
 #include "iristoolkit_perfectspecular.h"
 #include "iristoolkit_constanttexture.h"
+#include "iristoolkit_infiniteplane.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_
