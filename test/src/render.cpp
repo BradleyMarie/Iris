@@ -595,3 +595,266 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Success = WritePfm(Framebuffer, "RenderPerfectSpecularWorldSphere.pfm");
 }
+
+TEST(RenderMirrorPhongCheckerboardSpheres)
+{
+    PPHONG_LIGHT Lights[4];
+    POINT3 Sphere0Center;
+    POINT3 Sphere1Center;
+    POINT3 Light0Location;
+    POINT3 Light1Location;
+    POINT3 Light2Location;
+    POINT3 Light3Location;
+    POINT3 InfinitePlaneLocation;
+    VECTOR3 InfinitePlaneNormal;
+    COLOR3 White;
+    COLOR3 Black;
+    COLOR3 Red;
+    COLOR3 Green;
+    COLOR3 Blue;
+    COLOR3 GreyishGreen;
+    COLOR3 Grey;
+    COLOR3 SphereMirrorReflectance;
+    COLOR3 InfinitePlaneWhiteMirrorReflectance;
+    COLOR3 InfinitePlaneBlackMirrorReflectance;
+    PNORMAL Sphere0Normal;
+    PNORMAL Sphere1Normal;
+    PNORMAL InfinitePlaneSurfaceNormal;
+    PDIRECT_SHADER SpherePhongShader;
+    PDIRECT_SHADER InfinitePlaneWhitePhongShader;
+    PDIRECT_SHADER InfinitePlaneBlackPhongShader;
+    PINDIRECT_SHADER SphereIndirectShader;
+    PINDIRECT_SHADER InfinitePlaneWhiteIndirectShader;
+    PINDIRECT_SHADER InfinitePlaneBlackIndirectShader;
+    PDRAWING_SHAPE Sphere0;
+    PDRAWING_SHAPE Sphere1;
+    PDRAWING_SHAPE InfinitePlane;
+    PTEXTURE SphereTexture;
+    PTEXTURE InfinitePlaneTexture;
+    PSCENE Scene;
+    PFRAMEBUFFER Framebuffer;
+    VECTOR3 CameraDirection;
+    POINT3 PinholeLocation;
+    POINT3 LookAt;
+    VECTOR3 Up;
+    PTRACER RecursiveRayTracer;
+    ISTATUS Status;
+
+    PointInitialize(&InfinitePlaneLocation,
+                    (FLOAT) 0.0,
+                    (FLOAT) 0.0,
+                    (FLOAT) 0.0);
+
+    PointInitialize(&Sphere0Center,
+                    (FLOAT) 0.0,
+                    (FLOAT) 1.0,
+                    (FLOAT) 0.0);
+
+    PointInitialize(&Sphere1Center,
+                    (FLOAT) -1.0,
+                    (FLOAT) 0.5,
+                    (FLOAT) 1.5);
+
+    PointInitialize(&Light0Location,
+                    (FLOAT) -2.0,
+                    (FLOAT) 2.5,
+                    (FLOAT) 0.0);
+
+    PointInitialize(&Light1Location,
+                    (FLOAT) 1.5,
+                    (FLOAT) 2.5,
+                    (FLOAT) 1.5);
+
+    PointInitialize(&Light2Location,
+                    (FLOAT) 1.5,
+                    (FLOAT) 2.5,
+                    (FLOAT) -1.5);
+
+    PointInitialize(&Light3Location,
+                    (FLOAT) 0.0,
+                    (FLOAT) 3.5,
+                    (FLOAT) 0.0);
+
+    VectorInitialize(&InfinitePlaneNormal,
+                     (FLOAT) 0.0,
+                     (FLOAT) 1.0,
+                     (FLOAT) 0.0);
+
+    Color3InitializeFromComponents(&Red,
+                                   (FLOAT) 0.49,
+                                   (FLOAT) 0.07,
+                                   (FLOAT) 0.07);
+
+    Color3InitializeFromComponents(&Green,
+                                   (FLOAT) 0.07,
+                                   (FLOAT) 0.49,
+                                   (FLOAT) 0.07);
+
+    Color3InitializeFromComponents(&Blue,
+                                   (FLOAT) 0.07,
+                                   (FLOAT) 0.07,
+                                   (FLOAT) 0.49);
+
+    Color3InitializeFromComponents(&GreyishGreen,
+                                   (FLOAT) 0.21,
+                                   (FLOAT) 0.21,
+                                   (FLOAT) 0.35);
+
+    Color3InitializeFromComponents(&Grey,
+                                   (FLOAT) 0.5,
+                                   (FLOAT) 0.5,
+                                   (FLOAT) 0.5);
+
+    Color3InitializeFromComponents(&SphereMirrorReflectance,
+                                  (FLOAT) 0.6,
+                                  (FLOAT) 0.6,
+                                  (FLOAT) 0.6);
+
+    Color3InitializeFromComponents(&InfinitePlaneBlackMirrorReflectance,
+                                   (FLOAT) 0.1,
+                                   (FLOAT) 0.1, 
+                                   (FLOAT) 0.1);
+
+    Color3InitializeFromComponents(&InfinitePlaneWhiteMirrorReflectance,
+                                   (FLOAT) 0.7,
+                                   (FLOAT) 0.7, 
+                                   (FLOAT) 0.7);
+
+    Color3InitializeBlack(&Black);
+
+    Color3InitializeWhite(&White);
+
+    Lights[0] = PointPhongLightAllocate(&Light0Location,
+                                        &Black,
+                                        &Red,
+                                        &Red,
+                                        TRUE);
+
+    Lights[1] = PointPhongLightAllocate(&Light1Location,
+                                        &Black,
+                                        &Blue,
+                                        &Blue,
+                                        TRUE);
+
+    Lights[2] = PointPhongLightAllocate(&Light2Location,
+                                        &Black,
+                                        &Green,
+                                        &Green,
+                                        TRUE);
+
+    Lights[3] = PointPhongLightAllocate(&Light3Location,
+                                        &Black,
+                                        &GreyishGreen,
+                                        &GreyishGreen,
+                                        TRUE);
+
+    InfinitePlaneSurfaceNormal = ConstantNormalAllocate(&InfinitePlaneNormal,
+                                                        FALSE);
+
+    Sphere0Normal = SphereNormalAllocate(&Sphere0Center, TRUE);
+
+    Sphere1Normal = SphereNormalAllocate(&Sphere1Center, TRUE);
+
+    SpherePhongShader = PhongDirectShaderAllocate(Lights,
+                                                  4,
+                                                  LightShaderEvaluateAllLights,
+                                                  &Black,
+                                                  &Black,
+                                                  &Grey,
+                                                  (FLOAT) 50.0);
+
+    InfinitePlaneWhitePhongShader = PhongDirectShaderAllocate(Lights,
+                                                              4,
+                                                              LightShaderEvaluateAllLights,
+                                                              &Black,
+                                                              &White,
+                                                              &Black,
+                                                              (FLOAT) 150.0);
+
+    InfinitePlaneBlackPhongShader = PhongDirectShaderAllocate(Lights,
+                                                              4,
+                                                              LightShaderEvaluateAllLights,
+                                                              &Black,
+                                                              &Black,
+                                                              &Black,
+                                                              (FLOAT) 150.0);
+
+    InfinitePlaneWhiteIndirectShader = PerfectSpecularIndirectShaderAllocate(&InfinitePlaneWhiteMirrorReflectance);
+
+    InfinitePlaneBlackIndirectShader = PerfectSpecularIndirectShaderAllocate(&InfinitePlaneBlackMirrorReflectance);
+
+    SphereIndirectShader = PerfectSpecularIndirectShaderAllocate(&SphereMirrorReflectance);
+
+    InfinitePlaneTexture = XZCheckerboardTextureAllocate(NULL,
+                                                         InfinitePlaneWhitePhongShader,
+                                                         InfinitePlaneWhiteIndirectShader,
+                                                         NULL,
+                                                         NULL,
+                                                         InfinitePlaneBlackPhongShader,
+                                                         InfinitePlaneBlackIndirectShader,
+                                                         NULL);
+
+    SphereTexture = ConstantTextureAllocate(NULL, 
+                                            SpherePhongShader,
+                                            SphereIndirectShader,
+                                            NULL);
+
+    Sphere0 = SphereAllocate(&Sphere0Center,
+                             (FLOAT) 1.0,
+                             SphereTexture,
+                             Sphere0Normal,
+                             NULL,
+                             NULL);
+
+    Sphere1 = SphereAllocate(&Sphere1Center,
+                             (FLOAT) 0.5,
+                             SphereTexture,
+                             Sphere1Normal,
+                             NULL,
+                             NULL);
+
+    InfinitePlane = InfinitePlaneAllocate(&InfinitePlaneLocation,
+                                          &InfinitePlaneNormal,
+                                          InfinitePlaneTexture,
+                                          InfinitePlaneSurfaceNormal,
+                                          NULL,
+                                          NULL);
+
+    Scene = ListSceneAllocate();
+
+    Status = SceneAddWorldObject(Scene, Sphere0);
+
+    Status = SceneAddWorldObject(Scene, Sphere1);
+
+    Status = SceneAddWorldObject(Scene, InfinitePlane);
+
+    Framebuffer = FramebufferAllocate(&Black, 500, 500);
+
+    RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
+                                                               (PRANDOM) Scene, // HACK
+                                                               (FLOAT) 0.0005,
+                                                               5);
+
+    PointInitialize(&PinholeLocation, (FLOAT) 3.0, (FLOAT) 2.0, (FLOAT) 4.0);
+
+    PointInitialize(&LookAt, (FLOAT) -1.0, (FLOAT) 0.45, (FLOAT) 0.0);
+
+    PointSubtract(&LookAt, &PinholeLocation, &CameraDirection);
+
+    Status = PinholeCameraRender(&PinholeLocation,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 (FLOAT) 1.0,
+                                 &CameraDirection,
+                                 &Up,
+                                 0,
+                                 500,
+                                 0,
+                                 0,
+                                 FALSE,
+                                 NULL,
+                                 RecursiveRayTracer,
+                                 Framebuffer);
+
+    WritePfm(Framebuffer, "RenderMirrorPhongCheckerboardSpheres.pfm");
+}
