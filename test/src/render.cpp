@@ -759,7 +759,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                                   4,
                                                   LightShaderEvaluateAllLights,
                                                   &Black,
-                                                  &Black,
+                                                  &White,
                                                   &Grey,
                                                   (FLOAT) 50.0);
 
@@ -834,6 +834,8 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                                                (PRANDOM) Scene, // HACK
                                                                (FLOAT) 0.0005,
                                                                5);
+
+    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     PointInitialize(&PinholeLocation, (FLOAT) 3.0, (FLOAT) 2.0, (FLOAT) 4.0);
 

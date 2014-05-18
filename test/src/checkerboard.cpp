@@ -58,7 +58,7 @@ XZCheckerboardTextureGetShader(
 
     CheckerboardIndex = ModFloat(ManhattanDistance, (FLOAT) 2.0);
 
-    if (CheckerboardIndex > (FLOAT) 0.0)
+    if (IsZeroFloat(CheckerboardIndex) == FALSE)
     {
         Status = TextureShaderShadeShader(TextureShader,
                                           &CheckerboardTexture->Shaders[0]);

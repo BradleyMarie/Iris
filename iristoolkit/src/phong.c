@@ -372,16 +372,16 @@ PointPhongLightShade(
                        &PointPhongLight->Ambient,
                        LightColor);
 
+    PointSubtract(&PointPhongLight->WorldLocation,
+                  WorldHitPoint,
+                  &NormalizedWorldToLight);
+
+    VectorNormalizeWithLength(&NormalizedWorldToLight,
+                              &DistanceToLight,
+                              &NormalizedWorldToLight);
+
     if (PointPhongLight->CastsShadows != FALSE)
     {
-        PointSubtract(&PointPhongLight->WorldLocation,
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
-
-        VectorNormalizeWithLength(&NormalizedWorldToLight,
-                                  &DistanceToLight,
-                                  &NormalizedWorldToLight);
-
         RayInitialize(&RayToLight, 
                       WorldHitPoint,
                       &NormalizedWorldToLight);
@@ -503,16 +503,16 @@ AttenuatedPointPhongLightShade(
                        &AttenuatedPointPhongLight->Ambient,
                        LightColor);
 
+    PointSubtract(&AttenuatedPointPhongLight->WorldLocation,
+                  WorldHitPoint,
+                  &NormalizedWorldToLight);
+
+    VectorNormalizeWithLength(&NormalizedWorldToLight,
+                              &DistanceToLight,
+                              &NormalizedWorldToLight);
+
     if (AttenuatedPointPhongLight->CastsShadows != FALSE)
     {
-        PointSubtract(&AttenuatedPointPhongLight->WorldLocation,
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
-
-        VectorNormalizeWithLength(&NormalizedWorldToLight,
-                                  &DistanceToLight,
-                                  &NormalizedWorldToLight);
-
         RayInitialize(&RayToLight, 
                       WorldHitPoint,
                       &NormalizedWorldToLight);
@@ -639,6 +639,14 @@ PointPhongSpotLightShade(
 
     PointPhongSpotLight = (PCPOINT_PHONG_SPOT_LIGHT) Context;
 
+    PointSubtract(&PointPhongSpotLight->WorldLocation,
+                  WorldHitPoint,
+                  &NormalizedWorldToLight);
+
+    VectorNormalizeWithLength(&NormalizedWorldToLight,
+                              &DistanceToLight,
+                              &NormalizedWorldToLight);
+
     if (PointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
     {
         VectorNegate(&NormalizedWorldToLight,
@@ -673,14 +681,6 @@ PointPhongSpotLightShade(
 
     if (PointPhongSpotLight->CastsShadows != FALSE)
     {
-        PointSubtract(&PointPhongSpotLight->WorldLocation,
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
-
-        VectorNormalizeWithLength(&NormalizedWorldToLight,
-                                  &DistanceToLight,
-                                  &NormalizedWorldToLight);
-
         RayInitialize(&RayToLight, 
                       WorldHitPoint,
                       &NormalizedWorldToLight);
@@ -802,6 +802,14 @@ AttenuatedPointPhongSpotLightShade(
 
     AttenuatedPointPhongSpotLight = (PCATTENUATED_POINT_PHONG_SPOT_LIGHT) Context;
 
+    PointSubtract(&AttenuatedPointPhongSpotLight->WorldLocation,
+                  WorldHitPoint,
+                  &NormalizedWorldToLight);
+
+    VectorNormalizeWithLength(&NormalizedWorldToLight,
+                              &DistanceToLight,
+                              &NormalizedWorldToLight);
+
     if (AttenuatedPointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
     {
         VectorNegate(&NormalizedWorldToLight,
@@ -836,14 +844,6 @@ AttenuatedPointPhongSpotLightShade(
 
     if (AttenuatedPointPhongSpotLight->CastsShadows != FALSE)
     {
-        PointSubtract(&AttenuatedPointPhongSpotLight->WorldLocation,
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
-
-        VectorNormalizeWithLength(&NormalizedWorldToLight,
-                                  &DistanceToLight,
-                                  &NormalizedWorldToLight);
-
         RayInitialize(&RayToLight, 
                       WorldHitPoint,
                       &NormalizedWorldToLight);
@@ -1061,7 +1061,7 @@ PointPhongLightAllocate(
 
     PhongLight = (PPOINT_PHONG_LIGHT) malloc(sizeof(POINT_PHONG_LIGHT));
 
-    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
@@ -1104,7 +1104,7 @@ AttenuatedPointPhongLightAllocate(
 
     PhongLight = (PATTENUATED_POINT_PHONG_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_LIGHT));
 
-    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
@@ -1149,7 +1149,7 @@ PointPhongSpotLightAllocate(
 
     PhongLight = (PPOINT_PHONG_SPOT_LIGHT) malloc(sizeof(POINT_PHONG_SPOT_LIGHT));
 
-    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongSpotLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
@@ -1205,7 +1205,7 @@ AttenuatedPhongSpotLightAllocate(
 
     PhongLight = (PATTENUATED_POINT_PHONG_SPOT_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_SPOT_LIGHT));
 
-    PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
+    PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongSpotLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;

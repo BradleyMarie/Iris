@@ -101,11 +101,15 @@ VisibilityTesterTestVisibility(
                         &HitList,
                         &NumberOfHits);
 
-    DistanceToObject += Tester->Epsilon;
+    if (Tester->Epsilon < DistanceToObject)
+    {
+        DistanceToObject -= Tester->Epsilon;
+    }
 
     for (Index = 0; Index < NumberOfHits; Index++)
     {
-        if (HitList[Index]->Distance < DistanceToObject)
+        if (Tester->Epsilon < HitList[Index]->Distance &&
+            HitList[Index]->Distance < DistanceToObject)
         {
             *Visible = FALSE;
             return ISTATUS_SUCCESS;

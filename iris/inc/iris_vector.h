@@ -244,27 +244,6 @@ VectorLength(
 
 SFORCEINLINE
 VOID
-VectorNormalize(
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 NormalizedVector
-    )
-{
-    FLOAT Scalar;
-    FLOAT Length;
-
-    ASSERT(Vector != NULL);
-
-    Length = VectorLength(Vector);
-
-    ASSERT(IsZeroFloat(Length) == FALSE);
-
-    Scalar = (FLOAT) 1.0 / Length;
-
-    VectorScale(Vector, Scalar, NormalizedVector);
-}
-
-SFORCEINLINE
-VOID
 VectorNormalizeWithLength(
     _In_ PCVECTOR3 Vector,
     _Out_ PFLOAT OldLength,
@@ -275,6 +254,7 @@ VectorNormalizeWithLength(
 
     ASSERT(Vector != NULL);
     ASSERT(OldLength != NULL);
+    ASSERT(NormalizedVector != NULL);
 
     *OldLength = VectorLength(Vector);
 
@@ -283,6 +263,24 @@ VectorNormalizeWithLength(
     Scalar = (FLOAT) 1.0 / *OldLength;
 
     VectorScale(Vector, Scalar, NormalizedVector);
+}
+
+SFORCEINLINE
+VOID
+VectorNormalize(
+    _In_ PCVECTOR3 Vector,
+    _Out_ PVECTOR3 NormalizedVector
+    )
+{
+    FLOAT Scalar;
+    FLOAT Length;
+
+    ASSERT(Vector != NULL);
+    ASSERT(NormalizedVector != NULL);
+
+    VectorNormalizeWithLength(Vector,
+                              &Length,
+                              NormalizedVector);
 }
 
 SFORCEINLINE

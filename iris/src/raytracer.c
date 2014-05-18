@@ -190,7 +190,7 @@ RayTracerGetResults(
 
     if (SortResults != FALSE)
     {
-        IrisConstantPointerListSort(PointerList, GeometryHitCompare);
+        IrisConstantPointerListSort(PointerList, GeometryHitPointerCompare);
     }
 }
 

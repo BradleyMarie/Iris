@@ -56,21 +56,21 @@ GeometryHitInitialize(
 
 SFORCEINLINE
 COMPARISON_RESULT
-GeometryHitCompare(
+GeometryHitPointerCompare(
     _In_ PCVOID GeometryHit0,
     _In_ PCVOID GeometryHit1
     )
 {
-    PGEOMETRY_HIT Hit0;
-    PGEOMETRY_HIT Hit1;
+    PGEOMETRY_HIT *Hit0;
+    PGEOMETRY_HIT *Hit1;
 
     ASSERT(GeometryHit0 != NULL);
     ASSERT(GeometryHit1 != NULL);
 
-    Hit0 = (PGEOMETRY_HIT) GeometryHit0;
-    Hit1 = (PGEOMETRY_HIT) GeometryHit1;
+    Hit0 = (PGEOMETRY_HIT*) GeometryHit0;
+    Hit1 = (PGEOMETRY_HIT*) GeometryHit1;
 
-    return (Hit0->Distance <= Hit1->Distance) ? -1 : 1;
+    return ((*Hit0)->Distance <= (*Hit1)->Distance) ? -1 : 1;
 }
 
 #endif // _IRIS_GEOMETRY_HIT_INTERNAL_
