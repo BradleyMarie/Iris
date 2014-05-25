@@ -27,6 +27,7 @@ Abstract:
 #define _In_opt_
 #define _In_range_(low, hi)
 #define _In_reads_(size)
+#define _In_reads_opt_(size)
 #define _In_reads_bytes_opt_(size)
 
 #define _Field_size_(size) 

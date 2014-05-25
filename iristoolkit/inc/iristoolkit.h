@@ -34,5 +34,6 @@ Abstract:
 #include "iristoolkit_perfectspecular.h"
 #include "iristoolkit_constanttexture.h"
 #include "iristoolkit_infiniteplane.h"
+#include "iristoolkit_mwc.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_
