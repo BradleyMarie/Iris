@@ -18,7 +18,8 @@ add_library(iristoolkit SHARED
     src/perfectspecular.c
     src/constanttexture.c
     src/infiniteplane.c
-    src/mwc.c)
+    src/mwc.c
+    src/lambertianindirect.c)
 
 target_link_libraries(iristoolkit 
     iris 

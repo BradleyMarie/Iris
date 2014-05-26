@@ -19,6 +19,7 @@ Abstract:
 #include <irisshadingmodel.h>
 
 #include "iristoolkit_api.h"
+#include "iristoolkit_math.h"
 #include "iristoolkit_framebuffer.h"
 #include "iristoolkit_triangle.h"
 #include "iristoolkit_sphere.h"
@@ -35,5 +36,6 @@ Abstract:
 #include "iristoolkit_constanttexture.h"
 #include "iristoolkit_infiniteplane.h"
 #include "iristoolkit_mwc.h"
+#include "iristoolkit_lambertianindirect.h"
 
 #endif // _IRIS_TOOLKIT_HEADER_
