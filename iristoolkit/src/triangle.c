@@ -210,20 +210,19 @@ CONST STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
 };
 
 //
-// Public Functions
+// Static helper routines
 //
 
 _Check_return_
 _Ret_maybenull_
-PDRAWING_SHAPE
-TriangleAllocate(
+STATIC
+PTRIANGLE
+TriangleAllocateInternal(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal,
     _Out_opt_ PVECTOR3 FrontFaceSurfaceNormal 
     )
 {
@@ -281,8 +280,121 @@ TriangleAllocate(
 
     Triangle->Textures[0] = FrontTexture;
     Triangle->Textures[1] = BackTexture;
+
+    return Triangle;
+}
+
+//
+// Public functions
+//
+
+_Check_return_
+_Ret_maybenull_
+PDRAWING_SHAPE
+TriangleAllocate(
+    _In_ PCPOINT3 Vertex0,
+    _In_ PCPOINT3 Vertex1,
+    _In_ PCPOINT3 Vertex2,
+    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PCNORMAL BackNormal
+    )
+{
+    PTRIANGLE Triangle;
+
+    Triangle = TriangleAllocateInternal(Vertex0,
+                                        Vertex1,
+                                        Vertex2,
+                                        FrontTexture,
+                                        BackTexture,
+                                        NULL);
+
     Triangle->Normals[0] = FrontNormal;
     Triangle->Normals[1] = BackNormal;
+
+    return (PDRAWING_SHAPE) Triangle;
+}
+
+_Check_return_
+_Ret_maybenull_
+IRISTOOLKITAPI
+PDRAWING_SHAPE
+FlatTriangleAllocate(
+    _In_ PCPOINT3 Vertex0,
+    _In_ PCPOINT3 Vertex1,
+    _In_ PCPOINT3 Vertex2,
+    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PCTEXTURE BackTexture,
+    _Out_opt_ PNORMAL *FrontNormal,
+    _Out_opt_ PNORMAL *BackNormal
+    )
+{
+    PNORMAL AllocatedFrontNormal;
+    PNORMAL AllocatedBackNormal;
+    VECTOR3 FrontSurfaceNormal;
+    PTRIANGLE Triangle;
+
+    if ((FrontTexture != NULL && FrontNormal == NULL) ||
+        (BackTexture != NULL && BackNormal == NULL))
+    {
+        return NULL;
+    }
+
+    Triangle = TriangleAllocateInternal(Vertex0,
+                                        Vertex1,
+                                        Vertex2,
+                                        FrontTexture,
+                                        BackTexture,
+                                        &FrontSurfaceNormal);
+
+    if (FrontTexture != NULL)
+    {
+        AllocatedFrontNormal = ConstantNormalAllocate(&FrontSurfaceNormal,
+                                                      FALSE);
+
+        if (AllocatedFrontNormal == NULL)
+        {
+            free(Triangle);
+            return NULL;
+        }
+    }
+    else
+    {
+        AllocatedFrontNormal = NULL;
+    }
+
+    if (BackTexture != NULL)
+    {
+        VectorNegate(&FrontSurfaceNormal, &FrontSurfaceNormal);
+
+        AllocatedBackNormal = ConstantNormalAllocate(&FrontSurfaceNormal,
+                                                     FALSE);
+
+        if (AllocatedBackNormal == NULL)
+        {
+            NormalFree(AllocatedFrontNormal);
+            free(Triangle);
+            return NULL;
+        }
+    }
+    else
+    {
+        AllocatedBackNormal = NULL;
+    }
+
+    Triangle->Normals[0] = AllocatedFrontNormal;
+    Triangle->Normals[1] = AllocatedBackNormal;
+
+    if (FrontNormal != NULL)
+    {
+        *FrontNormal = AllocatedFrontNormal;
+    }
+
+    if (BackNormal != NULL)
+    {
+        *BackNormal = AllocatedBackNormal;
+    }
 
     return (PDRAWING_SHAPE) Triangle;
 }

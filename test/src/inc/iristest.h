@@ -27,6 +27,7 @@ extern "C" {
 #include "utility.h"
 #include "pfm.h"
 #include "checkerboard.h"
+#include "trianglecreator.h"
 
 using namespace std;
 

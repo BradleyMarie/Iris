@@ -264,7 +264,6 @@ TEST(RenderConstantRedWorldTriangle)
                                 Texture,
                                 NULL,
                                 NULL,
-                                NULL,
                                 NULL);
 
     Scene = ListSceneAllocate();
@@ -361,7 +360,6 @@ TEST(RenderInterpolatedRedWorldTriangle)
                                 &TriangleVertex1,
                                 &TriangleVertex2,
                                 Texture,
-                                NULL,
                                 NULL,
                                 NULL,
                                 NULL);
@@ -859,4 +857,296 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                  Framebuffer);
 
     WritePfm(Framebuffer, "RenderMirrorPhongCheckerboardSpheres.pfm");
+}
+
+TEST(RenderCornellBox)
+{
+    COLOR3 ShaderColor;
+    PFRAMEBUFFER Framebuffer;
+    PRANDOM Rng;
+    PEMISSIVE_SHADER EmissiveShader;
+    PINDIRECT_SHADER IndirectShader;
+    PTEXTURE Texture;
+    PSCENE Scene;
+    VECTOR3 CameraDirection;
+    POINT3 PinholeLocation;
+    POINT3 LookAt;
+    VECTOR3 Up;
+    PTRACER PathTracer;
+    ISTATUS Status;
+
+    Scene = ListSceneAllocate();
+
+    //
+    // Light Source
+    //
+
+    Color3InitializeFromComponents(&ShaderColor, 12.0f, 12.0f, 12.0f);
+
+    EmissiveShader = ConstantEmissiveShaderAllocate(&ShaderColor);
+
+    Texture = ConstantTextureAllocate(EmissiveShader, 
+                                      NULL,
+                                      NULL,
+                                      NULL);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+                   303.000000f,
+                   549.900000f,
+                   247.000000f,
+                   303.000000f,
+                   549.900000f,
+                   303.000000f,
+                   247.000000f,
+                   549.900000f,
+                   303.000000f,
+                   247.000000f,
+                   549.900000f,
+                   247.000000f,
+                   Texture,
+                   Texture);
+
+    //
+    // Tall Box
+    //
+
+    Color3InitializeFromComponents(&ShaderColor, 0.75f, 0.75f, 0.75f);
+
+    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+
+    Texture = ConstantTextureAllocate(NULL, 
+                                      NULL,
+                                      IndirectShader,
+                                      NULL);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+423.000000f, 330.000000f, 247.000000f,
+265.000000f, 330.000000f, 296.000000f,
+314.000000f, 330.000000f, 456.000000f, 
+472.000000f, 330.000000f, 406.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+423.000000f, 0.000000f, 247.000000f,
+423.000000f, 330.000000f, 247.000000f,
+472.000000f, 330.000000f, 406.000000f,
+472.000000f, 0.000000f, 406.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+472.000000f, 0.000000f, 406.000000f,
+472.000000f, 330.000000f, 406.000000f,
+314.000000f, 330.000000f, 456.000000f,
+314.000000f, 0.000000f, 456.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+314.000000f, 0.000000f, 456.000000f,
+314.000000f, 330.000000f, 456.000000f, 
+265.000000f, 330.000000f, 296.000000f, 
+265.000000f, 0.000000f, 296.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+265.000000f, 0.000000f, 296.000000f,
+265.000000f, 330.000000f, 296.000000f,
+423.000000f, 330.000000f, 247.000000f,
+423.000000f, 0.000000f, 247.000000f,
+                   Texture,
+                   Texture);
+
+    //
+    // Short Box
+    //
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+130.000000f, 165.000000f, 65.000000f,
+82.000000f, 165.000000f, 225.000000f, 
+240.000000f, 165.000000f, 272.000000f, 
+290.000000f, 165.000000f, 114.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+290.000000f, 0.000000f, 114.000000f,
+290.000000f, 165.000000f, 114.000000f,
+240.000000f, 165.000000f, 272.000000f,
+240.000000f, 0.000000f, 272.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+130.000000f, 0.000000f, 65.000000f, 
+130.000000f, 165.000000f, 65.000000f,
+290.000000f, 165.000000f, 114.000000f,
+290.000000f, 0.000000f, 114.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+82.000000f, 0.000000f, 225.000000f,
+82.000000f, 165.000000f, 225.000000f,
+130.000000f, 165.000000f, 65.000000f,
+130.000000f, 0.000000f, 65.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+240.000000f, 0.000000f, 272.000000f, 
+240.000000f, 165.000000f, 272.000000f,
+82.000000f, 165.000000f, 225.000000f,
+82.000000f, 0.000000f, 225.000000f,
+                   Texture,
+                   Texture);
+
+    //
+    // White Walls
+    //
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+550.000000f, 0.000000f, 560.000000f,
+0.000000f, 0.000000f, 560.000000f, 
+0.000000f, 550.000000f, 560.000000f, 
+560.000000f, 550.000000f, 560.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+560.000000f, 550.000000f, 0.000000f,
+560.000000f, 550.000000f, 560.000000f,
+0.000000f, 550.000000f, 560.000000f,
+0.000000f, 550.000000f, 0.000000f,
+                   Texture,
+                   Texture);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+550.000000f, 0.000000f, 0.000000f,
+0.000000f, 0.000000f, 0.000000f,
+0.000000f, 0.000000f, 560.000000f,
+550.000000f, 0.000000f, 560.000000f,
+                   Texture,
+                   Texture);
+
+    //
+    // Red Wall
+    //
+
+    Color3InitializeFromComponents(&ShaderColor, 0.75f, 0.25f, 0.25f);
+
+    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+
+    Texture = ConstantTextureAllocate(NULL, 
+                                      NULL,
+                                      IndirectShader,
+                                      NULL);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+550.000000f, 0.000000f, 0.000000f,
+550.000000f, 0.000000f, 560.000000f,
+560.000000f, 550.000000f, 560.000000f,
+560.000000f, 550.000000f, 0.000000f,
+                   Texture,
+                   Texture);
+
+    //
+    // Blue Wall
+    //
+
+    Color3InitializeFromComponents(&ShaderColor, 0.25f, 0.25f, 0.75f);
+
+    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+
+    Texture = ConstantTextureAllocate(NULL, 
+                                      NULL,
+                                      IndirectShader,
+                                      NULL);
+
+    CreateFlatQuad(Scene,
+                   NULL,
+                   TRUE,
+0.000000f, 0.000000f, 560.000000f,
+0.000000f, 0.000000f, 0.000000f, 
+0.000000f, 550.000000f, 0.000000f, 
+0.000000f, 550.000000f, 560.000000f, 
+                   Texture,
+                   Texture);
+
+    //
+    // Render
+    //
+
+    Rng = MultiplyWithCarryRngAllocate();
+
+    Color3InitializeBlack(&ShaderColor);
+
+    Framebuffer = FramebufferAllocate(&ShaderColor, 500, 500);
+
+    PathTracer = PathTracerAllocate(Scene,
+                                    Rng,
+                                    0.0005f,
+                                    0.0f,
+                                    0.5f,
+                                    5,
+                                    10);
+
+    VectorInitialize(&Up, 0.0f, 1.0f, 0.0f);
+
+    PointInitialize(&PinholeLocation, 278.0f, 273.0f, -500.0f);
+
+    VectorInitialize(&CameraDirection, 0.0f, 0.0f, 1.0f);
+
+    PointInitialize(&LookAt, (FLOAT) -1.0, (FLOAT) 0.45, (FLOAT) 0.0);
+
+    PointSubtract(&LookAt, &PinholeLocation, &CameraDirection);
+
+    Status = PinholeCameraRender(&PinholeLocation,
+                                 500,
+                                 546,
+                                 546,
+                                 &CameraDirection,
+                                 &Up,
+                                 0,
+                                 500,
+                                 2,
+                                 2,
+                                 FALSE,
+                                 NULL,
+                                 PathTracer,
+                                 Framebuffer);
+
+    WritePfm(Framebuffer, "RenderCornellBox.pfm");
 }

@@ -272,7 +272,6 @@ VectorNormalize(
     _Out_ PVECTOR3 NormalizedVector
     )
 {
-    FLOAT Scalar;
     FLOAT Length;
 
     ASSERT(Vector != NULL);
