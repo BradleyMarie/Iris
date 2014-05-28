@@ -19,7 +19,6 @@ Abstract:
 //
 
 #define LIST_SCENE_INTIAL_SIZE  10
-#define LIST_SCENE_SCALE_FACTOR  2
 
 //
 // Types
@@ -49,7 +48,9 @@ ListSceneAddObject(
 {
     PSCENE_OBJECT *Objects;
     PLIST_SCENE ListScene;
+    SIZE_T NewCapacity;
     SIZE_T ListSize;
+    ISTATUS Status;
 
     ASSERT(Context != NULL);
     ASSERT(SceneObject != NULL);
@@ -60,8 +61,24 @@ ListSceneAddObject(
 
     if (ListScene->ObjectsCapacity == ListSize)
     {
+        //
+        // List grows each time by a factor of 2
+        //
+
+        Status = CheckedAddSizeT(ListSize, ListSize, &NewCapacity);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            if (ListSize == SIZE_T_MAX)
+            {
+                return ISTATUS_ALLOCATION_FAILED;
+            }
+
+            NewCapacity = SIZE_T_MAX;
+        }
+
         Objects = (PSCENE_OBJECT*) realloc(ListScene->Objects,
-                                           ListSize * LIST_SCENE_SCALE_FACTOR * sizeof(PSCENE_OBJECT));
+                                           NewCapacity * sizeof(PSCENE_OBJECT));
 
         if (Objects == NULL)
         {
@@ -69,6 +86,7 @@ ListSceneAddObject(
         }
 
         ListScene->Objects = Objects;
+        ListScene->ObjectsCapacity = NewCapacity;
     }
     else
     {
@@ -114,7 +132,7 @@ ListSceneTrace(
 
         if (Status != ISTATUS_SUCCESS)
         {
-            return ISTATUS_SUCCESS;
+            return Status;
         }
     }
 
