@@ -214,9 +214,9 @@ Color3DivideByScalar(
     FLOAT Blue;
 
     ASSERT(Dividend != NULL);
-    ASSERT(IsNormalFloat(Divosor));
+    ASSERT(IsNormalFloat(Divisor));
     ASSERT(IsFiniteFloat(Divisor));
-    ASSERT(IsZeroFloat(Divisor));
+    ASSERT(IsZeroFloat(Divisor) != TRUE);
     ASSERT(Quotient != NULL);
 
     Inverse = (FLOAT) 1.0 / Divisor;

@@ -121,6 +121,13 @@ TriangleTraceTriangle(
     DotProduct = VectorDotProduct(&Ray->Direction, &Triangle->SurfaceNormal);
     Distance = VectorDotProduct(&Temp, &Triangle->SurfaceNormal) / -DotProduct;
 
+    if (IsNormalFloat(Distance) == FALSE ||
+        IsFiniteFloat(Distance) == FALSE)
+    {
+        *ShapeHitList = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
 #if !defined(ENABLE_CSG_SUPPORT)
 
     if (Distance < (FLOAT) 0.0)

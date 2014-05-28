@@ -870,7 +870,6 @@ TEST(RenderCornellBox)
     PSCENE Scene;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
-    POINT3 LookAt;
     VECTOR3 Up;
     PTRACER PathTracer;
     ISTATUS Status;
@@ -1129,10 +1128,6 @@ TEST(RenderCornellBox)
 
     VectorInitialize(&CameraDirection, 0.0f, 0.0f, 1.0f);
 
-    PointInitialize(&LookAt, (FLOAT) -1.0, (FLOAT) 0.45, (FLOAT) 0.0);
-
-    PointSubtract(&LookAt, &PinholeLocation, &CameraDirection);
-
     Status = PinholeCameraRender(&PinholeLocation,
                                  500,
                                  546,
@@ -1141,8 +1136,8 @@ TEST(RenderCornellBox)
                                  &Up,
                                  0,
                                  500,
-                                 2,
-                                 2,
+                                 0,
+                                 0,
                                  FALSE,
                                  NULL,
                                  PathTracer,

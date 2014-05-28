@@ -33,16 +33,27 @@ StaticPinholeCameraRender(
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
+    SIZE_T FramebufferColumnSubpixelIndex;
+    SIZE_T FramebufferRowSubpixelIndex;
     SIZE_T FramebufferColumnIndex;
     SIZE_T FramebufferRowIndex;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
     SIZE_T LastRowToRender;
+    POINT3 SubpixelRowStart;
+    POINT3 SubpixelOrigin;
+    FLOAT RandomNumber0;
+    FLOAT RandomNumber1;
+    FLOAT SubpixelWeight;
+    COLOR3 SubpixelColor;
+    COLOR3 PixelColor;
+    VECTOR3 SubpixelXDimensions;
+    VECTOR3 SubpixelYDimensions;
     VECTOR3 Direction;
+    POINT3 RayOrigin;
     POINT3 RowStart;
     ISTATUS Status;
     POINT3 Origin;
-    COLOR3 Color;
     RAY WorldRay;
 
     ASSERT(PinholeLocation != NULL);
@@ -62,15 +73,33 @@ StaticPinholeCameraRender(
 
     ASSERT(LastRowToRender <= FramebufferRows);
 
-    PointVectorAddScaled(ImagePlaneStartingLocation,
-                         PixelXDimensions,
-                         (FLOAT) 1.0 / ((FLOAT) 1.0 + (FLOAT) AdditionalXSamplesPerPixel),
-                         &RowStart);
+    if (AdditionalXSamplesPerPixel != 0)
+    {
+        VectorScale(PixelXDimensions,
+                    (FLOAT) 1.0 / (FLOAT) AdditionalXSamplesPerPixel,
+                    &SubpixelXDimensions);
+    }
+    else
+    {
+        SubpixelXDimensions = *PixelXDimensions;
+    }
 
-    PointVectorAddScaled(ImagePlaneStartingLocation,
-                         PixelYDimensions,
-                         (FLOAT) 1.0 / ((FLOAT) 1.0 + (FLOAT) AdditionalYSamplesPerPixel),
-                         &RowStart);
+    if (AdditionalYSamplesPerPixel != 0)
+    {
+        VectorScale(PixelYDimensions,
+                    (FLOAT) 1.0 / (FLOAT) AdditionalYSamplesPerPixel,
+                    &SubpixelYDimensions);
+    }
+    else
+    {
+        SubpixelYDimensions = *PixelYDimensions;
+    }
+
+    SubpixelWeight = (FLOAT) 1.0 /
+                      (((FLOAT) 1.0 + (FLOAT)AdditionalXSamplesPerPixel) *
+                      ((FLOAT)AdditionalYSamplesPerPixel + (FLOAT) 1.0));
+
+    RowStart = *ImagePlaneStartingLocation;
 
     for (FramebufferRowIndex = StartingRow;
          FramebufferRowIndex < LastRowToRender;
@@ -82,27 +111,85 @@ StaticPinholeCameraRender(
              FramebufferColumnIndex < FramebufferColumns;
              FramebufferColumnIndex++)
         {
-            PointSubtract(&Origin, PinholeLocation, &Direction);
+            Color3InitializeBlack(&PixelColor);
 
-            VectorNormalize(&Direction, &Direction);
+            SubpixelRowStart = Origin;
 
-            RayInitialize(&WorldRay, &Origin, &Direction);
+            FramebufferRowSubpixelIndex = 0;
 
-            Status = TracerTraceRay(RayTracer,
-                                    &WorldRay,
-                                    &Color);
-
-            if (Status != ISTATUS_SUCCESS)
+            do
             {
-                return Status;
-            }
+                SubpixelOrigin = SubpixelRowStart;
+
+                FramebufferColumnSubpixelIndex = 0;
+
+                do
+                {
+                    RayOrigin = SubpixelOrigin;
+
+                    if (Jitter != FALSE)
+                    {
+                        RandomNumber0 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
+                        RandomNumber1 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
+
+                        PointVectorAddScaled(&RayOrigin,
+                                             &SubpixelXDimensions,
+                                             RandomNumber0,
+                                             &RayOrigin);
+
+                        PointVectorAddScaled(&RayOrigin,
+                                             &SubpixelYDimensions,
+                                             RandomNumber1,
+                                             &RayOrigin);
+                    }
+                    else
+                    {
+                        PointVectorAddScaled(&RayOrigin,
+                                             &SubpixelXDimensions,
+                                             (FLOAT) 0.5,
+                                             &RayOrigin);
+
+                        PointVectorAddScaled(&RayOrigin,
+                                             &SubpixelYDimensions,
+                                             (FLOAT) 0.5,
+                                             &RayOrigin);
+                    }
+
+                    PointSubtract(&RayOrigin, PinholeLocation, &Direction);
+
+                    VectorNormalize(&Direction, &Direction);
+
+                    RayInitialize(&WorldRay, &RayOrigin, &Direction);
+
+                    Status = TracerTraceRay(RayTracer,
+                                            &WorldRay,
+                                            &SubpixelColor);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        return Status;
+                    }
+
+                    Color3Add(&PixelColor, &SubpixelColor, &PixelColor);
+
+                    PointVectorAdd(&SubpixelOrigin, &SubpixelXDimensions, &SubpixelOrigin);
+
+                } while (++FramebufferColumnSubpixelIndex < AdditionalXSamplesPerPixel);
+
+                PointVectorAdd(&SubpixelRowStart, &SubpixelYDimensions, &SubpixelRowStart);
+
+            } while (++FramebufferRowSubpixelIndex < AdditionalYSamplesPerPixel);
+
+            Color3ScaleByScalar(&PixelColor,
+                                SubpixelWeight,
+                                &PixelColor);
 
             FramebufferSetPixel(Framebuffer,
-                                &Color,
+                                &PixelColor,
                                 FramebufferRowIndex,
                                 FramebufferColumnIndex);
 
-            PointVectorAdd(&Origin, PixelXDimensions, &Origin);   
+            PointVectorAdd(&Origin, PixelXDimensions, &Origin);
         }
 
         PointVectorAdd(&RowStart, PixelYDimensions, &RowStart);

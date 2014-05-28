@@ -22,7 +22,6 @@ Abstract:
 // Constants
 //
 
-#define IRIS_PI ((FLOAT) 3.1415926535897932384626433832795)
 #define IRIS_TWO_PI (IRIS_PI * (FLOAT) 2.0)
 #define IRIS_INV_PI ((FLOAT) 1.0 / IRIS_PI)
 #define IRIS_INV_TWO_PI ((FLOAT) 1.0 / IRIS_TWO_PI)
@@ -45,6 +44,7 @@ IrisToolkitGenerateOrthogonalVector(
     _Out_ PVECTOR3 OrthogonalVector
     )
 {
+    VECTOR3 UnnormalizedOrthogonalVector;
     VECTOR_AXIS ShortestAxis;
 
     ShortestAxis = VectorDiminishedAxis(NormalizedVector);
@@ -52,27 +52,27 @@ IrisToolkitGenerateOrthogonalVector(
     switch (ShortestAxis)
     {
         case VECTOR_X_AXIS:
-            VectorInitialize(OrthogonalVector, 
+            VectorInitialize(&UnnormalizedOrthogonalVector,
                              (FLOAT) 1.0, 
                              (FLOAT) 0.0,
                              (FLOAT) 0.0);
             break;
         case VECTOR_Y_AXIS:
-            VectorInitialize(OrthogonalVector,
+            VectorInitialize(&UnnormalizedOrthogonalVector,
                              (FLOAT) 0.0,
                              (FLOAT) 1.0,
                              (FLOAT) 0.0);
             break;
         default: // VECTOR_Z_AXIS
-            VectorInitialize(OrthogonalVector,
+            VectorInitialize(&UnnormalizedOrthogonalVector,
                              (FLOAT) 0.0,
                              (FLOAT) 0.0,
                              (FLOAT) 1.0);
             break;
     }
 
-    VectorCrossProduct(NormalizedVector, OrthogonalVector, OrthogonalVector);
-    VectorNormalize(OrthogonalVector, OrthogonalVector);
+    VectorCrossProduct(NormalizedVector, &UnnormalizedOrthogonalVector, &UnnormalizedOrthogonalVector);
+    VectorNormalize(&UnnormalizedOrthogonalVector, OrthogonalVector);
 }
 
 SFORCEINLINE
@@ -84,23 +84,24 @@ IrisToolkitTransformVector(
     )
 {
     VECTOR3 OrthogonalVector;
+    VECTOR3 CrossProduct;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
     IrisToolkitGenerateOrthogonalVector(NormalizedNormal, &OrthogonalVector);
-    VectorCrossProduct(NormalizedNormal, &OrthogonalVector, TransformedVector);
+    VectorCrossProduct(NormalizedNormal, &OrthogonalVector, &CrossProduct);
 
     X = OrthogonalVector.X * VectorToTransform->X + 
-        TransformedVector->X * VectorToTransform->Y + 
+        CrossProduct.X * VectorToTransform->Y +
         NormalizedNormal->X * VectorToTransform->Z;
 
     Y = OrthogonalVector.Y * VectorToTransform->X + 
-        TransformedVector->Y * VectorToTransform->Y + 
+        CrossProduct.Y * VectorToTransform->Y +
         NormalizedNormal->Y * VectorToTransform->Z;
 
     Z = OrthogonalVector.Z * VectorToTransform->X + 
-        TransformedVector->Z * VectorToTransform->Y + 
+        CrossProduct.Z * VectorToTransform->Y +
         NormalizedNormal->Z * VectorToTransform->Z;
 
     VectorInitialize(TransformedVector, X, Y, Z);

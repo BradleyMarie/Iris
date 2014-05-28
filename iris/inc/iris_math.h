@@ -15,11 +15,14 @@ Abstract:
 #include <iris.h>
 #include <math.h>
 
+#if __STDC_VERSION__ < 199901L && _MSC_VER
+#include <float.h>
+#endif
+
 #ifndef _MATH_IRIS_
 #define _MATH_IRIS_
 
-#define PI_FLOAT (FLOAT)3.14159265358979323846264338327950288419716939
-#define INV_PI_FLOAT (FLOAT)0.3183098861837906715377675267450287240689
+#define IRIS_PI ((FLOAT) 3.14159265358979323846264338327950288419716939)
 
 #define SqrtFloat(number) sqrtf(number)
 #define AbsFloat(number) fabsf(number)
@@ -34,19 +37,32 @@ Abstract:
 
 #if __STDC_VERSION__ >= 199901L
 
-#define IsNormalFloat(number) isnormal(number)
-#define IsFiniteFloat(number) isfinite(number)
 #define MaxFloat(number0, number1) fmaxf(number0, number1)
 #define MinFloat(number0, number1) fminf(number0, number1)
 #define FmaFloat(m0, m1, a0) fmaf(m0, m1, a0)
 
 #else
 
-#define IsNormalFloat(number) TRUE
-#define IsFiniteFloat(number) TRUE
 #define MaxFloat(number0, number1) ((number0 < number1) ? number1 : number0)
 #define MinFloat(number0, number1) ((number0 < number1) ? number0 : number1)
 #define FmaFloat(m0, m1, a0) ((m0 * m1) + a0)
+
+#endif
+
+#if __STDC_VERSION__ >= 199901L
+
+#define IsNormalFloat(number) isnormal(number)
+#define IsFiniteFloat(number) isfinite(number)
+
+#elif _MSC_VER
+
+#define IsNormalFloat(number) (_isnan(number) == 0)
+#define IsFiniteFloat(number) (_finite(number) != 0)
+
+#else
+
+#define IsNormalFloat(number) TRUE
+#define IsFiniteFloat(number) TRUE
 
 #endif
 

@@ -368,6 +368,7 @@ RayShaderTraceRayMontecarlo(
 
     VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
     NormalizedWorldRay.Origin = WorldRay->Origin;
+    NormalizedWorldRay.Time = WorldRay->Time;
 
     RayTracer = RayShader->RayTracer;
 

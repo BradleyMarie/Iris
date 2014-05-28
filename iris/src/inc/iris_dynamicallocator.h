@@ -81,7 +81,7 @@ IrisDynamicMemoryAllocatorAllocate(
     ASSERT(SizeInBytes != 0);
 
     Status = CheckedAddSizeT(SizeInBytes, 
-                             sizeof(PIRIS_DYNAMIC_MEMORY_ALLOCATION),
+                             sizeof(IRIS_DYNAMIC_MEMORY_ALLOCATION),
                              &AllocationSize);
 
     if (Status != ISTATUS_SUCCESS)
@@ -147,7 +147,7 @@ IrisDynamicMemoryAllocatorAllocate(
         Allocator->AllocationListTail = IrisAllocation;
     }
 
-    return (PCHAR) IrisAllocation + sizeof(PIRIS_DYNAMIC_MEMORY_ALLOCATION);
+    return (PCHAR) IrisAllocation + sizeof(IRIS_DYNAMIC_MEMORY_ALLOCATION);
 }
 
 SFORCEINLINE
