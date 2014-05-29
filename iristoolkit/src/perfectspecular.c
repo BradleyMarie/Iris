@@ -51,7 +51,6 @@ PerfectSpecularShaderShade(
     PCPERFECT_SPECULAR_INDIRECT_SHADER PerfectSpecularIndirectShader;
     VECTOR3 WorldSurfaceNormal;
     VECTOR3 ReflectedDirection;
-    COLOR3 OutputColor;
     ISTATUS Status;
     RAY Reflected;
 
@@ -76,18 +75,9 @@ PerfectSpecularShaderShade(
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          &Reflected,
                                          &PerfectSpecularIndirectShader->Reflectance,
-                                         &OutputColor);
+                                         Indirect);
 
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Color3ScaleByColor(&OutputColor,
-                       &PerfectSpecularIndirectShader->Reflectance,
-                       Indirect);
-
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 //

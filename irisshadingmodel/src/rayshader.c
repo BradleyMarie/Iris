@@ -20,7 +20,7 @@ Abstract:
 
 struct _RAYSHADER {
     BOOL DoRouletteTermination;
-    PCOLOR3 CurrentReflectanceEstimatePointer;
+    PCOLOR3 PathThroughputPointer;
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
     PRANDOM Rng;
@@ -31,7 +31,7 @@ struct _RAYSHADER {
     PCVOID Context;
     PRAYSHADER NextRayShader;
     PSHADE_RAY_ROUTINE ShadeRayRoutine;
-    COLOR3 CurrentReflectanceEstimate;
+    COLOR3 OldPathThroughput;
 };
 
 //
@@ -71,7 +71,7 @@ RayShaderAllocateInternal(
     _In_ PCSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
-    _In_ PCOLOR3 CurrentReflectanceEstimatePointer,
+    _In_opt_ PCOLOR3 PathThroughputPointer,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
     _In_ UINT8 RussianRouletteStartDepth,
@@ -79,8 +79,6 @@ RayShaderAllocateInternal(
     _In_ UINT8 CurrentDepth
     )
 {
-    PCOLOR3 NextReflectanceEstimatePointer;
-    BOOL DoRouletteTermination;
     PRAYSHADER NextRayShader;
     PRAYSHADER RayShader;
     PRAYTRACER RayTracer;
@@ -109,13 +107,9 @@ RayShaderAllocateInternal(
         return NULL;
     }
 
-    if (CurrentReflectanceEstimatePointer == NULL)
+    if (PathThroughputPointer == NULL)
     {
-        NextReflectanceEstimatePointer = &RayShader->CurrentReflectanceEstimate;
-    }
-    else
-    {
-        NextReflectanceEstimatePointer = CurrentReflectanceEstimatePointer;
+        PathThroughputPointer = &RayShader->OldPathThroughput;
     }
 
     if (CurrentDepth < MaximumRecursionDepth)
@@ -125,7 +119,7 @@ RayShaderAllocateInternal(
                                                   Scene,
                                                   Rng,
                                                   Epsilon,
-                                                  NextReflectanceEstimatePointer,
+                                                  PathThroughputPointer,
                                                   MinimumContinueProbability,
                                                   MaximumContinueProbability,
                                                   RussianRouletteStartDepth,
@@ -155,15 +149,11 @@ RayShaderAllocateInternal(
     if (RussianRouletteStartDepth <= CurrentDepth &&
         RussianRouletteStartDepth != DISABLE_RUSSAIAN_ROULETTE_TERMINATION)
     {
-        DoRouletteTermination = MinimumContinueProbability != (FLOAT) 1.0;
-    }
-    else
-    {
-        DoRouletteTermination = FALSE;
+        MinimumContinueProbability = (FLOAT) 1.0;
+        MaximumContinueProbability = (FLOAT) 1.0;
     }
 
-    RayShader->DoRouletteTermination = DoRouletteTermination;
-    RayShader->CurrentReflectanceEstimatePointer = CurrentReflectanceEstimatePointer;
+    RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
     RayShader->MaximumContinueProbability = MaximumContinueProbability;
     RayShader->Rng = Rng;
@@ -175,75 +165,84 @@ RayShaderAllocateInternal(
     RayShader->NextRayShader = NextRayShader;
     RayShader->ShadeRayRoutine = ShadeRayRoutine;
 
-    Color3InitializeWhite(&RayShader->CurrentReflectanceEstimate);
+    Color3InitializeWhite(&RayShader->OldPathThroughput);
 
     return RayShader;
 }
 
 SFORCEINLINE
 VOID
-RayShaderRestoreReflectanceEstimate(
+RayShaderPopPathThroughput(
     _Inout_ PRAYSHADER RayShader
     )
 {
     ASSERT(RayShader != NULL);
 
-    if (RayShader->DoRouletteTermination == FALSE)
-    {
-        return;
-    }
-
     if (RayShader->CurrentDepth == 0)
     {
-        Color3InitializeWhite(&RayShader->CurrentReflectanceEstimate);
+        Color3InitializeWhite(RayShader->PathThroughputPointer);
     }
     else
     {
-        *RayShader->CurrentReflectanceEstimatePointer = RayShader->CurrentReflectanceEstimate;
+        *RayShader->PathThroughputPointer = RayShader->OldPathThroughput;
     }
 }
 
 SFORCEINLINE
 VOID
-RayShaderSaveReflectanceEstimateAndComputeContinueProbability(
+RayShaderPushPathThroughputAndComputeContinueProbability(
     _Inout_ PRAYSHADER RayShader,
-    _In_ PCCOLOR3 ReflectanceHint,
+    _In_ PCCOLOR3 Transmittance,
     _Out_ PFLOAT ContinueProbability
     )
 {
-    PCOLOR3 CurrentReflectanceEstimate;
-    FLOAT LightReturnedFromPath;
-    FLOAT LightReturnedFromRay;
+    PCOLOR3 PathThroughputPointer;
+    FLOAT RayContinueProbability;
 
     ASSERT(RayShader != NULL);
-    ASSERT(ReflectanceHint != NULL);
+    ASSERT(Transmittance != NULL);
     ASSERT(ContinueProbability != NULL);
-    ASSERT(RayShader->DoRouletteTermination != FALSE);
     ASSERT(RayShader->MinimumContinueProbability <= RayShader->MaximumContinueProbability);
     ASSERT(RayShader->MinimumContinueProbability >= (FLOAT) 0.0);
     ASSERT(RayShader->MinimumContinueProbability <= (FLOAT) 1.0);
     ASSERT(RayShader->MaximumContinueProbability >= (FLOAT) 0.0);
     ASSERT(RayShader->MaximumContinueProbability <= (FLOAT) 1.0);
 
-    CurrentReflectanceEstimate = RayShader->CurrentReflectanceEstimatePointer;
+    PathThroughputPointer = RayShader->PathThroughputPointer;
 
-    if (RayShader->CurrentDepth == 0)
+    if (RayShader->CurrentDepth != 0)
     {
-        *CurrentReflectanceEstimate = *ReflectanceHint;
+        RayShader->OldPathThroughput = *PathThroughputPointer;
+    }
+
+    Color3ScaleByColor(PathThroughputPointer,
+                       Transmittance,
+                       PathThroughputPointer);
+
+    if (RayShader->MinimumContinueProbability == (FLOAT) 1.0)
+    {
+        *ContinueProbability = (FLOAT) 1.0;
+        return;
+    }
+
+    RayContinueProbability = MinFloat(Color3AverageComponents(PathThroughputPointer),
+                                      RayShader->MaximumContinueProbability);
+
+    RayContinueProbability = MaxFloat(RayShader->MinimumContinueProbability,
+                                      RayContinueProbability);
+
+    if (RayContinueProbability != (FLOAT) 0.0)
+    {
+        Color3DivideByScalar(PathThroughputPointer,
+                             RayContinueProbability,
+                             PathThroughputPointer);
     }
     else
     {
-        RayShader->CurrentReflectanceEstimate = *CurrentReflectanceEstimate;
-
-        Color3ScaleByColor(CurrentReflectanceEstimate,
-                           ReflectanceHint,
-                           CurrentReflectanceEstimate);
+        Color3InitializeBlack(PathThroughputPointer);
     }
 
-    LightReturnedFromPath = Color3AverageComponents(CurrentReflectanceEstimate);
-    LightReturnedFromRay = Color3AverageComponents(ReflectanceHint);
-
-    *ContinueProbability = LightReturnedFromPath / LightReturnedFromRay;
+    *ContinueProbability = RayContinueProbability;
 }
 
 //
@@ -307,7 +306,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ PCRAY WorldRay,
-    _In_ PCCOLOR3 ReflectanceHint,
+    _In_ PCCOLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     )
 {
@@ -338,32 +337,32 @@ RayShaderTraceRayMontecarlo(
 
     ASSERT(RayShader != NULL);
     ASSERT(WorldRay != NULL);
-    ASSERT(ReflectanceHint != NULL);
+    ASSERT(Transmittance != NULL);
     ASSERT(Color != NULL);
 
-    if (RayShader->DoRouletteTermination != FALSE)
+    RayShaderPushPathThroughputAndComputeContinueProbability(RayShader,
+                                                             Transmittance,
+                                                             &ContinueProbability);
+
+    if (ContinueProbability == (FLOAT) 0.0)
     {
-        RayShaderSaveReflectanceEstimateAndComputeContinueProbability(RayShader,
-                                                                      ReflectanceHint,
-                                                                      &ContinueProbability);
+        RayShaderPopPathThroughput(RayShader);
+        Color3InitializeBlack(Color);
+        return ISTATUS_SUCCESS;
+    }
 
-        if (ContinueProbability == (FLOAT) 0.0)
-        {
-            RayShaderRestoreReflectanceEstimate(RayShader);
-            Color3InitializeBlack(Color);
-            return ISTATUS_SUCCESS;
-        }
-
+    if (ContinueProbability < (FLOAT) 1.0)
+    {
         NextRandom = RandomGenerateFloat(RayShader->Rng,
                                          (FLOAT) 0.0,
                                          (FLOAT) 1.0);
 
-        if (ContinueProbability < NextRandom)
+        if (ContinueProbability <= NextRandom)
         {
-            RayShaderRestoreReflectanceEstimate(RayShader);
+            RayShaderPopPathThroughput(RayShader);
             Color3InitializeBlack(Color);
             return ISTATUS_SUCCESS;
-        }   
+        }
     }
 
     VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
@@ -380,7 +379,7 @@ RayShaderTraceRayMontecarlo(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        RayShaderRestoreReflectanceEstimate(RayShader);
+        RayShaderPopPathThroughput(RayShader);
         return Status;
     }
 
@@ -391,7 +390,7 @@ RayShaderTraceRayMontecarlo(
 
     if (NumberOfHits == 0)
     {
-        RayShaderRestoreReflectanceEstimate(RayShader);
+        RayShaderPopPathThroughput(RayShader);
         Color3InitializeBlack(Color);
         return ISTATUS_SUCCESS;
     }
@@ -484,7 +483,7 @@ RayShaderTraceRayMontecarlo(
 
         if (Status != ISTATUS_SUCCESS)
         {
-            RayShaderRestoreReflectanceEstimate(RayShader);
+            RayShaderPopPathThroughput(RayShader);
             return Status;
         }
 
@@ -493,12 +492,14 @@ RayShaderTraceRayMontecarlo(
 
     Color3InitializeFromColor4(Color, &BlendedColor);
 
-    if (RayShader->DoRouletteTermination != FALSE)
+    if (ContinueProbability < (FLOAT) 1.0)
     {
         Color3DivideByScalar(Color, ContinueProbability, Color);
     }
 
-    RayShaderRestoreReflectanceEstimate(RayShader);
+    Color3ScaleByColor(Color, Transmittance, Color);
+
+    RayShaderPopPathThroughput(RayShader);
     return ISTATUS_SUCCESS;
 }
 

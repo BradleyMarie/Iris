@@ -84,7 +84,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ PCRAY WorldRay,
-    _In_ PCCOLOR3 ReflectanceHint,
+    _In_ PCCOLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     );
 

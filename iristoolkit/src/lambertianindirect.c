@@ -51,7 +51,6 @@ LambertianShaderShade(
     PCLAMBERTIAN_INDIRECT_SHADER LambertianIndirectShader;
     VECTOR3 WorldSurfaceNormal;
     VECTOR3 ReflectedDirection;
-    COLOR3 OutputColor;
     ISTATUS Status;
     RAY Reflected;
 
@@ -78,18 +77,9 @@ LambertianShaderShade(
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          &Reflected,
                                          &LambertianIndirectShader->Reflectance,
-                                         &OutputColor);
+                                         Indirect);
 
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Color3ScaleByColor(&OutputColor,
-                       &LambertianIndirectShader->Reflectance,
-                       Indirect);
-
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 //
