@@ -82,3 +82,22 @@ SharedGeometryHitGetModelToWorld(
 
     return GeometryHit->ModelToWorld;
 }
+
+PCMATRIX
+SharedGeometryHitGetWorldToModel(
+    _In_ PCSHARED_GEOMETRY_HIT GeometryHit
+    )
+{
+    PCMATRIX ModelToWorld;
+
+    ASSERT(GeometryHit != NULL);
+
+    ModelToWorld = GeometryHit->ModelToWorld;
+
+    if (ModelToWorld == NULL)
+    {
+        return NULL;
+    }
+
+    return ModelToWorld->Inverse;
+}

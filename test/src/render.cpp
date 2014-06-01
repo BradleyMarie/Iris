@@ -85,7 +85,6 @@ TEST(RenderConstantRedWorldSphere)
 
 TEST(RenderConstantRedModelSphere)
 {
-    INVERTIBLE_MATRIX IdentityMatrix;
     PEMISSIVE_SHADER ConstantShader;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
@@ -99,8 +98,6 @@ TEST(RenderConstantRedModelSphere)
     PSCENE Scene;
     bool Success;
     VECTOR3 Up;
-
-    MatrixInitializeIdentity(&IdentityMatrix);
 
     PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
@@ -122,7 +119,7 @@ TEST(RenderConstantRedModelSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, &IdentityMatrix, FALSE);
+    Status = SceneAddObject(Scene, Sphere, MatrixIdentityMatrix, FALSE);
 
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
@@ -157,7 +154,6 @@ TEST(RenderConstantRedModelSphere)
 
 TEST(RenderConstantRedPremultipliedSphere)
 {
-    INVERTIBLE_MATRIX IdentityMatrix;
     PEMISSIVE_SHADER ConstantShader;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
@@ -171,8 +167,6 @@ TEST(RenderConstantRedPremultipliedSphere)
     PSCENE Scene;
     bool Success;
     VECTOR3 Up;
-
-    MatrixInitializeIdentity(&IdentityMatrix);
 
     PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
@@ -194,7 +188,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, &IdentityMatrix, TRUE);
+    Status = SceneAddObject(Scene, Sphere, MatrixIdentityMatrix, TRUE);
 
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 

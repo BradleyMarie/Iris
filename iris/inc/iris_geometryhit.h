@@ -59,4 +59,10 @@ SharedGeometryHitGetModelToWorld(
     _In_ PCSHARED_GEOMETRY_HIT GeometryHit
     );
 
+IRISAPI
+PCMATRIX
+SharedGeometryHitGetWorldToModel(
+    _In_ PCSHARED_GEOMETRY_HIT GeometryHit
+    );
+
 #endif // _IRIS_GEOMETRY_HIT_

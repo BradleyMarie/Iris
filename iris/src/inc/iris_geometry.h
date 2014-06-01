@@ -23,7 +23,7 @@ Abstract:
 
 struct _GEOMETRY {
     PCSHAPE Shape;
-    PCINVERTIBLE_MATRIX ModelToWorld;
+    PCMATRIX ModelToWorld;
     BOOL Premultiplied;
 };
 
@@ -69,16 +69,16 @@ GeometryTraceGeometry(
     }
     else if (Geometry->Premultiplied != FALSE)
     {
-        GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
+        GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = TRUE;
         TraceRay = WorldRay;
     }
     else
     {
-        GeometryHit->ModelToWorld = &Geometry->ModelToWorld->Matrix;
+        GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = FALSE;
 
-        RayMatrixMultiply(&Geometry->ModelToWorld->Inverse,
+        RayMatrixMultiply(Geometry->ModelToWorld->Inverse,
                           WorldRay,
                           &GeometryHit->ModelRay);
 

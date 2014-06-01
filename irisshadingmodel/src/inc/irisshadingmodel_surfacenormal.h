@@ -47,7 +47,7 @@ SurfaceNormalInitialize(
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCNORMAL Normal,
     _In_ PCPOINT3 ModelHit,
-    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX WorldToModel,
     _In_opt_ PCVOID AdditionalData
     )
 {
@@ -64,9 +64,9 @@ SurfaceNormalInitialize(
     SurfaceNormal->NormalizedWorldNormalValid = FALSE;
     SurfaceNormal->Prenormalized = Normal->NormalVTable->Prenormalized;
 
-    if (ModelToWorld != NULL)
+    if (WorldToModel != NULL)
     {
-        SurfaceNormal->WorldToModel = ModelToWorld->Inverse;
+        SurfaceNormal->WorldToModel = WorldToModel;
     }
     else
     {

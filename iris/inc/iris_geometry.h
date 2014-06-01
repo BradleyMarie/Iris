@@ -34,7 +34,7 @@ IRISAPI
 PGEOMETRY
 GeometryAllocate(
     _In_ PCSHAPE Shape,
-    _In_opt_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
 

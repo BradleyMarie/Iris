@@ -114,18 +114,17 @@ TEST(PointVectorSubtractScaled)
 
 TEST(PointMatrixMultiply)
 {
-    INVERTIBLE_MATRIX Matrix;
     POINT3 Point1, Point2;
+    PMATRIX Matrix;
 
-    MatrixInitializeTranslation(&Matrix,
-                                (FLOAT) 1.0,
-                                (FLOAT) 2.0, 
-                                (FLOAT) 3.0);
+    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+                                       (FLOAT) 2.0, 
+                                       (FLOAT) 3.0);
 
     PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     PointInitialize(&Point2, (FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
 
-    PointMatrixMultiply(&Matrix.Matrix, &Point1, &Point1);
+    PointMatrixMultiply(Matrix, &Point1, &Point1);
 
     CHECK_EQUAL(Point2, Point1);
 }

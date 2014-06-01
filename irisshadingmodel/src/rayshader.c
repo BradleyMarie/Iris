@@ -35,30 +35,6 @@ struct _RAYSHADER {
 };
 
 //
-// Static Variables
-//
-
-STATIC
-CONST
-MATRIX IdentityMatrix = { (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          (FLOAT) 0.0,
-                          &IdentityMatrix };
-
-//
 // Static Functions
 //
 
@@ -320,6 +296,7 @@ RayShaderTraceRayMontecarlo(
     PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PCMATRIX ModelToWorld;
+    PCMATRIX WorldToModel;
     PCVOID AdditionalData;
     PRAYTRACER RayTracer;
     COLOR4 BlendedColor;
@@ -435,6 +412,8 @@ RayShaderTraceRayMontecarlo(
 
         ModelToWorld = SharedGeometryHitGetModelToWorld(SharedGeometryHit);
 
+        WorldToModel = SharedGeometryHitGetWorldToModel(SharedGeometryHit);
+
         Normal = DrawingShapeGetNormal(DrawingShape,
                                        GeometryHit->FaceHit);
 
@@ -443,7 +422,7 @@ RayShaderTraceRayMontecarlo(
             SurfaceNormalInitialize(&SurfaceNormal,
                                     Normal,
                                     &ModelHit,
-                                    ModelToWorld,
+                                    WorldToModel,
                                     AdditionalData);
 
             SurfaceNormalPointer = &SurfaceNormal;
@@ -455,7 +434,7 @@ RayShaderTraceRayMontecarlo(
 
         if (ModelToWorld == NULL)
         {
-            ModelToWorld = &IdentityMatrix;
+            ModelToWorld = MatrixIdentityMatrix;
         }
 
         TextureShaderInitialize(&TextureShader,

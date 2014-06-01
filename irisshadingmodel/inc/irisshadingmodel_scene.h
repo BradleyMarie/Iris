@@ -65,7 +65,7 @@ ISTATUS
 SceneAddObject(
     _Inout_ PSCENE Scene,
     _In_ PCDRAWING_SHAPE DrawingShape,
-    _In_opt_ PCINVERTIBLE_MATRIX ModelToWorld,
+    _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
 

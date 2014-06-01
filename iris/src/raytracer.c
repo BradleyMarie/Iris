@@ -99,9 +99,12 @@ RayTracerTraceGeometry(
     PCGEOMETRY_HIT GeometryHit;
     ISTATUS Status;
 
-    ASSERT(RayTracer != NULL);
-    ASSERT(WorldRay != NULL);
-    ASSERT(Geometry != NULL);
+    if (RayTracer == NULL ||
+        WorldRay == NULL ||
+        Geometry == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
     GeometryHitAllocator = &RayTracer->GeometryHitAllocator;

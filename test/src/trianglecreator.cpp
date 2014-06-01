@@ -18,7 +18,7 @@ Abstract:
 bool
 CreateFlatQuad(
     PSCENE Scene,
-    PCINVERTIBLE_MATRIX ModelToWorld,
+    PCMATRIX ModelToWorld,
     BOOL Premultiplied,
     float X0,
     float Y0,

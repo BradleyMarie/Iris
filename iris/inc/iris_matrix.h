@@ -21,29 +21,18 @@ Abstract:
 // Types
 //
 
-typedef struct _MATRIX {
-    FLOAT M[4][4];
-    CONST struct _MATRIX *Inverse;
-} MATRIX, *PMATRIX;
-
+typedef struct _MATRIX MATRIX, *PMATRIX;
 typedef CONST MATRIX *PCMATRIX;
-
-typedef struct _INVERTIBLE_MATRIX {
-    MATRIX Matrix;
-    MATRIX Inverse;
-} INVERTIBLE_MATRIX, *PINVERTIBLE_MATRIX;
-
-typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
 
 //
 // Function definitions
 //
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitialize(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocate(
     _In_ FLOAT M00,
     _In_ FLOAT M01,
     _In_ FLOAT M02,
@@ -62,49 +51,50 @@ MatrixInitialize(
     _In_ FLOAT M33
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeIdentity(
-    _Out_ PINVERTIBLE_MATRIX Matrix
+PMATRIX
+MatrixAllocateIdentity(
+    VOID
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeTranslation(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocateTranslation(
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeScalar(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocateScalar(
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeRotation(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocateRotation(
     _In_ FLOAT Theta,
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeFrustum(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocateFrustum(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
@@ -113,11 +103,11 @@ MatrixInitializeFrustum(
     _In_ FLOAT Far
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
 IRISAPI
-ISTATUS
-MatrixInitializeOrothographic(
-    _Out_ PINVERTIBLE_MATRIX Matrix,
+PMATRIX
+MatrixAllocateOrothographic(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
@@ -126,13 +116,38 @@ MatrixInitializeOrothographic(
     _In_ FLOAT Far
     );
 
-_Success_(return == ISTATUS_SUCCESS)
+_Check_return_
+_Ret_maybenull_
+IRISAPI
+PMATRIX
+MatrixAllocateProduct(
+    _In_ PCMATRIX Multiplicand0,
+    _In_ PCMATRIX Multiplicand1
+    );
+
+_Check_return_
+_Ret_maybenull_
+IRISAPI
+PMATRIX
+MatrixAllocateInverse(
+    _In_ PCMATRIX Matrix
+    );
+
+_Check_return_
+_Ret_maybenull_
 IRISAPI
 ISTATUS
-MatrixMultiply(
-    _In_ PCINVERTIBLE_MATRIX Multiplicand0,
-    _In_ PCINVERTIBLE_MATRIX Multiplicand1,
-    _Out_ PINVERTIBLE_MATRIX Product
+MatrixReadContents(
+    _In_ PCMATRIX Matrix,
+    _Inout_ FLOAT Contents[4][4]
     );
+
+IRISAPI
+VOID
+MatrixFree(
+    _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
+    );
+
+extern IRISAPI PCMATRIX MatrixIdentityMatrix;
 
 #endif // _MATRIX_IRIS_

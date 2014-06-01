@@ -46,7 +46,7 @@ TEST(RayEndpoint)
 
 TEST(RayMatrixMultiply)
 {
-    INVERTIBLE_MATRIX Matrix;
+    PMATRIX Matrix;
     POINT3 Origin;
     VECTOR3 Direction;
     RAY Ray, Multiplied;
@@ -59,12 +59,11 @@ TEST(RayMatrixMultiply)
     VectorInitialize(&Direction, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
     RayInitialize(&Multiplied, &Origin, &Direction);
 
-    MatrixInitializeTranslation(&Matrix,
-                                (FLOAT) 1.0,
-                                (FLOAT) 1.0,
-                                (FLOAT) 1.0);
+    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+                                       (FLOAT) 1.0,
+                                       (FLOAT) 1.0);
 
-    RayMatrixMultiply(&Matrix.Matrix, &Ray, &Ray);
+    RayMatrixMultiply(Matrix, &Ray, &Ray);
 
     CHECK_EQUAL(Multiplied, Ray);
 }

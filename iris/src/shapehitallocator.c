@@ -34,11 +34,13 @@ ShapeHitAllocatorAllocate(
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
-    ASSERT(AdditionalData == NULL || AdditionalDataSizeInBytes != 0);
-    ASSERT(IsNormalFloat(Distance));
-    ASSERT(IsFiniteFloat(Distance));
-    ASSERT(Allocator != NULL);
-    ASSERT(Shape != NULL);
+    if (Allocator == NULL ||
+        Shape == NULL || 
+        IsNormalFloat(Distance) == FALSE || IsFiniteFloat(Distance) == FALSE ||
+        (AdditionalData == NULL && AdditionalDataSizeInBytes != 0))
+    {
+        return NULL;
+    }
 
     ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
