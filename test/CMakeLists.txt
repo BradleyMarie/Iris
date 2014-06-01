@@ -1,6 +1,7 @@
 include_directories(../iris/inc 
     ../irisshadingmodel/inc 
     ../iristoolkit/inc
+    ../irisplusplus/inc
     unittest++
     src/inc)
 

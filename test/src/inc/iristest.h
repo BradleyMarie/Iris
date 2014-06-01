@@ -20,9 +20,7 @@ Abstract:
 #include <cstdio>
 #include <cmath>
 
-extern "C" {
-    #include <iristoolkit.h>
-}
+#include <irisplusplus.h>
 
 #include "utility.h"
 #include "pfm.h"
