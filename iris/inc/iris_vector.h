@@ -342,68 +342,6 @@ VectorDiminishedAxis(
 
 SFORCEINLINE
 VOID
-VectorMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 Product
-    )
-{
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
-
-    ASSERT(Matrix != NULL);
-    ASSERT(Vector != NULL);
-    ASSERT(Product != NULL);
-
-    X = Matrix->M[0][0] * Vector->X + 
-        Matrix->M[0][1] * Vector->Y + 
-        Matrix->M[0][2] * Vector->Z;
-
-    Y = Matrix->M[1][0] * Vector->X + 
-        Matrix->M[1][1] * Vector->Y + 
-        Matrix->M[1][2] * Vector->Z;
-
-    Z = Matrix->M[2][0] * Vector->X + 
-        Matrix->M[2][1] * Vector->Y + 
-        Matrix->M[2][2] * Vector->Z;
-
-    VectorInitialize(Product, X, Y, Z);
-}
-
-SFORCEINLINE
-VOID
-VectorMatrixTransposedMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 Product
-    )
-{
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
-
-    ASSERT(Matrix != NULL);
-    ASSERT(Vector != NULL);
-    ASSERT(Product != NULL);
-
-    X = Matrix->M[0][0] * Vector->X + 
-        Matrix->M[1][0] * Vector->Y + 
-        Matrix->M[2][0] * Vector->Z;
-
-    Y = Matrix->M[0][1] * Vector->X + 
-        Matrix->M[1][1] * Vector->Y + 
-        Matrix->M[2][1] * Vector->Z;
-
-    Z = Matrix->M[0][2] * Vector->X + 
-        Matrix->M[1][2] * Vector->Y + 
-        Matrix->M[2][2] * Vector->Z;
-
-    VectorInitialize(Product, X, Y, Z);
-}
-
-SFORCEINLINE
-VOID
 VectorReflect(
     _In_ PCVECTOR3 Incident,
     _In_ PCVECTOR3 Normal,
@@ -440,5 +378,25 @@ VectorHalfAngle(
     VectorAdd(Vector0, Vector1, Result);
     VectorNormalize(Result, Result);
 }
+
+#ifndef _DISABLE_IRIS_VECTOR_EXPORTS_
+
+IRISAPI
+VOID
+VectorMatrixMultiply(
+    _In_ PCMATRIX Matrix,
+    _In_ PCVECTOR3 Vector,
+    _Out_ PVECTOR3 Product
+    );
+
+IRISAPI
+VOID
+VectorMatrixTransposedMultiply(
+    _In_ PCMATRIX Matrix,
+    _In_ PCVECTOR3 Vector,
+    _Out_ PVECTOR3 Product
+    );
+
+#endif // _DISABLE_IRIS_VECTOR_EXPORTS_
 
 #endif // _VECTOR_IRIS_

@@ -47,7 +47,7 @@ RayInitialize(
 
     Ray->Origin = *Origin;
     Ray->Direction = *Direction;
-	Ray->Time = (FLOAT) 0.0;
+    Ray->Time = (FLOAT) 0.0;
 }
 
 SFORCEINLINE
@@ -70,25 +70,16 @@ RayEndpoint(
     PointVectorAdd(&Ray->Origin, &Vector, Endpoint);
 }
 
-SFORCEINLINE
+#ifndef _DISABLE_IRIS_RAY_EXPORTS_
+
+IRISAPI
 VOID
 RayMatrixMultiply(
-	_In_ PCMATRIX Multiplicand0,
+    _In_ PCMATRIX Multiplicand0,
     _In_ PCRAY Multiplicand1,
     _Out_ PRAY Product
-    )
-{
-    ASSERT(Multiplicand0 != NULL);
-    ASSERT(Multiplicand1 != NULL);
-    ASSERT(Product != NULL);
+    );
 
-	PointMatrixMultiply(Multiplicand0,
-                        &Multiplicand1->Origin, 
-                        &Product->Origin);
-
-    VectorMatrixMultiply(Multiplicand0,
-                         &Multiplicand1->Direction, 
-                         &Product->Direction);
-}
+#endif // _DISABLE_IRIS_RAY_EXPORTS_
 
 #endif // _RAY_IRIS_
