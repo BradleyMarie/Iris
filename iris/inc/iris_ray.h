@@ -73,12 +73,9 @@ RayEndpoint(
 SFORCEINLINE
 BOOL
 RayValidate(
-    _In_ PCRAY Ray,
-    _Out_opt_ PFLOAT Length
+    _In_ PCRAY Ray
     )
 {
-    FLOAT ComputedLength;
-
     if (Ray == NULL ||
         PointValidate(&Ray->Origin) == FALSE ||
         VectorValidate(&Ray->Direction) == FALSE)
@@ -86,16 +83,11 @@ RayValidate(
         return FALSE;
     }
 
-    ComputedLength = VectorLength(&Ray->Direction);
-
-    if (IsZeroFloat(ComputedLength) != FALSE)
+    if (IsZeroFloat(Ray->Direction.X) != FALSE &&
+        IsZeroFloat(Ray->Direction.Y) != FALSE &&
+        IsZeroFloat(Ray->Direction.Z) != FALSE)
     {
         return FALSE;
-    }
-
-    if (Length != NULL)
-    {
-        *Length = ComputedLength;
     }
 
     return TRUE;

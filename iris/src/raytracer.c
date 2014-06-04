@@ -70,7 +70,7 @@ RayTracerAllocate(
     ISTATUS Status;
 
     if (Ray == NULL ||
-        RayValidate(Ray, NULL) == FALSE)
+        RayValidate(Ray) == FALSE)
     {
         return NULL;
     }
@@ -133,7 +133,7 @@ RayTracerSetRay(
 
     if (RayTracer == NULL ||
         Ray == NULL ||
-        RayValidate(Ray, NULL) == FALSE)
+        RayValidate(Ray) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT;
     }
@@ -264,8 +264,6 @@ RayTracerGetNextGeometryHit(
     RayTracer->HitIndex = CurrentIndex + 1;
 
     InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
-
-
 
     GeometryHitInitialize(GeometryHit,
                           &RayTracer->CurrentRay,
