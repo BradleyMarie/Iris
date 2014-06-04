@@ -28,8 +28,11 @@ VisibilityTesterAllocate(
     _In_ FLOAT Epsilon
     )
 {
+    VECTOR3 TemporaryDirection;
     PVISIBILITY_TESTER Tester;
+    POINT3 TemporaryOrigin;
     PRAYTRACER RayTracer;
+    RAY TemporaryRay;
 
     ASSERT(Scene != NULL);
     ASSERT(IsNormalFloat(Epsilon));
@@ -42,7 +45,11 @@ VisibilityTesterAllocate(
         return NULL;
     }
 
-    RayTracer = RayTracerAllocate();
+    VectorInitialize(&TemporaryDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+    PointInitialize(&TemporaryOrigin, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    RayInitialize(&TemporaryRay, &TemporaryOrigin, &TemporaryDirection);
+
+    RayTracer = RayTracerAllocate(&TemporaryRay);
 
     if (RayTracer == NULL)
     {
@@ -67,12 +74,10 @@ VisibilityTesterTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
-    SIZE_T NumberOfHits;
+    PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
-    SIZE_T Index;
 
     ASSERT(Tester != NULL);
     ASSERT(WorldRay != NULL);
@@ -85,7 +90,12 @@ VisibilityTesterTestVisibility(
 
     RayTracer = Tester->RayTracer;
 
-    RayTracerClearResults(RayTracer);
+    Status = RayTracerSetRay(RayTracer, &NormalizedWorldRay);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     Status = SceneTrace(Tester->Scene,
                         &NormalizedWorldRay,
@@ -96,24 +106,29 @@ VisibilityTesterTestVisibility(
         return Status;
     }
 
-    RayTracerGetResults(RayTracer,
-                        FALSE,
-                        &HitList,
-                        &NumberOfHits);
+    Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+
+    if (Status == ISTATUS_NO_MORE_DATA)
+    {
+        *Visible = TRUE;
+        return ISTATUS_SUCCESS;
+    }
 
     if (Tester->Epsilon < DistanceToObject)
     {
         DistanceToObject -= Tester->Epsilon;
     }
 
-    for (Index = 0; Index < NumberOfHits; Index++)
+    while (Status == ISTATUS_SUCCESS)
     {
-        if (Tester->Epsilon < HitList[Index]->Distance &&
-            HitList[Index]->Distance < DistanceToObject)
+        if (Tester->Epsilon < ShapeHit->Distance &&
+            ShapeHit->Distance < DistanceToObject)
         {
             *Visible = FALSE;
             return ISTATUS_SUCCESS;
         }
+
+        Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
     }
 
     *Visible = TRUE;
@@ -129,10 +144,9 @@ VisibilityTesterTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PCGEOMETRY_HIT *HitList;
     RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
-    SIZE_T NumberOfHits;
+    PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
     ASSERT(Tester != NULL);
@@ -143,23 +157,36 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     RayTracer = Tester->RayTracer;
 
-    RayTracerClearResults(RayTracer);
-
-    Status = SceneTrace(Tester->Scene,
-                        &NormalizedWorldRay,
-                        RayTracer);
+    Status = RayTracerSetRay(RayTracer, &NormalizedWorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    RayTracerGetResults(RayTracer,
-                        FALSE,
-                        &HitList,
-                        &NumberOfHits);
+    Status = SceneTrace(Tester->Scene,
+        &NormalizedWorldRay,
+        RayTracer);
 
-    *Visible = (NumberOfHits > 0) ? TRUE : FALSE;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+
+    if (Status == ISTATUS_NO_MORE_DATA)
+    {
+        *Visible = TRUE;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Visible = FALSE;
     return ISTATUS_SUCCESS;
 }
 

@@ -26,12 +26,19 @@ typedef struct _SHAPE_HIT_ALLOCATOR {
     IRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
 } SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
 
-typedef struct _FULL_SHAPE_HIT {
-    SHAPE_HIT_LIST ShapeHitList;
+typedef struct _INTERNAL_SHAPE_HIT {
     SHAPE_HIT ShapeHit;
-} FULL_SHAPE_HIT, *PFULL_SHAPE_HIT;
+    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+} INTERNAL_SHAPE_HIT, *PINTERNAL_SHAPE_HIT;
 
-typedef CONST FULL_SHAPE_HIT *PCFULL_SHAPE_HIT;
+typedef CONST INTERNAL_SHAPE_HIT *PCINTERNAL_SHAPE_HIT;
+
+typedef struct _SHAPE_HIT_ALLOCATOR_ALLOCATION {
+    SHAPE_HIT_LIST ShapeHitList;
+    INTERNAL_SHAPE_HIT InternalShapeHit;
+} SHAPE_HIT_ALLOCATOR_ALLOCATION, *PSHAPE_HIT_ALLOCATOR_ALLOCATION;
+
+typedef CONST SHAPE_HIT_ALLOCATOR_ALLOCATION *PCSHAPE_HIT_ALLOCATOR_ALLOCATION;
 
 //
 // Functions
@@ -54,7 +61,7 @@ ShapeHitAllocatorInitialize(
     ShapeHitAllocator = &ShapeHitCollection->ShapeHitAllocator;
 
     Status = IrisStaticMemoryAllocatorInitialize(ShapeHitAllocator,
-                                                 sizeof(FULL_SHAPE_HIT));
+                                                 sizeof(SHAPE_HIT_ALLOCATOR_ALLOCATION));
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -102,6 +109,19 @@ ShapeHitAllocatorFreeAll(
 
     IrisDynamicMemoryAllocatorFreeAll(AdditionalDataAllocator);
     IrisStaticMemoryAllocatorFreeAll(ShapeHitAllocator);
+}
+
+SFORCEINLINE
+COMPARISON_RESULT
+InternalShapeHitCompare(
+    _In_ PCINTERNAL_SHAPE_HIT Hit0,
+    _In_ PCINTERNAL_SHAPE_HIT Hit1
+    )
+{
+    ASSERT(Hit0 != NULL);
+    ASSERT(Hit1 != NULL);
+
+    return (Hit0->ShapeHit.Distance <= Hit1->ShapeHit.Distance) ? -1 : 1;
 }
 
 #endif // _IRIS_SHAPE_HIT_ALLOCATOR_INTERNAL_

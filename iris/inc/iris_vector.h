@@ -283,6 +283,26 @@ VectorNormalize(
 }
 
 SFORCEINLINE
+BOOL
+VectorValidate(
+    _In_opt_ PCVECTOR3 Vector
+    )
+{
+    if (Vector == NULL ||
+        IsNormalFloat(Vector->X) == FALSE ||
+        IsFiniteFloat(Vector->X) == FALSE ||
+        IsNormalFloat(Vector->Y) == FALSE ||
+        IsFiniteFloat(Vector->Y) == FALSE ||
+        IsNormalFloat(Vector->Z) == FALSE ||
+        IsFiniteFloat(Vector->Z) == FALSE)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
     _In_ PCVECTOR3 Vector

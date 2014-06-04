@@ -206,6 +206,26 @@ PointVectorSubtractScaled(
     PointInitialize(Sum, X, Y, Z);
 }
 
+SFORCEINLINE
+BOOL
+PointValidate(
+    _In_opt_ PCPOINT3 Point
+    )
+{
+    if (Point == NULL ||
+        IsNormalFloat(Point->X) == FALSE ||
+        IsFiniteFloat(Point->X) == FALSE ||
+        IsNormalFloat(Point->Y) == FALSE ||
+        IsFiniteFloat(Point->Y) == FALSE ||
+        IsNormalFloat(Point->Z) == FALSE ||
+        IsFiniteFloat(Point->Z) == FALSE)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 #ifndef _DISABLE_IRIS_POINT_EXPORTS_
 
 IRISAPI

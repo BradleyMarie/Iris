@@ -33,7 +33,16 @@ _Ret_maybenull_
 IRISAPI
 PRAYTRACER
 RayTracerAllocate(
-    VOID
+    _In_ PCRAY Ray
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
+RayTracerSetRay(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ PCRAY Ray
     );
 
 _Check_return_
@@ -42,29 +51,33 @@ IRISAPI
 ISTATUS
 RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCRAY WorldRay,
     _In_ PCGEOMETRY Geometry
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-VOID
-RayTracerClearResults(
+ISTATUS
+RayTracerSort(
     _Inout_ PRAYTRACER RayTracer
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-VOID
-RayTracerGetResults(
+ISTATUS
+RayTracerGetNextGeometryHit(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ BOOL SortResults,
-    _Outptr_result_buffer_(HitListSize) PCGEOMETRY_HIT **HitList,
-    _Out_ PSIZE_T HitListSize
+    _Out_ PGEOMETRY_HIT GeometryHit
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-SIZE_T
-RayTracerGetHitCount(
-    _In_ PCRAYTRACER RayTracer
+ISTATUS
+RayTracerGetNextShapeHit(
+    _Inout_ PRAYTRACER RayTracer,
+    _Out_ PCSHAPE_HIT *ShapeHit
     );
 
 IRISAPI

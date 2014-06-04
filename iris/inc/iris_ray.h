@@ -70,6 +70,37 @@ RayEndpoint(
     PointVectorAdd(&Ray->Origin, &Vector, Endpoint);
 }
 
+SFORCEINLINE
+BOOL
+RayValidate(
+    _In_ PCRAY Ray,
+    _Out_opt_ PFLOAT Length
+    )
+{
+    FLOAT ComputedLength;
+
+    if (Ray == NULL ||
+        PointValidate(&Ray->Origin) == FALSE ||
+        VectorValidate(&Ray->Direction) == FALSE)
+    {
+        return FALSE;
+    }
+
+    ComputedLength = VectorLength(&Ray->Direction);
+
+    if (IsZeroFloat(ComputedLength) != FALSE)
+    {
+        return FALSE;
+    }
+
+    if (Length != NULL)
+    {
+        *Length = ComputedLength;
+    }
+
+    return TRUE;
+}
+
 #ifndef _DISABLE_IRIS_RAY_EXPORTS_
 
 IRISAPI

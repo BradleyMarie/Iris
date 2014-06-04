@@ -120,17 +120,6 @@ IrisConstantPointerListRetrieveAtIndex(
 }
 
 SFORCEINLINE
-PCVOID*
-IrisConstantPointerListGetStorage(
-    _In_ PCIRIS_CONSTANT_POINTER_LIST PointerList
-    )
-{
-    ASSERT(PointerList != NULL);
-
-    return PointerList->PointerList;
-}
-
-SFORCEINLINE
 SIZE_T
 IrisConstantPointerListGetSize(
     _In_ PCIRIS_CONSTANT_POINTER_LIST PointerList

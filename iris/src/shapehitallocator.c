@@ -27,10 +27,10 @@ ShapeHitAllocatorAllocate(
     _In_ SIZE_T AdditionalDataSizeInBytes
     )
 {
+    PSHAPE_HIT_ALLOCATOR_ALLOCATION ShapeHitAllocatorAllocation;
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
     PSHAPE_HIT_LIST ShapeHitList;
-    PFULL_SHAPE_HIT FullShapeHit;
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
@@ -51,10 +51,10 @@ ShapeHitAllocatorAllocate(
         return NULL;
     }
 
-    FullShapeHit = (PFULL_SHAPE_HIT) Allocation;
+    ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
 
-    ShapeHitList = &FullShapeHit->ShapeHitList;
-	ShapeHit = &FullShapeHit->ShapeHit;
+    ShapeHitList = &ShapeHitAllocatorAllocation->ShapeHitList;
+	ShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit.ShapeHit;
 
 	if (AdditionalDataSizeInBytes != 0)
     {

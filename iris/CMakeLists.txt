@@ -3,7 +3,6 @@ include(GenerateExportHeader)
 include_directories(inc src/inc)
 
 add_library(iris SHARED
-    src/geometryhit.c
     src/matrix.c
     src/raytracer.c
     src/geometry.c

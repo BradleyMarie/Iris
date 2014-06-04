@@ -33,7 +33,6 @@ SceneTracerTraceGeometry(
     Geometry = (PGEOMETRY) SceneObject;
 
     Status = RayTracerTraceGeometry(SceneTracer->RayTracer,
-                                    WorldRay,
                                     Geometry);
 
     return Status;

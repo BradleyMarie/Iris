@@ -21,14 +21,13 @@ Abstract:
 // Types
 //
 
-typedef UINT8 GEOMETRY_TYPE;
-typedef GEOMETRY_TYPE *PGEOMETRY_TYPE;
-
-struct _SHARED_GEOMETRY_HIT {
+typedef struct _SHARED_GEOMETRY_HIT {
     PCMATRIX ModelToWorld;
     BOOL Premultiplied;
     RAY ModelRay;
-};
+} SHARED_GEOMETRY_HIT, *PSHARED_GEOMETRY_HIT;
+
+typedef CONST SHARED_GEOMETRY_HIT *PCSHARED_GEOMETRY_HIT;
 
 //
 // Function Definitions
@@ -38,39 +37,50 @@ SFORCEINLINE
 VOID
 GeometryHitInitialize(
     _Out_ PGEOMETRY_HIT GeometryHit,
+    _In_ PCRAY WorldRay,
     _In_ PCSHARED_GEOMETRY_HIT SharedGeometryHit,
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
     ASSERT(GeometryHit != NULL);
+    ASSERT(WorldRay != NULL);
     ASSERT(SharedGeometryHit != NULL);
     ASSERT(ShapeHit != NULL);
 
-    GeometryHit->SharedGeometryHit = SharedGeometryHit;
-    GeometryHit->Shape = ShapeHit->Shape;
-    GeometryHit->Distance = ShapeHit->Distance;
-    GeometryHit->FaceHit = ShapeHit->FaceHit;
-    GeometryHit->AdditionalData = ShapeHit->AdditionalData;
-    GeometryHit->AdditionalDataSizeInBytes = ShapeHit->AdditionalDataSizeInBytes;
-}
+    RayEndpoint(WorldRay,
+                ShapeHit->Distance,
+                &GeometryHit->WorldHitPoint);
 
-SFORCEINLINE
-COMPARISON_RESULT
-GeometryHitPointerCompare(
-    _In_ PCVOID GeometryHit0,
-    _In_ PCVOID GeometryHit1
-    )
-{
-    PGEOMETRY_HIT *Hit0;
-    PGEOMETRY_HIT *Hit1;
+    GeometryHit->WorldViewer = WorldRay->Direction;
+    GeometryHit->ShapeHit = ShapeHit;
 
-    ASSERT(GeometryHit0 != NULL);
-    ASSERT(GeometryHit1 != NULL);
+    if (SharedGeometryHit->ModelToWorld == NULL)
+    {
+        GeometryHit->ModelViewer = GeometryHit->WorldViewer;
+        GeometryHit->ModelHitPoint = GeometryHit->WorldHitPoint;
+        GeometryHit->ModelToWorld = NULL;
+        GeometryHit->WorldToModel = NULL;
+        return;
+    }
 
-    Hit0 = (PGEOMETRY_HIT*) GeometryHit0;
-    Hit1 = (PGEOMETRY_HIT*) GeometryHit1;
+    if (SharedGeometryHit->Premultiplied != FALSE)
+    {
+        PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
+                            &GeometryHit->WorldHitPoint,
+                            &GeometryHit->ModelHitPoint);
 
-    return ((*Hit0)->Distance <= (*Hit1)->Distance) ? -1 : 1;
+        VectorMatrixTransposedMultiply(SharedGeometryHit->ModelToWorld->Inverse,
+                                       &GeometryHit->WorldViewer,
+                                       &GeometryHit->ModelViewer);
+    }
+    else
+    {
+        GeometryHit->ModelHitPoint = SharedGeometryHit->ModelRay.Origin;
+        GeometryHit->ModelViewer = SharedGeometryHit->ModelRay.Direction;
+    }
+
+    GeometryHit->ModelToWorld = SharedGeometryHit->ModelToWorld;
+    GeometryHit->WorldToModel = SharedGeometryHit->ModelToWorld->Inverse;
 }
 
 #endif // _IRIS_GEOMETRY_HIT_INTERNAL_
