@@ -33,7 +33,7 @@ _Ret_maybenull_
 IRISAPI
 PRAYTRACER
 RayTracerAllocate(
-    _In_ PCRAY Ray
+    _In_ RAY Ray
     );
 
 _Check_return_
@@ -42,7 +42,7 @@ IRISAPI
 ISTATUS
 RayTracerSetRay(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCRAY Ray
+    _In_ RAY Ray
     );
 
 _Check_return_

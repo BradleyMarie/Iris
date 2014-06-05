@@ -626,7 +626,7 @@ IRISAPI
 PMATRIX
 MatrixpAllocateRotation(
     _In_ FLOAT Theta,
-    _In_ PCVECTOR3 Axis
+    _In_ VECTOR3 Axis
     )
 {
     VECTOR3 NormalizedAxis;
@@ -647,12 +647,12 @@ MatrixpAllocateRotation(
 
     ASSERT(IsNormalFloat(Theta) != FALSE);
     ASSERT(IsFiniteFloat(Theta) != FALSE);
-    ASSERT(IsNormalFloat(Axis->X) != FALSE);
-    ASSERT(IsFiniteFloat(Axis->X) != FALSE);
-    ASSERT(IsNormalFloat(Axis->Y) != FALSE);
-    ASSERT(IsFiniteFloat(Axis->Y) != FALSE);
-    ASSERT(IsNormalFloat(Axis->Z) != FALSE);
-    ASSERT(IsFiniteFloat(Axis->Z) != FALSE);
+    ASSERT(IsNormalFloat(Axis.X) != FALSE);
+    ASSERT(IsFiniteFloat(Axis.X) != FALSE);
+    ASSERT(IsNormalFloat(Axis.Y) != FALSE);
+    ASSERT(IsFiniteFloat(Axis.Y) != FALSE);
+    ASSERT(IsNormalFloat(Axis.Z) != FALSE);
+    ASSERT(IsFiniteFloat(Axis.Z) != FALSE);
 
     Length = VectorLength(Axis);
 
@@ -661,7 +661,7 @@ MatrixpAllocateRotation(
         return NULL;
     }
 
-    VectorNormalize(Axis, &NormalizedAxis);
+    NormalizedAxis = VectorNormalize(Axis, NULL);
 
     Sin = SinFloat(Theta * IRIS_PI / (FLOAT) 180.0);
     Cos = CosFloat(Theta * IRIS_PI / (FLOAT) 180.0);
@@ -721,9 +721,9 @@ MatrixAllocateRotation(
         return NULL;
     }
 
-    VectorInitialize(&Axis, X, Y, Z);
+    Axis = VectorCreate(X, Y, Z);
 
-    Matrix = MatrixpAllocateRotation(Theta, &Axis);
+    Matrix = MatrixpAllocateRotation(Theta, Axis);
 
     return Matrix;
 }

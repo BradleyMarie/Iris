@@ -34,75 +34,41 @@ typedef CONST RAY *PCRAY;
 //
 
 SFORCEINLINE
-VOID
+RAY
 RayInitialize(
-    _Out_ PRAY Ray,
-    _In_ PCPOINT3 Origin,
-    _In_ PCVECTOR3 Direction
+    _In_ POINT3 Origin,
+    _In_ VECTOR3 Direction
     )
 {
-    ASSERT(Ray != NULL);
-    ASSERT(Origin != NULL);
-    ASSERT(Direction != NULL);
+    RAY Ray;
 
-    Ray->Origin = *Origin;
-    Ray->Direction = *Direction;
-    Ray->Time = (FLOAT) 0.0;
-}
+    Ray.Origin = Origin;
+    Ray.Direction = Direction;
+    Ray.Time = (FLOAT) 0.0;
 
-SFORCEINLINE
-VOID
-RayEndpoint(
-    _In_ PCRAY Ray,
-    _In_ FLOAT Distance,
-    _Out_ PPOINT3 Endpoint
-    )
-{
-    VECTOR3 Vector;
-
-    ASSERT(Ray != NULL);
-    ASSERT(IsNormalFloat(Distance));
-    ASSERT(IsFiniteFloat(Distance));
-    ASSERT(Endpoint != NULL);
-
-    VectorScale(&Ray->Direction, Distance, &Vector);
-
-    PointVectorAdd(&Ray->Origin, &Vector, Endpoint);
+    return Ray;
 }
 
 SFORCEINLINE
 BOOL
 RayValidate(
-    _In_ PCRAY Ray
+    _In_ RAY Ray
     )
 {
-    if (Ray == NULL ||
-        PointValidate(&Ray->Origin) == FALSE ||
-        VectorValidate(&Ray->Direction) == FALSE)
+    if (PointValidate(Ray.Origin) == FALSE ||
+        VectorValidate(Ray.Direction) == FALSE)
     {
         return FALSE;
     }
 
-    if (IsZeroFloat(Ray->Direction.X) != FALSE &&
-        IsZeroFloat(Ray->Direction.Y) != FALSE &&
-        IsZeroFloat(Ray->Direction.Z) != FALSE)
+    if (IsZeroFloat(Ray.Direction.X) != FALSE &&
+        IsZeroFloat(Ray.Direction.Y) != FALSE &&
+        IsZeroFloat(Ray.Direction.Z) != FALSE)
     {
         return FALSE;
     }
 
     return TRUE;
 }
-
-#ifndef _DISABLE_IRIS_RAY_EXPORTS_
-
-IRISAPI
-VOID
-RayMatrixMultiply(
-    _In_ PCMATRIX Multiplicand0,
-    _In_ PCRAY Multiplicand1,
-    _Out_ PRAY Product
-    );
-
-#endif // _DISABLE_IRIS_RAY_EXPORTS_
 
 #endif // _RAY_IRIS_

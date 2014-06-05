@@ -34,15 +34,15 @@ typedef CONST POINT3 *PCPOINT3;
 //
 
 SFORCEINLINE
-VOID
-PointInitialize(
-    _Out_ PPOINT3 Point,
+POINT3
+PointCreate(
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z
     )
 {
-    ASSERT(Point != NULL);
+    POINT3 Point;
+
     ASSERT(IsNormalFloat(X));
     ASSERT(IsFiniteFloat(X));
     ASSERT(IsNormalFloat(Y));
@@ -50,175 +50,133 @@ PointInitialize(
     ASSERT(IsNormalFloat(Z));
     ASSERT(IsFiniteFloat(Z));
 
-    Point->X = X;
-    Point->Y = Y;
-    Point->Z = Z;
+    Point.X = X;
+    Point.Y = Y;
+    Point.Z = Z;
+
+    return Point;
 }
 
 SFORCEINLINE
-VOID
-PointInitializeScaled(
-    _Out_ PPOINT3 Point,
-    _In_ FLOAT X,
-    _In_ FLOAT Y,
-    _In_ FLOAT Z,
-    _In_ FLOAT W
-    )
-{
-    FLOAT Scalar;
-
-    ASSERT(Point != NULL);
-    ASSERT(IsNormalFloat(X));
-    ASSERT(IsFiniteFloat(X));
-    ASSERT(IsNormalFloat(Y));
-    ASSERT(IsFiniteFloat(Y));
-    ASSERT(IsNormalFloat(Z));
-    ASSERT(IsFiniteFloat(Z));
-    ASSERT(IsZeroFloat(W) == FALSE);
-    ASSERT(IsNormalFloat(W));
-    ASSERT(IsFiniteFloat(W));
-
-    Scalar = (FLOAT) 1.0 / W;
-
-    PointInitialize(Point, X * Scalar, Y * Scalar, Z * Scalar);
-}
-
-SFORCEINLINE
-VOID
+VECTOR3
 PointSubtract(
-    _In_ PCPOINT3 Minuend,
-    _In_ PCPOINT3 Subtrahend,
-    _Out_ PVECTOR3 Difference
+    _In_ POINT3 Minuend,
+    _In_ POINT3 Subtrahend
     )
 {
+    VECTOR3 Difference;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Minuend != NULL);
-    ASSERT(Subtrahend != NULL);
-    ASSERT(Difference != NULL);
+    X = Minuend.X - Subtrahend.X;
+    Y = Minuend.Y - Subtrahend.Y;
+    Z = Minuend.Z - Subtrahend.Z;
 
-    X = Minuend->X - Subtrahend->X;
-    Y = Minuend->Y - Subtrahend->Y;
-    Z = Minuend->Z - Subtrahend->Z;
+    Difference = VectorCreate(X, Y, Z);
 
-    VectorInitialize(Difference, X, Y, Z);
+    return Difference;
 }
 
 SFORCEINLINE
-VOID
+POINT3
 PointVectorSubtract(
-    _In_ PCPOINT3 Minuend,
-    _In_ PCVECTOR3 Subtrahend,
-    _Out_ PPOINT3 Difference
+    _In_ POINT3 Minuend,
+    _In_ VECTOR3 Subtrahend
     )
 {
+    POINT3 Difference;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Minuend != NULL);
-    ASSERT(Subtrahend != NULL);
-    ASSERT(Difference != NULL);
+    X = Minuend.X - Subtrahend.X;
+    Y = Minuend.Y - Subtrahend.Y;
+    Z = Minuend.Z - Subtrahend.Z;
 
-    X = Minuend->X - Subtrahend->X;
-    Y = Minuend->Y - Subtrahend->Y;
-    Z = Minuend->Z - Subtrahend->Z;
+    Difference = PointCreate(X, Y, Z);
 
-    PointInitialize(Difference, X, Y, Z);
+    return Difference;
 }
 
 SFORCEINLINE
-VOID
+POINT3
 PointVectorAdd(
-    _In_ PCPOINT3 Addend0,
-    _In_ PCVECTOR3 Addend1,
-    _Out_ PPOINT3 Sum
+    _In_ POINT3 Addend0,
+    _In_ VECTOR3 Addend1
     )
 {
+    POINT3 Sum;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
-    ASSERT(Sum != NULL);
+    X = Addend0.X + Addend1.X;
+    Y = Addend0.Y + Addend1.Y;
+    Z = Addend0.Z + Addend1.Z;
 
-    X = Addend0->X + Addend1->X;
-    Y = Addend0->Y + Addend1->Y;
-    Z = Addend0->Z + Addend1->Z;
+    Sum = PointCreate(X, Y, Z);
 
-    PointInitialize(Sum, X, Y, Z);
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+POINT3
 PointVectorAddScaled(
-    _In_ PCPOINT3 Point,
-    _In_ PCVECTOR3 Vector,
-    _In_ FLOAT Scalar,
-    _Out_ PPOINT3 Sum
+    _In_ POINT3 Point,
+    _In_ VECTOR3 Vector,
+    _In_ FLOAT Scalar
     )
 {
+    POINT3 Sum;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Point != NULL);
-    ASSERT(Vector != NULL);
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(Sum != NULL);
 
-    X = FmaFloat(Scalar, Vector->X, Point->X);
-    Y = FmaFloat(Scalar, Vector->Y, Point->Y);
-    Z = FmaFloat(Scalar, Vector->Z, Point->Z);
+    X = FmaFloat(Scalar, Vector.X, Point.X);
+    Y = FmaFloat(Scalar, Vector.Y, Point.Y);
+    Z = FmaFloat(Scalar, Vector.Z, Point.Z);
 
-    PointInitialize(Sum, X, Y, Z);
+    Sum = PointCreate(X, Y, Z);
+
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+POINT3
 PointVectorSubtractScaled(
-    _In_ PCPOINT3 Point,
-    _In_ PCVECTOR3 Vector,
-    _In_ FLOAT Scalar,
-    _Out_ PPOINT3 Sum
+    _In_ POINT3 Point,
+    _In_ VECTOR3 Vector,
+    _In_ FLOAT Scalar
     )
 {
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
+    POINT3 Difference;
+    FLOAT NegatedScalar;
 
-    ASSERT(Point != NULL);
-    ASSERT(Vector != NULL);
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
-    ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(Sum != NULL);
+    NegatedScalar = -Scalar;
 
-    Scalar = -Scalar;
+    Difference = PointVectorAddScaled(Point,
+                                      Vector, 
+                                      NegatedScalar);
 
-    X = FmaFloat(Scalar, Vector->X, Point->X);
-    Y = FmaFloat(Scalar, Vector->Y, Point->Y);
-    Z = FmaFloat(Scalar, Vector->Z, Point->Z);
-
-    PointInitialize(Sum, X, Y, Z);
+    return Difference;
 }
 
 SFORCEINLINE
 BOOL
 PointValidate(
-    _In_opt_ PCPOINT3 Point
+    _In_ POINT3 Point
     )
 {
-    if (Point == NULL ||
-        IsNormalFloat(Point->X) == FALSE ||
-        IsFiniteFloat(Point->X) == FALSE ||
-        IsNormalFloat(Point->Y) == FALSE ||
-        IsFiniteFloat(Point->Y) == FALSE ||
-        IsNormalFloat(Point->Z) == FALSE ||
-        IsFiniteFloat(Point->Z) == FALSE)
+    if (IsNormalFloat(Point.X) == FALSE ||
+        IsFiniteFloat(Point.X) == FALSE ||
+        IsNormalFloat(Point.Y) == FALSE ||
+        IsFiniteFloat(Point.Y) == FALSE ||
+        IsNormalFloat(Point.Z) == FALSE ||
+        IsFiniteFloat(Point.Z) == FALSE)
     {
         return FALSE;
     }
@@ -228,11 +186,12 @@ PointValidate(
 
 #ifndef _DISABLE_IRIS_POINT_EXPORTS_
 
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-VOID
+ISTATUS
 PointMatrixMultiply(
     _In_ PCMATRIX Matrix,
-    _In_ PCPOINT3 Point,
+    _In_ POINT3 Point,
     _Out_ PPOINT3 Product
     );
 

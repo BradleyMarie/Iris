@@ -37,7 +37,7 @@ SFORCEINLINE
 ISTATUS 
 GeometryTraceGeometry(
     _In_ PCGEOMETRY Geometry, 
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Inout_ PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator,
     _Outptr_result_maybenull_ PCSHARED_GEOMETRY_HIT *SharedGeometryHit,
@@ -49,7 +49,6 @@ GeometryTraceGeometry(
     PCRAY TraceRay;
 
     ASSERT(Geometry != NULL);
-    ASSERT(WorldRay != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(SharedGeometryHitAllocator != NULL);
     ASSERT(SharedGeometryHit != NULL);
@@ -65,13 +64,13 @@ GeometryTraceGeometry(
     if (Geometry->ModelToWorld == NULL)
     {
         GeometryHit->ModelToWorld = NULL;
-        TraceRay = WorldRay;
+        TraceRay = &WorldRay;
     }
     else if (Geometry->Premultiplied != FALSE)
     {
         GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = TRUE;
-        TraceRay = WorldRay;
+        TraceRay = &WorldRay;
     }
     else
     {

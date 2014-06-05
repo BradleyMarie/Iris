@@ -27,40 +27,33 @@ Abstract:
 
 SFORCEINLINE
 VOID
-VectorMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+VectorInitialize(
+    _Out_ PVECTOR3 Vector,
+    _In_ FLOAT X, 
+    _In_ FLOAT Y, 
+    _In_ FLOAT Z
     )
 {
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
-
-    ASSERT(Matrix != NULL);
     ASSERT(Vector != NULL);
-    ASSERT(Product != NULL);
 
-    X = Matrix->M[0][0] * Vector->X + 
-        Matrix->M[0][1] * Vector->Y + 
-        Matrix->M[0][2] * Vector->Z;
+    ASSERT(IsNormalFloat(X) != FALSE);
+    ASSERT(IsFiniteFloat(X) != FALSE);
+    ASSERT(IsNormalFloat(Y) != FALSE);
+    ASSERT(IsFiniteFloat(Y) != FALSE);
+    ASSERT(IsNormalFloat(Z) != FALSE);
+    ASSERT(IsFiniteFloat(Z) != FALSE);
 
-    Y = Matrix->M[1][0] * Vector->X + 
-        Matrix->M[1][1] * Vector->Y + 
-        Matrix->M[1][2] * Vector->Z;
-
-    Z = Matrix->M[2][0] * Vector->X + 
-        Matrix->M[2][1] * Vector->Y + 
-        Matrix->M[2][2] * Vector->Z;
-
-    VectorInitialize(Product, X, Y, Z);
+    Vector->X = X;
+    Vector->Y = Y;
+    Vector->Z = Z;
 }
 
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-VOID
-VectorMatrixTransposedMultiply(
+ISTATUS
+VectorMatrixMultiply(
     _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
+    _In_ VECTOR3 Vector,
     _Out_ PVECTOR3 Product
     )
 {
@@ -68,23 +61,63 @@ VectorMatrixTransposedMultiply(
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Matrix != NULL);
-    ASSERT(Vector != NULL);
-    ASSERT(Product != NULL);
+    if (Matrix == NULL ||
+        Product == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
-    X = Matrix->M[0][0] * Vector->X + 
-        Matrix->M[1][0] * Vector->Y + 
-        Matrix->M[2][0] * Vector->Z;
+    X = Matrix->M[0][0] * Vector.X + 
+        Matrix->M[0][1] * Vector.Y + 
+        Matrix->M[0][2] * Vector.Z;
 
-    Y = Matrix->M[0][1] * Vector->X + 
-        Matrix->M[1][1] * Vector->Y + 
-        Matrix->M[2][1] * Vector->Z;
+    Y = Matrix->M[1][0] * Vector.X + 
+        Matrix->M[1][1] * Vector.Y + 
+        Matrix->M[1][2] * Vector.Z;
 
-    Z = Matrix->M[0][2] * Vector->X + 
-        Matrix->M[1][2] * Vector->Y + 
-        Matrix->M[2][2] * Vector->Z;
+    Z = Matrix->M[2][0] * Vector.X + 
+        Matrix->M[2][1] * Vector.Y + 
+        Matrix->M[2][2] * Vector.Z;
 
     VectorInitialize(Product, X, Y, Z);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+VectorMatrixTransposedMultiply(
+    _In_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector,
+    _Out_ PVECTOR3 Product
+    )
+{
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    if (Matrix == NULL ||
+        Product == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
+    X = Matrix->M[0][0] * Vector.X + 
+        Matrix->M[1][0] * Vector.Y + 
+        Matrix->M[2][0] * Vector.Z;
+
+    Y = Matrix->M[0][1] * Vector.X + 
+        Matrix->M[1][1] * Vector.Y + 
+        Matrix->M[2][1] * Vector.Z;
+
+    Z = Matrix->M[0][2] * Vector.X + 
+        Matrix->M[1][2] * Vector.Y + 
+        Matrix->M[2][2] * Vector.Z;
+
+    VectorInitialize(Product, X, Y, Z);
+
+    return ISTATUS_SUCCESS;
 }
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_

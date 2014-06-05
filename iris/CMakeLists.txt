@@ -8,8 +8,7 @@ add_library(iris SHARED
     src/geometry.c
     src/shapehitallocator.c
     src/point.c
-    src/vector.c
-    src/ray.c)
+    src/vector.c)
 
 generate_export_header(iris
     BASE_NAME iris

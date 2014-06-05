@@ -60,7 +60,7 @@ _Check_return_
 _Ret_maybenull_
 PRAYTRACER
 RayTracerAllocate(
-    _In_ PCRAY Ray
+    _In_ RAY Ray
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
@@ -69,8 +69,7 @@ RayTracerAllocate(
     PRAYTRACER RayTracer;
     ISTATUS Status;
 
-    if (Ray == NULL ||
-        RayValidate(Ray) == FALSE)
+    if (RayValidate(Ray) == FALSE)
     {
         return NULL;
     }
@@ -113,7 +112,7 @@ RayTracerAllocate(
         return NULL;
     }
 
-    RayTracer->CurrentRay = *Ray;
+    RayTracer->CurrentRay = Ray;
     RayTracer->HitIndex = 0;
 
     return RayTracer;
@@ -124,7 +123,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerSetRay(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCRAY Ray
+    _In_ RAY Ray
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
@@ -132,7 +131,6 @@ RayTracerSetRay(
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
     if (RayTracer == NULL ||
-        Ray == NULL ||
         RayValidate(Ray) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT;
@@ -146,7 +144,7 @@ RayTracerSetRay(
     ShapeHitAllocatorFreeAll(ShapeHitAllocator);
     IrisConstantPointerListClear(PointerList);
 
-    RayTracer->CurrentRay = *Ray;
+    RayTracer->CurrentRay = Ray;
     RayTracer->HitIndex = 0;
 
     return ISTATUS_SUCCESS;
@@ -179,7 +177,7 @@ RayTracerTraceGeometry(
     PointerList = &RayTracer->HitList;
 
     Status = GeometryTraceGeometry(Geometry,
-                                   &RayTracer->CurrentRay,
+                                   RayTracer->CurrentRay,
                                    ShapeHitAllocator,
                                    SharedGeometryHitAllocator,
                                    &SharedGeometryHit,
@@ -266,7 +264,7 @@ RayTracerGetNextGeometryHit(
     InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
 
     GeometryHitInitialize(GeometryHit,
-                          &RayTracer->CurrentRay,
+                          RayTracer->CurrentRay,
                           InternalShapeHit->SharedGeometryHit,
                           &InternalShapeHit->ShapeHit);
 

@@ -37,22 +37,19 @@ SFORCEINLINE
 VOID
 GeometryHitInitialize(
     _Out_ PGEOMETRY_HIT GeometryHit,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _In_ PCSHARED_GEOMETRY_HIT SharedGeometryHit,
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
     ASSERT(GeometryHit != NULL);
-    ASSERT(WorldRay != NULL);
     ASSERT(SharedGeometryHit != NULL);
     ASSERT(ShapeHit != NULL);
 
-    RayEndpoint(WorldRay,
-                ShapeHit->Distance,
-                &GeometryHit->WorldHitPoint);
-
-    GeometryHit->WorldViewer = WorldRay->Direction;
     GeometryHit->ShapeHit = ShapeHit;
+
+    GeometryHit->WorldHitPoint = RayEndpoint(WorldRay, ShapeHit->Distance);
+    GeometryHit->WorldViewer = WorldRay.Direction;
 
     if (SharedGeometryHit->ModelToWorld == NULL)
     {
@@ -66,11 +63,11 @@ GeometryHitInitialize(
     if (SharedGeometryHit->Premultiplied != FALSE)
     {
         PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
-                            &GeometryHit->WorldHitPoint,
+                            GeometryHit->WorldHitPoint,
                             &GeometryHit->ModelHitPoint);
 
         VectorMatrixTransposedMultiply(SharedGeometryHit->ModelToWorld->Inverse,
-                                       &GeometryHit->WorldViewer,
+                                       GeometryHit->WorldViewer,
                                        &GeometryHit->ModelViewer);
     }
     else

@@ -45,15 +45,15 @@ typedef VECTOR_AXIS *PVECTOR_AXIS;
 //
 
 SFORCEINLINE
-VOID
-VectorInitialize(
-    _Out_ PVECTOR3 Vector,
+VECTOR3
+VectorCreate(
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z
     )
 {
-    ASSERT(Vector != NULL);
+    VECTOR3 Result;
+
     ASSERT(IsNormalFloat(X) != FALSE);
     ASSERT(IsFiniteFloat(X) != FALSE);
     ASSERT(IsNormalFloat(Y) != FALSE);
@@ -61,240 +61,227 @@ VectorInitialize(
     ASSERT(IsNormalFloat(Z) != FALSE);
     ASSERT(IsFiniteFloat(Z) != FALSE);
 
-    Vector->X = X;
-    Vector->Y = Y;
-    Vector->Z = Z;
+    Result.X = X;
+    Result.Y = Y;
+    Result.Z = Z;
+
+    return Result;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorNegate(
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 Negation
+    _In_ VECTOR3 Vector
     )
 {
+    VECTOR3 Negation;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Vector != NULL);
-    ASSERT(Negation != NULL);
+    X = -Vector.X;
+    Y = -Vector.Y;
+    Z = -Vector.Z;
 
-    X = -Vector->X;
-    Y = -Vector->Y;
-    Z = -Vector->Z;
+    Negation = VectorCreate(X, Y, Z);
 
-    VectorInitialize(Negation, X, Y, Z);
+    return Negation;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorAdd(
-    _In_ PCVECTOR3 Addend0,
-    _In_ PCVECTOR3 Addend1,
-    _Out_ PVECTOR3 Sum
+    _In_ VECTOR3 Addend0,
+    _In_ VECTOR3 Addend1
     )
 {
+    VECTOR3 Sum;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
-    ASSERT(Sum != NULL);
+    X = Addend0.X + Addend1.X;
+    Y = Addend0.Y + Addend1.Y;
+    Z = Addend0.Z + Addend1.Z;
 
-    X = Addend0->X + Addend1->X;
-    Y = Addend0->Y + Addend1->Y;
-    Z = Addend0->Z + Addend1->Z;
+    Sum = VectorCreate(X, Y, Z);
 
-    VectorInitialize(Sum, X, Y, Z);
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorAddScaled(
-    _In_ PCVECTOR3 Addend0,
-    _In_ PCVECTOR3 Addend1,
-    _In_ FLOAT Scalar,
-    _Out_ PVECTOR3 Sum
+    _In_ VECTOR3 Addend0,
+    _In_ VECTOR3 Addend1,
+    _In_ FLOAT Scalar
     )
 {
+    VECTOR3 Sum;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(Sum != NULL);
 
-    X = FmaFloat(Scalar, Addend1->X, Addend0->X);
-    Y = FmaFloat(Scalar, Addend1->Y, Addend0->Y);
-    Z = FmaFloat(Scalar, Addend1->Z, Addend0->Z);
+    X = FmaFloat(Scalar, Addend1.X, Addend0.X);
+    Y = FmaFloat(Scalar, Addend1.Y, Addend0.Y);
+    Z = FmaFloat(Scalar, Addend1.Z, Addend0.Z);
 
-    VectorInitialize(Sum, X, Y, Z);
+    Sum = VectorCreate(X, Y, Z);
+
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorSubtract(
-    _In_ PCVECTOR3 Minuend,
-    _In_ PCVECTOR3 Subtrahend,
-    _Out_ PVECTOR3 Difference
+    _In_ VECTOR3 Minuend,
+    _In_ VECTOR3 Subtrahend
     )
 {
+    VECTOR3 Difference;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Minuend != NULL);
-    ASSERT(Subtrahend != NULL);
-    ASSERT(Difference != NULL);
+    X = Minuend.X - Subtrahend.X;
+    Y = Minuend.Y - Subtrahend.Y;
+    Z = Minuend.Z - Subtrahend.Z;
 
-    X = Minuend->X - Subtrahend->X;
-    Y = Minuend->Y - Subtrahend->Y;
-    Z = Minuend->Z - Subtrahend->Z;
+    Difference = VectorCreate(X, Y, Z);
 
-    VectorInitialize(Difference, X, Y, Z);
+    return Difference;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorScale(
-    _In_ PCVECTOR3 Vector,
-    _In_ FLOAT Scalar,
-    _Out_ PVECTOR3 ScaledVector
+    _In_ VECTOR3 Vector,
+    _In_ FLOAT Scalar
     )
 {
+    VECTOR3 ScaledVector;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Vector != NULL);
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(ScaledVector != NULL);
+    ASSERT(IsZeroFloat(Scalar) != FALSE);
 
-    X = Vector->X * Scalar;
-    Y = Vector->Y * Scalar;
-    Z = Vector->Z * Scalar;
+    X = Vector.X * Scalar;
+    Y = Vector.Y * Scalar;
+    Z = Vector.Z * Scalar;
 
-    VectorInitialize(ScaledVector, X, Y, Z);
+    ScaledVector = VectorCreate(X, Y, Z);
+
+    return ScaledVector;
 }
 
 SFORCEINLINE
 FLOAT
 VectorDotProduct(
-    _In_ PCVECTOR3 Operand0,
-    _In_ PCVECTOR3 Operand1
+    _In_ VECTOR3 Operand0,
+    _In_ VECTOR3 Operand1
     )
 {
+    FLOAT DotProduct;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Operand0 != NULL);
-    ASSERT(Operand1 != NULL);
+    X = Operand0.X * Operand1.X;
+    Y = Operand0.Y * Operand1.Y;
+    Z = Operand0.Z * Operand1.Z;
 
-    X = Operand0->X * Operand1->X;
-    Y = Operand0->Y * Operand1->Y;
-    Z = Operand0->Z * Operand1->Z;
+    DotProduct = X + Y + Z;
 
-    return X + Y + Z;
+    return DotProduct;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorCrossProduct(
-    _In_ PCVECTOR3 Operand0,
-    _In_ PCVECTOR3 Operand1,
-    _Out_ PVECTOR3 Product
+    _In_ VECTOR3 Operand0,
+    _In_ VECTOR3 Operand1
     )
 {
+    VECTOR3 CrossProduct;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(Operand0 != NULL);
-    ASSERT(Operand1 != NULL);
-    ASSERT(Product != NULL);
+    X = Operand0.Y * Operand1.Z - Operand0.Z * Operand1.Y;
+    Y = Operand0.Z * Operand1.X - Operand0.X * Operand1.Z;
+    Z = Operand0.X * Operand1.Y - Operand0.Y * Operand1.X;
 
-    X = Operand0->Y * Operand1->Z - Operand0->Z * Operand1->Y;
-    Y = Operand0->Z * Operand1->X - Operand0->X * Operand1->Z;
-    Z = Operand0->X * Operand1->Y - Operand0->Y * Operand1->X;
+    CrossProduct = VectorCreate(X, Y, Z);
 
-    VectorInitialize(Product, X, Y, Z);
+    return CrossProduct;
 }
 
 SFORCEINLINE
 FLOAT
 VectorLength(
-    _In_ PCVECTOR3 Vector
+    _In_ VECTOR3 Vector
     )
 {
     FLOAT DotProduct;
-
-    ASSERT(Vector != NULL);
+    FLOAT Length;
 
     DotProduct = VectorDotProduct(Vector, Vector);
 
-    return SqrtFloat(DotProduct);
+    Length = SqrtFloat(DotProduct);
+
+    return Length;
 }
 
 SFORCEINLINE
-VOID
-VectorNormalizeWithLength(
-    _In_ PCVECTOR3 Vector,
-    _Out_ PFLOAT OldLength,
-    _Out_ PVECTOR3 NormalizedVector
+VECTOR3
+VectorNormalize(
+    _In_ VECTOR3 Vector,
+    _Out_opt_ PFLOAT OldLength
     )
 {
+    VECTOR3 Normalized;
+    FLOAT Length;
     FLOAT Scalar;
 
-    ASSERT(Vector != NULL);
-    ASSERT(OldLength != NULL);
-    ASSERT(NormalizedVector != NULL);
+    Length = VectorLength(Vector);
 
-    *OldLength = VectorLength(Vector);
+    if (OldLength != NULL)
+    {
+        *OldLength = Length;
+    }
 
-    ASSERT(IsZeroFloat(*OldLength) == FALSE);
+    Scalar = (FLOAT) 1.0 / Length;
 
-    Scalar = (FLOAT) 1.0 / *OldLength;
+    Normalized = VectorScale(Vector, Scalar);
 
-    VectorScale(Vector, Scalar, NormalizedVector);
-}
-
-SFORCEINLINE
-VOID
-VectorNormalize(
-    _In_ PCVECTOR3 Vector,
-    _Out_ PVECTOR3 NormalizedVector
-    )
-{
-    FLOAT Length;
-
-    ASSERT(Vector != NULL);
-    ASSERT(NormalizedVector != NULL);
-
-    VectorNormalizeWithLength(Vector,
-                              &Length,
-                              NormalizedVector);
+    return Normalized;
 }
 
 SFORCEINLINE
 BOOL
 VectorValidate(
-    _In_opt_ PCVECTOR3 Vector
+    _In_ VECTOR3 Vector
     )
 {
-    if (Vector == NULL ||
-        IsNormalFloat(Vector->X) == FALSE ||
-        IsFiniteFloat(Vector->X) == FALSE ||
-        IsNormalFloat(Vector->Y) == FALSE ||
-        IsFiniteFloat(Vector->Y) == FALSE ||
-        IsNormalFloat(Vector->Z) == FALSE ||
-        IsFiniteFloat(Vector->Z) == FALSE)
+    if (IsZeroFloat(Vector.X) != FALSE &&
+        IsZeroFloat(Vector.Y) != FALSE &&
+        IsZeroFloat(Vector.Z) != FALSE)
+    {
+        return FALSE;
+    }
+
+    if (IsNormalFloat(Vector.X) == FALSE ||
+        IsFiniteFloat(Vector.X) == FALSE ||
+        IsNormalFloat(Vector.Y) == FALSE ||
+        IsFiniteFloat(Vector.Y) == FALSE ||
+        IsNormalFloat(Vector.Z) == FALSE ||
+        IsFiniteFloat(Vector.Z) == FALSE)
     {
         return FALSE;
     }
@@ -305,16 +292,16 @@ VectorValidate(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
-    _In_ PCVECTOR3 Vector
+    _In_ VECTOR3 Vector
     )
 {
     FLOAT AbsoluteValueX;
     FLOAT AbsoluteValueY;
     FLOAT AbsoluteValueZ;
 
-    AbsoluteValueX = AbsFloat(Vector->X);
-    AbsoluteValueY = AbsFloat(Vector->Y);
-    AbsoluteValueZ = AbsFloat(Vector->Z);
+    AbsoluteValueX = AbsFloat(Vector.X);
+    AbsoluteValueY = AbsFloat(Vector.Y);
+    AbsoluteValueZ = AbsFloat(Vector.Z);
 
     if (AbsoluteValueX > AbsoluteValueY &&
         AbsoluteValueX > AbsoluteValueZ)
@@ -334,16 +321,16 @@ VectorDominantAxis(
 SFORCEINLINE
 VECTOR_AXIS
 VectorDiminishedAxis(
-    _In_ PCVECTOR3 Vector
+    _In_ VECTOR3 Vector
     )
 {
     FLOAT AbsoluteValueX;
     FLOAT AbsoluteValueY;
     FLOAT AbsoluteValueZ;
 
-    AbsoluteValueX = AbsFloat(Vector->X);
-    AbsoluteValueY = AbsFloat(Vector->Y);
-    AbsoluteValueZ = AbsFloat(Vector->Z);
+    AbsoluteValueX = AbsFloat(Vector.X);
+    AbsoluteValueY = AbsFloat(Vector.Y);
+    AbsoluteValueZ = AbsFloat(Vector.Z);
 
     if (AbsoluteValueX < AbsoluteValueY &&
         AbsoluteValueX < AbsoluteValueZ)
@@ -361,59 +348,56 @@ VectorDiminishedAxis(
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorReflect(
-    _In_ PCVECTOR3 Incident,
-    _In_ PCVECTOR3 Normal,
-    _Out_ PVECTOR3 NormalizedReflected
+    _In_ VECTOR3 Incident,
+    _In_ VECTOR3 Normal
     )
 {
     VECTOR3 Reflected;
     FLOAT Scalar;
 
-    ASSERT(Incident != NULL);
-    ASSERT(Normal != NULL);
-    ASSERT(NormalizedReflected != NULL);
-
     Scalar = (FLOAT) 2.0 * VectorDotProduct(Normal, Incident);
 
-    VectorScale(Normal, Scalar, &Reflected);
-    VectorSubtract(Incident, &Reflected, &Reflected);
+    Reflected = VectorScale(Normal, Scalar);
+    Reflected = VectorSubtract(Incident, Reflected);
+    Reflected = VectorNormalize(Reflected, NULL);
 
-    VectorNormalize(&Reflected, NormalizedReflected);
+    return Reflected;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 VectorHalfAngle(
-    PCVECTOR3 Vector0,
-    PCVECTOR3 Vector1,
-    PVECTOR3 Result
+    VECTOR3 Vector0,
+    VECTOR3 Vector1
     )
 {
-    ASSERT(Vector0 != NULL);
-    ASSERT(Vector1 != NULL);
-    ASSERT(Result != NULL);
+    VECTOR3 Result;
 
-    VectorAdd(Vector0, Vector1, Result);
-    VectorNormalize(Result, Result);
+    Result = VectorAdd(Vector0, Vector1);
+    Result = VectorNormalize(Result, NULL);
+
+    return Result;
 }
 
 #ifndef _DISABLE_IRIS_VECTOR_EXPORTS_
 
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-VOID
+ISTATUS
 VectorMatrixMultiply(
     _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
+    _In_ VECTOR3 Vector,
     _Out_ PVECTOR3 Product
     );
 
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-VOID
+ISTATUS
 VectorMatrixTransposedMultiply(
     _In_ PCMATRIX Matrix,
-    _In_ PCVECTOR3 Vector,
+    _In_ VECTOR3 Vector,
     _Out_ PVECTOR3 Product
     );
 

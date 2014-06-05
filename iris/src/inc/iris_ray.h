@@ -17,34 +17,49 @@ Abstract:
 #ifndef _RAY_IRIS_INTERNAL_
 #define _RAY_IRIS_INTERNAL_
 
-#ifdef _IRIS_EXPORT_RAY_ROUTINES_
-#define RayMatrixMultiply(Matrix, Vector, Product) \
-        StaticRayMatrixMultiply(Matrix, Vector, Product)
-#endif
-
 SFORCEINLINE
-VOID
+POINT3
+RayEndpoint(
+    _In_ RAY Ray,
+    _In_ FLOAT Distance
+    )
+{
+    POINT3 Endpoint;
+
+    ASSERT(IsNormalFloat(Distance));
+    ASSERT(IsFiniteFloat(Distance));
+
+    Endpoint = PointVectorAddScaled(Ray.Origin,
+                                    Ray.Direction,
+                                    Distance);
+
+    return Endpoint;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
 RayMatrixMultiply(
-	_In_ PCMATRIX Multiplicand0,
-    _In_ PCRAY Multiplicand1,
+    _In_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1,
     _Out_ PRAY Product
     )
 {
-    ASSERT(Multiplicand0 != NULL);
-    ASSERT(Multiplicand1 != NULL);
-    ASSERT(Product != NULL);
+    if (Multiplicand0 == NULL ||
+        Product == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
 	PointMatrixMultiply(Multiplicand0,
-                        &Multiplicand1->Origin, 
+                        Multiplicand1.Origin, 
                         &Product->Origin);
 
     VectorMatrixMultiply(Multiplicand0,
-                         &Multiplicand1->Direction, 
+                         Multiplicand1.Direction, 
                          &Product->Direction);
-}
 
-#ifdef _IRIS_EXPORT_RAY_ROUTINES_
-#undef RayMatrixMultiply
-#endif
+    return ISTATUS_SUCCESS;
+}
 
 #endif // _RAY_IRIS_INTERNAL_
