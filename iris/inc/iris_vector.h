@@ -383,22 +383,32 @@ VectorHalfAngle(
 
 #ifndef _DISABLE_IRIS_VECTOR_EXPORTS_
 
-_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-ISTATUS
+VECTOR3
 VectorMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     );
 
-_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-ISTATUS
+VECTOR3
 VectorMatrixTransposedMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
+VectorMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
+VectorMatrixTransposedInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     );
 
 #endif // _DISABLE_IRIS_VECTOR_EXPORTS_

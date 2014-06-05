@@ -42,9 +42,8 @@ SurfaceNormalGetWorldNormal(
 
     if (SurfaceNormal->WorldToModel != NULL)
     {
-        VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel,
-                                       WorldNormal,
-                                       WorldNormal);
+        *WorldNormal = VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel,
+                                                      *WorldNormal);
     }
     else if (SurfaceNormal->Prenormalized != FALSE)
     {
@@ -126,7 +125,7 @@ SurfaceNormalGetNormalizedWorldNormal(
         return Status;
     }
 
-    VectorNormalize(NormalizedWorldNormal, NormalizedWorldNormal);
+    *NormalizedWorldNormal = VectorNormalize(*NormalizedWorldNormal, NULL);
 
     SurfaceNormal->NormalizedWorldNormal = *NormalizedWorldNormal;
     SurfaceNormal->NormalizedWorldNormalValid = TRUE;
@@ -161,7 +160,7 @@ SurfaceNormalGetNormalizedModelNormal(
         return Status;
     }
 
-    VectorNormalize(NormalizedModelNormal, NormalizedModelNormal);
+    *NormalizedModelNormal = VectorNormalize(*NormalizedModelNormal, NULL);
 
     SurfaceNormal->NormalizedModelNormal = *NormalizedModelNormal;
     SurfaceNormal->NormalizedModelNormalValid = TRUE;

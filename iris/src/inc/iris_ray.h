@@ -18,48 +18,49 @@ Abstract:
 #define _RAY_IRIS_INTERNAL_
 
 SFORCEINLINE
-POINT3
-RayEndpoint(
-    _In_ RAY Ray,
-    _In_ FLOAT Distance
-    )
-{
-    POINT3 Endpoint;
-
-    ASSERT(IsNormalFloat(Distance));
-    ASSERT(IsFiniteFloat(Distance));
-
-    Endpoint = PointVectorAddScaled(Ray.Origin,
-                                    Ray.Direction,
-                                    Distance);
-
-    return Endpoint;
-}
-
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS
+RAY
 RayMatrixMultiply(
-    _In_ PCMATRIX Multiplicand0,
-    _In_ RAY Multiplicand1,
-    _Out_ PRAY Product
+    _In_opt_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1
     )
 {
-    if (Multiplicand0 == NULL ||
-        Product == NULL)
+    VECTOR3 MultipliedDirection;
+    POINT3 MultipliedOrigin;
+    RAY Product;
+
+    if (Multiplicand0 == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return Multiplicand1;
     }
 
-	PointMatrixMultiply(Multiplicand0,
-                        Multiplicand1.Origin, 
-                        &Product->Origin);
+    MultipliedOrigin = PointMatrixMultiply(Multiplicand0,
+                                           Multiplicand1.Origin);
 
-    VectorMatrixMultiply(Multiplicand0,
-                         Multiplicand1.Direction, 
-                         &Product->Direction);
+    MultipliedDirection = VectorMatrixMultiply(Multiplicand0,
+                                               Multiplicand1.Direction);
 
-    return ISTATUS_SUCCESS;
+    Product = RayCreate(MultipliedOrigin, MultipliedDirection);
+
+    return Product;
+}
+
+SFORCEINLINE
+RAY
+RayMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1
+    )
+{
+    RAY Product;
+
+    if (Multiplicand0 == NULL)
+    {
+        return Multiplicand1;
+    }
+
+    Product = RayMatrixMultiply(Multiplicand0->Inverse, Multiplicand1);
+
+    return Product;
 }
 
 #endif // _RAY_IRIS_INTERNAL_

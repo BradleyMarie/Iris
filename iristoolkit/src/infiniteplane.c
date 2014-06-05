@@ -108,10 +108,10 @@ InfinitePlaneTraceInfinitePlane(
 
     InfinitePlane = (PCINFINITE_PLANE) Context;
 
-    PointSubtract(&Ray->Origin, &InfinitePlane->Vertex, &Temp);
+    Temp = PointSubtract(Ray->Origin, InfinitePlane->Vertex);
 
-    DotProduct = VectorDotProduct(&Ray->Direction, &InfinitePlane->SurfaceNormal);
-    Distance = VectorDotProduct(&Temp, &InfinitePlane->SurfaceNormal) / -DotProduct;
+    DotProduct = VectorDotProduct(Ray->Direction, InfinitePlane->SurfaceNormal);
+    Distance = VectorDotProduct(Temp, InfinitePlane->SurfaceNormal) / -DotProduct;
 
     if (Distance < (FLOAT) 0.0)
     {
@@ -184,7 +184,7 @@ InfinitePlaneAllocate(
         return NULL;
     }
 
-    if (VectorLength(SurfaceNormal) == (FLOAT) 0.0)
+    if (VectorLength(*SurfaceNormal) == (FLOAT) 0.0)
     {
         return NULL;
     }

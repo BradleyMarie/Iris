@@ -15,13 +15,20 @@ Abstract:
 #define _IRIS_EXPORT_POINT_ROUTINES_
 #include <irisp.h>
 
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
+POINT3
 PointMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ POINT3 Point,
-    _Out_ PPOINT3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
     )
 {
-    return StaticPointMatrixMultiply(Matrix, Point, Product);
+    return StaticPointMatrixMultiply(Matrix, Point);
+}
+
+POINT3
+PointMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
+    )
+{
+    return StaticPointMatrixInverseMultiply(Matrix, Point);
 }

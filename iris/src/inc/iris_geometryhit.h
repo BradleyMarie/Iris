@@ -62,13 +62,11 @@ GeometryHitInitialize(
 
     if (SharedGeometryHit->Premultiplied != FALSE)
     {
-        PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
-                            GeometryHit->WorldHitPoint,
-                            &GeometryHit->ModelHitPoint);
+        GeometryHit->ModelHitPoint = PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
+                                                         GeometryHit->WorldHitPoint);
 
-        VectorMatrixTransposedMultiply(SharedGeometryHit->ModelToWorld->Inverse,
-                                       GeometryHit->WorldViewer,
-                                       &GeometryHit->ModelViewer);
+        GeometryHit->ModelViewer = VectorMatrixTransposedMultiply(SharedGeometryHit->ModelToWorld->Inverse,
+                                                                  GeometryHit->WorldViewer);
     }
     else
     {

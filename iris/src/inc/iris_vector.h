@@ -18,53 +18,35 @@ Abstract:
 #define _VECTOR_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
-#define VectorMatrixMultiply(Matrix, Vector, Product) \
-        StaticVectorMatrixMultiply(Matrix, Vector, Product)
+#define VectorMatrixMultiply(Matrix, Vector) \
+        StaticVectorMatrixMultiply(Matrix, Vector)
 
-#define VectorMatrixTransposedMultiply(Matrix, Vector, Product) \
-        StaticVectorMatrixTransposedMultiply(Matrix, Vector, Product)
+#define VectorMatrixTransposedMultiply(Matrix, Vector) \
+        StaticVectorMatrixTransposedMultiply(Matrix, Vector)
+
+#define VectorMatrixInverseMultiply(Matrix, Vector) \
+        StaticVectorMatrixInverseMultiply(Matrix, Vector)
+
+#define VectorMatrixInverseTransposedMultiply(Matrix, Vector) \
+        StaticVectorMatrixInverseTransposedMultiply(Matrix, Vector)
+
 #endif
 
 SFORCEINLINE
-VOID
-VectorInitialize(
-    _Out_ PVECTOR3 Vector,
-    _In_ FLOAT X, 
-    _In_ FLOAT Y, 
-    _In_ FLOAT Z
-    )
-{
-    ASSERT(Vector != NULL);
-
-    ASSERT(IsNormalFloat(X) != FALSE);
-    ASSERT(IsFiniteFloat(X) != FALSE);
-    ASSERT(IsNormalFloat(Y) != FALSE);
-    ASSERT(IsFiniteFloat(Y) != FALSE);
-    ASSERT(IsNormalFloat(Z) != FALSE);
-    ASSERT(IsFiniteFloat(Z) != FALSE);
-
-    Vector->X = X;
-    Vector->Y = Y;
-    Vector->Z = Z;
-}
-
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS
+VECTOR3
 VectorMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     )
 {
+    VECTOR3 Product;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    if (Matrix == NULL ||
-        Product == NULL)
+    if (Matrix == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return Vector;
     }
 
     X = Matrix->M[0][0] * Vector.X + 
@@ -79,28 +61,26 @@ VectorMatrixMultiply(
         Matrix->M[2][1] * Vector.Y + 
         Matrix->M[2][2] * Vector.Z;
 
-    VectorInitialize(Product, X, Y, Z);
+    Product = VectorCreate(X, Y, Z);
 
-    return ISTATUS_SUCCESS;
+    return Product;
 }
 
-_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-ISTATUS
+VECTOR3
 VectorMatrixTransposedMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     )
 {
+    VECTOR3 Product;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    if (Matrix == NULL ||
-        Product == NULL)
+    if (Matrix == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return Vector;
     }
 
     X = Matrix->M[0][0] * Vector.X + 
@@ -115,14 +95,54 @@ VectorMatrixTransposedMultiply(
         Matrix->M[1][2] * Vector.Y + 
         Matrix->M[2][2] * Vector.Z;
 
-    VectorInitialize(Product, X, Y, Z);
+    Product = VectorCreate(X, Y, Z);
 
-    return ISTATUS_SUCCESS;
+    return Product;
+}
+
+SFORCEINLINE
+VECTOR3
+VectorMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
+
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    Product = VectorMatrixMultiply(Matrix->Inverse, Vector);
+
+    return Product;
+}
+
+SFORCEINLINE
+VECTOR3
+VectorMatrixInverseTransposedMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
+
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    Product = VectorMatrixTransposedMultiply(Matrix->Inverse, Vector);
+
+    return Product;
 }
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
 #undef VectorMatrixMultiply
 #undef VectorMatrixTransposedMultiply
+#undef VectorMatrixInverseMultiply
+#undef VectorMatrixInverseTransposedMultiply
 #endif
 
 #endif // _VECTOR_IRIS_INTERNAL_

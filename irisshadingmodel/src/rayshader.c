@@ -116,11 +116,11 @@ RayShaderAllocateInternal(
         NextRayShader = NULL;
     }
 
-    VectorInitialize(&TemporaryDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
-    PointInitialize(&TemporaryOrigin, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    RayInitialize(&TemporaryRay, &TemporaryOrigin, &TemporaryDirection);
+    TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+    TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    RayTracer = RayTracerAllocate(&TemporaryRay);
+    RayTracer = RayTracerAllocate(TemporaryRay);
 
     if (RayTracer == NULL)
     {
@@ -341,13 +341,11 @@ RayShaderTraceRayMontecarlo(
         }
     }
 
-    VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
-    NormalizedWorldRay.Origin = WorldRay->Origin;
-    NormalizedWorldRay.Time = WorldRay->Time;
+    NormalizedWorldRay = RayNormalize(*WorldRay);
 
     RayTracer = RayShader->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, &NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

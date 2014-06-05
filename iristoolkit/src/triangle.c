@@ -116,10 +116,10 @@ TriangleTraceTriangle(
 
     Triangle = (PCTRIANGLE) Context;
 
-    PointSubtract(&Ray->Origin, &Triangle->Vertex0, &Temp);
+    Temp = PointSubtract(Ray->Origin, Triangle->Vertex0);
 
-    DotProduct = VectorDotProduct(&Ray->Direction, &Triangle->SurfaceNormal);
-    Distance = VectorDotProduct(&Temp, &Triangle->SurfaceNormal) / -DotProduct;
+    DotProduct = VectorDotProduct(Ray->Direction, Triangle->SurfaceNormal);
+    Distance = VectorDotProduct(Temp, Triangle->SurfaceNormal) / -DotProduct;
 
     if (IsNormalFloat(Distance) == FALSE ||
         IsFiniteFloat(Distance) == FALSE)
@@ -138,8 +138,8 @@ TriangleTraceTriangle(
 
 #endif // !defined(ENABLE_CSG_SUPPORT)
 
-    RayEndpoint(Ray, Distance, &Hit);
-    PointSubtract(&Hit, &Triangle->Vertex0, &P);
+    Hit = RayEndpoint(Ray, Distance);
+    P = PointSubtract(Hit, Triangle->Vertex0);
 
     switch (Triangle->DominantAxis)
     {
@@ -252,12 +252,12 @@ TriangleAllocateInternal(
         return NULL;
     }
 
-    PointSubtract(Vertex1, Vertex0, &B);
-    PointSubtract(Vertex2, Vertex0, &C);
+    B = PointSubtract(*Vertex1, *Vertex0);
+    C = PointSubtract(*Vertex2, *Vertex0);
 
-    VectorCrossProduct(&C, &B, &CrossProduct);
+    CrossProduct = VectorCrossProduct(C, B);
 
-    CrossProductLength = VectorLength(&CrossProduct);
+    CrossProductLength = VectorLength(CrossProduct);
 
     if (CrossProductLength <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
@@ -277,8 +277,8 @@ TriangleAllocateInternal(
     Triangle->B = B;
     Triangle->C = C;
 
-    VectorNormalize(&CrossProduct, &Triangle->SurfaceNormal);
-    Triangle->DominantAxis = VectorDominantAxis(&Triangle->SurfaceNormal);
+    Triangle->SurfaceNormal = VectorNormalize(CrossProduct, NULL);
+    Triangle->DominantAxis = VectorDominantAxis(Triangle->SurfaceNormal);
 
     if (FrontFaceSurfaceNormal != NULL)
     {
@@ -373,7 +373,7 @@ FlatTriangleAllocate(
 
     if (BackTexture != NULL)
     {
-        VectorNegate(&FrontSurfaceNormal, &FrontSurfaceNormal);
+        FrontSurfaceNormal = VectorNegate(FrontSurfaceNormal);
 
         AllocatedBackNormal = ConstantNormalAllocate(&FrontSurfaceNormal,
                                                      FALSE);

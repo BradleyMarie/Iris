@@ -35,7 +35,7 @@ typedef CONST RAY *PCRAY;
 
 SFORCEINLINE
 RAY
-RayInitialize(
+RayCreate(
     _In_ POINT3 Origin,
     _In_ VECTOR3 Direction
     )
@@ -47,6 +47,40 @@ RayInitialize(
     Ray.Time = (FLOAT) 0.0;
 
     return Ray;
+}
+
+SFORCEINLINE
+POINT3
+RayEndpoint(
+    _In_ RAY Ray,
+    _In_ FLOAT Distance
+    )
+{
+    POINT3 Endpoint;
+
+    ASSERT(IsNormalFloat(Distance));
+    ASSERT(IsFiniteFloat(Distance));
+
+    Endpoint = PointVectorAddScaled(Ray.Origin,
+                                    Ray.Direction,
+                                    Distance);
+
+    return Endpoint;
+}
+
+SFORCEINLINE
+RAY
+RayNormalize(
+    _In_ RAY Ray
+    )
+{
+    VECTOR3 NormalizedDirection;
+    RAY NormalizedRay;
+
+    NormalizedDirection = VectorNormalize(Ray.Direction, NULL);
+    NormalizedRay = RayCreate(Ray.Origin, Ray.Direction);
+
+    return NormalizedRay;
 }
 
 SFORCEINLINE

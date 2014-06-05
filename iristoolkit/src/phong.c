@@ -276,8 +276,8 @@ DirectionalPhongLightShade(
         return Status;
     }
 
-    DiffuseCoefficient = VectorDotProduct(&DirectionalPhongLight->WorldDirectionToLight,
-                                          &NormalizedWorldSurfaceNormal);
+    DiffuseCoefficient = VectorDotProduct(DirectionalPhongLight->WorldDirectionToLight,
+                                          NormalizedWorldSurfaceNormal);
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
@@ -291,18 +291,17 @@ DirectionalPhongLightShade(
                         LightColor);
     }
 
-    VectorNegate(WorldViewer, &NegatedViewer);
+    NegatedViewer = VectorNegate(*WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
     //
 
-    VectorHalfAngle(&NegatedViewer,
-                    &DirectionalPhongLight->WorldDirectionToLight,
-                    &ViewerToLightHalfAngle);
+    ViewerToLightHalfAngle = VectorHalfAngle(NegatedViewer,
+                                             DirectionalPhongLight->WorldDirectionToLight);
 
-    SpecularCoefficient = VectorDotProduct(&ViewerToLightHalfAngle,
-                                           &NormalizedWorldSurfaceNormal);
+    SpecularCoefficient = VectorDotProduct(ViewerToLightHalfAngle,
+                                           NormalizedWorldSurfaceNormal);
 
     if (SpecularCoefficient > (FLOAT) 0.0)
     {
@@ -372,13 +371,11 @@ PointPhongLightShade(
                        &PointPhongLight->Ambient,
                        LightColor);
 
-    PointSubtract(&PointPhongLight->WorldLocation,
-                  WorldHitPoint,
-                  &NormalizedWorldToLight);
+    NormalizedWorldToLight = PointSubtract(PointPhongLight->WorldLocation,
+                                           *WorldHitPoint);
 
-    VectorNormalizeWithLength(&NormalizedWorldToLight,
-                              &DistanceToLight,
-                              &NormalizedWorldToLight);
+    NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             &DistanceToLight);
 
     if (PointPhongLight->CastsShadows != FALSE)
     {
@@ -406,8 +403,8 @@ PointPhongLightShade(
         return Status;
     }
 
-    DiffuseCoefficient = VectorDotProduct(&NormalizedWorldToLight,
-                                          &NormalizedWorldSurfaceNormal);
+    DiffuseCoefficient = VectorDotProduct(NormalizedWorldToLight,
+                                          NormalizedWorldSurfaceNormal);
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
@@ -421,18 +418,17 @@ PointPhongLightShade(
                         LightColor);
     }
 
-    VectorNegate(WorldViewer, &NegatedViewer);
+    NegatedViewer = VectorNegate(*WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
     //
 
-    VectorHalfAngle(&NegatedViewer,
-                    &NormalizedWorldToLight,
-                    &ViewerToLightHalfAngle);
+    ViewerToLightHalfAngle = VectorHalfAngle(NegatedViewer,
+                                             NormalizedWorldToLight);
 
-    SpecularCoefficient = VectorDotProduct(&ViewerToLightHalfAngle,
-                                           &NormalizedWorldSurfaceNormal);
+    SpecularCoefficient = VectorDotProduct(ViewerToLightHalfAngle,
+                                           NormalizedWorldSurfaceNormal);
 
     if (SpecularCoefficient > (FLOAT) 0.0)
     {
@@ -503,13 +499,11 @@ AttenuatedPointPhongLightShade(
                        &AttenuatedPointPhongLight->Ambient,
                        LightColor);
 
-    PointSubtract(&AttenuatedPointPhongLight->WorldLocation,
-                  WorldHitPoint,
-                  &NormalizedWorldToLight);
+    NormalizedWorldToLight = PointSubtract(AttenuatedPointPhongLight->WorldLocation,
+                                           *WorldHitPoint);
 
-    VectorNormalizeWithLength(&NormalizedWorldToLight,
-                              &DistanceToLight,
-                              &NormalizedWorldToLight);
+    NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             &DistanceToLight);
 
     if (AttenuatedPointPhongLight->CastsShadows != FALSE)
     {
@@ -537,8 +531,8 @@ AttenuatedPointPhongLightShade(
         return Status;
     }
 
-    DiffuseCoefficient = VectorDotProduct(&NormalizedWorldToLight,
-                                          &NormalizedWorldSurfaceNormal);
+    DiffuseCoefficient = VectorDotProduct(NormalizedWorldToLight,
+                                          NormalizedWorldSurfaceNormal);
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
@@ -552,18 +546,17 @@ AttenuatedPointPhongLightShade(
                         LightColor);
     }
 
-    VectorNegate(WorldViewer, &NegatedViewer);
+    NegatedViewer = VectorNegate(*WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
     //
 
-    VectorHalfAngle(&NegatedViewer,
-                    &NormalizedWorldToLight,
-                    &ViewerToLightHalfAngle);
+    ViewerToLightHalfAngle = VectorHalfAngle(NegatedViewer,
+                                             NormalizedWorldToLight);
 
-    SpecularCoefficient = VectorDotProduct(&ViewerToLightHalfAngle,
-                                           &NormalizedWorldSurfaceNormal);
+    SpecularCoefficient = VectorDotProduct(ViewerToLightHalfAngle,
+                                           NormalizedWorldSurfaceNormal);
 
     if (SpecularCoefficient > (FLOAT) 0.0)
     {
@@ -639,25 +632,22 @@ PointPhongSpotLightShade(
 
     PointPhongSpotLight = (PCPOINT_PHONG_SPOT_LIGHT) Context;
 
-    PointSubtract(&PointPhongSpotLight->WorldLocation,
-                  WorldHitPoint,
-                  &NormalizedWorldToLight);
+    NormalizedWorldToLight = PointSubtract(PointPhongSpotLight->WorldLocation,
+                                           *WorldHitPoint);
 
-    VectorNormalizeWithLength(&NormalizedWorldToLight,
-                              &DistanceToLight,
-                              &NormalizedWorldToLight);
+    NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             &DistanceToLight);
 
     if (PointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
     {
-        VectorNegate(&NormalizedWorldToLight,
-                     &NormalizedWorldFromLight);
+        NormalizedWorldFromLight = VectorNegate(NormalizedWorldToLight);
 
         //
         // WorldSpotLightDirection should already be normalized.
         //
 
-        SpotlightCoefficient = VectorDotProduct(&PointPhongSpotLight->WorldSpotLightDirection,
-                                                &NormalizedWorldFromLight);
+        SpotlightCoefficient = VectorDotProduct(PointPhongSpotLight->WorldSpotLightDirection,
+                                                NormalizedWorldFromLight);
 
         if (SpotlightCoefficient >= PointPhongSpotLight->SpotLightCutoff)
         {
@@ -705,8 +695,8 @@ PointPhongSpotLightShade(
         return Status;
     }
 
-    DiffuseCoefficient = VectorDotProduct(&NormalizedWorldToLight,
-                                          &NormalizedWorldSurfaceNormal);
+    DiffuseCoefficient = VectorDotProduct(NormalizedWorldToLight,
+                                          NormalizedWorldSurfaceNormal);
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
@@ -720,18 +710,17 @@ PointPhongSpotLightShade(
                         LightColor);
     }
 
-    VectorNegate(WorldViewer, &NegatedViewer);
+    NegatedViewer = VectorNegate(*WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
     //
 
-    VectorHalfAngle(&NegatedViewer,
-                    &NormalizedWorldToLight,
-                    &ViewerToLightHalfAngle);
+    ViewerToLightHalfAngle = VectorHalfAngle(NegatedViewer,
+                                             NormalizedWorldToLight);
 
-    SpecularCoefficient = VectorDotProduct(&ViewerToLightHalfAngle,
-                                           &NormalizedWorldSurfaceNormal);
+    SpecularCoefficient = VectorDotProduct(ViewerToLightHalfAngle,
+                                           NormalizedWorldSurfaceNormal);
 
     if (SpecularCoefficient > (FLOAT) 0.0)
     {
@@ -802,25 +791,23 @@ AttenuatedPointPhongSpotLightShade(
 
     AttenuatedPointPhongSpotLight = (PCATTENUATED_POINT_PHONG_SPOT_LIGHT) Context;
 
-    PointSubtract(&AttenuatedPointPhongSpotLight->WorldLocation,
-                  WorldHitPoint,
-                  &NormalizedWorldToLight);
+    NormalizedWorldToLight = PointSubtract(AttenuatedPointPhongSpotLight->WorldLocation,
+                                           *WorldHitPoint);
 
-    VectorNormalizeWithLength(&NormalizedWorldToLight,
-                              &DistanceToLight,
-                              &NormalizedWorldToLight);
+    NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             &DistanceToLight);
 
     if (AttenuatedPointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
     {
-        VectorNegate(&NormalizedWorldToLight,
-                     &NormalizedWorldFromLight);
+        VectorNegate(NormalizedWorldToLight,
+                     NormalizedWorldFromLight);
 
         //
         // WorldSpotLightDirection should already be normalized.
         //
 
-        SpotlightCoefficient = VectorDotProduct(&AttenuatedPointPhongSpotLight->WorldSpotLightDirection,
-                                                &NormalizedWorldFromLight);
+        SpotlightCoefficient = VectorDotProduct(AttenuatedPointPhongSpotLight->WorldSpotLightDirection,
+                                                NormalizedWorldFromLight);
 
         if (SpotlightCoefficient >= AttenuatedPointPhongSpotLight->SpotLightCutoff)
         {
@@ -868,8 +855,8 @@ AttenuatedPointPhongSpotLightShade(
         return Status;
     }
 
-    DiffuseCoefficient = VectorDotProduct(&NormalizedWorldToLight,
-                                          &NormalizedWorldSurfaceNormal);
+    DiffuseCoefficient = VectorDotProduct(NormalizedWorldToLight,
+                                          NormalizedWorldSurfaceNormal);
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
@@ -883,18 +870,17 @@ AttenuatedPointPhongSpotLightShade(
                         LightColor);
     }
 
-    VectorNegate(WorldViewer, &NegatedViewer);
+    NegatedViewer = VectorNegate(*WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
     //
 
-    VectorHalfAngle(&NegatedViewer,
-                    &NormalizedWorldToLight,
-                    &ViewerToLightHalfAngle);
+    ViewerToLightHalfAngle = VectorHalfAngle(NegatedViewer,
+                                             NormalizedWorldToLight);
 
-    SpecularCoefficient = VectorDotProduct(&ViewerToLightHalfAngle,
-                                           &NormalizedWorldSurfaceNormal);
+    SpecularCoefficient = VectorDotProduct(ViewerToLightHalfAngle,
+                                           NormalizedWorldSurfaceNormal);
 
     if (SpecularCoefficient > (FLOAT) 0.0)
     {
@@ -1031,8 +1017,7 @@ DirectionalPhongLightAllocate(
     PhongLight->Specular = *Specular;
     PhongLight->CastsShadows = CastsShadows;
 
-    VectorNormalize(WorldDirectionToLight,
-                    &PhongLight->WorldDirectionToLight);
+    PhongLight->WorldDirectionToLight = VectorNormalize(*WorldDirectionToLight, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1158,8 +1143,7 @@ PointPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    VectorNormalize(WorldSpotLightDirection,
-                    &PhongLight->WorldSpotLightDirection);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(*WorldSpotLightDirection, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1217,8 +1201,7 @@ AttenuatedPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    VectorNormalize(WorldSpotLightDirection,
-                    &PhongLight->WorldSpotLightDirection);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(*WorldSpotLightDirection, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }

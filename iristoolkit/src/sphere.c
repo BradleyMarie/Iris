@@ -120,15 +120,15 @@ SphereTraceSphere(
 
     Sphere = (PCSPHERE) Context;
 
-    PointSubtract(&Ray->Origin, &Sphere->Center, &CenterToRayOrigin);
+    CenterToRayOrigin = PointSubtract(Ray->Origin, Sphere->Center);
 
-    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(&Ray->Direction,
-                                                             &CenterToRayOrigin);
+    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(Ray->Direction,
+                                                             CenterToRayOrigin);
 
-    LengthOfRaySquared = VectorDotProduct(&Ray->Direction, &Ray->Direction);
+    LengthOfRaySquared = VectorDotProduct(Ray->Direction, Ray->Direction);
 
-    LengthSquaredCenterToOrigin = VectorDotProduct(&CenterToRayOrigin, 
-                                                   &CenterToRayOrigin);
+    LengthSquaredCenterToOrigin = VectorDotProduct(CenterToRayOrigin, 
+                                                   CenterToRayOrigin);
 
     Discriminant = ScalarProjectionOriginToCenterOntoRay * 
                    ScalarProjectionOriginToCenterOntoRay -

@@ -77,9 +77,8 @@ GeometryTraceGeometry(
         GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = FALSE;
 
-        RayMatrixMultiply(Geometry->ModelToWorld->Inverse,
-                          WorldRay,
-                          &GeometryHit->ModelRay);
+        GeometryHit->ModelRay = RayMatrixInverseMultiply(Geometry->ModelToWorld,
+                                                         WorldRay);
 
         TraceRay = &GeometryHit->ModelRay;
     }

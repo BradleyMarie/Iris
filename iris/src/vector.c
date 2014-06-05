@@ -15,24 +15,38 @@ Abstract:
 #define _IRIS_EXPORT_VECTOR_ROUTINES_
 #include <irisp.h>
 
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
+VECTOR3
 VectorMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     )
 {
-    return StaticVectorMatrixMultiply(Matrix, Vector, Product);
+    return StaticVectorMatrixMultiply(Matrix, Vector);
 }
 
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
+VECTOR3
 VectorMatrixTransposedMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector,
-    _Out_ PVECTOR3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
     )
 {
-    return StaticVectorMatrixTransposedMultiply(Matrix, Vector, Product);
+    return StaticVectorMatrixTransposedMultiply(Matrix, Vector);
+}
+
+VECTOR3
+VectorMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    return StaticVectorMatrixInverseMultiply(Matrix, Vector);
+}
+
+VECTOR3
+VectorMatrixInverseTransposedMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    return StaticVectorMatrixInverseTransposedMultiply(Matrix, Vector);
 }

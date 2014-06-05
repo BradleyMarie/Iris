@@ -45,11 +45,11 @@ VisibilityTesterAllocate(
         return NULL;
     }
 
-    VectorInitialize(&TemporaryDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
-    PointInitialize(&TemporaryOrigin, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    RayInitialize(&TemporaryRay, &TemporaryOrigin, &TemporaryDirection);
+    TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+    TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    RayTracer = RayTracerAllocate(&TemporaryRay);
+    RayTracer = RayTracerAllocate(TemporaryRay);
 
     if (RayTracer == NULL)
     {
@@ -85,12 +85,11 @@ VisibilityTesterTestVisibility(
     ASSERT(IsFiniteFloat(DistanceToObject));
     ASSERT((FLOAT) 0.0 <= DistanceToObject);
 
-    VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
-    NormalizedWorldRay.Origin = WorldRay->Origin;
+    NormalizedWorldRay = RayNormalize(*WorldRay);
 
     RayTracer = Tester->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, &NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -152,12 +151,11 @@ VisibilityTesterTestVisibilityAnyDistance(
     ASSERT(Tester != NULL);
     ASSERT(WorldRay != NULL);
 
-    VectorNormalize(&WorldRay->Direction, &NormalizedWorldRay.Direction);
-    NormalizedWorldRay.Origin = WorldRay->Origin;
+    NormalizedWorldRay = RayNormalize(*WorldRay);
 
     RayTracer = Tester->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, &NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

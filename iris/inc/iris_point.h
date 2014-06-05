@@ -186,13 +186,18 @@ PointValidate(
 
 #ifndef _DISABLE_IRIS_POINT_EXPORTS_
 
-_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-ISTATUS
+POINT3
 PointMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ POINT3 Point,
-    _Out_ PPOINT3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
+    );
+
+IRISAPI
+POINT3
+PointMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
     );
 
 #endif // _DISABLE_IRIS_POINT_EXPORTS

@@ -18,23 +18,24 @@ Abstract:
 #define _POINT_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
-#define PointMatrixMultiply(Matrix, Vector, Product) \
-        StaticPointMatrixMultiply(Matrix, Vector, Product)
+#define PointMatrixMultiply(Matrix, Vector) \
+        StaticPointMatrixMultiply(Matrix, Vector)
+
+#define PointMatrixInverseMultiply(Matrix, Vector) \
+        StaticPointMatrixInverseMultiply(Matrix, Vector)
 #endif
 
 SFORCEINLINE
-VOID
-PointInitializeScaled(
-    _Out_ PPOINT3 Point,
+POINT3
+PointCreateScaled(
     _In_ FLOAT X,
     _In_ FLOAT Y,
     _In_ FLOAT Z,
     _In_ FLOAT W
     )
 {
+    POINT3 Point;
     FLOAT Scalar;
-
-    ASSERT(Point != NULL);
 
     ASSERT(IsZeroFloat(W) == FALSE);
 
@@ -49,29 +50,29 @@ PointInitializeScaled(
 
     Scalar = (FLOAT) 1.0 / W;
 
-    Point->X = X * Scalar;
-    Point->Y = Y * Scalar;
-    Point->Z = Z * Scalar;
+    Point.X = X * Scalar;
+    Point.Y = Y * Scalar;
+    Point.Z = Z * Scalar;
+
+    return Point;
 }
 
-_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-ISTATUS
+POINT3
 PointMatrixMultiply(
-    _In_ PCMATRIX Matrix,
-    _In_ POINT3 Point,
-    _Out_ PPOINT3 Product
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
     )
 {
+    POINT3 Product;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
     FLOAT W;
 
-    if (Matrix == NULL ||
-        Product == NULL)
+    if (Matrix == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return Point;
     }
 
     X = Matrix->M[0][0] * Point.X + 
@@ -94,13 +95,33 @@ PointMatrixMultiply(
         Matrix->M[3][2] * Point.Z + 
         Matrix->M[3][3];
 
-    PointInitializeScaled(Product, X, Y, Z, W);
+    Product = PointCreateScaled(X, Y, Z, W);
 
-    return ISTATUS_SUCCESS;
+    return Product;
+}
+
+SFORCEINLINE
+POINT3
+PointMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ POINT3 Point
+    )
+{
+    POINT3 Product;
+
+    if (Matrix == NULL)
+    {
+        return Point;
+    }
+
+    Product = PointMatrixMultiply(Matrix->Inverse, Point);
+
+    return Product;
 }
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
 #undef PointMatrixMultiply
+#undef PointMatrixInverseMultiply
 #endif
 
 #endif // _POINT_IRIS_INTERNAL_
