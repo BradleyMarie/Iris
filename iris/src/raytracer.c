@@ -265,8 +265,7 @@ RayTracerGetNextGeometryHit(
 
     GeometryHitInitialize(GeometryHit,
                           RayTracer->CurrentRay,
-                          InternalShapeHit->SharedGeometryHit,
-                          &InternalShapeHit->ShapeHit);
+                          InternalShapeHit);
 
     return ISTATUS_SUCCESS;
 }

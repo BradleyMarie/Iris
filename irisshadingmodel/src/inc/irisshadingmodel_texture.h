@@ -55,7 +55,7 @@ TextureShaderInitialize(
     _In_ PCPOINT3 WorldHit,
     _In_ PCVECTOR3 ModelViewer,
     _In_ PCPOINT3 ModelHit,
-    _In_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX ModelToWorld,
     _In_ PCVOID AdditionalData,
     _In_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCOLOR4 Color
@@ -70,7 +70,6 @@ TextureShaderInitialize(
     ASSERT(WorldHit != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(ModelToWorld != NULL);
     ASSERT(Color != NULL);
 
     TextureShader->ShadeRayRoutine = ShadeRayRoutine;

@@ -69,7 +69,6 @@ PathTracerShadeHit(
     ASSERT(WorldHit != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(ModelToWorld != NULL);
     ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 
@@ -193,7 +192,6 @@ RecursiveRayTracerShadeHit(
     ASSERT(WorldHit != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(ModelToWorld != NULL);
     ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 

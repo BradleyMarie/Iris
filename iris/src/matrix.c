@@ -15,29 +15,6 @@ Abstract:
 #include <irisp.h>
 
 //
-// Static Variables
-//
-
-MATRIX IdentityMatrix = { { (FLOAT) 1.0,
-                            (FLOAT) 0.0,
-                            (FLOAT) 0.0,
-                            (FLOAT) 0.0,
-                            (FLOAT) 0.0, 
-                            (FLOAT) 1.0, 
-                            (FLOAT) 0.0, 
-                            (FLOAT) 0.0,
-                            (FLOAT) 0.0, 
-                            (FLOAT) 0.0, 
-                            (FLOAT) 1.0, 
-                            (FLOAT) 0.0,
-                            (FLOAT) 0.0, 
-                            (FLOAT) 0.0, 
-                            (FLOAT) 0.0, 
-                            (FLOAT) 1.0 },
-                            &IdentityMatrix,
-                            NULL };
-
-//
 // Static Functions
 //
 
