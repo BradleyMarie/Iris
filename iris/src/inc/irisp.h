@@ -38,6 +38,7 @@ Abstract:
 #include "iris_constpointerlist.h"
 #include "iris_dynamicallocator.h"
 #include "iris_staticallocator.h"
+#include "iris_shape.h"
 #include "iris_geometryhit.h"
 #include "iris_shapehitallocator.h"
 #include "iris_sharedgeometryhitallocator.h"

@@ -46,7 +46,7 @@ GeometryTraceGeometry(
 {
     PSHARED_GEOMETRY_HIT GeometryHit;
     ISTATUS Status;
-    PCRAY TraceRay;
+    RAY TraceRay;
 
     ASSERT(Geometry != NULL);
     ASSERT(ShapeHitAllocator != NULL);
@@ -64,13 +64,13 @@ GeometryTraceGeometry(
     if (Geometry->ModelToWorld == NULL)
     {
         GeometryHit->ModelToWorld = NULL;
-        TraceRay = &WorldRay;
+        TraceRay = WorldRay;
     }
     else if (Geometry->Premultiplied != FALSE)
     {
         GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = TRUE;
-        TraceRay = &WorldRay;
+        TraceRay = WorldRay;
     }
     else
     {
@@ -80,7 +80,7 @@ GeometryTraceGeometry(
         GeometryHit->ModelRay = RayMatrixInverseMultiply(Geometry->ModelToWorld,
                                                          WorldRay);
 
-        TraceRay = &GeometryHit->ModelRay;
+        TraceRay = GeometryHit->ModelRay;
     }
 
     Status = ShapeTraceShape(Geometry->Shape,

@@ -16,20 +16,23 @@ Abstract:
 
 _Check_return_
 _Ret_maybenull_
+SFORCEINLINE
 PSHAPE_HIT_LIST
-ShapeHitAllocatorAllocate(
+ShapeHitAllocatorAllocateInternal(
     _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSizeInBytes
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_opt_ PPOINT3 ModelHitPoint
     )
 {
     PSHAPE_HIT_ALLOCATOR_ALLOCATION ShapeHitAllocatorAllocation;
     PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
+    PINTERNAL_SHAPE_HIT InternalShapeHit;
     PSHAPE_HIT_LIST ShapeHitList;
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
@@ -54,9 +57,10 @@ ShapeHitAllocatorAllocate(
     ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
 
     ShapeHitList = &ShapeHitAllocatorAllocation->ShapeHitList;
-	ShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit.ShapeHit;
+    InternalShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit;
+    ShapeHit = &InternalShapeHit->ShapeHit;
 
-	if (AdditionalDataSizeInBytes != 0)
+    if (AdditionalDataSizeInBytes != 0)
     {
         AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
 
@@ -79,11 +83,76 @@ ShapeHitAllocatorAllocate(
     ShapeHit->Shape = Shape;
     ShapeHit->Distance = Distance;
     ShapeHit->FaceHit = FaceHit;
-	ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
+    ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
     ShapeHit->AdditionalData = Allocation;
+
+    if (ModelHitPoint != NULL)
+    {
+        InternalShapeHit->ModelHitPoint = *ModelHitPoint;
+        InternalShapeHit->ModelHitPointValid = TRUE;
+    }
+    else
+    {
+        InternalShapeHit->ModelHitPointValid = FALSE;
+    }
 
     ShapeHitList->NextShapeHit = NextShapeHit;
     ShapeHitList->ShapeHit = ShapeHit;
+
+    return ShapeHitList;
+}
+
+_Check_return_
+_Ret_maybenull_
+PSHAPE_HIT_LIST
+ShapeHitAllocatorAllocate(
+    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
+    _In_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_ PCSHAPE Shape,
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_ SIZE_T AdditionalDataSizeInBytes
+    )
+{
+    PSHAPE_HIT_LIST ShapeHitList;
+
+    ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
+                                                     NextShapeHit,
+                                                     Shape,
+                                                     Distance,
+                                                     FaceHit,
+                                                     AdditionalData,
+                                                     AdditionalDataSizeInBytes,
+                                                     NULL);
+
+    return ShapeHitList;
+}
+
+_Check_return_
+_Ret_maybenull_
+PSHAPE_HIT_LIST
+ShapeHitAllocatorAllocateWithHitPoint(
+    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
+    _In_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_ PCSHAPE Shape,
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ POINT3 HitPoint
+    )
+{
+    PSHAPE_HIT_LIST ShapeHitList;
+
+    ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
+                                                     NextShapeHit,
+                                                     Shape,
+                                                     Distance,
+                                                     FaceHit,
+                                                     AdditionalData,
+                                                     AdditionalDataSizeInBytes,
+                                                     &HitPoint);
 
     return ShapeHitList;
 }

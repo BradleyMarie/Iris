@@ -91,7 +91,7 @@ STATIC
 ISTATUS 
 SphereTraceSphere(
     _In_ PCVOID Context, 
-    _In_ PCRAY Ray,
+    _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
@@ -116,16 +116,15 @@ SphereTraceSphere(
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
     ASSERT(Context != NULL);
-    ASSERT(Ray != NULL);
 
     Sphere = (PCSPHERE) Context;
 
-    CenterToRayOrigin = PointSubtract(Ray->Origin, Sphere->Center);
+    CenterToRayOrigin = PointSubtract(Ray.Origin, Sphere->Center);
 
-    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(Ray->Direction,
+    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(Ray.Direction,
                                                              CenterToRayOrigin);
 
-    LengthOfRaySquared = VectorDotProduct(Ray->Direction, Ray->Direction);
+    LengthOfRaySquared = VectorDotProduct(Ray.Direction, Ray.Direction);
 
     LengthSquaredCenterToOrigin = VectorDotProduct(CenterToRayOrigin, 
                                                    CenterToRayOrigin);

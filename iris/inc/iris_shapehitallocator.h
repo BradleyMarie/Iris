@@ -62,4 +62,19 @@ ShapeHitAllocatorAllocate(
     _In_ SIZE_T AdditionalDataSizeInBytes
     );
 
+_Check_return_
+_Ret_maybenull_
+IRISAPI
+PSHAPE_HIT_LIST
+ShapeHitAllocatorAllocateWithHitPoint(
+    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
+    _In_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_ PCSHAPE Shape,
+    _In_ FLOAT Distance,
+    _In_ INT32 FaceHit,
+    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ POINT3 HitPoint
+    );
+
 #endif // _IRIS_SHAPE_HIT_ALLOCATOR_

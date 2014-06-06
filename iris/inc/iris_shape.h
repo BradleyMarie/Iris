@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSHAPE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
-    _In_ PCRAY Ray,
+    _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     );
@@ -41,35 +41,5 @@ typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
 struct _SHAPE {
     PCSHAPE_VTABLE VTable;
 };
-
-//
-// Function definitions
-//
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS 
-ShapeTraceShape(
-    _In_ PCSHAPE Shape, 
-    _In_ PCRAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
-    )
-{
-    ISTATUS Status;
-
-    ASSERT(Shape != NULL);
-    ASSERT(Ray != NULL);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
-
-    Status = Shape->VTable->TraceRoutine(Shape, 
-                                         Ray,
-                                         ShapeHitAllocator,
-                                         ShapeHitList);
-
-    return Status;
-}
 
 #endif // _IRIS_SHAPE_

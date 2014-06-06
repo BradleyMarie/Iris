@@ -29,6 +29,8 @@ typedef struct _SHAPE_HIT_ALLOCATOR {
 typedef struct _INTERNAL_SHAPE_HIT {
     SHAPE_HIT ShapeHit;
     PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    POINT3 ModelHitPoint;
+    BOOL ModelHitPointValid;
 } INTERNAL_SHAPE_HIT, *PINTERNAL_SHAPE_HIT;
 
 typedef CONST INTERNAL_SHAPE_HIT *PCINTERNAL_SHAPE_HIT;

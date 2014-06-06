@@ -91,7 +91,7 @@ STATIC
 ISTATUS 
 InfinitePlaneTraceInfinitePlane(
     _In_ PCVOID Context, 
-    _In_ PCRAY Ray,
+    _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
@@ -104,13 +104,12 @@ InfinitePlaneTraceInfinitePlane(
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
     ASSERT(Context != NULL);
-    ASSERT(Ray != NULL);
 
     InfinitePlane = (PCINFINITE_PLANE) Context;
 
-    Temp = PointSubtract(Ray->Origin, InfinitePlane->Vertex);
+    Temp = PointSubtract(Ray.Origin, InfinitePlane->Vertex);
 
-    DotProduct = VectorDotProduct(Ray->Direction, InfinitePlane->SurfaceNormal);
+    DotProduct = VectorDotProduct(Ray.Direction, InfinitePlane->SurfaceNormal);
     Distance = VectorDotProduct(Temp, InfinitePlane->SurfaceNormal) / -DotProduct;
 
     if (Distance < (FLOAT) 0.0)

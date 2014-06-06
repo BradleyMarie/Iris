@@ -61,7 +61,9 @@ GeometryHitInitialize(
     }
     else
     {
-        GeometryHit->ModelHitPoint = SharedGeometryHit->ModelRay.Origin;
+        GeometryHit->ModelHitPoint = RayEndpoint(SharedGeometryHit->ModelRay, 
+                                                 ShapeHit->Distance);
+
         GeometryHit->ModelViewer = SharedGeometryHit->ModelRay.Direction;
     }
 

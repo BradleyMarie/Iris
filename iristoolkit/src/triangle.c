@@ -95,7 +95,7 @@ STATIC
 ISTATUS 
 TriangleTraceTriangle(
     _In_ PCVOID Context, 
-    _In_ PCRAY Ray,
+    _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
@@ -112,13 +112,12 @@ TriangleTraceTriangle(
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
     ASSERT(Context != NULL);
-    ASSERT(Ray != NULL);
 
     Triangle = (PCTRIANGLE) Context;
 
-    Temp = PointSubtract(Ray->Origin, Triangle->Vertex0);
+    Temp = PointSubtract(Ray.Origin, Triangle->Vertex0);
 
-    DotProduct = VectorDotProduct(Ray->Direction, Triangle->SurfaceNormal);
+    DotProduct = VectorDotProduct(Ray.Direction, Triangle->SurfaceNormal);
     Distance = VectorDotProduct(Temp, Triangle->SurfaceNormal) / -DotProduct;
 
     if (IsNormalFloat(Distance) == FALSE ||
@@ -138,7 +137,7 @@ TriangleTraceTriangle(
 
 #endif // !defined(ENABLE_CSG_SUPPORT)
 
-    Hit = RayEndpoint(*Ray, Distance);
+    Hit = RayEndpoint(Ray, Distance);
     P = PointSubtract(Hit, Triangle->Vertex0);
 
     switch (Triangle->DominantAxis)
@@ -194,13 +193,14 @@ TriangleTraceTriangle(
 
     Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
 
-    *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                              NULL,
-                                              (PCSHAPE) Context,
-                                              Distance,
-                                              Face,
-                                              &BarycentricCoordinates,
-                                              sizeof(BARYCENTRIC_COORDINATES));
+    *ShapeHitList = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
+                                                          NULL,
+                                                          (PCSHAPE) Context,
+                                                          Distance,
+                                                          Face,
+                                                          &BarycentricCoordinates,
+                                                          sizeof(BARYCENTRIC_COORDINATES),
+                                                          Hit);
 
     return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
 }
