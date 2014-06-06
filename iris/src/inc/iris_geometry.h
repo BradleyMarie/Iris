@@ -23,7 +23,7 @@ Abstract:
 
 struct _GEOMETRY {
     PCSHAPE Shape;
-    PCMATRIX ModelToWorld;
+    PMATRIX ModelToWorld;
     BOOL Premultiplied;
 };
 

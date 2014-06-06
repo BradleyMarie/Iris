@@ -25,7 +25,6 @@ typedef struct _GEOMETRY_HIT {
     POINT3 ModelHitPoint;
     VECTOR3 WorldViewer;
     VECTOR3 ModelViewer;
-    PCMATRIX WorldToModel;
     PCMATRIX ModelToWorld;
 } GEOMETRY_HIT, *PGEOMETRY_HIT;
 

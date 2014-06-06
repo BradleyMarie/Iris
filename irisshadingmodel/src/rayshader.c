@@ -416,11 +416,6 @@ RayShaderTraceRayMontecarlo(
             SurfaceNormalPointer = NULL;
         }
 
-        if (GeometryHit.ModelToWorld == NULL)
-        {
-            GeometryHit.ModelToWorld = MatrixIdentityMatrix;
-        }
-
         TextureShaderInitialize(&TextureShader,
                                 RayShader->ShadeRayRoutine,
                                 RayShader->Context,

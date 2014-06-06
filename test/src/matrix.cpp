@@ -120,30 +120,6 @@ TEST(MatrixInverse)
     CHECK_EQUAL((FLOAT) 1.0, InverseContents[3][3]);
 }
 
-TEST(MatrixInitializeIdentity)
-{
-    FLOAT Contents[4][4];
-
-    MatrixReadContents(MatrixIdentityMatrix, Contents);
-
-    CHECK_EQUAL((FLOAT) 1.0, Contents[0][0]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[0][1]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[0][2]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[0][3]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[1][0]);
-    CHECK_EQUAL((FLOAT) 1.0, Contents[1][1]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[1][2]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[1][3]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[2][0]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[2][1]);
-    CHECK_EQUAL((FLOAT) 1.0, Contents[2][2]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[2][3]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[3][0]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[3][1]);
-    CHECK_EQUAL((FLOAT) 0.0, Contents[3][2]);
-    CHECK_EQUAL((FLOAT) 1.0, Contents[3][3]);
-}
-
 TEST(MatrixInitializeTranslation)
 {
     FLOAT Contents[4][4];
@@ -256,7 +232,7 @@ TEST(MatrixMultiplyWithIdentity)
                                        (FLOAT) 2.0,
                                        (FLOAT) 3.0);
 
-    Matrix = MatrixAllocateProduct(MatrixIdentityMatrix, Matrix);
+    Matrix = MatrixAllocateProduct(NULL, Matrix);
 
     MatrixReadContents(Matrix, Contents);
 

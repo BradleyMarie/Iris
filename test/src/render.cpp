@@ -119,7 +119,7 @@ TEST(RenderConstantRedModelSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, MatrixIdentityMatrix, FALSE);
+    Status = SceneAddObject(Scene, Sphere, NULL, FALSE);
 
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
@@ -188,7 +188,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, MatrixIdentityMatrix, TRUE);
+    Status = SceneAddObject(Scene, Sphere, NULL, TRUE);
 
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 

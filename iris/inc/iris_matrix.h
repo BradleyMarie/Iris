@@ -55,14 +55,6 @@ _Check_return_
 _Ret_maybenull_
 IRISAPI
 PMATRIX
-MatrixAllocateIdentity(
-    VOID
-    );
-
-_Check_return_
-_Ret_maybenull_
-IRISAPI
-PMATRIX
 MatrixAllocateTranslation(
     _In_ FLOAT X,
     _In_ FLOAT Y,
@@ -121,8 +113,8 @@ _Ret_maybenull_
 IRISAPI
 PMATRIX
 MatrixAllocateProduct(
-    _In_ PCMATRIX Multiplicand0,
-    _In_ PCMATRIX Multiplicand1
+    _In_opt_ PMATRIX Multiplicand0,
+    _In_opt_ PMATRIX Multiplicand1
     );
 
 _Check_return_
@@ -130,7 +122,7 @@ _Ret_maybenull_
 IRISAPI
 PMATRIX
 MatrixAllocateInverse(
-    _In_ PCMATRIX Matrix
+    _In_opt_ PMATRIX Matrix
     );
 
 _Check_return_
@@ -144,10 +136,14 @@ MatrixReadContents(
 
 IRISAPI
 VOID
-MatrixFree(
-    _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
+MatrixReference(
+    _In_opt_ PMATRIX Matrix
     );
 
-extern IRISAPI PCMATRIX MatrixIdentityMatrix;
+IRISAPI
+VOID
+MatrixDereference(
+    _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
+    );
 
 #endif // _MATRIX_IRIS_

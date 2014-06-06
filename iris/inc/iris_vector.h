@@ -406,7 +406,7 @@ VectorMatrixInverseMultiply(
 
 IRISAPI
 VECTOR3
-VectorMatrixTransposedInverseMultiply(
+VectorMatrixInverseTransposedMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ VECTOR3 Vector
     );

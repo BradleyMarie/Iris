@@ -51,22 +51,13 @@ GeometryHitInitialize(
     GeometryHit->WorldHitPoint = RayEndpoint(WorldRay, ShapeHit->Distance);
     GeometryHit->WorldViewer = WorldRay.Direction;
 
-    if (SharedGeometryHit->ModelToWorld == NULL)
-    {
-        GeometryHit->ModelViewer = GeometryHit->WorldViewer;
-        GeometryHit->ModelHitPoint = GeometryHit->WorldHitPoint;
-        GeometryHit->ModelToWorld = NULL;
-        GeometryHit->WorldToModel = NULL;
-        return;
-    }
-
     if (SharedGeometryHit->Premultiplied != FALSE)
     {
         GeometryHit->ModelHitPoint = PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
                                                          GeometryHit->WorldHitPoint);
 
-        GeometryHit->ModelViewer = VectorMatrixTransposedMultiply(SharedGeometryHit->ModelToWorld->Inverse,
-                                                                  GeometryHit->WorldViewer);
+        GeometryHit->ModelViewer = VectorMatrixInverseTransposedMultiply(SharedGeometryHit->ModelToWorld,
+                                                                         GeometryHit->WorldViewer);
     }
     else
     {
@@ -75,7 +66,6 @@ GeometryHitInitialize(
     }
 
     GeometryHit->ModelToWorld = SharedGeometryHit->ModelToWorld;
-    GeometryHit->WorldToModel = SharedGeometryHit->ModelToWorld->Inverse;
 }
 
 #endif // _IRIS_GEOMETRY_HIT_INTERNAL_

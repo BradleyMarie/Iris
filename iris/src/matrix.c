@@ -37,8 +37,6 @@ MATRIX IdentityMatrix = { { (FLOAT) 1.0,
                             &IdentityMatrix,
                             NULL };
 
-extern PCMATRIX MatrixIdentityMatrix = &IdentityMatrix;
-
 //
 // Static Functions
 //
@@ -358,7 +356,6 @@ MatrixpInvert(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocate(
     _In_ FLOAT M00,
@@ -480,7 +477,6 @@ MatrixAllocate(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateTranslation(
     _In_ FLOAT X,
@@ -551,7 +547,6 @@ MatrixAllocateTranslation(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateScalar(
     _In_ FLOAT X,
@@ -622,7 +617,6 @@ MatrixAllocateScalar(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixpAllocateRotation(
     _In_ FLOAT Theta,
@@ -701,7 +695,6 @@ MatrixpAllocateRotation(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateRotation(
     _In_ FLOAT Theta,
@@ -730,7 +723,6 @@ MatrixAllocateRotation(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateFrustum(
     _In_ FLOAT Left,
@@ -794,7 +786,6 @@ MatrixAllocateFrustum(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateOrothographic(
     _In_ FLOAT Left,
@@ -859,11 +850,10 @@ MatrixAllocateOrothographic(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateProduct(
-    _In_ PCMATRIX Multiplicand0,
-    _In_ PCMATRIX Multiplicand1
+    _In_opt_ PMATRIX Multiplicand0,
+    _In_opt_ PMATRIX Multiplicand1
     )
 {
     PMATRIX Matrix;
@@ -884,9 +874,21 @@ MatrixAllocateProduct(
     FLOAT M32;
     FLOAT M33;
 
-    if (Multiplicand0 == NULL || Multiplicand1 == NULL)
+    if (Multiplicand0 == NULL && Multiplicand1 == NULL)
     {
         return NULL;
+    }
+
+    if (Multiplicand0 == NULL)
+    {
+        MatrixReference(Multiplicand1);
+        return Multiplicand1;
+    }
+
+    if (Multiplicand1 == NULL)
+    {
+        MatrixReference(Multiplicand0);
+        return Multiplicand0;
     }
 
     M00 = Multiplicand0->M[0][0] * Multiplicand1->M[0][0] + 
@@ -991,10 +993,9 @@ MatrixAllocateProduct(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 PMATRIX
 MatrixAllocateInverse(
-    _In_ PCMATRIX Matrix
+    _In_opt_ PMATRIX Matrix
     )
 {
     PMATRIX Inverse;
@@ -1016,7 +1017,6 @@ MatrixAllocateInverse(
 
 _Check_return_
 _Ret_maybenull_
-IRISAPI
 ISTATUS
 MatrixReadContents(
     _In_ PCMATRIX Matrix,
@@ -1048,13 +1048,25 @@ MatrixReadContents(
     return ISTATUS_SUCCESS;
 }
 
-IRISAPI
 VOID
-MatrixFree(
+MatrixReference(
+    _In_opt_ PMATRIX Matrix
+    )
+{
+    if (Matrix == NULL)
+    {
+        return;
+    }
+
+    Matrix->InvertibleMatrix->ReferenceCount += 1;
+}
+
+VOID
+MatrixDereference(
     _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
     )
 {
-    if (Matrix == NULL || Matrix->InvertibleMatrix == NULL)
+    if (Matrix == NULL)
     {
         return;
     }

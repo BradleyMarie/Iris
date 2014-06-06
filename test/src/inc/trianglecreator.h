@@ -21,7 +21,7 @@ Abstract:
 bool
 CreateFlatQuad(
     PSCENE Scene,
-    PCMATRIX ModelToWorld,
+    PMATRIX ModelToWorld,
     BOOL Premultiplied,
     float X0,
     float Y0,

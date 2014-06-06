@@ -19,7 +19,7 @@ _Ret_maybenull_
 PGEOMETRY
 GeometryAllocate(
     _In_ PCSHAPE Shape,
-    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
 {
@@ -41,6 +41,8 @@ GeometryAllocate(
     Geometry->ModelToWorld = ModelToWorld;
     Geometry->Premultiplied = Premultiplied;
 
+    MatrixReference(ModelToWorld);
+
     return Geometry;
 }
 
@@ -49,5 +51,6 @@ GeometryFree(
     _Pre_maybenull_ _Post_invalid_ PGEOMETRY Geometry
     )
 {
+    MatrixDereference(Geometry->ModelToWorld);
     free(Geometry);
 }

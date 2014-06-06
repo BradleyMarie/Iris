@@ -29,7 +29,6 @@ Abstract:
 
 #define VectorMatrixInverseTransposedMultiply(Matrix, Vector) \
         StaticVectorMatrixInverseTransposedMultiply(Matrix, Vector)
-
 #endif
 
 SFORCEINLINE
