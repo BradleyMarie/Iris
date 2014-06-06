@@ -19,10 +19,10 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 StaticPinholeCameraRender(
-    _In_ PCPOINT3 PinholeLocation,
-    _In_ PCPOINT3 ImagePlaneStartingLocation,
-    _In_ PCVECTOR3 PixelXDimensions,
-    _In_ PCVECTOR3 PixelYDimensions,
+    _In_ POINT3 PinholeLocation,
+    _In_ POINT3 ImagePlaneStartingLocation,
+    _In_ VECTOR3 PixelXDimensions,
+    _In_ VECTOR3 PixelYDimensions,
     _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
@@ -56,10 +56,6 @@ StaticPinholeCameraRender(
     POINT3 Origin;
     RAY WorldRay;
 
-    ASSERT(PinholeLocation != NULL);
-    ASSERT(ImagePlaneStartingLocation != NULL);
-    ASSERT(PixelXDimensions != NULL);
-    ASSERT(PixelYDimensions != NULL);
     ASSERT(RowsToRender != 0);
     ASSERT(Jitter == FALSE || Rng != NULL);
     ASSERT(RayTracer != NULL);
@@ -75,31 +71,29 @@ StaticPinholeCameraRender(
 
     if (AdditionalXSamplesPerPixel != 0)
     {
-        VectorScale(PixelXDimensions,
-                    (FLOAT) 1.0 / (FLOAT) AdditionalXSamplesPerPixel,
-                    &SubpixelXDimensions);
+        SubpixelXDimensions = VectorScale(PixelXDimensions,
+                                          (FLOAT) 1.0 / (FLOAT) AdditionalXSamplesPerPixel);
     }
     else
     {
-        SubpixelXDimensions = *PixelXDimensions;
+        SubpixelXDimensions = PixelXDimensions;
     }
 
     if (AdditionalYSamplesPerPixel != 0)
     {
-        VectorScale(PixelYDimensions,
-                    (FLOAT) 1.0 / (FLOAT) AdditionalYSamplesPerPixel,
-                    &SubpixelYDimensions);
+        SubpixelYDimensions = VectorScale(PixelYDimensions,
+                                          (FLOAT) 1.0 / (FLOAT) AdditionalYSamplesPerPixel);
     }
     else
     {
-        SubpixelYDimensions = *PixelYDimensions;
+        SubpixelYDimensions = PixelYDimensions;
     }
 
     SubpixelWeight = (FLOAT) 1.0 /
                       (((FLOAT) 1.0 + (FLOAT)AdditionalXSamplesPerPixel) *
                       ((FLOAT)AdditionalYSamplesPerPixel + (FLOAT) 1.0));
 
-    RowStart = *ImagePlaneStartingLocation;
+    RowStart = ImagePlaneStartingLocation;
 
     for (FramebufferRowIndex = StartingRow;
          FramebufferRowIndex < LastRowToRender;
@@ -132,34 +126,30 @@ StaticPinholeCameraRender(
                         RandomNumber0 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
                         RandomNumber1 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
 
-                        PointVectorAddScaled(&RayOrigin,
-                                             &SubpixelXDimensions,
-                                             RandomNumber0,
-                                             &RayOrigin);
+                        RayOrigin = PointVectorAddScaled(RayOrigin,
+                                                         SubpixelXDimensions,
+                                                         RandomNumber0);
 
-                        PointVectorAddScaled(&RayOrigin,
-                                             &SubpixelYDimensions,
-                                             RandomNumber1,
-                                             &RayOrigin);
+                        RayOrigin = PointVectorAddScaled(RayOrigin,
+                                                         SubpixelYDimensions,
+                                                         RandomNumber1);
                     }
                     else
                     {
-                        PointVectorAddScaled(&RayOrigin,
-                                             &SubpixelXDimensions,
-                                             (FLOAT) 0.5,
-                                             &RayOrigin);
+                        RayOrigin = PointVectorAddScaled(RayOrigin,
+                                                         SubpixelXDimensions,
+                                                         (FLOAT) 0.5);
 
-                        PointVectorAddScaled(&RayOrigin,
-                                             &SubpixelYDimensions,
-                                             (FLOAT) 0.5,
-                                             &RayOrigin);
+                        RayOrigin = PointVectorAddScaled(RayOrigin,
+                                                         SubpixelYDimensions,
+                                                         (FLOAT) 0.5);
                     }
 
-                    PointSubtract(&RayOrigin, PinholeLocation, &Direction);
+                    Direction = PointSubtract(RayOrigin, PinholeLocation);
 
-                    VectorNormalize(&Direction, &Direction);
+                    Direction = VectorNormalize(Direction, NULL);
 
-                    RayInitialize(&WorldRay, &RayOrigin, &Direction);
+                    WorldRay = RayCreate(RayOrigin, Direction);
 
                     Status = TracerTraceRay(RayTracer,
                                             &WorldRay,
@@ -172,11 +162,11 @@ StaticPinholeCameraRender(
 
                     Color3Add(&PixelColor, &SubpixelColor, &PixelColor);
 
-                    PointVectorAdd(&SubpixelOrigin, &SubpixelXDimensions, &SubpixelOrigin);
+                    SubpixelOrigin = PointVectorAdd(SubpixelOrigin, SubpixelXDimensions);
 
                 } while (++FramebufferColumnSubpixelIndex < AdditionalXSamplesPerPixel);
 
-                PointVectorAdd(&SubpixelRowStart, &SubpixelYDimensions, &SubpixelRowStart);
+                SubpixelRowStart = PointVectorAdd(SubpixelRowStart, SubpixelYDimensions);
 
             } while (++FramebufferRowSubpixelIndex < AdditionalYSamplesPerPixel);
 
@@ -189,10 +179,10 @@ StaticPinholeCameraRender(
                                 FramebufferRowIndex,
                                 FramebufferColumnIndex);
 
-            PointVectorAdd(&Origin, PixelXDimensions, &Origin);
+            Origin = PointVectorAdd(Origin, PixelXDimensions);
         }
 
-        PointVectorAdd(&RowStart, PixelYDimensions, &RowStart);
+        RowStart = PointVectorAdd(RowStart, PixelYDimensions);
     }
 
     return ISTATUS_SUCCESS;
@@ -264,57 +254,47 @@ PinholeCameraRender(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    VectorNormalize(CameraDirection, &NormalizedCameraDirection);
+    NormalizedCameraDirection = VectorNormalize(*CameraDirection, NULL);
 
-    VectorNormalize(Up, &NormalizedUpVector);
+    NormalizedUpVector = VectorNormalize(*Up, NULL);
 
-    VectorCrossProduct(&NormalizedCameraDirection,
-                       Up,
-                       &ImagePlaneWidthVector);
+    ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, *Up);
 
-    VectorNormalize(&ImagePlaneWidthVector, &ImagePlaneWidthVector);
+    ImagePlaneWidthVector = VectorNormalize(ImagePlaneWidthVector, NULL);
 
-    VectorCrossProduct(CameraDirection,
-                       &ImagePlaneWidthVector,
-                       &ImagePlaneHeightVector);
+    ImagePlaneHeightVector = VectorCrossProduct(*CameraDirection,
+                                                ImagePlaneWidthVector);
 
-    VectorNormalize(&ImagePlaneHeightVector, &ImagePlaneHeightVector);
+    ImagePlaneHeightVector = VectorNormalize(ImagePlaneHeightVector, NULL);
 
-    VectorScale(&ImagePlaneWidthVector,
-                ImagePlaneWidth,
-                &ImagePlaneWidthVector);
+    ImagePlaneWidthVector = VectorScale(ImagePlaneWidthVector,
+                                        ImagePlaneWidth);
 
-    VectorScale(&ImagePlaneHeightVector,
-                ImagePlaneHeight,
-                &ImagePlaneHeightVector);
+    ImagePlaneHeightVector = VectorScale(ImagePlaneHeightVector,
+                                         ImagePlaneHeight);
 
-    PointVectorAddScaled(PinholeLocation,
-                         &NormalizedCameraDirection,
-                         ImagePlaneDistance,
-                         &ImagePlaneCorner);
+    ImagePlaneCorner = PointVectorAddScaled(*PinholeLocation,
+                                            NormalizedCameraDirection,
+                                            ImagePlaneDistance);
 
-    PointVectorSubtractScaled(&ImagePlaneCorner,
-                              &ImagePlaneWidthVector,
-                              (FLOAT) 0.5,
-                              &ImagePlaneCorner);
+    ImagePlaneCorner = PointVectorSubtractScaled(ImagePlaneCorner,
+                                                 ImagePlaneWidthVector,
+                                                 (FLOAT) 0.5);
 
-    PointVectorSubtractScaled(&ImagePlaneCorner,
-                              &ImagePlaneHeightVector,
-                              (FLOAT) 0.5,
-                              &ImagePlaneCorner);
+    ImagePlaneCorner = PointVectorSubtractScaled(ImagePlaneCorner,
+                                                 ImagePlaneHeightVector,
+                                                 (FLOAT) 0.5);
 
-    VectorScale(&ImagePlaneWidthVector,
-                (FLOAT) 1.0 / (FLOAT) FramebufferColumns,
-                &ImagePlaneWidthVector);
+    ImagePlaneWidthVector = VectorScale(ImagePlaneWidthVector,
+                                        (FLOAT) 1.0 / (FLOAT) FramebufferColumns);
 
-    VectorScale(&ImagePlaneHeightVector,
-                (FLOAT) 1.0 / (FLOAT) FramebufferRows,
-                &ImagePlaneHeightVector);
+    ImagePlaneHeightVector = VectorScale(ImagePlaneHeightVector,
+                                         (FLOAT) 1.0 / (FLOAT) FramebufferRows);
 
-    Status = StaticPinholeCameraRender(PinholeLocation,
-                                       &ImagePlaneCorner,
-                                       &ImagePlaneWidthVector,
-                                       &ImagePlaneHeightVector,
+    Status = StaticPinholeCameraRender(*PinholeLocation,
+                                       ImagePlaneCorner,
+                                       ImagePlaneWidthVector,
+                                       ImagePlaneHeightVector,
                                        StartingRow,
                                        RowsToRender,
                                        AdditionalXSamplesPerPixel,

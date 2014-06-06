@@ -72,7 +72,7 @@ LambertianShaderShade(
                                       Rng,
                                       &ReflectedDirection);
 
-    RayInitialize(&Reflected, WorldHitPoint, &ReflectedDirection);
+    Reflected = RayCreate(*WorldHitPoint, ReflectedDirection);
 
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          &Reflected,

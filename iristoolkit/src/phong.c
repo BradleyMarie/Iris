@@ -253,9 +253,8 @@ DirectionalPhongLightShade(
 
     if (DirectionalPhongLight->CastsShadows != FALSE)
     {
-        RayInitialize(&RayToLight, 
-                      WorldHitPoint,
-                      &DirectionalPhongLight->WorldDirectionToLight);
+        RayToLight = RayCreate(*WorldHitPoint,
+                               DirectionalPhongLight->WorldDirectionToLight);
 
         Status = VisibilityTesterTestVisibilityAnyDistance(VisibilityTester,
                                                            &RayToLight,
@@ -379,9 +378,8 @@ PointPhongLightShade(
 
     if (PointPhongLight->CastsShadows != FALSE)
     {
-        RayInitialize(&RayToLight, 
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
+        RayToLight = RayCreate(*WorldHitPoint,
+                               NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
                                                 &RayToLight,
@@ -507,9 +505,8 @@ AttenuatedPointPhongLightShade(
 
     if (AttenuatedPointPhongLight->CastsShadows != FALSE)
     {
-        RayInitialize(&RayToLight, 
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
+        RayToLight = RayCreate(*WorldHitPoint,
+                               NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
                                                 &RayToLight,
@@ -671,9 +668,8 @@ PointPhongSpotLightShade(
 
     if (PointPhongSpotLight->CastsShadows != FALSE)
     {
-        RayInitialize(&RayToLight, 
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
+        RayToLight = RayCreate(*WorldHitPoint,
+                               NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
                                                 &RayToLight,
@@ -799,8 +795,7 @@ AttenuatedPointPhongSpotLightShade(
 
     if (AttenuatedPointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
     {
-        VectorNegate(NormalizedWorldToLight,
-                     NormalizedWorldFromLight);
+        NormalizedWorldFromLight = VectorNegate(NormalizedWorldToLight);
 
         //
         // WorldSpotLightDirection should already be normalized.
@@ -831,9 +826,8 @@ AttenuatedPointPhongSpotLightShade(
 
     if (AttenuatedPointPhongSpotLight->CastsShadows != FALSE)
     {
-        RayInitialize(&RayToLight, 
-                      WorldHitPoint,
-                      &NormalizedWorldToLight);
+        RayToLight = RayCreate(*WorldHitPoint,
+                               NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
                                                 &RayToLight,

@@ -48,7 +48,7 @@ SphereNormalComputeFrontNormal(
 
     SphereNormal = (PCSPHERE_NORMAL) Context;
 
-    PointSubtract(ModelHitPoint, &SphereNormal->Center, SurfaceNormal);
+    *SurfaceNormal = PointSubtract(*ModelHitPoint, SphereNormal->Center);
 
     return ISTATUS_SUCCESS;
 }
@@ -72,7 +72,7 @@ SphereNormalComputeBackNormal(
 
     SphereNormal = (PCSPHERE_NORMAL) Context;
 
-    PointSubtract(&SphereNormal->Center, ModelHitPoint, SurfaceNormal);
+    *SurfaceNormal = PointSubtract(SphereNormal->Center, *ModelHitPoint);
 
     return ISTATUS_SUCCESS;
 }

@@ -169,7 +169,7 @@ VectorScale(
 
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(IsZeroFloat(Scalar) != FALSE);
+    ASSERT(IsZeroFloat(Scalar) == FALSE);
 
     X = Vector.X * Scalar;
     Y = Vector.Y * Scalar;

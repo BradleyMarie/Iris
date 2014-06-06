@@ -30,7 +30,7 @@ TEST(RenderConstantRedWorldSphere)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&SphereColor, 
                                    (FLOAT) 1.0, 
@@ -59,9 +59,9 @@ TEST(RenderConstantRedWorldSphere)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -99,7 +99,7 @@ TEST(RenderConstantRedModelSphere)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&SphereColor, 
                                    (FLOAT) 1.0, 
@@ -128,9 +128,9 @@ TEST(RenderConstantRedModelSphere)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -168,7 +168,7 @@ TEST(RenderConstantRedPremultipliedSphere)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&SphereColor, 
                                    (FLOAT) 1.0, 
@@ -197,9 +197,9 @@ TEST(RenderConstantRedPremultipliedSphere)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -239,9 +239,9 @@ TEST(RenderConstantRedWorldTriangle)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&TriangleVertex0, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&TriangleVertex1, (FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
-    PointInitialize(&TriangleVertex2, (FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
+    TriangleVertex0 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    TriangleVertex1 = PointCreate((FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
+    TriangleVertex2 = PointCreate((FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&TriangleColor, 
                                    (FLOAT) 1.0, 
@@ -271,9 +271,9 @@ TEST(RenderConstantRedWorldTriangle)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -318,9 +318,9 @@ TEST(RenderInterpolatedRedWorldTriangle)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&TriangleVertex0, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&TriangleVertex1, (FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
-    PointInitialize(&TriangleVertex2, (FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
+    TriangleVertex0 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    TriangleVertex1 = PointCreate((FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
+    TriangleVertex2 = PointCreate((FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&Red, 
                                    (FLOAT) 1.0, 
@@ -369,9 +369,9 @@ TEST(RenderInterpolatedRedWorldTriangle)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -415,7 +415,7 @@ TEST(RenderPhongWorldSphere)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&SphereCenter, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&DiffuseLightColor, 
                                    (FLOAT) 1.0, 
@@ -434,7 +434,7 @@ TEST(RenderPhongWorldSphere)
 
     Color3InitializeBlack(&Black);
 
-    VectorInitialize(&LightDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
+    LightDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
 
     PhongLight = DirectionalPhongLightAllocate(&LightDirection,
                                                &Black,
@@ -472,9 +472,9 @@ TEST(RenderPhongWorldSphere)
                                                                (FLOAT) 0.0005,
                                                                0);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -516,7 +516,7 @@ TEST(RenderPerfectSpecularWorldSphere)
     bool Success;
     VECTOR3 Up;
 
-    PointInitialize(&SphereCenter, (FLOAT) 1.0, (FLOAT) 0.0, (FLOAT) -1.0);
+    SphereCenter = PointCreate((FLOAT) 1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
     Color3InitializeFromComponents(&SphereColor, 
                                    (FLOAT) 1.0, 
@@ -538,7 +538,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Status = SceneAddWorldObject(Scene, Sphere);
 
-    PointInitialize(&SphereCenter2, (FLOAT) -1.0, (FLOAT) 0.0, (FLOAT) -1.0);
+    SphereCenter2 = PointCreate((FLOAT)-1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
     Color3InitializeWhite(&Reflectance);
 
@@ -564,9 +564,9 @@ TEST(RenderPerfectSpecularWorldSphere)
                                                                (FLOAT) 0.0005,
                                                                1);
 
-    PointInitialize(&PinholeLocation, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
-    VectorInitialize(&CameraDirection, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) -1.0);
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 4.0);
+    CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -632,45 +632,37 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     PTRACER RecursiveRayTracer;
     ISTATUS Status;
 
-    PointInitialize(&InfinitePlaneLocation,
-                    (FLOAT) 0.0,
-                    (FLOAT) 0.0,
-                    (FLOAT) 0.0);
+    InfinitePlaneLocation = PointCreate((FLOAT) 0.0,
+                                        (FLOAT) 0.0,
+                                        (FLOAT) 0.0);
 
-    PointInitialize(&Sphere0Center,
-                    (FLOAT) 0.0,
-                    (FLOAT) 1.0,
-                    (FLOAT) 0.0);
+    Sphere0Center = PointCreate((FLOAT) 0.0,
+                                (FLOAT) 1.0,
+                                (FLOAT) 0.0);
 
-    PointInitialize(&Sphere1Center,
-                    (FLOAT) -1.0,
-                    (FLOAT) 0.5,
-                    (FLOAT) 1.5);
+    Sphere1Center= PointCreate((FLOAT) -1.0,
+                               (FLOAT) 0.5,
+                               (FLOAT) 1.5);
 
-    PointInitialize(&Light0Location,
-                    (FLOAT) -2.0,
-                    (FLOAT) 2.5,
-                    (FLOAT) 0.0);
+    Light0Location = PointCreate((FLOAT) -2.0,
+                                 (FLOAT) 2.5,
+                                 (FLOAT) 0.0);
 
-    PointInitialize(&Light1Location,
-                    (FLOAT) 1.5,
-                    (FLOAT) 2.5,
-                    (FLOAT) 1.5);
+    Light1Location = PointCreate((FLOAT) 1.5,
+                                 (FLOAT) 2.5,
+                                 (FLOAT) 1.5);
 
-    PointInitialize(&Light2Location,
-                    (FLOAT) 1.5,
-                    (FLOAT) 2.5,
-                    (FLOAT) -1.5);
+    Light2Location = PointCreate((FLOAT) 1.5,
+                                 (FLOAT) 2.5,
+                                 (FLOAT) -1.5);
 
-    PointInitialize(&Light3Location,
-                    (FLOAT) 0.0,
-                    (FLOAT) 3.5,
-                    (FLOAT) 0.0);
+    Light3Location = PointCreate((FLOAT) 0.0,
+                                 (FLOAT) 3.5,
+                                 (FLOAT) 0.0);
 
-    VectorInitialize(&InfinitePlaneNormal,
-                     (FLOAT) 0.0,
-                     (FLOAT) 1.0,
-                     (FLOAT) 0.0);
+    InfinitePlaneNormal = VectorCreate((FLOAT) 0.0,
+                                       (FLOAT) 1.0,
+                                       (FLOAT) 0.0);
 
     Color3InitializeFromComponents(&Red,
                                    (FLOAT) 0.49,
@@ -827,13 +819,10 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                                                (FLOAT) 0.0005,
                                                                5);
 
-    VectorInitialize(&Up, (FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
-
-    PointInitialize(&PinholeLocation, (FLOAT) 3.0, (FLOAT) 2.0, (FLOAT) 4.0);
-
-    PointInitialize(&LookAt, (FLOAT) -1.0, (FLOAT) 0.45, (FLOAT) 0.0);
-
-    PointSubtract(&LookAt, &PinholeLocation, &CameraDirection);
+    Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
+    PinholeLocation = PointCreate((FLOAT) 3.0, (FLOAT) 2.0, (FLOAT) 4.0);
+    LookAt = PointCreate((FLOAT)-1.0, (FLOAT) 0.45, (FLOAT) 0.0);
+    CameraDirection = PointSubtract(LookAt, PinholeLocation);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  (FLOAT) 1.0,
@@ -1116,11 +1105,9 @@ TEST(RenderCornellBox)
                                     5,
                                     10);
 
-    VectorInitialize(&Up, 0.0f, 1.0f, 0.0f);
-
-    PointInitialize(&PinholeLocation, 278.0f, 273.0f, -500.0f);
-
-    VectorInitialize(&CameraDirection, 0.0f, 0.0f, 1.0f);
+    Up = VectorCreate(0.0f, 1.0f, 0.0f);
+    PinholeLocation = PointCreate(278.0f, 273.0f, -500.0f);
+    CameraDirection = VectorCreate(0.0f, 0.0f, 1.0f);
 
     Status = PinholeCameraRender(&PinholeLocation,
                                  500,

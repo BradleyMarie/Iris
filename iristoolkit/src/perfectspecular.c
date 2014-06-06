@@ -68,9 +68,9 @@ PerfectSpecularShaderShade(
 
     SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal, &WorldSurfaceNormal);
 
-    VectorReflect(WorldViewer, &WorldSurfaceNormal, &ReflectedDirection);
+    ReflectedDirection = VectorReflect(*WorldViewer, WorldSurfaceNormal);
 
-    RayInitialize(&Reflected, WorldHitPoint, &ReflectedDirection);
+    Reflected = RayCreate(*WorldHitPoint, ReflectedDirection);
 
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          &Reflected,

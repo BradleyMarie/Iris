@@ -38,13 +38,12 @@ Abstract:
 //
 
 SFORCEINLINE
-VOID
+VECTOR3
 IrisToolkitGenerateOrthogonalVector(
-    _In_ PCVECTOR3 NormalizedVector,
-    _Out_ PVECTOR3 OrthogonalVector
+    _In_ VECTOR3 NormalizedVector
     )
 {
-    VECTOR3 UnnormalizedOrthogonalVector;
+    VECTOR3 OrthogonalVector;
     VECTOR_AXIS ShortestAxis;
 
     ShortestAxis = VectorDiminishedAxis(NormalizedVector);
@@ -52,59 +51,62 @@ IrisToolkitGenerateOrthogonalVector(
     switch (ShortestAxis)
     {
         case VECTOR_X_AXIS:
-            VectorInitialize(&UnnormalizedOrthogonalVector,
-                             (FLOAT) 1.0, 
-                             (FLOAT) 0.0,
-                             (FLOAT) 0.0);
+            OrthogonalVector = VectorCreate((FLOAT) 1.0,
+                                            (FLOAT) 0.0,
+                                            (FLOAT) 0.0);
             break;
         case VECTOR_Y_AXIS:
-            VectorInitialize(&UnnormalizedOrthogonalVector,
-                             (FLOAT) 0.0,
-                             (FLOAT) 1.0,
-                             (FLOAT) 0.0);
+            OrthogonalVector = VectorCreate((FLOAT) 1.0,
+                                            (FLOAT) 1.0,
+                                            (FLOAT) 0.0);
             break;
         default: // VECTOR_Z_AXIS
-            VectorInitialize(&UnnormalizedOrthogonalVector,
-                             (FLOAT) 0.0,
-                             (FLOAT) 0.0,
-                             (FLOAT) 1.0);
+            OrthogonalVector = VectorCreate((FLOAT) 0.0,
+                                            (FLOAT) 0.0,
+                                            (FLOAT) 1.0);
             break;
     }
 
-    VectorCrossProduct(NormalizedVector, &UnnormalizedOrthogonalVector, &UnnormalizedOrthogonalVector);
-    VectorNormalize(&UnnormalizedOrthogonalVector, OrthogonalVector);
+    OrthogonalVector = VectorCrossProduct(NormalizedVector,
+                                          OrthogonalVector);
+
+    OrthogonalVector = VectorNormalize(OrthogonalVector, NULL);
+
+    return OrthogonalVector;
 }
 
 SFORCEINLINE
-VOID
+VECTOR3
 IrisToolkitTransformVector(
-    _In_ PCVECTOR3 NormalizedNormal,
-    _In_ PCVECTOR3 VectorToTransform,
-    _Out_ PVECTOR3 TransformedVector
+    _In_ VECTOR3 NormalizedNormal,
+    _In_ VECTOR3 VectorToTransform
     )
 {
+    VECTOR3 TransformedVector;
     VECTOR3 OrthogonalVector;
     VECTOR3 CrossProduct;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    IrisToolkitGenerateOrthogonalVector(NormalizedNormal, &OrthogonalVector);
-    VectorCrossProduct(NormalizedNormal, &OrthogonalVector, &CrossProduct);
+    OrthogonalVector = IrisToolkitGenerateOrthogonalVector(NormalizedNormal);
+    CrossProduct = VectorCrossProduct(NormalizedNormal, OrthogonalVector);
 
-    X = OrthogonalVector.X * VectorToTransform->X + 
-        CrossProduct.X * VectorToTransform->Y +
-        NormalizedNormal->X * VectorToTransform->Z;
+    X = OrthogonalVector.X * VectorToTransform.X + 
+        CrossProduct.X * VectorToTransform.Y +
+        NormalizedNormal.X * VectorToTransform.Z;
 
-    Y = OrthogonalVector.Y * VectorToTransform->X + 
-        CrossProduct.Y * VectorToTransform->Y +
-        NormalizedNormal->Y * VectorToTransform->Z;
+    Y = OrthogonalVector.Y * VectorToTransform.X + 
+        CrossProduct.Y * VectorToTransform.Y +
+        NormalizedNormal.Y * VectorToTransform.Z;
 
-    Z = OrthogonalVector.Z * VectorToTransform->X + 
-        CrossProduct.Z * VectorToTransform->Y +
-        NormalizedNormal->Z * VectorToTransform->Z;
+    Z = OrthogonalVector.Z * VectorToTransform.X + 
+        CrossProduct.Z * VectorToTransform.Y +
+        NormalizedNormal.Z * VectorToTransform.Z;
 
-    VectorInitialize(TransformedVector, X, Y, Z);
+    TransformedVector = VectorCreate(X, Y, Z);
+
+    return TransformedVector;
 }
 
 SFORCEINLINE
@@ -115,6 +117,7 @@ IrisToolkitCosineSampleHemisphere(
     _Out_ PVECTOR3 RandomVector
     )
 {
+    VECTOR3 Result;
     FLOAT RandomNumber0;
     FLOAT RandomNumber1;
     FLOAT Radius;
@@ -138,9 +141,9 @@ IrisToolkitCosineSampleHemisphere(
     Y = Radius * SineFloat(Theta);
     Z = SqrtFloat((FLOAT) 1.0 - RandomNumber0);
 
-    VectorInitialize(RandomVector, X, Y, Z);
+    Result = VectorCreate(X, Y, Z);
 
-    IrisToolkitTransformVector(NormalizedNormal, RandomVector, RandomVector);
+    *RandomVector = IrisToolkitTransformVector(*NormalizedNormal, Result);
 }
 
 #endif // _MATH_IRIS_TOOLKIT_

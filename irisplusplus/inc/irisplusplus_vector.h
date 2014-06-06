@@ -32,19 +32,18 @@ class Vector
 {
 public:
     Vector(FLOAT X, FLOAT Y, FLOAT Z)
-    {
-        VectorInitialize(&Data, X, Y, Z);
-    }
+        : Data(VectorCreate(X, Y, Z))
+    { }
 
     Vector(const VECTOR3 & IrisVector)
-    : Data(IrisVector)
+        : Data(IrisVector)
     { }
 
     Vector operator-() const
     {
         VECTOR3 Negated;
 
-        VectorNegate(&Data, &Negated);
+        Negated = VectorNegate(Data);
 
         return Vector(Negated);
     }
@@ -66,24 +65,24 @@ public:
 
     FLOAT Length() const
     {
-        return VectorLength(&Data);
+        return VectorLength(Data);
     }
 
     VectorAxis DominantAxis()
     {
-        return VectorAxis(VectorDominantAxis(&Data));
+        return VectorAxis(VectorDominantAxis(Data));
     }
 
     VectorAxis DiminishedAxis()
     {
-        return VectorAxis(VectorDiminishedAxis(&Data));
+        return VectorAxis(VectorDiminishedAxis(Data));
     }
 
     static Vector Normalize(const Vector & ToNormalize)
     {
         VECTOR3 Normalized;
 
-        VectorNormalize(&ToNormalize.Data, &Normalized);
+        VectorNormalize(ToNormalize.Data, NULL);
 
         return Vector(Normalized);
     }
@@ -93,21 +92,21 @@ public:
         VECTOR3 Normalized;
         FLOAT OldLength;
 
-        VectorNormalizeWithLength(&ToNormalize.Data, &OldLength, &Normalized);
+        Normalized = VectorNormalize(ToNormalize.Data, &OldLength);
 
         return std::make_pair(Vector(Normalized), OldLength);
     }
 
     static FLOAT DotProduct(const Vector & Operand0, const Vector & Operand1)
     {
-        return VectorDotProduct(&Operand0.Data, &Operand1.Data);
+        return VectorDotProduct(Operand0.Data, Operand1.Data);
     }
 
     static Vector CrossProduct(const Vector & Operand0, const Vector & Operand1)
     {
         VECTOR3 Product;
 
-        VectorCrossProduct(&Operand0.Data, &Operand1.Data, &Product);
+        Product = VectorCrossProduct(Operand0.Data, Operand1.Data);
 
         return Vector(Product);
     }
@@ -116,7 +115,7 @@ public:
     {
         VECTOR3 Sum;
 
-        VectorAddScaled(&Addend0.Data, &Addend1.Data, Scalar, &Sum);
+        Sum = VectorAddScaled(Addend0.Data, Addend1.Data, Scalar);
 
         return Vector(Sum);
     }
@@ -125,7 +124,7 @@ public:
     {
         VECTOR3 Reflected;
 
-        VectorReflect(&Vec.Data, &Normal.Data, &Reflected);
+        Reflected = VectorReflect(Vec.Data, Normal.Data);
 
         return Vector(Reflected);
     }
@@ -134,7 +133,7 @@ public:
     {
         VECTOR3 HalfAngle;
 
-        VectorHalfAngle(&Vector0.Data, &Vector1.Data, &HalfAngle);
+        HalfAngle = VectorHalfAngle(Vector0.Data, Vector1.Data);
 
         return Vector(HalfAngle);
     }
@@ -185,7 +184,7 @@ static inline Vector operator+(const Vector & Addend0, const Vector & Addend1)
 {
     VECTOR3 Sum;
 
-    VectorAdd(&Addend0.Data, &Addend1.Data, &Sum);
+    Sum = VectorAdd(Addend0.Data, Addend1.Data);
 
     return Vector(Sum);
 }
@@ -194,7 +193,7 @@ static inline Vector operator-(const Vector & Minuend, const Vector & Subtrahend
 {
     VECTOR3 Difference;
 
-    VectorSubtract(&Minuend.Data, &Subtrahend.Data, &Difference);
+    Difference = VectorSubtract(Minuend.Data, Subtrahend.Data);
 
     return Vector(Difference);
 }
@@ -203,7 +202,7 @@ static inline Vector operator*(const Vector & ToScale, FLOAT Scalar)
 {
     VECTOR3 Scaled;
 
-    VectorScale(&ToScale.Data, Scalar, &Scaled);
+    Scaled = VectorScale(ToScale.Data, Scalar);
 
     return Vector(Scaled);
 }

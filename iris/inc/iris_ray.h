@@ -105,4 +105,22 @@ RayValidate(
     return TRUE;
 }
 
+#ifndef _DISABLE_IRIS_RAY_EXPORTS_
+
+IRISAPI
+RAY
+RayMatrixMultiply(
+    _In_opt_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1
+    );
+
+IRISAPI
+RAY
+RayMatrixInverseMultiply(
+    _In_opt_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1
+    );
+
+#endif // _DISABLE_IRIS_RAY_EXPORTS_
+
 #endif // _RAY_IRIS_

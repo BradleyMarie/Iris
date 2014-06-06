@@ -98,7 +98,7 @@ ConstantNormalAllocate(
     if (Normalize != FALSE)
     {
         ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalPrenormalizedHeader;
-        VectorNormalize(Normal, &ConstantNormal->Normal);
+        ConstantNormal->Normal = VectorNormalize(*Normal, NULL);
     }
     else
     {

@@ -46,10 +46,10 @@ CreateFlatQuad(
     POINT3 P2;
     POINT3 P3;
 
-    PointInitialize(&P0, X0, Y0, Z0);
-    PointInitialize(&P1, X1, Y1, Z1);
-    PointInitialize(&P2, X2, Y2, Z2);
-    PointInitialize(&P3, X3, Y3, Z3);
+    P0 = PointCreate(X0, Y0, Z0);
+    P1 = PointCreate(X1, Y1, Z1);
+    P2 = PointCreate(X2, Y2, Z2);
+    P3 = PointCreate(X3, Y3, Z3);
 
     Triangle0 = FlatTriangleAllocate(&P0,
                                      &P1,

@@ -138,7 +138,7 @@ TriangleTraceTriangle(
 
 #endif // !defined(ENABLE_CSG_SUPPORT)
 
-    Hit = RayEndpoint(Ray, Distance);
+    Hit = RayEndpoint(*Ray, Distance);
     P = PointSubtract(Hit, Triangle->Vertex0);
 
     switch (Triangle->DominantAxis)

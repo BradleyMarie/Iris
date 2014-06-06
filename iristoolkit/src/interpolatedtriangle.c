@@ -350,7 +350,7 @@ InterpolatedTriangleNormalComputeNormal(
     InterpolatedTriangleNormal = (PCINTERPOLATED_TRIANGLE_NORMAL) Context;
     BarycentricCoordinates = (PCBARYCENTRIC_COORDINATES) AdditionalData;
 
-    VectorInitialize(SurfaceNormal, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    *SurfaceNormal = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
     for (Index = 0; Index < IRIS_TOOLKIT_TRIANGLE_VERTICES; Index++)
     {
@@ -367,10 +367,9 @@ InterpolatedTriangleNormalComputeNormal(
             return Status;
         }
 
-        VectorAddScaled(SurfaceNormal,
-                        &ComponentNormal,
-                        BarycentricCoordinates->Coordinates[Index],
-                        SurfaceNormal);
+        *SurfaceNormal = VectorAddScaled(*SurfaceNormal,
+                                         ComponentNormal,
+                                         BarycentricCoordinates->Coordinates[Index]);
     }
 
     return ISTATUS_SUCCESS;

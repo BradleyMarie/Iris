@@ -17,6 +17,14 @@ Abstract:
 #ifndef _RAY_IRIS_INTERNAL_
 #define _RAY_IRIS_INTERNAL_
 
+#ifdef _IRIS_EXPORT_RAY_ROUTINES_
+#define RayMatrixMultiply(Matrix, Vector) \
+        StaticRayMatrixMultiply(Matrix, Vector)
+
+#define RayMatrixInverseMultiply(Matrix, Vector) \
+        StaticRayMatrixInverseMultiply(Matrix, Vector)
+#endif
+
 SFORCEINLINE
 RAY
 RayMatrixMultiply(
@@ -62,5 +70,10 @@ RayMatrixInverseMultiply(
 
     return Product;
 }
+
+#ifdef _IRIS_EXPORT_RAY_ROUTINES_
+#undef RayMatrixMultiply
+#undef RayMatrixInverseMultiply
+#endif
 
 #endif // _RAY_IRIS_INTERNAL_

@@ -18,26 +18,11 @@ TEST(PointInitialize)
 {
     POINT3 Point1, Point2;
 
-    PointInitialize(&Point1, (FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
+    Point1 = PointCreate((FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
 
     Point2.X = (FLOAT) 1.0;
     Point2.Y = (FLOAT) 2.0;
     Point2.Z = (FLOAT) 3.0;
-
-    CHECK_EQUAL(Point2, Point1);
-}
-
-TEST(PointInitializeScaled)
-{
-    POINT3 Point1, Point2;
-
-    PointInitializeScaled(&Point1,
-                          (FLOAT) 1.0,
-                          (FLOAT) 2.0,
-                          (FLOAT) 3.0,
-                          (FLOAT) 2.0);
-
-    PointInitialize(&Point2, (FLOAT) 0.5, (FLOAT) 1.0, (FLOAT) 1.5);
 
     CHECK_EQUAL(Point2, Point1);
 }
@@ -47,11 +32,11 @@ TEST(PointSubtract)
     POINT3 Point1, Point2;
     VECTOR3 Vector1, Vector2;
 
-    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&Point2, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
-    PointSubtract(&Point2, &Point1, &Vector1);
+    Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Point2 = PointCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Vector1 = PointSubtract(Point2, Point1);
 
-    VectorInitialize(&Vector2, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Vector2 = VectorCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     CHECK_EQUAL(Vector2, Vector1);
 }
@@ -61,11 +46,11 @@ TEST(PointVectorSubtract)
     POINT3 Point1, Point2;
     VECTOR3 Vector;
 
-    PointInitialize(&Point1, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
-    PointInitialize(&Point2, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    VectorInitialize(&Vector, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Point1 = PointCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Point2 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Vector = VectorCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
-    PointVectorSubtract(&Point1, &Vector, &Point1);
+    Point1 = PointVectorSubtract(Point1, Vector);
 
     CHECK_EQUAL(Point2, Point1);
 }
@@ -75,11 +60,11 @@ TEST(PointVectorAdd)
     POINT3 Point1, Point2;
     VECTOR3 Vector;
 
-    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&Point2, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
-    VectorInitialize(&Vector, (FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Point2 = PointCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
+    Vector = VectorCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
-    PointVectorAdd(&Point1, &Vector, &Point1);
+    Point1 = PointVectorAdd(Point1, Vector);
 
     CHECK_EQUAL(Point2, Point1);
 }
@@ -89,11 +74,11 @@ TEST(PointVectorAddScaled)
     POINT3 Point1, Point2;
     VECTOR3 Vector;
 
-    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&Point2, (FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
-    VectorInitialize(&Vector, (FLOAT) 4.0, (FLOAT) 4.0, (FLOAT) 4.0);
+    Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Point2 = PointCreate((FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
+    Vector = VectorCreate((FLOAT) 4.0, (FLOAT) 4.0, (FLOAT) 4.0);
 
-    PointVectorAddScaled(&Point1, &Vector, (FLOAT) 0.5, &Point1);
+    Point1 = PointVectorAddScaled(Point1, Vector, (FLOAT) 0.5);
 
     CHECK_EQUAL(Point2, Point1);
 }
@@ -103,11 +88,11 @@ TEST(PointVectorSubtractScaled)
     POINT3 Point1, Point2;
     VECTOR3 Vector;
 
-    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&Point2, (FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
-    VectorInitialize(&Vector, (FLOAT) -4.0, (FLOAT) -4.0, (FLOAT) -4.0);
+    Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Point2 = PointCreate((FLOAT) 2.0, (FLOAT) 2.0, (FLOAT) 2.0);
+    Vector = VectorCreate((FLOAT)-4.0, (FLOAT)-4.0, (FLOAT)-4.0);
 
-    PointVectorSubtractScaled(&Point1, &Vector, (FLOAT) 0.5, &Point1);
+    Point1 = PointVectorSubtractScaled(Point1, Vector, (FLOAT) 0.5);
 
     CHECK_EQUAL(Point2, Point1);
 }
@@ -121,10 +106,10 @@ TEST(PointMatrixMultiply)
                                        (FLOAT) 2.0, 
                                        (FLOAT) 3.0);
 
-    PointInitialize(&Point1, (FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    PointInitialize(&Point2, (FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
+    Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
+    Point2 = PointCreate((FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
 
-    PointMatrixMultiply(Matrix, &Point1, &Point1);
+    Point1 = PointMatrixMultiply(Matrix, Point1);
 
     CHECK_EQUAL(Point2, Point1);
 }
