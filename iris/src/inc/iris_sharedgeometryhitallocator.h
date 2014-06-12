@@ -71,8 +71,6 @@ SharedGeometryHitAllocatorAllocate(
     return (PSHARED_GEOMETRY_HIT) Allocation;
 }
 
-_Check_return_
-_Ret_maybenull_
 SFORCEINLINE
 VOID
 SharedGeometryHitAllocatorFreeLastAllocation(
@@ -88,8 +86,6 @@ SharedGeometryHitAllocatorFreeLastAllocation(
     IrisStaticMemoryAllocatorFreeLastAllocation(SharedGeometryHitAllocator);
 }
 
-_Check_return_
-_Ret_maybenull_
 SFORCEINLINE
 VOID
 SharedGeometryHitAllocatorFreeAll(
@@ -105,8 +101,6 @@ SharedGeometryHitAllocatorFreeAll(
     IrisStaticMemoryAllocatorFreeAll(SharedGeometryHitAllocator);
 }
 
-_Check_return_
-_Ret_maybenull_
 SFORCEINLINE
 VOID
 SharedGeometryHitAllocatorDestroy(

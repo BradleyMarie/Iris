@@ -54,7 +54,6 @@ RayTracerTraceGeometry(
     _In_ PCGEOMETRY Geometry
     );
 
-_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
@@ -83,7 +82,7 @@ RayTracerGetNextShapeHit(
 IRISAPI
 VOID
 RayTracerFree(
-    _Pre_maybenull_ _Post_invalid_ PRAYTRACER RayTracer
+    _In_opt_ _Post_invalid_ PRAYTRACER RayTracer
     );
 
 #endif // _RAYTRACER_IRIS_

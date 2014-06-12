@@ -49,23 +49,23 @@ IRISAPI
 PSHAPE
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes)PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     );
 
-_Ret_maybenull_
+_Ret_
 IRISAPI
 PCVOID
 ShapeGetData(
-    _In_opt_ PCSHAPE Shape
+    _In_ PCSHAPE Shape
     );
 
-_Ret_maybenull_
+_Ret_
 IRISAPI
 PCSHAPE_VTABLE
 ShapeGetVTable(
-    _In_opt_ PCSHAPE Shape
+    _In_ PCSHAPE Shape
     );
 
 IRISAPI
@@ -77,7 +77,7 @@ ShapeReference(
 IRISAPI
 VOID
 ShapeDereference(
-    _Pre_maybenull_ _Post_invalid_ PSHAPE Shape
+    _In_opt_ _Post_invalid_ PSHAPE Shape
     );
 
 #endif // _IRIS_SHAPE_

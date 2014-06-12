@@ -99,7 +99,7 @@ DirectShaderShade(
 SFORCEINLINE
 VOID
 DirectShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PDIRECT_SHADER DirectShader
+    _In_opt_ _Post_invalid_ PDIRECT_SHADER DirectShader
     )
 {
     if (DirectShader == NULL)

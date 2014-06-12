@@ -56,8 +56,8 @@ TextureShaderInitialize(
     _In_ PCPOINT3 ModelHit,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ PCVOID AdditionalData,
-    _In_ PSURFACE_NORMAL SurfaceNormal,
-    _In_ PCOLOR4 Color
+    _In_opt_ PSURFACE_NORMAL SurfaceNormal,
+    _Pre_invalid_ PCOLOR4 Color
     )
 {
     ASSERT(TextureShader != NULL);

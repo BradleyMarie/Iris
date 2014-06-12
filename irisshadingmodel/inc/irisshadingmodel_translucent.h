@@ -29,7 +29,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_opt_ PCVOID AdditionalData,
     _Out_ PFLOAT Alpha
     );
 
@@ -50,7 +50,7 @@ IRISSHADINGMODELAPI
 PTRANSLUCENT_SHADER
 TranslucentShaderAllocate(
     _In_ PCTRANSLUCENT_SHADER_VTABLE TranslucentShaderVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     );
@@ -76,7 +76,7 @@ TranslucentShaderReference(
 IRISSHADINGMODELAPI
 VOID
 TranslucentShaderDereference(
-    _Pre_maybenull_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
+    _In_opt_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
     );
 
 #endif // _TRANSLUCENT_SHADER_IRIS_SHADING_MODEL_

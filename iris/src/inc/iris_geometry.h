@@ -96,10 +96,12 @@ GeometryTraceGeometry(
     if (*ShapeHitList == NULL)
     {
         SharedGeometryHitAllocatorFreeLastAllocation(SharedGeometryHitAllocator);
-        return ISTATUS_SUCCESS;
+        *SharedGeometryHit = NULL;
     }
-
-    *SharedGeometryHit = GeometryHit;
+    else
+    {
+        *SharedGeometryHit = GeometryHit;
+    }
 
     return ISTATUS_SUCCESS;
 }

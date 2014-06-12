@@ -69,7 +69,7 @@ IrisConstantPointerListInitialize(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
 IrisConstantPointerListAddPointer(
@@ -144,12 +144,13 @@ IrisConstantPointerListClear(
 SFORCEINLINE
 VOID
 IrisConstantPointerListDestroy(
-    _Inout_ PIRIS_CONSTANT_POINTER_LIST PointerList
+    _Inout_  PIRIS_CONSTANT_POINTER_LIST PointerList
     )
 {
     ASSERT(PointerList != NULL);
 
     free((PVOID)PointerList->PointerList);
+    PointerList->PointerList = NULL;
 }
 
 SFORCEINLINE

@@ -54,10 +54,10 @@ IRISAPI
 PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_reads_bytes_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes
     );
 
@@ -67,10 +67,10 @@ IRISAPI
 PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocateWithHitPoint(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_reads_bytes_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ POINT3 HitPoint
     );

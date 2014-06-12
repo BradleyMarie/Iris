@@ -57,22 +57,24 @@ IRISSHADINGMODELAPI
 PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     );
 
+_Ret_maybenull_
 IRISSHADINGMODELAPI
 PCTEXTURE
 DrawingShapeGetTexture(
-    _In_opt_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
     );
 
+_Ret_maybenull_
 IRISSHADINGMODELAPI
 PCNORMAL
 DrawingShapeGetNormal(
-    _In_opt_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
     );
 
@@ -85,7 +87,7 @@ DrawingShapeReference(
 IRISSHADINGMODELAPI
 VOID
 DrawingShapeDereference(
-    _Pre_maybenull_ _Post_invalid_ PDRAWING_SHAPE DrawingShape
+    _In_opt_ _Post_invalid_ PDRAWING_SHAPE DrawingShape
     );
 
 #endif // _DRAWING_SHAPE_IRIS_SHADING_MODEL_

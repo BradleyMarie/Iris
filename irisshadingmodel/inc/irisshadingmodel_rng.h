@@ -110,7 +110,7 @@ RandomGenerateIndex(
 SFORCEINLINE
 VOID
 RandomFree(
-    _Pre_maybenull_ _Post_invalid_ PRANDOM Rng
+    _In_opt_ _Post_invalid_ PRANDOM Rng
     )
 {
     if (Rng == NULL)

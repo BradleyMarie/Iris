@@ -126,12 +126,12 @@ MatrixAllocateInverse(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
 MatrixReadContents(
     _In_ PCMATRIX Matrix,
-    _Inout_ FLOAT Contents[4][4]
+    _Out_writes_(4) FLOAT Contents[4][4]
     );
 
 IRISAPI
@@ -143,7 +143,7 @@ MatrixReference(
 IRISAPI
 VOID
 MatrixDereference(
-    _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
+    _In_opt_ _Post_invalid_ PMATRIX Matrix
     );
 
 #endif // _MATRIX_IRIS_

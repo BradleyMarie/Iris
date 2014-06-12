@@ -78,7 +78,7 @@ NormalComputeNormal(
 SFORCEINLINE
 VOID
 NormalFree(
-    _Pre_maybenull_ _Post_invalid_ PNORMAL Normal
+    _In_opt_ _Post_invalid_ PNORMAL Normal
     )
 {
     if (Normal == NULL)

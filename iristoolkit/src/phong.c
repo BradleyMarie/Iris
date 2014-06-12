@@ -969,6 +969,11 @@ PhongDirectShaderAllocate(
 
     PhongShader = (PPHONG_SHADER) malloc(sizeof(PHONG_SHADER));
 
+    if (PhongShader == NULL)
+    {
+        return NULL;
+    }
+
     PhongShader->DirectShaderHeader.DirectShaderVTable = &PhongShaderVTable;
     PhongShader->LightSelectionRoutine = LightSelectionRoutine;
     PhongShader->Lights = Lights;
@@ -1005,6 +1010,11 @@ DirectionalPhongLightAllocate(
 
     PhongLight = (PDIRECTIONAL_PHONG_LIGHT) malloc(sizeof(DIRECTIONAL_PHONG_LIGHT));
 
+    if (PhongLight == NULL)
+    {
+        return NULL;
+    }
+
     PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
@@ -1039,6 +1049,11 @@ PointPhongLightAllocate(
     }
 
     PhongLight = (PPOINT_PHONG_LIGHT) malloc(sizeof(POINT_PHONG_LIGHT));
+
+    if (PhongLight == NULL)
+    {
+        return NULL;
+    }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
@@ -1082,6 +1097,11 @@ AttenuatedPointPhongLightAllocate(
     }
 
     PhongLight = (PATTENUATED_POINT_PHONG_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_LIGHT));
+
+    if (PhongLight == NULL)
+    {
+        return NULL;
+    }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
@@ -1127,6 +1147,11 @@ PointPhongSpotLightAllocate(
     }
 
     PhongLight = (PPOINT_PHONG_SPOT_LIGHT) malloc(sizeof(POINT_PHONG_SPOT_LIGHT));
+
+    if (PhongLight == NULL)
+    {
+        return NULL;
+    }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongSpotLightVTable;
     PhongLight->WorldLocation = *WorldLocation;
@@ -1182,6 +1207,11 @@ AttenuatedPhongSpotLightAllocate(
     }
 
     PhongLight = (PATTENUATED_POINT_PHONG_SPOT_LIGHT) malloc(sizeof(ATTENUATED_POINT_PHONG_SPOT_LIGHT));
+
+    if (PhongLight == NULL)
+    {
+        return NULL;
+    }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongSpotLightVTable;
     PhongLight->WorldLocation = *WorldLocation;

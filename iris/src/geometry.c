@@ -49,9 +49,14 @@ GeometryAllocate(
 
 VOID
 GeometryFree(
-    _Pre_maybenull_ _Post_invalid_ PGEOMETRY Geometry
+    _In_opt_ _Post_invalid_ PGEOMETRY Geometry
     )
 {
+    if (Geometry == NULL)
+    {
+        return;
+    }
+
     MatrixDereference(Geometry->ModelToWorld);
     ShapeDereference(Geometry->Shape);
     free(Geometry);

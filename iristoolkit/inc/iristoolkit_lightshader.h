@@ -26,7 +26,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PLIGHT_SHADING_ROUTINE)(
-    _In_ PCVOID Context,
+    _In_opt_ PCVOID Context,
     _In_ PCVOID Light,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,

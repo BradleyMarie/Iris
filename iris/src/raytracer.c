@@ -208,7 +208,6 @@ RayTracerTraceGeometry(
     return ISTATUS_SUCCESS;
 }
 
-_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerSort(
@@ -251,7 +250,7 @@ RayTracerGetNextGeometryHit(
     HitCount = IrisConstantPointerListGetSize(PointerList);
     CurrentIndex = RayTracer->HitIndex;
 
-    if (HitCount == RayTracer->HitIndex)
+    if (HitCount == CurrentIndex)
     {
         return ISTATUS_NO_MORE_DATA;
     }
@@ -314,7 +313,7 @@ RayTracerGetNextShapeHit(
 
 VOID
 RayTracerFree(
-    _Pre_maybenull_ _Post_invalid_ PRAYTRACER RayTracer
+    _In_opt_ _Post_invalid_ PRAYTRACER RayTracer
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;

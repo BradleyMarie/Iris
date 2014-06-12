@@ -35,7 +35,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PathTracerShadeHit(
-    _In_opt_ PCVOID Context,
+    _In_ PCVOID Context,
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
@@ -150,7 +150,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RecursiveRayTracerShadeHit(
-    _In_opt_ PCVOID Context,
+    _In_ PCVOID Context,
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
@@ -284,12 +284,17 @@ RecursiveRayTracerShadeHit(
 STATIC
 VOID
 CommonTracerFree(
-    _Pre_maybenull_ _Post_invalid_ PVOID Context
+    _In_opt_ _Post_invalid_ PVOID Context
     )
 {
     PCOMMON_TRACER Tracer;
 
     ASSERT(Context != NULL);
+
+    if (Context == NULL)
+    {
+        return;
+    }
 
     Tracer = (PCOMMON_TRACER) Context;
 

@@ -144,7 +144,7 @@ TracerTraceRay(
 SFORCEINLINE
 VOID
 TracerFree(
-    _Pre_maybenull_ _Post_invalid_ PTRACER Tracer
+    _In_opt_ _Post_invalid_ PTRACER Tracer
     )
 {
     if (Tracer == NULL)

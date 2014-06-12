@@ -41,7 +41,7 @@ GeometryAllocate(
 IRISAPI
 VOID
 GeometryFree(
-    _Pre_maybenull_ _Post_invalid_ PGEOMETRY Geometry
+    _In_opt_ _Post_invalid_ PGEOMETRY Geometry
     );
 
 #endif // _GEOMETRY_IRIS_

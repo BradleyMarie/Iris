@@ -190,7 +190,7 @@ VisibilityTesterTestVisibilityAnyDistance(
 
 VOID
 VisibilityTesterFree(
-    _Pre_maybenull_ _Post_invalid_ PVISIBILITY_TESTER Tester
+    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
     )
 {
     if (Tester == NULL)

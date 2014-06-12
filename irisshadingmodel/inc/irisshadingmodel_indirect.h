@@ -100,7 +100,7 @@ IndirectShaderShade(
 SFORCEINLINE
 VOID
 IndirectShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PINDIRECT_SHADER IndirectShader
+    _In_opt_ _Post_invalid_ PINDIRECT_SHADER IndirectShader
     )
 {
     if (IndirectShader == NULL)

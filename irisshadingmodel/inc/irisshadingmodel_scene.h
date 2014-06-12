@@ -87,7 +87,7 @@ SceneAddWorldObject(
 SFORCEINLINE
 VOID
 SceneFree(
-    _Pre_maybenull_ _Post_invalid_ PSCENE Scene
+    _In_opt_ _Post_invalid_ PSCENE Scene
     )
 {
     if (Scene == NULL)

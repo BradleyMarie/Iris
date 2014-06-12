@@ -127,7 +127,6 @@ ListSceneTrace(
     for (Index = 0; Index < ListSize; Index++)
     {
         Status = SceneTracerTraceGeometry(SceneTracer,
-                                          WorldRay,
                                           Objects[Index]);
 
         if (Status != ISTATUS_SUCCESS)

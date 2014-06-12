@@ -58,7 +58,6 @@ FramebufferGetPixel(
     _Out_ PCOLOR3 Color
     );
 
-_Success_(return == ISTATUS_SUCCESS)
 IRISTOOLKITAPI
 ISTATUS
 FramebufferGetDimensions(
@@ -70,7 +69,7 @@ FramebufferGetDimensions(
 IRISTOOLKITAPI
 VOID
 FramebufferFree(
-    _Pre_maybenull_ _Post_invalid_ PFRAMEBUFFER Framebuffer
+    _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     );
 
 #endif // _FRAMEBUFFER_IRIS_TOOLKIT_

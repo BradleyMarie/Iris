@@ -23,7 +23,7 @@ _Ret_maybenull_
 PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     )
@@ -38,9 +38,10 @@ DrawingShapeAllocate(
     return (PDRAWING_SHAPE) Shape;
 }
 
+_Ret_maybenull_
 PCTEXTURE
 DrawingShapeGetTexture(
-    _In_opt_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
     )
 {
@@ -68,9 +69,10 @@ DrawingShapeGetTexture(
     return Texture;
 }
 
+_Ret_maybenull_
 PCNORMAL
 DrawingShapeGetNormal(
-    _In_opt_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
     )
 {
@@ -112,7 +114,7 @@ DrawingShapeReference(
 
 VOID
 DrawingShapeDereference(
-    _Pre_maybenull_ _Post_invalid_ PDRAWING_SHAPE DrawingShape
+    _In_opt_ _Post_invalid_ PDRAWING_SHAPE DrawingShape
     )
 {
     PSHAPE Shape;

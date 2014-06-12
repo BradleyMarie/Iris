@@ -64,7 +64,7 @@ InterpolatedTriangleEmissiveShaderShade(
     _In_ PCVOID Context,
     _In_ PCPOINT3 WorldHitPoint,
     _In_ PCPOINT3 ModelHitPoint,
-    _In_opt_ PCVOID AdditionalData,
+    _In_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     )
 {
@@ -125,7 +125,7 @@ InterpolatedTriangleDirectShaderShade(
     _In_ PCPOINT3 ModelHitPoint,
     _In_ PCVECTOR3 WorldViewer,
     _In_ PCVECTOR3 ModelViewer,
-    _In_opt_ PCVOID AdditionalData,
+    _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -197,7 +197,7 @@ InterpolatedTriangleIndirectShaderShade(
     _In_ PCPOINT3 ModelHitPoint,
     _In_ PCVECTOR3 WorldViewer,
     _In_ PCVECTOR3 ModelViewer,
-    _In_opt_ PCVOID AdditionalData,
+    _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,

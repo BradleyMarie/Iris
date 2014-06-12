@@ -18,6 +18,7 @@
 *.pdb
 
 # Executables
+bin/
 *.exe
 *.out
 *.app
@@ -54,3 +55,9 @@ CMakeFiles/
 iris/inc/iris_api.h
 iristoolkit/inc/iristoolkit_api.h
 irisshadingmodel/inc/irisshadingmodel_api.h
+
+#Analysis files
+iris.dir/
+irisshadingmodel.dir/
+iristoolkit.dir/
+iris-test.dir/

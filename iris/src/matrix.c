@@ -175,7 +175,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 MatrixpInvert(
-    _Out_ FLOAT Inverse[4][4],
+    _Out_writes_(4) FLOAT Inverse[4][4],
     _In_ FLOAT M00,
     _In_ FLOAT M01,
     _In_ FLOAT M02,
@@ -993,11 +993,11 @@ MatrixAllocateInverse(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixReadContents(
     _In_ PCMATRIX Matrix,
-    _Inout_ FLOAT Contents[4][4]
+    _Out_writes_(4) FLOAT Contents[4][4]
     )
 {
     if (Matrix == NULL || Contents == NULL)
@@ -1040,7 +1040,7 @@ MatrixReference(
 
 VOID
 MatrixDereference(
-    _Pre_maybenull_ _Post_invalid_ PMATRIX Matrix
+    _In_opt_ _Post_invalid_ PMATRIX Matrix
     )
 {
     if (Matrix == NULL)

@@ -33,7 +33,7 @@ _Ret_maybenull_
 PTRANSLUCENT_SHADER
 TranslucentShaderAllocate(
     _In_ PCTRANSLUCENT_SHADER_VTABLE TranslucentShaderVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     )
@@ -140,7 +140,7 @@ TranslucentShaderReference(
 
 VOID
 TranslucentShaderDereference(
-    _Pre_maybenull_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
+    _In_opt_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
     )
 {
     PFREE_ROUTINE FreeRoutine;

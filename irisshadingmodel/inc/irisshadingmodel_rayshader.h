@@ -103,7 +103,7 @@ RayShaderTraceRayMontecarlo(
 IRISSHADINGMODELAPI
 VOID
 RayShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PRAYSHADER RayShader
+    _In_opt_ _Post_invalid_ PRAYSHADER RayShader
     );
 
 _Check_return_

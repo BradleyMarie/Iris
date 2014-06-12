@@ -44,7 +44,7 @@ struct _SURFACE_NORMAL {
 SFORCEINLINE
 VOID
 SurfaceNormalInitialize(
-    _Inout_ PSURFACE_NORMAL SurfaceNormal,
+    _Out_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCNORMAL Normal,
     _In_ PCPOINT3 ModelHit,
     _In_opt_ PCMATRIX WorldToModel,

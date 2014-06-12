@@ -66,7 +66,13 @@ PerfectSpecularShaderShade(
 
     PerfectSpecularIndirectShader = (PCPERFECT_SPECULAR_INDIRECT_SHADER) Context;
 
-    SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal, &WorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &WorldSurfaceNormal);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     ReflectedDirection = VectorReflect(*WorldViewer, WorldSurfaceNormal);
 

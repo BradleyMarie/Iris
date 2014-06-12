@@ -84,7 +84,7 @@ TextureShade(
 SFORCEINLINE
 VOID
 TextureFree(
-    _Pre_maybenull_ _Post_invalid_ PTEXTURE Texture
+    _In_opt_ _Post_invalid_ PTEXTURE Texture
     )
 {
     if (Texture == NULL)

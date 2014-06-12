@@ -66,7 +66,13 @@ LambertianShaderShade(
 
     LambertianIndirectShader = (PCLAMBERTIAN_INDIRECT_SHADER) Context;
 
-    SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal, &WorldSurfaceNormal);
+    Status = SurfaceNormalGetNormalizedWorldNormal(SurfaceNormal,
+                                                   &WorldSurfaceNormal);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     IrisToolkitCosineSampleHemisphere(&WorldSurfaceNormal,
                                       Rng,

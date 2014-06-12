@@ -16,7 +16,7 @@ Abstract:
 
 VOID 
 SceneObjectFree(
-    _Pre_maybenull_ _Post_invalid_ PSCENE_OBJECT SceneObject
+    _In_opt_ _Post_invalid_ PSCENE_OBJECT SceneObject
     )
 {
     PGEOMETRY Geometry;

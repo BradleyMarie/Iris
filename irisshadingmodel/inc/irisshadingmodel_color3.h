@@ -120,9 +120,9 @@ Color3Subtract(
     ASSERT(Subtrahend != NULL);
     ASSERT(Difference != NULL);
 
-    Red = Minuend->Red - Difference->Red;
-    Green = Minuend->Green - Difference->Green;
-    Blue = Minuend->Blue - Difference->Blue;
+    Red = Minuend->Red - Subtrahend->Red;
+    Green = Minuend->Green - Subtrahend->Green;
+    Blue = Minuend->Blue - Subtrahend->Blue;
 
     Color3InitializeFromComponents(Difference, Red, Green, Blue);
 }

@@ -19,7 +19,6 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SceneTracerTraceGeometry(
     _Inout_ PSCENE_TRACER SceneTracer,
-    _In_ PCRAY WorldRay,
     _In_ PCSCENE_OBJECT SceneObject
     )
 {

@@ -222,7 +222,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 TriangleInitialize(
-    _In_ PTRIANGLE Triangle,
+    _Out_ PTRIANGLE Triangle,
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
@@ -319,6 +319,7 @@ TriangleAllocate(
 
 _Check_return_
 _Ret_maybenull_
+_Success_(return != NULL)
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 FlatTriangleAllocate(
@@ -350,7 +351,7 @@ FlatTriangleAllocate(
                                 *Vertex2,
                                 FrontTexture,
                                 BackTexture,
-                                NULL);
+                                &FrontSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {

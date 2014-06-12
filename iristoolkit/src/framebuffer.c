@@ -144,7 +144,6 @@ FramebufferGetPixel(
     return ISTATUS_SUCCESS;
 }
 
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 FramebufferGetDimensions(
     _In_ PCFRAMEBUFFER Framebuffer,
@@ -167,7 +166,7 @@ FramebufferGetDimensions(
 
 VOID
 FramebufferFree(
-    _Pre_maybenull_ _Post_invalid_ PFRAMEBUFFER Framebuffer
+    _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     )
 {
     if (Framebuffer == NULL)

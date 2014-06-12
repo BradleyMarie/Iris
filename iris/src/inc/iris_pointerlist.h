@@ -67,7 +67,7 @@ IrisPointerListInitialize(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
 IrisPointerListAddPointer(
@@ -159,6 +159,7 @@ IrisPointerListDestroy(
     ASSERT(PointerList != NULL);
 
     free(PointerList->PointerList);
+    PointerList->PointerList = NULL;
 }
 
 SFORCEINLINE

@@ -19,7 +19,6 @@ Abstract:
 //
 
 struct _RAYSHADER {
-    BOOL DoRouletteTermination;
     PCOLOR3 PathThroughputPointer;
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
@@ -129,7 +128,7 @@ RayShaderAllocateInternal(
         return NULL;
     }
 
-    if (RussianRouletteStartDepth <= CurrentDepth &&
+    if (CurrentDepth <= RussianRouletteStartDepth &&
         RussianRouletteStartDepth != DISABLE_RUSSAIAN_ROULETTE_TERMINATION)
     {
         MinimumContinueProbability = (FLOAT) 1.0;
@@ -232,6 +231,7 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
 // Functions
 //
 
+_Check_return_
 _Ret_maybenull_
 PRAYSHADER
 RayShaderAllocate(
@@ -303,7 +303,6 @@ RayShaderTraceRayMontecarlo(
     PCVOID AdditionalData;
     PRAYTRACER RayTracer;
     COLOR4 BlendedColor;
-    VECTOR3 ModelViewer;
     PCTEXTURE Texture;
     FLOAT NextRandom;
     PCNORMAL Normal;
@@ -424,7 +423,7 @@ RayShaderTraceRayMontecarlo(
                                 Distance,
                                 &NormalizedWorldRay.Direction,
                                 &GeometryHit.WorldHitPoint,
-                                &ModelViewer,
+                                &GeometryHit.ModelViewer,
                                 &GeometryHit.ModelHitPoint,
                                 GeometryHit.ModelToWorld,
                                 AdditionalData,
@@ -466,7 +465,7 @@ RayShaderTraceRayMontecarlo(
 IRISSHADINGMODELAPI
 VOID
 RayShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PRAYSHADER RayShader
+    _In_opt_ _Post_invalid_ PRAYSHADER RayShader
     )
 {
     PRAYSHADER NextRayShader;

@@ -61,7 +61,7 @@ VisibilityTesterTestVisibilityAnyDistance(
 IRISSHADINGMODELAPI
 VOID
 VisibilityTesterFree(
-    _Pre_maybenull_ _Post_invalid_ PVISIBILITY_TESTER Tester
+    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
     );
 
 #endif // _RANDOM_IRIS_SHADING_MODEL_

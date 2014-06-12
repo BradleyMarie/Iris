@@ -169,7 +169,7 @@ Color4ScaleByScalar(
     Red = Color->Red * Scalar;
     Green = Color->Green * Scalar;
     Blue = Color->Blue * Scalar;
-    Alpha = Color->Alpha * Alpha;
+    Alpha = Color->Alpha * Scalar;
 
     Color4InitializeFromComponents(Scaled, Red, Green, Blue, Alpha);
 }

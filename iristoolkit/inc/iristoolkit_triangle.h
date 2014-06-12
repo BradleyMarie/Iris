@@ -53,6 +53,7 @@ TriangleAllocate(
 
 _Check_return_
 _Ret_maybenull_
+_Success_(return != NULL)
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 FlatTriangleAllocate(

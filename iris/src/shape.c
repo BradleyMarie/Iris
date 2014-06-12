@@ -23,7 +23,7 @@ _Ret_maybenull_
 PSHAPE
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
-    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     )
@@ -89,10 +89,10 @@ ShapeAllocate(
     return Shape;
 }
 
-_Ret_maybenull_
+_Ret_
 PCVOID
 ShapeGetData(
-    _In_opt_ PCSHAPE Shape
+    _In_ PCSHAPE Shape
     )
 {
     if (Shape == NULL)
@@ -103,10 +103,10 @@ ShapeGetData(
     return (PUINT8) Shape + Shape->DataOffset;
 }
 
-_Ret_maybenull_
+_Ret_
 PCSHAPE_VTABLE
 ShapeGetVTable(
-    _In_opt_ PCSHAPE Shape
+    _In_ PCSHAPE Shape
     )
 {
     if (Shape == NULL)
@@ -132,7 +132,7 @@ ShapeReference(
 
 VOID
 ShapeDereference(
-    _Pre_maybenull_ _Post_invalid_ PSHAPE Shape
+    _In_opt_ _Post_invalid_ PSHAPE Shape
     )
 {
     PFREE_ROUTINE FreeRoutine;

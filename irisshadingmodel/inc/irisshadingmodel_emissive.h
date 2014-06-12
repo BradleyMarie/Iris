@@ -79,7 +79,7 @@ EmissiveShaderShade(
 SFORCEINLINE
 VOID
 EmissiveShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PEMISSIVE_SHADER EmissiveShader
+    _In_opt_ _Post_invalid_ PEMISSIVE_SHADER EmissiveShader
     )
 {
     if (EmissiveShader == NULL)
