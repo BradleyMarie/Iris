@@ -15,14 +15,6 @@ Abstract:
 #include <irisshadingmodelp.h>
 
 //
-// Types
-//
-
-// struct _DRAWING_SHAPE {
-//     PCDRAWING_SHAPE_VTABLE DrawingShapeVTable;
-// };
-
-//
 // Functions
 //
 
