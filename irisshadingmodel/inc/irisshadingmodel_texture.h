@@ -105,7 +105,10 @@ IRISSHADINGMODELAPI
 ISTATUS
 TextureShaderShadeShader(
     _Inout_ PTEXTURE_SHADER TextureShader,
-    _In_ PCSHADER Shader
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
     );
 
 #endif // _TEXTURE_IRIS_SHADING_MODEL_

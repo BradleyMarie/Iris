@@ -40,7 +40,6 @@ typedef struct _INTERPOLATED_TRIANGLE_INDIRECT_SHADER {
 typedef CONST INTERPOLATED_TRIANGLE_INDIRECT_SHADER *PCINTERPOLATED_TRIANGLE_INDIRECT_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER {
-    TRANSLUCENT_SHADER TranslucentShaderHeader;
     PCTRANSLUCENT_SHADER TranslucentShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER, *PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER;
 
@@ -512,12 +511,13 @@ _Check_return_
 _Ret_maybenull_
 PTRANSLUCENT_SHADER
 InterpolatedTriangleTranslucentShaderAllocate(
-    _In_ PCTRANSLUCENT_SHADER Shader0,
-    _In_ PCTRANSLUCENT_SHADER Shader1,
-    _In_ PCTRANSLUCENT_SHADER Shader2
+    _In_ PTRANSLUCENT_SHADER Shader0,
+    _In_ PTRANSLUCENT_SHADER Shader1,
+    _In_ PTRANSLUCENT_SHADER Shader2
     )
 {
-    PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER TranslucentShader;
+    INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER InterpolatedShader;
+    PTRANSLUCENT_SHADER TranslucentShader;
 
     if (Shader0 == NULL &&
         Shader1 == NULL &&
@@ -526,19 +526,23 @@ InterpolatedTriangleTranslucentShaderAllocate(
         return NULL;
     }
 
-    TranslucentShader = (PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER) malloc(sizeof(INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER));
+    InterpolatedShader.TranslucentShaders[0] = Shader0;
+    InterpolatedShader.TranslucentShaders[1] = Shader1;
+    InterpolatedShader.TranslucentShaders[2] = Shader2;
 
-    if (TranslucentShader == NULL)
+    TranslucentShader = TranslucentShaderAllocate(&InterpolatedTriangleTranslucentShaderVTable,
+                                                  &InterpolatedShader,
+                                                  sizeof(INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER),
+                                                  sizeof(PCTRANSLUCENT_SHADER));
+
+    if (TranslucentShader != NULL)
     {
-        return NULL;
+        TranslucentShaderReference(Shader0);
+        TranslucentShaderReference(Shader1);
+        TranslucentShaderReference(Shader2);
     }
 
-    TranslucentShader->TranslucentShaderHeader.TranslucentShaderVTable = &InterpolatedTriangleTranslucentShaderVTable;
-    TranslucentShader->TranslucentShaders[0] = Shader0;
-    TranslucentShader->TranslucentShaders[1] = Shader1;
-    TranslucentShader->TranslucentShaders[2] = Shader2;
-
-    return (PTRANSLUCENT_SHADER) TranslucentShader;
+    return TranslucentShader;
 }
 
 _Check_return_

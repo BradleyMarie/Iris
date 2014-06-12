@@ -18,6 +18,16 @@ Abstract:
 #include <irisp.h>
 
 //
+// Types
+//
+
+struct _SHAPE {
+    PCSHAPE_VTABLE VTable;
+    SIZE_T ReferenceCount;
+    SIZE_T DataOffset;
+};
+
+//
 // Functions
 //
 
@@ -32,13 +42,19 @@ ShapeTraceShape(
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
+    PCVOID DataBeginAddress;
     ISTATUS Status;
 
     ASSERT(Shape != NULL);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
-    Status = Shape->VTable->TraceRoutine(Shape, 
+    ShapeHitAllocatorSetCurrentShape(ShapeHitAllocator, Shape);
+
+    DataBeginAddress = (PCUINT8) Shape +
+                       Shape->DataOffset;
+
+    Status = Shape->VTable->TraceRoutine(DataBeginAddress, 
                                          Ray,
                                          ShapeHitAllocator,
                                          ShapeHitList);

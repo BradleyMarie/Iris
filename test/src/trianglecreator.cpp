@@ -74,7 +74,7 @@ CreateFlatQuad(
 
     if (Triangle1 == NULL)
     {
-        DrawingShapeFree(Triangle0);
+        DrawingShapeDereference(Triangle0);
         NormalFree(FrontNormal);
         NormalFree(BackNormal);
         return false;
@@ -87,8 +87,8 @@ CreateFlatQuad(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        DrawingShapeFree(Triangle0);
-        DrawingShapeFree(Triangle1);
+        DrawingShapeDereference(Triangle0);
+        DrawingShapeDereference(Triangle1);
         NormalFree(FrontNormal);
         NormalFree(BackNormal);
         return false;
@@ -101,8 +101,8 @@ CreateFlatQuad(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        DrawingShapeFree(Triangle0);
-        DrawingShapeFree(Triangle1);
+        DrawingShapeDereference(Triangle0);
+        DrawingShapeDereference(Triangle1);
         NormalFree(FrontNormal);
         NormalFree(BackNormal);
         return false;

@@ -19,13 +19,18 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 TextureShaderShadeShader(
     _Inout_ PTEXTURE_SHADER TextureShader,
-    _In_ PCSHADER Shader
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
     )
 {
     ISTATUS Status;
 
-    ASSERT(TextureShader != NULL);
-    ASSERT(Shader != NULL);
+    if (TextureShader == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     Status = TextureShader->ShadeRayRoutine(TextureShader->Context,
                                             TextureShader->NextRayShader,
@@ -37,7 +42,10 @@ TextureShaderShadeShader(
                                             TextureShader->ModelHit,
                                             TextureShader->ModelToWorld,
                                             TextureShader->AdditionalData,
-                                            Shader,
+                                            EmissiveShader,
+                                            DirectShader,
+                                            IndirectShader,
+                                            TranslucentShader,
                                             TextureShader->SurfaceNormal,
                                             TextureShader->Color);
 

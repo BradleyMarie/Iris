@@ -55,7 +55,6 @@ PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
-    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -69,7 +68,6 @@ PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocateWithHitPoint(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
-    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,

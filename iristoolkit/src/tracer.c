@@ -43,17 +43,17 @@ PathTracerShadeHit(
     _In_ PCPOINT3 WorldHit,
     _In_ PCVECTOR3 ModelViewer,
     _In_ PCPOINT3 ModelHit,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ PCVOID AdditionalData,
-    _In_ PCSHADER Shader,
-    _In_ PSURFACE_NORMAL SurfaceNormal,
+    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCVOID AdditionalData,
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader,
+    _In_opt_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PCOLOR4 Color
     )
 {
-    PCTRANSLUCENT_SHADER TranslucentShader;
     PVISIBILITY_TESTER VisibilityTester;
-    PCINDIRECT_SHADER IndirectShader;
-    PCEMISSIVE_SHADER EmissiveShader;
     COLOR3 ColorWithoutAlpha;
     COLOR3 ComponentColor;
     PCOMMON_TRACER Tracer;
@@ -69,12 +69,9 @@ PathTracerShadeHit(
     ASSERT(WorldHit != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 
     Tracer = (PCOMMON_TRACER) Context;
-
-    TranslucentShader = Shader->TranslucentShader;
 
     if (TranslucentShader != NULL)
     {
@@ -102,8 +99,6 @@ PathTracerShadeHit(
 
     Color3InitializeBlack(&ColorWithoutAlpha);
 
-    EmissiveShader = Shader->EmissiveShader;
-
     if (EmissiveShader != NULL)
     {
         Status = EmissiveShaderShade(EmissiveShader,
@@ -119,8 +114,6 @@ PathTracerShadeHit(
 
         Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
     }
-
-    IndirectShader = Shader->IndirectShader;
 
     VisibilityTester = Tracer->VisibilityTester;
     Rng = Tracer->Rng;
@@ -165,18 +158,17 @@ RecursiveRayTracerShadeHit(
     _In_ PCPOINT3 WorldHit,
     _In_ PCVECTOR3 ModelViewer,
     _In_ PCPOINT3 ModelHit,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ PCVOID AdditionalData,
-    _In_ PCSHADER Shader,
-    _In_ PSURFACE_NORMAL SurfaceNormal,
+    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCVOID AdditionalData,
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader,
+    _In_opt_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PCOLOR4 Color
     )
 {
-    PCTRANSLUCENT_SHADER TranslucentShader;
     PVISIBILITY_TESTER VisibilityTester;
-    PCINDIRECT_SHADER IndirectShader;
-    PCEMISSIVE_SHADER EmissiveShader;
-    PCDIRECT_SHADER DirectShader;
     COLOR3 ColorWithoutAlpha;
     COLOR3 ComponentColor;
     PCOMMON_TRACER Tracer;
@@ -192,12 +184,9 @@ RecursiveRayTracerShadeHit(
     ASSERT(WorldHit != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
-    ASSERT(Shader != NULL);
     ASSERT(Color != NULL);
 
     Tracer = (PCOMMON_TRACER) Context;
-
-    TranslucentShader = Shader->TranslucentShader;
 
     if (TranslucentShader != NULL)
     {
@@ -225,8 +214,6 @@ RecursiveRayTracerShadeHit(
 
     Color3InitializeBlack(&ColorWithoutAlpha);
 
-    EmissiveShader = Shader->EmissiveShader;
-
     if (EmissiveShader != NULL)
     {
         Status = EmissiveShaderShade(EmissiveShader,
@@ -242,8 +229,6 @@ RecursiveRayTracerShadeHit(
 
         Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
     }
-
-    IndirectShader = Shader->IndirectShader;
 
     VisibilityTester = Tracer->VisibilityTester;
     Rng = Tracer->Rng;
@@ -269,8 +254,6 @@ RecursiveRayTracerShadeHit(
 
         Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
     }
-
-    DirectShader = Shader->DirectShader;
 
     if (DirectShader != NULL)
     {

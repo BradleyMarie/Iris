@@ -52,9 +52,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PTRANSLUCENT_SHADER
 InterpolatedTriangleTranslucentShaderAllocate(
-    _In_ PCTRANSLUCENT_SHADER Shader0,
-    _In_ PCTRANSLUCENT_SHADER Shader1,
-    _In_ PCTRANSLUCENT_SHADER Shader2
+    _In_ PTRANSLUCENT_SHADER Shader0,
+    _In_ PTRANSLUCENT_SHADER Shader1,
+    _In_ PTRANSLUCENT_SHADER Shader2
     );
 
 _Check_return_

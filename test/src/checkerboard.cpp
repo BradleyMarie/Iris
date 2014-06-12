@@ -20,7 +20,10 @@ Abstract:
 
 typedef struct _CHECKERBOARD_TEXTURE {
     TEXTURE TextureHeader;
-    SHADER Shaders[2];
+    PCEMISSIVE_SHADER EmissiveShaders[2];
+    PCDIRECT_SHADER DirectShaders[2];
+    PCINDIRECT_SHADER IndirectShaders[2];
+    PTRANSLUCENT_SHADER TranslucentShaders[2];
 } CHECKERBOARD_TEXTURE, *PCHECKERBOARD_TEXTURE;
 
 typedef CONST CHECKERBOARD_TEXTURE *PCCHECKERBOARD_TEXTURE;
@@ -61,15 +64,39 @@ XZCheckerboardTextureGetShader(
     if (IsZeroFloat(CheckerboardIndex) == FALSE)
     {
         Status = TextureShaderShadeShader(TextureShader,
-                                          &CheckerboardTexture->Shaders[0]);
+                                          CheckerboardTexture->EmissiveShaders[0],
+                                          CheckerboardTexture->DirectShaders[0],
+                                          CheckerboardTexture->IndirectShaders[0],
+                                          CheckerboardTexture->TranslucentShaders[0]);
     }
     else
     {
         Status = TextureShaderShadeShader(TextureShader,
-                                          &CheckerboardTexture->Shaders[1]);   
+                                          CheckerboardTexture->EmissiveShaders[1],
+                                          CheckerboardTexture->DirectShaders[1],
+                                          CheckerboardTexture->IndirectShaders[1],
+                                          CheckerboardTexture->TranslucentShaders[1]);
     }
 
     return Status;
+}
+
+STATIC
+VOID
+XZCheckerboardTextureFree(
+    _In_ PVOID Context
+)
+{
+    PCHECKERBOARD_TEXTURE CheckerboardTexture;
+
+    ASSERT(Context != NULL);
+
+    CheckerboardTexture = (PCHECKERBOARD_TEXTURE) Context;
+
+    TranslucentShaderDereference(CheckerboardTexture->TranslucentShaders[0]);
+    TranslucentShaderDereference(CheckerboardTexture->TranslucentShaders[1]);
+
+    free(Context);
 }
 
 //
@@ -92,11 +119,11 @@ XZCheckerboardTextureAllocate(
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader0,
     _In_opt_ PCDIRECT_SHADER DirectShader0,
     _In_opt_ PCINDIRECT_SHADER IndirectShader0,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader0,
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader0,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader1,
     _In_opt_ PCDIRECT_SHADER DirectShader1,
     _In_opt_ PCINDIRECT_SHADER IndirectShader1,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader1
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader1
     )
 {
     PCHECKERBOARD_TEXTURE CheckerboardTexture;
@@ -121,14 +148,17 @@ XZCheckerboardTextureAllocate(
     }
 
     CheckerboardTexture->TextureHeader.TextureVTable = &XZCheckerboardTextureVTable;
-    CheckerboardTexture->Shaders[0].EmissiveShader = EmissiveShader0;
-    CheckerboardTexture->Shaders[0].IndirectShader = IndirectShader0;
-    CheckerboardTexture->Shaders[0].DirectShader = DirectShader0;
-    CheckerboardTexture->Shaders[0].TranslucentShader = TranslucentShader0;
-    CheckerboardTexture->Shaders[1].EmissiveShader = EmissiveShader1;
-    CheckerboardTexture->Shaders[1].IndirectShader = IndirectShader1;
-    CheckerboardTexture->Shaders[1].DirectShader = DirectShader1;
-    CheckerboardTexture->Shaders[1].TranslucentShader = TranslucentShader1;
+    CheckerboardTexture->EmissiveShaders[0] = EmissiveShader0;
+    CheckerboardTexture->IndirectShaders[0] = IndirectShader0;
+    CheckerboardTexture->DirectShaders[0] = DirectShader0;
+    CheckerboardTexture->TranslucentShaders[0] = TranslucentShader0;
+    CheckerboardTexture->EmissiveShaders[1] = EmissiveShader1;
+    CheckerboardTexture->IndirectShaders[1] = IndirectShader1;
+    CheckerboardTexture->DirectShaders[1] = DirectShader1;
+    CheckerboardTexture->TranslucentShaders[1] = TranslucentShader1;
+
+    TranslucentShaderReference(TranslucentShader0);
+    TranslucentShaderReference(TranslucentShader1);
 
     return (PTEXTURE) CheckerboardTexture;
 }

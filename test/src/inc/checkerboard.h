@@ -28,11 +28,11 @@ XZCheckerboardTextureAllocate(
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader0,
     _In_opt_ PCDIRECT_SHADER DirectShader0,
     _In_opt_ PCINDIRECT_SHADER IndirectShader0,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader0,
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader0,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader1,
     _In_opt_ PCDIRECT_SHADER DirectShader1,
     _In_opt_ PCINDIRECT_SHADER IndirectShader1,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader1
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader1
     );
 
 #endif // _CHECKERBOARD_TEXTURE_IRIS_TOOLKIT_

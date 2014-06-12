@@ -26,7 +26,6 @@ Abstract:
 //
 
 typedef struct _INFINITE_PLANE {
-    DRAWING_SHAPE ShapeHeader;
     PCTEXTURE Textures[2];
     PCNORMAL Normals[2];
     POINT3 Vertex;
@@ -122,7 +121,6 @@ InfinitePlaneTraceInfinitePlane(
     {
         *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                                   NULL,
-                                                  (PCSHAPE) Context,
                                                   Distance,
                                                   INFINITE_PLANE_FRONT_FACE,
                                                   NULL,
@@ -132,7 +130,6 @@ InfinitePlaneTraceInfinitePlane(
     {
         *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                                   NULL,
-                                                  (PCSHAPE) Context,
                                                   Distance,
                                                   INFINITE_PLANE_BACK_FACE,
                                                   NULL,
@@ -147,8 +144,7 @@ InfinitePlaneTraceInfinitePlane(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE InfinitePlaneHeader = {
-    { InfinitePlaneTraceInfinitePlane },
-    free,
+    { InfinitePlaneTraceInfinitePlane, NULL },
     InfinitePlaneGetTexture,
     InfinitePlaneGetNormal
 };
@@ -169,7 +165,8 @@ InfinitePlaneAllocate(
     _In_opt_ PCNORMAL BackNormal
     )
 {
-    PINFINITE_PLANE InfinitePlane;
+    INFINITE_PLANE InfinitePlane;
+    PDRAWING_SHAPE DrawingShape;
 
     if (Vertex == NULL ||
         SurfaceNormal == NULL)
@@ -188,21 +185,17 @@ InfinitePlaneAllocate(
         return NULL;
     }
 
-    InfinitePlane = (PINFINITE_PLANE) malloc(sizeof(INFINITE_PLANE));
+    InfinitePlane.Vertex = *Vertex;
+    InfinitePlane.SurfaceNormal = *SurfaceNormal;
+    InfinitePlane.Textures[0] = FrontTexture;
+    InfinitePlane.Textures[1] = BackTexture;
+    InfinitePlane.Normals[0] = FrontNormal;
+    InfinitePlane.Normals[1] = BackNormal;
 
-    if (InfinitePlane == NULL)
-    {
-        return NULL;
-    }
+    DrawingShape = DrawingShapeAllocate(&InfinitePlaneHeader,
+                                        &InfinitePlane,
+                                        sizeof(INFINITE_PLANE),
+                                        sizeof(PVOID));
 
-    InfinitePlane->ShapeHeader.DrawingShapeVTable = &InfinitePlaneHeader;
-
-    InfinitePlane->Vertex = *Vertex;
-    InfinitePlane->SurfaceNormal = *SurfaceNormal;
-    InfinitePlane->Textures[0] = FrontTexture;
-    InfinitePlane->Textures[1] = BackTexture;
-    InfinitePlane->Normals[0] = FrontNormal;
-    InfinitePlane->Normals[1] = BackNormal;
-
-    return (PDRAWING_SHAPE) InfinitePlane;
+    return DrawingShape;
 }

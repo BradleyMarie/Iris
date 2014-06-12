@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the TRANSLUCENT_MATERIAL type.
+    This file contains the definitions for the TRANSLUCENT_SHADER type.
 
 --*/
 
@@ -40,19 +40,24 @@ typedef struct _TRANSLUCENT_SHADER_VTABLE {
 
 typedef CONST TRANSLUCENT_SHADER_VTABLE *PCTRANSLUCENT_SHADER_VTABLE;
 
-typedef struct _TRANSLUCENT_SHADER {
-    PCTRANSLUCENT_SHADER_VTABLE TranslucentShaderVTable;
-} TRANSLUCENT_SHADER, *PTRANSLUCENT_SHADER;
-
-typedef CONST TRANSLUCENT_SHADER *PCTRANSLUCENT_SHADER;
-
 //
 // Functions
 //
 
 _Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PTRANSLUCENT_SHADER
+TranslucentShaderAllocate(
+    _In_ PCTRANSLUCENT_SHADER_VTABLE TranslucentShaderVTable,
+    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 ISTATUS
 TranslucentShaderShade(
     _In_ PCTRANSLUCENT_SHADER TranslucentShader,
@@ -60,36 +65,18 @@ TranslucentShaderShade(
     _In_ PCPOINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PFLOAT Alpha
-    )
-{
-    ISTATUS Status;
+    );
 
-    ASSERT(TranslucentShader != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(Alpha != NULL);
-
-    Status = TranslucentShader->TranslucentShaderVTable->TranslucentRoutine(TranslucentShader,
-                                                                            WorldHitPoint,
-                                                                            ModelHitPoint,
-                                                                            AdditionalData,
-                                                                            Alpha);
-
-    return Status;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-TranslucentShaderFree(
-    _Pre_maybenull_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
-    )
-{
-    if (TranslucentShader == NULL)
-    {
-        return;
-    }
+TranslucentShaderReference(
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
+    );
 
-    TranslucentShader->TranslucentShaderVTable->FreeRoutine(TranslucentShader);
-}
+IRISSHADINGMODELAPI
+VOID
+TranslucentShaderDereference(
+    _Pre_maybenull_ _Post_invalid_ PTRANSLUCENT_SHADER TranslucentShader
+    );
 
 #endif // _TRANSLUCENT_SHADER_IRIS_SHADING_MODEL_

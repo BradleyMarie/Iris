@@ -27,8 +27,17 @@ Abstract:
 // Forward declarations
 //
 
-typedef struct _SHADER SHADER, *PSHADER;
-typedef CONST SHADER *PCSHADER;
+typedef struct _EMISSIVE_SHADER EMISSIVE_SHADER, *PEMISSIVE_SHADER;
+typedef CONST EMISSIVE_SHADER *PCEMISSIVE_SHADER;
+
+typedef struct _DIRECT_SHADER DIRECT_SHADER, *PDIRECT_SHADER;
+typedef CONST DIRECT_SHADER *PCDIRECT_SHADER;
+
+typedef struct _INDIRECT_SHADER INDIRECT_SHADER, *PINDIRECT_SHADER;
+typedef CONST INDIRECT_SHADER *PCINDIRECT_SHADER;
+
+typedef struct _TRANSLUCENT_SHADER TRANSLUCENT_SHADER, *PTRANSLUCENT_SHADER;
+typedef CONST TRANSLUCENT_SHADER *PCTRANSLUCENT_SHADER;
 
 //
 // Types
@@ -50,10 +59,13 @@ ISTATUS
     _In_ PCPOINT3 WorldHit,
     _In_ PCVECTOR3 ModelViewer,
     _In_ PCPOINT3 ModelHit,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ PCVOID AdditionalData,
-    _In_ PCSHADER Shader,
-    _In_ PSURFACE_NORMAL SurfaceNormal,
+    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCVOID AdditionalData,
+    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PCDIRECT_SHADER DirectShader,
+    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader,
+    _In_opt_ PSURFACE_NORMAL SurfaceNormal,
     _Out_ PCOLOR4 Color
     );
 

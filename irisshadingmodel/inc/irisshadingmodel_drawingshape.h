@@ -41,65 +41,51 @@ PCNORMAL
 
 typedef struct _DRAWING_SHAPE_VTABLE {
     SHAPE_VTABLE ShapeVTable;
-    PFREE_ROUTINE FreeRoutine;
     PDRAWING_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
     PDRAWING_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
 } DRAWING_SHAPE_VTABLE, *PDRAWING_SHAPE_VTABLE;
 
 typedef CONST DRAWING_SHAPE_VTABLE *PCDRAWING_SHAPE_VTABLE;
 
-struct _DRAWING_SHAPE {
-    PCDRAWING_SHAPE_VTABLE DrawingShapeVTable;
-};
-
 //
 // Functions
 //
 
-SFORCEINLINE
+_Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PDRAWING_SHAPE
+DrawingShapeAllocate(
+    _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
+    _Field_size_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+IRISSHADINGMODELAPI
 PCTEXTURE
 DrawingShapeGetTexture(
-    _In_ PCDRAWING_SHAPE Shape,
+    _In_opt_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
-    )
-{
-    PCTEXTURE Texture;
+    );
 
-    ASSERT(Shape != NULL);
-
-    Texture = Shape->DrawingShapeVTable->GetTextureRoutine(Shape, FaceHit);
-    
-    return Texture;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 PCNORMAL
 DrawingShapeGetNormal(
-    _In_ PCDRAWING_SHAPE Shape,
+    _In_opt_ PCDRAWING_SHAPE DrawingShape,
     _In_ UINT32 FaceHit
-    )
-{
-    PCNORMAL Normal;
+    );
 
-    ASSERT(Shape != NULL);
-
-    Normal = Shape->DrawingShapeVTable->GetNormalRoutine(Shape, FaceHit);
-    
-    return Normal;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-DrawingShapeFree(
-    _Pre_maybenull_ _Post_invalid_ PDRAWING_SHAPE Shape
-    )
-{
-    if (Shape == NULL)
-    {
-        return;
-    }
+DrawingShapeReference(
+    _In_opt_ PDRAWING_SHAPE DrawingShape
+    );
 
-    Shape->DrawingShapeVTable->FreeRoutine(Shape);
-}
+IRISSHADINGMODELAPI
+VOID
+DrawingShapeDereference(
+    _Pre_maybenull_ _Post_invalid_ PDRAWING_SHAPE DrawingShape
+    );
 
 #endif // _DRAWING_SHAPE_IRIS_SHADING_MODEL_

@@ -4,7 +4,7 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    c
+    matrix.c
 
 Abstract:
 

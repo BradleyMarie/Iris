@@ -29,7 +29,7 @@ ConstantTextureAllocate(
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
     _In_opt_ PCDIRECT_SHADER DirectShader,
     _In_opt_ PCINDIRECT_SHADER IndirectShader,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
     );
 
 #endif // _CONSTANT_TEXTURE_IRIS_TOOLKIT_

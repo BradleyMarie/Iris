@@ -30,7 +30,6 @@ Abstract:
 #include "irisshadingmodel_direct.h"
 #include "irisshadingmodel_indirect.h"
 #include "irisshadingmodel_translucent.h"
-#include "irisshadingmodel_shader.h"
 #include "irisshadingmodel_texture.h"
 #include "irisshadingmodel_drawingshape.h"
 #include "irisshadingmodel_sceneobject.h"

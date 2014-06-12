@@ -33,7 +33,6 @@ struct _TEXTURE_SHADER {
     PCPOINT3 ModelHit;
     PCMATRIX ModelToWorld;
     PCVOID AdditionalData;
-    PCSHADER Shader;
     PSURFACE_NORMAL SurfaceNormal;
     PCOLOR4 Color;
 };

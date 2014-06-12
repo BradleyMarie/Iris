@@ -33,7 +33,7 @@ _Ret_maybenull_
 IRISAPI
 PGEOMETRY
 GeometryAllocate(
-    _In_ PCSHAPE Shape,
+    _In_ PSHAPE Shape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );

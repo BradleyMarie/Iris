@@ -27,7 +27,6 @@ Abstract:
 //
 
 typedef struct _TRIANGLE {
-    DRAWING_SHAPE ShapeHeader;
     PCTEXTURE Textures[2];
     PCNORMAL Normals[2];
     POINT3 Vertex0;
@@ -195,7 +194,6 @@ TriangleTraceTriangle(
 
     *ShapeHitList = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
                                                           NULL,
-                                                          (PCSHAPE) Context,
                                                           Distance,
                                                           Face,
                                                           &BarycentricCoordinates,
@@ -210,8 +208,7 @@ TriangleTraceTriangle(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
-    { TriangleTraceTriangle },
-    free,
+    { TriangleTraceTriangle, NULL },
     TriangleGetTexture,
     TriangleGetNormal
 };
@@ -221,13 +218,14 @@ CONST STATIC DRAWING_SHAPE_VTABLE TriangleHeader = {
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 STATIC
-PTRIANGLE
-TriangleAllocateInternal(
-    _In_ PCPOINT3 Vertex0,
-    _In_ PCPOINT3 Vertex1,
-    _In_ PCPOINT3 Vertex2,
+ISTATUS
+TriangleInitialize(
+    _In_ PTRIANGLE Triangle,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
     _In_opt_ PCTEXTURE FrontTexture,
     _In_opt_ PCTEXTURE BackTexture,
     _Out_opt_ PVECTOR3 FrontFaceSurfaceNormal 
@@ -235,25 +233,17 @@ TriangleAllocateInternal(
 {
     FLOAT CrossProductLength;
     VECTOR3 CrossProduct;
-    PTRIANGLE Triangle;
     VECTOR3 B;
     VECTOR3 C;
-
-    if (Vertex0 == NULL || 
-        Vertex1 == NULL ||
-        Vertex2 == NULL)
-    {
-        return NULL;
-    }
 
     if (FrontTexture == NULL &&
         BackTexture == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT;
     }
 
-    B = PointSubtract(*Vertex1, *Vertex0);
-    C = PointSubtract(*Vertex2, *Vertex0);
+    B = PointSubtract(Vertex1, Vertex0);
+    C = PointSubtract(Vertex2, Vertex0);
 
     CrossProduct = VectorCrossProduct(C, B);
 
@@ -261,19 +251,10 @@ TriangleAllocateInternal(
 
     if (CrossProductLength <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Triangle = (PTRIANGLE) malloc(sizeof(TRIANGLE));
-
-    if (Triangle == NULL)
-    {
-        return NULL;
-    }
-
-    Triangle->ShapeHeader.DrawingShapeVTable = &TriangleHeader;
-
-    Triangle->Vertex0 = *Vertex0;
+    Triangle->Vertex0 = Vertex0;
     Triangle->B = B;
     Triangle->C = C;
 
@@ -288,7 +269,7 @@ TriangleAllocateInternal(
     Triangle->Textures[0] = FrontTexture;
     Triangle->Textures[1] = BackTexture;
 
-    return Triangle;
+    return ISTATUS_SUCCESS;
 }
 
 //
@@ -308,19 +289,32 @@ TriangleAllocate(
     _In_opt_ PCNORMAL BackNormal
     )
 {
-    PTRIANGLE Triangle;
+    PDRAWING_SHAPE DrawingShape;
+    TRIANGLE Triangle;
+    ISTATUS Status;
 
-    Triangle = TriangleAllocateInternal(Vertex0,
-                                        Vertex1,
-                                        Vertex2,
-                                        FrontTexture,
-                                        BackTexture,
-                                        NULL);
+    Status = TriangleInitialize(&Triangle,
+                                *Vertex0,
+                                *Vertex1,
+                                *Vertex2,
+                                FrontTexture,
+                                BackTexture,
+                                NULL);
 
-    Triangle->Normals[0] = FrontNormal;
-    Triangle->Normals[1] = BackNormal;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return NULL;
+    }
 
-    return (PDRAWING_SHAPE) Triangle;
+    Triangle.Normals[0] = FrontNormal;
+    Triangle.Normals[1] = BackNormal;
+
+    DrawingShape = DrawingShapeAllocate(&TriangleHeader,
+                                        &Triangle,
+                                        sizeof(TRIANGLE),
+                                        sizeof(PVOID));
+
+    return DrawingShape;
 }
 
 _Check_return_
@@ -337,10 +331,12 @@ FlatTriangleAllocate(
     _Out_opt_ PNORMAL *BackNormal
     )
 {
+    PDRAWING_SHAPE DrawingShape;
     PNORMAL AllocatedFrontNormal;
     PNORMAL AllocatedBackNormal;
     VECTOR3 FrontSurfaceNormal;
-    PTRIANGLE Triangle;
+    TRIANGLE Triangle;
+    ISTATUS Status;
 
     if ((FrontTexture != NULL && FrontNormal == NULL) ||
         (BackTexture != NULL && BackNormal == NULL))
@@ -348,12 +344,18 @@ FlatTriangleAllocate(
         return NULL;
     }
 
-    Triangle = TriangleAllocateInternal(Vertex0,
-                                        Vertex1,
-                                        Vertex2,
-                                        FrontTexture,
-                                        BackTexture,
-                                        &FrontSurfaceNormal);
+    Status = TriangleInitialize(&Triangle,
+                                *Vertex0,
+                                *Vertex1,
+                                *Vertex2,
+                                FrontTexture,
+                                BackTexture,
+                                NULL);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return NULL;
+    }
 
     if (FrontTexture != NULL)
     {
@@ -362,7 +364,6 @@ FlatTriangleAllocate(
 
         if (AllocatedFrontNormal == NULL)
         {
-            free(Triangle);
             return NULL;
         }
     }
@@ -381,7 +382,6 @@ FlatTriangleAllocate(
         if (AllocatedBackNormal == NULL)
         {
             NormalFree(AllocatedFrontNormal);
-            free(Triangle);
             return NULL;
         }
     }
@@ -390,8 +390,8 @@ FlatTriangleAllocate(
         AllocatedBackNormal = NULL;
     }
 
-    Triangle->Normals[0] = AllocatedFrontNormal;
-    Triangle->Normals[1] = AllocatedBackNormal;
+    Triangle.Normals[0] = AllocatedFrontNormal;
+    Triangle.Normals[1] = AllocatedBackNormal;
 
     if (FrontNormal != NULL)
     {
@@ -403,5 +403,16 @@ FlatTriangleAllocate(
         *BackNormal = AllocatedBackNormal;
     }
 
-    return (PDRAWING_SHAPE) Triangle;
+    DrawingShape = DrawingShapeAllocate(&TriangleHeader,
+                                        &Triangle,
+                                        sizeof(TRIANGLE),
+                                        sizeof(PVOID));
+
+    if (DrawingShape == NULL)
+    {
+        free(AllocatedFrontNormal);
+        free(AllocatedBackNormal);
+    }
+
+    return DrawingShape;
 }

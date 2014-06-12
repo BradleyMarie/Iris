@@ -20,7 +20,10 @@ Abstract:
 
 typedef struct _CONSTANT_TEXTURE {
     TEXTURE TextureHeader;
-    SHADER Shader;
+    PCEMISSIVE_SHADER EmissiveShader;
+    PCDIRECT_SHADER DirectShader;
+    PCINDIRECT_SHADER IndirectShader;
+    PTRANSLUCENT_SHADER TranslucentShader;
 } CONSTANT_TEXTURE, *PCONSTANT_TEXTURE;
 
 typedef CONST CONSTANT_TEXTURE *PCCONSTANT_TEXTURE;
@@ -52,9 +55,27 @@ ConstantTextureGetShader(
     ConstantTexture = (PCCONSTANT_TEXTURE) Context;
 
     Status = TextureShaderShadeShader(TextureShader,
-                                      &ConstantTexture->Shader);
+                                      ConstantTexture->EmissiveShader,
+                                      ConstantTexture->DirectShader,
+                                      ConstantTexture->IndirectShader,
+                                      ConstantTexture->TranslucentShader);
 
     return Status;
+}
+
+STATIC
+VOID
+ConstantTextureFree(
+    _In_ PVOID Context
+    )
+{
+    PCCONSTANT_TEXTURE ConstantTexture;
+
+    ASSERT(Context != NULL);
+
+    ConstantTexture = (PCCONSTANT_TEXTURE) Context;
+
+    TranslucentShaderDereference(ConstantTexture->TranslucentShader);
 }
 
 //
@@ -63,7 +84,7 @@ ConstantTextureGetShader(
 
 CONST STATIC TEXTURE_VTABLE ConstantTextureVTable = {
     ConstantTextureGetShader,
-    free
+    ConstantTextureFree
 };
 
 //
@@ -78,7 +99,7 @@ ConstantTextureAllocate(
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
     _In_opt_ PCDIRECT_SHADER DirectShader,
     _In_opt_ PCINDIRECT_SHADER IndirectShader,
-    _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
+    _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
     )
 {
     PCONSTANT_TEXTURE ConstantTexture;
@@ -99,10 +120,12 @@ ConstantTextureAllocate(
     }
 
     ConstantTexture->TextureHeader.TextureVTable = &ConstantTextureVTable;
-    ConstantTexture->Shader.EmissiveShader = EmissiveShader;
-    ConstantTexture->Shader.IndirectShader = IndirectShader;
-    ConstantTexture->Shader.DirectShader = DirectShader;
-    ConstantTexture->Shader.TranslucentShader = TranslucentShader;
+    ConstantTexture->EmissiveShader = EmissiveShader;
+    ConstantTexture->IndirectShader = IndirectShader;
+    ConstantTexture->DirectShader = DirectShader;
+    ConstantTexture->TranslucentShader = TranslucentShader;
+
+    TranslucentShaderReference(TranslucentShader);
 
     return (PTEXTURE) ConstantTexture;
 }

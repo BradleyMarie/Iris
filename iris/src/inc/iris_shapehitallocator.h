@@ -32,6 +32,7 @@ typedef CONST SHARED_GEOMETRY_HIT *PCSHARED_GEOMETRY_HIT;
 typedef struct _SHAPE_HIT_ALLOCATOR {
     IRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     IRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
+    PCSHAPE CurrentShape;
 } SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
 
 typedef struct _INTERNAL_SHAPE_HIT {
@@ -119,6 +120,19 @@ ShapeHitAllocatorFreeAll(
 
     IrisDynamicMemoryAllocatorFreeAll(AdditionalDataAllocator);
     IrisStaticMemoryAllocatorFreeAll(ShapeHitAllocator);
+}
+
+SFORCEINLINE
+VOID
+ShapeHitAllocatorSetCurrentShape(
+    _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
+    _In_ PCSHAPE Shape
+    )
+{
+    ASSERT(Allocator != NULL);
+    ASSERT(Shape != NULL);
+
+    Allocator->CurrentShape = Shape;
 }
 
 SFORCEINLINE

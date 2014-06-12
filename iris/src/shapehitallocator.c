@@ -21,7 +21,6 @@ PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocateInternal(
     _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
-    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -38,7 +37,6 @@ ShapeHitAllocatorAllocateInternal(
     PVOID Allocation;
 
     if (Allocator == NULL ||
-        Shape == NULL || 
         IsNormalFloat(Distance) == FALSE || IsFiniteFloat(Distance) == FALSE ||
         (AdditionalData == NULL && AdditionalDataSizeInBytes != 0))
     {
@@ -80,7 +78,7 @@ ShapeHitAllocatorAllocateInternal(
         Allocation = NULL;
     }
 
-    ShapeHit->Shape = Shape;
+    ShapeHit->Shape = Allocator->CurrentShape;
     ShapeHit->Distance = Distance;
     ShapeHit->FaceHit = FaceHit;
     ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
@@ -108,7 +106,6 @@ PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
-    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -119,7 +116,6 @@ ShapeHitAllocatorAllocate(
 
     ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
                                                      NextShapeHit,
-                                                     Shape,
                                                      Distance,
                                                      FaceHit,
                                                      AdditionalData,
@@ -135,7 +131,6 @@ PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocateWithHitPoint(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_ PSHAPE_HIT_LIST NextShapeHit,
-    _In_ PCSHAPE Shape,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -147,7 +142,6 @@ ShapeHitAllocatorAllocateWithHitPoint(
 
     ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
                                                      NextShapeHit,
-                                                     Shape,
                                                      Distance,
                                                      FaceHit,
                                                      AdditionalData,

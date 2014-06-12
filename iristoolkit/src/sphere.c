@@ -26,7 +26,6 @@ Abstract:
 //
 
 typedef struct _SPHERE {
-    DRAWING_SHAPE ShapeHeader;
     PCTEXTURE Textures[2];
     PCNORMAL Normals[2];
     POINT3 Center;
@@ -189,7 +188,6 @@ SphereTraceSphere(
 
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               NULL,
-                                              (PCSHAPE) Context,
                                               Distance0,
                                               Face0,
                                               NULL,
@@ -207,7 +205,6 @@ SphereTraceSphere(
 
     *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
                                               *ShapeHitList,
-                                              (PCSHAPE) Context,
                                               Distance1,
                                               Face1,
                                               NULL,
@@ -228,8 +225,7 @@ SphereTraceSphere(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
-    { SphereTraceSphere },
-    free,
+    { SphereTraceSphere, NULL },
     SphereGetTexture,
     SphereGetNormal
 };
@@ -251,7 +247,8 @@ SphereAllocate(
     _In_opt_ PCNORMAL BackNormal
     )
 {
-    PSPHERE Sphere;
+    PDRAWING_SHAPE DrawingShape;
+    SPHERE Sphere;
 
     ASSERT(Center != NULL);
 
@@ -268,22 +265,17 @@ SphereAllocate(
         return NULL;
     }
 
-    Sphere = (PSPHERE) malloc(sizeof(SPHERE));
+    Sphere.Center = *Center;
+    Sphere.RadiusSquared = Radius * Radius;
+    Sphere.Textures[0] = FrontTexture;
+    Sphere.Textures[1] = BackTexture;
+    Sphere.Normals[0] = FrontNormal;
+    Sphere.Normals[1] = BackNormal;
 
-    if (Sphere == NULL)
-    {
-        return NULL;
-    }
+    DrawingShape = DrawingShapeAllocate(&SphereHeader,
+                                        &Sphere,
+                                        sizeof(SPHERE),
+                                        sizeof(PVOID));
 
-    Sphere->ShapeHeader.DrawingShapeVTable = &SphereHeader;
-
-    Sphere->Center = *Center;
-    Sphere->RadiusSquared = Radius * Radius;
-
-    Sphere->Textures[0] = FrontTexture;
-    Sphere->Textures[1] = BackTexture;
-    Sphere->Normals[0] = FrontNormal;
-    Sphere->Normals[1] = BackNormal;
-
-    return (PDRAWING_SHAPE) Sphere;
+    return DrawingShape;
 }
