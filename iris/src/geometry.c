@@ -37,6 +37,11 @@ GeometryAllocate(
         return NULL;
     }
 
+    if (ModelToWorld == NULL)
+    {
+        Premultiplied = TRUE;
+    }
+
     Geometry->Shape = Shape;
     Geometry->ModelToWorld = ModelToWorld;
     Geometry->Premultiplied = Premultiplied;

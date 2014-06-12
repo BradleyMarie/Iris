@@ -26,7 +26,6 @@ SceneTracerTraceGeometry(
     ISTATUS Status;
 
     ASSERT(SceneTracer != NULL);
-    ASSERT(WorldRay != NULL);
     ASSERT(SceneObject != NULL);
 
     Geometry = (PGEOMETRY) SceneObject;

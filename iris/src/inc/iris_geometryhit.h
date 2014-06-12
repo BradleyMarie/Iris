@@ -52,9 +52,9 @@ GeometryHitInitialize(
 
         GeometryHit->ModelHitPoint = PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
                                                          GeometryHit->WorldHitPoint);
-
-        GeometryHit->ModelViewer = VectorMatrixInverseTransposedMultiply(SharedGeometryHit->ModelToWorld,
-                                                                         WorldRay.Direction);
+        
+        GeometryHit->ModelViewer = VectorMatrixInverseMultiply(SharedGeometryHit->ModelToWorld,
+                                                               WorldRay.Direction);
     }
     else
     {

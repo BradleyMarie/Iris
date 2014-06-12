@@ -128,8 +128,8 @@ RayShaderAllocateInternal(
         return NULL;
     }
 
-    if (CurrentDepth <= RussianRouletteStartDepth &&
-        RussianRouletteStartDepth != DISABLE_RUSSAIAN_ROULETTE_TERMINATION)
+    if (RussianRouletteStartDepth == DISABLE_RUSSAIAN_ROULETTE_TERMINATION ||
+        CurrentDepth < RussianRouletteStartDepth)
     {
         MinimumContinueProbability = (FLOAT) 1.0;
         MaximumContinueProbability = (FLOAT) 1.0;
@@ -404,7 +404,7 @@ RayShaderTraceRayMontecarlo(
         {
             SurfaceNormalInitialize(&SurfaceNormal,
                                     Normal,
-                                    &GeometryHit.ModelHitPoint,
+                                    GeometryHit.ModelHitPoint,
                                     GeometryHit.ModelToWorld,
                                     AdditionalData);
 

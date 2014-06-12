@@ -61,20 +61,15 @@ GeometryTraceGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (Geometry->ModelToWorld == NULL)
-    {
-        GeometryHit->ModelToWorld = NULL;
-        TraceRay = WorldRay;
-    }
-    else if (Geometry->Premultiplied != FALSE)
-    {
-        GeometryHit->ModelToWorld = Geometry->ModelToWorld;
+    GeometryHit->ModelToWorld = Geometry->ModelToWorld;
+
+    if (Geometry->Premultiplied != FALSE)
+    {   
         GeometryHit->Premultiplied = TRUE;
         TraceRay = WorldRay;
     }
     else
     {
-        GeometryHit->ModelToWorld = Geometry->ModelToWorld;
         GeometryHit->Premultiplied = FALSE;
 
         GeometryHit->ModelRay = RayMatrixInverseMultiply(Geometry->ModelToWorld,

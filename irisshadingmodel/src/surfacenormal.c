@@ -40,10 +40,10 @@ SurfaceNormalGetWorldNormal(
         return Status;
     }
 
-    if (SurfaceNormal->WorldToModel != NULL)
+    if (SurfaceNormal->ModelToWorld != NULL)
     {
-        *WorldNormal = VectorMatrixTransposedMultiply(SurfaceNormal->WorldToModel,
-                                                      *WorldNormal);
+        *WorldNormal = VectorMatrixInverseTransposedMultiply(SurfaceNormal->ModelToWorld,
+                                                             *WorldNormal);
     }
     else if (SurfaceNormal->Prenormalized != FALSE)
     {
@@ -77,7 +77,7 @@ SurfaceNormalGetModelNormal(
     }
 
     Status = NormalComputeNormal(SurfaceNormal->Normal,
-                                 SurfaceNormal->ModelHit,
+                                 &SurfaceNormal->ModelHit,
                                  SurfaceNormal->AdditionalData,
                                  ModelNormal);
 

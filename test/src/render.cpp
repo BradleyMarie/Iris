@@ -631,6 +631,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     VECTOR3 Up;
     PTRACER RecursiveRayTracer;
     ISTATUS Status;
+    PRANDOM Rng;
 
     InfinitePlaneLocation = PointCreate((FLOAT) 0.0,
                                         (FLOAT) 0.0,
@@ -778,7 +779,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                                          InfinitePlaneBlackIndirectShader,
                                                          NULL);
 
-    SphereTexture = ConstantTextureAllocate(NULL, 
+    SphereTexture = ConstantTextureAllocate(NULL,
                                             SpherePhongShader,
                                             SphereIndirectShader,
                                             NULL);
@@ -812,10 +813,12 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Status = SceneAddWorldObject(Scene, InfinitePlane);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&Black, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                5);
 

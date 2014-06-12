@@ -31,8 +31,8 @@ struct _SURFACE_NORMAL {
     VECTOR3 WorldNormal;
     VECTOR3 ModelNormal;
     PCNORMAL Normal;
-    PCMATRIX WorldToModel;
-    PCPOINT3 ModelHit;
+    PCMATRIX ModelToWorld;
+    POINT3 ModelHit;
     PCVOID AdditionalData;
     BOOL Prenormalized;
 };
@@ -46,8 +46,8 @@ VOID
 SurfaceNormalInitialize(
     _Out_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCNORMAL Normal,
-    _In_ PCPOINT3 ModelHit,
-    _In_opt_ PCMATRIX WorldToModel,
+    _In_ POINT3 ModelHit,
+    _In_opt_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData
     )
 {
@@ -64,13 +64,13 @@ SurfaceNormalInitialize(
     SurfaceNormal->NormalizedWorldNormalValid = FALSE;
     SurfaceNormal->Prenormalized = Normal->NormalVTable->Prenormalized;
 
-    if (WorldToModel != NULL)
+    if (ModelToWorld != NULL)
     {
-        SurfaceNormal->WorldToModel = WorldToModel;
+        SurfaceNormal->ModelToWorld = ModelToWorld;
     }
     else
     {
-        SurfaceNormal->WorldToModel = NULL;   
+        SurfaceNormal->ModelToWorld = NULL;
     }
 }
 
