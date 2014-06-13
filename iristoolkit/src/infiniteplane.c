@@ -39,7 +39,7 @@ typedef CONST INFINITE_PLANE *PCINFINITE_PLANE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCTEXTURE 
 InfinitePlaneGetTexture(
@@ -62,7 +62,7 @@ InfinitePlaneGetTexture(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCNORMAL 
 InfinitePlaneGetNormal(

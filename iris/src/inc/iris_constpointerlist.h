@@ -106,6 +106,7 @@ IrisConstantPointerListAddPointer(
     return ISTATUS_SUCCESS;
 }
 
+_When_(Index < PointerList->PointerListSize, _Ret_)
 SFORCEINLINE
 PCVOID
 IrisConstantPointerListRetrieveAtIndex(

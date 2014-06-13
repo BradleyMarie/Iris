@@ -332,7 +332,7 @@ MatrixpInvert(
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocate(
     _In_ FLOAT M00,
@@ -453,7 +453,7 @@ MatrixAllocate(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateTranslation(
     _In_ FLOAT X,
@@ -523,7 +523,7 @@ MatrixAllocateTranslation(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateScalar(
     _In_ FLOAT X,
@@ -593,7 +593,7 @@ MatrixAllocateScalar(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixpAllocateRotation(
     _In_ FLOAT Theta,
@@ -671,7 +671,7 @@ MatrixpAllocateRotation(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateRotation(
     _In_ FLOAT Theta,
@@ -699,7 +699,7 @@ MatrixAllocateRotation(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateFrustum(
     _In_ FLOAT Left,
@@ -762,7 +762,7 @@ MatrixAllocateFrustum(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateOrothographic(
     _In_ FLOAT Left,
@@ -826,7 +826,8 @@ MatrixAllocateOrothographic(
 }
 
 _Check_return_
-_Ret_maybenull_
+_When_(Multiplicand0 == NULL && Multiplicand1 == NULL, _Ret_null_)
+_When_(Multiplicand0 != NULL || Multiplicand1 != NULL, _Ret_opt_)
 PMATRIX
 MatrixAllocateProduct(
     _In_opt_ PMATRIX Multiplicand0,
@@ -969,7 +970,7 @@ MatrixAllocateProduct(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PMATRIX
 MatrixAllocateInverse(
     _In_opt_ PMATRIX Matrix
@@ -992,8 +993,6 @@ MatrixAllocateInverse(
     return Inverse;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 MatrixReadContents(
     _In_ PCMATRIX Matrix,

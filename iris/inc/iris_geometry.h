@@ -29,7 +29,7 @@ typedef CONST GEOMETRY *PCGEOMETRY;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PGEOMETRY
 GeometryAllocate(

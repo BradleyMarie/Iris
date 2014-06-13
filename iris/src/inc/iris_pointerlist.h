@@ -104,6 +104,7 @@ IrisPointerListAddPointer(
     return ISTATUS_SUCCESS;
 }
 
+_When_(Index < PointerList->PointerListSize, _Ret_)
 SFORCEINLINE
 PVOID
 IrisPointerListRetrieveAtIndex(
@@ -115,17 +116,6 @@ IrisPointerListRetrieveAtIndex(
     ASSERT(Index < PointerList->PointerListSize);
 
     return PointerList->PointerList[Index];
-}
-
-SFORCEINLINE
-PVOID*
-IrisPointerListGetStorage(
-    _In_ PIRIS_POINTER_LIST PointerList
-    )
-{
-    ASSERT(PointerList != NULL);
-
-    return PointerList->PointerList;
 }
 
 SFORCEINLINE

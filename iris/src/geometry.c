@@ -15,7 +15,7 @@ Abstract:
 #include <irisp.h>
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PGEOMETRY
 GeometryAllocate(
     _In_ PSHAPE Shape,

@@ -19,46 +19,72 @@ Abstract:
 //
 
 _Check_return_
-_Ret_maybenull_
+_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
+_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
 PSHAPE
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
     )
 {
     PSHAPE Shape;
     SIZE_T DataOffset;
     PVOID DataAddress;
     SIZE_T AllocationSize;
+    SIZE_T DataPadding;
     PVOID Allocation;
     ISTATUS Status;
 
-    if (ShapeVTable == NULL ||
-        Data == NULL ||
-        DataSizeInBytes == 0 ||
-        DataAlignment == 0)
+    if (ShapeVTable == NULL)
     {
         return NULL;
     }
 
-    Status = CheckedAddSizeT(sizeof(SHAPE),
-                             DataAlignment,
-                             &AllocationSize);
-
-    if (Status != ISTATUS_SUCCESS)
+    if (DataSizeInBytes != 0)
     {
-        return NULL;
+        if (Data == NULL ||
+            DataAlignment == 0)
+        {
+            return NULL;
+        }
+
+        //
+        // This technically means even-sized alignments
+        // are 1 byte larger than they need to be.
+        //
+        
+        if (DataAlignment % 2 == 1)
+        {
+            DataPadding = DataAlignment - 1;
+        }
+        else
+        {
+            DataPadding = DataAlignment;
+        }
+
+        Status = CheckedAddSizeT(sizeof(SHAPE),
+                                 DataPadding,
+                                 &AllocationSize);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return NULL;
+        }
+
+        Status = CheckedAddSizeT(AllocationSize,
+                                 DataSizeInBytes,
+                                 &AllocationSize);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return NULL;
+        }
     }
-
-    Status = CheckedAddSizeT(AllocationSize,
-                             DataSizeInBytes,
-                             &AllocationSize);
-
-    if (Status != ISTATUS_SUCCESS)
+    else
     {
-        return NULL;
+        AllocationSize = sizeof(SHAPE);
     }
 
     Allocation = malloc(AllocationSize);
@@ -68,39 +94,33 @@ ShapeAllocate(
         return NULL;
     }
 
-    DataOffset = (SIZE_T) ((PUINT8) Allocation + sizeof(SHAPE)) % DataAlignment;
-
-    if (DataOffset != 0)
-    {
-        DataOffset = DataAlignment - DataOffset;
-    }
-
-    DataOffset += sizeof(SHAPE);
-
-    DataAddress = (PUINT8) Allocation + DataOffset;
-
     Shape = (PSHAPE) Allocation;
 
     Shape->VTable = ShapeVTable;
     Shape->ReferenceCount = 1;
-    Shape->DataOffset = DataOffset;
-    memcpy(DataAddress, Data, DataSizeInBytes);
 
-    return Shape;
-}
-
-_Ret_
-PCVOID
-ShapeGetData(
-    _In_ PCSHAPE Shape
-    )
-{
-    if (Shape == NULL)
+    if (DataSizeInBytes != 0)
     {
-        return NULL;
+        DataOffset = (SIZE_T) ((PUINT8) Allocation + sizeof(SHAPE)) % DataAlignment;
+
+        if (DataOffset != 0)
+        {
+            DataOffset = DataAlignment - DataOffset;
+        }
+
+        DataOffset += sizeof(SHAPE);
+
+        DataAddress = (PUINT8) Allocation + DataOffset;
+
+        Shape->DataOffset = DataOffset;
+        memcpy(DataAddress, Data, DataSizeInBytes);
+    }
+    else
+    {
+        DataOffset = 0;
     }
 
-    return (PUINT8) Shape + Shape->DataOffset;
+    return Shape;
 }
 
 _Ret_
@@ -115,6 +135,21 @@ ShapeGetVTable(
     }
 
     return Shape->VTable;
+}
+
+_Check_return_
+_Ret_opt_
+PCVOID
+ShapeGetData(
+    _In_ PCSHAPE Shape
+    )
+{
+    if (Shape == NULL || Shape->DataOffset == 0)
+    {
+        return NULL;
+    }
+
+    return (PUINT8) Shape + Shape->DataOffset;
 }
 
 VOID

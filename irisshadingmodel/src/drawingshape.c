@@ -19,13 +19,14 @@ Abstract:
 //
 
 _Check_return_
-_Ret_maybenull_
+_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
+_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
 PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
     )
 {
     PSHAPE Shape;
@@ -38,7 +39,7 @@ DrawingShapeAllocate(
     return (PDRAWING_SHAPE) Shape;
 }
 
-_Ret_maybenull_
+_Ret_opt_
 PCTEXTURE
 DrawingShapeGetTexture(
     _In_ PCDRAWING_SHAPE DrawingShape,
@@ -69,7 +70,7 @@ DrawingShapeGetTexture(
     return Texture;
 }
 
-_Ret_maybenull_
+_Ret_opt_
 PCNORMAL
 DrawingShapeGetNormal(
     _In_ PCDRAWING_SHAPE DrawingShape,

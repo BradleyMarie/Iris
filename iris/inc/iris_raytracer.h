@@ -29,7 +29,7 @@ typedef CONST RAYTRACER *PCRAYTRACER;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PRAYTRACER
 RayTracerAllocate(
@@ -54,7 +54,6 @@ RayTracerTraceGeometry(
     _In_ PCGEOMETRY Geometry
     );
 
-_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
 RayTracerSort(

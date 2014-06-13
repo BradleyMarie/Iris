@@ -39,7 +39,7 @@ typedef CONST SPHERE *PCSPHERE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCTEXTURE 
 SphereGetTexture(
@@ -62,7 +62,7 @@ SphereGetTexture(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCNORMAL 
 SphereGetNormal(

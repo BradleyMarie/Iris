@@ -59,9 +59,7 @@ IrisDynamicMemoryAllocatorInitialize(
     Allocator->NextAllocation = NULL;
 }
 
-_Check_return_
-_Ret_maybenull_
-_Post_writable_byte_size_(SizeInBytes)
+_When_(SizeInBytes != 0, _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(SizeInBytes))
 SFORCEINLINE
 PVOID
 IrisDynamicMemoryAllocatorAllocate(

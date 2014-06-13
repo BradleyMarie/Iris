@@ -44,27 +44,29 @@ typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
+_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
 IRISAPI
 PSHAPE
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
-    _In_reads_bytes_(DataSizeInBytes)PCVOID Data,
+    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
-    );
-
-_Ret_
-IRISAPI
-PCVOID
-ShapeGetData(
-    _In_ PCSHAPE Shape
+    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
     );
 
 _Ret_
 IRISAPI
 PCSHAPE_VTABLE
 ShapeGetVTable(
+    _In_ PCSHAPE Shape
+    );
+
+_Check_return_
+_Ret_opt_
+IRISAPI
+PCVOID
+ShapeGetData(
     _In_ PCSHAPE Shape
     );
 

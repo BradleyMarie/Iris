@@ -29,7 +29,7 @@ typedef CONST MATRIX *PCMATRIX;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocate(
@@ -52,7 +52,7 @@ MatrixAllocate(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateTranslation(
@@ -62,7 +62,7 @@ MatrixAllocateTranslation(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateScalar(
@@ -72,7 +72,7 @@ MatrixAllocateScalar(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateRotation(
@@ -83,7 +83,7 @@ MatrixAllocateRotation(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateFrustum(
@@ -96,7 +96,7 @@ MatrixAllocateFrustum(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateOrothographic(
@@ -109,7 +109,8 @@ MatrixAllocateOrothographic(
     );
 
 _Check_return_
-_Ret_maybenull_
+_When_(Multiplicand0 == NULL && Multiplicand1 == NULL, _Ret_null_)
+_When_(Multiplicand0 != NULL || Multiplicand1 != NULL, _Ret_opt_)
 IRISAPI
 PMATRIX
 MatrixAllocateProduct(
@@ -118,15 +119,13 @@ MatrixAllocateProduct(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PMATRIX
 MatrixAllocateInverse(
     _In_opt_ PMATRIX Matrix
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
 MatrixReadContents(

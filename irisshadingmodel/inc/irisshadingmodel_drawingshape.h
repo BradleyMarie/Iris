@@ -23,19 +23,19 @@ Abstract:
 
 typedef
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PCTEXTURE
 (*PDRAWING_SHAPE_GET_TEXTURE_ROUTINE)(
-    _In_ PCVOID Context, 
+    _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
 
 typedef
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 PCNORMAL 
 (*PDRAWING_SHAPE_GET_NORMAL_ROUTINE)(
-    _In_ PCVOID Context, 
+    _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
 
@@ -52,17 +52,18 @@ typedef CONST DRAWING_SHAPE_VTABLE *PCDRAWING_SHAPE_VTABLE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
+_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
 IRISSHADINGMODELAPI
 PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
     );
 
-_Ret_maybenull_
+_Ret_opt_
 IRISSHADINGMODELAPI
 PCTEXTURE
 DrawingShapeGetTexture(
@@ -70,7 +71,7 @@ DrawingShapeGetTexture(
     _In_ UINT32 FaceHit
     );
 
-_Ret_maybenull_
+_Ret_opt_
 IRISSHADINGMODELAPI
 PCNORMAL
 DrawingShapeGetNormal(

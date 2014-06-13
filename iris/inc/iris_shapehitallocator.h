@@ -49,7 +49,7 @@ typedef CONST SHAPE_HIT_LIST *PCSHAPE_HIT_LIST;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocate(
@@ -57,12 +57,12 @@ ShapeHitAllocatorAllocate(
     _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes
     );
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 IRISAPI
 PSHAPE_HIT_LIST
 ShapeHitAllocatorAllocateWithHitPoint(
@@ -70,7 +70,7 @@ ShapeHitAllocatorAllocateWithHitPoint(
     _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ POINT3 HitPoint
     );

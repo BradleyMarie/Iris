@@ -43,7 +43,7 @@ typedef CONST TRIANGLE *PCTRIANGLE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCTEXTURE 
 TriangleGetTexture(
@@ -66,7 +66,7 @@ TriangleGetTexture(
 }
 
 _Check_return_
-_Ret_maybenull_
+_Ret_opt_
 STATIC
 PCNORMAL 
 TriangleGetNormal(
