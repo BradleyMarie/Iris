@@ -220,50 +220,6 @@ RayTracerSort(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerGetNextGeometryHit(
-    _Inout_ PRAYTRACER RayTracer,
-    _Out_ PGEOMETRY_HIT GeometryHit
-    )
-{
-    PCIRIS_CONSTANT_POINTER_LIST PointerList;
-    PCINTERNAL_SHAPE_HIT InternalShapeHit;
-    PCVOID ValueAtIndex;
-    SIZE_T CurrentIndex;
-    SIZE_T HitCount;
-
-    if (RayTracer == NULL ||
-        GeometryHit == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT;
-    }
-
-    PointerList = &RayTracer->HitList;
-
-    HitCount = IrisConstantPointerListGetSize(PointerList);
-    CurrentIndex = RayTracer->HitIndex;
-
-    if (HitCount == CurrentIndex)
-    {
-        return ISTATUS_NO_MORE_DATA;
-    }
-
-    ValueAtIndex = IrisConstantPointerListRetrieveAtIndex(PointerList,
-                                                          CurrentIndex);
-
-    RayTracer->HitIndex = CurrentIndex + 1;
-
-    InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
-
-    GeometryHitInitialize(GeometryHit,
-                          RayTracer->CurrentRay,
-                          InternalShapeHit);
-
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
 RayTracerGetNextShapeHit(
     _Inout_ PRAYTRACER RayTracer,
     _Out_ PCSHAPE_HIT *ShapeHit
@@ -299,6 +255,132 @@ RayTracerGetNextShapeHit(
     InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
 
     *ShapeHit = &InternalShapeHit->ShapeHit;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
+RayTracerGetNextHit(
+    _Inout_ PRAYTRACER RayTracer,
+    _Out_ PCSHAPE_HIT *ShapeHit,
+    _Out_opt_ PVECTOR3 ModelViewer,
+    _Out_opt_ PPOINT3 ModelHitPoint,
+    _Out_opt_ PPOINT3 WorldHitPoint,
+    _Out_opt_ PCMATRIX *ModelToWorld
+    )
+{
+    PCIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PCINTERNAL_SHAPE_HIT InternalShapeHit;
+    PPOINT3 WorldHitPointPointer;
+    POINT3 LocalWorldHitPoint;
+    PCVOID ValueAtIndex;
+    SIZE_T CurrentIndex;
+    SIZE_T HitCount;
+
+    if (RayTracer == NULL ||
+        ShapeHit == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
+    PointerList = &RayTracer->HitList;
+
+    HitCount = IrisConstantPointerListGetSize(PointerList);
+    CurrentIndex = RayTracer->HitIndex;
+
+    if (HitCount == CurrentIndex)
+    {
+        return ISTATUS_NO_MORE_DATA;
+    }
+
+    ValueAtIndex = IrisConstantPointerListRetrieveAtIndex(PointerList,
+                                                          CurrentIndex);
+
+    RayTracer->HitIndex = CurrentIndex + 1;
+
+    InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
+
+    SharedGeometryHit = InternalShapeHit->SharedGeometryHit;
+
+    *ShapeHit = &InternalShapeHit->ShapeHit;
+
+    if (ModelToWorld != NULL)
+    {
+        *ModelToWorld = SharedGeometryHit->ModelToWorld;
+    }
+    
+    if (SharedGeometryHit->Premultiplied != FALSE)
+    {
+        if (ModelHitPoint != NULL ||
+            WorldHitPoint != NULL)
+        {
+            if (ModelHitPoint == NULL)
+            {
+                WorldHitPointPointer = &LocalWorldHitPoint;
+            }
+            else
+            {
+                WorldHitPointPointer = ModelHitPoint;
+            }
+
+            if (InternalShapeHit->ModelHitPointValid != FALSE)
+            {
+                *WorldHitPointPointer = InternalShapeHit->ModelHitPoint;
+            }
+            else
+            {
+                *WorldHitPointPointer = RayEndpoint(RayTracer->CurrentRay,
+                                                    InternalShapeHit->ShapeHit.Distance);
+            }
+
+            if (WorldHitPoint != NULL)
+            {
+                *WorldHitPoint = *WorldHitPointPointer;
+            }
+
+            if (ModelHitPoint != NULL)
+            {
+                *ModelHitPoint = PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
+                                                     *WorldHitPointPointer);
+            }
+        }
+        
+        if (ModelViewer != NULL)
+        {
+            *ModelViewer = VectorMatrixInverseMultiply(SharedGeometryHit->ModelToWorld,
+                                                       RayTracer->CurrentRay.Direction);
+        }
+    }
+    else
+    {
+        if (ModelHitPoint != NULL)
+        {
+            if (InternalShapeHit->ModelHitPointValid != FALSE)
+            {
+                *ModelHitPoint = InternalShapeHit->ModelHitPoint;
+            }
+            else
+            {
+                *ModelHitPoint = RayEndpoint(SharedGeometryHit->ModelRay,
+                                             InternalShapeHit->ShapeHit.Distance);
+            }
+        }
+
+        if (ModelViewer != NULL)
+        {
+            *ModelViewer = SharedGeometryHit->ModelRay.Direction;
+        }
+
+        if (WorldHitPoint != NULL)
+        {
+            *WorldHitPoint = RayEndpoint(RayTracer->CurrentRay, 
+                                         InternalShapeHit->ShapeHit.Distance);
+        }
+    }
 
     return ISTATUS_SUCCESS;
 }

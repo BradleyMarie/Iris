@@ -298,10 +298,14 @@ RayShaderTraceRayMontecarlo(
     PCDRAWING_SHAPE DrawingShape;
     TEXTURE_SHADER TextureShader;
     FLOAT ContinueProbability;
-    GEOMETRY_HIT GeometryHit;
     RAY NormalizedWorldRay;
     PCVOID AdditionalData;
+    PCMATRIX ModelToWorld;
+    PCSHAPE_HIT ShapeHit;
+    POINT3 WorldHitPoint;
+    POINT3 ModelHitPoint;
     PRAYTRACER RayTracer;
+    VECTOR3 ModelViewer;
     COLOR4 BlendedColor;
     PCTEXTURE Texture;
     FLOAT NextRandom;
@@ -363,7 +367,12 @@ RayShaderTraceRayMontecarlo(
 
     RayTracerSort(RayTracer);
 
-    Status = RayTracerGetNextGeometryHit(RayTracer, &GeometryHit);
+    Status = RayTracerGetNextHit(RayTracer,
+                                 &ShapeHit,
+                                 &ModelViewer,
+                                 &ModelHitPoint,
+                                 &WorldHitPoint,
+                                 &ModelToWorld);
 
     if (Status == ISTATUS_NO_MORE_DATA)
     {
@@ -376,36 +385,46 @@ RayShaderTraceRayMontecarlo(
 
     while (Status == ISTATUS_SUCCESS && BlendedColor.Alpha < (FLOAT) 1.0)
     {
-        Distance = GeometryHit.ShapeHit->Distance;
+        Distance = ShapeHit->Distance;
 
         if (Distance <= RayShader->Epsilon)
         {
-            Status = RayTracerGetNextGeometryHit(RayTracer, &GeometryHit);
+            Status = RayTracerGetNextHit(RayTracer,
+                                         &ShapeHit,
+                                         &ModelViewer,
+                                         &ModelHitPoint,
+                                         &WorldHitPoint,
+                                         &ModelToWorld);
             continue;
         }
 
-        DrawingShape = (PCDRAWING_SHAPE) GeometryHit.ShapeHit->Shape;
+        DrawingShape = (PCDRAWING_SHAPE) ShapeHit->Shape;
 
         Texture = DrawingShapeGetTexture(DrawingShape,
-                                         GeometryHit.ShapeHit->FaceHit);
+                                         ShapeHit->FaceHit);
 
         if (Texture == NULL)
         {
-            Status = RayTracerGetNextGeometryHit(RayTracer, &GeometryHit);
+            Status = RayTracerGetNextHit(RayTracer,
+                                         &ShapeHit,
+                                         &ModelViewer,
+                                         &ModelHitPoint,
+                                         &WorldHitPoint,
+                                         &ModelToWorld);
             continue;
         }
 
         Normal = DrawingShapeGetNormal(DrawingShape,
-                                       GeometryHit.ShapeHit->FaceHit);
+                                       ShapeHit->FaceHit);
 
-        AdditionalData = GeometryHit.ShapeHit->AdditionalData;
+        AdditionalData = ShapeHit->AdditionalData;
 
         if (Normal != NULL)
         {
             SurfaceNormalInitialize(&SurfaceNormal,
                                     Normal,
-                                    GeometryHit.ModelHitPoint,
-                                    GeometryHit.ModelToWorld,
+                                    ModelHitPoint,
+                                    ModelToWorld,
                                     AdditionalData);
 
             SurfaceNormalPointer = &SurfaceNormal;
@@ -422,10 +441,10 @@ RayShaderTraceRayMontecarlo(
                                 RayShader->CurrentDepth,
                                 Distance,
                                 &NormalizedWorldRay.Direction,
-                                &GeometryHit.WorldHitPoint,
-                                &GeometryHit.ModelViewer,
-                                &GeometryHit.ModelHitPoint,
-                                GeometryHit.ModelToWorld,
+                                &WorldHitPoint,
+                                &ModelViewer,
+                                &ModelHitPoint,
+                                ModelToWorld,
                                 AdditionalData,
                                 SurfaceNormalPointer,
                                 &HitColor);
@@ -433,8 +452,8 @@ RayShaderTraceRayMontecarlo(
         Color4InitializeTransparent(&HitColor);
 
         Status = TextureShade(Texture,
-                              &GeometryHit.WorldHitPoint,
-                              &GeometryHit.ModelHitPoint,
+                              &WorldHitPoint,
+                              &ModelHitPoint,
                               AdditionalData,
                               &TextureShader);
 
@@ -446,7 +465,12 @@ RayShaderTraceRayMontecarlo(
 
         Color4Over(&BlendedColor, &HitColor, &BlendedColor);
 
-        Status = RayTracerGetNextGeometryHit(RayTracer, &GeometryHit);
+        Status = RayTracerGetNextHit(RayTracer,
+                                     &ShapeHit,
+                                     &ModelViewer,
+                                     &ModelHitPoint,
+                                     &WorldHitPoint,
+                                     &ModelToWorld);
     }
 
     Color3InitializeFromColor4(Color, &BlendedColor);

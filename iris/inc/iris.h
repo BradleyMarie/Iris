@@ -31,7 +31,6 @@ Abstract:
 #include "iris_ray.h"
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
-#include "iris_geometryhit.h"
 #include "iris_geometry.h"
 #include "iris_raytracer.h"
 

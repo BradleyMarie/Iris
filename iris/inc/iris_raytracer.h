@@ -64,18 +64,22 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerGetNextGeometryHit(
+RayTracerGetNextShapeHit(
     _Inout_ PRAYTRACER RayTracer,
-    _Out_ PGEOMETRY_HIT GeometryHit
+    _Out_ PCSHAPE_HIT *ShapeHit
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerGetNextShapeHit(
+RayTracerGetNextHit(
     _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCSHAPE_HIT *ShapeHit
+    _Out_ PCSHAPE_HIT *ShapeHit,
+    _Out_opt_ PVECTOR3 ModelViewer,
+    _Out_opt_ PPOINT3 ModelHitPoint,
+    _Out_opt_ PPOINT3 WorldHitPoint,
+    _Out_opt_ PCMATRIX *ModelToWorld
     );
 
 IRISAPI

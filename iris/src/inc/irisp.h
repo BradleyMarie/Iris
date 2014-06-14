@@ -41,7 +41,6 @@ Abstract:
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_sharedgeometryhitallocator.h"
-#include "iris_geometryhit.h"
 #include "iris_geometry.h"
 
 #endif // _IRIS_INTERNAL_HEADER_
