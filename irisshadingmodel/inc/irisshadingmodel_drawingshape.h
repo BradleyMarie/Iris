@@ -52,8 +52,7 @@ typedef CONST DRAWING_SHAPE_VTABLE *PCDRAWING_SHAPE_VTABLE;
 //
 
 _Check_return_
-_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
-_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
+_Ret_opt_
 IRISSHADINGMODELAPI
 PDRAWING_SHAPE
 DrawingShapeAllocate(

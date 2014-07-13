@@ -19,8 +19,7 @@ Abstract:
 //
 
 _Check_return_
-_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
-_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
+_Ret_opt_
 PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
