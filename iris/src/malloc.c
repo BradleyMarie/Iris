@@ -14,6 +14,10 @@ Abstract:
 
 #include <irisp.h>
 
+#if __STDC_VERSION__ >= 201112L
+#include <stdalign.h>
+#endif
+
 _Check_return_
 _Success_(return != NULL)
 _Ret_maybenull_ 
@@ -149,12 +153,50 @@ IrisAlignedMalloc(
     _In_ SIZE_T Alignment
     )
 {
+    SIZE_T AlignmentMinusOne;
+    PVOID Allocation;
+
+
+#if __STDC_VERSION__ >= 201112L
+    
+    if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
+    {
+        return NULL;
+    }
+
+    AlignmentMinusOne = Alignment - 1;
+
+    if (Alignment & AlignmentMinusOne)
+    {
+        return NULL;
+    }
+
+    Allocation = aligned_alloc(Alignment, SizeInBytes);
+
+#elif _MSC_VER
+
+    if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
+    {
+        return NULL;
+    }
+
+    AlignmentMinusOne = Alignment - 1;
+
+    if (Alignment & AlignmentMinusOne)
+    {
+        return NULL;
+    }
+
+    Allocation = _aligned_malloc(SizeInBytes, Alignment);
+
+#else
+
     PVOID OriginalAllocation;
     PUINT8 AllocationAsByteArray;
     PVOID *OriginalAllocationPointer;
     SIZE_T AllocationAlignment;
-    SIZE_T AlignmentMinusOne;
     SIZE_T AllocationSize;
+    PVOID Allocation;
     ISTATUS Status;
 
     if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
@@ -206,7 +248,11 @@ IrisAlignedMalloc(
 
     *OriginalAllocationPointer = OriginalAllocation;
 
-    return (PVOID) AllocationAsByteArray;
+    Allocation = (PVOID) AllocationAsByteArray;
+
+#endif
+
+    return Allocation;
 }
 
 VOID
@@ -214,6 +260,16 @@ IrisAlignedFree(
     _Pre_maybenull_ _Post_invalid_ PVOID Data
     )
 {
+#if __STDC_VERSION__ >= 201112L
+
+    free(Data);
+
+#elif _MSC_VER
+
+    _aligned_free(Data);
+
+#else
+
     PVOID *OriginalAllocationPointer;
 
     if (Data == NULL)
@@ -224,4 +280,6 @@ IrisAlignedFree(
     OriginalAllocationPointer = (PVOID*) Data - 1;
 
     free(*OriginalAllocationPointer);
+
+#endif
 }

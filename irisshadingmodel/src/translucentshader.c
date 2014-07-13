@@ -19,9 +19,9 @@ Abstract:
 //
 
 struct _TRANSLUCENT_SHADER {
-    PCTRANSLUCENT_SHADER_VTABLE TranslucentShaderVTable;
-    SIZE_T DataBeginOffset;
+    PCTRANSLUCENT_SHADER_VTABLE VTable;
     SIZE_T ReferenceCount;
+    PVOID Data;
 };
 
 //
@@ -39,54 +39,40 @@ TranslucentShaderAllocate(
     )
 {
     PTRANSLUCENT_SHADER TranslucentShader;
-    SIZE_T DataBeginOffset;
-    PVOID DataBeginAddress;
-    SIZE_T AllocationSize;
-    PVOID Allocation;
-    ISTATUS Status;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
 
-    if (TranslucentShaderVTable == NULL ||
-        Data == NULL ||
-        DataSizeInBytes == 0 ||
-        DataAlignment == 0)
+    if (TranslucentShaderVTable == NULL)
     {
         return NULL;
     }
 
-    Status = CheckedAddSizeT(sizeof(TRANSLUCENT_SHADER),
-                             DataAlignment,
-                             &AllocationSize);
-
-    if (Status != ISTATUS_SUCCESS)
+    if (Data == NULL && DataSizeInBytes == 0)
     {
         return NULL;
     }
 
-    Status = CheckedAddSizeT(AllocationSize,
-                             DataSizeInBytes,
-                             &AllocationSize);
+    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(TRANSLUCENT_SHADER),
+                                                   sizeof(PVOID),
+                                                   DataSizeInBytes,
+                                                   DataAlignment,
+                                                   &DataAllocation);
 
-    if (Status != ISTATUS_SUCCESS)
+    if (HeaderAllocation == NULL)
     {
         return NULL;
     }
 
-    Allocation = malloc(AllocationSize);
+    TranslucentShader = (PTRANSLUCENT_SHADER)HeaderAllocation;
 
-    if (Allocation == NULL)
-    {
-        return NULL;
-    }
-
-    DataBeginOffset = ((UINT_PTR) Allocation + DataAlignment) % DataAlignment - (UINT_PTR) Allocation;
-    DataBeginAddress = (PUINT8) Allocation + DataBeginOffset;
-
-    TranslucentShader = (PTRANSLUCENT_SHADER) Allocation;
-
-    TranslucentShader->TranslucentShaderVTable = TranslucentShaderVTable;
+    TranslucentShader->VTable = TranslucentShaderVTable;
+    TranslucentShader->Data = DataAllocation;
     TranslucentShader->ReferenceCount = 1;
-    TranslucentShader->DataBeginOffset = (PUINT8) Allocation - (PUINT8) DataBeginAddress;
-    memcpy(DataBeginAddress, Data, DataSizeInBytes);
+
+    if (DataSizeInBytes != 0)
+    {
+        memcpy(DataAllocation, Data, DataSizeInBytes);
+    }
 
     return TranslucentShader;
 }
@@ -102,7 +88,6 @@ TranslucentShaderShade(
     _Out_ PFLOAT Alpha
     )
 {
-    PCVOID DataBeginAddress;
     ISTATUS Status;
 
     if (TranslucentShader == NULL ||
@@ -113,14 +98,11 @@ TranslucentShaderShade(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    DataBeginAddress = (PCUINT8) TranslucentShader +
-                       TranslucentShader->DataBeginOffset;
-
-    Status = TranslucentShader->TranslucentShaderVTable->TranslucentRoutine(DataBeginAddress,
-                                                                            WorldHitPoint,
-                                                                            ModelHitPoint,
-                                                                            AdditionalData,
-                                                                            Alpha);
+    Status = TranslucentShader->VTable->TranslucentRoutine(TranslucentShader->Data,
+                                                           WorldHitPoint,
+                                                           ModelHitPoint,
+                                                           AdditionalData,
+                                                           Alpha);
 
     return Status;
 }
@@ -144,7 +126,6 @@ TranslucentShaderDereference(
     )
 {
     PFREE_ROUTINE FreeRoutine;
-    PVOID DataBeginAddress;
 
     if (TranslucentShader == NULL)
     {
@@ -155,16 +136,13 @@ TranslucentShaderDereference(
 
     if (TranslucentShader->ReferenceCount == 0)
     {
-        FreeRoutine = TranslucentShader->TranslucentShaderVTable->FreeRoutine;
+        FreeRoutine = TranslucentShader->VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {
-            DataBeginAddress = (PUINT8) TranslucentShader +
-                               TranslucentShader->DataBeginOffset;
-
-            FreeRoutine(DataBeginAddress);
+            FreeRoutine(TranslucentShader->Data);
         }
 
-        free(TranslucentShader);
+        IrisAlignedFree(TranslucentShader);
     }
 }
