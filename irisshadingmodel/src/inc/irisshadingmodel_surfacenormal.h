@@ -53,7 +53,6 @@ SurfaceNormalInitialize(
 {
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Normal != NULL);
-    ASSERT(ModelHit != NULL);
 
     SurfaceNormal->Normal = Normal;
     SurfaceNormal->ModelHit = ModelHit;

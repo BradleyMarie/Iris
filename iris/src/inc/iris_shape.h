@@ -24,7 +24,7 @@ Abstract:
 struct _SHAPE {
     PCSHAPE_VTABLE VTable;
     SIZE_T ReferenceCount;
-    SIZE_T DataOffset;
+    PVOID Data;
 };
 
 //
@@ -42,7 +42,6 @@ ShapeTraceShape(
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    PCVOID DataBeginAddress;
     ISTATUS Status;
 
     ASSERT(Shape != NULL);
@@ -51,10 +50,7 @@ ShapeTraceShape(
 
     ShapeHitAllocatorSetCurrentShape(ShapeHitAllocator, Shape);
 
-    DataBeginAddress = (PCUINT8) Shape +
-                       Shape->DataOffset;
-
-    Status = Shape->VTable->TraceRoutine(DataBeginAddress, 
+    Status = Shape->VTable->TraceRoutine(Shape->Data, 
                                          Ray,
                                          ShapeHitAllocator,
                                          ShapeHitList);

@@ -26,7 +26,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSHAPE_TRACE_ROUTINE)(
-    _In_ PCVOID Context, 
+    _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
@@ -44,15 +44,14 @@ typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
 //
 
 _Check_return_
-_When_(DataSizeInBytes != 0 && Data != NULL && DataAlignment != 0, _Ret_opt_)
-_When_(DataSizeInBytes != 0 && Data == NULL, _Ret_null_)
+_Ret_opt_
 IRISAPI
 PSHAPE
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
     _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
+    _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
     );
 
 _Ret_

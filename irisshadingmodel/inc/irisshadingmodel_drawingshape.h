@@ -59,8 +59,8 @@ PDRAWING_SHAPE
 DrawingShapeAllocate(
     _In_ PCDRAWING_SHAPE_VTABLE DrawingShapeVTable,
     _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ _When_(DataSizeInBytes == 0, _Reserved_) SIZE_T DataAlignment
+    _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
     );
 
 _Ret_opt_

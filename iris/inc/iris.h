@@ -24,6 +24,7 @@ Abstract:
 #include "iris_types.h"
 #include "iris_limits.h"
 #include "iris_error.h"
+#include "iris_malloc.h"
 #include "iris_math.h"
 #include "iris_matrix.h"
 #include "iris_vector.h"

@@ -93,7 +93,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 TriangleTraceTriangle(
-    _In_ PCVOID Context, 
+    _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList

@@ -49,6 +49,9 @@ typedef INT64 *PINT64;
 typedef size_t SIZE_T;
 typedef SIZE_T *PSIZE_T;
 
+typedef uintptr_t UINT_PTR;
+typedef UINT_PTR *PUINT_PTR;
+
 #define VOID void
 typedef VOID *PVOID;
 
