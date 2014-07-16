@@ -47,78 +47,52 @@ typedef struct _RANDOM_VTABLE {
 
 typedef CONST RANDOM_VTABLE *PCRANDOM_VTABLE;
 
-typedef struct _RANDOM {
-    PCRANDOM_VTABLE RandomVTable;
-} RANDOM, *PRANDOM;
-
+typedef struct _RANDOM RANDOM, *PRANDOM;
 typedef CONST RANDOM *PCRANDOM;
 
 //
 // Functions
 //
 
+_Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PRANDOM
+RandomAllocate(
+    _In_ PCRANDOM_VTABLE RandomVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
 _Ret_range_(Minimum, Maximum)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 FLOAT
 RandomGenerateFloat(
     _In_ PRANDOM Rng,
     _In_ FLOAT Minimum,
     _In_ FLOAT Maximum
-    )
-{
-    FLOAT Result;
-
-    ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Minimum));
-    ASSERT(IsFiniteFloat(Minimum));
-    ASSERT(IsNormalFloat(Maximum));
-    ASSERT(IsFiniteFloat(Minimum));
-    ASSERT(Minimum < Maximum);
-
-    Result = Rng->RandomVTable->GenerateFloatRoutine(Rng, Minimum, Maximum);
-
-    ASSERT(IsNormalFloat(Result));
-    ASSERT(IsFiniteFloat(Result));
-    ASSERT(Minimum <= Result);
-    ASSERT(Result <= Maximum);
-
-    return Result;
-}
+    );
 
 _Ret_range_(Minimum, Maximum) 
-SFORCEINLINE
+IRISSHADINGMODELAPI
 SIZE_T
 RandomGenerateIndex(
     _In_ PRANDOM Rng,
     _In_ SIZE_T Minimum,
     _In_ SIZE_T Maximum
-    )
-{
-    SIZE_T Result;
+    );
 
-    ASSERT(Rng != NULL);
-    ASSERT(Minimum < Maximum);
-
-    Result = Rng->RandomVTable->GenerateIndexRoutine(Rng, Minimum, Maximum);
-
-    ASSERT(Minimum <= Result);
-    ASSERT(Result <= Maximum);
-
-    return Result;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-RandomFree(
-    _In_opt_ _Post_invalid_ PRANDOM Rng
-    )
-{
-    if (Rng == NULL)
-    {
-        return;
-    }
+RandomReference(
+    _In_opt_ PRANDOM Random
+    );
 
-    Rng->RandomVTable->FreeRoutine(Rng);
-}
+IRISSHADINGMODELAPI
+VOID
+RandomDereference(
+    _In_opt_ _Post_invalid_ PRANDOM Random
+    );
 
 #endif // _RANDOM_IRIS_SHADING_MODEL_

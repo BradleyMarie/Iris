@@ -28,6 +28,7 @@ TEST(RenderConstantRedWorldSphere)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -51,11 +52,13 @@ TEST(RenderConstantRedWorldSphere)
     Scene = ListSceneAllocate();
 
     Status = SceneAddWorldObject(Scene, Sphere);
+    
+    Rng = MultiplyWithCarryRngAllocate();
 
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -97,6 +100,7 @@ TEST(RenderConstantRedModelSphere)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -121,10 +125,12 @@ TEST(RenderConstantRedModelSphere)
 
     Status = SceneAddObject(Scene, Sphere, NULL, FALSE);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -166,6 +172,7 @@ TEST(RenderConstantRedPremultipliedSphere)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -190,10 +197,12 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Status = SceneAddObject(Scene, Sphere, NULL, TRUE);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -237,6 +246,7 @@ TEST(RenderConstantRedWorldTriangle)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     TriangleVertex0 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -264,10 +274,12 @@ TEST(RenderConstantRedWorldTriangle)
 
     Status = SceneAddWorldObject(Scene, Triangle);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&TriangleColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -316,6 +328,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     TriangleVertex0 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -362,10 +375,12 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     Status = SceneAddWorldObject(Scene, Triangle);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&Red, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -413,6 +428,7 @@ TEST(RenderPhongWorldSphere)
     PSCENE Scene;
     COLOR3 Black;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -465,10 +481,12 @@ TEST(RenderPhongWorldSphere)
 
     Status = SceneAddWorldObject(Scene, Sphere);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&Black, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -514,6 +532,7 @@ TEST(RenderPerfectSpecularWorldSphere)
     ISTATUS Status;
     PSCENE Scene;
     bool Success;
+    PRANDOM Rng;
     VECTOR3 Up;
 
     SphereCenter = PointCreate((FLOAT) 1.0, (FLOAT) 0.0, (FLOAT)-1.0);
@@ -557,10 +576,12 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Status = SceneAddWorldObject(Scene, Sphere);
 
+    Rng = MultiplyWithCarryRngAllocate();
+
     Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               (PRANDOM) Scene, // HACK
+                                                               Rng,
                                                                (FLOAT) 0.0005,
                                                                1);
 

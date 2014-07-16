@@ -135,6 +135,8 @@ RayShaderAllocateInternal(
         MaximumContinueProbability = (FLOAT) 1.0;
     }
 
+    RandomReference(Rng);
+
     RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
     RayShader->MaximumContinueProbability = MaximumContinueProbability;
@@ -507,5 +509,6 @@ RayShaderFree(
     }
 
     RayTracerFree(RayShader->RayTracer);
+    RandomDereference(RayShader->Rng);
     free(RayShader);
 }

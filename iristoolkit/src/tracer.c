@@ -300,6 +300,7 @@ CommonTracerFree(
 
     RayShaderFree(Tracer->TracerHeader.RayShader);
     VisibilityTesterFree(Tracer->VisibilityTester);
+    RandomDereference(Tracer->Rng);
     free(Tracer);
 }
 
@@ -364,6 +365,8 @@ CommonTracerAllocateInternal(
         free(Tracer);
         return NULL;
     }
+
+    RandomReference(Rng);
 
     Tracer->TracerHeader.FreeRoutine = TracerFree;
     Tracer->TracerHeader.RayShader = RayShader;

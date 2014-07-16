@@ -63,7 +63,7 @@ TranslucentShaderAllocate(
         return NULL;
     }
 
-    TranslucentShader = (PTRANSLUCENT_SHADER)HeaderAllocation;
+    TranslucentShader = (PTRANSLUCENT_SHADER) HeaderAllocation;
 
     TranslucentShader->VTable = TranslucentShaderVTable;
     TranslucentShader->Data = DataAllocation;

@@ -30,7 +30,6 @@ Abstract:
 //
 
 typedef struct _MWC_RNG {
-    RANDOM RandomHeader;
     _Field_size_(RANDOM_STATE_SIZE) PUINT32 RngState;
     UINT32 C;
     SIZE_T I;
@@ -129,7 +128,6 @@ MultiplyWithCarryRngFree(
     Rng = (PMWC_RNG) Pointer;
 
     free(Rng->RngState);
-    free(Rng);
 }
 
 //
@@ -154,8 +152,9 @@ MultiplyWithCarryRngAllocate(
     VOID
     )
 {
+    PRANDOM Random;
     PUINT32 RngState;
-    PMWC_RNG Rng;
+    MWC_RNG Rng;
     SIZE_T Index;
     UINT32 Seed;
     time_t Timer;
@@ -166,14 +165,6 @@ MultiplyWithCarryRngAllocate(
 
     if (RngState == NULL)
     {
-        return NULL;
-    }
-
-    Rng = (PMWC_RNG) malloc(sizeof(MWC_RNG));
-
-    if (Rng == NULL)
-    {
-        free(RngState);
         return NULL;
     }
 
@@ -201,10 +192,19 @@ MultiplyWithCarryRngAllocate(
                           PHI ^ Index;
     }
 
-    Rng->RandomHeader.RandomVTable = &MwcVTable;
-    Rng->RngState = RngState;
-    Rng->C = INITIAL_C_VALUE;
-    Rng->I = INITIAL_I_VALUE;
+    Rng.RngState = RngState;
+    Rng.C = INITIAL_C_VALUE;
+    Rng.I = INITIAL_I_VALUE;
 
-    return (PRANDOM) Rng;
+    Random = RandomAllocate(&MwcVTable,
+                            &Rng,
+                            sizeof(MWC_RNG),
+                            sizeof(PVOID));
+
+    if (Random == NULL)
+    {
+        MultiplyWithCarryRngFree(&Rng);
+    }
+
+    return Random;
 }
