@@ -29,9 +29,9 @@ InfinitePlaneAllocate(
     _In_ PCPOINT3 Vertex,
     _In_ PCVECTOR3 SurfaceNormal,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal
+    _In_opt_ PNORMAL BackNormal
     );
 
 #endif // _INFINITE_PLANE_IRIS_TOOLKIT_

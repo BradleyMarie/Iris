@@ -61,7 +61,8 @@ SurfaceNormalInitialize(
     SurfaceNormal->ModelNormalValid = FALSE;
     SurfaceNormal->NormalizedModelNormalValid = FALSE;
     SurfaceNormal->NormalizedWorldNormalValid = FALSE;
-    SurfaceNormal->Prenormalized = Normal->NormalVTable->Prenormalized;
+
+    NormalPrenormalized(Normal, &SurfaceNormal->Prenormalized);
 
     if (ModelToWorld != NULL)
     {

@@ -27,7 +27,7 @@ Abstract:
 
 typedef struct _INFINITE_PLANE {
     PCTEXTURE Textures[2];
-    PCNORMAL Normals[2];
+    PNORMAL Normals[2];
     POINT3 Vertex;
     VECTOR3 SurfaceNormal;
 } INFINITE_PLANE, *PINFINITE_PLANE;
@@ -139,6 +139,19 @@ InfinitePlaneTraceInfinitePlane(
     return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
 }
 
+STATIC
+InfinitePlaneFree(
+    _In_ PVOID Context
+    )
+{
+    PINFINITE_PLANE InfinitePlane;
+
+    InfinitePlane = (PINFINITE_PLANE) Context;
+
+    NormalDereference(InfinitePlane->Normals[INFINITE_PLANE_FRONT_FACE]);
+    NormalDereference(InfinitePlane->Normals[INFINITE_PLANE_BACK_FACE]);
+}
+
 //
 // Static variables
 //
@@ -160,9 +173,9 @@ InfinitePlaneAllocate(
     _In_ PCPOINT3 Vertex,
     _In_ PCVECTOR3 SurfaceNormal,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal
+    _In_opt_ PNORMAL BackNormal
     )
 {
     INFINITE_PLANE InfinitePlane;
@@ -187,10 +200,10 @@ InfinitePlaneAllocate(
 
     InfinitePlane.Vertex = *Vertex;
     InfinitePlane.SurfaceNormal = *SurfaceNormal;
-    InfinitePlane.Textures[0] = FrontTexture;
-    InfinitePlane.Textures[1] = BackTexture;
-    InfinitePlane.Normals[0] = FrontNormal;
-    InfinitePlane.Normals[1] = BackNormal;
+    InfinitePlane.Textures[INFINITE_PLANE_FRONT_FACE] = FrontTexture;
+    InfinitePlane.Textures[INFINITE_PLANE_BACK_FACE] = BackTexture;
+    InfinitePlane.Normals[INFINITE_PLANE_FRONT_FACE] = FrontNormal;
+    InfinitePlane.Normals[INFINITE_PLANE_BACK_FACE] = BackNormal;
 
     DrawingShape = DrawingShapeAllocate(&InfinitePlaneHeader,
                                         &InfinitePlane,

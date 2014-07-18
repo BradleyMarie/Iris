@@ -40,10 +40,7 @@ typedef struct _NORMAL_VTABLE {
 
 typedef CONST NORMAL_VTABLE *PCNORMAL_VTABLE;
 
-typedef struct _NORMAL {
-    PCNORMAL_VTABLE NormalVTable;
-} NORMAL, *PNORMAL;
-
+typedef struct _NORMAL NORMAL, *PNORMAL;
 typedef CONST NORMAL *PCNORMAL;
 
 //
@@ -51,42 +48,45 @@ typedef CONST NORMAL *PCNORMAL;
 //
 
 _Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PNORMAL
+NormalAllocate(
+    _In_ PCNORMAL_VTABLE TranslucentShaderVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 ISTATUS
 NormalComputeNormal(
-    _In_ PCNORMAL Normal, 
+    _In_ PCNORMAL Normal,
     _In_ PCPOINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
-    )
-{
-    ISTATUS Status;
+    );
 
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(Normal != NULL);
-    
-    Status = Normal->NormalVTable->ComputeNormalRoutine(Normal,
-                                                        ModelHitPoint,
-                                                        AdditionalData,
-                                                        SurfaceNormal);
+_Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
+ISTATUS
+NormalPrenormalized(
+    _In_ PCNORMAL Normal,
+    _Out_ PBOOL Prenormalized
+    );
 
-    return Status;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-NormalFree(
-    _In_opt_ _Post_invalid_ PNORMAL Normal
-    )
-{
-    if (Normal == NULL)
-    {
-        return;
-    }
+NormalReference(
+    _In_opt_ PNORMAL Normal
+    );
 
-    Normal->NormalVTable->FreeRoutine(Normal);
-}
+IRISSHADINGMODELAPI
+VOID
+NormalDereference(
+    _In_opt_ _Post_invalid_ PNORMAL Normal
+    );
 
 #endif // _NORMAL_IRIS_SHADING_MODEL_

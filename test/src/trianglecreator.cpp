@@ -75,8 +75,8 @@ CreateFlatQuad(
     if (Triangle1 == NULL)
     {
         DrawingShapeDereference(Triangle0);
-        NormalFree(FrontNormal);
-        NormalFree(BackNormal);
+        NormalDereference(FrontNormal);
+        NormalDereference(BackNormal);
         return false;
     }
 
@@ -89,8 +89,8 @@ CreateFlatQuad(
     {
         DrawingShapeDereference(Triangle0);
         DrawingShapeDereference(Triangle1);
-        NormalFree(FrontNormal);
-        NormalFree(BackNormal);
+        NormalDereference(FrontNormal);
+        NormalDereference(BackNormal);
         return false;
     }
 
@@ -103,8 +103,8 @@ CreateFlatQuad(
     {
         DrawingShapeDereference(Triangle0);
         DrawingShapeDereference(Triangle1);
-        NormalFree(FrontNormal);
-        NormalFree(BackNormal);
+        NormalDereference(FrontNormal);
+        NormalDereference(BackNormal);
         return false;
     }
 

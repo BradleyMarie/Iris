@@ -19,7 +19,6 @@ Abstract:
 //
 
 typedef struct _CONSTANT_NORMAL {
-    NORMAL NormalHeader;
     VECTOR3 Normal;
 } CONSTANT_NORMAL, *PCONSTANT_NORMAL;
 
@@ -81,30 +80,38 @@ ConstantNormalAllocate(
     _In_ BOOL Normalize
     )
 {
-    PCONSTANT_NORMAL ConstantNormal;
+    PCNORMAL_VTABLE ConstantNormalVTable;
+    CONSTANT_NORMAL ConstantNormal;
+    PNORMAL SurfaceNormal;
+    BOOL Valid;
 
     if (Normal == FALSE)
     {
         return NULL;
     }
 
-    ConstantNormal = (PCONSTANT_NORMAL) malloc(sizeof(CONSTANT_NORMAL));
+    Valid = VectorValidate(*Normal);
 
-    if (ConstantNormal == NULL)
+    if (Valid == FALSE)
     {
         return NULL;
     }
 
     if (Normalize != FALSE)
     {
-        ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalPrenormalizedHeader;
-        ConstantNormal->Normal = VectorNormalize(*Normal, NULL);
+        ConstantNormalVTable = &ConstantNormalPrenormalizedHeader;
+        ConstantNormal.Normal = VectorNormalize(*Normal, NULL);
     }
     else
     {
-        ConstantNormal->NormalHeader.NormalVTable = &ConstantNormalHeader;
-        ConstantNormal->Normal = *Normal;
+        ConstantNormalVTable = &ConstantNormalHeader;
+        ConstantNormal.Normal = *Normal;
     }
 
-    return (PNORMAL) ConstantNormal;
+    SurfaceNormal = NormalAllocate(ConstantNormalVTable,
+                                   &ConstantNormal,
+                                   sizeof(CONSTANT_NORMAL),
+                                   sizeof(PVOID));
+
+    return SurfaceNormal;
 }

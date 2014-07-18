@@ -46,7 +46,6 @@ typedef struct _INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER {
 typedef CONST INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER *PCINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_NORMAL {
-    NORMAL NormalHeader;
     PCNORMAL Normals[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_NORMAL, *PINTERPOLATED_TRIANGLE_NORMAL;
 
@@ -354,12 +353,11 @@ InterpolatedTriangleNormalComputeNormal(
     for (Index = 0; Index < IRIS_TOOLKIT_TRIANGLE_VERTICES; Index++)
     {
         Normal = InterpolatedTriangleNormal->Normals[Index];
-        ComputeNormalRoutine = Normal->NormalVTable->ComputeNormalRoutine;
 
-        Status = ComputeNormalRoutine(Normal,
-                                      HitPoint,
-                                      AdditionalData,
-                                      &ComponentNormal);
+        Status = NormalComputeNormal(Normal,
+                                     HitPoint,
+                                     AdditionalData,
+                                     &ComponentNormal);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -398,7 +396,7 @@ CONST STATIC TRANSLUCENT_SHADER_VTABLE InterpolatedTriangleTranslucentShaderVTab
     free
 };
 
-CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalHeader = {
+CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalVTable = {
     InterpolatedTriangleNormalComputeNormal,
     free,
     FALSE
@@ -554,7 +552,8 @@ InterpolatedTriangleNormalAllocate(
     _In_ PCNORMAL Normal2
     )
 {
-    PINTERPOLATED_TRIANGLE_NORMAL Normal;
+    INTERPOLATED_TRIANGLE_NORMAL InterpolatedNormal;
+    PNORMAL Normal;
 
     if (Normal0 == NULL ||
         Normal1 == NULL ||
@@ -563,17 +562,14 @@ InterpolatedTriangleNormalAllocate(
         return NULL;
     }
 
-    Normal = (PINTERPOLATED_TRIANGLE_NORMAL) malloc(sizeof(INTERPOLATED_TRIANGLE_NORMAL));
+    InterpolatedNormal.Normals[0] = Normal0;
+    InterpolatedNormal.Normals[1] = Normal1;
+    InterpolatedNormal.Normals[2] = Normal2;
 
-    if (Normal == NULL)
-    {
-        return NULL;
-    }
+    Normal = NormalAllocate(&InterpolatedTriangleNormalVTable,
+                            &InterpolatedNormal,
+                            sizeof(INTERPOLATED_TRIANGLE_NORMAL),
+                            sizeof(PVOID));
 
-    Normal->NormalHeader.NormalVTable = &InterpolatedTriangleNormalHeader;
-    Normal->Normals[0] = Normal0;
-    Normal->Normals[1] = Normal1;
-    Normal->Normals[2] = Normal2;
-
-    return (PNORMAL) Normal;
+    return Normal;
 }

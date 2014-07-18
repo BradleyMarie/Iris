@@ -19,7 +19,6 @@ Abstract:
 //
 
 typedef struct _SPHERE_NORMAL {
-    NORMAL NormalHeader;
     POINT3 Center;
 } SPHERE_NORMAL, *PSPHERE_NORMAL;
 
@@ -105,30 +104,38 @@ SphereNormalAllocate(
     _In_ BOOL Front
     )
 {
-    PSPHERE_NORMAL SphereNormal;
+    PCNORMAL_VTABLE SphereNormalVTable;
+    SPHERE_NORMAL SphereNormal;
+    PNORMAL Normal;
+    BOOL Valid;
 
     if (Center == NULL)
     {
         return NULL;
     }
 
-    SphereNormal = (PSPHERE_NORMAL) malloc(sizeof(SPHERE_NORMAL));
+    Valid = PointValidate(*Center);
 
-    if (SphereNormal == NULL)
+    if (Valid == FALSE)
     {
         return NULL;
     }
-
+    
     if (Front != FALSE)
     {
-        SphereNormal->NormalHeader.NormalVTable = &SphereNormalFrontHeader;
+        SphereNormalVTable = &SphereNormalFrontHeader;
     }
     else
     {
-        SphereNormal->NormalHeader.NormalVTable = &SphereNormalBackHeader;
+        SphereNormalVTable = &SphereNormalBackHeader;
     }
 
-    SphereNormal->Center = *Center;
+    SphereNormal.Center = *Center;
 
-    return (PNORMAL) SphereNormal;
+    Normal = NormalAllocate(SphereNormalVTable,
+                            &SphereNormal,
+                            sizeof(SPHERE_NORMAL),
+                            sizeof(PVOID));
+
+    return Normal;
 }

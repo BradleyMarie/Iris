@@ -27,7 +27,7 @@ Abstract:
 
 typedef struct _SPHERE {
     PCTEXTURE Textures[2];
-    PCNORMAL Normals[2];
+    PNORMAL Normals[2];
     POINT3 Center;
     FLOAT RadiusSquared;
 } SPHERE, *PSPHERE;
@@ -220,12 +220,25 @@ SphereTraceSphere(
     return ISTATUS_SUCCESS;
 }
 
+STATIC
+SphereFree(
+    _In_ PVOID Context
+    )
+{
+    PSPHERE Sphere;
+
+    Sphere = (PSPHERE) Context;
+
+    NormalDereference(Sphere->Normals[SPHERE_FRONT_FACE]);
+    NormalDereference(Sphere->Normals[SPHERE_BACK_FACE]);
+}
+
 //
 // Static variables
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
-    { SphereTraceSphere, NULL },
+    { SphereTraceSphere, SphereFree },
     SphereGetTexture,
     SphereGetNormal
 };
@@ -242,9 +255,9 @@ SphereAllocate(
     _In_ PCPOINT3 Center,
     _In_ FLOAT Radius,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal
+    _In_opt_ PNORMAL BackNormal
     )
 {
     PDRAWING_SHAPE DrawingShape;
@@ -267,15 +280,21 @@ SphereAllocate(
 
     Sphere.Center = *Center;
     Sphere.RadiusSquared = Radius * Radius;
-    Sphere.Textures[0] = FrontTexture;
-    Sphere.Textures[1] = BackTexture;
-    Sphere.Normals[0] = FrontNormal;
-    Sphere.Normals[1] = BackNormal;
+    Sphere.Textures[SPHERE_FRONT_FACE] = FrontTexture;
+    Sphere.Textures[SPHERE_BACK_FACE] = BackTexture;
+    Sphere.Normals[SPHERE_FRONT_FACE] = FrontNormal;
+    Sphere.Normals[SPHERE_BACK_FACE] = BackNormal;
 
     DrawingShape = DrawingShapeAllocate(&SphereHeader,
                                         &Sphere,
                                         sizeof(SPHERE),
                                         sizeof(PVOID));
+
+    if (DrawingShape != NULL)
+    {
+        NormalReference(FrontNormal);
+        NormalReference(BackNormal);
+    }
 
     return DrawingShape;
 }

@@ -46,9 +46,9 @@ TriangleAllocate(
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal
+    _In_opt_ PNORMAL BackNormal
     );
 
 _Check_return_

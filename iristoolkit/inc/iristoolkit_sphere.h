@@ -29,9 +29,9 @@ SphereAllocate(
     _In_ PCPOINT3 Center,
     _In_ FLOAT Radius,
     _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCNORMAL FrontNormal,
+    _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PCTEXTURE BackTexture,
-    _In_opt_ PCNORMAL BackNormal
+    _In_opt_ PNORMAL BackNormal
     );
 
 #endif // _SPHERE_IRIS_TOOLKIT_
