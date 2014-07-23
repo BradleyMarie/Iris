@@ -205,10 +205,12 @@ TriangleTraceTriangle(
 
 STATIC
 TriangleFree(
-    _In_ PVOID Context
+    _In_ _Post_invalid_ PVOID Context
     )
 {
     PTRIANGLE Triangle;
+
+    ASSERT(Context != NULL);
 
     Triangle = (PTRIANGLE) Context;
 
@@ -362,12 +364,6 @@ FlatTriangleAllocate(
     TRIANGLE Triangle;
     ISTATUS Status;
 
-    if ((FrontTexture != NULL && FrontNormal == NULL) ||
-        (BackTexture != NULL && BackNormal == NULL))
-    {
-        return NULL;
-    }
-
     Status = TriangleInitialize(&Triangle,
                                 *Vertex0,
                                 *Vertex1,
@@ -436,8 +432,8 @@ FlatTriangleAllocate(
     {
         TextureReference(FrontTexture);
         TextureReference(BackTexture);
-        NormalReference(*FrontNormal);
-        NormalReference(*BackNormal);   
+        NormalReference(AllocatedFrontNormal);
+        NormalReference(AllocatedBackNormal);
     }
     else
     {

@@ -45,17 +45,24 @@ typedef struct _DIRECT_SHADER_VTABLE {
 
 typedef CONST DIRECT_SHADER_VTABLE *PCDIRECT_SHADER_VTABLE;
 
-struct _DIRECT_SHADER {
-    PCDIRECT_SHADER_VTABLE DirectShaderVTable;
-};
-
 //
 // Functions
 //
 
 _Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PDIRECT_SHADER
+DirectShaderAllocate(
+    _In_ PCDIRECT_SHADER_VTABLE DirectShaderVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 ISTATUS
 DirectShaderShade(
     _In_ PCDIRECT_SHADER DirectShader,
@@ -68,46 +75,18 @@ DirectShaderShade(
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 Direct
-    )
-{
-    ISTATUS Status;
+    );
 
-    ASSERT(DirectShader != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(ModelViewer != NULL);
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(VisibilityTester != NULL);
-    ASSERT(Direct != NULL);
-
-    Status = DirectShader->DirectShaderVTable->DirectRoutine(DirectShader,
-                                                             WorldHitPoint,
-                                                             ModelHitPoint,
-                                                             WorldViewer,
-                                                             ModelViewer,
-                                                             AdditionalData,
-                                                             SurfaceNormal,
-                                                             Rng,
-                                                             VisibilityTester,
-                                                             Direct);
-
-    return Status;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-DirectShaderFree(
-    _In_opt_ _Post_invalid_ PDIRECT_SHADER DirectShader
-    )
-{
-    if (DirectShader == NULL)
-    {
-        return;
-    }
+DirectShaderReference(
+    _In_opt_ PDIRECT_SHADER DirectShader
+    );
 
-    DirectShader->DirectShaderVTable->FreeRoutine(DirectShader);
-}
+IRISSHADINGMODELAPI
+VOID
+DirectShaderDereference(
+    _In_opt_ _Post_invalid_ PDIRECT_SHADER DirectShader
+    );
 
 #endif // _DIRECT_SHADER_IRIS_SHADING_MODEL_

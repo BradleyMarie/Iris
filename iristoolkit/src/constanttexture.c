@@ -19,9 +19,9 @@ Abstract:
 //
 
 typedef struct _CONSTANT_TEXTURE {
-    PCEMISSIVE_SHADER EmissiveShader;
-    PCDIRECT_SHADER DirectShader;
-    PCINDIRECT_SHADER IndirectShader;
+    PEMISSIVE_SHADER EmissiveShader;
+    PDIRECT_SHADER DirectShader;
+    PINDIRECT_SHADER IndirectShader;
     PTRANSLUCENT_SHADER TranslucentShader;
 } CONSTANT_TEXTURE, *PCONSTANT_TEXTURE;
 
@@ -65,7 +65,7 @@ ConstantTextureGetShader(
 STATIC
 VOID
 ConstantTextureFree(
-    _In_ PVOID Context
+    _In_ _Post_invalid_ PVOID Context
     )
 {
     PCCONSTANT_TEXTURE ConstantTexture;
@@ -74,6 +74,9 @@ ConstantTextureFree(
 
     ConstantTexture = (PCCONSTANT_TEXTURE) Context;
 
+    EmissiveShaderDereference(ConstantTexture->EmissiveShader);
+    DirectShaderDereference(ConstantTexture->DirectShader);
+    IndirectShaderDereference(ConstantTexture->IndirectShader);
     TranslucentShaderDereference(ConstantTexture->TranslucentShader);
 }
 
@@ -95,9 +98,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PTEXTURE
 ConstantTextureAllocate(
-    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
-    _In_opt_ PCDIRECT_SHADER DirectShader,
-    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PDIRECT_SHADER DirectShader,
+    _In_opt_ PINDIRECT_SHADER IndirectShader,
     _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
     )
 {
@@ -124,6 +127,9 @@ ConstantTextureAllocate(
 
     if (Texture != NULL)
     {
+        EmissiveShaderReference(EmissiveShader);
+        DirectShaderReference(DirectShader);
+        IndirectShaderReference(IndirectShader);
         TranslucentShaderReference(TranslucentShader);
     }
     

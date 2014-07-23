@@ -20,7 +20,6 @@ Abstract:
 //
 
 typedef struct _LAMBERTIAN_INDIRECT_SHADER {
-    INDIRECT_SHADER IndirectShaderHeader;
     COLOR3 Reflectance;
 } LAMBERTIAN_INDIRECT_SHADER, *PLAMBERTIAN_INDIRECT_SHADER;
 
@@ -94,7 +93,7 @@ LambertianShaderShade(
 
 CONST STATIC INDIRECT_SHADER_VTABLE LambertianShaderVTable = {
     LambertianShaderShade,
-    free
+    NULL
 };
 
 //
@@ -108,22 +107,20 @@ LambertianIndirectShaderAllocate(
     _In_ PCOLOR3 Reflectance
     )
 {
-    PLAMBERTIAN_INDIRECT_SHADER LambertianIndirectShader;
+    LAMBERTIAN_INDIRECT_SHADER LambertianIndirectShader;
+    PINDIRECT_SHADER IndirectShader;
 
     if (Reflectance == NULL)
     {
         return NULL;
     }
 
-    LambertianIndirectShader = (PLAMBERTIAN_INDIRECT_SHADER) malloc(sizeof(LAMBERTIAN_INDIRECT_SHADER));
+    LambertianIndirectShader.Reflectance = *Reflectance;
 
-    if (LambertianIndirectShader == NULL)
-    {
-        return NULL;
-    }
+    IndirectShader = IndirectShaderAllocate(&LambertianShaderVTable,
+                                            &LambertianIndirectShader,
+                                            sizeof(LAMBERTIAN_INDIRECT_SHADER),
+                                            sizeof(PVOID));
 
-    LambertianIndirectShader->IndirectShaderHeader.IndirectShaderVTable = &LambertianShaderVTable;
-    LambertianIndirectShader->Reflectance = *Reflectance;
-
-    return (PINDIRECT_SHADER) LambertianIndirectShader;
+    return IndirectShader;
 }

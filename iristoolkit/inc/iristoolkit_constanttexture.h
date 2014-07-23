@@ -26,9 +26,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PTEXTURE
 ConstantTextureAllocate(
-    _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
-    _In_opt_ PCDIRECT_SHADER DirectShader,
-    _In_opt_ PCINDIRECT_SHADER IndirectShader,
+    _In_opt_ PEMISSIVE_SHADER EmissiveShader,
+    _In_opt_ PDIRECT_SHADER DirectShader,
+    _In_opt_ PINDIRECT_SHADER IndirectShader,
     _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
     );
 

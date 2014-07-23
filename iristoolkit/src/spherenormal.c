@@ -82,13 +82,13 @@ SphereNormalComputeBackNormal(
 
 CONST STATIC NORMAL_VTABLE SphereNormalFrontHeader = {
     SphereNormalComputeFrontNormal,
-    free,
+    NULL,
     FALSE
 };
 
 CONST STATIC NORMAL_VTABLE SphereNormalBackHeader = {
     SphereNormalComputeBackNormal,
-    free,
+    NULL,
     FALSE
 };
 

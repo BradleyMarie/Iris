@@ -20,7 +20,6 @@ Abstract:
 //
 
 typedef struct _PERFECT_SPECULAR_INDIRECT_SHADER {
-    INDIRECT_SHADER IndirectShaderHeader;
     COLOR3 Reflectance;
 } PERFECT_SPECULAR_INDIRECT_SHADER, *PPERFECT_SPECULAR_INDIRECT_SHADER;
 
@@ -92,7 +91,7 @@ PerfectSpecularShaderShade(
 
 CONST STATIC INDIRECT_SHADER_VTABLE PerfectSpecularShaderVTable = {
     PerfectSpecularShaderShade,
-    free
+    NULL
 };
 
 //
@@ -106,22 +105,20 @@ PerfectSpecularIndirectShaderAllocate(
     _In_ PCOLOR3 Reflectance
     )
 {
-    PPERFECT_SPECULAR_INDIRECT_SHADER PerfectSpecularIndirectShader;
+    PERFECT_SPECULAR_INDIRECT_SHADER PerfectSpecularIndirectShader;
+    PINDIRECT_SHADER IndirectShader;
 
     if (Reflectance == NULL)
     {
         return NULL;
     }
 
-    PerfectSpecularIndirectShader = (PPERFECT_SPECULAR_INDIRECT_SHADER) malloc(sizeof(PERFECT_SPECULAR_INDIRECT_SHADER));
+    PerfectSpecularIndirectShader.Reflectance = *Reflectance;
 
-    if (PerfectSpecularIndirectShader == NULL)
-    {
-        return NULL;
-    }
+    IndirectShader = IndirectShaderAllocate(&PerfectSpecularShaderVTable,
+                                            &PerfectSpecularIndirectShader,
+                                            sizeof(PERFECT_SPECULAR_INDIRECT_SHADER),
+                                            sizeof(PVOID));
 
-    PerfectSpecularIndirectShader->IndirectShaderHeader.IndirectShaderVTable = &PerfectSpecularShaderVTable;
-    PerfectSpecularIndirectShader->Reflectance = *Reflectance;
-
-    return (PINDIRECT_SHADER) PerfectSpecularIndirectShader;
+    return IndirectShader;
 }

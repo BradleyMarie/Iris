@@ -19,7 +19,6 @@ Abstract:
 //
 
 typedef struct _CONSTANT_EMISSIVE_SHADER {
-    EMISSIVE_SHADER EmissiveShaderHeader;
     COLOR3 Color;
 } CONSTANT_EMISSIVE_SHADER, *PCONSTANT_EMISSIVE_SHADER;
 
@@ -61,7 +60,7 @@ ConstantEmissiveShaderShade(
 
 CONST STATIC EMISSIVE_SHADER_VTABLE ConstantEmissiveShaderVTable = {
     ConstantEmissiveShaderShade,
-    free
+    NULL
 };
 
 //
@@ -75,22 +74,20 @@ ConstantEmissiveShaderAllocate(
     _In_ PCOLOR3 Color
     )
 {
-    PCONSTANT_EMISSIVE_SHADER ConstantEmissiveShader;
+    CONSTANT_EMISSIVE_SHADER ConstantEmissiveShader;
+    PEMISSIVE_SHADER EmissiveShader;
 
     if (Color == NULL)
     {
         return NULL;
     }
 
-    ConstantEmissiveShader = (PCONSTANT_EMISSIVE_SHADER) malloc(sizeof(CONSTANT_EMISSIVE_SHADER));
+    ConstantEmissiveShader.Color = *Color;
 
-    if (ConstantEmissiveShader == NULL)
-    {
-        return NULL;
-    }
+    EmissiveShader = EmissiveShaderAllocate(&ConstantEmissiveShaderVTable,
+                                            &ConstantEmissiveShader,
+                                            sizeof(CONSTANT_EMISSIVE_SHADER),
+                                            sizeof(PVOID));
 
-    ConstantEmissiveShader->EmissiveShaderHeader.EmissiveShaderVTable = &ConstantEmissiveShaderVTable;
-    ConstantEmissiveShader->Color = *Color;
-
-    return (PEMISSIVE_SHADER) ConstantEmissiveShader;
+    return EmissiveShader;
 }

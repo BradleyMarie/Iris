@@ -22,9 +22,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PEMISSIVE_SHADER
 InterpolatedTriangleEmissiveShaderAllocate(
-    _In_ PCEMISSIVE_SHADER Shader0,
-    _In_ PCEMISSIVE_SHADER Shader1,
-    _In_ PCEMISSIVE_SHADER Shader2
+    _In_ PEMISSIVE_SHADER Shader0,
+    _In_ PEMISSIVE_SHADER Shader1,
+    _In_ PEMISSIVE_SHADER Shader2
     );
 
 _Check_return_
@@ -32,9 +32,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDIRECT_SHADER
 InterpolatedTriangleDirectShaderAllocate(
-    _In_ PCDIRECT_SHADER Shader0,
-    _In_ PCDIRECT_SHADER Shader1,
-    _In_ PCDIRECT_SHADER Shader2
+    _In_ PDIRECT_SHADER Shader0,
+    _In_ PDIRECT_SHADER Shader1,
+    _In_ PDIRECT_SHADER Shader2
     );
 
 _Check_return_
@@ -42,9 +42,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PINDIRECT_SHADER
 InterpolatedTriangleIndirectShaderAllocate(
-    _In_ PCINDIRECT_SHADER Shader0,
-    _In_ PCINDIRECT_SHADER Shader1,
-    _In_ PCINDIRECT_SHADER Shader2
+    _In_ PINDIRECT_SHADER Shader0,
+    _In_ PINDIRECT_SHADER Shader1,
+    _In_ PINDIRECT_SHADER Shader2
     );
 
 _Check_return_
@@ -62,9 +62,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PNORMAL
 InterpolatedTriangleNormalAllocate(
-    _In_ PCNORMAL Normal0,
-    _In_ PCNORMAL Normal1,
-    _In_ PCNORMAL Normal2
+    _In_ PNORMAL Normal0,
+    _In_ PNORMAL Normal1,
+    _In_ PNORMAL Normal2
     );
 
 #endif // _INTERPOLATED_TRIANGLE_IRIS_TOOLKIT_

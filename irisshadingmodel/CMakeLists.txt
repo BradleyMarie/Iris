@@ -14,7 +14,10 @@ add_library(irisshadingmodel SHARED
     src/translucentshader.c
     src/drawingshape.c
     src/random.c
-    src/normal.c)
+    src/normal.c
+    src/emissive.c
+    src/indirect.c
+    src/direct.c)
 
 target_link_libraries(irisshadingmodel 
     iris)

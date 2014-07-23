@@ -115,17 +115,14 @@ MultiplyWithCarryRngGenerateIndex(
 
 VOID
 MultiplyWithCarryRngFree(
-    _Pre_maybenull_ _Post_invalid_ PVOID Pointer
+    _In_ _Post_invalid_ PVOID Context
     )
 {
     PMWC_RNG Rng;
 
-    if (Pointer == NULL)
-    {
-        return;
-    }
+    ASSERT(Context != NULL);
 
-    Rng = (PMWC_RNG) Pointer;
+    Rng = (PMWC_RNG) Context;
 
     free(Rng->RngState);
 }

@@ -222,10 +222,12 @@ SphereTraceSphere(
 
 STATIC
 SphereFree(
-    _In_ PVOID Context
+    _In_ _Post_invalid_ PVOID Context
     )
 {
     PSPHERE Sphere;
+
+    ASSERT(Context != NULL);
 
     Sphere = (PSPHERE) Context;
 

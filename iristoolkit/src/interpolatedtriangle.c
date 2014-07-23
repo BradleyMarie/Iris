@@ -19,34 +19,31 @@ Abstract:
 //
 
 typedef struct _INTERPOLATED_TRIANGLE_EMISSIVE_SHADER {
-    EMISSIVE_SHADER EmissiveShaderHeader;
-    PCEMISSIVE_SHADER EmissiveShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
+    PEMISSIVE_SHADER EmissiveShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_EMISSIVE_SHADER, *PINTERPOLATED_TRIANGLE_EMISSIVE_SHADER;
 
 typedef CONST INTERPOLATED_TRIANGLE_EMISSIVE_SHADER *PCINTERPOLATED_TRIANGLE_EMISSIVE_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_DIRECT_SHADER {
-    DIRECT_SHADER DirectShaderHeader;
-    PCDIRECT_SHADER DirectShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
+    PDIRECT_SHADER DirectShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_DIRECT_SHADER, *PINTERPOLATED_TRIANGLE_DIRECT_SHADER;
 
 typedef CONST INTERPOLATED_TRIANGLE_DIRECT_SHADER *PCINTERPOLATED_TRIANGLE_DIRECT_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_INDIRECT_SHADER {
-    INDIRECT_SHADER IndirectShaderHeader;
-    PCINDIRECT_SHADER IndirectShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
+    PINDIRECT_SHADER IndirectShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_INDIRECT_SHADER, *PINTERPOLATED_TRIANGLE_INDIRECT_SHADER;
 
 typedef CONST INTERPOLATED_TRIANGLE_INDIRECT_SHADER *PCINTERPOLATED_TRIANGLE_INDIRECT_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER {
-    PCTRANSLUCENT_SHADER TranslucentShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
+    PTRANSLUCENT_SHADER TranslucentShaders[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER, *PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER;
 
 typedef CONST INTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER *PCINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER;
 
 typedef struct _INTERPOLATED_TRIANGLE_NORMAL {
-    PCNORMAL Normals[IRIS_TOOLKIT_TRIANGLE_VERTICES];
+    PNORMAL Normals[IRIS_TOOLKIT_TRIANGLE_VERTICES];
 } INTERPOLATED_TRIANGLE_NORMAL, *PINTERPOLATED_TRIANGLE_NORMAL;
 
 typedef CONST INTERPOLATED_TRIANGLE_NORMAL *PCINTERPOLATED_TRIANGLE_NORMAL;
@@ -371,33 +368,113 @@ InterpolatedTriangleNormalComputeNormal(
     return ISTATUS_SUCCESS;
 }
 
+VOID
+InterpolatedTriangleEmissiveShaderFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PINTERPOLATED_TRIANGLE_EMISSIVE_SHADER InterpolatedEmissiveShader;
+
+    ASSERT(Context != NULL);
+
+    InterpolatedEmissiveShader = (PINTERPOLATED_TRIANGLE_EMISSIVE_SHADER) Context;
+
+    EmissiveShaderDereference(InterpolatedEmissiveShader->EmissiveShaders[0]);
+    EmissiveShaderDereference(InterpolatedEmissiveShader->EmissiveShaders[1]);
+    EmissiveShaderDereference(InterpolatedEmissiveShader->EmissiveShaders[2]);
+}
+
+VOID
+InterpolatedTriangleDirectShaderFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PINTERPOLATED_TRIANGLE_DIRECT_SHADER InterpolatedDirectShader;
+
+    ASSERT(Context != NULL);
+
+    InterpolatedDirectShader = (PINTERPOLATED_TRIANGLE_DIRECT_SHADER) Context;
+
+    DirectShaderDereference(InterpolatedDirectShader->DirectShaders[0]);
+    DirectShaderDereference(InterpolatedDirectShader->DirectShaders[1]);
+    DirectShaderDereference(InterpolatedDirectShader->DirectShaders[2]);
+}
+
+VOID
+InterpolatedTriangleIndirectShaderFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PINTERPOLATED_TRIANGLE_INDIRECT_SHADER InterpolatedIndirectShader;
+
+    ASSERT(Context != NULL);
+
+    InterpolatedIndirectShader = (PINTERPOLATED_TRIANGLE_INDIRECT_SHADER) Context;
+
+    IndirectShaderDereference(InterpolatedIndirectShader->IndirectShaders[0]);
+    IndirectShaderDereference(InterpolatedIndirectShader->IndirectShaders[1]);
+    IndirectShaderDereference(InterpolatedIndirectShader->IndirectShaders[2]);
+}
+
+VOID
+InterpolatedTriangleTranslucentShaderFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER InterpolatedTranslucentShader;
+
+    ASSERT(Context != NULL);
+
+    InterpolatedTranslucentShader = (PINTERPOLATED_TRIANGLE_TRANSLUCENT_SHADER) Context;
+
+    TranslucentShaderDereference(InterpolatedTranslucentShader->TranslucentShaders[0]);
+    TranslucentShaderDereference(InterpolatedTranslucentShader->TranslucentShaders[1]);
+    TranslucentShaderDereference(InterpolatedTranslucentShader->TranslucentShaders[2]);
+}
+
+VOID
+InterpolatedTriangleNormalFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PINTERPOLATED_TRIANGLE_NORMAL InterpolatedNormal;
+
+    ASSERT(Context != NULL);
+
+    InterpolatedNormal = (PINTERPOLATED_TRIANGLE_NORMAL) Context;
+
+    NormalDereference(InterpolatedNormal->Normals[0]);
+    NormalDereference(InterpolatedNormal->Normals[1]);
+    NormalDereference(InterpolatedNormal->Normals[2]);
+}
+
 //
 // Static variables
 //
 
 CONST STATIC EMISSIVE_SHADER_VTABLE InterpolatedTriangleEmissiveShaderVTable = {
     InterpolatedTriangleEmissiveShaderShade,
-    free
+    InterpolatedTriangleEmissiveShaderFree
 };
 
 CONST STATIC DIRECT_SHADER_VTABLE InterpolatedTriangleDirectShaderVTable = {
     InterpolatedTriangleDirectShaderShade,
-    free
+    InterpolatedTriangleDirectShaderFree
 };
 
 CONST STATIC INDIRECT_SHADER_VTABLE InterpolatedTriangleIndirectShaderVTable = {
     InterpolatedTriangleIndirectShaderShade,
-    free
+    InterpolatedTriangleIndirectShaderFree
 };
 
 CONST STATIC TRANSLUCENT_SHADER_VTABLE InterpolatedTriangleTranslucentShaderVTable = {
     InterpolatedTriangleTranslucentShaderShade,
-    free
+    InterpolatedTriangleTranslucentShaderFree
 };
 
 CONST STATIC NORMAL_VTABLE InterpolatedTriangleNormalVTable = {
     InterpolatedTriangleNormalComputeNormal,
-    free,
+    InterpolatedTriangleNormalFree,
     FALSE
 };
 
@@ -409,12 +486,13 @@ _Check_return_
 _Ret_maybenull_
 PEMISSIVE_SHADER
 InterpolatedTriangleEmissiveShaderAllocate(
-    _In_ PCEMISSIVE_SHADER Shader0,
-    _In_ PCEMISSIVE_SHADER Shader1,
-    _In_ PCEMISSIVE_SHADER Shader2
+    _In_ PEMISSIVE_SHADER Shader0,
+    _In_ PEMISSIVE_SHADER Shader1,
+    _In_ PEMISSIVE_SHADER Shader2
     )
 {
-    PINTERPOLATED_TRIANGLE_EMISSIVE_SHADER EmissiveShader;
+    INTERPOLATED_TRIANGLE_EMISSIVE_SHADER InterpolatedEmissiveShader;
+    PEMISSIVE_SHADER EmissiveShader;
 
     if (Shader0 == NULL &&
         Shader1 == NULL &&
@@ -423,31 +501,36 @@ InterpolatedTriangleEmissiveShaderAllocate(
         return NULL;
     }
 
-    EmissiveShader = (PINTERPOLATED_TRIANGLE_EMISSIVE_SHADER) malloc(sizeof(INTERPOLATED_TRIANGLE_EMISSIVE_SHADER));
+    InterpolatedEmissiveShader.EmissiveShaders[0] = Shader0;
+    InterpolatedEmissiveShader.EmissiveShaders[1] = Shader1;
+    InterpolatedEmissiveShader.EmissiveShaders[2] = Shader2;
 
-    if (EmissiveShader == NULL)
+    EmissiveShader = EmissiveShaderAllocate(&InterpolatedTriangleEmissiveShaderVTable,
+                                            &InterpolatedEmissiveShader,
+                                            sizeof(INTERPOLATED_TRIANGLE_EMISSIVE_SHADER),
+                                            sizeof(PVOID));
+
+    if (EmissiveShader != NULL)
     {
-        return NULL;
+        EmissiveShaderReference(Shader0);
+        EmissiveShaderReference(Shader1);
+        EmissiveShaderReference(Shader2);
     }
 
-    EmissiveShader->EmissiveShaderHeader.EmissiveShaderVTable = &InterpolatedTriangleEmissiveShaderVTable;
-    EmissiveShader->EmissiveShaders[0] = Shader0;
-    EmissiveShader->EmissiveShaders[1] = Shader1;
-    EmissiveShader->EmissiveShaders[2] = Shader2;
-
-    return (PEMISSIVE_SHADER) EmissiveShader;
+    return EmissiveShader;
 }
 
 _Check_return_
 _Ret_maybenull_
 PDIRECT_SHADER
 InterpolatedTriangleDirectShaderAllocate(
-    _In_ PCDIRECT_SHADER Shader0,
-    _In_ PCDIRECT_SHADER Shader1,
-    _In_ PCDIRECT_SHADER Shader2
+    _In_ PDIRECT_SHADER Shader0,
+    _In_ PDIRECT_SHADER Shader1,
+    _In_ PDIRECT_SHADER Shader2
     )
 {
-    PINTERPOLATED_TRIANGLE_DIRECT_SHADER DirectShader;
+    INTERPOLATED_TRIANGLE_DIRECT_SHADER InterpolatedDirectShader;
+    PDIRECT_SHADER DirectShader;
 
     if (Shader0 == NULL &&
         Shader1 == NULL &&
@@ -456,31 +539,36 @@ InterpolatedTriangleDirectShaderAllocate(
         return NULL;
     }
 
-    DirectShader = (PINTERPOLATED_TRIANGLE_DIRECT_SHADER) malloc(sizeof(INTERPOLATED_TRIANGLE_DIRECT_SHADER));
+    InterpolatedDirectShader.DirectShaders[0] = Shader0;
+    InterpolatedDirectShader.DirectShaders[1] = Shader1;
+    InterpolatedDirectShader.DirectShaders[2] = Shader2;
 
-    if (DirectShader == NULL)
+    DirectShader = DirectShaderAllocate(&InterpolatedTriangleDirectShaderVTable,
+                                        &InterpolatedDirectShader,
+                                        sizeof(INTERPOLATED_TRIANGLE_DIRECT_SHADER),
+                                        sizeof(PVOID));
+
+    if (DirectShader != NULL)
     {
-        return NULL;
+        DirectShaderReference(Shader0);
+        DirectShaderReference(Shader1);
+        DirectShaderReference(Shader2);
     }
 
-    DirectShader->DirectShaderHeader.DirectShaderVTable = &InterpolatedTriangleDirectShaderVTable;
-    DirectShader->DirectShaders[0] = Shader0;
-    DirectShader->DirectShaders[1] = Shader1;
-    DirectShader->DirectShaders[2] = Shader2;
-
-    return (PDIRECT_SHADER) DirectShader;
+    return DirectShader;
 }
 
 _Check_return_
 _Ret_maybenull_
 PINDIRECT_SHADER
 InterpolatedTriangleIndirectShaderAllocate(
-    _In_ PCINDIRECT_SHADER Shader0,
-    _In_ PCINDIRECT_SHADER Shader1,
-    _In_ PCINDIRECT_SHADER Shader2
+    _In_ PINDIRECT_SHADER Shader0,
+    _In_ PINDIRECT_SHADER Shader1,
+    _In_ PINDIRECT_SHADER Shader2
     )
 {
-    PINTERPOLATED_TRIANGLE_INDIRECT_SHADER IndirectShader;
+    INTERPOLATED_TRIANGLE_INDIRECT_SHADER InterpolatedIndirectShader;
+    PINDIRECT_SHADER IndirectShader;
 
     if (Shader0 == NULL &&
         Shader1 == NULL &&
@@ -489,19 +577,23 @@ InterpolatedTriangleIndirectShaderAllocate(
         return NULL;
     }
 
-    IndirectShader = (PINTERPOLATED_TRIANGLE_INDIRECT_SHADER) malloc(sizeof(INTERPOLATED_TRIANGLE_INDIRECT_SHADER));
+    InterpolatedIndirectShader.IndirectShaders[0] = Shader0;
+    InterpolatedIndirectShader.IndirectShaders[1] = Shader1;
+    InterpolatedIndirectShader.IndirectShaders[2] = Shader2;
 
-    if (IndirectShader == NULL)
+    IndirectShader = IndirectShaderAllocate(&InterpolatedTriangleIndirectShaderVTable,
+                                            &InterpolatedIndirectShader,
+                                            sizeof(INTERPOLATED_TRIANGLE_INDIRECT_SHADER),
+                                            sizeof(PVOID));
+
+    if (IndirectShader != NULL)
     {
-        return NULL;
+        IndirectShaderReference(Shader0);
+        IndirectShaderReference(Shader1);
+        IndirectShaderReference(Shader2);
     }
 
-    IndirectShader->IndirectShaderHeader.IndirectShaderVTable = &InterpolatedTriangleIndirectShaderVTable;
-    IndirectShader->IndirectShaders[0] = Shader0;
-    IndirectShader->IndirectShaders[1] = Shader1;
-    IndirectShader->IndirectShaders[2] = Shader2;
-
-    return (PINDIRECT_SHADER) IndirectShader;
+    return IndirectShader;
 }
 
 _Check_return_
@@ -546,9 +638,9 @@ _Check_return_
 _Ret_maybenull_
 PNORMAL
 InterpolatedTriangleNormalAllocate(
-    _In_ PCNORMAL Normal0,
-    _In_ PCNORMAL Normal1,
-    _In_ PCNORMAL Normal2
+    _In_ PNORMAL Normal0,
+    _In_ PNORMAL Normal1,
+    _In_ PNORMAL Normal2
     )
 {
     INTERPOLATED_TRIANGLE_NORMAL InterpolatedNormal;
@@ -569,6 +661,13 @@ InterpolatedTriangleNormalAllocate(
                             &InterpolatedNormal,
                             sizeof(INTERPOLATED_TRIANGLE_NORMAL),
                             sizeof(PVOID));
+
+    if (Normal != NULL)
+    {
+        NormalReference(Normal0);
+        NormalReference(Normal1);
+        NormalReference(Normal2);
+    }
 
     return Normal;
 }

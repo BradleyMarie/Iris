@@ -140,17 +140,25 @@ ListSceneTrace(
 STATIC
 VOID
 ListSceneFree(
-    _Pre_maybenull_ _Post_invalid_ PVOID Scene
+    _In_ _Post_invalid_ PVOID Context
     )
 {
+    PSCENE_OBJECT *Objects;
     PLIST_SCENE ListScene;
+    SIZE_T ListSize;
+    SIZE_T Index;
 
-    if (Scene == NULL)
+    ASSERT(Context != NULL);
+
+    ListScene = (PLIST_SCENE) Context;
+
+    ListSize = ListScene->ObjectsSize;
+    Objects = ListScene->Objects;
+    
+    for (Index = 0; Index < ListSize; Index++)
     {
-        return;
+        SceneObjectFree(Objects[Index]);
     }
-
-    ListScene = (PLIST_SCENE) Scene;
 
     free(ListScene->Objects);
 }

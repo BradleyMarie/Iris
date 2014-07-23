@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the EMISSIVE_MATERIAL type.
+    This file contains the definitions for the EMISSIVE_SHADER type.
 
 --*/
 
@@ -40,17 +40,24 @@ typedef struct _EMISSIVE_SHADER_VTABLE {
 
 typedef CONST EMISSIVE_SHADER_VTABLE *PCEMISSIVE_SHADER_VTABLE;
 
-struct _EMISSIVE_SHADER {
-    PCEMISSIVE_SHADER_VTABLE EmissiveShaderVTable;
-};
-
 //
 // Functions
 //
 
 _Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PEMISSIVE_SHADER
+EmissiveShaderAllocate(
+    _In_ PCEMISSIVE_SHADER_VTABLE EmissiveShaderVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 ISTATUS
 EmissiveShaderShade(
     _In_ PCEMISSIVE_SHADER EmissiveShader,
@@ -58,36 +65,18 @@ EmissiveShaderShade(
     _In_ PCPOINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
-    )
-{
-    ISTATUS Status;
+    );
 
-    ASSERT(EmissiveShader != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(Emissive != NULL);
-
-    Status = EmissiveShader->EmissiveShaderVTable->EmissiveRoutine(EmissiveShader,
-                                                                   WorldHitPoint,
-                                                                   ModelHitPoint,
-                                                                   AdditionalData,
-                                                                   Emissive);
-
-    return Status;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-EmissiveShaderFree(
-    _In_opt_ _Post_invalid_ PEMISSIVE_SHADER EmissiveShader
-    )
-{
-    if (EmissiveShader == NULL)
-    {
-        return;
-    }
+EmissiveShaderReference(
+    _In_opt_ PEMISSIVE_SHADER EmissiveShader
+    );
 
-    EmissiveShader->EmissiveShaderVTable->FreeRoutine(EmissiveShader);
-}
+IRISSHADINGMODELAPI
+VOID
+EmissiveShaderDereference(
+    _In_opt_ _Post_invalid_ PEMISSIVE_SHADER EmissiveShader
+    );
 
 #endif // _EMISSIVE_SHADER_IRIS_SHADING_MODEL_

@@ -19,7 +19,6 @@ Abstract:
 //
 
 typedef struct _PHONG_SHADER {
-    DIRECT_SHADER DirectShaderHeader;
     PLIGHT_SELECTION_ROUTINE LightSelectionRoutine;
     _Field_size_(NumberOfLights) PCPHONG_LIGHT CONST *Lights;
     SIZE_T NumberOfLights;
@@ -907,7 +906,7 @@ AttenuatedPointPhongSpotLightShade(
 
 CONST STATIC DIRECT_SHADER_VTABLE PhongShaderVTable = {
     PhongDirectShaderShade,
-    free
+    NULL
 };
 
 CONST STATIC PHONG_LIGHT_VTABLE DirectionalPhongLightVTable = {
@@ -953,7 +952,8 @@ PhongDirectShaderAllocate(
     _In_ FLOAT Shininess
     )
 {
-    PPHONG_SHADER PhongShader;
+    PDIRECT_SHADER DirectShader;
+    PHONG_SHADER PhongShader;
 
     if (Lights == NULL ||
         NumberOfLights == 0 ||
@@ -967,23 +967,20 @@ PhongDirectShaderAllocate(
         return NULL;
     }
 
-    PhongShader = (PPHONG_SHADER) malloc(sizeof(PHONG_SHADER));
+    PhongShader.LightSelectionRoutine = LightSelectionRoutine;
+    PhongShader.Lights = Lights;
+    PhongShader.NumberOfLights = NumberOfLights;
+    PhongShader.Ambient = *Ambient;
+    PhongShader.Diffuse = *Diffuse;
+    PhongShader.Specular = *Specular;
+    PhongShader.Shininess = Shininess;
 
-    if (PhongShader == NULL)
-    {
-        return NULL;
-    }
+    DirectShader = DirectShaderAllocate(&PhongShaderVTable,
+                                        &PhongShader,
+                                        sizeof(PHONG_SHADER),
+                                        sizeof(PVOID));
 
-    PhongShader->DirectShaderHeader.DirectShaderVTable = &PhongShaderVTable;
-    PhongShader->LightSelectionRoutine = LightSelectionRoutine;
-    PhongShader->Lights = Lights;
-    PhongShader->NumberOfLights = NumberOfLights;
-    PhongShader->Ambient = *Ambient;
-    PhongShader->Diffuse = *Diffuse;
-    PhongShader->Specular = *Specular;
-    PhongShader->Shininess = Shininess;
-
-    return (PDIRECT_SHADER) PhongShader;
+    return DirectShader;
 }
 
 _Check_return_

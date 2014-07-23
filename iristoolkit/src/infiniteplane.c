@@ -141,10 +141,12 @@ InfinitePlaneTraceInfinitePlane(
 
 STATIC
 InfinitePlaneFree(
-    _In_ PVOID Context
+    _In_ _Post_invalid_ PVOID Context
     )
 {
     PINFINITE_PLANE InfinitePlane;
+
+    ASSERT(Context != NULL);
 
     InfinitePlane = (PINFINITE_PLANE) Context;
 

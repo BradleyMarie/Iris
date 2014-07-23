@@ -58,13 +58,13 @@ ConstantNormalComputeNormal(
 
 CONST STATIC NORMAL_VTABLE ConstantNormalHeader = {
     ConstantNormalComputeNormal,
-    free,
+    NULL,
     FALSE
 };
 
 CONST STATIC NORMAL_VTABLE ConstantNormalPrenormalizedHeader = {
     ConstantNormalComputeNormal,
-    free,
+    NULL,
     TRUE
 };
 

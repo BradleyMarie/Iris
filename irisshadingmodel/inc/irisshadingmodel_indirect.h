@@ -46,17 +46,24 @@ typedef struct _INDIRECT_SHADER_VTABLE {
 
 typedef CONST INDIRECT_SHADER_VTABLE *PCINDIRECT_SHADER_VTABLE;
 
-struct _INDIRECT_SHADER {
-    PCINDIRECT_SHADER_VTABLE IndirectShaderVTable;
-};
-
 //
 // Functions
 //
 
 _Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PINDIRECT_SHADER
+IndirectShaderAllocate(
+    _In_ PCINDIRECT_SHADER_VTABLE IndirectShaderVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+IRISSHADINGMODELAPI
 ISTATUS
 IndirectShaderShade(
     _In_ PCINDIRECT_SHADER IndirectShader,
@@ -70,45 +77,18 @@ IndirectShaderShade(
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_opt_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect
-    )
-{
-    ISTATUS Status;
+    );
 
-    ASSERT(IndirectShader != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(VisibilityTester != NULL);
-    ASSERT(Indirect != NULL);
-
-    Status = IndirectShader->IndirectShaderVTable->IndirectRoutine(IndirectShader,
-                                                                   WorldHitPoint,
-                                                                   ModelHitPoint,
-                                                                   WorldViewer,
-                                                                   ModelViewer,
-                                                                   AdditionalData,
-                                                                   SurfaceNormal,
-                                                                   Rng,
-                                                                   VisibilityTester,
-                                                                   RayTracer,
-                                                                   Indirect);
-
-    return Status;
-}
-
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
-IndirectShaderFree(
-    _In_opt_ _Post_invalid_ PINDIRECT_SHADER IndirectShader
-    )
-{
-    if (IndirectShader == NULL)
-    {
-        return;
-    }
+IndirectShaderReference(
+    _In_opt_ PINDIRECT_SHADER IndirectShader
+    );
 
-    IndirectShader->IndirectShaderVTable->FreeRoutine(IndirectShader);
-}
+IRISSHADINGMODELAPI
+VOID
+IndirectShaderDereference(
+    _In_opt_ _Post_invalid_ PINDIRECT_SHADER IndirectShader
+    );
 
 #endif // _INDIRECT_SHADER_IRIS_SHADING_MODEL_
