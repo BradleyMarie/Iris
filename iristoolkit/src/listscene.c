@@ -25,7 +25,6 @@ Abstract:
 //
 
 typedef struct _LIST_SCENE {
-    PCSCENE_VTABLE SceneHeader;
     _Field_size_(ObjectsCapacity) PSCENE_OBJECT *Objects;
     SIZE_T ObjectsCapacity;
     SIZE_T ObjectsSize;
@@ -154,14 +153,13 @@ ListSceneFree(
     ListScene = (PLIST_SCENE) Scene;
 
     free(ListScene->Objects);
-    free(ListScene);
 }
 
 //
 // Static variables
 //
 
-STATIC SCENE_VTABLE ListSceneHeader = {
+STATIC SCENE_VTABLE ListSceneVTable = {
     ListSceneAddObject,
     ListSceneTrace,
     ListSceneFree
@@ -179,7 +177,8 @@ ListSceneAllocate(
     )
 {
     PSCENE_OBJECT *Objects;
-    PLIST_SCENE ListScene;
+    LIST_SCENE ListScene;
+    PSCENE Scene;
 
     Objects = (PSCENE_OBJECT*) malloc(sizeof(PSCENE_OBJECT) * LIST_SCENE_INTIAL_SIZE);
 
@@ -188,18 +187,19 @@ ListSceneAllocate(
         return NULL;
     }
 
-    ListScene = (PLIST_SCENE) malloc(sizeof(LIST_SCENE));
+    ListScene.Objects = Objects;
+    ListScene.ObjectsSize = 0;
+    ListScene.ObjectsCapacity = LIST_SCENE_INTIAL_SIZE;
 
-    if (ListScene == NULL)
+    Scene = SceneAllocate(&ListSceneVTable,
+                          &ListScene,
+                          sizeof(LIST_SCENE),
+                          sizeof(PVOID));
+
+    if (Scene == NULL)
     {
         free(Objects);
-        return NULL;
     }
 
-    ListScene->SceneHeader = &ListSceneHeader;
-    ListScene->Objects = Objects;
-    ListScene->ObjectsSize = 0;
-    ListScene->ObjectsCapacity = LIST_SCENE_INTIAL_SIZE;
-
-    return (PSCENE) ListScene;
+    return Scene;
 }

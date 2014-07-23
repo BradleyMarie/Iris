@@ -17,6 +17,19 @@ Abstract:
 
 #include <irisshadingmodelp.h>
 
+//
+// Types
+//
+
+struct _SCENE {
+    PCSCENE_VTABLE VTable;
+    PVOID Data;
+};
+
+//
+// Functions
+//
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
@@ -36,9 +49,9 @@ SceneTrace(
 
     SceneTracerInitialize(&SceneTracer, RayTracer);
 
-    Status = Scene->SceneVTable->TraceRoutine(Scene,
-                                              WorldRay,
-                                              &SceneTracer);
+    Status = Scene->VTable->TraceRoutine(Scene->Data,
+                                         WorldRay,
+                                         &SceneTracer);
 
     return Status;
 }

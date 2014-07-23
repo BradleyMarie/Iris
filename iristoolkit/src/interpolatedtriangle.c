@@ -334,7 +334,6 @@ InterpolatedTriangleNormalComputeNormal(
 {
     PCINTERPOLATED_TRIANGLE_NORMAL InterpolatedTriangleNormal;
     PCBARYCENTRIC_COORDINATES BarycentricCoordinates;
-    PNORMAL_COMPUTE_NORMAL_ROUTINE ComputeNormalRoutine;
     VECTOR3 ComponentNormal;
     PCNORMAL Normal;
     ISTATUS Status;

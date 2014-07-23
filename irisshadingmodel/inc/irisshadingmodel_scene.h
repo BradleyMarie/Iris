@@ -48,15 +48,23 @@ typedef struct _SCENE_VTABLE {
 
 typedef CONST SCENE_VTABLE *PCSCENE_VTABLE;
 
-typedef struct _SCENE {
-    PCSCENE_VTABLE SceneVTable;
-} SCENE, *PSCENE;
-
+typedef struct _SCENE SCENE, *PSCENE;
 typedef CONST SCENE *PCSCENE;
 
 //
 // Functions
 //
+
+_Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PSCENE
+SceneAllocate(
+    _In_ PCSCENE_VTABLE SceneVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -84,18 +92,10 @@ SceneAddWorldObject(
     return SceneAddObject(Scene, DrawingShape, NULL, TRUE);
 }
 
-SFORCEINLINE
+IRISSHADINGMODELAPI
 VOID
 SceneFree(
     _In_opt_ _Post_invalid_ PSCENE Scene
-    )
-{
-    if (Scene == NULL)
-    {
-        return;
-    }
-
-    Scene->SceneVTable->FreeRoutine(Scene);
-}
+    );
 
 #endif // _SCENE_IRIS_SHADING_MODEL_
