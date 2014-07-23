@@ -26,7 +26,7 @@ Abstract:
 //
 
 typedef struct _SPHERE {
-    PCTEXTURE Textures[2];
+    PTEXTURE Textures[2];
     PNORMAL Normals[2];
     POINT3 Center;
     FLOAT RadiusSquared;
@@ -229,6 +229,8 @@ SphereFree(
 
     Sphere = (PSPHERE) Context;
 
+    TextureDereference(Sphere->Textures[SPHERE_FRONT_FACE]);
+    TextureDereference(Sphere->Textures[SPHERE_BACK_FACE]);
     NormalDereference(Sphere->Normals[SPHERE_FRONT_FACE]);
     NormalDereference(Sphere->Normals[SPHERE_BACK_FACE]);
 }
@@ -254,9 +256,9 @@ PDRAWING_SHAPE
 SphereAllocate(
     _In_ PCPOINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _In_opt_ PNORMAL BackNormal
     )
 {
@@ -292,6 +294,8 @@ SphereAllocate(
 
     if (DrawingShape != NULL)
     {
+        TextureReference(FrontTexture);
+        TextureReference(BackTexture);
         NormalReference(FrontNormal);
         NormalReference(BackNormal);
     }

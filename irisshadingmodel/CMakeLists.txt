@@ -9,6 +9,7 @@ add_library(irisshadingmodel SHARED
     src/scenetracer.c
     src/visibilitytester.c
     src/rayshader.c
+    src/textureshader.c
     src/texture.c
     src/translucentshader.c
     src/drawingshape.c

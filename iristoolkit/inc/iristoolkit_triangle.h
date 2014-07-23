@@ -45,9 +45,9 @@ TriangleAllocate(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
-    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _In_opt_ PNORMAL BackNormal
     );
 
@@ -60,8 +60,8 @@ FlatTriangleAllocate(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
-    _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _Out_opt_ PNORMAL *FrontNormal,
     _Out_opt_ PNORMAL *BackNormal
     );

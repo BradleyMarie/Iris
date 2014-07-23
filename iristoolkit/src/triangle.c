@@ -27,7 +27,7 @@ Abstract:
 //
 
 typedef struct _TRIANGLE {
-    PCTEXTURE Textures[2];
+    PTEXTURE Textures[2];
     PNORMAL Normals[2];
     POINT3 Vertex0;
     VECTOR3 B;
@@ -212,6 +212,8 @@ TriangleFree(
 
     Triangle = (PTRIANGLE) Context;
 
+    TextureDereference(Triangle->Textures[TRIANGLE_FRONT_FACE]);
+    TextureDereference(Triangle->Textures[TRIANGLE_BACK_FACE]);
     NormalDereference(Triangle->Normals[TRIANGLE_FRONT_FACE]);
     NormalDereference(Triangle->Normals[TRIANGLE_BACK_FACE]);
 }
@@ -239,8 +241,8 @@ TriangleInitialize(
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
-    _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _Out_opt_ PVECTOR3 FrontFaceSurfaceNormal 
     )
 {
@@ -296,9 +298,9 @@ TriangleAllocate(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
-    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _In_opt_ PNORMAL BackNormal
     )
 {
@@ -329,6 +331,8 @@ TriangleAllocate(
 
     if (DrawingShape != NULL)
     {
+        TextureReference(FrontTexture);
+        TextureReference(BackTexture);
         NormalReference(FrontNormal);
         NormalReference(BackNormal);   
     }
@@ -345,8 +349,8 @@ FlatTriangleAllocate(
     _In_ PCPOINT3 Vertex0,
     _In_ PCPOINT3 Vertex1,
     _In_ PCPOINT3 Vertex2,
-    _In_opt_ PCTEXTURE FrontTexture,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _Out_opt_ PNORMAL *FrontNormal,
     _Out_opt_ PNORMAL *BackNormal
     )
@@ -430,6 +434,8 @@ FlatTriangleAllocate(
 
     if (DrawingShape != NULL)
     {
+        TextureReference(FrontTexture);
+        TextureReference(BackTexture);
         NormalReference(*FrontNormal);
         NormalReference(*BackNormal);   
     }

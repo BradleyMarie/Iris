@@ -26,7 +26,7 @@ Abstract:
 //
 
 typedef struct _INFINITE_PLANE {
-    PCTEXTURE Textures[2];
+    PTEXTURE Textures[2];
     PNORMAL Normals[2];
     POINT3 Vertex;
     VECTOR3 SurfaceNormal;
@@ -148,6 +148,8 @@ InfinitePlaneFree(
 
     InfinitePlane = (PINFINITE_PLANE) Context;
 
+    TextureDereference(InfinitePlane->Textures[INFINITE_PLANE_FRONT_FACE]);
+    TextureDereference(InfinitePlane->Textures[INFINITE_PLANE_BACK_FACE]);
     NormalDereference(InfinitePlane->Normals[INFINITE_PLANE_FRONT_FACE]);
     NormalDereference(InfinitePlane->Normals[INFINITE_PLANE_BACK_FACE]);
 }
@@ -172,9 +174,9 @@ PDRAWING_SHAPE
 InfinitePlaneAllocate(
     _In_ PCPOINT3 Vertex,
     _In_ PCVECTOR3 SurfaceNormal,
-    _In_opt_ PCTEXTURE FrontTexture,
+    _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
-    _In_opt_ PCTEXTURE BackTexture,
+    _In_opt_ PTEXTURE BackTexture,
     _In_opt_ PNORMAL BackNormal
     )
 {
@@ -209,6 +211,14 @@ InfinitePlaneAllocate(
                                         &InfinitePlane,
                                         sizeof(INFINITE_PLANE),
                                         sizeof(PVOID));
+
+    if (DrawingShape != NULL)
+    {
+        TextureReference(FrontTexture);
+        TextureReference(BackTexture);
+        NormalReference(FrontNormal);
+        NormalDereference(BackNormal);
+    }
 
     return DrawingShape;
 }

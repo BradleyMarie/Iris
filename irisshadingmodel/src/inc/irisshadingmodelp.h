@@ -21,6 +21,6 @@ Abstract:
 #include "irisshadingmodel_sceneobject.h"
 #include "irisshadingmodel_scenetracer.h"
 #include "irisshadingmodel_scene.h"
-#include "irisshadingmodel_texture.h"
+#include "irisshadingmodel_textureshader.h"
 
 #endif // _IRIS_SHADING_MODEL_INTERNAL_HEADER_

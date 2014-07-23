@@ -4,16 +4,16 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_texture.h
+    irisshadingmodel_textureshader.h
 
 Abstract:
 
-    This file contains the internal definitions for the TEXTURE type.
+    This file contains the internal definitions for the TEXTURE_SHADER type.
 
 --*/
 
-#ifndef _TEXTURE_IRIS_SHADING_MODEL_INTERNAL_
-#define _TEXTURE_IRIS_SHADING_MODEL_INTERNAL_
+#ifndef _TEXTURE_SHADER_IRIS_SHADING_MODEL_INTERNAL_
+#define _TEXTURE_SHADER_IRIS_SHADING_MODEL_INTERNAL_
 
 #include <irisshadingmodelp.h>
 
@@ -86,4 +86,4 @@ TextureShaderInitialize(
     TextureShader->Color = Color;
 }
 
-#endif // _TEXTURE_IRIS_SHADING_MODEL_INTERNAL_
+#endif // _TEXTURE_SHADER_IRIS_SHADING_MODEL_INTERNAL_

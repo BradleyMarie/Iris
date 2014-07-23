@@ -43,57 +43,8 @@ typedef struct _TEXTURE_VTABLE {
 
 typedef CONST TEXTURE_VTABLE *PCTEXTURE_VTABLE;
 
-typedef struct _TEXTURE {
-    PCTEXTURE_VTABLE TextureVTable;
-} TEXTURE, *PTEXTURE;
-
+typedef struct _TEXTURE TEXTURE, *PTEXTURE;
 typedef CONST TEXTURE *PCTEXTURE;
-
-//
-// Functions
-//
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS
-TextureShade(
-    _In_ PCTEXTURE Texture,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_opt_ PCVOID AdditionalData,
-    _Inout_ PTEXTURE_SHADER TextureShader
-    )
-{
-    ISTATUS Status;
-
-    ASSERT(Texture != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(TextureShader != NULL);
-
-    Status = Texture->TextureVTable->TextureShadeRoutine(Texture,
-                                                         WorldHitPoint,
-                                                         ModelHitPoint,
-                                                         AdditionalData,
-                                                         TextureShader);
-
-    return Status;
-}
-
-SFORCEINLINE
-VOID
-TextureFree(
-    _In_opt_ _Post_invalid_ PTEXTURE Texture
-    )
-{
-    if (Texture == NULL)
-    {
-        return;
-    }
-
-    Texture->TextureVTable->FreeRoutine(Texture);
-}
 
 //
 // Prototypes
@@ -109,6 +60,41 @@ TextureShaderShadeShader(
     _In_opt_ PCDIRECT_SHADER DirectShader,
     _In_opt_ PCINDIRECT_SHADER IndirectShader,
     _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
+    );
+
+_Check_return_
+_Ret_maybenull_
+IRISSHADINGMODELAPI
+PTEXTURE
+TextureAllocate(
+    _In_ PCTEXTURE_VTABLE TextureVTable,
+    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
+ISTATUS
+TextureShade(
+    _In_ PCTEXTURE Texture,
+    _In_ PCPOINT3 WorldHitPoint,
+    _In_ PCPOINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PTEXTURE_SHADER TextureShader
+    );
+
+IRISSHADINGMODELAPI
+VOID
+TextureReference(
+    _In_opt_ PTEXTURE Texture
+    );
+
+IRISSHADINGMODELAPI
+VOID
+TextureDereference(
+    _In_opt_ _Post_invalid_ PTEXTURE Texture
     );
 
 #endif // _TEXTURE_IRIS_SHADING_MODEL_

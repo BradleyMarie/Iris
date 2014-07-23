@@ -19,7 +19,6 @@ Abstract:
 //
 
 typedef struct _CONSTANT_TEXTURE {
-    TEXTURE TextureHeader;
     PCEMISSIVE_SHADER EmissiveShader;
     PCDIRECT_SHADER DirectShader;
     PCINDIRECT_SHADER IndirectShader;
@@ -102,7 +101,8 @@ ConstantTextureAllocate(
     _In_opt_ PTRANSLUCENT_SHADER TranslucentShader
     )
 {
-    PCONSTANT_TEXTURE ConstantTexture;
+    CONSTANT_TEXTURE ConstantTexture;
+    PTEXTURE Texture;
 
     if (EmissiveShader == NULL &&
         DirectShader == NULL &&
@@ -112,20 +112,20 @@ ConstantTextureAllocate(
         return NULL;
     }
 
-    ConstantTexture = (PCONSTANT_TEXTURE) malloc(sizeof(CONSTANT_TEXTURE));
+    ConstantTexture.EmissiveShader = EmissiveShader;
+    ConstantTexture.IndirectShader = IndirectShader;
+    ConstantTexture.DirectShader = DirectShader;
+    ConstantTexture.TranslucentShader = TranslucentShader;
 
-    if (ConstantTexture == NULL)
+    Texture = TextureAllocate(&ConstantTextureVTable,
+                              &ConstantTexture,
+                              sizeof(CONSTANT_TEXTURE),
+                              sizeof(PVOID));
+
+    if (Texture != NULL)
     {
-        return NULL;
+        TranslucentShaderReference(TranslucentShader);
     }
-
-    ConstantTexture->TextureHeader.TextureVTable = &ConstantTextureVTable;
-    ConstantTexture->EmissiveShader = EmissiveShader;
-    ConstantTexture->IndirectShader = IndirectShader;
-    ConstantTexture->DirectShader = DirectShader;
-    ConstantTexture->TranslucentShader = TranslucentShader;
-
-    TranslucentShaderReference(TranslucentShader);
-
-    return (PTEXTURE) ConstantTexture;
+    
+    return Texture;
 }

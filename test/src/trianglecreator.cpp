@@ -32,8 +32,8 @@ CreateFlatQuad(
     float X3,
     float Y3,
     float Z3,
-    PCTEXTURE FrontTexture,
-    PCTEXTURE BackTexture
+    PTEXTURE FrontTexture,
+    PTEXTURE BackTexture
     )
 {
     PDRAWING_SHAPE Triangle0;
