@@ -108,10 +108,10 @@ ISTATUS
 PhongDirectShaderShadeLight(
     _In_ PCVOID Context,
     _In_ PCVOID Light,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -125,10 +125,6 @@ PhongDirectShaderShadeLight(
 
     ASSERT(Context != NULL);
     ASSERT(Light != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(ModelViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -158,10 +154,10 @@ STATIC
 ISTATUS
 PhongDirectShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -173,10 +169,6 @@ PhongDirectShaderShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(ModelViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -211,8 +203,8 @@ DirectionalPhongLightShade(
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -237,8 +229,6 @@ DirectionalPhongLightShade(
     ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -252,11 +242,11 @@ DirectionalPhongLightShade(
 
     if (DirectionalPhongLight->CastsShadows != FALSE)
     {
-        RayToLight = RayCreate(*WorldHitPoint,
+        RayToLight = RayCreate(WorldHitPoint,
                                DirectionalPhongLight->WorldDirectionToLight);
 
         Status = VisibilityTesterTestVisibilityAnyDistance(VisibilityTester,
-                                                           &RayToLight,
+                                                           RayToLight,
                                                            &LightVisible);
 
         if (Status != ISTATUS_SUCCESS ||
@@ -289,7 +279,7 @@ DirectionalPhongLightShade(
                         LightColor);
     }
 
-    NegatedViewer = VectorNegate(*WorldViewer);
+    NegatedViewer = VectorNegate(WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
@@ -328,8 +318,8 @@ PointPhongLightShade(
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -356,8 +346,6 @@ PointPhongLightShade(
     ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -370,18 +358,18 @@ PointPhongLightShade(
                        LightColor);
 
     NormalizedWorldToLight = PointSubtract(PointPhongLight->WorldLocation,
-                                           *WorldHitPoint);
+                                           WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
                                              &DistanceToLight);
 
     if (PointPhongLight->CastsShadows != FALSE)
     {
-        RayToLight = RayCreate(*WorldHitPoint,
+        RayToLight = RayCreate(WorldHitPoint,
                                NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
-                                                &RayToLight,
+                                                RayToLight,
                                                 DistanceToLight,
                                                 &LightVisible);
 
@@ -415,7 +403,7 @@ PointPhongLightShade(
                         LightColor);
     }
 
-    NegatedViewer = VectorNegate(*WorldViewer);
+    NegatedViewer = VectorNegate(WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
@@ -454,8 +442,8 @@ AttenuatedPointPhongLightShade(
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -483,8 +471,6 @@ AttenuatedPointPhongLightShade(
     ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -497,18 +483,18 @@ AttenuatedPointPhongLightShade(
                        LightColor);
 
     NormalizedWorldToLight = PointSubtract(AttenuatedPointPhongLight->WorldLocation,
-                                           *WorldHitPoint);
+                                           WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
                                              &DistanceToLight);
 
     if (AttenuatedPointPhongLight->CastsShadows != FALSE)
     {
-        RayToLight = RayCreate(*WorldHitPoint,
+        RayToLight = RayCreate(WorldHitPoint,
                                NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
-                                                &RayToLight,
+                                                RayToLight,
                                                 DistanceToLight,
                                                 &LightVisible);
 
@@ -542,7 +528,7 @@ AttenuatedPointPhongLightShade(
                         LightColor);
     }
 
-    NegatedViewer = VectorNegate(*WorldViewer);
+    NegatedViewer = VectorNegate(WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
@@ -589,8 +575,8 @@ PointPhongSpotLightShade(
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -619,8 +605,6 @@ PointPhongSpotLightShade(
     ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -629,7 +613,7 @@ PointPhongSpotLightShade(
     PointPhongSpotLight = (PCPOINT_PHONG_SPOT_LIGHT) Context;
 
     NormalizedWorldToLight = PointSubtract(PointPhongSpotLight->WorldLocation,
-                                           *WorldHitPoint);
+                                           WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
                                              &DistanceToLight);
@@ -667,11 +651,11 @@ PointPhongSpotLightShade(
 
     if (PointPhongSpotLight->CastsShadows != FALSE)
     {
-        RayToLight = RayCreate(*WorldHitPoint,
+        RayToLight = RayCreate(WorldHitPoint,
                                NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
-                                                &RayToLight,
+                                                RayToLight,
                                                 DistanceToLight,
                                                 &LightVisible);
 
@@ -705,7 +689,7 @@ PointPhongSpotLightShade(
                         LightColor);
     }
 
-    NegatedViewer = VectorNegate(*WorldViewer);
+    NegatedViewer = VectorNegate(WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
@@ -746,8 +730,8 @@ AttenuatedPointPhongSpotLightShade(
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -777,8 +761,6 @@ AttenuatedPointPhongSpotLightShade(
     ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -787,7 +769,7 @@ AttenuatedPointPhongSpotLightShade(
     AttenuatedPointPhongSpotLight = (PCATTENUATED_POINT_PHONG_SPOT_LIGHT) Context;
 
     NormalizedWorldToLight = PointSubtract(AttenuatedPointPhongSpotLight->WorldLocation,
-                                           *WorldHitPoint);
+                                           WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
                                              &DistanceToLight);
@@ -825,11 +807,11 @@ AttenuatedPointPhongSpotLightShade(
 
     if (AttenuatedPointPhongSpotLight->CastsShadows != FALSE)
     {
-        RayToLight = RayCreate(*WorldHitPoint,
+        RayToLight = RayCreate(WorldHitPoint,
                                NormalizedWorldToLight);
 
         Status = VisibilityTesterTestVisibility(VisibilityTester,
-                                                &RayToLight,
+                                                RayToLight,
                                                 DistanceToLight,
                                                 &LightVisible);
 
@@ -863,7 +845,7 @@ AttenuatedPointPhongSpotLightShade(
                         LightColor);
     }
 
-    NegatedViewer = VectorNegate(*WorldViewer);
+    NegatedViewer = VectorNegate(WorldViewer);
 
     //
     // WorldViewer and WorldDirectionToLight should already be normalized.
@@ -988,7 +970,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 DirectionalPhongLightAllocate(
-    _In_ PVECTOR3 WorldDirectionToLight,
+    _In_ VECTOR3 WorldDirectionToLight,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -997,7 +979,7 @@ DirectionalPhongLightAllocate(
 {
     PDIRECTIONAL_PHONG_LIGHT PhongLight;
 
-    if (WorldDirectionToLight == NULL ||
+    if (VectorValidate(WorldDirectionToLight) == FALSE ||
         Ambient == NULL ||
         Diffuse == NULL ||
         Specular == NULL)
@@ -1018,7 +1000,7 @@ DirectionalPhongLightAllocate(
     PhongLight->Specular = *Specular;
     PhongLight->CastsShadows = CastsShadows;
 
-    PhongLight->WorldDirectionToLight = VectorNormalize(*WorldDirectionToLight, NULL);
+    PhongLight->WorldDirectionToLight = VectorNormalize(WorldDirectionToLight, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1028,7 +1010,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -1037,7 +1019,7 @@ PointPhongLightAllocate(
 {
     PPOINT_PHONG_LIGHT PhongLight;
 
-    if (WorldLocation == NULL ||
+    if (PointValidate(WorldLocation) == FALSE ||
         Ambient == NULL ||
         Diffuse == NULL ||
         Specular == NULL)
@@ -1053,7 +1035,7 @@ PointPhongLightAllocate(
     }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongLightVTable;
-    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->WorldLocation = WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
     PhongLight->Specular = *Specular;
@@ -1067,7 +1049,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPointPhongLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -1079,7 +1061,7 @@ AttenuatedPointPhongLightAllocate(
 {
     PATTENUATED_POINT_PHONG_LIGHT PhongLight;
 
-    if (WorldLocation == NULL ||
+    if (PointValidate(WorldLocation) == FALSE ||
         Ambient == NULL ||
         Diffuse == NULL ||
         Specular == NULL ||
@@ -1101,7 +1083,7 @@ AttenuatedPointPhongLightAllocate(
     }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongLightVTable;
-    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->WorldLocation = WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
     PhongLight->Specular = *Specular;
@@ -1118,23 +1100,23 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongSpotLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ BOOL CastsShadows,
-    _In_ PCVECTOR3 WorldSpotLightDirection,
+    _In_ VECTOR3 WorldSpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
     )
 {
     PPOINT_PHONG_SPOT_LIGHT PhongLight;
 
-    if (WorldLocation == NULL ||
+    if (PointValidate(WorldLocation) == FALSE ||
         Ambient == NULL ||
         Diffuse == NULL ||
         Specular == NULL ||
-        WorldSpotLightDirection == NULL ||
+        VectorValidate(WorldSpotLightDirection) == FALSE ||
         IsNormalFloat(SpotLightExponent) == FALSE ||
         IsFiniteFloat(SpotLightExponent) == FALSE ||
         IsNormalFloat(SpotLightCutoff) == FALSE ||
@@ -1151,7 +1133,7 @@ PointPhongSpotLightAllocate(
     }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongSpotLightVTable;
-    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->WorldLocation = WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
     PhongLight->Specular = *Specular;
@@ -1159,7 +1141,7 @@ PointPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    PhongLight->WorldSpotLightDirection = VectorNormalize(*WorldSpotLightDirection, NULL);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1169,7 +1151,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPhongSpotLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -1177,14 +1159,14 @@ AttenuatedPhongSpotLightAllocate(
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
     _In_ FLOAT QuadraticAttenuation,
-    _In_ PCVECTOR3 WorldSpotLightDirection,
+    _In_ VECTOR3 WorldSpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
     )
 {
     PATTENUATED_POINT_PHONG_SPOT_LIGHT PhongLight;
 
-    if (WorldLocation == NULL ||
+    if (PointValidate(WorldLocation) == FALSE ||
         Ambient == NULL ||
         Diffuse == NULL ||
         Specular == NULL ||
@@ -1194,7 +1176,7 @@ AttenuatedPhongSpotLightAllocate(
         IsFiniteFloat(LinearAttenuation) == FALSE ||
         IsNormalFloat(QuadraticAttenuation) == FALSE ||
         IsFiniteFloat(QuadraticAttenuation) == FALSE ||
-        WorldSpotLightDirection == NULL ||
+        VectorValidate(WorldSpotLightDirection) == FALSE ||
         IsNormalFloat(SpotLightExponent) == FALSE ||
         IsFiniteFloat(SpotLightExponent) == FALSE ||
         IsNormalFloat(SpotLightCutoff) == FALSE ||
@@ -1211,7 +1193,7 @@ AttenuatedPhongSpotLightAllocate(
     }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongSpotLightVTable;
-    PhongLight->WorldLocation = *WorldLocation;
+    PhongLight->WorldLocation = WorldLocation;
     PhongLight->Ambient = *Ambient;
     PhongLight->Diffuse = *Diffuse;
     PhongLight->Specular = *Specular;
@@ -1222,7 +1204,7 @@ AttenuatedPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    PhongLight->WorldSpotLightDirection = VectorNormalize(*WorldSpotLightDirection, NULL);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }

@@ -42,7 +42,8 @@ IRISAPI
 ISTATUS
 RayTracerSetRay(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ RAY Ray
+    _In_ RAY Ray,
+    _In_ BOOL NormalizeRay
     );
 
 _Check_return_

@@ -35,10 +35,10 @@ STATIC
 ISTATUS
 LambertianShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -54,8 +54,6 @@ LambertianShaderShade(
     RAY Reflected;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
 
     if (RayTracer == NULL)
     {
@@ -73,14 +71,14 @@ LambertianShaderShade(
         return Status;
     }
 
-    IrisToolkitCosineSampleHemisphere(&WorldSurfaceNormal,
+    IrisToolkitCosineSampleHemisphere(WorldSurfaceNormal,
                                       Rng,
                                       &ReflectedDirection);
 
-    Reflected = RayCreate(*WorldHitPoint, ReflectedDirection);
+    Reflected = RayCreate(WorldHitPoint, ReflectedDirection);
 
     Status = RayShaderTraceRayMontecarlo(RayTracer,
-                                         &Reflected,
+                                         Reflected,
                                          &LambertianIndirectShader->Reflectance,
                                          Indirect);
 

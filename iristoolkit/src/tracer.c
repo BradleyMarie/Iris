@@ -39,10 +39,10 @@ PathTracerShadeHit(
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCPOINT3 WorldHit,
-    _In_ PCVECTOR3 ModelViewer,
-    _In_ PCPOINT3 ModelHit,
+    _In_ VECTOR3 WorldViewer,
+    _In_ POINT3 WorldHit,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHit,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
@@ -65,10 +65,6 @@ PathTracerShadeHit(
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
     ASSERT(Distance > (FLOAT) 0.0);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(WorldHit != NULL);
-    ASSERT(ModelViewer != NULL);
-    ASSERT(ModelHit != NULL);
     ASSERT(Color != NULL);
 
     Tracer = (PCOMMON_TRACER) Context;
@@ -154,10 +150,10 @@ RecursiveRayTracerShadeHit(
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCPOINT3 WorldHit,
-    _In_ PCVECTOR3 ModelViewer,
-    _In_ PCPOINT3 ModelHit,
+    _In_ VECTOR3 WorldViewer,
+    _In_ POINT3 WorldHit,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHit,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
@@ -180,10 +176,6 @@ RecursiveRayTracerShadeHit(
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
     ASSERT(Distance > (FLOAT) 0.0);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(WorldHit != NULL);
-    ASSERT(ModelViewer != NULL);
-    ASSERT(ModelHit != NULL);
     ASSERT(Color != NULL);
 
     Tracer = (PCOMMON_TRACER) Context;
@@ -323,16 +315,10 @@ CommonTracerAllocateInternal(
     PCOMMON_TRACER Tracer;
     PRAYSHADER RayShader;
 
-    ASSERT(Scene != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Epsilon));
-    ASSERT(IsFiniteFloat(Epsilon));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
-    ASSERT(TracerShadeRoutine != NULL);
+    //
+    // No need to validate any of the arguments since they will all
+    // be validated by VisibilityTesterAllocate and RayShaderAllocate.
+    //
 
     Tracer = (PCOMMON_TRACER) malloc(sizeof(COMMON_TRACER));
 
@@ -395,15 +381,10 @@ PathTracerAllocate(
 { 
     PTRACER PathTracer;
 
-    ASSERT(Scene != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Epsilon));
-    ASSERT(IsFiniteFloat(Epsilon));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
+    //
+    // This function relies on CommonTracerAllocateInternal for
+    // argument verification
+    //
 
     PathTracer = CommonTracerAllocateInternal(Scene,
                                               Rng,
@@ -432,15 +413,10 @@ RecursiveRayTracerAllocate(
 {
     PTRACER RecursiveRayTracer;
 
-    ASSERT(Scene != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Epsilon));
-    ASSERT(IsFiniteFloat(Epsilon));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(IsNormalFloat(MaximumContinueProbability));
-    ASSERT(IsFiniteFloat(MaximumContinueProbability));
-    ASSERT(MinimumContinueProbability <= MaximumContinueProbability);
+    //
+    // This function relies on CommonTracerAllocateInternal for
+    // argument verification
+    //
 
     RecursiveRayTracer = CommonTracerAllocateInternal(Scene,
                                                       Rng,

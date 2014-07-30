@@ -36,7 +36,7 @@ SFORCEINLINE
 ISTATUS 
 SceneTrace(
     _In_ PCSCENE Scene, 
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Inout_ PRAYTRACER RayTracer
     )
 {
@@ -44,7 +44,6 @@ SceneTrace(
     ISTATUS Status;
 
     ASSERT(Scene != NULL);
-    ASSERT(WorldRay != NULL);
     ASSERT(RayTracer != NULL);
 
     SceneTracerInitialize(&SceneTracer, RayTracer);

@@ -27,10 +27,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PINDIRECT_SHADING_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -67,10 +67,10 @@ IRISSHADINGMODELAPI
 ISTATUS
 IndirectShaderShade(
     _In_ PCINDIRECT_SHADER IndirectShader,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,

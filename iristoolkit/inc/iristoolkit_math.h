@@ -110,24 +110,45 @@ IrisToolkitTransformVector(
 }
 
 SFORCEINLINE
-VOID
+ISTATUS
 IrisToolkitCosineSampleHemisphere(
-    _In_ PCVECTOR3 NormalizedNormal,
+    _In_ VECTOR3 NormalizedNormal,
     _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
     )
 {
-    VECTOR3 Result;
     FLOAT RandomNumber0;
     FLOAT RandomNumber1;
     FLOAT Radius;
+    VECTOR3 Result;
+    ISTATUS Status;
     FLOAT Theta;
     FLOAT X;
     FLOAT Y;
     FLOAT Z;
 
-    RandomNumber0 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
-    RandomNumber1 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
+    ASSERT(Rng != NULL);
+    ASSERT(RandomVector != NULL);
+
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber0);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber1);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     //
     // Uniformly sample unit disk, must take 
@@ -143,7 +164,9 @@ IrisToolkitCosineSampleHemisphere(
 
     Result = VectorCreate(X, Y, Z);
 
-    *RandomVector = IrisToolkitTransformVector(*NormalizedNormal, Result);
+    *RandomVector = IrisToolkitTransformVector(NormalizedNormal, Result);
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _MATH_IRIS_TOOLKIT_

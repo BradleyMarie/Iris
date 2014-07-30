@@ -55,10 +55,10 @@ ISTATUS
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCPOINT3 WorldHit,
-    _In_ PCVECTOR3 ModelViewer,
-    _In_ PCPOINT3 ModelHit,
+    _In_ VECTOR3 WorldViewer,
+    _In_ POINT3 WorldHit,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHit,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
@@ -95,7 +95,7 @@ IRISSHADINGMODELAPI
 ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _In_ PCCOLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     );
@@ -112,7 +112,7 @@ SFORCEINLINE
 ISTATUS
 RayShaderTraceRay(
     _Inout_ PRAYSHADER RayShader,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Out_ PCOLOR3 Color
     )
 {

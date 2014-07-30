@@ -82,8 +82,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 TextureShade(
     _In_ PCTEXTURE Texture,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PTEXTURE_SHADER TextureShader
     )
@@ -91,8 +91,6 @@ TextureShade(
     ISTATUS Status;
 
     if (Texture == NULL ||
-        WorldHitPoint == NULL ||
-        ModelHitPoint == NULL ||
         TextureShader == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT;

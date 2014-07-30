@@ -42,7 +42,7 @@ TEST(RenderConstantRedWorldSphere)
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
-    Sphere = SphereAllocate(&SphereCenter,
+    Sphere = SphereAllocate(SphereCenter,
                             (FLOAT) 1.0,
                             Texture,
                             NULL,
@@ -66,12 +66,12 @@ TEST(RenderConstantRedWorldSphere)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -114,7 +114,7 @@ TEST(RenderConstantRedModelSphere)
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
-    Sphere = SphereAllocate(&SphereCenter,
+    Sphere = SphereAllocate(SphereCenter,
                             (FLOAT) 1.0,
                             Texture,
                             NULL,
@@ -138,12 +138,12 @@ TEST(RenderConstantRedModelSphere)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -186,7 +186,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
-    Sphere = SphereAllocate(&SphereCenter,
+    Sphere = SphereAllocate(SphereCenter,
                             (FLOAT) 1.0,
                             Texture,
                             NULL,
@@ -210,12 +210,12 @@ TEST(RenderConstantRedPremultipliedSphere)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -262,9 +262,9 @@ TEST(RenderConstantRedWorldTriangle)
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
-    Triangle = TriangleAllocate(&TriangleVertex0,
-                                &TriangleVertex1,
-                                &TriangleVertex2,
+    Triangle = TriangleAllocate(TriangleVertex0,
+                                TriangleVertex1,
+                                TriangleVertex2,
                                 Texture,
                                 NULL,
                                 NULL,
@@ -287,12 +287,12 @@ TEST(RenderConstantRedWorldTriangle)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -363,9 +363,9 @@ TEST(RenderInterpolatedRedWorldTriangle)
                                       NULL,
                                       NULL);
 
-    Triangle = TriangleAllocate(&TriangleVertex0,
-                                &TriangleVertex1,
-                                &TriangleVertex2,
+    Triangle = TriangleAllocate(TriangleVertex0,
+                                TriangleVertex1,
+                                TriangleVertex2,
                                 Texture,
                                 NULL,
                                 NULL,
@@ -388,12 +388,12 @@ TEST(RenderInterpolatedRedWorldTriangle)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -452,7 +452,7 @@ TEST(RenderPhongWorldSphere)
 
     LightDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
 
-    PhongLight = DirectionalPhongLightAllocate(&LightDirection,
+    PhongLight = DirectionalPhongLightAllocate(LightDirection,
                                                &Black,
                                                &DiffuseLightColor,
                                                &Black,
@@ -468,9 +468,9 @@ TEST(RenderPhongWorldSphere)
 
     Texture = ConstantTextureAllocate(NULL, PhongShader, NULL, NULL);
 
-    SphereFrontNormal = SphereNormalAllocate(&SphereCenter, TRUE);
+    SphereFrontNormal = SphereNormalAllocate(SphereCenter, TRUE);
 
-    Sphere = SphereAllocate(&SphereCenter,
+    Sphere = SphereAllocate(SphereCenter,
                             (FLOAT) 1.0,
                             Texture,
                             SphereFrontNormal,
@@ -494,12 +494,12 @@ TEST(RenderPhongWorldSphere)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -546,7 +546,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
-    Sphere = SphereAllocate(&SphereCenter,
+    Sphere = SphereAllocate(SphereCenter,
                             (FLOAT) 1.0,
                             Texture,
                             NULL,
@@ -565,9 +565,9 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Texture = ConstantTextureAllocate(NULL, NULL, PerfectSpecularShader, NULL);
 
-    SphereFrontNormal = SphereNormalAllocate(&SphereCenter2, TRUE);
+    SphereFrontNormal = SphereNormalAllocate(SphereCenter2, TRUE);
 
-    Sphere = SphereAllocate(&SphereCenter2,
+    Sphere = SphereAllocate(SphereCenter2,
                             (FLOAT) 1.0,
                             Texture,
                             SphereFrontNormal,
@@ -589,12 +589,12 @@ TEST(RenderPerfectSpecularWorldSphere)
     CameraDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT)-1.0);
     Up = VectorCreate((FLOAT) 0.0, (FLOAT) 1.0, (FLOAT) 0.0);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -730,36 +730,36 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Color3InitializeWhite(&White);
 
-    Lights[0] = PointPhongLightAllocate(&Light0Location,
+    Lights[0] = PointPhongLightAllocate(Light0Location,
                                         &Black,
                                         &Red,
                                         &Red,
                                         TRUE);
 
-    Lights[1] = PointPhongLightAllocate(&Light1Location,
+    Lights[1] = PointPhongLightAllocate(Light1Location,
                                         &Black,
                                         &Blue,
                                         &Blue,
                                         TRUE);
 
-    Lights[2] = PointPhongLightAllocate(&Light2Location,
+    Lights[2] = PointPhongLightAllocate(Light2Location,
                                         &Black,
                                         &Green,
                                         &Green,
                                         TRUE);
 
-    Lights[3] = PointPhongLightAllocate(&Light3Location,
+    Lights[3] = PointPhongLightAllocate(Light3Location,
                                         &Black,
                                         &GreyishGreen,
                                         &GreyishGreen,
                                         TRUE);
 
-    InfinitePlaneSurfaceNormal = ConstantNormalAllocate(&InfinitePlaneNormal,
+    InfinitePlaneSurfaceNormal = ConstantNormalAllocate(InfinitePlaneNormal,
                                                         FALSE);
 
-    Sphere0Normal = SphereNormalAllocate(&Sphere0Center, TRUE);
+    Sphere0Normal = SphereNormalAllocate(Sphere0Center, TRUE);
 
-    Sphere1Normal = SphereNormalAllocate(&Sphere1Center, TRUE);
+    Sphere1Normal = SphereNormalAllocate(Sphere1Center, TRUE);
 
     SpherePhongShader = PhongDirectShaderAllocate(Lights,
                                                   4,
@@ -805,22 +805,22 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                             SphereIndirectShader,
                                             NULL);
 
-    Sphere0 = SphereAllocate(&Sphere0Center,
+    Sphere0 = SphereAllocate(Sphere0Center,
                              (FLOAT) 1.0,
                              SphereTexture,
                              Sphere0Normal,
                              NULL,
                              NULL);
 
-    Sphere1 = SphereAllocate(&Sphere1Center,
+    Sphere1 = SphereAllocate(Sphere1Center,
                              (FLOAT) 0.5,
                              SphereTexture,
                              Sphere1Normal,
                              NULL,
                              NULL);
 
-    InfinitePlane = InfinitePlaneAllocate(&InfinitePlaneLocation,
-                                          &InfinitePlaneNormal,
+    InfinitePlane = InfinitePlaneAllocate(InfinitePlaneLocation,
+                                          InfinitePlaneNormal,
                                           InfinitePlaneTexture,
                                           InfinitePlaneSurfaceNormal,
                                           NULL,
@@ -848,12 +848,12 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     LookAt = PointCreate((FLOAT)-1.0, (FLOAT) 0.45, (FLOAT) 0.0);
     CameraDirection = PointSubtract(LookAt, PinholeLocation);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
                                  (FLOAT) 1.0,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,
@@ -1133,12 +1133,12 @@ TEST(RenderCornellBox)
     PinholeLocation = PointCreate(278.0f, 273.0f, -500.0f);
     CameraDirection = VectorCreate(0.0f, 0.0f, 1.0f);
 
-    Status = PinholeCameraRender(&PinholeLocation,
+    Status = PinholeCameraRender(PinholeLocation,
                                  500,
                                  546,
                                  546,
-                                 &CameraDirection,
-                                 &Up,
+                                 CameraDirection,
+                                 Up,
                                  0,
                                  500,
                                  0,

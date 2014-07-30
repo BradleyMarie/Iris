@@ -27,8 +27,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PEMISSIVE_SHADING_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     );
@@ -61,8 +61,8 @@ IRISSHADINGMODELAPI
 ISTATUS
 EmissiveShaderShade(
     _In_ PCEMISSIVE_SHADER EmissiveShader,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     );

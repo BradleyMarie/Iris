@@ -253,6 +253,13 @@ TriangleInitialize(
     VECTOR3 B;
     VECTOR3 C;
 
+    if (PointValidate(Vertex0) == FALSE ||
+        PointValidate(Vertex1) == FALSE ||
+        PointValidate(Vertex2) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
     if (FrontTexture == NULL &&
         BackTexture == NULL)
     {
@@ -297,9 +304,9 @@ _Check_return_
 _Ret_maybenull_
 PDRAWING_SHAPE
 TriangleAllocate(
-    _In_ PCPOINT3 Vertex0,
-    _In_ PCPOINT3 Vertex1,
-    _In_ PCPOINT3 Vertex2,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PTEXTURE BackTexture,
@@ -310,10 +317,14 @@ TriangleAllocate(
     TRIANGLE Triangle;
     ISTATUS Status;
 
+    //
+    // Argument verification done by TriangleInitialize
+    //
+
     Status = TriangleInitialize(&Triangle,
-                                *Vertex0,
-                                *Vertex1,
-                                *Vertex2,
+                                Vertex0,
+                                Vertex1,
+                                Vertex2,
                                 FrontTexture,
                                 BackTexture,
                                 NULL);
@@ -348,9 +359,9 @@ _Success_(return != NULL)
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 FlatTriangleAllocate(
-    _In_ PCPOINT3 Vertex0,
-    _In_ PCPOINT3 Vertex1,
-    _In_ PCPOINT3 Vertex2,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PTEXTURE BackTexture,
     _Out_opt_ PNORMAL *FrontNormal,
@@ -364,10 +375,14 @@ FlatTriangleAllocate(
     TRIANGLE Triangle;
     ISTATUS Status;
 
+    //
+    // Argument verification done by TriangleInitialize
+    //
+
     Status = TriangleInitialize(&Triangle,
-                                *Vertex0,
-                                *Vertex1,
-                                *Vertex2,
+                                Vertex0,
+                                Vertex1,
+                                Vertex2,
                                 FrontTexture,
                                 BackTexture,
                                 &FrontSurfaceNormal);
@@ -379,7 +394,7 @@ FlatTriangleAllocate(
 
     if (FrontTexture != NULL)
     {
-        AllocatedFrontNormal = ConstantNormalAllocate(&FrontSurfaceNormal,
+        AllocatedFrontNormal = ConstantNormalAllocate(FrontSurfaceNormal,
                                                       FALSE);
 
         if (AllocatedFrontNormal == NULL)
@@ -396,7 +411,7 @@ FlatTriangleAllocate(
     {
         FrontSurfaceNormal = VectorNegate(FrontSurfaceNormal);
 
-        AllocatedBackNormal = ConstantNormalAllocate(&FrontSurfaceNormal,
+        AllocatedBackNormal = ConstantNormalAllocate(FrontSurfaceNormal,
                                                      FALSE);
 
         if (AllocatedBackNormal == NULL)

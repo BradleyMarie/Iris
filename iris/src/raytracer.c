@@ -116,7 +116,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerSetRay(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ RAY Ray
+    _In_ RAY Ray,
+    _In_ BOOL NormalizeRay
     )
 {
     PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
@@ -137,8 +138,16 @@ RayTracerSetRay(
     ShapeHitAllocatorFreeAll(ShapeHitAllocator);
     IrisConstantPointerListClear(PointerList);
 
-    RayTracer->CurrentRay = Ray;
     RayTracer->HitIndex = 0;
+
+    if (NormalizeRay != FALSE)
+    {
+        RayTracer->CurrentRay = RayNormalize(Ray);
+    }
+    else
+    {
+        RayTracer->CurrentRay = Ray;
+    }
 
     return ISTATUS_SUCCESS;
 }

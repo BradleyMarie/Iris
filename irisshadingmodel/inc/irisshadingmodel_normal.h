@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PNORMAL_COMPUTE_NORMAL_ROUTINE)(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     );
@@ -64,7 +64,7 @@ IRISSHADINGMODELAPI
 ISTATUS
 NormalComputeNormal(
     _In_ PCNORMAL Normal,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     );

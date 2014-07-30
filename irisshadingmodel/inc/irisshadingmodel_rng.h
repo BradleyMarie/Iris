@@ -22,21 +22,21 @@ Abstract:
 //
 
 typedef
-_Ret_range_(Minimum, Maximum)
-FLOAT
+ISTATUS
 (*PGENERATE_FLOAT_ROUTINE)(
     _In_ PVOID Context,
     _In_ FLOAT Minimum,
-    _In_ FLOAT Maximum
+    _In_ FLOAT Maximum,
+    _Out_range_(Minimum, Maximum) PFLOAT RandomValue
     );
 
 typedef
-_Ret_range_(Minimum, Maximum)
-SIZE_T
+ISTATUS
 (*PGENERATE_INDEX_ROUTINE)(
     _In_ PVOID Context,
     _In_ SIZE_T Minimum,
-    _In_ SIZE_T Maximum
+    _In_ SIZE_T Maximum,
+    _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     );
 
 typedef struct _RANDOM_VTABLE {
@@ -65,22 +65,22 @@ RandomAllocate(
     _In_ SIZE_T DataAlignment
     );
 
-_Ret_range_(Minimum, Maximum)
 IRISSHADINGMODELAPI
-FLOAT
+ISTATUS
 RandomGenerateFloat(
     _In_ PRANDOM Rng,
     _In_ FLOAT Minimum,
-    _In_ FLOAT Maximum
+    _In_ FLOAT Maximum,
+    _Out_range_(Minimum, Maximum) PFLOAT RandomValue
     );
 
-_Ret_range_(Minimum, Maximum) 
 IRISSHADINGMODELAPI
-SIZE_T
+ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM Rng,
     _In_ SIZE_T Minimum,
-    _In_ SIZE_T Maximum
+    _In_ SIZE_T Maximum,
+    _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     );
 
 IRISSHADINGMODELAPI

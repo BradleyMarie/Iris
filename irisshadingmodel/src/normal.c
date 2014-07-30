@@ -83,7 +83,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 NormalComputeNormal(
     _In_ PCNORMAL Normal, 
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -91,7 +91,6 @@ NormalComputeNormal(
     ISTATUS Status;
 
     if (Normal == NULL ||
-        ModelHitPoint == NULL ||
         SurfaceNormal == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT;

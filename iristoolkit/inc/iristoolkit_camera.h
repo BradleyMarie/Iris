@@ -26,12 +26,12 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISTOOLKITAPI
 ISTATUS
 PinholeCameraRender(
-    _In_ PCPOINT3 PinholeLocation,
+    _In_ POINT3 PinholeLocation,
     _In_ FLOAT ImagePlaneDistance,
     _In_ FLOAT ImagePlaneHeight,
     _In_ FLOAT ImagePlaneWidth,
-    _In_ PCVECTOR3 CameraDirection,
-    _In_ PCVECTOR3 Up,
+    _In_ VECTOR3 CameraDirection,
+    _In_ VECTOR3 Up,
     _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,

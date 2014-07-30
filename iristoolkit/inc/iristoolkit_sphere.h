@@ -26,7 +26,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 SphereAllocate(
-    _In_ PCPOINT3 Center,
+    _In_ POINT3 Center,
     _In_ FLOAT Radius,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,

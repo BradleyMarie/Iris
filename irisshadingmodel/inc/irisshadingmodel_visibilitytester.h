@@ -43,7 +43,7 @@ IRISSHADINGMODELAPI
 ISTATUS
 VisibilityTesterTestVisibility(
     _In_ PVISIBILITY_TESTER Tester,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
     _Out_ PBOOL Visible
     );
@@ -54,7 +54,7 @@ IRISSHADINGMODELAPI
 ISTATUS
 VisibilityTesterTestVisibilityAnyDistance(
     _In_ PVISIBILITY_TESTER Tester,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Out_ PBOOL Visible
     );
 

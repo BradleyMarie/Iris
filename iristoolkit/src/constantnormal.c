@@ -34,7 +34,7 @@ STATIC
 ISTATUS
 ConstantNormalComputeNormal(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -42,7 +42,6 @@ ConstantNormalComputeNormal(
     PCONSTANT_NORMAL ConstantNormal;
 
     ASSERT(Context != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(SurfaceNormal != NULL);
 
     ConstantNormal = (PCONSTANT_NORMAL) Context;
@@ -76,7 +75,7 @@ _Check_return_
 _Ret_maybenull_
 PNORMAL
 ConstantNormalAllocate(
-    _In_ PCVECTOR3 Normal,
+    _In_ VECTOR3 Normal,
     _In_ BOOL Normalize
     )
 {
@@ -85,12 +84,7 @@ ConstantNormalAllocate(
     PNORMAL SurfaceNormal;
     BOOL Valid;
 
-    if (Normal == FALSE)
-    {
-        return NULL;
-    }
-
-    Valid = VectorValidate(*Normal);
+    Valid = VectorValidate(Normal);
 
     if (Valid == FALSE)
     {
@@ -100,12 +94,12 @@ ConstantNormalAllocate(
     if (Normalize != FALSE)
     {
         ConstantNormalVTable = &ConstantNormalPrenormalizedHeader;
-        ConstantNormal.Normal = VectorNormalize(*Normal, NULL);
+        ConstantNormal.Normal = VectorNormalize(Normal, NULL);
     }
     else
     {
         ConstantNormalVTable = &ConstantNormalHeader;
-        ConstantNormal.Normal = *Normal;
+        ConstantNormal.Normal = Normal;
     }
 
     SurfaceNormal = NormalAllocate(ConstantNormalVTable,

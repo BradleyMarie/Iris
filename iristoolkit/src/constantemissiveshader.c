@@ -34,8 +34,8 @@ STATIC
 ISTATUS
 ConstantEmissiveShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     )
@@ -43,8 +43,6 @@ ConstantEmissiveShaderShade(
     PCCONSTANT_EMISSIVE_SHADER ConstantEmissiveShader;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(Emissive != NULL);
 
     ConstantEmissiveShader = (PCONSTANT_EMISSIVE_SHADER) Context;

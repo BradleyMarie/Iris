@@ -79,7 +79,11 @@ SceneAddObject(
     PSCENE_OBJECT SceneObject;
     ISTATUS Status;
 
-    ASSERT(DrawingShape != NULL);
+    if (Scene == NULL ||
+        DrawingShape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     SceneObject = SceneObjectAllocate(DrawingShape,
                                       ModelToWorld,

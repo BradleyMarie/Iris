@@ -34,9 +34,13 @@ VisibilityTesterAllocate(
     PRAYTRACER RayTracer;
     RAY TemporaryRay;
 
-    ASSERT(Scene != NULL);
-    ASSERT(IsNormalFloat(Epsilon));
-    ASSERT(IsFiniteFloat(Epsilon));
+    if (Scene == NULL ||
+        IsNormalFloat(Epsilon) == FALSE ||
+        IsFiniteFloat(Epsilon) == FALSE ||
+        Epsilon < (FLOAT) 0.0)
+    {
+        return NULL;
+    }
 
     Tester = (PVISIBILITY_TESTER) malloc(sizeof(VISIBILITY_TESTER));
 
@@ -69,27 +73,30 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 VisibilityTesterTestVisibility(
     _In_ PVISIBILITY_TESTER Tester,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
     _Out_ PBOOL Visible
     )
 {
-    RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
-    ASSERT(Tester != NULL);
-    ASSERT(WorldRay != NULL);
-    ASSERT(IsNormalFloat(DistanceToObject));
-    ASSERT(IsFiniteFloat(DistanceToObject));
-    ASSERT((FLOAT) 0.0 <= DistanceToObject);
+    //
+    // Ray is validated by RayTracerSetRay
+    //
 
-    NormalizedWorldRay = RayNormalize(*WorldRay);
+    if (Tester == NULL ||
+        IsNormalFloat(DistanceToObject) == FALSE ||
+        IsFiniteFloat(DistanceToObject) == FALSE ||
+        DistanceToObject < (FLOAT) 0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     RayTracer = Tester->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -97,7 +104,7 @@ VisibilityTesterTestVisibility(
     }
 
     Status = SceneTrace(Tester->Scene,
-                        &NormalizedWorldRay,
+                        WorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
@@ -113,12 +120,13 @@ VisibilityTesterTestVisibility(
         return ISTATUS_SUCCESS;
     }
 
-    if (Tester->Epsilon < DistanceToObject)
+    if (Tester->Epsilon < DistanceToObject &&
+        IsFiniteFloat(DistanceToObject) != FALSE)
     {
         DistanceToObject -= Tester->Epsilon;
     }
 
-    while (Status == ISTATUS_SUCCESS)
+    do
     {
         if (Tester->Epsilon < ShapeHit->Distance &&
             ShapeHit->Distance < DistanceToObject)
@@ -128,34 +136,42 @@ VisibilityTesterTestVisibility(
         }
 
         Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
-    }
+    } while (Status == ISTATUS_SUCCESS);
 
     *Visible = TRUE;
     return ISTATUS_SUCCESS;
 }
 
+//
+// This is needed since not all C environments support the INFINITY macro
+//
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
 ISTATUS
 VisibilityTesterTestVisibilityAnyDistance(
     _In_ PVISIBILITY_TESTER Tester,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Out_ PBOOL Visible
     )
 {
-    RAY NormalizedWorldRay;
     PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
-    ASSERT(Tester != NULL);
-    ASSERT(WorldRay != NULL);
+    //
+    // Ray is validated by RayTracerSetRay
+    //
 
-    NormalizedWorldRay = RayNormalize(*WorldRay);
+    if (Tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     RayTracer = Tester->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -163,8 +179,8 @@ VisibilityTesterTestVisibilityAnyDistance(
     }
 
     Status = SceneTrace(Tester->Scene,
-        &NormalizedWorldRay,
-        RayTracer);
+                        WorldRay,
+                        RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -179,12 +195,18 @@ VisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_SUCCESS;
     }
 
-    if (Status != ISTATUS_SUCCESS)
+    do
     {
-        return Status;
-    }
+        if (Tester->Epsilon < ShapeHit->Distance)
+        {
+            *Visible = FALSE;
+            return ISTATUS_SUCCESS;
+        }
 
-    *Visible = FALSE;
+        Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+    } while (Status == ISTATUS_SUCCESS);
+
+    *Visible = TRUE;
     return ISTATUS_SUCCESS;
 }
 

@@ -256,7 +256,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 SphereAllocate(
-    _In_ PCPOINT3 Center,
+    _In_ POINT3 Center,
     _In_ FLOAT Radius,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
@@ -267,9 +267,8 @@ SphereAllocate(
     PDRAWING_SHAPE DrawingShape;
     SPHERE Sphere;
 
-    ASSERT(Center != NULL);
-
-    if (Radius == (FLOAT) 0.0 ||
+    if (PointValidate(Center) == FALSE ||
+        Radius == (FLOAT) 0.0 ||
         IsNormalFloat(Radius) == FALSE ||
         IsFiniteFloat(Radius) == FALSE)
     {
@@ -282,7 +281,7 @@ SphereAllocate(
         return NULL;
     }
 
-    Sphere.Center = *Center;
+    Sphere.Center = Center;
     Sphere.RadiusSquared = Radius * Radius;
     Sphere.Textures[SPHERE_FRONT_FACE] = FrontTexture;
     Sphere.Textures[SPHERE_BACK_FACE] = BackTexture;

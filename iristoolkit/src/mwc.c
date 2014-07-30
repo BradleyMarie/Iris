@@ -62,17 +62,17 @@ MultiplyWithCarryGenerateRandom(
     return Ret;
 }
 
-_Ret_range_(Minimum, Maximum)
-SFORCEINLINE
-FLOAT
+STATIC
+ISTATUS
 MultiplyWithCarryRngGenerateFloat(
     _In_ PVOID Rng,
     _In_ FLOAT Minimum,
-    _In_ FLOAT Maximum
+    _In_ FLOAT Maximum,
+    _Out_range_(Minimum, Maximum) PFLOAT RandomValue
     )
 {
     PMWC_RNG MwcRng;
-    UINT32 RandomValue;
+    UINT32 Rand;
     FLOAT RandomFloat;
 
     ASSERT(Rng != NULL);
@@ -84,33 +84,37 @@ MultiplyWithCarryRngGenerateFloat(
 
     MwcRng = (PMWC_RNG) Rng;
 
-    RandomValue = MultiplyWithCarryGenerateRandom(MwcRng);
+    Rand = MultiplyWithCarryGenerateRandom(MwcRng);
 
-    RandomFloat = (FLOAT) RandomValue / (FLOAT) UINT32_MAX;
+    RandomFloat = (FLOAT) Rand / (FLOAT) UINT32_MAX;
 
-    return RandomFloat * (Maximum - Minimum) + Minimum;
+    *RandomValue = RandomFloat * (Maximum - Minimum) + Minimum;
+
+    return ISTATUS_SUCCESS;
 }
 
-_Ret_range_(Minimum, Maximum) 
-SFORCEINLINE
-SIZE_T
+STATIC
+ISTATUS
 MultiplyWithCarryRngGenerateIndex(
     _In_ PVOID Rng,
     _In_ SIZE_T Minimum,
-    _In_ SIZE_T Maximum
+    _In_ SIZE_T Maximum,
+    _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     )
 {
     PMWC_RNG MwcRng;
-    UINT32 RandomValue;
+    UINT32 Rand;
 
     ASSERT(Rng != NULL);
     ASSERT(Minimum < Maximum);
 
     MwcRng = (PMWC_RNG) Rng;
 
-    RandomValue = MultiplyWithCarryGenerateRandom(MwcRng);
+    Rand = MultiplyWithCarryGenerateRandom(MwcRng);
 
-    return (SIZE_T) ((RandomValue % (Maximum - Minimum)) + Minimum);
+    *RandomValue = (SIZE_T) ((Rand % (Maximum - Minimum)) + Minimum);
+
+    return ISTATUS_SUCCESS;
 }
 
 VOID

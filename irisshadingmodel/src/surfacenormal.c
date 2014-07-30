@@ -24,8 +24,11 @@ SurfaceNormalGetWorldNormal(
 {
     ISTATUS Status;
 
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(WorldNormal != NULL);
+    if (SurfaceNormal == NULL ||
+        WorldNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     if (SurfaceNormal->WorldNormalValid != FALSE)
     {
@@ -67,8 +70,11 @@ SurfaceNormalGetModelNormal(
 {
     ISTATUS Status;
 
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(ModelNormal != NULL);
+    if (SurfaceNormal == NULL ||
+        ModelNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     if (SurfaceNormal->ModelNormalValid != FALSE)
     {
@@ -77,7 +83,7 @@ SurfaceNormalGetModelNormal(
     }
 
     Status = NormalComputeNormal(SurfaceNormal->Normal,
-                                 &SurfaceNormal->ModelHit,
+                                 SurfaceNormal->ModelHit,
                                  SurfaceNormal->AdditionalData,
                                  ModelNormal);
 
@@ -108,8 +114,11 @@ SurfaceNormalGetNormalizedWorldNormal(
 {
     ISTATUS Status;
 
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(NormalizedWorldNormal != NULL);
+    if (SurfaceNormal == NULL ||
+        NormalizedWorldNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     if (SurfaceNormal->NormalizedWorldNormalValid != FALSE)
     {
@@ -143,8 +152,11 @@ SurfaceNormalGetNormalizedModelNormal(
 {
     ISTATUS Status;
 
-    ASSERT(SurfaceNormal != NULL);
-    ASSERT(NormalizedModelNormal != NULL);
+    if (SurfaceNormal == NULL ||
+        NormalizedModelNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     if (SurfaceNormal->NormalizedModelNormalValid != FALSE)
     {

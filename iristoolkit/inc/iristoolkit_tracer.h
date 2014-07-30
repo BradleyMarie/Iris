@@ -124,12 +124,15 @@ SFORCEINLINE
 ISTATUS
 TracerTraceRay(
     _Inout_ PTRACER Tracer,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Out_ PCOLOR3 Color
     )
 {
     COLOR3 AmountReflected;
     ISTATUS Status;
+
+    ASSERT(Tracer != NULL);
+    ASSERT(Color != NULL);
 
     Color3InitializeWhite(&AmountReflected);
 

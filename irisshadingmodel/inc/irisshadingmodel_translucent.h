@@ -27,8 +27,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PTRANSLUCENT_SHADING_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PFLOAT Alpha
     );
@@ -61,8 +61,8 @@ IRISSHADINGMODELAPI
 ISTATUS
 TranslucentShaderShade(
     _In_ PCTRANSLUCENT_SHADER TranslucentShader,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PFLOAT Alpha
     );

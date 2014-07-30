@@ -58,8 +58,8 @@ STATIC
 ISTATUS
 InterpolatedTriangleEmissiveShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     )
@@ -72,8 +72,6 @@ InterpolatedTriangleEmissiveShaderShade(
     UINT32 Index;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(AdditionalData != NULL);
     ASSERT(Emissive != NULL);
 
@@ -117,10 +115,10 @@ STATIC
 ISTATUS
 InterpolatedTriangleDirectShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -136,8 +134,6 @@ InterpolatedTriangleDirectShaderShade(
     UINT32 Index;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(AdditionalData != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
@@ -189,10 +185,10 @@ STATIC
 ISTATUS
 InterpolatedTriangleIndirectShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -209,8 +205,6 @@ InterpolatedTriangleIndirectShaderShade(
     UINT32 Index;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(AdditionalData != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
@@ -263,8 +257,8 @@ STATIC
 ISTATUS
 InterpolatedTriangleTranslucentShaderShade(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PFLOAT Alpha
     )
@@ -277,8 +271,6 @@ InterpolatedTriangleTranslucentShaderShade(
     UINT32 Index;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(AdditionalData != NULL);
     ASSERT(Alpha != NULL);
 
@@ -324,7 +316,7 @@ STATIC
 ISTATUS
 InterpolatedTriangleNormalComputeNormal(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 HitPoint,
+    _In_ POINT3 HitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -337,7 +329,6 @@ InterpolatedTriangleNormalComputeNormal(
     UINT32 Index;
 
     ASSERT(Context != NULL);
-    ASSERT(HitPoint != NULL);
     ASSERT(AdditionalData != NULL);
     ASSERT(SurfaceNormal != NULL);
 

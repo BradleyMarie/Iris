@@ -27,10 +27,10 @@ struct _TEXTURE_SHADER {
     PRAYSHADER NextRayShader;
     UINT8 CurrentDepth;
     FLOAT Distance;
-    PCVECTOR3 WorldViewer;
-    PCPOINT3 WorldHit;
-    PCVECTOR3 ModelViewer;
-    PCPOINT3 ModelHit;
+    VECTOR3 WorldViewer;
+    POINT3 WorldHit;
+    VECTOR3 ModelViewer;
+    POINT3 ModelHit;
     PCMATRIX ModelToWorld;
     PCVOID AdditionalData;
     PSURFACE_NORMAL SurfaceNormal;
@@ -50,10 +50,10 @@ TextureShaderInitialize(
     _Inout_opt_ PRAYSHADER NextRayShader,
     _In_ UINT8 CurrentDepth,
     _In_ FLOAT Distance,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCPOINT3 WorldHit,
-    _In_ PCVECTOR3 ModelViewer,
-    _In_ PCPOINT3 ModelHit,
+    _In_ VECTOR3 WorldViewer,
+    _In_ POINT3 WorldHit,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHit,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ PCVOID AdditionalData,
     _In_opt_ PSURFACE_NORMAL SurfaceNormal,
@@ -65,10 +65,6 @@ TextureShaderInitialize(
     ASSERT(IsNormalFloat(Distance));
     ASSERT(IsFiniteFloat(Distance));
     ASSERT(Distance > (FLOAT) 0.0);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(WorldHit != NULL);
-    ASSERT(ModelViewer != NULL);
-    ASSERT(ModelHit != NULL);
     ASSERT(Color != NULL);
 
     TextureShader->ShadeRayRoutine = ShadeRayRoutine;

@@ -104,7 +104,7 @@ STATIC
 ISTATUS 
 ListSceneTrace(
     _In_ PCVOID Context, 
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Inout_ PSCENE_TRACER SceneTracer
     )
 {
@@ -115,7 +115,6 @@ ListSceneTrace(
     SIZE_T Index;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldRay != NULL);
     ASSERT(SceneTracer != NULL);
 
     ListScene = (PLIST_SCENE) Context;
@@ -125,8 +124,7 @@ ListSceneTrace(
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = SceneTracerTraceGeometry(SceneTracer,
-                                          Objects[Index]);
+        Status = SceneTracerTraceGeometry(SceneTracer, Objects[Index]);
 
         if (Status != ISTATUS_SUCCESS)
         {

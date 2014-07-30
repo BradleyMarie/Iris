@@ -22,10 +22,10 @@ LightShaderEvaluateAllLights(
     _In_reads_(NumberOfLights) PCVOID CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -40,10 +40,6 @@ LightShaderEvaluateAllLights(
     ASSERT(Lights != NULL);
     ASSERT(NumberOfLights != 0);
     ASSERT(LightShadingRoutine != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(ModelViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
@@ -84,10 +80,10 @@ LightShaderEvaluateOneLight(
     _In_reads_(NumberOfLights) PCVOID CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SHADING_ROUTINE LightShadingRoutine,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
-    _In_ PCVECTOR3 ModelViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
@@ -101,16 +97,17 @@ LightShaderEvaluateOneLight(
     ASSERT(Lights != NULL);
     ASSERT(NumberOfLights != 0);
     ASSERT(LightShadingRoutine != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
-    ASSERT(WorldViewer != NULL);
-    ASSERT(ModelViewer != NULL);
     ASSERT(SurfaceNormal != NULL);
     ASSERT(Rng != NULL);
     ASSERT(VisibilityTester != NULL);
     ASSERT(Direct != NULL);
 
-    LightIndex = RandomGenerateIndex(Rng, 0, NumberOfLights);
+    Status = RandomGenerateIndex(Rng, 0, NumberOfLights, &LightIndex);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     Status = LightShadingRoutine(Context,
                                  Lights[LightIndex],

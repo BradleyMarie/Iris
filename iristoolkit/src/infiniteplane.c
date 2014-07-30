@@ -174,8 +174,8 @@ _Check_return_
 _Ret_maybenull_
 PDRAWING_SHAPE
 InfinitePlaneAllocate(
-    _In_ PCPOINT3 Vertex,
-    _In_ PCVECTOR3 SurfaceNormal,
+    _In_ POINT3 Vertex,
+    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PTEXTURE BackTexture,
@@ -185,8 +185,8 @@ InfinitePlaneAllocate(
     INFINITE_PLANE InfinitePlane;
     PDRAWING_SHAPE DrawingShape;
 
-    if (Vertex == NULL ||
-        SurfaceNormal == NULL)
+    if (PointValidate(Vertex) == FALSE ||
+        VectorValidate(SurfaceNormal) == FALSE)
     {
         return NULL;
     }
@@ -197,13 +197,10 @@ InfinitePlaneAllocate(
         return NULL;
     }
 
-    if (VectorLength(*SurfaceNormal) == (FLOAT) 0.0)
-    {
-        return NULL;
-    }
+    SurfaceNormal = VectorNormalize(SurfaceNormal, NULL);
 
-    InfinitePlane.Vertex = *Vertex;
-    InfinitePlane.SurfaceNormal = *SurfaceNormal;
+    InfinitePlane.Vertex = Vertex;
+    InfinitePlane.SurfaceNormal = SurfaceNormal;
     InfinitePlane.Textures[INFINITE_PLANE_FRONT_FACE] = FrontTexture;
     InfinitePlane.Textures[INFINITE_PLANE_BACK_FACE] = BackTexture;
     InfinitePlane.Normals[INFINITE_PLANE_FRONT_FACE] = FrontNormal;

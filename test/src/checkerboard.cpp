@@ -37,8 +37,8 @@ STATIC
 ISTATUS
 XZCheckerboardTextureGetShader(
     _In_ PCVOID Context,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PTEXTURE_SHADER TextureShader
     )
@@ -49,14 +49,12 @@ XZCheckerboardTextureGetShader(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(WorldHitPoint != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(TextureShader != NULL);
 
     CheckerboardTexture = (PCHECKERBOARD_TEXTURE) Context;
 
-    ManhattanDistance = FloorFloat(ModelHitPoint->Z) + 
-                        FloorFloat(ModelHitPoint->X);
+    ManhattanDistance = FloorFloat(ModelHitPoint.Z) + 
+                        FloorFloat(ModelHitPoint.X);
 
     CheckerboardIndex = ModFloat(ManhattanDistance, (FLOAT) 2.0);
 

@@ -36,7 +36,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSCENE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _Inout_ PSCENE_TRACER SceneTracer
     );
 

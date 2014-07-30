@@ -51,9 +51,9 @@ CreateFlatQuad(
     P2 = PointCreate(X2, Y2, Z2);
     P3 = PointCreate(X3, Y3, Z3);
 
-    Triangle0 = FlatTriangleAllocate(&P0,
-                                     &P1,
-                                     &P2,
+    Triangle0 = FlatTriangleAllocate(P0,
+                                     P1,
+                                     P2,
                                      FrontTexture,
                                      BackTexture,
                                      &FrontNormal,
@@ -64,9 +64,9 @@ CreateFlatQuad(
         return false;
     }
 
-    Triangle1 = TriangleAllocate(&P0,
-                                 &P2,
-                                 &P3,
+    Triangle1 = TriangleAllocate(P0,
+                                 P2,
+                                 P3,
                                  FrontTexture,
                                  FrontNormal,
                                  BackTexture,

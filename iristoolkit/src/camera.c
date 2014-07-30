@@ -123,8 +123,25 @@ StaticPinholeCameraRender(
 
                     if (Jitter != FALSE)
                     {
-                        RandomNumber0 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
-                        RandomNumber1 = RandomGenerateFloat(Rng, (FLOAT) 0.0, (FLOAT) 1.0);
+                        Status = RandomGenerateFloat(Rng,
+                                                     (FLOAT) 0.0,
+                                                     (FLOAT) 1.0,
+                                                     &RandomNumber0);
+
+                        if (Status != ISTATUS_SUCCESS)
+                        {
+                            return Status;
+                        }
+
+                        Status = RandomGenerateFloat(Rng,
+                                                     (FLOAT) 0.0,
+                                                     (FLOAT) 1.0,
+                                                     &RandomNumber1);
+
+                        if (Status != ISTATUS_SUCCESS)
+                        {
+                            return Status;
+                        }
 
                         RayOrigin = PointVectorAddScaled(RayOrigin,
                                                          SubpixelXDimensions,
@@ -152,7 +169,7 @@ StaticPinholeCameraRender(
                     WorldRay = RayCreate(RayOrigin, Direction);
 
                     Status = TracerTraceRay(RayTracer,
-                                            &WorldRay,
+                                            WorldRay,
                                             &SubpixelColor);
 
                     if (Status != ISTATUS_SUCCESS)
@@ -192,12 +209,12 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PinholeCameraRender(
-    _In_ PCPOINT3 PinholeLocation,
+    _In_ POINT3 PinholeLocation,
     _In_ FLOAT ImagePlaneDistance,
     _In_ FLOAT ImagePlaneHeight,
     _In_ FLOAT ImagePlaneWidth,
-    _In_ PCVECTOR3 CameraDirection,
-    _In_ PCVECTOR3 Up,
+    _In_ VECTOR3 CameraDirection,
+    _In_ VECTOR3 Up,
     _In_ SIZE_T StartingRow,
     _In_ SIZE_T RowsToRender,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
@@ -218,7 +235,7 @@ PinholeCameraRender(
     POINT3 ImagePlaneCorner;
     ISTATUS Status;
 
-    if (PinholeLocation == NULL ||
+    if (PointValidate(PinholeLocation) == FALSE ||
         IsNormalFloat(ImagePlaneDistance) == FALSE ||
         IsFiniteFloat(ImagePlaneDistance) == FALSE ||
         IsZeroFloat(ImagePlaneDistance) != FALSE ||
@@ -228,8 +245,8 @@ PinholeCameraRender(
         IsNormalFloat(ImagePlaneWidth) == FALSE ||
         IsFiniteFloat(ImagePlaneWidth) == FALSE ||
         IsZeroFloat(ImagePlaneWidth) != FALSE ||
-        CameraDirection == NULL ||
-        Up == NULL ||
+        VectorValidate(CameraDirection) == FALSE ||
+        VectorValidate(Up) == FALSE ||
         RowsToRender == 0 ||
         (Jitter == TRUE && Rng == NULL) ||
         RayTracer == NULL ||
@@ -254,15 +271,15 @@ PinholeCameraRender(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    NormalizedCameraDirection = VectorNormalize(*CameraDirection, NULL);
+    NormalizedCameraDirection = VectorNormalize(CameraDirection, NULL);
 
-    NormalizedUpVector = VectorNormalize(*Up, NULL);
+    NormalizedUpVector = VectorNormalize(Up, NULL);
 
-    ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, *Up);
+    ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, Up);
 
     ImagePlaneWidthVector = VectorNormalize(ImagePlaneWidthVector, NULL);
 
-    ImagePlaneHeightVector = VectorCrossProduct(*CameraDirection,
+    ImagePlaneHeightVector = VectorCrossProduct(CameraDirection,
                                                 ImagePlaneWidthVector);
 
     ImagePlaneHeightVector = VectorNormalize(ImagePlaneHeightVector, NULL);
@@ -273,7 +290,7 @@ PinholeCameraRender(
     ImagePlaneHeightVector = VectorScale(ImagePlaneHeightVector,
                                          ImagePlaneHeight);
 
-    ImagePlaneCorner = PointVectorAddScaled(*PinholeLocation,
+    ImagePlaneCorner = PointVectorAddScaled(PinholeLocation,
                                             NormalizedCameraDirection,
                                             ImagePlaneDistance);
 
@@ -291,7 +308,7 @@ PinholeCameraRender(
     ImagePlaneHeightVector = VectorScale(ImagePlaneHeightVector,
                                          (FLOAT) 1.0 / (FLOAT) FramebufferRows);
 
-    Status = StaticPinholeCameraRender(*PinholeLocation,
+    Status = StaticPinholeCameraRender(PinholeLocation,
                                        ImagePlaneCorner,
                                        ImagePlaneWidthVector,
                                        ImagePlaneHeightVector,

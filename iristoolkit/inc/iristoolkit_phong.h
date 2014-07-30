@@ -29,8 +29,8 @@ ISTATUS
     _In_ PCCOLOR3 Diffuse,
     _In_ PCCOLOR3 Specular,
     _In_ FLOAT Shininess,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCVECTOR3 WorldViewer,
+    _In_ POINT3 WorldHitPoint,
+    _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
@@ -73,7 +73,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 DirectionalPhongLightAllocate(
-    _In_ PVECTOR3 WorldDirectionToLight,
+    _In_ VECTOR3 WorldDirectionToLight,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -85,7 +85,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -97,7 +97,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPointPhongLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -112,12 +112,12 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongSpotLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
     _In_ BOOL CastsShadows,
-    _In_ PCVECTOR3 SpotLightDirection,
+    _In_ VECTOR3 SpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
     );
@@ -127,7 +127,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPhongSpotLightAllocate(
-    _In_ PCPOINT3 WorldLocation,
+    _In_ POINT3 WorldLocation,
     _In_ PCOLOR3 Ambient,
     _In_ PCOLOR3 Diffuse,
     _In_ PCOLOR3 Specular,
@@ -135,7 +135,7 @@ AttenuatedPhongSpotLightAllocate(
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
     _In_ FLOAT QuadraticAttenuation,
-    _In_ PCVECTOR3 SpotLightDirection,
+    _In_ VECTOR3 SpotLightDirection,
     _In_ FLOAT SpotLightExponent,
     _In_ FLOAT SpotLightCutoff
     );

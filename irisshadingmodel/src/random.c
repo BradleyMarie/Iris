@@ -77,52 +77,58 @@ RandomAllocate(
     return Random;
 }
 
-_Ret_range_(Minimum, Maximum)
-FLOAT
+ISTATUS
 RandomGenerateFloat(
     _In_ PRANDOM Rng,
     _In_ FLOAT Minimum,
-    _In_ FLOAT Maximum
+    _In_ FLOAT Maximum,
+    _Out_range_(Minimum, Maximum) PFLOAT RandomValue
     )
 {
-    FLOAT Result;
+    ISTATUS Status;
 
-    ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Minimum));
-    ASSERT(IsFiniteFloat(Minimum));
-    ASSERT(IsNormalFloat(Maximum));
-    ASSERT(IsFiniteFloat(Minimum));
-    ASSERT(Minimum < Maximum);
+    if (Rng == NULL ||
+        IsNormalFloat(Minimum) == FALSE ||
+        IsFiniteFloat(Minimum) == FALSE ||
+        IsNormalFloat(Maximum) == FALSE ||
+        IsFiniteFloat(Maximum) == FALSE ||
+        Minimum > Maximum ||
+        RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
-    Result = Rng->RandomVTable->GenerateFloatRoutine(Rng->Data, Minimum, Maximum);
+    Status = Rng->RandomVTable->GenerateFloatRoutine(Rng->Data,
+                                                     Minimum,
+                                                     Maximum,
+                                                     RandomValue);
 
-    ASSERT(IsNormalFloat(Result));
-    ASSERT(IsFiniteFloat(Result));
-    ASSERT(Minimum <= Result);
-    ASSERT(Result <= Maximum);
-
-    return Result;
+    return Status;
 }
 
-_Ret_range_(Minimum, Maximum) 
-SIZE_T
+ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM Rng,
     _In_ SIZE_T Minimum,
-    _In_ SIZE_T Maximum
+    _In_ SIZE_T Maximum,
+    _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     )
 {
-    SIZE_T Result;
+    ISTATUS Status;
 
-    ASSERT(Rng != NULL);
-    ASSERT(Minimum < Maximum);
+    if (Rng == NULL ||
+        Minimum > Maximum ||
+        RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
-    Result = Rng->RandomVTable->GenerateIndexRoutine(Rng->Data, Minimum, Maximum);
+    Status = Rng->RandomVTable->GenerateIndexRoutine(Rng->Data,
+                                                     Minimum,
+                                                     Maximum,
+                                                     RandomValue);
 
-    ASSERT(Minimum <= Result);
-    ASSERT(Result <= Maximum);
-
-    return Result;
+    return Status;
 }
 
 VOID

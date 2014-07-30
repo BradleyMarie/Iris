@@ -82,8 +82,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 EmissiveShaderShade(
     _In_ PCEMISSIVE_SHADER EmissiveShader,
-    _In_ PCPOINT3 WorldHitPoint,
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _Out_ PCOLOR3 Emissive
     )
@@ -91,8 +91,6 @@ EmissiveShaderShade(
     ISTATUS Status;
 
     if (EmissiveShader == NULL ||
-        WorldHitPoint == NULL ||
-        ModelHitPoint == NULL ||
         Emissive == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT;

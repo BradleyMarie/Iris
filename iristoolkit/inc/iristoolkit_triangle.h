@@ -42,9 +42,9 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 TriangleAllocate(
-    _In_ PCPOINT3 Vertex0,
-    _In_ PCPOINT3 Vertex1,
-    _In_ PCPOINT3 Vertex2,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PTEXTURE BackTexture,
@@ -57,9 +57,9 @@ _Success_(return != NULL)
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 FlatTriangleAllocate(
-    _In_ PCPOINT3 Vertex0,
-    _In_ PCPOINT3 Vertex1,
-    _In_ PCPOINT3 Vertex2,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PTEXTURE BackTexture,
     _Out_opt_ PNORMAL *FrontNormal,

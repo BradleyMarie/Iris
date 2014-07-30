@@ -25,8 +25,19 @@ SceneTracerTraceGeometry(
     PGEOMETRY Geometry;
     ISTATUS Status;
 
-    ASSERT(SceneTracer != NULL);
     ASSERT(SceneObject != NULL);
+
+    //
+    // Leaving this as an assert since this function just passes SceneObject
+    // through  to RayTracerTraceGeometry, so if it is NULL it will cause
+    // to return ISTATUS_INVALID_ARGUMENT without needing an explicit check
+    // here.
+    //
+
+    if (SceneTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     Geometry = (PGEOMETRY) SceneObject;
 

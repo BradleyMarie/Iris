@@ -26,8 +26,8 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PDRAWING_SHAPE
 InfinitePlaneAllocate(
-    _In_ PCPOINT3 Vertex,
-    _In_ PCVECTOR3 SurfaceNormal,
+    _In_ POINT3 Vertex,
+    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PTEXTURE FrontTexture,
     _In_opt_ PNORMAL FrontNormal,
     _In_opt_ PTEXTURE BackTexture,

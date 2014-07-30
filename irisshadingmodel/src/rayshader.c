@@ -290,7 +290,7 @@ IRISSHADINGMODELAPI
 ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
-    _In_ PCRAY WorldRay,
+    _In_ RAY WorldRay,
     _In_ PCCOLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     )
@@ -300,7 +300,6 @@ RayShaderTraceRayMontecarlo(
     PCDRAWING_SHAPE DrawingShape;
     TEXTURE_SHADER TextureShader;
     FLOAT ContinueProbability;
-    RAY NormalizedWorldRay;
     PCVOID AdditionalData;
     PCMATRIX ModelToWorld;
     PCSHAPE_HIT ShapeHit;
@@ -316,10 +315,12 @@ RayShaderTraceRayMontecarlo(
     FLOAT Distance;
     ISTATUS Status;
 
-    ASSERT(RayShader != NULL);
-    ASSERT(WorldRay != NULL);
-    ASSERT(Transmittance != NULL);
-    ASSERT(Color != NULL);
+    if (RayShader == NULL ||
+        Transmittance == NULL ||
+        Color == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
 
     RayShaderPushPathThroughputAndComputeContinueProbability(RayShader,
                                                              Transmittance,
@@ -334,9 +335,15 @@ RayShaderTraceRayMontecarlo(
 
     if (ContinueProbability < (FLOAT) 1.0)
     {
-        NextRandom = RandomGenerateFloat(RayShader->Rng,
-                                         (FLOAT) 0.0,
-                                         (FLOAT) 1.0);
+        Status = RandomGenerateFloat(RayShader->Rng,
+                                     (FLOAT) 0.0,
+                                     (FLOAT) 1.0,
+                                     &NextRandom);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
 
         if (ContinueProbability <= NextRandom)
         {
@@ -346,11 +353,9 @@ RayShaderTraceRayMontecarlo(
         }
     }
 
-    NormalizedWorldRay = RayNormalize(*WorldRay);
-
     RayTracer = RayShader->RayTracer;
 
-    Status = RayTracerSetRay(RayTracer, NormalizedWorldRay);
+    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -358,7 +363,7 @@ RayShaderTraceRayMontecarlo(
     }
 
     Status = SceneTrace(RayShader->Scene,
-                        &NormalizedWorldRay,
+                        WorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
@@ -442,10 +447,10 @@ RayShaderTraceRayMontecarlo(
                                 RayShader->NextRayShader,
                                 RayShader->CurrentDepth,
                                 Distance,
-                                &NormalizedWorldRay.Direction,
-                                &WorldHitPoint,
-                                &ModelViewer,
-                                &ModelHitPoint,
+                                WorldRay.Direction,
+                                WorldHitPoint,
+                                ModelViewer,
+                                ModelHitPoint,
                                 ModelToWorld,
                                 AdditionalData,
                                 SurfaceNormalPointer,
@@ -454,8 +459,8 @@ RayShaderTraceRayMontecarlo(
         Color4InitializeTransparent(&HitColor);
 
         Status = TextureShade(Texture,
-                              &WorldHitPoint,
-                              &ModelHitPoint,
+                              WorldHitPoint,
+                              ModelHitPoint,
                               AdditionalData,
                               &TextureShader);
 

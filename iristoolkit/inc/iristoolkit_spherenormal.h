@@ -26,7 +26,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PNORMAL
 SphereNormalAllocate(
-    _In_ PCPOINT3 Center,
+    _In_ POINT3 Center,
     _In_ BOOL Front
     );
 

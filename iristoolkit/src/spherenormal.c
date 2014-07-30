@@ -34,7 +34,7 @@ STATIC
 ISTATUS
 SphereNormalComputeFrontNormal(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -42,12 +42,11 @@ SphereNormalComputeFrontNormal(
     PCSPHERE_NORMAL SphereNormal;
 
     ASSERT(Context != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(SurfaceNormal != NULL);
 
     SphereNormal = (PCSPHERE_NORMAL) Context;
 
-    *SurfaceNormal = PointSubtract(*ModelHitPoint, SphereNormal->Center);
+    *SurfaceNormal = PointSubtract(ModelHitPoint, SphereNormal->Center);
 
     return ISTATUS_SUCCESS;
 }
@@ -58,7 +57,7 @@ STATIC
 ISTATUS
 SphereNormalComputeBackNormal(
     _In_ PCVOID Context, 
-    _In_ PCPOINT3 ModelHitPoint,
+    _In_ POINT3 ModelHitPoint,
     _In_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -66,12 +65,11 @@ SphereNormalComputeBackNormal(
     PCSPHERE_NORMAL SphereNormal;
 
     ASSERT(Context != NULL);
-    ASSERT(ModelHitPoint != NULL);
     ASSERT(SurfaceNormal != NULL);
 
     SphereNormal = (PCSPHERE_NORMAL) Context;
 
-    *SurfaceNormal = PointSubtract(SphereNormal->Center, *ModelHitPoint);
+    *SurfaceNormal = PointSubtract(SphereNormal->Center, ModelHitPoint);
 
     return ISTATUS_SUCCESS;
 }
@@ -100,7 +98,7 @@ _Check_return_
 _Ret_maybenull_
 PNORMAL
 SphereNormalAllocate(
-    _In_ PCPOINT3 Center,
+    _In_ POINT3 Center,
     _In_ BOOL Front
     )
 {
@@ -109,12 +107,7 @@ SphereNormalAllocate(
     PNORMAL Normal;
     BOOL Valid;
 
-    if (Center == NULL)
-    {
-        return NULL;
-    }
-
-    Valid = PointValidate(*Center);
+    Valid = PointValidate(Center);
 
     if (Valid == FALSE)
     {
@@ -130,7 +123,7 @@ SphereNormalAllocate(
         SphereNormalVTable = &SphereNormalBackHeader;
     }
 
-    SphereNormal.Center = *Center;
+    SphereNormal.Center = Center;
 
     Normal = NormalAllocate(SphereNormalVTable,
                             &SphereNormal,

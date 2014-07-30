@@ -26,7 +26,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PNORMAL
 ConstantNormalAllocate(
-    _In_ PCVECTOR3 Normal,
+    _In_ VECTOR3 Normal,
     _In_ BOOL Normalize
     );
 
