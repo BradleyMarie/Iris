@@ -190,7 +190,7 @@ MultiplyWithCarryRngAllocate(
     {
         RngState[Index] = RngState[Index - 3] ^ 
                           RngState[Index - 2] ^ 
-                          PHI ^ Index;
+                          PHI ^ (UINT32) Index;
     }
 
     Rng.RngState = RngState;
