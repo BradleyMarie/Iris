@@ -32,7 +32,7 @@ _Check_return_
 _Ret_maybenull_
 PFRAMEBUFFER
 FramebufferAllocate(
-    _In_ PCCOLOR3 InitialColor,
+    _In_ COLOR3 InitialColor,
     _In_ SIZE_T Rows,
     _In_ SIZE_T Columns
     )
@@ -43,8 +43,7 @@ FramebufferAllocate(
     ISTATUS Status;
     SIZE_T Index;
 
-    if (InitialColor == NULL ||
-        Rows == 0 ||
+    if (Rows == 0 ||
         Columns == 0)
     {
         return NULL;
@@ -74,7 +73,7 @@ FramebufferAllocate(
 
     for (Index = 0; Index < ArrayLength; Index++)
     {
-        Pixels[Index] = *InitialColor;
+        Pixels[Index] = InitialColor;
     }
 
     Framebuffer->Rows = Rows;
@@ -88,7 +87,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 FramebufferSetPixel(
     _Inout_ PFRAMEBUFFER Framebuffer,
-    _In_ PCCOLOR3 Color,
+    _In_ COLOR3 Color,
     _In_ SIZE_T Row,
     _In_ SIZE_T Column
     )
@@ -96,7 +95,6 @@ FramebufferSetPixel(
     SIZE_T RowSize;
 
     if (Framebuffer == NULL || 
-        Color == NULL ||
         Framebuffer->Columns <= Column)
     {
         return ISTATUS_INVALID_ARGUMENT;
@@ -109,7 +107,7 @@ FramebufferSetPixel(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Framebuffer->Pixels[Row * RowSize + Column] = *Color;
+    Framebuffer->Pixels[Row * RowSize + Column] = Color;
 
     return ISTATUS_SUCCESS;
 }

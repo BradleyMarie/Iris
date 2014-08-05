@@ -105,7 +105,7 @@ StaticPinholeCameraRender(
              FramebufferColumnIndex < FramebufferColumns;
              FramebufferColumnIndex++)
         {
-            Color3InitializeBlack(&PixelColor);
+            PixelColor = Color3InitializeBlack();
 
             SubpixelRowStart = Origin;
 
@@ -177,7 +177,7 @@ StaticPinholeCameraRender(
                         return Status;
                     }
 
-                    Color3Add(&PixelColor, &SubpixelColor, &PixelColor);
+                    PixelColor = Color3Add(PixelColor, SubpixelColor);
 
                     SubpixelOrigin = PointVectorAdd(SubpixelOrigin, SubpixelXDimensions);
 
@@ -187,12 +187,11 @@ StaticPinholeCameraRender(
 
             } while (++FramebufferRowSubpixelIndex < AdditionalYSamplesPerPixel);
 
-            Color3ScaleByScalar(&PixelColor,
-                                SubpixelWeight,
-                                &PixelColor);
+            PixelColor = Color3ScaleByScalar(PixelColor,
+                                             SubpixelWeight);
 
             FramebufferSetPixel(Framebuffer,
-                                &PixelColor,
+                                PixelColor,
                                 FramebufferRowIndex,
                                 FramebufferColumnIndex);
 

@@ -45,7 +45,7 @@ LightShaderEvaluateAllLights(
     ASSERT(VisibilityTester != NULL);
     ASSERT(Direct != NULL);
 
-    Color3InitializeBlack(Direct);
+    *Direct = Color3InitializeBlack();
 
     for (LightIndex = 0; LightIndex < NumberOfLights; LightIndex++)
     {
@@ -66,7 +66,7 @@ LightShaderEvaluateAllLights(
             return Status;
         }
 
-        Color3Add(Direct, &LightColor, Direct);
+        *Direct = Color3Add(*Direct, LightColor);
     }
 
     return ISTATUS_SUCCESS;
@@ -126,7 +126,7 @@ LightShaderEvaluateOneLight(
         return Status;
     }
 
-    Color3ScaleByScalar(Direct, (FLOAT) NumberOfLights, Direct);
+    *Direct = Color3ScaleByScalar(*Direct, (FLOAT) NumberOfLights);
 
     return ISTATUS_SUCCESS;
 }

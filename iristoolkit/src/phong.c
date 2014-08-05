@@ -134,9 +134,9 @@ PhongDirectShaderShadeLight(
     PhongLight = (PCPHONG_LIGHT) Light;
 
     Status = PhongLight->PhongLightVTable->ShadeRoutine(Light,
-                                                        &PhongShader->Ambient,
-                                                        &PhongShader->Diffuse,
-                                                        &PhongShader->Specular,
+                                                        PhongShader->Ambient,
+                                                        PhongShader->Diffuse,
+                                                        PhongShader->Specular,
                                                         PhongShader->Shininess,
                                                         WorldHitPoint,
                                                         WorldViewer,
@@ -199,9 +199,9 @@ STATIC
 ISTATUS
 DirectionalPhongLightShade(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -224,9 +224,6 @@ DirectionalPhongLightShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(Ambient != NULL);
-    ASSERT(Diffuse != NULL);
-    ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
     ASSERT(SurfaceNormal != NULL);
@@ -236,9 +233,8 @@ DirectionalPhongLightShade(
 
     DirectionalPhongLight = (PCDIRECTIONAL_PHONG_LIGHT) Context;
 
-    Color3ScaleByColor(Ambient,
-                       &DirectionalPhongLight->Ambient,
-                       LightColor);
+    *LightColor = Color3ScaleByColor(Ambient,
+                                     DirectionalPhongLight->Ambient);
 
     if (DirectionalPhongLight->CastsShadows != FALSE)
     {
@@ -269,14 +265,12 @@ DirectionalPhongLightShade(
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
-        Color3ScaleByColor(&DirectionalPhongLight->Diffuse,
-                           Diffuse,
-                           &ReflectedDiffuse);
+        ReflectedDiffuse = Color3ScaleByColor(DirectionalPhongLight->Diffuse,
+                                              Diffuse);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedDiffuse,
-                        DiffuseCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedDiffuse,
+                                      DiffuseCoefficient);
     }
 
     NegatedViewer = VectorNegate(WorldViewer);
@@ -295,14 +289,12 @@ DirectionalPhongLightShade(
     {
         SpecularCoefficient = PowFloat(SpecularCoefficient, Shininess);
 
-        Color3ScaleByColor(&DirectionalPhongLight->Specular,
-                           Specular,
-                           &ReflectedSpecular);
+        ReflectedSpecular = Color3ScaleByColor(DirectionalPhongLight->Specular,
+                                               Specular);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedSpecular,
-                        SpecularCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedSpecular,
+                                      SpecularCoefficient);
     }
 
     return ISTATUS_SUCCESS;
@@ -314,9 +306,9 @@ STATIC
 ISTATUS
 PointPhongLightShade(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -341,9 +333,6 @@ PointPhongLightShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(Ambient != NULL);
-    ASSERT(Diffuse != NULL);
-    ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
     ASSERT(SurfaceNormal != NULL);
@@ -353,9 +342,8 @@ PointPhongLightShade(
 
     PointPhongLight = (PCPOINT_PHONG_LIGHT) Context;
 
-    Color3ScaleByColor(Ambient,
-                       &PointPhongLight->Ambient,
-                       LightColor);
+    *LightColor = Color3ScaleByColor(Ambient,
+                                     PointPhongLight->Ambient);
 
     NormalizedWorldToLight = PointSubtract(PointPhongLight->WorldLocation,
                                            WorldHitPoint);
@@ -393,14 +381,12 @@ PointPhongLightShade(
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
-        Color3ScaleByColor(&PointPhongLight->Diffuse,
-                           Diffuse,
-                           &ReflectedDiffuse);
+        ReflectedDiffuse = Color3ScaleByColor(PointPhongLight->Diffuse,
+                                              Diffuse);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedDiffuse,
-                        DiffuseCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedDiffuse,
+                                      DiffuseCoefficient);
     }
 
     NegatedViewer = VectorNegate(WorldViewer);
@@ -419,14 +405,12 @@ PointPhongLightShade(
     {
         SpecularCoefficient = PowFloat(SpecularCoefficient, Shininess);
 
-        Color3ScaleByColor(&PointPhongLight->Specular,
-                           Specular,
-                           &ReflectedSpecular);
+        ReflectedSpecular = Color3ScaleByColor(PointPhongLight->Specular,
+                                               Specular);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedSpecular,
-                        SpecularCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedSpecular,
+                                      SpecularCoefficient);
     }
 
     return ISTATUS_SUCCESS;
@@ -438,9 +422,9 @@ STATIC
 ISTATUS
 AttenuatedPointPhongLightShade(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -466,9 +450,6 @@ AttenuatedPointPhongLightShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(Ambient != NULL);
-    ASSERT(Diffuse != NULL);
-    ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
     ASSERT(SurfaceNormal != NULL);
@@ -478,9 +459,8 @@ AttenuatedPointPhongLightShade(
 
     AttenuatedPointPhongLight = (PCATTENUATED_POINT_PHONG_LIGHT) Context;
 
-    Color3ScaleByColor(Ambient,
-                       &AttenuatedPointPhongLight->Ambient,
-                       LightColor);
+    *LightColor = Color3ScaleByColor(Ambient,
+                                     AttenuatedPointPhongLight->Ambient);
 
     NormalizedWorldToLight = PointSubtract(AttenuatedPointPhongLight->WorldLocation,
                                            WorldHitPoint);
@@ -518,14 +498,12 @@ AttenuatedPointPhongLightShade(
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
-        Color3ScaleByColor(&AttenuatedPointPhongLight->Diffuse,
-                           Diffuse,
-                           &ReflectedDiffuse);
+        ReflectedDiffuse = Color3ScaleByColor(AttenuatedPointPhongLight->Diffuse,
+                                              Diffuse);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedDiffuse,
-                        DiffuseCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedDiffuse,
+                                      DiffuseCoefficient);
     }
 
     NegatedViewer = VectorNegate(WorldViewer);
@@ -544,14 +522,12 @@ AttenuatedPointPhongLightShade(
     {
         SpecularCoefficient = PowFloat(SpecularCoefficient, Shininess);
 
-        Color3ScaleByColor(&AttenuatedPointPhongLight->Specular,
-                           Specular,
-                           &ReflectedSpecular);
+        ReflectedSpecular = Color3ScaleByColor(AttenuatedPointPhongLight->Specular,
+                                               Specular);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedSpecular,
-                        SpecularCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedSpecular,
+                                      SpecularCoefficient);
     }
 
     Attenuation = AttenuatedPointPhongLight->ConstantAttenuation + 
@@ -560,7 +536,7 @@ AttenuatedPointPhongLightShade(
 
     Attenuation = (FLOAT) 1.0 / Attenuation;
 
-    Color3ScaleByScalar(LightColor, Attenuation, LightColor);
+    *LightColor = Color3ScaleByScalar(*LightColor, Attenuation);
 
     return ISTATUS_SUCCESS;
 }
@@ -571,9 +547,9 @@ STATIC
 ISTATUS
 PointPhongSpotLightShade(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -600,9 +576,6 @@ PointPhongSpotLightShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(Ambient != NULL);
-    ASSERT(Diffuse != NULL);
-    ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
     ASSERT(SurfaceNormal != NULL);
@@ -636,7 +609,7 @@ PointPhongSpotLightShade(
         }
         else
         {
-            Color3InitializeBlack(LightColor);
+            *LightColor = Color3InitializeBlack();
             return ISTATUS_SUCCESS;
         }
     }
@@ -645,9 +618,8 @@ PointPhongSpotLightShade(
         SpotlightCoefficient = (FLOAT) 1.0;
     }
 
-    Color3ScaleByColor(Ambient,
-                       &PointPhongSpotLight->Ambient,
-                       LightColor);
+    *LightColor = Color3ScaleByColor(Ambient,
+                                     PointPhongSpotLight->Ambient);
 
     if (PointPhongSpotLight->CastsShadows != FALSE)
     {
@@ -679,14 +651,12 @@ PointPhongSpotLightShade(
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
-        Color3ScaleByColor(&PointPhongSpotLight->Diffuse,
-                           Diffuse,
-                           &ReflectedDiffuse);
+        ReflectedDiffuse = Color3ScaleByColor(PointPhongSpotLight->Diffuse,
+                                              Diffuse);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedDiffuse,
-                        DiffuseCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedDiffuse,
+                                      DiffuseCoefficient);
     }
 
     NegatedViewer = VectorNegate(WorldViewer);
@@ -705,17 +675,15 @@ PointPhongSpotLightShade(
     {
         SpecularCoefficient = PowFloat(SpecularCoefficient, Shininess);
 
-        Color3ScaleByColor(&PointPhongSpotLight->Specular,
-                           Specular,
-                           &ReflectedSpecular);
+        ReflectedSpecular = Color3ScaleByColor(PointPhongSpotLight->Specular,
+                                               Specular);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedSpecular,
-                        SpecularCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedSpecular,
+                                      SpecularCoefficient);
     }
 
-    Color3ScaleByScalar(LightColor, SpotlightCoefficient, LightColor);
+    *LightColor = Color3ScaleByScalar(*LightColor, SpotlightCoefficient);
 
     return ISTATUS_SUCCESS;
 }
@@ -726,9 +694,9 @@ STATIC
 ISTATUS
 AttenuatedPointPhongSpotLightShade(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -756,9 +724,6 @@ AttenuatedPointPhongSpotLightShade(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(Ambient != NULL);
-    ASSERT(Diffuse != NULL);
-    ASSERT(Specular != NULL);
     ASSERT(IsNormalFloat(Shininess) != FALSE);
     ASSERT(IsFiniteFloat(Shininess) != FALSE);
     ASSERT(SurfaceNormal != NULL);
@@ -792,7 +757,7 @@ AttenuatedPointPhongSpotLightShade(
         }
         else
         {
-            Color3InitializeBlack(LightColor);
+            *LightColor = Color3InitializeBlack();
             return ISTATUS_SUCCESS;
         }
     }
@@ -801,9 +766,8 @@ AttenuatedPointPhongSpotLightShade(
         SpotlightCoefficient = (FLOAT) 1.0;
     }
 
-    Color3ScaleByColor(Ambient,
-                       &AttenuatedPointPhongSpotLight->Ambient, 
-                       LightColor);
+    *LightColor = Color3ScaleByColor(Ambient,
+                                     AttenuatedPointPhongSpotLight->Ambient);
 
     if (AttenuatedPointPhongSpotLight->CastsShadows != FALSE)
     {
@@ -835,14 +799,12 @@ AttenuatedPointPhongSpotLightShade(
 
     if (DiffuseCoefficient > (FLOAT) 0.0)
     {
-        Color3ScaleByColor(&AttenuatedPointPhongSpotLight->Diffuse,
-                           Diffuse,
-                           &ReflectedDiffuse);
+        ReflectedDiffuse = Color3ScaleByColor(AttenuatedPointPhongSpotLight->Diffuse,
+                                              Diffuse);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedDiffuse,
-                        DiffuseCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedDiffuse,
+                                      DiffuseCoefficient);
     }
 
     NegatedViewer = VectorNegate(WorldViewer);
@@ -861,14 +823,12 @@ AttenuatedPointPhongSpotLightShade(
     {
         SpecularCoefficient = PowFloat(SpecularCoefficient, Shininess);
 
-        Color3ScaleByColor(&AttenuatedPointPhongSpotLight->Specular,
-                           Specular,
-                           &ReflectedSpecular);
+        ReflectedSpecular = Color3ScaleByColor(AttenuatedPointPhongSpotLight->Specular,
+                                               Specular);
 
-        Color3AddScaled(LightColor,
-                        &ReflectedSpecular,
-                        SpecularCoefficient,
-                        LightColor);
+        *LightColor = Color3AddScaled(*LightColor,
+                                      ReflectedSpecular,
+                                      SpecularCoefficient);
     }
 
     Attenuation = AttenuatedPointPhongSpotLight->ConstantAttenuation + 
@@ -877,7 +837,7 @@ AttenuatedPointPhongSpotLightShade(
 
     Attenuation = (FLOAT) 1.0 / Attenuation;
 
-    Color3ScaleByScalar(LightColor, Attenuation * SpotlightCoefficient, LightColor);
+    *LightColor = Color3ScaleByScalar(*LightColor, Attenuation * SpotlightCoefficient);
 
     return ISTATUS_SUCCESS;
 }
@@ -928,9 +888,9 @@ PhongDirectShaderAllocate(
     _In_reads_(NumberOfLights) PCPHONG_LIGHT CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SELECTION_ROUTINE LightSelectionRoutine,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess
     )
 {
@@ -940,9 +900,6 @@ PhongDirectShaderAllocate(
     if (Lights == NULL ||
         NumberOfLights == 0 ||
         LightSelectionRoutine == NULL ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL ||
         IsFiniteFloat(Shininess) == FALSE ||
         IsNormalFloat(Shininess) == FALSE)
     {
@@ -952,9 +909,9 @@ PhongDirectShaderAllocate(
     PhongShader.LightSelectionRoutine = LightSelectionRoutine;
     PhongShader.Lights = Lights;
     PhongShader.NumberOfLights = NumberOfLights;
-    PhongShader.Ambient = *Ambient;
-    PhongShader.Diffuse = *Diffuse;
-    PhongShader.Specular = *Specular;
+    PhongShader.Ambient = Ambient;
+    PhongShader.Diffuse = Diffuse;
+    PhongShader.Specular = Specular;
     PhongShader.Shininess = Shininess;
 
     DirectShader = DirectShaderAllocate(&PhongShaderVTable,
@@ -971,18 +928,15 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 DirectionalPhongLightAllocate(
     _In_ VECTOR3 WorldDirectionToLight,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows
     )
 {
     PDIRECTIONAL_PHONG_LIGHT PhongLight;
 
-    if (VectorValidate(WorldDirectionToLight) == FALSE ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL)
+    if (VectorValidate(WorldDirectionToLight) == FALSE)
     {
         return NULL;
     }
@@ -995,9 +949,9 @@ DirectionalPhongLightAllocate(
     }
 
     PhongLight->PhongLightHeader.PhongLightVTable = &DirectionalPhongLightVTable;
-    PhongLight->Ambient = *Ambient;
-    PhongLight->Diffuse = *Diffuse;
-    PhongLight->Specular = *Specular;
+    PhongLight->Ambient = Ambient;
+    PhongLight->Diffuse = Diffuse;
+    PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
 
     PhongLight->WorldDirectionToLight = VectorNormalize(WorldDirectionToLight, NULL);
@@ -1011,18 +965,15 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows
     )
 {
     PPOINT_PHONG_LIGHT PhongLight;
 
-    if (PointValidate(WorldLocation) == FALSE ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL)
+    if (PointValidate(WorldLocation) == FALSE)
     {
         return NULL;
     }
@@ -1036,9 +987,9 @@ PointPhongLightAllocate(
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongLightVTable;
     PhongLight->WorldLocation = WorldLocation;
-    PhongLight->Ambient = *Ambient;
-    PhongLight->Diffuse = *Diffuse;
-    PhongLight->Specular = *Specular;
+    PhongLight->Ambient = Ambient;
+    PhongLight->Diffuse = Diffuse;
+    PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
 
     return (PPHONG_LIGHT) PhongLight;
@@ -1050,9 +1001,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPointPhongLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
@@ -1062,9 +1013,6 @@ AttenuatedPointPhongLightAllocate(
     PATTENUATED_POINT_PHONG_LIGHT PhongLight;
 
     if (PointValidate(WorldLocation) == FALSE ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL ||
         IsNormalFloat(ConstantAttenuation) == FALSE ||
         IsFiniteFloat(ConstantAttenuation) == FALSE ||
         IsNormalFloat(LinearAttenuation) == FALSE ||
@@ -1084,9 +1032,9 @@ AttenuatedPointPhongLightAllocate(
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongLightVTable;
     PhongLight->WorldLocation = WorldLocation;
-    PhongLight->Ambient = *Ambient;
-    PhongLight->Diffuse = *Diffuse;
-    PhongLight->Specular = *Specular;
+    PhongLight->Ambient = Ambient;
+    PhongLight->Diffuse = Diffuse;
+    PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
     PhongLight->ConstantAttenuation = ConstantAttenuation;
     PhongLight->LinearAttenuation = LinearAttenuation;
@@ -1101,9 +1049,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongSpotLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ VECTOR3 WorldSpotLightDirection,
     _In_ FLOAT SpotLightExponent,
@@ -1113,9 +1061,6 @@ PointPhongSpotLightAllocate(
     PPOINT_PHONG_SPOT_LIGHT PhongLight;
 
     if (PointValidate(WorldLocation) == FALSE ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL ||
         VectorValidate(WorldSpotLightDirection) == FALSE ||
         IsNormalFloat(SpotLightExponent) == FALSE ||
         IsFiniteFloat(SpotLightExponent) == FALSE ||
@@ -1134,9 +1079,9 @@ PointPhongSpotLightAllocate(
 
     PhongLight->PhongLightHeader.PhongLightVTable = &PointPhongSpotLightVTable;
     PhongLight->WorldLocation = WorldLocation;
-    PhongLight->Ambient = *Ambient;
-    PhongLight->Diffuse = *Diffuse;
-    PhongLight->Specular = *Specular;
+    PhongLight->Ambient = Ambient;
+    PhongLight->Diffuse = Diffuse;
+    PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
@@ -1152,9 +1097,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPhongSpotLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
@@ -1167,9 +1112,6 @@ AttenuatedPhongSpotLightAllocate(
     PATTENUATED_POINT_PHONG_SPOT_LIGHT PhongLight;
 
     if (PointValidate(WorldLocation) == FALSE ||
-        Ambient == NULL ||
-        Diffuse == NULL ||
-        Specular == NULL ||
         IsNormalFloat(ConstantAttenuation) == FALSE ||
         IsFiniteFloat(ConstantAttenuation) == FALSE ||
         IsNormalFloat(LinearAttenuation) == FALSE ||
@@ -1194,9 +1136,9 @@ AttenuatedPhongSpotLightAllocate(
 
     PhongLight->PhongLightHeader.PhongLightVTable = &AttenuatedPointPhongSpotLightVTable;
     PhongLight->WorldLocation = WorldLocation;
-    PhongLight->Ambient = *Ambient;
-    PhongLight->Diffuse = *Diffuse;
-    PhongLight->Specular = *Specular;
+    PhongLight->Ambient = Ambient;
+    PhongLight->Diffuse = Diffuse;
+    PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
     PhongLight->ConstantAttenuation = ConstantAttenuation;
     PhongLight->LinearAttenuation = LinearAttenuation;

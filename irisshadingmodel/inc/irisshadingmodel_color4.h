@@ -35,16 +35,16 @@ typedef CONST COLOR4 *PCCOLOR4;
 //
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4InitializeFromComponents(
-    _Out_ PCOLOR4 Color,
     _In_ FLOAT Red,
     _In_ FLOAT Green,
     _In_ FLOAT Blue,
     _In_ FLOAT Alpha
     )
 {
-    ASSERT(Color != NULL);
+    COLOR4 Color;
+
     ASSERT(IsNormalFloat(Red));
     ASSERT(IsFiniteFloat(Red));
     ASSERT(IsNormalFloat(Green));
@@ -56,165 +56,161 @@ Color4InitializeFromComponents(
     ASSERT((FLOAT) 0.0 <= Alpha);
     ASSERT(Alpha <= (FLOAT) 1.0);
 
-    Color->Red = Red;
-    Color->Green = Green;
-    Color->Blue = Blue;
-    Color->Alpha = Alpha;
+    Color.Red = Red;
+    Color.Green = Green;
+    Color.Blue = Blue;
+    Color.Alpha = Alpha;
+
+    return Color;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4InitializeFromColor3(
-    _Out_ PCOLOR4 Color,
-    _In_ PCCOLOR3 Color3,
+    _In_ COLOR3 Color3,
     _In_ FLOAT Alpha
     )
 {
-    ASSERT(Color != NULL);
-    ASSERT(Color3 != NULL);
+    COLOR4 Color;
+
     ASSERT((FLOAT) 0.0 <= Alpha);
     ASSERT(Alpha <= (FLOAT) 1.0);
 
-    Color4InitializeFromComponents(Color,
-                                   Color3->Red,
-                                   Color3->Green,
-                                   Color3->Blue,
-                                   Alpha);
+    Color = Color4InitializeFromComponents(Color3.Red,
+                                           Color3.Green,
+                                           Color3.Blue,
+                                           Alpha);
+
+    return Color;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3InitializeFromColor4(
-    _Out_ PCOLOR3 Color,
-    _In_ PCCOLOR4 Color4
+    _In_ COLOR4 Color4
     )
 {
-    ASSERT(Color != NULL);
-    ASSERT(Color4 != NULL);
+    COLOR3 Color;
 
-    Color3InitializeFromComponents(Color,
-                                   Color4->Red,
-                                   Color4->Green,
-                                   Color4->Blue);
+    Color = Color3InitializeFromComponents(Color4.Red,
+                                           Color4.Green,
+                                           Color4.Blue);
+
+    return Color;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4Add(
-    _In_ PCCOLOR4 Addend0,
-    _In_ PCCOLOR4 Addend1,
-    _Out_ PCOLOR4 Sum
+    _In_ COLOR4 Addend0,
+    _In_ COLOR4 Addend1
     )
 {
+    COLOR4 Sum;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
     FLOAT Alpha;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
-    ASSERT(Sum != NULL);
+    Red = Addend0.Red + Addend1.Red;
+    Green = Addend0.Green + Addend1.Green;
+    Blue = Addend0.Blue + Addend1.Blue;
+    Alpha = Addend0.Alpha + Addend1.Alpha;
 
-    Red = Addend0->Red + Addend1->Red;
-    Green = Addend0->Green + Addend1->Green;
-    Blue = Addend0->Blue + Addend1->Blue;
-    Alpha = Addend0->Alpha + Addend1->Alpha;
+    Sum = Color4InitializeFromComponents(Red, Green, Blue, Alpha);
 
-    Color4InitializeFromComponents(Sum, Red, Green, Blue, Alpha);
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4ScaleByColor(
-    _In_ PCCOLOR4 Color,
-    _In_ PCCOLOR4 Scalar,
-    _Out_ PCOLOR4 Scaled
+    _In_ COLOR4 Color,
+    _In_ COLOR4 Scalar
     )
 {
+    COLOR4 Scaled;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
     FLOAT Alpha;
 
-    ASSERT(Color != NULL);
-    ASSERT(Scalar != NULL);
-    ASSERT(Scaled != NULL);
+    Red = Color.Red * Scalar.Red;
+    Green = Color.Green * Scalar.Green;
+    Blue = Color.Blue * Scalar.Blue;
+    Alpha = Color.Alpha * Scalar.Alpha;
 
-    Red = Color->Red * Scalar->Red;
-    Green = Color->Green * Scalar->Green;
-    Blue = Color->Blue * Scalar->Blue;
-    Alpha = Color->Alpha * Scalar->Alpha;
+    Scaled = Color4InitializeFromComponents(Red, Green, Blue, Alpha);
 
-    Color4InitializeFromComponents(Scaled, Red, Green, Blue, Alpha);
+    return Scaled;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4ScaleByScalar(
-    _In_ PCCOLOR4 Color,
-    _In_ FLOAT Scalar,
-    _Out_ PCOLOR4 Scaled
+    _In_ COLOR4 Color,
+    _In_ FLOAT Scalar
     )
 {
+    COLOR4 Scaled;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
     FLOAT Alpha;
 
-    ASSERT(Color != NULL);
     ASSERT(IsNormalFloat(Scalar));
     ASSERT(IsFiniteFloat(Scalar));
-    ASSERT(Scaled != NULL);
 
-    Red = Color->Red * Scalar;
-    Green = Color->Green * Scalar;
-    Blue = Color->Blue * Scalar;
-    Alpha = Color->Alpha * Scalar;
+    Red = Color.Red * Scalar;
+    Green = Color.Green * Scalar;
+    Blue = Color.Blue * Scalar;
+    Alpha = Color.Alpha * Scalar;
 
-    Color4InitializeFromComponents(Scaled, Red, Green, Blue, Alpha);
+    Scaled = Color4InitializeFromComponents(Red, Green, Blue, Alpha);
+
+    return Scaled;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4Over(
-    _In_ PCCOLOR4 Over,
-    _In_ PCCOLOR4 Under,
-    _Out_ PCOLOR4 Blended
+    _In_ COLOR4 Over,
+    _In_ COLOR4 Under
     )
 {
+    COLOR4 Blended;
     FLOAT AlphaScalar;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
     FLOAT Alpha;
 
-    ASSERT(Over != NULL);
-    ASSERT(Under != NULL);
-    ASSERT(Blended != NULL);
+    AlphaScalar = Under.Alpha * ((FLOAT) 1.0 - Over.Alpha);
 
-    AlphaScalar = Under->Alpha * ((FLOAT) 1.0 - Over->Alpha);
+    Red = Over.Red * Over.Alpha + Under.Red * AlphaScalar;
+    Green = Over.Green * Over.Alpha + Under.Green * AlphaScalar;
+    Blue = Over.Blue * Over.Alpha + Under.Blue * AlphaScalar;
+    Alpha = MinFloat(Over.Alpha + AlphaScalar, (FLOAT) 1.0);
 
-    Red = Over->Red * Over->Alpha + Under->Red * AlphaScalar;
-    Green = Over->Green * Over->Alpha + Under->Green * AlphaScalar;
-    Blue = Over->Blue * Over->Alpha + Under->Blue * AlphaScalar;
-    Alpha = MinFloat(Over->Alpha + AlphaScalar, (FLOAT) 1.0);
+    Blended = Color4InitializeFromComponents(Red, Green, Blue, Alpha);
 
-    Color4InitializeFromComponents(Blended, Red, Green, Blue, Alpha);
+    return Blended;
 }
 
 SFORCEINLINE
-VOID
+COLOR4
 Color4InitializeTransparent(
-    _Out_ PCOLOR4 Color
+    VOID
     )
 {
-    ASSERT(Color != NULL);
+    COLOR4 Color;
 
-    Color4InitializeFromComponents(Color,
-                                   (FLOAT) 0.0,
-                                   (FLOAT) 0.0,
-                                   (FLOAT) 0.0,
-                                   (FLOAT) 0.0);
+    Color = Color4InitializeFromComponents((FLOAT) 0.0,
+                                           (FLOAT) 0.0,
+                                           (FLOAT) 0.0,
+                                           (FLOAT) 0.0);
+
+    return Color;
 }
 
 #endif // _COLOR4_IRIS_SHADING_MODEL_

@@ -25,9 +25,9 @@ typedef
 ISTATUS
 (*PPHONG_LIGHT_SHADE_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ PCCOLOR3 Ambient,
-    _In_ PCCOLOR3 Diffuse,
-    _In_ PCCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
@@ -62,9 +62,9 @@ PhongDirectShaderAllocate(
     _In_reads_(NumberOfLights) PCPHONG_LIGHT CONST *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PLIGHT_SELECTION_ROUTINE LightSelectionRoutine,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ FLOAT Shininess
     );
 
@@ -74,9 +74,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 DirectionalPhongLightAllocate(
     _In_ VECTOR3 WorldDirectionToLight,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows
     );
 
@@ -86,9 +86,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows
     );
 
@@ -98,9 +98,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPointPhongLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,
@@ -113,9 +113,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 PointPhongSpotLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ VECTOR3 SpotLightDirection,
     _In_ FLOAT SpotLightExponent,
@@ -128,9 +128,9 @@ IRISTOOLKITAPI
 PPHONG_LIGHT
 AttenuatedPhongSpotLightAllocate(
     _In_ POINT3 WorldLocation,
-    _In_ PCOLOR3 Ambient,
-    _In_ PCOLOR3 Diffuse,
-    _In_ PCOLOR3 Specular,
+    _In_ COLOR3 Ambient,
+    _In_ COLOR3 Diffuse,
+    _In_ COLOR3 Specular,
     _In_ BOOL CastsShadows,
     _In_ FLOAT ConstantAttenuation,
     _In_ FLOAT LinearAttenuation,

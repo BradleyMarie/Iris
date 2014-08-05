@@ -134,11 +134,11 @@ TracerTraceRay(
     ASSERT(Tracer != NULL);
     ASSERT(Color != NULL);
 
-    Color3InitializeWhite(&AmountReflected);
+    AmountReflected = Color3InitializeWhite();
 
     Status = RayShaderTraceRayMontecarlo(Tracer->RayShader,
                                          WorldRay,
-                                         &AmountReflected,
+                                         AmountReflected,
                                          Color);
 
     return Status;

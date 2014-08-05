@@ -26,7 +26,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PEMISSIVE_SHADER
 ConstantEmissiveShaderAllocate(
-    _In_ PCOLOR3 Color
+    _In_ COLOR3 Color
     );
 
 #endif // _CONSTANT_EMISSIVE_SHADER_IRIS_TOOLKIT_

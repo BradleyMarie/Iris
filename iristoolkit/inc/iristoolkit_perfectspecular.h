@@ -27,7 +27,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PINDIRECT_SHADER
 PerfectSpecularIndirectShaderAllocate(
-    _In_ PCOLOR3 Reflectance
+    _In_ COLOR3 Reflectance
     );
 
 #endif // _PERFECT_SPECULAR_INDIRECT_SHADER_IRIS_TOOLKIT_

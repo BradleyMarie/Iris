@@ -149,7 +149,7 @@ RayShaderAllocateInternal(
     RayShader->NextRayShader = NextRayShader;
     RayShader->ShadeRayRoutine = ShadeRayRoutine;
 
-    Color3InitializeWhite(&RayShader->OldPathThroughput);
+    RayShader->OldPathThroughput = Color3InitializeWhite();
 
     return RayShader;
 }
@@ -164,7 +164,7 @@ RayShaderPopPathThroughput(
 
     if (RayShader->CurrentDepth == 0)
     {
-        Color3InitializeWhite(RayShader->PathThroughputPointer);
+        *RayShader->PathThroughputPointer = Color3InitializeWhite();
     }
     else
     {
@@ -176,7 +176,7 @@ SFORCEINLINE
 VOID
 RayShaderPushPathThroughputAndComputeContinueProbability(
     _Inout_ PRAYSHADER RayShader,
-    _In_ PCCOLOR3 Transmittance,
+    _In_ COLOR3 Transmittance,
     _Out_ PFLOAT ContinueProbability
     )
 {
@@ -184,7 +184,6 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
     FLOAT RayContinueProbability;
 
     ASSERT(RayShader != NULL);
-    ASSERT(Transmittance != NULL);
     ASSERT(ContinueProbability != NULL);
     ASSERT(RayShader->MinimumContinueProbability <= RayShader->MaximumContinueProbability);
     ASSERT(RayShader->MinimumContinueProbability >= (FLOAT) 0.0);
@@ -199,9 +198,8 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
         RayShader->OldPathThroughput = *PathThroughputPointer;
     }
 
-    Color3ScaleByColor(PathThroughputPointer,
-                       Transmittance,
-                       PathThroughputPointer);
+    *PathThroughputPointer = Color3ScaleByColor(Transmittance,
+                                                *PathThroughputPointer);
 
     if (RayShader->MinimumContinueProbability == (FLOAT) 1.0)
     {
@@ -209,7 +207,7 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
         return;
     }
 
-    RayContinueProbability = MinFloat(Color3AverageComponents(PathThroughputPointer),
+    RayContinueProbability = MinFloat(Color3AverageComponents(*PathThroughputPointer),
                                       RayShader->MaximumContinueProbability);
 
     RayContinueProbability = MaxFloat(RayShader->MinimumContinueProbability,
@@ -217,13 +215,12 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
 
     if (RayContinueProbability != (FLOAT) 0.0)
     {
-        Color3DivideByScalar(PathThroughputPointer,
-                             RayContinueProbability,
-                             PathThroughputPointer);
+        *PathThroughputPointer = Color3DivideByScalar(*PathThroughputPointer,
+                                                      RayContinueProbability);
     }
     else
     {
-        Color3InitializeBlack(PathThroughputPointer);
+        *PathThroughputPointer = Color3InitializeBlack();
     }
 
     *ContinueProbability = RayContinueProbability;
@@ -291,7 +288,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ RAY WorldRay,
-    _In_ PCCOLOR3 Transmittance,
+    _In_ COLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     )
 {
@@ -316,7 +313,6 @@ RayShaderTraceRayMontecarlo(
     ISTATUS Status;
 
     if (RayShader == NULL ||
-        Transmittance == NULL ||
         Color == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT;
@@ -329,7 +325,7 @@ RayShaderTraceRayMontecarlo(
     if (ContinueProbability == (FLOAT) 0.0)
     {
         RayShaderPopPathThroughput(RayShader);
-        Color3InitializeBlack(Color);
+        *Color = Color3InitializeBlack();
         return ISTATUS_SUCCESS;
     }
 
@@ -348,7 +344,7 @@ RayShaderTraceRayMontecarlo(
         if (ContinueProbability <= NextRandom)
         {
             RayShaderPopPathThroughput(RayShader);
-            Color3InitializeBlack(Color);
+            *Color = Color3InitializeBlack();
             return ISTATUS_SUCCESS;
         }
     }
@@ -384,11 +380,11 @@ RayShaderTraceRayMontecarlo(
     if (Status == ISTATUS_NO_MORE_DATA)
     {
         RayShaderPopPathThroughput(RayShader);
-        Color3InitializeBlack(Color);
+        *Color = Color3InitializeBlack();
         return ISTATUS_SUCCESS;
     }
 
-    Color4InitializeTransparent(&BlendedColor);
+    BlendedColor = Color4InitializeTransparent();
 
     while (Status == ISTATUS_SUCCESS && BlendedColor.Alpha < (FLOAT) 1.0)
     {
@@ -456,7 +452,7 @@ RayShaderTraceRayMontecarlo(
                                 SurfaceNormalPointer,
                                 &HitColor);
 
-        Color4InitializeTransparent(&HitColor);
+        HitColor = Color4InitializeTransparent();
 
         Status = TextureShade(Texture,
                               WorldHitPoint,
@@ -470,7 +466,7 @@ RayShaderTraceRayMontecarlo(
             return Status;
         }
 
-        Color4Over(&BlendedColor, &HitColor, &BlendedColor);
+        BlendedColor = Color4Over(BlendedColor, HitColor);
 
         Status = RayTracerGetNextHit(RayTracer,
                                      &ShapeHit,
@@ -480,14 +476,14 @@ RayShaderTraceRayMontecarlo(
                                      &ModelToWorld);
     }
 
-    Color3InitializeFromColor4(Color, &BlendedColor);
+    *Color = Color3InitializeFromColor4(BlendedColor);
 
     if (ContinueProbability < (FLOAT) 1.0)
     {
-        Color3DivideByScalar(Color, ContinueProbability, Color);
+        *Color = Color3DivideByScalar(*Color, ContinueProbability);
     }
 
-    Color3ScaleByColor(Color, Transmittance, Color);
+    *Color = Color3ScaleByColor(*Color, Transmittance);
 
     RayShaderPopPathThroughput(RayShader);
     return ISTATUS_SUCCESS;

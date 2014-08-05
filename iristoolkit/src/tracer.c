@@ -84,7 +84,7 @@ PathTracerShadeHit(
 
         if (Alpha == (FLOAT) 0.0)
         {
-            Color4InitializeTransparent(Color);
+            *Color = Color4InitializeTransparent();
             return ISTATUS_SUCCESS;
         }
     }
@@ -93,7 +93,7 @@ PathTracerShadeHit(
         Alpha = (FLOAT) 1.0;
     }
 
-    Color3InitializeBlack(&ColorWithoutAlpha);
+    ColorWithoutAlpha = Color3InitializeBlack();
 
     if (EmissiveShader != NULL)
     {
@@ -108,7 +108,7 @@ PathTracerShadeHit(
             return Status;
         }
 
-        Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
+        ColorWithoutAlpha = Color3Add(ColorWithoutAlpha, ComponentColor);
     }
 
     VisibilityTester = Tracer->VisibilityTester;
@@ -133,10 +133,10 @@ PathTracerShadeHit(
             return Status;
         }
 
-        Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
+        ColorWithoutAlpha = Color3Add(ColorWithoutAlpha, ComponentColor);
     }
 
-    Color4InitializeFromColor3(Color, &ColorWithoutAlpha, Alpha);
+    *Color = Color4InitializeFromColor3(ColorWithoutAlpha, Alpha);
 
     return ISTATUS_SUCCESS;
 }
@@ -195,7 +195,7 @@ RecursiveRayTracerShadeHit(
 
         if (Alpha == (FLOAT) 0.0)
         {
-            Color4InitializeTransparent(Color);
+            *Color = Color4InitializeTransparent();
             return ISTATUS_SUCCESS;
         }
     }
@@ -204,7 +204,7 @@ RecursiveRayTracerShadeHit(
         Alpha = (FLOAT) 1.0;
     }
 
-    Color3InitializeBlack(&ColorWithoutAlpha);
+    ColorWithoutAlpha = Color3InitializeBlack();
 
     if (EmissiveShader != NULL)
     {
@@ -219,7 +219,7 @@ RecursiveRayTracerShadeHit(
             return Status;
         }
 
-        Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
+        ColorWithoutAlpha = Color3Add(ColorWithoutAlpha, ComponentColor);
     }
 
     VisibilityTester = Tracer->VisibilityTester;
@@ -244,7 +244,7 @@ RecursiveRayTracerShadeHit(
             return Status;
         }
 
-        Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
+        ColorWithoutAlpha = Color3Add(ColorWithoutAlpha, ComponentColor);
     }
 
     if (DirectShader != NULL)
@@ -265,10 +265,10 @@ RecursiveRayTracerShadeHit(
             return Status;
         }
 
-        Color3Add(&ColorWithoutAlpha, &ComponentColor, &ColorWithoutAlpha);
+        ColorWithoutAlpha = Color3Add(ColorWithoutAlpha, ComponentColor);
     }
 
-    Color4InitializeFromColor3(Color, &ColorWithoutAlpha, Alpha);
+    *Color = Color4InitializeFromColor3(ColorWithoutAlpha, Alpha);
 
     return ISTATUS_SUCCESS;
 }

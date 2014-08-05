@@ -96,7 +96,7 @@ ISTATUS
 RayShaderTraceRayMontecarlo(
     _Inout_ PRAYSHADER RayShader,
     _In_ RAY WorldRay,
-    _In_ PCCOLOR3 Transmittance,
+    _In_ COLOR3 Transmittance,
     _Out_ PCOLOR3 Color
     );
 
@@ -119,11 +119,11 @@ RayShaderTraceRay(
     COLOR3 AmountReflected;
     ISTATUS Status;
 
-    Color3InitializeWhite(&AmountReflected);
+    AmountReflected = Color3InitializeWhite();
 
     Status = RayShaderTraceRayMontecarlo(RayShader,
                                          WorldRay,
-                                         &AmountReflected,
+                                         AmountReflected,
                                          Color);
 
     return Status;

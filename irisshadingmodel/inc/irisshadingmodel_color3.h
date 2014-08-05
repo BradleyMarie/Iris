@@ -34,15 +34,15 @@ typedef CONST COLOR3 *PCCOLOR3;
 //
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3InitializeFromComponents(
-    _Out_ PCOLOR3 Color,
     _In_ FLOAT Red,
     _In_ FLOAT Green,
     _In_ FLOAT Blue
     )
 {
-    ASSERT(Color != NULL);
+    COLOR3 Color;
+
     ASSERT(IsNormalFloat(Red));
     ASSERT(IsFiniteFloat(Red));
     ASSERT(IsNormalFloat(Green));
@@ -50,195 +50,187 @@ Color3InitializeFromComponents(
     ASSERT(IsNormalFloat(Blue));
     ASSERT(IsFiniteFloat(Blue));
 
-    Color->Red = Red;
-    Color->Green = Green;
-    Color->Blue = Blue;
+    Color.Red = Red;
+    Color.Green = Green;
+    Color.Blue = Blue;
+
+    return Color;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3Add(
-    _In_ PCCOLOR3 Addend0,
-    _In_ PCCOLOR3 Addend1,
-    _Out_ PCOLOR3 Sum
+    _In_ COLOR3 Addend0,
+    _In_ COLOR3 Addend1
     )
 {
+    COLOR3 Sum;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
-    ASSERT(Sum != NULL);
+    Red = Addend0.Red + Addend1.Red;
+    Green = Addend0.Green + Addend1.Green;
+    Blue = Addend0.Blue + Addend1.Blue;
 
-    Red = Addend0->Red + Addend1->Red;
-    Green = Addend0->Green + Addend1->Green;
-    Blue = Addend0->Blue + Addend1->Blue;
+    Sum = Color3InitializeFromComponents(Red, Green, Blue);
 
-    Color3InitializeFromComponents(Sum, Red, Green, Blue);
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3AddScaled(
-    _In_ PCCOLOR3 Addend0,
-    _In_ PCCOLOR3 Addend1,
-    _In_ FLOAT Scalar,
-    _Out_ PCOLOR3 Sum
+    _In_ COLOR3 Addend0,
+    _In_ COLOR3 Addend1,
+    _In_ FLOAT Scalar
     )
 {
+    COLOR3 Sum;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Addend0 != NULL);
-    ASSERT(Addend1 != NULL);
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(Sum != NULL);
 
-    Red = FmaFloat(Scalar, Addend1->Red, Addend0->Red);
-    Green = FmaFloat(Scalar, Addend1->Green, Addend0->Green);
-    Blue = FmaFloat(Scalar, Addend1->Blue, Addend0->Blue);
+    Red = FmaFloat(Scalar, Addend1.Red, Addend0.Red);
+    Green = FmaFloat(Scalar, Addend1.Green, Addend0.Green);
+    Blue = FmaFloat(Scalar, Addend1.Blue, Addend0.Blue);
 
-    Color3InitializeFromComponents(Sum, Red, Green, Blue);
+    Sum = Color3InitializeFromComponents(Red, Green, Blue);
+
+    return Sum;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3Subtract(
-    _In_ PCCOLOR3 Minuend,
-    _In_ PCCOLOR3 Subtrahend,
-    _Out_ PCOLOR3 Difference
+    _In_ COLOR3 Minuend,
+    _In_ COLOR3 Subtrahend
     )
 {
+    COLOR3 Difference;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Minuend != NULL);
-    ASSERT(Subtrahend != NULL);
-    ASSERT(Difference != NULL);
+    Red = Minuend.Red - Subtrahend.Red;
+    Green = Minuend.Green - Subtrahend.Green;
+    Blue = Minuend.Blue - Subtrahend.Blue;
 
-    Red = Minuend->Red - Subtrahend->Red;
-    Green = Minuend->Green - Subtrahend->Green;
-    Blue = Minuend->Blue - Subtrahend->Blue;
+    Difference = Color3InitializeFromComponents(Red, Green, Blue);
 
-    Color3InitializeFromComponents(Difference, Red, Green, Blue);
+    return Difference;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3ScaleByColor(
-    _In_ PCCOLOR3 Color,
-    _In_ PCCOLOR3 Scalar,
-    _Out_ PCOLOR3 Scaled
+    _In_ COLOR3 Color,
+    _In_ COLOR3 Scalar
     )
 {
+    COLOR3 Scaled;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Color != NULL);
-    ASSERT(Scalar != NULL);
-    ASSERT(Scaled != NULL);
+    Red = Color.Red * Scalar.Red;
+    Green = Color.Green * Scalar.Green;
+    Blue = Color.Blue * Scalar.Blue;
 
-    Red = Color->Red * Scalar->Red;
-    Green = Color->Green * Scalar->Green;
-    Blue = Color->Blue * Scalar->Blue;
+    Scaled = Color3InitializeFromComponents(Red, Green, Blue);
 
-    Color3InitializeFromComponents(Scaled, Red, Green, Blue);
+    return Scaled;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3ScaleByScalar(
-    _In_ PCCOLOR3 Color,
-    _In_ FLOAT Scalar,
-    _Out_ PCOLOR3 Scaled
+    _In_ COLOR3 Color,
+    _In_ FLOAT Scalar
     )
 {
+    COLOR3 Scaled;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Color != NULL);
     ASSERT(IsNormalFloat(Scalar));
     ASSERT(IsFiniteFloat(Scalar));
-    ASSERT(Scaled != NULL);
 
-    Red = Color->Red * Scalar;
-    Green = Color->Green * Scalar;
-    Blue = Color->Blue * Scalar;
+    Red = Color.Red * Scalar;
+    Green = Color.Green * Scalar;
+    Blue = Color.Blue * Scalar;
 
-    Color3InitializeFromComponents(Scaled, Red, Green, Blue);
+    Scaled = Color3InitializeFromComponents(Red, Green, Blue);
+
+    return Scaled;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3DivideByColor(
-    _In_ PCCOLOR3 Dividend,
-    _In_ PCCOLOR3 Divisor,
-    _Out_ PCOLOR3 Quotient
+    _In_ COLOR3 Dividend,
+    _In_ COLOR3 Divisor
     )
 {
+    COLOR3 Quotient;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Dividend != NULL);
-    ASSERT(Divisor != NULL);
-    ASSERT(IsZeroFloat(Divisor->Red));
-    ASSERT(IsZeroFloat(Divisor->Green));
-    ASSERT(IsZeroFloat(Divisor->Blue));
-    ASSERT(Quotient != NULL);
+    ASSERT(IsZeroFloat(Divisor.Red));
+    ASSERT(IsZeroFloat(Divisor.Green));
+    ASSERT(IsZeroFloat(Divisor.Blue));
 
-    Red = Dividend->Red / Divisor->Red;
-    Green = Dividend->Green / Divisor->Green;
-    Blue = Dividend->Blue / Divisor->Blue;
+    Red = Dividend.Red / Divisor.Red;
+    Green = Dividend.Green / Divisor.Green;
+    Blue = Dividend.Blue / Divisor.Blue;
 
-    Color3InitializeFromComponents(Quotient, Red, Green, Blue);
+    Quotient = Color3InitializeFromComponents(Red, Green, Blue);
+
+    return Quotient;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3DivideByScalar(
-    _In_ PCCOLOR3 Dividend,
-    _In_ FLOAT Divisor,
-    _Out_ PCOLOR3 Quotient
+    _In_ COLOR3 Dividend,
+    _In_ FLOAT Divisor
     )
 {
+    COLOR3 Quotient;
     FLOAT Inverse;
     FLOAT Red;
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(Dividend != NULL);
     ASSERT(IsNormalFloat(Divisor));
     ASSERT(IsFiniteFloat(Divisor));
     ASSERT(IsZeroFloat(Divisor) != TRUE);
-    ASSERT(Quotient != NULL);
 
     Inverse = (FLOAT) 1.0 / Divisor;
 
-    Red = Dividend->Red * Inverse;
-    Green = Dividend->Green * Inverse;
-    Blue = Dividend->Blue * Inverse;
+    Red = Dividend.Red * Inverse;
+    Green = Dividend.Green * Inverse;
+    Blue = Dividend.Blue * Inverse;
 
-    Color3InitializeFromComponents(Quotient, Red, Green, Blue);
+    Quotient = Color3InitializeFromComponents(Red, Green, Blue);
+
+    return Quotient;
 }
 
 SFORCEINLINE
 FLOAT
 Color3AverageComponents(
-    _In_ PCCOLOR3 Color
+    _In_ COLOR3 Color
     )
 {
     FLOAT Average;
 
-    ASSERT(Color != NULL);
-
-    Average = (Color->Red + Color->Green + Color->Blue) / (FLOAT) 3.0;
+    Average = (Color.Red + Color.Green + Color.Blue) / (FLOAT) 3.0;
 
     return Average;
 }
@@ -246,42 +238,46 @@ Color3AverageComponents(
 SFORCEINLINE
 BOOL
 Color3IsBlack(
-    _In_ PCCOLOR3 Color
+    _In_ COLOR3 Color
     )
 {
     BOOL Result;
 
-    ASSERT(Color != NULL);
-
-    Result = IsZeroFloat(Color->Red) &&
-             IsZeroFloat(Color->Green) &&
-             IsZeroFloat(Color->Blue);
+    Result = IsZeroFloat(Color.Red) &&
+             IsZeroFloat(Color.Green) &&
+             IsZeroFloat(Color.Blue);
 
     return Result;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3InitializeBlack(
-    _Out_ PCOLOR3 Color
+    VOID
     )
 {
-    Color3InitializeFromComponents(Color,
-                                   (FLOAT) 0.0,
-                                   (FLOAT) 0.0,
-                                   (FLOAT) 0.0);
+    COLOR3 Color;
+
+    Color = Color3InitializeFromComponents((FLOAT) 0.0,
+                                           (FLOAT) 0.0,
+                                           (FLOAT) 0.0);
+
+    return Color;
 }
 
 SFORCEINLINE
-VOID
+COLOR3
 Color3InitializeWhite(
-    _Out_ PCOLOR3 Color
+    VOID
     )
 {
-    Color3InitializeFromComponents(Color,
-                                   (FLOAT) 1.0,
-                                   (FLOAT) 1.0,
-                                   (FLOAT) 1.0);
+    COLOR3 Color;
+
+    Color = Color3InitializeFromComponents((FLOAT) 1.0,
+                                           (FLOAT) 1.0,
+                                           (FLOAT) 1.0);
+
+    return Color;
 }
 
 #endif // _COLOR3_IRIS_SHADING_MODEL_

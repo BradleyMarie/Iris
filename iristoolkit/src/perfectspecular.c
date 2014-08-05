@@ -57,7 +57,7 @@ PerfectSpecularShaderShade(
 
     if (RayTracer == NULL)
     {
-        Color3InitializeBlack(Indirect);
+        *Indirect = Color3InitializeBlack();
         return ISTATUS_SUCCESS;
     }
 
@@ -77,7 +77,7 @@ PerfectSpecularShaderShade(
 
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          Reflected,
-                                         &PerfectSpecularIndirectShader->Reflectance,
+                                         PerfectSpecularIndirectShader->Reflectance,
                                          Indirect);
 
     return Status;
@@ -100,18 +100,13 @@ _Check_return_
 _Ret_maybenull_
 PINDIRECT_SHADER
 PerfectSpecularIndirectShaderAllocate(
-    _In_ PCOLOR3 Reflectance
+    _In_ COLOR3 Reflectance
     )
 {
     PERFECT_SPECULAR_INDIRECT_SHADER PerfectSpecularIndirectShader;
     PINDIRECT_SHADER IndirectShader;
 
-    if (Reflectance == NULL)
-    {
-        return NULL;
-    }
-
-    PerfectSpecularIndirectShader.Reflectance = *Reflectance;
+    PerfectSpecularIndirectShader.Reflectance = Reflectance;
 
     IndirectShader = IndirectShaderAllocate(&PerfectSpecularShaderVTable,
                                             &PerfectSpecularIndirectShader,

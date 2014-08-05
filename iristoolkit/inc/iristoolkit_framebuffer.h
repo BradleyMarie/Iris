@@ -33,7 +33,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PFRAMEBUFFER
 FramebufferAllocate(
-    _In_ PCCOLOR3 InitialColor,
+    _In_ COLOR3 InitialColor,
     _In_ SIZE_T Rows,
     _In_ SIZE_T Columns
     );
@@ -43,7 +43,7 @@ IRISTOOLKITAPI
 ISTATUS
 FramebufferSetPixel(
     _Inout_ PFRAMEBUFFER Framebuffer,
-    _In_ PCCOLOR3 Color,
+    _In_ COLOR3 Color,
     _In_ SIZE_T Row,
     _In_ SIZE_T Column
     );

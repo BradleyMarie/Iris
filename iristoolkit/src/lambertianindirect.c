@@ -57,7 +57,7 @@ LambertianShaderShade(
 
     if (RayTracer == NULL)
     {
-        Color3InitializeBlack(Indirect);
+        *Indirect = Color3InitializeBlack();
         return ISTATUS_SUCCESS;
     }
 
@@ -79,7 +79,7 @@ LambertianShaderShade(
 
     Status = RayShaderTraceRayMontecarlo(RayTracer,
                                          Reflected,
-                                         &LambertianIndirectShader->Reflectance,
+                                         LambertianIndirectShader->Reflectance,
                                          Indirect);
 
     return Status;
@@ -102,18 +102,13 @@ _Check_return_
 _Ret_maybenull_
 PINDIRECT_SHADER
 LambertianIndirectShaderAllocate(
-    _In_ PCOLOR3 Reflectance
+    _In_ COLOR3 Reflectance
     )
 {
     LAMBERTIAN_INDIRECT_SHADER LambertianIndirectShader;
     PINDIRECT_SHADER IndirectShader;
 
-    if (Reflectance == NULL)
-    {
-        return NULL;
-    }
-
-    LambertianIndirectShader.Reflectance = *Reflectance;
+    LambertianIndirectShader.Reflectance = Reflectance;
 
     IndirectShader = IndirectShaderAllocate(&LambertianShaderVTable,
                                             &LambertianIndirectShader,

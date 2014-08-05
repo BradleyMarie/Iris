@@ -27,7 +27,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PINDIRECT_SHADER
 LambertianIndirectShaderAllocate(
-    _In_ PCOLOR3 Reflectance
+    _In_ COLOR3 Reflectance
     );
 
 #endif // _LAMBERTIAN_INDIRECT_SHADER_IRIS_TOOLKIT_

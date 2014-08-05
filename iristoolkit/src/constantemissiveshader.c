@@ -69,18 +69,13 @@ _Check_return_
 _Ret_maybenull_
 PEMISSIVE_SHADER
 ConstantEmissiveShaderAllocate(
-    _In_ PCOLOR3 Color
+    _In_ COLOR3 Color
     )
 {
     CONSTANT_EMISSIVE_SHADER ConstantEmissiveShader;
     PEMISSIVE_SHADER EmissiveShader;
 
-    if (Color == NULL)
-    {
-        return NULL;
-    }
-
-    ConstantEmissiveShader.Color = *Color;
+    ConstantEmissiveShader.Color = Color;
 
     EmissiveShader = EmissiveShaderAllocate(&ConstantEmissiveShaderVTable,
                                             &ConstantEmissiveShader,

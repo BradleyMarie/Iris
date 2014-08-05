@@ -33,12 +33,11 @@ TEST(RenderConstantRedWorldSphere)
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&SphereColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    SphereColor = Color3InitializeFromComponents((FLOAT) 1.0,
+                                                 (FLOAT) 0.0, 
+                                                 (FLOAT) 0.0);
 
-    ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
+    ConstantShader = ConstantEmissiveShaderAllocate(SphereColor);
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
@@ -55,7 +54,7 @@ TEST(RenderConstantRedWorldSphere)
     
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
+    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -105,12 +104,11 @@ TEST(RenderConstantRedModelSphere)
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&SphereColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    SphereColor = Color3InitializeFromComponents((FLOAT) 1.0, 
+                                                 (FLOAT) 0.0, 
+                                                 (FLOAT) 0.0);
 
-    ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
+    ConstantShader = ConstantEmissiveShaderAllocate(SphereColor);
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
@@ -127,7 +125,7 @@ TEST(RenderConstantRedModelSphere)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
+    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -177,12 +175,11 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&SphereColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    SphereColor = Color3InitializeFromComponents((FLOAT) 1.0,
+                                                 (FLOAT) 0.0,
+                                                 (FLOAT) 0.0);
 
-    ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
+    ConstantShader = ConstantEmissiveShaderAllocate(SphereColor);
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
@@ -199,7 +196,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
+    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -253,12 +250,11 @@ TEST(RenderConstantRedWorldTriangle)
     TriangleVertex1 = PointCreate((FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
     TriangleVertex2 = PointCreate((FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&TriangleColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    TriangleColor = Color3InitializeFromComponents((FLOAT) 1.0, 
+                                                   (FLOAT) 0.0, 
+                                                   (FLOAT) 0.0);
 
-    ConstantShader = ConstantEmissiveShaderAllocate(&TriangleColor);
+    ConstantShader = ConstantEmissiveShaderAllocate(TriangleColor);
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
@@ -276,7 +272,7 @@ TEST(RenderConstantRedWorldTriangle)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&TriangleColor, 500, 500);
+    Framebuffer = FramebufferAllocate(TriangleColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -335,24 +331,21 @@ TEST(RenderInterpolatedRedWorldTriangle)
     TriangleVertex1 = PointCreate((FLOAT) 0.0, (FLOAT) 1.5, (FLOAT) 0.0);
     TriangleVertex2 = PointCreate((FLOAT) 1.5, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&Red, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    Red = Color3InitializeFromComponents((FLOAT) 1.0, 
+                                         (FLOAT) 0.0, 
+                                         (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&Green, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0);
+    Green = Color3InitializeFromComponents((FLOAT) 0.0, 
+                                           (FLOAT) 1.0, 
+                                           (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&Blue, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 1.0);
+    Blue = Color3InitializeFromComponents((FLOAT) 0.0, 
+                                         (FLOAT) 0.0, 
+                                          (FLOAT) 1.0);
 
-    ConstantShader0 = ConstantEmissiveShaderAllocate(&Red);
-    ConstantShader1 = ConstantEmissiveShaderAllocate(&Green);
-    ConstantShader2 = ConstantEmissiveShaderAllocate(&Blue);
+    ConstantShader0 = ConstantEmissiveShaderAllocate(Red);
+    ConstantShader1 = ConstantEmissiveShaderAllocate(Green);
+    ConstantShader2 = ConstantEmissiveShaderAllocate(Blue);
 
     InterpolatedEmissiveShader = InterpolatedTriangleEmissiveShaderAllocate(ConstantShader0,
                                                                             ConstantShader1,
@@ -377,7 +370,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&Red, 500, 500);
+    Framebuffer = FramebufferAllocate(Red, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -433,37 +426,34 @@ TEST(RenderPhongWorldSphere)
 
     SphereCenter = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&DiffuseLightColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 1.0);
+    DiffuseLightColor = Color3InitializeFromComponents((FLOAT) 1.0, 
+                                                       (FLOAT) 1.0, 
+                                                       (FLOAT) 1.0);
 
-    Color3InitializeFromComponents(&AmbientShaderColor, 
-                                   (FLOAT) 0.2, 
-                                   (FLOAT) 0.2, 
-                                   (FLOAT) 0.2);
+    AmbientShaderColor = Color3InitializeFromComponents((FLOAT) 0.2,
+                                                        (FLOAT) 0.2, 
+                                                        (FLOAT) 0.2);
 
-    Color3InitializeFromComponents(&DiffuseShaderColor, 
-                                   (FLOAT) 0.8, 
-                                   (FLOAT) 0.8, 
-                                   (FLOAT) 0.8);
+    DiffuseShaderColor = Color3InitializeFromComponents((FLOAT) 0.8,
+                                                        (FLOAT) 0.8, 
+                                                        (FLOAT) 0.8);
 
-    Color3InitializeBlack(&Black);
+    Black = Color3InitializeBlack();
 
     LightDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
 
     PhongLight = DirectionalPhongLightAllocate(LightDirection,
-                                               &Black,
-                                               &DiffuseLightColor,
-                                               &Black,
+                                               Black,
+                                               DiffuseLightColor,
+                                               Black,
                                                FALSE);
 
     PhongShader = PhongDirectShaderAllocate(&PhongLight,
                                             1,
                                             LightShaderEvaluateAllLights,
-                                            &AmbientShaderColor,
-                                            &DiffuseShaderColor,
-                                            &Black,
+                                            AmbientShaderColor,
+                                            DiffuseShaderColor,
+                                            Black,
                                             (FLOAT) 0.0);
 
     Texture = ConstantTextureAllocate(NULL, PhongShader, NULL, NULL);
@@ -483,7 +473,7 @@ TEST(RenderPhongWorldSphere)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&Black, 500, 500);
+    Framebuffer = FramebufferAllocate(Black, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -537,12 +527,11 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     SphereCenter = PointCreate((FLOAT) 1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
-    Color3InitializeFromComponents(&SphereColor, 
-                                   (FLOAT) 1.0, 
-                                   (FLOAT) 0.0, 
-                                   (FLOAT) 0.0);
+    SphereColor = Color3InitializeFromComponents((FLOAT) 1.0, 
+                                                 (FLOAT) 0.0, 
+                                                 (FLOAT) 0.0);
 
-    ConstantShader = ConstantEmissiveShaderAllocate(&SphereColor);
+    ConstantShader = ConstantEmissiveShaderAllocate(SphereColor);
 
     Texture = ConstantTextureAllocate(ConstantShader, NULL, NULL, NULL);
 
@@ -559,9 +548,9 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     SphereCenter2 = PointCreate((FLOAT)-1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
-    Color3InitializeWhite(&Reflectance);
+    Reflectance = Color3InitializeWhite();
 
-    PerfectSpecularShader = PerfectSpecularIndirectShaderAllocate(&Reflectance);
+    PerfectSpecularShader = PerfectSpecularIndirectShaderAllocate(Reflectance);
 
     Texture = ConstantTextureAllocate(NULL, NULL, PerfectSpecularShader, NULL);
 
@@ -578,7 +567,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&SphereColor, 500, 500);
+    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -686,72 +675,64 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                        (FLOAT) 1.0,
                                        (FLOAT) 0.0);
 
-    Color3InitializeFromComponents(&Red,
-                                   (FLOAT) 0.49,
-                                   (FLOAT) 0.07,
-                                   (FLOAT) 0.07);
+    Red = Color3InitializeFromComponents((FLOAT) 0.49,
+                                         (FLOAT) 0.07,
+                                         (FLOAT) 0.07);
 
-    Color3InitializeFromComponents(&Green,
-                                   (FLOAT) 0.07,
-                                   (FLOAT) 0.49,
-                                   (FLOAT) 0.07);
+    Green = Color3InitializeFromComponents((FLOAT) 0.07,
+                                           (FLOAT) 0.49,
+                                           (FLOAT) 0.07);
 
-    Color3InitializeFromComponents(&Blue,
-                                   (FLOAT) 0.07,
-                                   (FLOAT) 0.07,
-                                   (FLOAT) 0.49);
+    Blue = Color3InitializeFromComponents((FLOAT) 0.07,
+                                          (FLOAT) 0.07,
+                                          (FLOAT) 0.49);
 
-    Color3InitializeFromComponents(&GreyishGreen,
-                                   (FLOAT) 0.21,
-                                   (FLOAT) 0.21,
-                                   (FLOAT) 0.35);
+    GreyishGreen = Color3InitializeFromComponents((FLOAT) 0.21,
+                                                  (FLOAT) 0.21,
+                                                  (FLOAT) 0.35);
 
-    Color3InitializeFromComponents(&Grey,
-                                   (FLOAT) 0.5,
-                                   (FLOAT) 0.5,
-                                   (FLOAT) 0.5);
+    Grey = Color3InitializeFromComponents((FLOAT) 0.5,
+                                          (FLOAT) 0.5,
+                                          (FLOAT) 0.5);
 
-    Color3InitializeFromComponents(&SphereMirrorReflectance,
-                                  (FLOAT) 0.6,
-                                  (FLOAT) 0.6,
-                                  (FLOAT) 0.6);
+    SphereMirrorReflectance = Color3InitializeFromComponents((FLOAT) 0.6,
+                                                             (FLOAT) 0.6,
+                                                             (FLOAT) 0.6);
 
-    Color3InitializeFromComponents(&InfinitePlaneBlackMirrorReflectance,
-                                   (FLOAT) 0.1,
-                                   (FLOAT) 0.1, 
-                                   (FLOAT) 0.1);
+    InfinitePlaneBlackMirrorReflectance = Color3InitializeFromComponents((FLOAT) 0.1,
+                                                                         (FLOAT) 0.1, 
+                                                                         (FLOAT) 0.1);
 
-    Color3InitializeFromComponents(&InfinitePlaneWhiteMirrorReflectance,
-                                   (FLOAT) 0.7,
-                                   (FLOAT) 0.7, 
-                                   (FLOAT) 0.7);
+    InfinitePlaneWhiteMirrorReflectance = Color3InitializeFromComponents((FLOAT) 0.7,
+                                                                         (FLOAT) 0.7, 
+                                                                         (FLOAT) 0.7);
 
-    Color3InitializeBlack(&Black);
+    Black = Color3InitializeBlack();
 
-    Color3InitializeWhite(&White);
+    White = Color3InitializeWhite();
 
     Lights[0] = PointPhongLightAllocate(Light0Location,
-                                        &Black,
-                                        &Red,
-                                        &Red,
+                                        Black,
+                                        Red,
+                                        Red,
                                         TRUE);
 
     Lights[1] = PointPhongLightAllocate(Light1Location,
-                                        &Black,
-                                        &Blue,
-                                        &Blue,
+                                        Black,
+                                        Blue,
+                                        Blue,
                                         TRUE);
 
     Lights[2] = PointPhongLightAllocate(Light2Location,
-                                        &Black,
-                                        &Green,
-                                        &Green,
+                                        Black,
+                                        Green,
+                                        Green,
                                         TRUE);
 
     Lights[3] = PointPhongLightAllocate(Light3Location,
-                                        &Black,
-                                        &GreyishGreen,
-                                        &GreyishGreen,
+                                        Black,
+                                        GreyishGreen,
+                                        GreyishGreen,
                                         TRUE);
 
     InfinitePlaneSurfaceNormal = ConstantNormalAllocate(InfinitePlaneNormal,
@@ -764,32 +745,32 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     SpherePhongShader = PhongDirectShaderAllocate(Lights,
                                                   4,
                                                   LightShaderEvaluateAllLights,
-                                                  &Black,
-                                                  &White,
-                                                  &Grey,
+                                                  Black,
+                                                  White,
+                                                  Grey,
                                                   (FLOAT) 50.0);
 
     InfinitePlaneWhitePhongShader = PhongDirectShaderAllocate(Lights,
                                                               4,
                                                               LightShaderEvaluateAllLights,
-                                                              &Black,
-                                                              &White,
-                                                              &Black,
+                                                              Black,
+                                                              White,
+                                                              Black,
                                                               (FLOAT) 150.0);
 
     InfinitePlaneBlackPhongShader = PhongDirectShaderAllocate(Lights,
                                                               4,
                                                               LightShaderEvaluateAllLights,
-                                                              &Black,
-                                                              &Black,
-                                                              &Black,
+                                                              Black,
+                                                              Black,
+                                                              Black,
                                                               (FLOAT) 150.0);
 
-    InfinitePlaneWhiteIndirectShader = PerfectSpecularIndirectShaderAllocate(&InfinitePlaneWhiteMirrorReflectance);
+    InfinitePlaneWhiteIndirectShader = PerfectSpecularIndirectShaderAllocate(InfinitePlaneWhiteMirrorReflectance);
 
-    InfinitePlaneBlackIndirectShader = PerfectSpecularIndirectShaderAllocate(&InfinitePlaneBlackMirrorReflectance);
+    InfinitePlaneBlackIndirectShader = PerfectSpecularIndirectShaderAllocate(InfinitePlaneBlackMirrorReflectance);
 
-    SphereIndirectShader = PerfectSpecularIndirectShaderAllocate(&SphereMirrorReflectance);
+    SphereIndirectShader = PerfectSpecularIndirectShaderAllocate(SphereMirrorReflectance);
 
     InfinitePlaneTexture = XZCheckerboardTextureAllocate(NULL,
                                                          InfinitePlaneWhitePhongShader,
@@ -836,7 +817,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Framebuffer = FramebufferAllocate(&Black, 500, 500);
+    Framebuffer = FramebufferAllocate(Black, 500, 500);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
                                                                Rng,
@@ -887,9 +868,9 @@ TEST(RenderCornellBox)
     // Light Source
     //
 
-    Color3InitializeFromComponents(&ShaderColor, 12.0f, 12.0f, 12.0f);
+    ShaderColor = Color3InitializeFromComponents(12.0f, 12.0f, 12.0f);
 
-    EmissiveShader = ConstantEmissiveShaderAllocate(&ShaderColor);
+    EmissiveShader = ConstantEmissiveShaderAllocate(ShaderColor);
 
     Texture = ConstantTextureAllocate(EmissiveShader, 
                                       NULL,
@@ -918,9 +899,9 @@ TEST(RenderCornellBox)
     // Tall Box
     //
 
-    Color3InitializeFromComponents(&ShaderColor, 0.75f, 0.75f, 0.75f);
+    ShaderColor = Color3InitializeFromComponents(0.75f, 0.75f, 0.75f);
 
-    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+    IndirectShader = LambertianIndirectShaderAllocate(ShaderColor);
 
     Texture = ConstantTextureAllocate(NULL, 
                                       NULL,
@@ -1069,9 +1050,9 @@ TEST(RenderCornellBox)
     // Red Wall
     //
 
-    Color3InitializeFromComponents(&ShaderColor, 0.75f, 0.25f, 0.25f);
+    ShaderColor = Color3InitializeFromComponents(0.75f, 0.25f, 0.25f);
 
-    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+    IndirectShader = LambertianIndirectShaderAllocate(ShaderColor);
 
     Texture = ConstantTextureAllocate(NULL, 
                                       NULL,
@@ -1092,9 +1073,9 @@ TEST(RenderCornellBox)
     // Blue Wall
     //
 
-    Color3InitializeFromComponents(&ShaderColor, 0.25f, 0.25f, 0.75f);
+    ShaderColor = Color3InitializeFromComponents(0.25f, 0.25f, 0.75f);
 
-    IndirectShader = LambertianIndirectShaderAllocate(&ShaderColor);
+    IndirectShader = LambertianIndirectShaderAllocate(ShaderColor);
 
     Texture = ConstantTextureAllocate(NULL, 
                                       NULL,
@@ -1117,9 +1098,9 @@ TEST(RenderCornellBox)
 
     Rng = MultiplyWithCarryRngAllocate();
 
-    Color3InitializeBlack(&ShaderColor);
+    ShaderColor = Color3InitializeBlack();
 
-    Framebuffer = FramebufferAllocate(&ShaderColor, 500, 500);
+    Framebuffer = FramebufferAllocate(ShaderColor, 500, 500);
 
     PathTracer = PathTracerAllocate(Scene,
                                     Rng,

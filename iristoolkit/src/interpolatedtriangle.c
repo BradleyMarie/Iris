@@ -78,7 +78,7 @@ InterpolatedTriangleEmissiveShaderShade(
     InterpolatedTriangleEmissiveShader = (PCINTERPOLATED_TRIANGLE_EMISSIVE_SHADER) Context;
     BarycentricCoordinates = (PCBARYCENTRIC_COORDINATES) AdditionalData;
 
-    Color3InitializeBlack(Emissive);
+    *Emissive = Color3InitializeBlack();
 
     for (Index = 0; Index < IRIS_TOOLKIT_TRIANGLE_VERTICES; Index++)
     {
@@ -100,10 +100,9 @@ InterpolatedTriangleEmissiveShaderShade(
             return Status;
         }
 
-        Color3AddScaled(Emissive,
-                        &ComponentColor,
-                        BarycentricCoordinates->Coordinates[Index],
-                        Emissive);
+        *Emissive = Color3AddScaled(*Emissive,
+                                    ComponentColor,
+                                    BarycentricCoordinates->Coordinates[Index]);
     }
 
     return ISTATUS_SUCCESS;
@@ -143,7 +142,7 @@ InterpolatedTriangleDirectShaderShade(
     InterpolatedTriangleDirectShader = (PCINTERPOLATED_TRIANGLE_DIRECT_SHADER) Context;
     BarycentricCoordinates = (PCBARYCENTRIC_COORDINATES) AdditionalData;
 
-    Color3InitializeBlack(Direct);
+    *Direct = Color3InitializeBlack();
 
     for (Index = 0; Index < IRIS_TOOLKIT_TRIANGLE_VERTICES; Index++)
     {
@@ -170,10 +169,9 @@ InterpolatedTriangleDirectShaderShade(
             return Status;
         }
 
-        Color3AddScaled(Direct,
-                        &ComponentColor,
-                        BarycentricCoordinates->Coordinates[Index],
-                        Direct);
+        *Direct = Color3AddScaled(*Direct,
+                                  ComponentColor,
+                                  BarycentricCoordinates->Coordinates[Index]);
     }
 
     return ISTATUS_SUCCESS;
@@ -214,7 +212,7 @@ InterpolatedTriangleIndirectShaderShade(
     InterpolatedTriangleIndirectShader = (PCINTERPOLATED_TRIANGLE_INDIRECT_SHADER) Context;
     BarycentricCoordinates = (PCBARYCENTRIC_COORDINATES) AdditionalData;
 
-    Color3InitializeBlack(Indirect);
+    *Indirect = Color3InitializeBlack();
 
     for (Index = 0; Index < IRIS_TOOLKIT_TRIANGLE_VERTICES; Index++)
     {
@@ -242,10 +240,9 @@ InterpolatedTriangleIndirectShaderShade(
             return Status;
         }
 
-        Color3AddScaled(Indirect,
-                        &ComponentColor,
-                        BarycentricCoordinates->Coordinates[Index],
-                        Indirect);
+        *Indirect = Color3AddScaled(*Indirect,
+                                    ComponentColor,
+                                    BarycentricCoordinates->Coordinates[Index]);
     }
 
     return ISTATUS_SUCCESS;
