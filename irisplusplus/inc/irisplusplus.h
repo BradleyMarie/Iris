@@ -27,6 +27,7 @@ extern "C" {
 // Include C++ standard library headers
 //
 
+#include <stdexcept>
 #include <utility>
 #include <new>
 
@@ -34,9 +35,11 @@ extern "C" {
 // Include Iris++ Headers
 //
 
+#include "irisplusplus_api.h"
 #include "irisplusplus_matrix.h"
 #include "irisplusplus_vector.h"
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"
+#include "irisplusplus_shape.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

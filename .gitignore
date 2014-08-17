@@ -56,6 +56,7 @@ CMakeFiles/
 iris/inc/iris_api.h
 iristoolkit/inc/iristoolkit_api.h
 irisshadingmodel/inc/irisshadingmodel_api.h
+irisplusplus/inc/irisplusplus_api.h
 
 #Analysis files
 iris.dir/

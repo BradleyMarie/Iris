@@ -49,4 +49,5 @@ add_executable(iris-test
 target_link_libraries(iris-test 
     iris 
     irisshadingmodel
-    iristoolkit)
+    iristoolkit
+    irisplusplus)
