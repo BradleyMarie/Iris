@@ -29,9 +29,9 @@ typedef CONST MATRIX *PCMATRIX;
 //
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
+ISTATUS
 MatrixAllocate(
     _In_ FLOAT M00,
     _In_ FLOAT M01,
@@ -48,81 +48,86 @@ MatrixAllocate(
     _In_ FLOAT M30,
     _In_ FLOAT M31,
     _In_ FLOAT M32,
-    _In_ FLOAT M33
+    _In_ FLOAT M33,
+    _Out_ PMATRIX *Matrix
     );
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
+ISTATUS
 MatrixAllocateTranslation(
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     );
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
+ISTATUS
 MatrixAllocateScalar(
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     );
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
+ISTATUS
 MatrixAllocateRotation(
     _In_ FLOAT Theta,
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     );
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
-MatrixAllocateFrustum(
-    _In_ FLOAT Left,
-    _In_ FLOAT Right,
-    _In_ FLOAT Bottom,
-    _In_ FLOAT Top,
-    _In_ FLOAT Near,
-    _In_ FLOAT Far
-    );
-
-_Check_return_
-_Ret_opt_
-IRISAPI
-PMATRIX
+ISTATUS
 MatrixAllocateOrthographic(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
     _In_ FLOAT Top,
     _In_ FLOAT Near,
-    _In_ FLOAT Far
+    _In_ FLOAT Far,
+    _Out_ PMATRIX *Matrix
     );
 
 _Check_return_
-_When_(Multiplicand0 == NULL && Multiplicand1 == NULL, _Ret_null_)
-_When_(Multiplicand0 != NULL || Multiplicand1 != NULL, _Ret_opt_)
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PMATRIX
+ISTATUS
+MatrixAllocateFrustum(
+    _In_ FLOAT Left,
+    _In_ FLOAT Right,
+    _In_ FLOAT Bottom,
+    _In_ FLOAT Top,
+    _In_ FLOAT Near,
+    _In_ FLOAT Far,
+    _Out_ PMATRIX *Matrix
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
 MatrixAllocateProduct(
     _In_opt_ PMATRIX Multiplicand0,
-    _In_opt_ PMATRIX Multiplicand1
+    _In_opt_ PMATRIX Multiplicand1,
+    _Out_ PMATRIX *Result
     );
 
-_Check_return_
 _Ret_opt_
 IRISAPI
 PMATRIX
-MatrixAllocateInverse(
+MatrixGetInverse(
     _In_opt_ PMATRIX Matrix
     );
 

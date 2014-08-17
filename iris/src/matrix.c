@@ -194,9 +194,9 @@ MatrixpInvert(
     _In_ FLOAT M33
     )
 {
-    FLOAT Matrix[4][4];
     SIZE_T ColumnIndex;
     SIZE_T CurrentRow;
+    FLOAT Matrix[4][4];
     SIZE_T RowIndex;
 
     ASSERT(Inverse != NULL);
@@ -332,8 +332,8 @@ MatrixpInvert(
 //
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocate(
     _In_ FLOAT M00,
     _In_ FLOAT M01,
@@ -350,31 +350,113 @@ MatrixAllocate(
     _In_ FLOAT M30,
     _In_ FLOAT M31,
     _In_ FLOAT M32,
-    _In_ FLOAT M33
+    _In_ FLOAT M33,
+    _Out_ PMATRIX *Matrix
     )
 {
-    PINVERTIBLE_MATRIX InvertibleMatrix;
     FLOAT Inverse[4][4];
+    PINVERTIBLE_MATRIX InvertibleMatrix;
     ISTATUS Status;
 
-    if (!IsNormalFloat(M00) != FALSE || !IsFiniteFloat(M00) != FALSE ||
-        !IsNormalFloat(M01) != FALSE || !IsFiniteFloat(M01) != FALSE ||
-        !IsNormalFloat(M02) != FALSE || !IsFiniteFloat(M02) != FALSE ||
-        !IsNormalFloat(M03) != FALSE || !IsFiniteFloat(M03) != FALSE ||
-        !IsNormalFloat(M10) != FALSE || !IsFiniteFloat(M10) != FALSE ||
-        !IsNormalFloat(M11) != FALSE || !IsFiniteFloat(M11) != FALSE ||
-        !IsNormalFloat(M12) != FALSE || !IsFiniteFloat(M12) != FALSE ||
-        !IsNormalFloat(M13) != FALSE || !IsFiniteFloat(M13) != FALSE ||
-        !IsNormalFloat(M20) != FALSE || !IsFiniteFloat(M20) != FALSE ||
-        !IsNormalFloat(M21) != FALSE || !IsFiniteFloat(M21) != FALSE ||
-        !IsNormalFloat(M22) != FALSE || !IsFiniteFloat(M22) != FALSE ||
-        !IsNormalFloat(M23) != FALSE || !IsFiniteFloat(M23) != FALSE ||
-        !IsNormalFloat(M30) != FALSE || !IsFiniteFloat(M30) != FALSE ||
-        !IsNormalFloat(M31) != FALSE || !IsFiniteFloat(M31) != FALSE ||
-        !IsNormalFloat(M32) != FALSE || !IsFiniteFloat(M32) != FALSE ||
-        !IsNormalFloat(M33) != FALSE || !IsFiniteFloat(M33) != FALSE)
+    if (IsNormalFloat(M00) == FALSE ||
+        IsFiniteFloat(M00) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(M01) == FALSE ||
+        IsFiniteFloat(M01) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(M02) == FALSE ||
+        IsFiniteFloat(M02) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (IsNormalFloat(M03) == FALSE ||
+        IsFiniteFloat(M03) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (IsNormalFloat(M10) == FALSE ||
+        IsFiniteFloat(M10) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (IsNormalFloat(M11) == FALSE ||
+        IsFiniteFloat(M11) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (IsNormalFloat(M12) == FALSE ||
+        IsFiniteFloat(M12) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (IsNormalFloat(M13) == FALSE ||
+        IsFiniteFloat(M13) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (IsNormalFloat(M20) == FALSE ||
+        IsFiniteFloat(M20) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (IsNormalFloat(M21) == FALSE ||
+        IsFiniteFloat(M21) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_09;
+    }
+
+    if (IsNormalFloat(M22) == FALSE ||
+        IsFiniteFloat(M22) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_10;
+    }
+
+    if (IsNormalFloat(M23) == FALSE ||
+        IsFiniteFloat(M23) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_11;
+    }
+
+    if (IsNormalFloat(M30) == FALSE ||
+        IsFiniteFloat(M30) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_12;
+    }
+
+    if (IsNormalFloat(M31) == FALSE ||
+        IsFiniteFloat(M31) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_13;
+    }
+
+    if (IsNormalFloat(M32) == FALSE ||
+        IsFiniteFloat(M32) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_14;
+    }
+
+    if (IsNormalFloat(M33) == FALSE ||
+        IsFiniteFloat(M33) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_15;
+    }
+
+    if (Matrix == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_16;
     }
 
     Status = MatrixpInvert(Inverse,
@@ -397,14 +479,14 @@ MatrixAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        return NULL;
+        return Status;
     }
 
     InvertibleMatrix = malloc(sizeof(INVERTIBLE_MATRIX));
 
     if (InvertibleMatrix == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     MatrixpInitialize(&InvertibleMatrix->Matrix,
@@ -449,32 +531,46 @@ MatrixAllocate(
 
     InvertibleMatrix->ReferenceCount = 1;
 
-    return &InvertibleMatrix->Matrix;
+    *Matrix = &InvertibleMatrix->Matrix;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateTranslation(
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     )
 {
     PINVERTIBLE_MATRIX InvertibleMatrix;
 
-    if (!IsNormalFloat(X) != FALSE || !IsFiniteFloat(X) != FALSE ||
-        !IsNormalFloat(Y) != FALSE || !IsFiniteFloat(Y) != FALSE ||
-        !IsNormalFloat(Z) != FALSE || !IsFiniteFloat(Z) != FALSE)
+    if (IsNormalFloat(X) == FALSE ||
+        IsFiniteFloat(X) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Y) == FALSE ||
+        IsFiniteFloat(Y) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Z) == FALSE ||
+        IsFiniteFloat(Z) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     InvertibleMatrix = malloc(sizeof(INVERTIBLE_MATRIX));
 
     if (InvertibleMatrix == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     MatrixpInitialize(&InvertibleMatrix->Matrix, 
@@ -519,32 +615,46 @@ MatrixAllocateTranslation(
 
     InvertibleMatrix->ReferenceCount = 1;
 
-    return &InvertibleMatrix->Matrix;
+    *Matrix = &InvertibleMatrix->Matrix;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateScalar(
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     )
 {
     PINVERTIBLE_MATRIX InvertibleMatrix;
 
-    if (!IsNormalFloat(X) != FALSE || !IsFiniteFloat(X) != FALSE ||
-        !IsNormalFloat(Y) != FALSE || !IsFiniteFloat(Y) != FALSE ||
-        !IsNormalFloat(Z) != FALSE || !IsFiniteFloat(Z) != FALSE)
+    if (IsNormalFloat(X) == FALSE ||
+        IsFiniteFloat(X) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Y) == FALSE ||
+        IsFiniteFloat(Y) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Z) == FALSE ||
+        IsFiniteFloat(Z) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     InvertibleMatrix = malloc(sizeof(INVERTIBLE_MATRIX));
 
     if (InvertibleMatrix == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     MatrixpInitialize(&InvertibleMatrix->Matrix, 
@@ -589,21 +699,20 @@ MatrixAllocateScalar(
 
     InvertibleMatrix->ReferenceCount = 1;
 
-    return &InvertibleMatrix->Matrix;
+    *Matrix = &InvertibleMatrix->Matrix;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixpAllocateRotation(
     _In_ FLOAT Theta,
-    _In_ VECTOR3 Axis
+    _In_ VECTOR3 Axis,
+    _Out_ PMATRIX *Matrix
     )
 {
-    VECTOR3 NormalizedAxis;
-    PMATRIX Matrix;
-    FLOAT Length;
-    FLOAT Sin;
     FLOAT Cos;
     FLOAT Ic;
     FLOAT M00;
@@ -615,6 +724,9 @@ MatrixpAllocateRotation(
     FLOAT M20;
     FLOAT M21;
     FLOAT M22;
+    VECTOR3 NormalizedAxis;
+    FLOAT Sin;
+    ISTATUS Status;
 
     ASSERT(IsNormalFloat(Theta) != FALSE);
     ASSERT(IsFiniteFloat(Theta) != FALSE);
@@ -624,13 +736,8 @@ MatrixpAllocateRotation(
     ASSERT(IsFiniteFloat(Axis.Y) != FALSE);
     ASSERT(IsNormalFloat(Axis.Z) != FALSE);
     ASSERT(IsFiniteFloat(Axis.Z) != FALSE);
-
-    Length = VectorLength(Axis);
-
-    if (IsZeroFloat(Length) != FALSE)
-    {
-        return NULL;
-    }
+    ASSERT(IsZeroFloat(Length) == FALSE);
+    ASSERT(Matrix != NULL);
 
     NormalizedAxis = VectorNormalize(Axis, NULL);
 
@@ -650,7 +757,7 @@ MatrixpAllocateRotation(
     M21 = NormalizedAxis.Z * NormalizedAxis.Y * Ic + NormalizedAxis.X * Sin;
     M22 = NormalizedAxis.Z * NormalizedAxis.Z * Ic + Cos;
 
-    Matrix = MatrixAllocate(M00, 
+    Status = MatrixAllocate(M00, 
                             M01, 
                             M02, 
                             (FLOAT) 0.0, 
@@ -665,72 +772,144 @@ MatrixpAllocateRotation(
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
-                            (FLOAT) 1.0);
+                            (FLOAT) 1.0,
+                            Matrix);
 
-    return Matrix;
+    return Status;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateRotation(
     _In_ FLOAT Theta,
     _In_ FLOAT X,
     _In_ FLOAT Y,
-    _In_ FLOAT Z
+    _In_ FLOAT Z,
+    _Out_ PMATRIX *Matrix
     )
 {
-    PMATRIX Matrix;
     VECTOR3 Axis;
+    FLOAT Length;
+    ISTATUS Status;
 
-    if (!IsNormalFloat(Theta) != FALSE || !IsFiniteFloat(Theta) != FALSE ||
-        !IsNormalFloat(X) != FALSE || !IsFiniteFloat(X) != FALSE ||
-        !IsNormalFloat(Y) != FALSE || !IsFiniteFloat(Y) != FALSE ||
-        !IsNormalFloat(Z) != FALSE || !IsFiniteFloat(Z) != FALSE)
+    if (IsNormalFloat(Theta) == FALSE || 
+        IsFiniteFloat(Theta) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(X) == FALSE || 
+        IsFiniteFloat(X) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Y) == FALSE || 
+        IsFiniteFloat(Y) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (IsNormalFloat(Z) == FALSE || 
+        IsFiniteFloat(Z) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Matrix == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     Axis = VectorCreate(X, Y, Z);
+    Length = VectorLength(Axis);
 
-    Matrix = MatrixpAllocateRotation(Theta, Axis);
+    if (IsZeroFloat(Length) != FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
 
-    return Matrix;
+    Status = MatrixpAllocateRotation(Theta, Axis, Matrix);
+
+    return Status;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateOrthographic(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
     _In_ FLOAT Top,
     _In_ FLOAT Near,
-    _In_ FLOAT Far
+    _In_ FLOAT Far,
+    _Out_ PMATRIX *Matrix
     )
 {
-    PMATRIX Matrix;
-    FLOAT Tx;
-    FLOAT Ty;
-    FLOAT Tz;
+    ISTATUS Status;
     FLOAT Sx;
     FLOAT Sy;
     FLOAT Sz;
+    FLOAT Tx;
+    FLOAT Ty;
+    FLOAT Tz;
 
-    if (!IsNormalFloat(Left) != FALSE || !IsFiniteFloat(Left) != FALSE ||
-        !IsNormalFloat(Right) != FALSE || !IsFiniteFloat(Right) != FALSE ||
-        !IsNormalFloat(Bottom) != FALSE || !IsFiniteFloat(Bottom) != FALSE ||
-        !IsNormalFloat(Top) != FALSE || !IsFiniteFloat(Top) != FALSE ||
-        !IsNormalFloat(Near) != FALSE || !IsFiniteFloat(Near) != FALSE ||
-        !IsNormalFloat(Far) != FALSE || !IsFiniteFloat(Far) != FALSE)
+    if (IsNormalFloat(Left) == FALSE ||
+        IsFiniteFloat(Left) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Left == Right || Bottom == Top || Near == Far)
+    if (IsNormalFloat(Right) == FALSE ||
+        IsFiniteFloat(Right) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Bottom) == FALSE ||
+        IsFiniteFloat(Bottom) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (IsNormalFloat(Top) == FALSE ||
+        IsFiniteFloat(Top) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (IsNormalFloat(Near) == FALSE ||
+        IsFiniteFloat(Near) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (IsNormalFloat(Far) == FALSE ||
+        IsFiniteFloat(Far) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (Matrix == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (Left == Right)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (Bottom == Top)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+    }
+
+    if (Near == Far)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
     }
 
     Tx = -(Right + Left) / (Right - Left);
@@ -741,7 +920,7 @@ MatrixAllocateOrthographic(
     Sy = (FLOAT) 2.0 / (Top - Bottom);
     Sz = (FLOAT) -2.0 / (Far - Near);
 
-    Matrix = MatrixAllocate(Sx,
+    Status = MatrixAllocate(Sx,
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             Tx,
@@ -756,45 +935,89 @@ MatrixAllocateOrthographic(
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
-                            (FLOAT) 1.0);
+                            (FLOAT) 1.0,
+                            Matrix);
 
-    return Matrix;
+    return Status;
 }
 
 _Check_return_
-_Ret_opt_
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateFrustum(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
     _In_ FLOAT Top,
     _In_ FLOAT Near,
-    _In_ FLOAT Far
+    _In_ FLOAT Far,
+    _Out_ PMATRIX *Matrix
     )
 {
-    PMATRIX Matrix;
-    FLOAT Sx;
-    FLOAT Sy;
     FLOAT A;
     FLOAT B;
     FLOAT C;
     FLOAT D;
+    ISTATUS Status;
+    FLOAT Sx;
+    FLOAT Sy;
 
-    if (!IsNormalFloat(Left) != FALSE || !IsFiniteFloat(Left) != FALSE ||
-        !IsNormalFloat(Right) != FALSE || !IsFiniteFloat(Right) != FALSE ||
-        !IsNormalFloat(Bottom) != FALSE || !IsFiniteFloat(Bottom) != FALSE ||
-        !IsNormalFloat(Top) != FALSE || !IsFiniteFloat(Top) != FALSE ||
-        !IsNormalFloat(Near) != FALSE || !IsFiniteFloat(Near) != FALSE ||
-        !IsNormalFloat(Far) != FALSE || !IsFiniteFloat(Far) != FALSE)
+    if (IsNormalFloat(Left) == FALSE ||
+        IsFiniteFloat(Left) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Left == Right || Bottom == Top || Near == Far || 
-        Near <= (FLOAT) 0.0 || Far <= (FLOAT) 0.0)
+    if (IsNormalFloat(Right) == FALSE ||
+        IsFiniteFloat(Right) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Bottom) == FALSE ||
+        IsFiniteFloat(Bottom) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (IsNormalFloat(Top) == FALSE ||
+        IsFiniteFloat(Top) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (IsNormalFloat(Near) == FALSE ||
+        IsFiniteFloat(Near) == FALSE ||
+        Near <= (FLOAT) 0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (IsNormalFloat(Far) == FALSE ||
+        IsFiniteFloat(Far) == FALSE ||
+        Far <= (FLOAT) 0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (Matrix == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (Left == Right)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (Bottom == Top)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+    }
+
+    if (Near == Far)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
     }
 
     Sx = ((FLOAT) 2.0 * Near) / (Right - Left);
@@ -806,7 +1029,7 @@ MatrixAllocateFrustum(
     C = -(Far + Near) / (Far - Near);
     D = (FLOAT) -2.0 * Far * Near / (Far - Near);
 
-    Matrix = MatrixAllocate(Sx,
+    Status = MatrixAllocate(Sx,
                             (FLOAT) 0.0,
                             A,
                             (FLOAT) 0.0,
@@ -821,21 +1044,21 @@ MatrixAllocateFrustum(
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             (FLOAT) -1.0,
-                            (FLOAT) 0.0);
+                            (FLOAT) 0.0,
+                            Matrix);
 
-    return Matrix;
+    return Status;
 }
 
 _Check_return_
-_When_(Multiplicand0 == NULL && Multiplicand1 == NULL, _Ret_null_)
-_When_(Multiplicand0 != NULL || Multiplicand1 != NULL, _Ret_opt_)
-PMATRIX
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MatrixAllocateProduct(
     _In_opt_ PMATRIX Multiplicand0,
-    _In_opt_ PMATRIX Multiplicand1
+    _In_opt_ PMATRIX Multiplicand1,
+    _Out_ PMATRIX *Result
     )
 {
-    PMATRIX Matrix;
     FLOAT M00;
     FLOAT M01;
     FLOAT M02;
@@ -852,22 +1075,31 @@ MatrixAllocateProduct(
     FLOAT M31;
     FLOAT M32;
     FLOAT M33;
+    ISTATUS Status;
+
+    if (Result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
 
     if (Multiplicand0 == NULL && Multiplicand1 == NULL)
     {
-        return NULL;
+        *Result = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     if (Multiplicand0 == NULL)
     {
         MatrixReference(Multiplicand1);
-        return Multiplicand1;
+        *Result = Multiplicand1;
+        return ISTATUS_SUCCESS;
     }
 
     if (Multiplicand1 == NULL)
     {
         MatrixReference(Multiplicand0);
-        return Multiplicand0;
+        *Result = Multiplicand0;
+        return ISTATUS_SUCCESS;
     }
 
     M00 = Multiplicand0->M[0][0] * Multiplicand1->M[0][0] + 
@@ -950,7 +1182,7 @@ MatrixAllocateProduct(
           Multiplicand0->M[3][2] * Multiplicand1->M[2][3] +
           Multiplicand0->M[3][3] * Multiplicand1->M[3][3];
 
-    Matrix = MatrixAllocate(M00,
+    Status = MatrixAllocate(M00,
                             M01,
                             M02,
                             M03,
@@ -965,33 +1197,26 @@ MatrixAllocateProduct(
                             M30,
                             M31,
                             M32,
-                            M33);
+                            M33,
+                            Result);
 
-    return Matrix;
+    return Status;
 }
 
-_Check_return_
 _Ret_opt_
 PMATRIX
-MatrixAllocateInverse(
+MatrixGetInverse(
     _In_opt_ PMATRIX Matrix
     )
 {
-    PMATRIX Inverse;
-
     if (Matrix == NULL)
     {
         return NULL;
     }
 
-    if (Matrix->InvertibleMatrix != NULL)
-    {
-        Matrix->InvertibleMatrix->ReferenceCount += 1;
-    }
-    
-    Inverse = Matrix->Inverse;
+    Matrix->InvertibleMatrix->ReferenceCount += 1;
 
-    return Inverse;
+    return Matrix->Inverse;
 }
 
 ISTATUS
@@ -1000,9 +1225,14 @@ MatrixReadContents(
     _Out_writes_(4) FLOAT Contents[4][4]
     )
 {
-    if (Matrix == NULL || Contents == NULL)
+    if (Matrix == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Contents == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     Contents[0][0] = Matrix->M[0][0];

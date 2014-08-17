@@ -18,8 +18,9 @@ TEST(MatrixInitialize)
 {
     FLOAT Contents[4][4];
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocate((FLOAT) 1.0,
+    Status = MatrixAllocate((FLOAT) 1.0,
                             (FLOAT) 2.0,
                             (FLOAT) 3.0,
                             (FLOAT) 4.0,
@@ -34,7 +35,10 @@ TEST(MatrixInitialize)
                             (FLOAT) 13.0,
                             (FLOAT) 14.0,
                             (FLOAT) 15.0,
-                            (FLOAT) 16.0);
+                            (FLOAT) 16.0,
+                            &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix, Contents);
 
@@ -58,11 +62,12 @@ TEST(MatrixInitialize)
 
 TEST(MatrixInverse)
 {
-    FLOAT InverseContents[4][4];
     FLOAT Contents[4][4];
+    FLOAT InverseContents[4][4];
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocate((FLOAT) 1.0,
+    Status = MatrixAllocate((FLOAT) 1.0,
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             (FLOAT) 1.0,
@@ -77,7 +82,10 @@ TEST(MatrixInverse)
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
                             (FLOAT) 0.0,
-                            (FLOAT) 1.0);
+                            (FLOAT) 1.0,
+                            &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix, Contents);
 
@@ -98,7 +106,7 @@ TEST(MatrixInverse)
     CHECK_EQUAL((FLOAT) 0.0, Contents[3][2]);
     CHECK_EQUAL((FLOAT) 1.0, Contents[3][3]);
 
-    Matrix = MatrixAllocateInverse(Matrix);
+    Matrix = MatrixGetInverse(Matrix);
 
     MatrixReadContents(Matrix, InverseContents);
 
@@ -124,10 +132,14 @@ TEST(MatrixInitializeTranslation)
 {
     FLOAT Contents[4][4];
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+    Status = MatrixAllocateTranslation((FLOAT) 1.0,
                                        (FLOAT) 2.0,
-                                       (FLOAT) 3.0);
+                                       (FLOAT) 3.0,
+                                       &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix, Contents);
 
@@ -153,10 +165,14 @@ TEST(MatrixInitializeScalar)
 {
     FLOAT Contents[4][4];
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocateScalar((FLOAT) 1.0,
+    Status = MatrixAllocateScalar((FLOAT) 1.0,
                                   (FLOAT) 2.0,
-                                  (FLOAT) 3.0);
+                                  (FLOAT) 3.0,
+                                  &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix, Contents);
 
@@ -192,16 +208,25 @@ TEST(MatrixMultiply)
 {
     FLOAT Contents[4][4];
     PMATRIX Matrix1, Matrix2, Matrix3;
+    ISTATUS Status;
 
-    Matrix1 = MatrixAllocateTranslation((FLOAT) 1.0,
-                                        (FLOAT) 2.0,
-                                        (FLOAT) 3.0);
+    Status = MatrixAllocateTranslation((FLOAT) 1.0,
+                                       (FLOAT) 2.0,
+                                       (FLOAT) 3.0,
+                                       &Matrix1);
 
-    Matrix2 = MatrixAllocateScalar((FLOAT) 2.0,
-                                   (FLOAT) 2.0,
-                                   (FLOAT) 2.0);
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Matrix3 = MatrixAllocateProduct(Matrix1, Matrix2);
+    Status = MatrixAllocateScalar((FLOAT) 2.0,
+                                  (FLOAT) 2.0,
+                                  (FLOAT) 2.0,
+                                  &Matrix2);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
+
+    Status = MatrixAllocateProduct(Matrix1, Matrix2, &Matrix3);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix3, Contents);
 
@@ -227,12 +252,18 @@ TEST(MatrixMultiplyWithIdentity)
 {
     FLOAT Contents[4][4];
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+    Status = MatrixAllocateTranslation((FLOAT) 1.0,
                                        (FLOAT) 2.0,
-                                       (FLOAT) 3.0);
+                                       (FLOAT) 3.0,
+                                       &Matrix);
 
-    Matrix = MatrixAllocateProduct(NULL, Matrix);
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
+
+    Status = MatrixAllocateProduct(NULL, Matrix, &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     MatrixReadContents(Matrix, Contents);
 

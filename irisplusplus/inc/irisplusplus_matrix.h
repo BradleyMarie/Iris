@@ -53,31 +53,87 @@ public:
         _In_ FLOAT M33
         )
     {
-        PMATRIX IrisMatrix;
+        ISTATUS Status;
         
-        IrisMatrix = MatrixAllocate(M00,
-                                    M01,
-                                    M02,
-                                    M03,
-                                    M10,
-                                    M11,
-                                    M12,
-                                    M13,
-                                    M20,
-                                    M21,
-                                    M22,
-                                    M23,
-                                    M30,
-                                    M31,
-                                    M32,
-                                    M33);
+        Status = MatrixAllocate(M00,
+                                M01,
+                                M02,
+                                M03,
+                                M10,
+                                M11,
+                                M12,
+                                M13,
+                                M20,
+                                M21,
+                                M22,
+                                M23,
+                                M30,
+                                M31,
+                                M32,
+                                M33,
+                                &Data);
 
-        if (IrisMatrix == NULL)
+        switch (Status)
         {
-            throw std::bad_alloc();   
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_ARITHMETIC_ERROR:
+                throw std::invalid_argument("Not Invertible");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("M00");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("M01");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("M02");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("M03");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_04:
+                throw std::invalid_argument("M10");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_05:
+                throw std::invalid_argument("M11");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_06:
+                throw std::invalid_argument("M12");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_07:
+                throw std::invalid_argument("M13");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_08:
+                throw std::invalid_argument("M20");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_09:
+                throw std::invalid_argument("M21");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_10:
+                throw std::invalid_argument("M22");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_11:
+                throw std::invalid_argument("M23");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_12:
+                throw std::invalid_argument("M30");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_13:
+                throw std::invalid_argument("M31");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_14:
+                throw std::invalid_argument("M32");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_15:
+                throw std::invalid_argument("M33");
+                break;
+            default:
+                ASSERT(false);
         }
-
-        Data = IrisMatrix;
     }
 
     static
@@ -89,12 +145,28 @@ public:
         )
     {
         PMATRIX IrisMatrix;
+        ISTATUS Status;
 
-        IrisMatrix = MatrixAllocateTranslation(X, Y, Z);
+        Status = MatrixAllocateTranslation(X, Y, Z, &IrisMatrix);
 
-        if (IrisMatrix == NULL)
+        switch (Status)
         {
-            throw std::bad_alloc();
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("X");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("Y");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Z");
+                break;
+            default:
+                ASSERT(FALSE);
         }
 
         return Matrix(IrisMatrix);
@@ -109,12 +181,28 @@ public:
         )
     {
         PMATRIX IrisMatrix;
+        ISTATUS Status;
 
-        IrisMatrix = MatrixAllocateScalar(X, Y, Z);
+        Status = MatrixAllocateScalar(X, Y, Z, &IrisMatrix);
 
-        if (IrisMatrix == NULL)
+        switch (Status)
         {
-            throw std::bad_alloc();
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("X");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("Y");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Z");
+                break;
+            default:
+                ASSERT(FALSE);
         }
 
         return Matrix(IrisMatrix);
@@ -130,12 +218,97 @@ public:
         )
     {
         PMATRIX IrisMatrix;
+        ISTATUS Status;
 
-        IrisMatrix = MatrixAllocateRotation(Theta, X, Y, Z);
+        Status = MatrixAllocateRotation(Theta, X, Y, Z, &IrisMatrix);
 
-        if (IrisMatrix == NULL)
+        switch (Status)
         {
-            throw std::bad_alloc();
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("Theta");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("X");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Y");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Z");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_00:
+                throw std::invalid_argument("All Axes Are Zero");
+                break;
+            default:
+                ASSERT(FALSE);
+        }
+
+        return Matrix(IrisMatrix);
+    }
+
+    static
+        Matrix
+        Orthographic(
+        _In_ FLOAT Left,
+        _In_ FLOAT Right,
+        _In_ FLOAT Bottom,
+        _In_ FLOAT Top,
+        _In_ FLOAT Near,
+        _In_ FLOAT Far
+        )
+    {
+        PMATRIX IrisMatrix;
+        ISTATUS Status;
+
+        Status = MatrixAllocateOrthographic(Left,
+                                            Right,
+                                            Bottom,
+                                            Top,
+                                            Near,
+                                            Far,
+                                            &IrisMatrix);
+
+        switch (Status)
+        {
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("Left");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("Right");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Bottom");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Top");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_04:
+                throw std::invalid_argument("Near");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_05:
+                throw std::invalid_argument("Far");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_00:
+                throw std::invalid_argument("Left == Right");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_01:
+                throw std::invalid_argument("Bottom == Top");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_02:
+                throw std::invalid_argument("Near == Far");
+                break;
+            default:
+                ASSERT(FALSE);
         }
 
         return Matrix(IrisMatrix);
@@ -153,45 +326,52 @@ public:
         )
     {
         PMATRIX IrisMatrix;
+        ISTATUS Status;
 
-        IrisMatrix = MatrixAllocateFrustum(Left,
-                                           Right,
-                                           Top,
-                                           Bottom,
-                                           Near,
-                                           Far);
+        Status = MatrixAllocateFrustum(Left,
+                                       Right,
+                                       Top,
+                                       Bottom,
+                                       Near,
+                                       Far,
+                                       &IrisMatrix);
 
-        if (IrisMatrix == NULL)
+        switch (Status)
         {
-            throw std::bad_alloc();
-        }
-
-        return Matrix(IrisMatrix);
-    }
-
-    static
-    Matrix
-    Orthographic(
-        _In_ FLOAT Left,
-        _In_ FLOAT Right,
-        _In_ FLOAT Bottom,
-        _In_ FLOAT Top,
-        _In_ FLOAT Near,
-        _In_ FLOAT Far
-        )
-    {
-        PMATRIX IrisMatrix;
-
-        IrisMatrix = MatrixAllocateOrthographic(Left,
-                                                Right,
-                                                Top,
-                                                Bottom,
-                                                Near,
-                                                Far);
-
-        if (IrisMatrix == NULL)
-        {
-            throw std::bad_alloc();
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+                break;
+            case ISTATUS_INVALID_ARGUMENT_00:
+                throw std::invalid_argument("Left");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_01:
+                throw std::invalid_argument("Right");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Bottom");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Top");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_04:
+                throw std::invalid_argument("Near");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_05:
+                throw std::invalid_argument("Far");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_00:
+                throw std::invalid_argument("Left == Right");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_01:
+                throw std::invalid_argument("Bottom == Top");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_02:
+                throw std::invalid_argument("Near == Far");
+                break;
+            default:
+                ASSERT(FALSE);
         }
 
         return Matrix(IrisMatrix);
@@ -229,17 +409,7 @@ public:
     {
         PMATRIX IrisMatrix;
 
-        if (Data == NULL)
-        {
-            return Identity();
-        }
-
-        IrisMatrix = MatrixAllocateInverse(Data);
-
-        if (IrisMatrix == NULL)
-        {
-            throw std::bad_alloc();
-        }
+        IrisMatrix = MatrixGetInverse(Data);
 
         return Matrix(IrisMatrix);
     }
@@ -327,6 +497,7 @@ operator*(
     )
 {
     PMATRIX IrisMatrix;
+    ISTATUS Status;
 
     if (Multiplicand0.Data == NULL && 
         Multiplicand1.Data == NULL)
@@ -334,12 +505,20 @@ operator*(
         return Matrix::Identity();
     }
 
-    IrisMatrix = MatrixAllocateProduct(Multiplicand0.Data,
-                                       Multiplicand1.Data);
+    Status = MatrixAllocateProduct(Multiplicand0.Data,
+                                   Multiplicand1.Data,
+                                   &IrisMatrix);
 
-    if (IrisMatrix == NULL)
+    switch (Status)
     {
-        throw std::bad_alloc();
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        case ISTATUS_ARITHMETIC_ERROR:
+            throw std::invalid_argument("Product Not Invertible");
+            break;
     }
 
     return Matrix(IrisMatrix);

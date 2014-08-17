@@ -50,6 +50,7 @@ TEST(RayMatrixMultiply)
     POINT3 Origin;
     VECTOR3 Direction;
     RAY Ray, Multiplied;
+    ISTATUS Status;
 
     Origin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     Direction = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
@@ -59,9 +60,12 @@ TEST(RayMatrixMultiply)
     Direction = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
     Multiplied = RayCreate(Origin, Direction);
 
-    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+    Status = MatrixAllocateTranslation((FLOAT) 1.0,
                                        (FLOAT) 1.0,
-                                       (FLOAT) 1.0);
+                                       (FLOAT) 1.0,
+                                       &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     Ray = RayMatrixMultiply(Matrix, Ray);
 

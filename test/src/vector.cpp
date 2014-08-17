@@ -135,9 +135,15 @@ TEST(VectorCrossProduct)
 TEST(VectorMatrixMultiply)
 {
     VECTOR3 Vector1, Vector2;
-    PCMATRIX Matrix;
+    PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocateScalar((FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
+    Status = MatrixAllocateScalar((FLOAT) 1.0, 
+                                  (FLOAT) 2.0, 
+                                  (FLOAT) 3.0,
+                                  &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     Vector1 = VectorCreate((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
     Vector2 = VectorCreate((FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
@@ -150,9 +156,10 @@ TEST(VectorMatrixMultiply)
 TEST(VectorMatrixTransposedMultiply)
 {
     VECTOR3 Vector1, Vector2;
-    PCMATRIX Matrix;
+    PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocate((FLOAT) 1.0,
+    Status = MatrixAllocate((FLOAT) 1.0,
                             (FLOAT) 2.0,
                             (FLOAT) 3.0,
                             (FLOAT) 4.0,
@@ -167,7 +174,10 @@ TEST(VectorMatrixTransposedMultiply)
                             (FLOAT) 2.0,
                             (FLOAT) 9.0,
                             (FLOAT) 6.0,
-                            (FLOAT) 4.0);
+                            (FLOAT) 4.0,
+                            &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     Vector1 = VectorCreate((FLOAT) 1.0, (FLOAT) 3.0, (FLOAT) 4.0);
     Vector2 = VectorCreate((FLOAT) 21.0, (FLOAT) 16.0, (FLOAT) 16.0);

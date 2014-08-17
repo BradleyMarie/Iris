@@ -101,10 +101,14 @@ TEST(PointMatrixMultiply)
 {
     POINT3 Point1, Point2;
     PMATRIX Matrix;
+    ISTATUS Status;
 
-    Matrix = MatrixAllocateTranslation((FLOAT) 1.0,
+    Status = MatrixAllocateTranslation((FLOAT) 1.0,
                                        (FLOAT) 2.0, 
-                                       (FLOAT) 3.0);
+                                       (FLOAT) 3.0,
+                                       &Matrix);
+
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
     Point1 = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     Point2 = PointCreate((FLOAT) 1.0, (FLOAT) 2.0, (FLOAT) 3.0);
