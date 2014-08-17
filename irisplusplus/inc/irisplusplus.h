@@ -28,13 +28,15 @@ extern "C" {
 //
 
 #include <utility>
+#include <new>
 
 //
 // Include Iris++ Headers
 //
 
-namespace Iris {
+#include "irisplusplus_matrix.h"
 #include "irisplusplus_vector.h"
-}
+#include "irisplusplus_point.h"
+#include "irisplusplus_ray.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

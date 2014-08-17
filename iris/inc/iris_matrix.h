@@ -99,7 +99,7 @@ _Check_return_
 _Ret_opt_
 IRISAPI
 PMATRIX
-MatrixAllocateOrothographic(
+MatrixAllocateOrthographic(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,

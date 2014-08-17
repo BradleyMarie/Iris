@@ -13,10 +13,12 @@ Abstract:
 
 --*/
 
-#include <iristoolkit.h>
+#include <irisplusplus.h>
 
 #ifndef _VECTOR_IRIS_PLUS_PLUS_
 #define _VECTOR_IRIS_PLUS_PLUS_
+
+namespace Iris {
 
 //
 // Types
@@ -31,11 +33,11 @@ enum class VectorAxis : VECTOR_AXIS {
 class Vector
 {
 public:
-    Vector(FLOAT X, FLOAT Y, FLOAT Z)
+    Vector(_In_ FLOAT X, _In_ FLOAT Y, _In_ FLOAT Z)
         : Data(VectorCreate(X, Y, Z))
     { }
 
-    Vector(const VECTOR3 & IrisVector)
+    Vector(_In_ const VECTOR3 & IrisVector)
         : Data(IrisVector)
     { }
 
@@ -51,11 +53,6 @@ public:
     VECTOR3 AsVECTOR3() const
     {
         return Data;
-    }
-
-    PVECTOR3 AsPVECTOR3()
-    {
-        return &Data;
     }
 
     PCVECTOR3 AsPCVECTOR3() const
@@ -87,7 +84,7 @@ public:
         return Vector(Normalized);
     }
 
-    static std::pair<Vector, FLOAT> NormalizeWithLength(const Vector & ToNormalize)
+    static std::pair<Vector, FLOAT> NormalizeWithLength(_In_ const Vector & ToNormalize)
     {
         VECTOR3 Normalized;
         FLOAT OldLength;
@@ -97,12 +94,12 @@ public:
         return std::make_pair(Vector(Normalized), OldLength);
     }
 
-    static FLOAT DotProduct(const Vector & Operand0, const Vector & Operand1)
+    static FLOAT DotProduct(_In_ const Vector & Operand0, _In_ const Vector & Operand1)
     {
         return VectorDotProduct(Operand0.Data, Operand1.Data);
     }
 
-    static Vector CrossProduct(const Vector & Operand0, const Vector & Operand1)
+    static Vector CrossProduct(_In_ const Vector & Operand0, _In_ const Vector & Operand1)
     {
         VECTOR3 Product;
 
@@ -111,7 +108,7 @@ public:
         return Vector(Product);
     }
 
-    static Vector Fma(const Vector & Addend0, const Vector & Addend1, FLOAT Scalar)
+    static Vector Fma(_In_ const Vector & Addend0, _In_ const Vector & Addend1, _In_ FLOAT Scalar)
     {
         VECTOR3 Sum;
 
@@ -120,7 +117,7 @@ public:
         return Vector(Sum);
     }
 
-    static Vector Reflect(const Vector & Vec, const Vector & Normal)
+    static Vector Reflect(_In_ const Vector & Vec, _In_ const Vector & Normal)
     {
         VECTOR3 Reflected;
 
@@ -129,7 +126,7 @@ public:
         return Vector(Reflected);
     }
 
-    static Vector HalfAngle(const Vector & Vector0, const Vector & Vector1)
+    static Vector HalfAngle(_In_ const Vector & Vector0, _In_ const Vector & Vector1)
     {
         VECTOR3 HalfAngle;
 
@@ -138,19 +135,64 @@ public:
         return Vector(HalfAngle);
     }
 
-    FLOAT & X()
+    static
+    Vector
+    TransposedMultiply(
+        _In_ const Matrix & Multiplicand0,
+        _In_ const Vector & Multiplicand1
+        )
     {
-        return Data.X;
+        PCMATRIX IrisMultiplicand0;
+        VECTOR3 IrisMultiplicand1;
+        VECTOR3 IrisResult;
+
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
+        IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
+
+        IrisResult = VectorMatrixTransposedMultiply(IrisMultiplicand0,
+                                                    IrisMultiplicand1);
+
+        return Vector(IrisResult);
     }
 
-    FLOAT & Y()
+    static
+    Vector
+    InverseMultiply(
+        _In_ const Matrix & Multiplicand0,
+        _In_ const Vector & Multiplicand1
+        )
     {
-        return Data.Y;
+        PCMATRIX IrisMultiplicand0;
+        VECTOR3 IrisMultiplicand1;
+        VECTOR3 IrisResult;
+
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
+        IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
+
+        IrisResult = VectorMatrixInverseMultiply(IrisMultiplicand0,
+                                                 IrisMultiplicand1);
+
+        return Vector(IrisResult);
     }
 
-    FLOAT & Z()
+    static
+    Vector
+    InverseTransposedMultiply(
+        _In_ const Matrix & Multiplicand0,
+        _In_ const Vector & Multiplicand1
+        )
     {
-        return Data.Z;
+        PCMATRIX IrisMultiplicand0;
+        VECTOR3 IrisMultiplicand1;
+        VECTOR3 IrisResult;
+
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
+        IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
+
+        IrisResult = VectorMatrixInverseTransposedMultiply(IrisMultiplicand0,
+                                                           IrisMultiplicand1);
+
+        return Vector(IrisResult);
     }
 
     FLOAT X() const
@@ -167,44 +209,85 @@ public:
     {
         return Data.Z;
     }
-    
-    friend Vector operator+(const Vector & Addend0, const Vector & Addednd1);
-    friend Vector operator-(const Vector & Minuend, const Vector & Subtrahend);
-    friend Vector operator*(const Vector & ToScale, FLOAT Scalar);
+
+    bool Validate() const
+    {
+        BOOL Valid;
+
+        Valid = VectorValidate(Data);
+
+        return (Valid != FALSE) ? true : false;
+    }
 
 private:
-    VECTOR3 Data;
+    const VECTOR3 Data;
 };
 
 //
 // Functions
 //
 
-static inline Vector operator+(const Vector & Addend0, const Vector & Addend1)
+static inline Vector operator+(_In_ const Vector & Addend0, _In_ const Vector & Addend1)
 {
-    VECTOR3 Sum;
+    VECTOR3 IrisAddend0;
+    VECTOR3 IrisAddend1;
+    VECTOR3 IrisSum;
 
-    Sum = VectorAdd(Addend0.Data, Addend1.Data);
+    IrisAddend0 = Addend0.AsVECTOR3();
+    IrisAddend1 = Addend1.AsVECTOR3();
 
-    return Vector(Sum);
+    IrisSum = VectorAdd(IrisAddend0,IrisAddend1);
+
+    return Vector(IrisSum);
 }
 
-static inline Vector operator-(const Vector & Minuend, const Vector & Subtrahend)
+static inline Vector operator-(_In_ const Vector & Minuend, _In_ const Vector & Subtrahend)
 {
-    VECTOR3 Difference;
+    VECTOR3 IrisDifference;
+    VECTOR3 IrisMinuend;
+    VECTOR3 IrisSubtrahend;
 
-    Difference = VectorSubtract(Minuend.Data, Subtrahend.Data);
+    IrisMinuend = Minuend.AsVECTOR3();
+    IrisSubtrahend = Subtrahend.AsVECTOR3();
 
-    return Vector(Difference);
+    IrisDifference = VectorSubtract(IrisMinuend, IrisSubtrahend);
+
+    return Vector(IrisDifference);
 }
 
-static inline Vector operator*(const Vector & ToScale, FLOAT Scalar)
+static inline Vector operator*(_In_ const Vector & ToScale, _In_ FLOAT Scalar)
 {
-    VECTOR3 Scaled;
+    VECTOR3 IrisScaled;
+    VECTOR3 IrisToScale;
 
-    Scaled = VectorScale(ToScale.Data, Scalar);
+    IrisToScale = ToScale.AsVECTOR3();
 
-    return Vector(Scaled);
+    IrisScaled = VectorScale(IrisToScale, Scalar);
+
+    return Vector(IrisScaled);
 }
+
+static
+inline
+Vector
+operator*(
+    _In_ const Matrix & Multiplicand0,
+    _In_ const Vector & Multiplicand1
+    )
+{
+    PCMATRIX IrisMultiplicand0;
+    VECTOR3 IrisMultiplicand1;
+    VECTOR3 IrisResult;
+
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
+    IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
+
+    IrisResult = VectorMatrixMultiply(IrisMultiplicand0,
+                                      IrisMultiplicand1);
+
+    return Vector(IrisResult);
+}
+
+} // namespace Iris
 
 #endif // _VECTOR_IRIS_PLUS_PLUS_

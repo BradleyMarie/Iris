@@ -701,7 +701,7 @@ MatrixAllocateRotation(
 _Check_return_
 _Ret_opt_
 PMATRIX
-MatrixAllocateFrustum(
+MatrixAllocateOrthographic(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
@@ -737,9 +737,9 @@ MatrixAllocateFrustum(
     Ty = -(Top + Bottom) / (Top - Bottom);
     Tz = -(Far + Near) / (Far - Near);
 
-    Sx = (FLOAT)2.0 / (Right - Left);
-    Sy = (FLOAT)2.0 / (Top - Bottom);
-    Sz = (FLOAT)-2.0 / (Far - Near);
+    Sx = (FLOAT) 2.0 / (Right - Left);
+    Sy = (FLOAT) 2.0 / (Top - Bottom);
+    Sz = (FLOAT) -2.0 / (Far - Near);
 
     Matrix = MatrixAllocate(Sx,
                             (FLOAT) 0.0,
@@ -764,7 +764,7 @@ MatrixAllocateFrustum(
 _Check_return_
 _Ret_opt_
 PMATRIX
-MatrixAllocateOrothographic(
+MatrixAllocateFrustum(
     _In_ FLOAT Left,
     _In_ FLOAT Right,
     _In_ FLOAT Bottom,
@@ -791,7 +791,8 @@ MatrixAllocateOrothographic(
         return NULL;
     }
 
-    if (Left == Right || Bottom == Top || Near == Far)
+    if (Left == Right || Bottom == Top || Near == Far || 
+        Near <= (FLOAT) 0.0 || Far <= (FLOAT) 0.0)
     {
         return NULL;
     }
