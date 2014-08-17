@@ -736,7 +736,7 @@ MatrixpAllocateRotation(
     ASSERT(IsFiniteFloat(Axis.Y) != FALSE);
     ASSERT(IsNormalFloat(Axis.Z) != FALSE);
     ASSERT(IsFiniteFloat(Axis.Z) != FALSE);
-    ASSERT(IsZeroFloat(Length) == FALSE);
+    ASSERT(IsZeroFloat(VectorLength(Axis)) == FALSE);
     ASSERT(Matrix != NULL);
 
     NormalizedAxis = VectorNormalize(Axis, NULL);

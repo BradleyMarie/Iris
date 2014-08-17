@@ -24,18 +24,25 @@ namespace Iris {
 // Types
 //
 
-class Ray
-{
+class Ray {
 public:
-    Ray(_In_ const Point & Origin, _In_ const Vector & Direction)
+    Ray(
+        _In_ const Point & Origin, 
+        _In_ const Vector & Direction
+        )
         : Data(RayCreate(Origin.AsPOINT3(), Direction.AsVECTOR3()))
     { }
 
-    Ray(_In_ RAY IrisRay)
+    Ray(
+        _In_ RAY IrisRay
+        )
         : Data(IrisRay)
     { }
 
-    Point Endpoint(_In_ FLOAT Distance) const
+    Point 
+    Endpoint(
+        _In_ FLOAT Distance
+        ) const
     {
         POINT3 IrisEndpoint;
 
@@ -44,22 +51,34 @@ public:
         return Point(IrisEndpoint);
     }
 
-    RAY AsRAY() const
+    RAY 
+    AsRAY(
+        void
+        ) const
     {
         return Data;
     }
 
-    Point Origin() const
+    Point
+    Origin(
+        void
+        ) const
     {
         return Point(Data.Origin);
     }
 
-    Vector Direction() const
+    Vector 
+    Direction(
+        void
+        ) const
     {
         return Vector(Data.Direction);
     }
 
-    bool Validate() const
+    bool 
+    Validate(
+        void
+        ) const
     {
         BOOL Valid;
 
@@ -68,7 +87,11 @@ public:
         return (Valid != FALSE) ? true : false;
     }
 
-    static Ray Normalize(_In_ const Ray & ToNormalize)
+    static 
+    Ray 
+    Normalize(
+        _In_ const Ray & ToNormalize
+        )
     {
         RAY IrisResult;
 

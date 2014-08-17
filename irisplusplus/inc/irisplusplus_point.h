@@ -24,18 +24,29 @@ namespace Iris {
 // Types
 //
 
-class Point
-{
+class Point {
 public:
-    Point(_In_ FLOAT X, _In_ FLOAT Y, _In_ FLOAT Z)
+    Point(
+        _In_ FLOAT X, 
+        _In_ FLOAT Y, 
+        _In_ FLOAT Z
+        )
         : Data(PointCreate(X, Y, Z))
     { }
 
-    Point(_In_ const POINT3 & IrisPoint)
+    Point(
+        _In_ const POINT3 & IrisPoint
+        )
         : Data(IrisPoint)
     { }
 
-    static Point AddScaled(_In_ const Point & Addend0, _In_ const Vector & Addend1, _In_ FLOAT Scalar)
+    static
+    Point
+    AddScaled(
+        _In_ const Point & Addend0, 
+        _In_ const Vector & Addend1, 
+        _In_ FLOAT Scalar
+        )
     {
         POINT3 IrisAddend0;
         VECTOR3 IrisAddend1;
@@ -44,12 +55,20 @@ public:
         IrisAddend0 = Addend0.AsPOINT3();
         IrisAddend1 = Addend1.AsVECTOR3();
 
-        IrisResult = PointVectorAddScaled(IrisAddend0, IrisAddend1, Scalar);
+        IrisResult = PointVectorAddScaled(IrisAddend0, 
+                                          IrisAddend1, 
+                                          Scalar);
 
         return Point(IrisResult);
     }
 
-    static Point SubtractScaled(_In_ const Point & Minuend, _In_ const Vector & Subtrahend, _In_ FLOAT Scalar)
+    static
+    Point
+    SubtractScaled(
+        _In_ const Point & Minuend, 
+        _In_ const Vector & Subtrahend, 
+        _In_ FLOAT Scalar
+        )
     {
         POINT3 IrisMinuend;
         VECTOR3 IrisSubtrahend;
@@ -58,7 +77,9 @@ public:
         IrisMinuend = Minuend.AsPOINT3();
         IrisSubtrahend = Subtrahend.AsVECTOR3();
 
-        IrisResult = PointVectorSubtractScaled(IrisMinuend, IrisSubtrahend, Scalar);
+        IrisResult = PointVectorSubtractScaled(IrisMinuend, 
+                                               IrisSubtrahend, 
+                                               Scalar);
 
         return Point(IrisResult);
     }
@@ -83,32 +104,50 @@ public:
         return Point(IrisResult);
     }
 
-    POINT3 AsPOINT3() const
+    POINT3
+    AsPOINT3(
+        void
+        ) const
     {
         return Data;
     }
 
-    PCPOINT3 AsPCPOINT3() const
+    PCPOINT3 
+    AsPCPOINT3(
+        void
+        ) const
     {
         return &Data;
     }
 
-    FLOAT X() const
+    FLOAT 
+    X(
+        void
+        ) const
     {
         return Data.X;
     }
 
-    FLOAT Y() const
+    FLOAT 
+    Y(
+        void
+        ) const
     {
         return Data.Y;
     }
 
-    FLOAT Z() const
+    FLOAT 
+    Z(
+        void
+        ) const
     {
         return Data.Z;
     }
 
-    bool Validate() const
+    bool 
+    Validate(
+        void
+        ) const
     {
         BOOL Valid;
 
@@ -125,7 +164,13 @@ private:
 // Functions
 //
 
-static inline Point operator+(_In_ const Point & Addend0, _In_ const Vector & Addend1)
+static 
+inline 
+Point 
+operator+(
+    _In_ const Point & Addend0, 
+    _In_ const Vector & Addend1
+    )
 {
     POINT3 IrisAddend0;
     VECTOR3 IrisAddend1;
@@ -139,7 +184,13 @@ static inline Point operator+(_In_ const Point & Addend0, _In_ const Vector & Ad
     return Point(IrisResult);
 }
 
-static inline Point operator-(_In_ const Point & Minuend, _In_ const Vector & Subtrahend)
+static
+inline
+Point 
+operator-(
+    _In_ const Point & Minuend, 
+    _In_ const Vector & Subtrahend
+    )
 {
     POINT3 IrisMinuend;
     VECTOR3 IrisSubtrahend;

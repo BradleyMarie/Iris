@@ -24,8 +24,7 @@ namespace Iris {
 // Types
 //
 
-class Matrix
-{
+class Matrix {
 private: 
     Matrix(
         _In_ PMATRIX IrisMatrix
@@ -380,7 +379,7 @@ public:
     static 
     Matrix
     Identity(
-        VOID
+        void
         )
     {
         return Matrix(NULL);
@@ -388,7 +387,7 @@ public:
 
     PMATRIX
     AsPMATRIX(
-        VOID
+        void
         )
     {
         return Data;
@@ -396,7 +395,7 @@ public:
 
     PCMATRIX
     AsPCMATRIX(
-        VOID
+        void
         ) const
     {
         return Data;
@@ -404,7 +403,7 @@ public:
 
     Matrix
     Inverse(
-        VOID
+        void
         )
     {
         PMATRIX IrisMatrix;
@@ -414,7 +413,7 @@ public:
         return Matrix(IrisMatrix);
     }
 
-    VOID
+    void
     ReadContents(
         _Out_writes_(4) FLOAT Contents[4][4]
         )
@@ -472,7 +471,9 @@ public:
         return *this;
     }
 
-    ~Matrix()
+    ~Matrix(
+        void
+        )
     {
         MatrixDereference(Data);
     }

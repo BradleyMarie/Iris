@@ -30,18 +30,24 @@ enum class VectorAxis : VECTOR_AXIS {
     Z = VECTOR_Z_AXIS
 };
 
-class Vector
-{
+class Vector {
 public:
-    Vector(_In_ FLOAT X, _In_ FLOAT Y, _In_ FLOAT Z)
+    Vector(
+        _In_ FLOAT X, 
+        _In_ FLOAT Y, 
+        _In_ FLOAT Z
+        )
         : Data(VectorCreate(X, Y, Z))
     { }
 
-    Vector(_In_ const VECTOR3 & IrisVector)
+    Vector(
+        _In_ const VECTOR3 & IrisVector
+        )
         : Data(IrisVector)
     { }
 
-    Vector operator-() const
+    Vector 
+    operator-() const
     {
         VECTOR3 Negated;
 
@@ -50,32 +56,51 @@ public:
         return Vector(Negated);
     }
 
-    VECTOR3 AsVECTOR3() const
+    VECTOR3 
+    AsVECTOR3(
+        void
+        ) const
     {
         return Data;
     }
 
-    PCVECTOR3 AsPCVECTOR3() const
+    PCVECTOR3 
+    AsPCVECTOR3(
+        void
+        ) const
     {
         return &Data;
     }
 
-    FLOAT Length() const
+    FLOAT 
+    Length(
+        void
+        ) const
     {
         return VectorLength(Data);
     }
 
-    VectorAxis DominantAxis()
+    VectorAxis 
+    DominantAxis(
+        void
+        )
     {
         return VectorAxis(VectorDominantAxis(Data));
     }
 
-    VectorAxis DiminishedAxis()
+    VectorAxis 
+    DiminishedAxis(
+        void
+        )
     {
         return VectorAxis(VectorDiminishedAxis(Data));
     }
 
-    static Vector Normalize(const Vector & ToNormalize)
+    static 
+    Vector 
+    Normalize(
+        const Vector & ToNormalize
+        )
     {
         VECTOR3 Normalized;
 
@@ -84,7 +109,11 @@ public:
         return Vector(Normalized);
     }
 
-    static std::pair<Vector, FLOAT> NormalizeWithLength(_In_ const Vector & ToNormalize)
+    static 
+    std::pair<Vector, FLOAT> 
+    NormalizeWithLength(
+        _In_ const Vector & ToNormalize
+        )
     {
         VECTOR3 Normalized;
         FLOAT OldLength;
@@ -94,12 +123,22 @@ public:
         return std::make_pair(Vector(Normalized), OldLength);
     }
 
-    static FLOAT DotProduct(_In_ const Vector & Operand0, _In_ const Vector & Operand1)
+    static 
+    FLOAT 
+    DotProduct(
+        _In_ const Vector & Operand0, 
+        _In_ const Vector & Operand1
+        )
     {
         return VectorDotProduct(Operand0.Data, Operand1.Data);
     }
 
-    static Vector CrossProduct(_In_ const Vector & Operand0, _In_ const Vector & Operand1)
+    static 
+    Vector 
+    CrossProduct(
+        _In_ const Vector & Operand0, 
+        _In_ const Vector & Operand1
+        )
     {
         VECTOR3 Product;
 
@@ -108,7 +147,13 @@ public:
         return Vector(Product);
     }
 
-    static Vector Fma(_In_ const Vector & Addend0, _In_ const Vector & Addend1, _In_ FLOAT Scalar)
+    static 
+    Vector 
+    Fma(
+        _In_ const Vector & Addend0, 
+        _In_ const Vector & Addend1, 
+        _In_ FLOAT Scalar
+        )
     {
         VECTOR3 Sum;
 
@@ -117,7 +162,12 @@ public:
         return Vector(Sum);
     }
 
-    static Vector Reflect(_In_ const Vector & Vec, _In_ const Vector & Normal)
+    static 
+    Vector 
+    Reflect(
+        _In_ const Vector & Vec, 
+        _In_ const Vector & Normal
+        )
     {
         VECTOR3 Reflected;
 
@@ -126,7 +176,12 @@ public:
         return Vector(Reflected);
     }
 
-    static Vector HalfAngle(_In_ const Vector & Vector0, _In_ const Vector & Vector1)
+    static 
+    Vector 
+    HalfAngle(
+        _In_ const Vector & Vector0, 
+        _In_ const Vector & Vector1
+        )
     {
         VECTOR3 HalfAngle;
 
@@ -195,22 +250,34 @@ public:
         return Vector(IrisResult);
     }
 
-    FLOAT X() const
+    FLOAT 
+    X(
+        void
+        ) const
     {
         return Data.X;
     }
 
-    FLOAT Y() const
+    FLOAT 
+    Y(
+        void
+        ) const
     {
         return Data.Y;
     }
 
-    FLOAT Z() const
+    FLOAT 
+    Z(
+        void
+        ) const
     {
         return Data.Z;
     }
 
-    bool Validate() const
+    bool 
+    Validate(
+        void
+        ) const
     {
         BOOL Valid;
 
@@ -227,7 +294,13 @@ private:
 // Functions
 //
 
-static inline Vector operator+(_In_ const Vector & Addend0, _In_ const Vector & Addend1)
+static 
+inline 
+Vector 
+operator+(
+    _In_ const Vector & Addend0, 
+    _In_ const Vector & Addend1
+    )
 {
     VECTOR3 IrisAddend0;
     VECTOR3 IrisAddend1;
@@ -241,7 +314,13 @@ static inline Vector operator+(_In_ const Vector & Addend0, _In_ const Vector & 
     return Vector(IrisSum);
 }
 
-static inline Vector operator-(_In_ const Vector & Minuend, _In_ const Vector & Subtrahend)
+static 
+inline 
+Vector 
+operator-(
+    _In_ const Vector & Minuend, 
+    _In_ const Vector & Subtrahend
+    )
 {
     VECTOR3 IrisDifference;
     VECTOR3 IrisMinuend;
@@ -255,7 +334,13 @@ static inline Vector operator-(_In_ const Vector & Minuend, _In_ const Vector & 
     return Vector(IrisDifference);
 }
 
-static inline Vector operator*(_In_ const Vector & ToScale, _In_ FLOAT Scalar)
+static 
+inline 
+Vector 
+operator*(
+    _In_ const Vector & ToScale, 
+    _In_ FLOAT Scalar
+    )
 {
     VECTOR3 IrisScaled;
     VECTOR3 IrisToScale;
