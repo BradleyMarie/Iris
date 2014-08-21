@@ -23,8 +23,8 @@ namespace Iris {
 
 _Check_return_ 
 _Ret_opt_
-PCTEXTURE
 static
+PCTEXTURE
 ShapeGetTexture(
     _In_opt_ PCVOID Context,
     _In_ UINT32 FaceHit
@@ -36,8 +36,8 @@ ShapeGetTexture(
 
 _Check_return_
 _Ret_opt_
-PCNORMAL
 static
+PCNORMAL
 ShapeGetNormal(
     _In_opt_ PCVOID Context,
     _In_ UINT32 FaceHit
@@ -47,12 +47,22 @@ ShapeGetNormal(
     return ShapePointer->GetNormal(FaceHit);
 }
 
+static
+VOID
+ShapeFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    const Shape *ShapePointer = static_cast<const Shape*>(Context);
+    delete ShapePointer;
+}
+
 //
 // Static Variables
 //
 
 const static DRAWING_SHAPE_VTABLE InteropVTable = {
-    { NULL, NULL },
+    { NULL, ShapeFree },
     ShapeGetTexture,
     ShapeGetNormal
 };
@@ -89,7 +99,16 @@ Shape::Shape(
 : Data(DrawingShape)
 { }
 
-Shape::~Shape(
+void
+Shape::Reference(
+    void
+    )
+{
+    DrawingShapeReference(Data);
+}
+
+void 
+Shape::Dereference(
     void
     )
 {

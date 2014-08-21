@@ -30,20 +30,20 @@ enum class VectorAxis : VECTOR_AXIS {
     Z = VECTOR_Z_AXIS
 };
 
-class Vector {
+class Vector final {
 public:
     Vector(
         _In_ FLOAT X, 
         _In_ FLOAT Y, 
         _In_ FLOAT Z
         )
-        : Data(VectorCreate(X, Y, Z))
+    : Data(VectorCreate(X, Y, Z))
     { }
 
     Vector(
         _In_ const VECTOR3 & IrisVector
         )
-        : Data(IrisVector)
+    : Data(IrisVector)
     { }
 
     Vector 

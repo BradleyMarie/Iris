@@ -24,12 +24,12 @@ namespace Iris {
 // Types
 //
 
-class Matrix {
+class Matrix final {
 private: 
     Matrix(
         _In_ PMATRIX IrisMatrix
         )
-        : Data(IrisMatrix)
+    : Data(IrisMatrix)
     { }
 
 public:
@@ -152,7 +152,7 @@ public:
     Matrix(
         const Matrix & ToCopy
         )
-        : Data(ToCopy.Data)
+    : Data(ToCopy.Data)
     {
         MatrixReference(Data);
     }    

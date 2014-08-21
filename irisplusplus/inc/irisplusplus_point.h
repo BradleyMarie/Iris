@@ -24,20 +24,20 @@ namespace Iris {
 // Types
 //
 
-class Point {
+class Point final {
 public:
     Point(
         _In_ FLOAT X, 
         _In_ FLOAT Y, 
         _In_ FLOAT Z
         )
-        : Data(PointCreate(X, Y, Z))
+    : Data(PointCreate(X, Y, Z))
     { }
 
     Point(
         _In_ const POINT3 & IrisPoint
         )
-        : Data(IrisPoint)
+    : Data(IrisPoint)
     { }
 
     static

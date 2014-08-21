@@ -24,19 +24,19 @@ namespace Iris {
 // Types
 //
 
-class Ray {
+class Ray final {
 public:
     Ray(
         _In_ const Point & Origin, 
         _In_ const Vector & Direction
         )
-        : Data(RayCreate(Origin.AsPOINT3(), Direction.AsVECTOR3()))
+    : Data(RayCreate(Origin.AsPOINT3(), Direction.AsVECTOR3()))
     { }
 
     Ray(
         _In_ RAY IrisRay
         )
-        : Data(IrisRay)
+    : Data(IrisRay)
     { }
 
     Point 

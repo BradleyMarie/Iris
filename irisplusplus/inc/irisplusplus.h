@@ -40,6 +40,7 @@ extern "C" {
 #include "irisplusplus_vector.h"
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"
+#include "irisplusplus_irispointer.h"
 #include "irisplusplus_shape.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

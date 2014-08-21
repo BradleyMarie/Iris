@@ -56,11 +56,11 @@ public:
         _In_ UINT32 FaceHit
         ) const = 0;
 
-    IRISPLUSPLUSAPI
     virtual
     ~Shape(
         void
-        );
+        )
+    { }
 
 private:
     PDRAWING_SHAPE Data;
@@ -70,37 +70,35 @@ private:
         _In_ PDRAWING_SHAPE DrawingShape
         );
 
-    _Check_return_ 
-    _Ret_opt_
-    friend
-    PCTEXTURE
-    ShapeGetTexture(
-        _In_opt_ PCVOID Context,
-        _In_ UINT32 FaceHit
+    IRISPLUSPLUSAPI
+    void
+    Reference(
+        void
         );
 
-    _Check_return_
-    _Ret_opt_
-    friend
-    PCNORMAL
-    ShapeGetNormal(
-        _In_opt_ PCVOID Context,
-        _In_ UINT32 FaceHit
+    IRISPLUSPLUSAPI
+    void 
+    Dereference(
+        void
         );
 
+    friend class IrisPointer<Shape>;
     friend class CShape;
 };
 
 class CShape : public Shape {
-public:
+protected:
     CShape(
         _In_ PDRAWING_SHAPE DrawingShape
         );
+
+public:
 
     _Check_return_
     _Ret_opt_
     IRISPLUSPLUSAPI
     PCTEXTURE
+    final
     virtual
     GetTexture(
         _In_ UINT32 FaceHit
@@ -110,6 +108,7 @@ public:
     _Ret_opt_
     IRISPLUSPLUSAPI
     PCNORMAL
+    final
     virtual
     GetNormal(
         _In_ UINT32 FaceHit
