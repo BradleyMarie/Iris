@@ -146,4 +146,13 @@ CShape::GetNormal(
     return DrawingShapeGetNormal(Data, FaceHit);
 }
 
+IrisPointer<Shape>
+CShape::Create(
+    _In_ PDRAWING_SHAPE DrawingShape
+    )
+{
+    CShape* Allocated = new CShape(DrawingShape);
+    return IrisPointer<Shape>(Allocated);
+}
+
 } // namespace Iris

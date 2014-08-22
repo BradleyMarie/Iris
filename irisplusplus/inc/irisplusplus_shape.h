@@ -42,16 +42,16 @@ public:
 
     _Check_return_
     _Ret_opt_
-    PCTEXTURE
     virtual
+    PCTEXTURE
     GetTexture(
         _In_ UINT32 FaceHit
         ) const = 0;
 
     _Check_return_
     _Ret_opt_
-    PCNORMAL
     virtual
+    PCNORMAL
     GetNormal(
         _In_ UINT32 FaceHit
         ) const = 0;
@@ -86,20 +86,26 @@ private:
     friend class CShape;
 };
 
-class CShape : public Shape {
-protected:
+class CShape final : public Shape {
+private:
     CShape(
         _In_ PDRAWING_SHAPE DrawingShape
         );
 
 public:
 
+    IRISPLUSPLUSAPI
+    static
+    IrisPointer<Shape>
+    Create(
+        _In_ PDRAWING_SHAPE DrawingShape
+        );
+
     _Check_return_
     _Ret_opt_
     IRISPLUSPLUSAPI
-    PCTEXTURE
-    final
     virtual
+    PCTEXTURE
     GetTexture(
         _In_ UINT32 FaceHit
         ) const;
@@ -107,9 +113,8 @@ public:
     _Check_return_
     _Ret_opt_
     IRISPLUSPLUSAPI
-    PCNORMAL
-    final
     virtual
+    PCNORMAL
     GetNormal(
         _In_ UINT32 FaceHit
         ) const;

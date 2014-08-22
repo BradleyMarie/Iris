@@ -47,16 +47,16 @@ public:
         Data->Reference();
     }
 
-    const T*
-    GetPointer(
+    T &
+    operator*(
         void
         ) const
     {
-        return Data;
+        return *Data;
     }
 
-    T*
-    GetPointer(
+    T *
+    operator->(
         void
         ) const
     {
