@@ -33,12 +33,6 @@ typedef SHAPE_HIT ShapeHit;
 
 class ShapeHitAllocator {
 public:
-    ShapeHitAllocator(
-        _In_ PSHAPE_HIT_ALLOCATOR HitAllocator
-        )
-    : Data(HitAllocator)
-    { }
-    
     _Ret_
     ShapeHitList *
     Allocate(
@@ -122,6 +116,12 @@ public:
 private:
     PSHAPE_HIT_ALLOCATOR Data;
 
+    ShapeHitAllocator(
+        _In_ PSHAPE_HIT_ALLOCATOR HitAllocator
+        )
+    : Data(HitAllocator)
+    { }
+
     _Ret_
     IRISPLUSPLUSAPI
     ShapeHitList *
@@ -143,6 +143,17 @@ private:
         _In_ POINT3 & HitPoint,
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes
+        );
+    
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    friend
+    ISTATUS 
+    ShapeTrace(
+        _In_opt_ PCVOID Context, 
+        _In_ RAY Ray,
+        _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
+        _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
         );
 };
 
