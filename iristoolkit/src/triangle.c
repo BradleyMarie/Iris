@@ -100,13 +100,14 @@ TriangleTraceTriangle(
     )
 {
     BARYCENTRIC_COORDINATES BarycentricCoordinates;
-    PCTRIANGLE Triangle;
-    FLOAT DotProduct;
     FLOAT Distance;
-    VECTOR3 Temp;
-    POINT3 Hit;
+    FLOAT DotProduct;
     INT32 Face;
+    POINT3 Hit;
     VECTOR3 P;
+    ISTATUS Status;
+    VECTOR3 Temp;
+    PCTRIANGLE Triangle;
 
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
@@ -192,15 +193,16 @@ TriangleTraceTriangle(
 
     Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
 
-    *ShapeHitList = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
-                                                          NULL,
-                                                          Distance,
-                                                          Face,
-                                                          &BarycentricCoordinates,
-                                                          sizeof(BARYCENTRIC_COORDINATES),
-                                                          Hit);
+    Status = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
+                                                   NULL,
+                                                   Distance,
+                                                   Face,
+                                                   &BarycentricCoordinates,
+                                                   sizeof(BARYCENTRIC_COORDINATES),
+                                                   Hit,
+                                                   ShapeHitList);
 
-    return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
+    return Status;
 }
 
 STATIC
@@ -248,10 +250,10 @@ TriangleInitialize(
     _Out_opt_ PVECTOR3 FrontFaceSurfaceNormal 
     )
 {
-    FLOAT CrossProductLength;
-    VECTOR3 CrossProduct;
     VECTOR3 B;
     VECTOR3 C;
+    VECTOR3 CrossProduct;
+    FLOAT CrossProductLength;
 
     if (PointValidate(Vertex0) == FALSE ||
         PointValidate(Vertex1) == FALSE ||
@@ -314,8 +316,8 @@ TriangleAllocate(
     )
 {
     PDRAWING_SHAPE DrawingShape;
-    TRIANGLE Triangle;
     ISTATUS Status;
+    TRIANGLE Triangle;
 
     //
     // Argument verification done by TriangleInitialize
@@ -368,12 +370,12 @@ FlatTriangleAllocate(
     _Out_opt_ PNORMAL *BackNormal
     )
 {
-    PDRAWING_SHAPE DrawingShape;
-    PNORMAL AllocatedFrontNormal;
     PNORMAL AllocatedBackNormal;
+    PNORMAL AllocatedFrontNormal;
+    PDRAWING_SHAPE DrawingShape;
     VECTOR3 FrontSurfaceNormal;
-    TRIANGLE Triangle;
     ISTATUS Status;
+    TRIANGLE Triangle;
 
     //
     // Argument verification done by TriangleInitialize

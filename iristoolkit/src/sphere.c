@@ -95,15 +95,16 @@ SphereTraceSphere(
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    FLOAT NegatedScalarProjectionOriginToCenterOntoRay;
-    FLOAT ScalarProjectionOriginToCenterOntoRay;
-    FLOAT LengthSquaredCenterToOrigin;
     VECTOR3 CenterToRayOrigin;
-    FLOAT LengthOfRaySquared;
     FLOAT Discriminant;
     FLOAT Distance0;
-    PCSPHERE Sphere;
     UINT32 Face0;
+    FLOAT LengthOfRaySquared;
+    FLOAT LengthSquaredCenterToOrigin;
+    FLOAT NegatedScalarProjectionOriginToCenterOntoRay;
+    FLOAT ScalarProjectionOriginToCenterOntoRay;
+    PCSPHERE Sphere;
+    ISTATUS Status;
 
 #if defined(ENABLE_CSG_SUPPORT)
 
@@ -186,16 +187,17 @@ SphereTraceSphere(
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
-    *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                              NULL,
-                                              Distance0,
-                                              Face0,
-                                              NULL,
-                                              0);
+    Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
+                                       NULL,
+                                       Distance0,
+                                       Face0,
+                                       NULL,
+                                       0,
+                                       ShapeHitList);
 
-    if (*ShapeHitList == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
     }
 
 #if defined(ENABLE_CSG_SUPPORT)
@@ -203,16 +205,17 @@ SphereTraceSphere(
     Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
                 LengthOfRaySquared;
 
-    *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                              *ShapeHitList,
-                                              Distance1,
-                                              Face1,
-                                              NULL,
-                                              0);
+    Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
+                                       *ShapeHitList,
+                                       Distance1,
+                                       Face1,
+                                       NULL,
+                                       0,
+                                       ShapeHitList);
 
-    if (*ShapeHitList == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
     }
 
 #endif // defined(ENABLE_CSG_SUPPORT)

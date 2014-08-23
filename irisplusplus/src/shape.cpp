@@ -21,6 +21,28 @@ namespace Iris {
 // Static Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS 
+ShapeTrace(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
+    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    )
+{
+    assert(Context != NULL);
+    assert(IrisHitAllocator != NULL);
+    assert(ShapeHitList != NULL);
+
+    ShapeHitAllocator HitAllocator(IrisHitAllocator);
+
+    const Shape *ShapePointer = static_cast<const Shape*>(Context);
+    *ShapeHitList = ShapePointer->Trace(Ray, HitAllocator);
+    return ISTATUS_SUCCESS;
+}
+
 _Check_return_ 
 _Ret_opt_
 static
@@ -30,6 +52,8 @@ ShapeGetTexture(
     _In_ UINT32 FaceHit
     )
 {
+    assert(Context != NULL);
+
     const Shape *ShapePointer = static_cast<const Shape*>(Context);
     return ShapePointer->GetTexture(FaceHit);
 }
@@ -43,6 +67,8 @@ ShapeGetNormal(
     _In_ UINT32 FaceHit
     )
 {
+    assert(Context != NULL);
+
     const Shape *ShapePointer = static_cast<const Shape*>(Context);
     return ShapePointer->GetNormal(FaceHit);
 }
@@ -53,6 +79,8 @@ ShapeFree(
     _In_ _Post_invalid_ PVOID Context
     )
 {
+    assert(Context != NULL);
+
     const Shape *ShapePointer = static_cast<const Shape*>(Context);
     delete ShapePointer;
 }
@@ -124,6 +152,16 @@ CShape::CShape(
     {
         throw std::invalid_argument("DrawingShape");
     }
+}
+
+_Ret_
+ShapeHitList *
+CShape::Trace(
+    _In_ Ray ModelRay,
+    _Inout_ ShapeHitAllocator & HitAllocator
+    ) const
+{
+    throw std::logic_error("Impossible Path");
 }
 
 _Check_return_

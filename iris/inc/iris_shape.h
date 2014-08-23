@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
+#include <iris.h>
+
 #ifndef _IRIS_SHAPE_
 #define _IRIS_SHAPE_
-
-#include <iris.h>
 
 //
 // Types

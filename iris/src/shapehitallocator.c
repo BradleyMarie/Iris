@@ -15,9 +15,9 @@ Abstract:
 #include <irisp.h>
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
-PSHAPE_HIT_LIST
+ISTATUS
 ShapeHitAllocatorAllocateInternal(
     _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
     _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
@@ -25,7 +25,8 @@ ShapeHitAllocatorAllocateInternal(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
-    _In_opt_ PPOINT3 ModelHitPoint
+    _In_opt_ PPOINT3 ModelHitPoint,
+    _Out_ PSHAPE_HIT_LIST *OutputShapeHitList
     )
 {
     PSHAPE_HIT_ALLOCATOR_ALLOCATION ShapeHitAllocatorAllocation;
@@ -36,12 +37,24 @@ ShapeHitAllocatorAllocateInternal(
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
-    if (Allocator == NULL ||
-        IsNormalFloat(Distance) == FALSE || IsFiniteFloat(Distance) == FALSE ||
-        (AdditionalData == NULL && AdditionalDataSizeInBytes != 0))
+    if (Allocator == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
+
+    if (IsNormalFloat(Distance) == FALSE ||
+        IsFiniteFloat(Distance) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (AdditionalData == NULL &&
+        AdditionalDataSizeInBytes != 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    ASSERT(OutputShapeHitList != NULL);
 
     ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
@@ -49,7 +62,7 @@ ShapeHitAllocatorAllocateInternal(
 
     if (Allocation == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
@@ -68,7 +81,7 @@ ShapeHitAllocatorAllocateInternal(
         if (Allocation == NULL)
         {
             IrisStaticMemoryAllocatorFreeLastAllocation(ShapeHitAllocator);
-            return NULL;
+            return ISTATUS_ALLOCATION_FAILED;
         }
 
         memcpy(Allocation, AdditionalData, AdditionalDataSizeInBytes);
@@ -97,37 +110,46 @@ ShapeHitAllocatorAllocateInternal(
     ShapeHitList->NextShapeHit = NextShapeHit;
     ShapeHitList->ShapeHit = ShapeHit;
 
-    return ShapeHitList;
+    *OutputShapeHitList = ShapeHitList;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
-_Ret_opt_
-PSHAPE_HIT_LIST
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 ShapeHitAllocatorAllocate(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSizeInBytes
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _Out_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    PSHAPE_HIT_LIST ShapeHitList;
+    ISTATUS Status;
 
-    ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
-                                                     NextShapeHit,
-                                                     Distance,
-                                                     FaceHit,
-                                                     AdditionalData,
-                                                     AdditionalDataSizeInBytes,
-                                                     NULL);
+    if (ShapeHitList == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
 
-    return ShapeHitList;
+    Status = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
+                                               NextShapeHit,
+                                               Distance,
+                                               FaceHit,
+                                               AdditionalData,
+                                               AdditionalDataSizeInBytes,
+                                               NULL,
+                                               ShapeHitList);
+
+    return Status;
 }
 
 _Check_return_
-_Ret_opt_
-PSHAPE_HIT_LIST
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 ShapeHitAllocatorAllocateWithHitPoint(
     _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
     _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
@@ -135,18 +157,25 @@ ShapeHitAllocatorAllocateWithHitPoint(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
-    _In_ POINT3 HitPoint
+    _In_ POINT3 HitPoint,
+    _Out_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    PSHAPE_HIT_LIST ShapeHitList;
+    ISTATUS Status;
 
-    ShapeHitList = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
-                                                     NextShapeHit,
-                                                     Distance,
-                                                     FaceHit,
-                                                     AdditionalData,
-                                                     AdditionalDataSizeInBytes,
-                                                     &HitPoint);
+    if (ShapeHitList == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
 
-    return ShapeHitList;
+    Status = ShapeHitAllocatorAllocateInternal(ShapeHitAllocator,
+                                               NextShapeHit,
+                                               Distance,
+                                               FaceHit,
+                                               AdditionalData,
+                                               AdditionalDataSizeInBytes,
+                                               &HitPoint,
+                                               ShapeHitList);
+
+    return Status;
 }

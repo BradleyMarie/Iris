@@ -40,6 +40,14 @@ public:
         return Data;
     }
 
+    _Ret_
+    virtual
+    ShapeHitList *
+    Trace(
+        _In_ Ray ModelRay,
+        _Inout_ ShapeHitAllocator & HitAllocator
+        ) const = 0;
+
     _Check_return_
     _Ret_opt_
     virtual
@@ -100,6 +108,15 @@ public:
     Create(
         _In_ PDRAWING_SHAPE DrawingShape
         );
+
+    _Ret_
+    IRISPLUSPLUSAPI
+    virtual
+    ShapeHitList *
+    Trace(
+        _In_ Ray ModelRay,
+        _Inout_ ShapeHitAllocator & HitAllocator
+        ) const;
 
     _Check_return_
     _Ret_opt_

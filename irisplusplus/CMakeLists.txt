@@ -8,7 +8,8 @@ include_directories(../iris/inc
 
 add_library(irisplusplus SHARED
     src/shape.cpp
-    src/matrix.cpp)
+    src/matrix.cpp
+    src/shapehitallocator.cpp)
 
 target_link_libraries(irisplusplus
     iristoolkit 

@@ -95,9 +95,10 @@ InfinitePlaneTraceInfinitePlane(
     _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
-    PCINFINITE_PLANE InfinitePlane;
-    FLOAT DotProduct;
     FLOAT Distance;
+    FLOAT DotProduct;
+    PCINFINITE_PLANE InfinitePlane;
+    ISTATUS Status;
     VECTOR3 Temp;
 
     ASSERT(ShapeHitAllocator != NULL);
@@ -119,24 +120,26 @@ InfinitePlaneTraceInfinitePlane(
 
     if (DotProduct < (FLOAT) 0.0)
     {
-        *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                                  NULL,
-                                                  Distance,
-                                                  INFINITE_PLANE_FRONT_FACE,
-                                                  NULL,
-                                                  0);
+        Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
+                                           NULL,
+                                           Distance,
+                                           INFINITE_PLANE_FRONT_FACE,
+                                           NULL,
+                                           0,
+                                           ShapeHitList);
     }
     else
     {
-        *ShapeHitList = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                                  NULL,
-                                                  Distance,
-                                                  INFINITE_PLANE_BACK_FACE,
-                                                  NULL,
-                                                  0);
+        Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
+                                           NULL,
+                                           Distance,
+                                           INFINITE_PLANE_BACK_FACE,
+                                           NULL,
+                                           0,
+                                           ShapeHitList);
     }
 
-    return (*ShapeHitList == NULL) ? ISTATUS_ALLOCATION_FAILED : ISTATUS_SUCCESS;
+    return Status;
 }
 
 STATIC
@@ -182,8 +185,8 @@ InfinitePlaneAllocate(
     _In_opt_ PNORMAL BackNormal
     )
 {
-    INFINITE_PLANE InfinitePlane;
     PDRAWING_SHAPE DrawingShape;
+    INFINITE_PLANE InfinitePlane;
 
     if (PointValidate(Vertex) == FALSE ||
         VectorValidate(SurfaceNormal) == FALSE)
