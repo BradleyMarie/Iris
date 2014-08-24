@@ -32,6 +32,7 @@ protected:
         );
 
 public:
+    _Ret_
     PDRAWING_SHAPE
     AsPDRAWING_SHAPE(
         void
@@ -42,7 +43,7 @@ public:
 
     _Ret_
     virtual
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Trace(
         _In_ Ray ModelRay,
         _Inout_ ShapeHitAllocator & HitAllocator
@@ -79,12 +80,14 @@ private:
         );
 
     IRISPLUSPLUSAPI
+    virtual
     void
     Reference(
         void
         );
 
     IRISPLUSPLUSAPI
+    virtual
     void 
     Dereference(
         void
@@ -95,13 +98,7 @@ private:
 };
 
 class CShape final : public Shape {
-private:
-    CShape(
-        _In_ PDRAWING_SHAPE DrawingShape
-        );
-
 public:
-
     IRISPLUSPLUSAPI
     static
     IrisPointer<Shape>
@@ -112,7 +109,7 @@ public:
     _Ret_
     IRISPLUSPLUSAPI
     virtual
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Trace(
         _In_ Ray ModelRay,
         _Inout_ ShapeHitAllocator & HitAllocator
@@ -135,6 +132,27 @@ public:
     GetNormal(
         _In_ UINT32 FaceHit
         ) const;
+
+    IRISPLUSPLUSAPI
+    virtual
+    void
+    Reference(
+        void
+        );
+
+    IRISPLUSPLUSAPI
+    virtual
+    void 
+    Dereference(
+        void
+        );
+
+private:
+    CShape(
+        _In_ PDRAWING_SHAPE DrawingShape
+        );
+
+    size_t References;
 };
 
 } // namespace Iris

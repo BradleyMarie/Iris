@@ -21,22 +21,15 @@ Abstract:
 namespace Iris {
 
 //
-// Typedefs
-//
-
-typedef SHAPE_HIT_LIST ShapeHitList;
-typedef SHAPE_HIT ShapeHit;
-
-//
 // Types
 //
 
 class ShapeHitAllocator {
 public:
     _Ret_
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const Point & HitPoint
@@ -44,21 +37,21 @@ public:
     {
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
-        ShapeHitList * Output = Allocate(NextShapeHit,
-                                         Distance,
-                                         FaceHit,
-                                         IrisHitPoint,
-                                         NULL,
-                                         0);
+        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
+                                          Distance,
+                                          FaceHit,
+                                          IrisHitPoint,
+                                          NULL,
+                                          0);
 
         return Output;
     }
 
     template<typename T>
     _Ret_
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const Point & HitPoint,
@@ -67,48 +60,48 @@ public:
     {
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
-        ShapeHitList * Output = Allocate(NextShapeHit,
-                                         Distance,
-                                         FaceHit,
-                                         IrisHitPoint,
-                                         static_cast<PCVOID>(AdditionalData),
-                                         sizeof(T));
+        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
+                                          Distance,
+                                          FaceHit,
+                                          IrisHitPoint,
+                                          static_cast<PCVOID>(AdditionalData),
+                                          sizeof(T));
 
         return Output;
     }
 
     _Ret_
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit
         )
     {
-        ShapeHitList * Output = Allocate(NextShapeHit,
-                                         Distance,
-                                         FaceHit,
-                                         NULL,
-                                         0);
+        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
+                                          Distance,
+                                          FaceHit,
+                                          NULL,
+                                          0);
 
         return Output;
     }
 
     template<typename T>
     _Ret_
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const T & AdditionalData
         )
     {
-        ShapeHitList * Output = Allocate(NextShapeHit,
-                                         Distance,
-                                         FaceHit,
-                                         static_cast<PCVOID>(AdditionalData),
-                                         sizeof(T));
+        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
+                                          Distance,
+                                          FaceHit,
+                                          static_cast<PCVOID>(AdditionalData),
+                                          sizeof(T));
 
         return Output;
     }
@@ -124,9 +117,9 @@ private:
 
     _Ret_
     IRISPLUSPLUSAPI
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,    
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -135,9 +128,9 @@ private:
 
     _Ret_
     IRISPLUSPLUSAPI
-    ShapeHitList *
+    PSHAPE_HIT_LIST
     Allocate(
-        _In_opt_ ShapeHitList * NextShapeHit,
+        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ POINT3 & HitPoint,

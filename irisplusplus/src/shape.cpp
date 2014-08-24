@@ -103,15 +103,12 @@ Shape::Shape(
     void
     )
 {
-    PDRAWING_SHAPE DrawingShape;
-    Shape *ShapePointer;
+    Shape *ShapePointer = this;
 
-    ShapePointer = this;
-
-    DrawingShape = DrawingShapeAllocate(&InteropVTable,
-                                        &ShapePointer,
-                                        sizeof(Shape*),
-                                        sizeof(Shape*));
+    PDRAWING_SHAPE DrawingShape = DrawingShapeAllocate(&InteropVTable,
+                                                       &ShapePointer,
+                                                       sizeof(Shape*),
+                                                       sizeof(Shape*));
 
     if (DrawingShape == NULL)
     {
@@ -146,16 +143,11 @@ Shape::Dereference(
 CShape::CShape(
     _In_ PDRAWING_SHAPE DrawingShape
     )
-: Shape(DrawingShape)
-{ 
-    if (DrawingShape == NULL)
-    {
-        throw std::invalid_argument("DrawingShape");
-    }
-}
+: Shape(DrawingShape), References(1)
+{ }
 
 _Ret_
-ShapeHitList *
+PSHAPE_HIT_LIST
 CShape::Trace(
     _In_ Ray ModelRay,
     _Inout_ ShapeHitAllocator & HitAllocator
@@ -189,8 +181,36 @@ CShape::Create(
     _In_ PDRAWING_SHAPE DrawingShape
     )
 {
+    if (DrawingShape == NULL)
+    {
+        throw std::invalid_argument("DrawingShape");
+    }
+
     CShape* Allocated = new CShape(DrawingShape);
     return IrisPointer<Shape>(Allocated);
+}
+
+void
+CShape::Reference(
+    void
+    )
+{
+    Shape::Reference();
+    References += 1;
+}
+
+void 
+CShape::Dereference(
+    void
+    )
+{
+    Shape::Dereference();
+    References -= 1;
+
+    if (References == 0)
+    {
+        delete this;
+    }
 }
 
 } // namespace Iris

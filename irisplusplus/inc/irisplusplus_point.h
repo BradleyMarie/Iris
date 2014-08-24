@@ -112,6 +112,7 @@ public:
         return Data;
     }
 
+    _Ret_
     PCPOINT3 
     AsPCPOINT3(
         void

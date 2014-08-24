@@ -64,6 +64,7 @@ public:
         return Data;
     }
 
+    _Ret_
     PCVECTOR3 
     AsPCVECTOR3(
         void
