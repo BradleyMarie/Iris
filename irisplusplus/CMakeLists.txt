@@ -10,7 +10,8 @@ add_library(irisplusplus SHARED
     src/shape.cpp
     src/matrix.cpp
     src/shapehitallocator.cpp
-    src/normal.cpp)
+    src/normal.cpp
+    src/texture.cpp)
 
 target_link_libraries(irisplusplus
     iristoolkit 
