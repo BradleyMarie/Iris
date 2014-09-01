@@ -12,7 +12,8 @@ add_library(irisplusplus SHARED
     src/shapehitallocator.cpp
     src/normal.cpp
     src/texture.cpp
-    src/translucentshader.cpp)
+    src/translucentshader.cpp
+    src/emissiveshader.cpp)
 
 target_link_libraries(irisplusplus
     iristoolkit 

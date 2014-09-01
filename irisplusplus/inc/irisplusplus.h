@@ -47,5 +47,6 @@ extern "C" {
 #include "irisplusplus_texture.h"
 #include "irisplusplus_shape.h"
 #include "irisplusplus_translucentshader.h"
+#include "irisplusplus_emissiveshader.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_
