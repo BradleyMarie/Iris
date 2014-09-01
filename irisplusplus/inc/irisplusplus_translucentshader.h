@@ -4,19 +4,19 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisplusplus_normal.h
+    irisplusplus_translucentshader.h
 
 Abstract:
 
     This file contains the definitions for the 
-    Iris++ normal type.
+    Iris++ translucent shader type.
 
 --*/
 
 #include <irisplusplus.h>
 
-#ifndef _NORMAL_IRIS_PLUS_PLUS_
-#define _NORMAL_IRIS_PLUS_PLUS_
+#ifndef _TRANSLUCENT_SHADER_IRIS_PLUS_PLUS_
+#define _TRANSLUCENT_SHADER_IRIS_PLUS_PLUS_
 
 namespace Iris {
 
@@ -24,48 +24,44 @@ namespace Iris {
 // Types
 //
 
-class Normal {
+class TranslucentShader {
 protected:
     IRISPLUSPLUSAPI
-    Normal(
-        bool Prenormalized
+    TranslucentShader(
+        void
         );
 
 public:
     _Ret_
-    PNORMAL
-    AsPNORMAL(
+    PTRANSLUCENT_SHADER
+    AsPTRANSLUCENT_SHADER(
         void
         ) const
     {
         return Data;
     }
 
+    _Ret_
     virtual
-    VECTOR3
-    ComputeNormal(
+    FLOAT
+    Shade(
+        _In_ const Point & WorldHitPoint,
         _In_ const Point & ModelHitPoint,
-        _In_opt_ const void *AdditionalData
+        _In_opt_ const void * AdditionalData
         ) const = 0;
 
     virtual
-    BOOL
-    Prenormalized(
-        void
-        ) const = 0;
-
-    virtual
-    ~Normal(
+    ~TranslucentShader(
         void
         )
     { }
 
 private:
-    PNORMAL Data;
+    PTRANSLUCENT_SHADER Data;
 
     IRISPLUSPLUSAPI
-    Normal(
-        _In_ PNORMAL IrisNormal
+    TranslucentShader(
+        _In_ PTRANSLUCENT_SHADER Shader
         );
 
     IRISPLUSPLUSAPI
@@ -82,39 +78,27 @@ private:
         void
         );
 
-    friend class IrisPointer<Normal>;
-    friend class CNormal;
+    friend class IrisPointer<TranslucentShader>;
+    friend class CTranslucentShader;
 };
 
-class CNormal final : public Normal {
+class CTranslucentShader final : public TranslucentShader {
 public:
     IRISPLUSPLUSAPI
     static
-    IrisPointer<Normal>
+    IrisPointer<TranslucentShader>
     Create(
-        _In_ PNORMAL IrisNormal
+        _In_ PTRANSLUCENT_SHADER Shader
         );
 
-    IRISPLUSPLUSAPI
+    _Ret_
     virtual
-    VECTOR3
-    ComputeNormal(
+    FLOAT
+    Shade(
+        _In_ const Point & WorldHitPoint,
         _In_ const Point & ModelHitPoint,
-        _In_opt_ const void *AdditionalData
+        _In_opt_ const void * AdditionalData
         ) const;
-
-    IRISPLUSPLUSAPI
-    virtual
-    BOOL
-    Prenormalized(
-        void
-        ) const;
-
-private:
-    IRISPLUSPLUSAPI
-    CNormal(
-        _In_ PNORMAL IrisNormal
-        );
 
     IRISPLUSPLUSAPI
     virtual
@@ -128,6 +112,11 @@ private:
     void 
     Dereference(
         void
+        );
+
+private:
+    CTranslucentShader(
+        _In_ PTRANSLUCENT_SHADER Shader
         );
 
     std::atomic_size_t References;
@@ -135,4 +124,4 @@ private:
 
 } // namespace Iris
 
-#endif // _NORMAL_IRIS_PLUS_PLUS_
+#endif // _TRANSLUCENT_SHADER_IRIS_PLUS_PLUS_

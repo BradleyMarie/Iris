@@ -16,13 +16,13 @@ Abstract:
 #define _IRIS_HEADER_
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "iris_api.h"
 #include "iris_annotations.h"
 #include "iris_sal.h"
 #include "iris_assert.h"
 #include "iris_types.h"
-#include "iris_limits.h"
 #include "iris_error.h"
 #include "iris_malloc.h"
 #include "iris_math.h"

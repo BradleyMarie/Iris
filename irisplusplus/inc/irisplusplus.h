@@ -29,6 +29,7 @@ extern "C" {
 
 #include <stdexcept>
 #include <utility>
+#include <atomic>
 #include <new>
 
 //
@@ -45,5 +46,6 @@ extern "C" {
 #include "irisplusplus_normal.h"
 #include "irisplusplus_texture.h"
 #include "irisplusplus_shape.h"
+#include "irisplusplus_translucentshader.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

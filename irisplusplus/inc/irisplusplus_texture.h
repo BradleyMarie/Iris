@@ -162,7 +162,7 @@ private:
         void
         );
 
-    size_t References;
+    std::atomic_size_t References;
 };
 
 } // namespace Iris

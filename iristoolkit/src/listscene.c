@@ -68,12 +68,12 @@ ListSceneAddObject(
 
         if (Status != ISTATUS_SUCCESS)
         {
-            if (ListSize == SIZE_T_MAX)
+            if (ListSize == SIZE_MAX)
             {
                 return ISTATUS_ALLOCATION_FAILED;
             }
 
-            NewCapacity = SIZE_T_MAX;
+            NewCapacity = SIZE_MAX;
         }
 
         Objects = (PSCENE_OBJECT*) realloc(ListScene->Objects,

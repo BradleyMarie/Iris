@@ -152,7 +152,7 @@ private:
         _In_ PDRAWING_SHAPE DrawingShape
         );
 
-    size_t References;
+    std::atomic_size_t References;
 };
 
 } // namespace Iris

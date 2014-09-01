@@ -228,7 +228,7 @@ CheckedAddSizeT(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    if (SIZE_T_MAX - Addend0 < Addend1)
+    if (SIZE_MAX - Addend0 < Addend1)
     {
         return ISTATUS_INTEGER_OVERFLOW;
     }
