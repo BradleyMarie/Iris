@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This file contains the definitions for the 
-    Iris++ emiwssive shader type.
+    Iris++ emissive shader type.
 
 --*/
 

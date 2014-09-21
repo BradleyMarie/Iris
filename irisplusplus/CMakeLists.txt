@@ -13,7 +13,8 @@ add_library(irisplusplus SHARED
     src/normal.cpp
     src/texture.cpp
     src/translucentshader.cpp
-    src/emissiveshader.cpp)
+    src/emissiveshader.cpp
+    src/random.cpp)
 
 target_link_libraries(irisplusplus
     iristoolkit 
