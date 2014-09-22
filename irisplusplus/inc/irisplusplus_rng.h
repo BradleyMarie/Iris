@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This file contains the definitions for the 
-    Iris++ random number generator shader type.
+    Iris++ random number generator type.
 
 --*/
 
@@ -99,6 +99,7 @@ public:
         );
 
     _Ret_range_(Minimum, Maximum)
+    IRISPLUSPLUSAPI
     virtual
     FLOAT
     GenerateFloat(
@@ -107,6 +108,7 @@ public:
         ) const;
 
     _Ret_range_(Minimum, Maximum)
+    IRISPLUSPLUSAPI
     virtual
     SIZE_T
     GenerateIndex(

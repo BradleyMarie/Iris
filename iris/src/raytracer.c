@@ -124,10 +124,14 @@ RayTracerSetRay(
     PIRIS_CONSTANT_POINTER_LIST PointerList;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
-    if (RayTracer == NULL ||
-        RayValidate(Ray) == FALSE)
+    if (RayTracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
@@ -149,6 +153,28 @@ RayTracerSetRay(
         RayTracer->CurrentRay = Ray;
     }
 
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RayTracerGetRay(
+    _In_ PRAYTRACER RayTracer,
+    _Out_ PRAY Ray
+    )
+{
+    if (RayTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Ray == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *Ray = RayTracer->CurrentRay;
     return ISTATUS_SUCCESS;
 }
 

@@ -29,6 +29,7 @@ extern "C" {
 
 #include <stdexcept>
 #include <utility>
+#include <memory>
 #include <atomic>
 #include <new>
 
@@ -49,5 +50,6 @@ extern "C" {
 #include "irisplusplus_translucentshader.h"
 #include "irisplusplus_emissiveshader.h"
 #include "irisplusplus_rng.h"
+#include "irisplusplus_visibilitytester.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

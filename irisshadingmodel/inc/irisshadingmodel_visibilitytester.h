@@ -29,12 +29,13 @@ typedef CONST VISIBILITY_TESTER *PCVISIBILITY_TESTER;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
-PVISIBILITY_TESTER
+ISTATUS
 VisibilityTesterAllocate(
     _In_ PCSCENE Scene,
-    _In_ FLOAT Epsilon
+    _In_ FLOAT Epsilon,
+    _Out_ PVISIBILITY_TESTER *VisibilityTester
     );
 
 _Check_return_

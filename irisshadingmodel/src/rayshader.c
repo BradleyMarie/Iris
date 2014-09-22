@@ -359,7 +359,6 @@ RayShaderTraceRayMontecarlo(
     }
 
     Status = SceneTrace(RayShader->Scene,
-                        WorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

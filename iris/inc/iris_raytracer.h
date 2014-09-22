@@ -50,6 +50,15 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
+RayTracerGetRay(
+    _In_ PRAYTRACER RayTracer,
+    _Out_ PRAY Ray
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
 RayTracerTraceGeometry(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCGEOMETRY Geometry

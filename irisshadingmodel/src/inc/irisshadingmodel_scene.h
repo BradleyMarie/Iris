@@ -35,18 +35,20 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 SceneTrace(
-    _In_ PCSCENE Scene, 
-    _In_ RAY WorldRay,
+    _In_ PCSCENE Scene,
     _Inout_ PRAYTRACER RayTracer
     )
 {
     SCENE_TRACER SceneTracer;
     ISTATUS Status;
+    RAY WorldRay;
 
     ASSERT(Scene != NULL);
     ASSERT(RayTracer != NULL);
 
     SceneTracerInitialize(&SceneTracer, RayTracer);
+
+    RayTracerGetRay(RayTracer, &WorldRay);
 
     Status = Scene->VTable->TraceRoutine(Scene->Data,
                                          WorldRay,

@@ -21,11 +21,12 @@ struct _VISIBILITY_TESTER {
 };
 
 _Check_return_
-_Ret_maybenull_
-PVISIBILITY_TESTER
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 VisibilityTesterAllocate(
     _In_ PCSCENE Scene,
-    _In_ FLOAT Epsilon
+    _In_ FLOAT Epsilon,
+    _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
 {
     VECTOR3 TemporaryDirection;
@@ -34,19 +35,28 @@ VisibilityTesterAllocate(
     PRAYTRACER RayTracer;
     RAY TemporaryRay;
 
-    if (Scene == NULL ||
-        IsNormalFloat(Epsilon) == FALSE ||
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Epsilon) == FALSE ||
         IsFiniteFloat(Epsilon) == FALSE ||
         Epsilon < (FLOAT) 0.0)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (VisibilityTester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     Tester = (PVISIBILITY_TESTER) malloc(sizeof(VISIBILITY_TESTER));
 
     if (Tester == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
@@ -58,14 +68,16 @@ VisibilityTesterAllocate(
     if (RayTracer == NULL)
     {
         free(Tester);
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     Tester->Scene = Scene;
     Tester->RayTracer = RayTracer;
     Tester->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
 
-    return Tester;
+    *VisibilityTester = Tester;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
@@ -86,25 +98,39 @@ VisibilityTesterTestVisibility(
     // Ray is validated by RayTracerSetRay
     //
 
-    if (Tester == NULL ||
-        IsNormalFloat(DistanceToObject) == FALSE ||
+    if (Tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(DistanceToObject) == FALSE ||
         IsFiniteFloat(DistanceToObject) == FALSE ||
         DistanceToObject < (FLOAT) 0.0)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Visible == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     RayTracer = Tester->RayTracer;
 
     Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
 
-    if (Status != ISTATUS_SUCCESS)
+    switch (Status)
     {
-        return Status;
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_01:
+            return ISTATUS_INVALID_ARGUMENT_01;
+        default:
+            ASSERT(FALSE);
+            return Status;
     }
 
     Status = SceneTrace(Tester->Scene,
-                        WorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
@@ -166,20 +192,30 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     if (Tester == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Visible == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RayTracer = Tester->RayTracer;
 
     Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
 
-    if (Status != ISTATUS_SUCCESS)
+    switch (Status)
     {
-        return Status;
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_01:
+            return ISTATUS_INVALID_ARGUMENT_01;
+        default:
+            ASSERT(FALSE);
+            return Status;
     }
 
     Status = SceneTrace(Tester->Scene,
-                        WorldRay,
                         RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

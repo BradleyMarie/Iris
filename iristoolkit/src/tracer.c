@@ -314,6 +314,7 @@ CommonTracerAllocateInternal(
     PVISIBILITY_TESTER VisibilityTester;
     PCOMMON_TRACER Tracer;
     PRAYSHADER RayShader;
+    ISTATUS Status;
 
     //
     // No need to validate any of the arguments since they will all
@@ -327,9 +328,11 @@ CommonTracerAllocateInternal(
         return NULL;
     }
 
-    VisibilityTester = VisibilityTesterAllocate(Scene, Epsilon);
+    Status = VisibilityTesterAllocate(Scene,
+                                      Epsilon,
+                                      &VisibilityTester);
 
-    if (VisibilityTester == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
         free(Tracer);
         return NULL;
