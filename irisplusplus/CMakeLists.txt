@@ -15,7 +15,8 @@ add_library(irisplusplus SHARED
     src/translucentshader.cpp
     src/emissiveshader.cpp
     src/random.cpp
-    src/visibilitytester.cpp)
+    src/visibilitytester.cpp
+    src/scene.cpp)
 
 target_link_libraries(irisplusplus
     iristoolkit 

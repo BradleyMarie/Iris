@@ -116,6 +116,11 @@ public:
         _In_ SIZE_T Maximum
         ) const;
 
+private:
+    CRandom(
+        _In_ PRANDOM Rng
+        );
+
     IRISPLUSPLUSAPI
     virtual
     void
@@ -128,11 +133,6 @@ public:
     void 
     Dereference(
         void
-        );
-
-private:
-    CRandom(
-        _In_ PRANDOM Rng
         );
 
     std::atomic_size_t References;

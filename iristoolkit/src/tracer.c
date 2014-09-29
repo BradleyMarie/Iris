@@ -301,7 +301,7 @@ _Ret_maybenull_
 STATIC
 PTRACER
 CommonTracerAllocateInternal(
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -373,7 +373,7 @@ _Check_return_
 _Ret_maybenull_
 PTRACER
 PathTracerAllocate(
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -405,7 +405,7 @@ _Check_return_
 _Ret_maybenull_
 PTRACER
 RecursiveRayTracerAllocate(
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,

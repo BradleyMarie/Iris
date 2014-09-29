@@ -56,6 +56,7 @@ SceneAllocate(
     Scene = (PSCENE) HeaderAllocation;
 
     Scene->VTable = SceneVTable;
+    Scene->ReferenceCount = 1;
     Scene->Data = DataAllocation;
 
     if (DataSizeInBytes != 0)
@@ -100,7 +101,20 @@ SceneAddObject(
 }
 
 VOID
-SceneFree(
+SceneReference(
+    _In_opt_ PSCENE Scene
+    )
+{
+    if (Scene == NULL)
+    {
+        return;
+    }
+
+    Scene->ReferenceCount += 1;
+}
+
+VOID
+SceneDereference(
     _In_opt_ _Post_invalid_ PSCENE Scene
     )
 {
@@ -111,12 +125,17 @@ SceneFree(
         return;
     }
 
-    FreeRoutine = Scene->VTable->FreeRoutine;
+    Scene->ReferenceCount -= 1;
 
-    if (FreeRoutine != NULL)
+    if (Scene->ReferenceCount == 0)
     {
-        FreeRoutine(Scene->Data);
-    }
+        FreeRoutine = Scene->VTable->FreeRoutine;
 
-    IrisAlignedFree(Scene);
+        if (FreeRoutine != NULL)
+        {
+            FreeRoutine(Scene->Data);
+        }
+
+        IrisAlignedFree(Scene);
+    }
 }

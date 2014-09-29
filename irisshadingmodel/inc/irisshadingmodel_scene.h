@@ -94,7 +94,13 @@ SceneAddWorldObject(
 
 IRISSHADINGMODELAPI
 VOID
-SceneFree(
+SceneReference(
+    _In_opt_ PSCENE Scene
+    );
+
+IRISSHADINGMODELAPI
+VOID
+SceneDereference(
     _In_opt_ _Post_invalid_ PSCENE Scene
     );
 

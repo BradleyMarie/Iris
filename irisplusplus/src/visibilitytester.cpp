@@ -23,12 +23,14 @@ namespace Iris {
 //
 
 VisibiltyTester::VisibiltyTester(
-    _In_ PCSCENE Scene,
+    _In_ IrisPointer<Scene> Scene,
     _In_ FLOAT Epsilon
     )
 : FreeData(false)
 {
-    ISTATUS Status = VisibilityTesterAllocate(Scene,
+    PSCENE IrisScene = Scene->AsPSCENE();
+
+    ISTATUS Status = VisibilityTesterAllocate(IrisScene,
                                               Epsilon,
                                               &Data);
 
@@ -142,7 +144,7 @@ VisibiltyTester::~VisibiltyTester(
 IRISPLUSPLUSAPI
 std::shared_ptr<VisibiltyTester>
 VisibiltyTester::Create(
-    _In_ PCSCENE Scene,
+    _In_ IrisPointer<Scene> Scene,
     _In_ FLOAT Epsilon
     )
 {

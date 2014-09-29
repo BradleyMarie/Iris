@@ -33,7 +33,7 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
 VisibilityTesterAllocate(
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ FLOAT Epsilon,
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     );

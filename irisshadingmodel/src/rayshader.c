@@ -23,7 +23,7 @@ struct _RAYSHADER {
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
     PRANDOM Rng;
-    PCSCENE Scene;
+    PSCENE Scene;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
     UINT8 CurrentDepth;
@@ -43,7 +43,7 @@ PRAYSHADER
 RayShaderAllocateInternal(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_opt_ PCOLOR3 PathThroughputPointer,
@@ -136,6 +136,7 @@ RayShaderAllocateInternal(
     }
 
     RandomReference(Rng);
+    SceneReference(Scene);
 
     RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
@@ -236,7 +237,7 @@ PRAYSHADER
 RayShaderAllocate(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -510,5 +511,6 @@ RayShaderFree(
 
     RayTracerFree(RayShader->RayTracer);
     RandomDereference(RayShader->Rng);
+    SceneDereference(RayShader->Scene);
     free(RayShader);
 }

@@ -50,6 +50,7 @@ extern "C" {
 #include "irisplusplus_translucentshader.h"
 #include "irisplusplus_emissiveshader.h"
 #include "irisplusplus_rng.h"
+#include "irisplusplus_scene.h"
 #include "irisplusplus_visibilitytester.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

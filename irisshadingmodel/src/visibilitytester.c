@@ -17,14 +17,14 @@ Abstract:
 struct _VISIBILITY_TESTER {
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
-    PCSCENE Scene;
+    PSCENE Scene;
 };
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 VisibilityTesterAllocate(
-    _In_ PCSCENE Scene,
+    _In_ PSCENE Scene,
     _In_ FLOAT Epsilon,
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
@@ -70,6 +70,8 @@ VisibilityTesterAllocate(
         free(Tester);
         return ISTATUS_ALLOCATION_FAILED;
     }
+
+    SceneReference(Scene);
 
     Tester->Scene = Scene;
     Tester->RayTracer = RayTracer;
@@ -257,5 +259,6 @@ VisibilityTesterFree(
     }
 
     RayTracerFree(Tester->RayTracer);
+    SceneDereference(Tester->Scene);
     free(Tester);
 }

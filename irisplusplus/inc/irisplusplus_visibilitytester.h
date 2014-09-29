@@ -30,14 +30,8 @@ public:
     static
     std::shared_ptr<VisibiltyTester>
     Create(
-        _In_ PCSCENE Scene,
+        _In_ IrisPointer<Scene> Scene,
         _In_ FLOAT Epsilon
-        );
-
-    IRISPLUSPLUSAPI
-    VisibiltyTester(
-        _In_ PVISIBILITY_TESTER Tester,
-        _In_ bool FreeTesterOnDestruction
         );
 
     _Ret_
@@ -72,8 +66,14 @@ public:
 private:
     IRISPLUSPLUSAPI
     VisibiltyTester(
-        _In_ PCSCENE Scene,
+        _In_ IrisPointer<Scene> Scene,
         _In_ FLOAT Epsilon
+        );
+
+    IRISPLUSPLUSAPI
+    VisibiltyTester(
+        _In_ PVISIBILITY_TESTER Tester,
+        _In_ bool FreeTesterOnDestruction
         );
 
     //

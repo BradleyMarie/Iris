@@ -23,6 +23,7 @@ Abstract:
 
 struct _SCENE {
     PCSCENE_VTABLE VTable;
+    SIZE_T ReferenceCount;
     PVOID Data;
 };
 
