@@ -43,6 +43,7 @@ extern "C" {
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"
 #include "irisplusplus_irispointer.h"
+#include "irisplusplus_refcountedptr.h"
 #include "irisplusplus_shapehitallocator.h"
 #include "irisplusplus_normal.h"
 #include "irisplusplus_texture.h"
@@ -52,5 +53,6 @@ extern "C" {
 #include "irisplusplus_rng.h"
 #include "irisplusplus_scene.h"
 #include "irisplusplus_visibilitytester.h"
+#include "irisplusplus_surfacenormal.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

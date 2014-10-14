@@ -31,7 +31,7 @@ public:
         void
         ) const
     {
-        return Data;
+        return Data.GetPointer();
     }
 
     PSCENE_OBJECT
@@ -39,13 +39,8 @@ public:
         void
         )
     {
-        return Data;
+        return Data.GetPointer();
     }
-
-    void
-    Release(
-        void
-        );
 
 private:
     SceneObject(
@@ -61,7 +56,7 @@ private:
         _In_ PSCENE_OBJECT SceneObject
         );
 
-    PSCENE_OBJECT Data;
+    ReferenceCountedPointer<PSCENE_OBJECT, SceneObjectFree> Data;
 };
 
 class SceneTracer final {

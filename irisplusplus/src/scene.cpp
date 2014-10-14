@@ -22,14 +22,6 @@ namespace Iris {
 // SceneTracer/SceneObject Functions
 //
 
-void
-SceneObject::Release(
-    void
-    )
-{
-    SceneObjectFree(Data);
-}
-
 SceneObject::SceneObject(
     _In_ PSCENE_OBJECT IrisSceneObject
     )
