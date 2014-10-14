@@ -1,0 +1,38 @@
+//
+// Iris
+//
+
+//
+// IrisShadingModel
+//
+
+//
+// IrisToolkit
+//
+
+// 
+// IrisPlusPlus
+//
+
+1) Write Color3
+2) Write Color4
+3) Write RayShader
+4) Write IndirectShader
+5) Write DirectShader
+
+//
+// IrisPlusPlusToolkit
+//
+
+1) Implement IrisToolkit wrapper classes
+
+	a) Shaders
+	b) Normals
+	c) Textures
+	d) Shapes
+	e) Scenes
+	f) RNGs
+	g) Framebuffer
+	h) Cameras (may want to rethink IrisToolkit architecture as well)
+
+2) Port Tests
