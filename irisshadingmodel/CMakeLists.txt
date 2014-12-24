@@ -17,7 +17,8 @@ add_library(irisshadingmodel SHARED
     src/normal.c
     src/emissive.c
     src/indirect.c
-    src/direct.c)
+    src/direct.c
+    src/spectrum.c)
 
 target_link_libraries(irisshadingmodel 
     iris)

@@ -34,6 +34,8 @@ Abstract:
 #define IsNaNFloat(number) isnan(number)
 #define IsInfFloat(number) isinf(number)
 #define IsZeroFloat(number) (number == (FLOAT) 0.0)
+#define IsPositiveFloat(number) (number > (FLOAT) 0.0)
+#define IsNegativeFloat(number) (number < (FLOAT) 0.0)
 
 #if __STDC_VERSION__ >= 199901L
 
