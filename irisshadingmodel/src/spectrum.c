@@ -52,7 +52,7 @@ SpectrumAllocate(
         return NULL;
     }
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(PSPECTRUM),
+    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(SPECTRUM),
                                                    sizeof(PVOID),
                                                    DataSizeInBytes,
                                                    DataAlignment,
@@ -97,9 +97,9 @@ SpectrumSample(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Status = Spectrum->VTable->IndirectRoutine(Spectrum->Data,
-                                               Wavelength,
-                                               Intensity);
+    Status = Spectrum->VTable->SampleRoutine(Spectrum->Data,
+                                             Wavelength,
+                                             Intensity);
 
     return Status;
 }

@@ -32,7 +32,7 @@ ISTATUS
     );
 
 typedef struct _SPECTRUM_VTABLE {
-    PSPECTRUM_SAMPLE_ROUTINE IndirectRoutine;
+    PSPECTRUM_SAMPLE_ROUTINE SampleRoutine;
     PFREE_ROUTINE FreeRoutine;
 } SPECTRUM_VTABLE, *PSPECTRUM_VTABLE;
 

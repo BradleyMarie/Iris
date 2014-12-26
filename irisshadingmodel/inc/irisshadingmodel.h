@@ -21,6 +21,7 @@ Abstract:
 #include "irisshadingmodel_types.h"
 #include "irisshadingmodel_rng.h"
 #include "irisshadingmodel_spectrum.h"
+#include "irisshadingmodel_reflector.h"
 #include "irisshadingmodel_color3.h"
 #include "irisshadingmodel_color4.h"
 #include "irisshadingmodel_normal.h"
