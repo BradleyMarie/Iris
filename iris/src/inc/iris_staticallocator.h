@@ -23,7 +23,8 @@ Abstract:
 #ifndef _IRIS_STATIC_MEMORY_ALLOCATOR_INTERNAL_
 #define _IRIS_STATIC_MEMORY_ALLOCATOR_INTERNAL_
 
-#include <irisp.h>
+#include <iris.h>
+#include "iris_pointerlist.h"
 
 //
 // Types

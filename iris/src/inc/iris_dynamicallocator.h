@@ -23,7 +23,7 @@ Abstract:
 #ifndef _IRIS_DYNAMIC_MEMORY_ALLOCATOR_INTERNAL_
 #define _IRIS_DYNAMIC_MEMORY_ALLOCATOR_INTERNAL_
 
-#include <irisp.h>
+#include <iris.h>
 
 //
 // Types

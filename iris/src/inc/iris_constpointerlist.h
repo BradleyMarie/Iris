@@ -15,7 +15,8 @@ Abstract:
 #ifndef _IRIS_CONSTANT_POINTER_LIST_INTERNAL_
 #define _IRIS_CONSTANT_POINTER_LIST_INTERNAL_
 
-#include <irisp.h>
+#include <iris.h>
+#include "iris_types.h"
 
 #define IRIS_CONSTANT_POINTER_LIST_INITIAL_SIZE 16
 #define IRIS_CONSTANT_POINTER_LIST_GROWTH_FACTOR 2

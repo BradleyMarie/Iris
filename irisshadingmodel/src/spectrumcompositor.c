@@ -16,47 +16,6 @@ Abstract:
 #include <irisshadingmodelp.h>
 
 //
-// Types
-//
-
-typedef struct _FMA_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCSPECTRUM Spectrum0;
-    PCSPECTRUM Spectrum1;
-    FLOAT Attenuation;
-} FMA_SPECTRUM, *PFMA_SPECTRUM;
-
-typedef CONST FMA_SPECTRUM *PCFMA_SPECTRUM;
-
-typedef struct _ATTENUATED_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCSPECTRUM Spectrum;
-    FLOAT Attenuation;
-} ATTENUATED_SPECTRUM, *PATTENUATED_SPECTRUM;
-
-typedef CONST ATTENUATED_SPECTRUM *PCATTENUATED_SPECTRUM;
-
-typedef struct _SUM_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCSPECTRUM Spectrum0;
-    PCSPECTRUM Spectrum1;
-} SUM_SPECTRUM, *PSUM_SPECTRUM;
-
-typedef CONST SUM_SPECTRUM *PCSUM_SPECTRUM;
-
-typedef struct _REFLECTION_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCSPECTRUM Spectrum;
-    PCREFLECTOR Reflector;
-} REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
-
-typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
-
-struct _SPECTRUM_COMPOSITOR {
-    FLOAT Temp;
-};
-
-//
 // Static Functions
 //
 
@@ -230,6 +189,117 @@ ReflectionSpectrumSample(
     }
 
     return ISTATUS_SUCCESS; 
+}
+
+//
+// Static Variables
+//
+
+CONST STATIC SPECTRUM_VTABLE FmaSpectrumVTable = {
+    FmaSpectrumSample,
+    NULL
+};
+
+CONST STATIC SPECTRUM_VTABLE AttenuatedSpectrumVTable = {
+    AttenuatedSpectrumSample,
+    NULL
+};
+
+CONST STATIC SPECTRUM_VTABLE SumSpectrumVTable = {
+    SumSpectrumSample,
+    NULL
+};
+
+CONST STATIC SPECTRUM_VTABLE ReflectionSpectrumVTable = {
+    ReflectionSpectrumSample,
+    NULL
+};
+
+//
+// Initialization Functions
+//
+
+STATIC
+VOID
+FmaSpectrumInitialize(
+    _Out_ PFMA_SPECTRUM FmaSpectrum,
+    _In_ PCSPECTRUM Spectrum0,
+    _In_ PCSPECTRUM Spectrum1,
+    _In_ FLOAT Attenuation
+    )
+{
+    ASSERT(FmaSpectrum != NULL);
+    ASSERT(Spectrum0 != NULL);
+    ASSERT(Spectrum1 != NULL);
+    ASSERT(IsNormalFloat(Attenuation) != FALSE);
+    ASSERT(IsFiniteFloat(Attenuation) != FALSE);
+    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+
+    FmaSpectrum->SpectrumHeader.VTable = &FmaSpectrumVTable;
+    FmaSpectrum->SpectrumHeader.ReferenceCount = 0;
+    FmaSpectrum->SpectrumHeader.Data = FmaSpectrum;
+    FmaSpectrum->Spectrum0 = Spectrum0;
+    FmaSpectrum->Spectrum1 = Spectrum1;
+    FmaSpectrum->Attenuation = Attenuation;
+}
+
+STATIC
+VOID
+AttenuatedSpectrumInitialize(
+    _Out_ PATTENUATED_SPECTRUM AttenuatedSpectrum,
+    _In_ PCSPECTRUM Spectrum,
+    _In_ FLOAT Attenuation
+    )
+{
+    ASSERT(AttenuatedSpectrum != NULL);
+    ASSERT(Spectrum != NULL);
+    ASSERT(IsNormalFloat(Attenuation) != FALSE);
+    ASSERT(IsFiniteFloat(Attenuation) != FALSE);
+    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+
+    AttenuatedSpectrum->SpectrumHeader.VTable = &AttenuatedSpectrumVTable;
+    AttenuatedSpectrum->SpectrumHeader.ReferenceCount = 0;
+    AttenuatedSpectrum->SpectrumHeader.Data = AttenuatedSpectrum;
+    AttenuatedSpectrum->Spectrum = Spectrum;
+    AttenuatedSpectrum->Attenuation = Attenuation;
+}
+
+STATIC
+VOID
+SumSpectrumInitialize(
+    _Out_ PSUM_SPECTRUM SumSpectrum,
+    _In_ PCSPECTRUM Spectrum0,
+    _In_ PCSPECTRUM Spectrum1
+    )
+{
+    ASSERT(SumSpectrum != NULL);
+    ASSERT(Spectrum0 != NULL);
+    ASSERT(Spectrum1 != NULL);
+
+    SumSpectrum->SpectrumHeader.VTable = &SumSpectrumVTable;
+    SumSpectrum->SpectrumHeader.ReferenceCount = 0;
+    SumSpectrum->SpectrumHeader.Data = SumSpectrum;
+    SumSpectrum->Spectrum0 = Spectrum0;
+    SumSpectrum->Spectrum1 = Spectrum1;
+}
+
+STATIC
+VOID
+ReflectionSpectrumInitialize(
+    _Out_ PREFLECTION_SPECTRUM ReflectionSpectrum,
+    _In_ PCSPECTRUM Spectrum,
+    _In_ PCREFLECTOR Reflector
+    )
+{
+    ASSERT(ReflectionSpectrum != NULL);
+    ASSERT(Spectrum != NULL);
+    ASSERT(Reflector != NULL);
+
+    ReflectionSpectrum->SpectrumHeader.VTable = &ReflectionSpectrumVTable;
+    ReflectionSpectrum->SpectrumHeader.ReferenceCount = 0;
+    ReflectionSpectrum->SpectrumHeader.Data = ReflectionSpectrum;
+    ReflectionSpectrum->Spectrum = Spectrum;
+    ReflectionSpectrum->Reflector = Reflector;
 }
 
 //

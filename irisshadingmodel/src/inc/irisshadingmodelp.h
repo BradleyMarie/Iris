@@ -23,5 +23,6 @@ Abstract:
 #include "irisshadingmodel_scene.h"
 #include "irisshadingmodel_textureshader.h"
 #include "irisshadingmodel_spectrum.h"
+#include "irisshadingmodel_spectrumcompositor.h"
 
 #endif // _IRIS_SHADING_MODEL_INTERNAL_HEADER_
