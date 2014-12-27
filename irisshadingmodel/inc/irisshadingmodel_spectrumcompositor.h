@@ -36,7 +36,7 @@ SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _In_ PCSPECTRUM Spectrum0,
     _In_ PCSPECTRUM Spectrum1,
-    _Out_ PSPECTRUM *Sum
+    _Out_ PCSPECTRUM *Sum
     );
 
 _Check_return_
@@ -46,7 +46,8 @@ ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _In_ PCSPECTRUM Spectrum,
-    _Out_ PSPECTRUM *AttenuatedSpectrum
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM *AttenuatedSpectrum
     );
 
 _Check_return_
@@ -58,7 +59,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
     _In_ PCSPECTRUM Spectrum0,
     _In_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PSPECTRUM *AttenuatedSum
+    _Out_ PCSPECTRUM *AttenuatedSum
     );
 
 _Check_return_
@@ -69,7 +70,7 @@ SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _In_ PCSPECTRUM Spectrum,
     _In_ PCREFLECTOR Reflector,
-    _Out_ PSPECTRUM *Sum
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     );
 
 #endif // _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_

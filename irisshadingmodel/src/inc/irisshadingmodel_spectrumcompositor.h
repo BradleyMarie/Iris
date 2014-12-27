@@ -122,6 +122,18 @@ SpectrumCompositorInitialize(
 
 SFORCEINLINE
 VOID
+SpectrumCompositorClear(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    IrisStaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
+    IrisStaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
+    IrisStaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
+    IrisStaticMemoryAllocatorFreeAll(&Compositor->SumSpectrumAllocator);
+}
+
+SFORCEINLINE
+VOID
 SpectrumCompositorDestroy(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor
     )
