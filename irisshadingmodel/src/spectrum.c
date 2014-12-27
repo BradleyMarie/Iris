@@ -15,16 +15,6 @@ Abstract:
 #include <irisshadingmodelp.h>
 
 //
-// Types
-//
-
-struct _SPECTRUM {
-    PCSPECTRUM_VTABLE VTable;
-    SIZE_T ReferenceCount;
-    PVOID Data;
-};
-
-//
 // Functions
 //
 
@@ -115,31 +105,4 @@ SpectrumReference(
     }
 
     Spectrum->ReferenceCount += 1;
-}
-
-VOID
-SpectrumDereference(
-    _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-
-    if (Spectrum == NULL)
-    {
-        return;
-    }
-
-    Spectrum->ReferenceCount -= 1;
-
-    if (Spectrum->ReferenceCount == 0)
-    {
-        FreeRoutine = Spectrum->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Spectrum->Data);
-        }
-
-        IrisAlignedFree(Spectrum);
-    }
 }
