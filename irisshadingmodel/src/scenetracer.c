@@ -22,8 +22,8 @@ SceneTracerTraceGeometry(
     _In_ PCSCENE_OBJECT SceneObject
     )
 {
-    PGEOMETRY Geometry;
     ISTATUS Status;
+    PSHAPE Shape;
 
     ASSERT(SceneObject != NULL);
 
@@ -39,10 +39,12 @@ SceneTracerTraceGeometry(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Geometry = (PGEOMETRY) SceneObject;
+    Shape = (PSHAPE) SceneObject->Shape;
 
-    Status = RayTracerTraceGeometry(SceneTracer->RayTracer,
-                                    Geometry);
+    Status = RayTracerTraceShapeWithTransform(SceneTracer->RayTracer,
+                                              Shape,
+                                              SceneObject->ModelToWorld,
+                                              SceneObject->Premultiplied);
 
     return Status;
 }

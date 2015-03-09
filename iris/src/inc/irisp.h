@@ -40,7 +40,6 @@ Abstract:
 #include "iris_staticallocator.h"
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
-#include "iris_sharedgeometryhitallocator.h"
-#include "iris_geometry.h"
+#include "iris_sharedhitdataallocator.h"
 
 #endif // _IRIS_INTERNAL_HEADER_

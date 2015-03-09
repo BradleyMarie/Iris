@@ -20,7 +20,7 @@ Abstract:
 
 struct _RAYTRACER {
     SHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    SHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
+    SHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     IRIS_CONSTANT_POINTER_LIST HitList;
     SIZE_T HitIndex;
     RAY CurrentRay;
@@ -95,7 +95,7 @@ RayTracerAllocate(
         return NULL;
     }
 
-    Status = SharedGeometryHitAllocatorInitialize(&RayTracer->SharedGeometryHitAllocator);
+    Status = SharedHitDataAllocatorInitialize(&RayTracer->SharedHitDataAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -120,7 +120,7 @@ RayTracerSetRay(
     _In_ BOOL NormalizeRay
     )
 {
-    PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
+    PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PIRIS_CONSTANT_POINTER_LIST PointerList;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
@@ -134,11 +134,11 @@ RayTracerSetRay(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
+    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
     ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
     PointerList = &RayTracer->HitList;
 
-    SharedGeometryHitAllocatorFreeAll(SharedGeometryHitAllocator);
+    SharedHitDataAllocatorFreeAll(SharedHitDataAllocator);
     ShapeHitAllocatorFreeAll(ShapeHitAllocator);
     IrisConstantPointerListClear(PointerList);
 
@@ -181,46 +181,160 @@ RayTracerGetRay(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerTraceGeometry(
+RayTracerTraceShape(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCGEOMETRY Geometry
+    _In_ PCSHAPE Shape
     )
 {
-    PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
+    PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PIRIS_CONSTANT_POINTER_LIST PointerList;
-    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PSHARED_HIT_DATA SharedHitData;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
     PINTERNAL_SHAPE_HIT InternalShapeHit;
     PSHAPE_HIT_LIST ShapeHitList;
     ISTATUS Status;
 
-    if (RayTracer == NULL ||
-        Geometry == NULL)
+    if (RayTracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
+    if (Shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
     ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
     PointerList = &RayTracer->HitList;
 
-    Status = GeometryTraceGeometry(Geometry,
-                                   RayTracer->CurrentRay,
-                                   ShapeHitAllocator,
-                                   SharedGeometryHitAllocator,
-                                   &SharedGeometryHit,
-                                   &ShapeHitList);
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = NULL;
+    SharedHitData->Premultiplied = TRUE;
+    SharedHitData->ModelRay = RayTracer->CurrentRay;
+
+    Status = ShapeTraceShape(Shape,
+                             RayTracer->CurrentRay,
+                             ShapeHitAllocator,
+                             &ShapeHitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
+    if (ShapeHitList == NULL)
+    {
+        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
+        SharedHitData = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     while (ShapeHitList != NULL)
     {
         InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
 
-        InternalShapeHit->SharedGeometryHit = SharedGeometryHit;
+        InternalShapeHit->SharedHitData = SharedHitData;
+
+        Status = IrisConstantPointerListAddPointer(PointerList,
+                                                   InternalShapeHit);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+
+        ShapeHitList = ShapeHitList->NextShapeHit;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RayTracerTraceShapeWithTransform(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ PCSHAPE Shape,
+    _In_opt_ PCMATRIX ModelToWorld,
+    _In_ BOOL Premultiplied
+    )
+{
+    PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
+    PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PSHARED_HIT_DATA SharedHitData;
+    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    PINTERNAL_SHAPE_HIT InternalShapeHit;
+    PSHAPE_HIT_LIST ShapeHitList;
+    ISTATUS Status;
+    RAY TraceRay;
+
+    if (RayTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
+    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    PointerList = &RayTracer->HitList;
+
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = ModelToWorld;
+
+    if (Premultiplied != FALSE)
+    {   
+        SharedHitData->Premultiplied = TRUE;
+        TraceRay = RayTracer->CurrentRay;
+    }
+    else
+    {
+        SharedHitData->Premultiplied = FALSE;
+
+        SharedHitData->ModelRay = RayMatrixInverseMultiply(ModelToWorld,
+                                                           RayTracer->CurrentRay);
+
+        TraceRay = SharedHitData->ModelRay;
+    }
+
+    Status = ShapeTraceShape(Shape,
+                             TraceRay,
+                             ShapeHitAllocator,
+                             &ShapeHitList);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (ShapeHitList == NULL)
+    {
+        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
+        SharedHitData = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    while (ShapeHitList != NULL)
+    {
+        InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
+
+        InternalShapeHit->SharedHitData = SharedHitData;
 
         Status = IrisConstantPointerListAddPointer(PointerList,
                                                    InternalShapeHit);
@@ -308,7 +422,7 @@ RayTracerGetNextHit(
     )
 {
     PCIRIS_CONSTANT_POINTER_LIST PointerList;
-    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PCSHARED_HIT_DATA SharedHitData;
     PCINTERNAL_SHAPE_HIT InternalShapeHit;
     PPOINT3 WorldHitPointPointer;
     POINT3 LocalWorldHitPoint;
@@ -339,16 +453,16 @@ RayTracerGetNextHit(
 
     InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
 
-    SharedGeometryHit = InternalShapeHit->SharedGeometryHit;
+    SharedHitData = InternalShapeHit->SharedHitData;
 
     *ShapeHit = &InternalShapeHit->ShapeHit;
 
     if (ModelToWorld != NULL)
     {
-        *ModelToWorld = SharedGeometryHit->ModelToWorld;
+        *ModelToWorld = SharedHitData->ModelToWorld;
     }
     
-    if (SharedGeometryHit->Premultiplied != FALSE)
+    if (SharedHitData->Premultiplied != FALSE)
     {
         if (ModelHitPoint != NULL ||
             WorldHitPoint != NULL)
@@ -379,14 +493,14 @@ RayTracerGetNextHit(
 
             if (ModelHitPoint != NULL)
             {
-                *ModelHitPoint = PointMatrixMultiply(SharedGeometryHit->ModelToWorld,
+                *ModelHitPoint = PointMatrixMultiply(SharedHitData->ModelToWorld,
                                                      *WorldHitPointPointer);
             }
         }
         
         if (ModelViewer != NULL)
         {
-            *ModelViewer = VectorMatrixInverseMultiply(SharedGeometryHit->ModelToWorld,
+            *ModelViewer = VectorMatrixInverseMultiply(SharedHitData->ModelToWorld,
                                                        RayTracer->CurrentRay.Direction);
         }
     }
@@ -400,14 +514,14 @@ RayTracerGetNextHit(
             }
             else
             {
-                *ModelHitPoint = RayEndpoint(SharedGeometryHit->ModelRay,
+                *ModelHitPoint = RayEndpoint(SharedHitData->ModelRay,
                                              InternalShapeHit->ShapeHit.Distance);
             }
         }
 
         if (ModelViewer != NULL)
         {
-            *ModelViewer = SharedGeometryHit->ModelRay.Direction;
+            *ModelViewer = SharedHitData->ModelRay.Direction;
         }
 
         if (WorldHitPoint != NULL)
@@ -425,7 +539,7 @@ RayTracerFree(
     _In_opt_ _Post_invalid_ PRAYTRACER RayTracer
     )
 {
-    PSHARED_GEOMETRY_HIT_ALLOCATOR SharedGeometryHitAllocator;
+    PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PIRIS_CONSTANT_POINTER_LIST PointerList;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
@@ -434,11 +548,11 @@ RayTracerFree(
         return;
     }
 
-    SharedGeometryHitAllocator = &RayTracer->SharedGeometryHitAllocator;
+    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
     ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
     PointerList = &RayTracer->HitList;
 
-    SharedGeometryHitAllocatorDestroy(SharedGeometryHitAllocator);
+    SharedHitDataAllocatorDestroy(SharedHitDataAllocator);
     ShapeHitAllocatorDestroy(ShapeHitAllocator);
     IrisConstantPointerListDestroy(PointerList);
 

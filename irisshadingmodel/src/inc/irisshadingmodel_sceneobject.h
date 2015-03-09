@@ -18,6 +18,18 @@ Abstract:
 #include <irisshadingmodelp.h>
 
 //
+// Types
+//
+
+typedef struct _SCENE_OBJECT {
+    PCDRAWING_SHAPE Shape;
+    PCMATRIX ModelToWorld;
+    BOOL Premultiplied;
+} SCENE_OBJECT, *PSCENE_OBJECT;
+
+typedef CONST SCENE_OBJECT *PCSCENE_OBJECT;
+
+//
 // Functions
 //
 
@@ -31,18 +43,28 @@ SceneObjectAllocate(
     _In_ BOOL Premultiplied
     )
 {
-    PGEOMETRY Geometry;
+    PSCENE_OBJECT SceneObject;
     PSHAPE Shape;
 
     ASSERT(DrawingShape != NULL);
 
+    SceneObject = (PSCENE_OBJECT) malloc(sizeof(SCENE_OBJECT));
+
+    if (SceneObject == NULL)
+    {
+        return NULL;
+    }
+
     Shape = (PSHAPE) DrawingShape;
 
-    Geometry = GeometryAllocate(Shape,
-                                ModelToWorld,
-                                Premultiplied);
+    SceneObject->Shape = DrawingShape;
+    SceneObject->ModelToWorld = ModelToWorld;
+    SceneObject->Premultiplied = Premultiplied;
 
-    return (PSCENE_OBJECT) Geometry;
+    MatrixReference(ModelToWorld);
+    ShapeReference(Shape);
+
+    return SceneObject;
 }
 
 #endif // _SCENE_IRIS_SCENE_OBJECT_INTERNAL_

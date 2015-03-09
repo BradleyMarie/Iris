@@ -21,13 +21,13 @@ Abstract:
 // Types
 //
 
-typedef struct _SHARED_GEOMETRY_HIT {
+typedef struct _SHARED_HIT_DATA {
     PCMATRIX ModelToWorld;
     BOOL Premultiplied;
     RAY ModelRay;
-} SHARED_GEOMETRY_HIT, *PSHARED_GEOMETRY_HIT;
+} SHARED_HIT_DATA, *PSHARED_HIT_DATA;
 
-typedef CONST SHARED_GEOMETRY_HIT *PCSHARED_GEOMETRY_HIT;
+typedef CONST SHARED_HIT_DATA *PCSHARED_HIT_DATA;
 
 typedef struct _SHAPE_HIT_ALLOCATOR {
     IRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
@@ -37,7 +37,7 @@ typedef struct _SHAPE_HIT_ALLOCATOR {
 
 typedef struct _INTERNAL_SHAPE_HIT {
     SHAPE_HIT ShapeHit;
-    PCSHARED_GEOMETRY_HIT SharedGeometryHit;
+    PCSHARED_HIT_DATA SharedHitData;
     POINT3 ModelHitPoint;
     BOOL ModelHitPointValid;
 } INTERNAL_SHAPE_HIT, *PINTERNAL_SHAPE_HIT;

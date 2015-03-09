@@ -5,7 +5,6 @@ include_directories(inc src/inc)
 add_library(iris SHARED
     src/matrix.c
     src/raytracer.c
-    src/geometry.c
     src/shapehitallocator.c
     src/point.c
     src/vector.c

@@ -59,9 +59,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerTraceGeometry(
+RayTracerTraceShape(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCGEOMETRY Geometry
+    _In_ PCSHAPE Shape
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
+RayTracerTraceShapeWithTransform(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ PCSHAPE Shape,
+    _In_opt_ PCMATRIX ModelToWorld,
+    _In_ BOOL Premultiplied
     );
 
 IRISAPI

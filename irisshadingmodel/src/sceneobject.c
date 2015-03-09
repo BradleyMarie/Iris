@@ -19,9 +19,16 @@ SceneObjectFree(
     _In_opt_ _Post_invalid_ PSCENE_OBJECT SceneObject
     )
 {
-    PGEOMETRY Geometry;
+    PSHAPE Shape;
 
-    Geometry = (PGEOMETRY) SceneObject;
+    if (SceneObject == NULL)
+    {
+        return;
+    }
 
-    GeometryFree(Geometry);
+    Shape = (PSHAPE) SceneObject->Shape;
+
+    MatrixDereference(SceneObject->ModelToWorld);
+    ShapeDereference(SceneObject->Shape);
+    free(SceneObject);
 }
