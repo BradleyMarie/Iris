@@ -5,6 +5,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
 
 add_subdirectory(iris)
+add_subdirectory(irisadvanced)
 add_subdirectory(irisshadingmodel)
 add_subdirectory(iristoolkit)
 add_subdirectory(irisplusplus)

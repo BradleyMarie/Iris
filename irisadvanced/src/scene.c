@@ -12,7 +12,17 @@ Abstract:
 
 --*/
 
-#include <irisshadingmodelp.h>
+#include <irisadvanced.h>
+
+//
+// Types
+//
+
+struct _SCENE {
+    PCSCENE_VTABLE VTable;
+    SIZE_T ReferenceCount;
+    PVOID Data;
+};
 
 //
 // Functions
@@ -70,32 +80,17 @@ SceneAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-SceneAddObject(
-    _Inout_ PSCENE Scene,
-    _In_ PDRAWING_SHAPE DrawingShape,
-    _In_opt_ PMATRIX ModelToWorld,
-    _In_ BOOL Premultiplied
+SceneTrace(
+    _In_ PCSCENE Scene,
+    _Inout_ PRAYTRACER RayTracer
     )
 {
-    PSCENE_OBJECT SceneObject;
     ISTATUS Status;
 
-    if (Scene == NULL ||
-        DrawingShape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT;
-    }
+    ASSERT(Scene != NULL);
+    ASSERT(RayTracer != NULL);
 
-    SceneObject = SceneObjectAllocate(DrawingShape,
-                                      ModelToWorld,
-                                      Premultiplied);
-
-    if (SceneObject == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    Status = Scene->VTable->AddObjectRoutine(Scene->Data, SceneObject);
+    Status = Scene->VTable->TraceRoutine(Scene->Data, RayTracer);
 
     return Status;
 }

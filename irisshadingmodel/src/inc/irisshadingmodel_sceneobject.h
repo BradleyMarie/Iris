@@ -22,8 +22,8 @@ Abstract:
 //
 
 typedef struct _SCENE_OBJECT {
-    PCDRAWING_SHAPE Shape;
-    PCMATRIX ModelToWorld;
+    PDRAWING_SHAPE Shape;
+    PMATRIX ModelToWorld;
     BOOL Premultiplied;
 } SCENE_OBJECT, *PSCENE_OBJECT;
 
@@ -38,7 +38,7 @@ _Ret_maybenull_
 SFORCEINLINE
 PSCENE_OBJECT 
 SceneObjectAllocate(
-    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_ PDRAWING_SHAPE DrawingShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )

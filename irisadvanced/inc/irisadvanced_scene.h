@@ -4,7 +4,7 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_scene.h
+    irisadvanced_scene.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SCENE_IRIS_SHADING_MODEL_
-#define _SCENE_IRIS_SHADING_MODEL_
+#ifndef _SCENE_IRIS_ADVANCED_
+#define _SCENE_IRIS_ADVANCED_
 
-#include <irisshadingmodel.h>
+#include <irisadvanced.h>
 
 //
 // Types
@@ -25,23 +25,12 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PSCENE_ADD_OBJECT_ROUTINE)(
-    _Inout_ PVOID Context,
-    _In_ PSCENE_OBJECT SceneObject
-    );
-
-typedef
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
 (*PSCENE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
-    _In_ RAY WorldRay,
-    _Inout_ PSCENE_TRACER SceneTracer
+    _Inout_ PRAYTRACER RayTracer
     );
 
 typedef struct _SCENE_VTABLE {
-    PSCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
     PSCENE_TRACE_ROUTINE TraceRoutine;
     PFREE_ROUTINE FreeRoutine;
 } SCENE_VTABLE, *PSCENE_VTABLE;
@@ -57,7 +46,7 @@ typedef CONST SCENE *PCSCENE;
 
 _Check_return_
 _Ret_maybenull_
-IRISSHADINGMODELAPI
+IRISADVANCEDAPI
 PSCENE
 SceneAllocate(
     _In_ PCSCENE_VTABLE SceneVTable,
@@ -68,40 +57,23 @@ SceneAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISADVANCEDAPI
 ISTATUS 
-SceneAddObject(
-    _Inout_ PSCENE Scene,
-    _In_ PDRAWING_SHAPE DrawingShape,
-    _In_opt_ PMATRIX ModelToWorld,
-    _In_ BOOL Premultiplied
+SceneTrace(
+    _In_ PCSCENE Scene,
+    _Inout_ PRAYTRACER RayTracer
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
-ISTATUS 
-SceneAddWorldObject(
-    _Inout_ PSCENE Scene,
-    _In_ PDRAWING_SHAPE DrawingShape
-    )
-{
-    ASSERT(Scene != NULL);
-    ASSERT(DrawingShape != NULL);
-
-    return SceneAddObject(Scene, DrawingShape, NULL, TRUE);
-}
-
-IRISSHADINGMODELAPI
+IRISADVANCEDAPI
 VOID
 SceneReference(
     _In_opt_ PSCENE Scene
     );
 
-IRISSHADINGMODELAPI
+IRISADVANCEDAPI
 VOID
 SceneDereference(
     _In_opt_ _Post_invalid_ PSCENE Scene
     );
 
-#endif // _SCENE_IRIS_SHADING_MODEL_
+#endif // _SCENE_IRIS_ADVANCED_
