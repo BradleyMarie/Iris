@@ -55,6 +55,7 @@ CMakeFiles/
 # Generated files
 iris/inc/iris_api.h
 irisadvanced/inc/irisadvanced_api.h
+irisrgb/inc/irisrgb_api.h
 iristoolkit/inc/iristoolkit_api.h
 irisshadingmodel/inc/irisshadingmodel_api.h
 irisplusplus/inc/irisplusplus_api.h

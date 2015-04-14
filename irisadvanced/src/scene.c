@@ -95,6 +95,35 @@ SceneTrace(
     return Status;
 }
 
+_Ret_
+PCSCENE_VTABLE
+SceneGetVTable(
+    _In_ PCSCENE Scene
+    )
+{
+    if (Scene == NULL)
+    {
+        return NULL;
+    }
+
+    return Scene->VTable;
+}
+
+_Check_return_
+_Ret_opt_
+PVOID
+SceneGetData(
+    _In_ PSCENE Scene
+    )
+{
+    if (Scene == NULL)
+    {
+        return NULL;
+    }
+
+    return Scene->Data;
+}
+
 VOID
 SceneReference(
     _In_opt_ PSCENE Scene

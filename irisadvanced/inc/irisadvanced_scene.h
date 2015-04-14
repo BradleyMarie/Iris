@@ -64,6 +64,21 @@ SceneTrace(
     _Inout_ PRAYTRACER RayTracer
     );
 
+_Ret_
+IRISADVANCEDAPI
+PCSCENE_VTABLE
+SceneGetVTable(
+    _In_ PCSCENE Scene
+    );
+
+_Check_return_
+_Ret_opt_
+IRISADVANCEDAPI
+PVOID
+SceneGetData(
+    _In_ PSCENE Scene
+    );
+
 IRISADVANCEDAPI
 VOID
 SceneReference(
