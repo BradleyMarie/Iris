@@ -15,7 +15,7 @@ Abstract:
 #ifndef _TYPES_IRIS_RGB_
 #define _TYPES_IRIS_RGB_
 
-typedef struct _SCENE SCENE, *PSCENE;
-typedef CONST SCENE *PCSCENE;
+typedef struct _RGB_SCENE RGB_SCENE, *PRGB_SCENE;
+typedef CONST RGB_SCENE *PCRGB_SCENE;
 
 #endif // _TYPES_IRIS_RGB_

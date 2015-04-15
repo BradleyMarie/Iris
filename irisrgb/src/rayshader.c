@@ -23,7 +23,7 @@ struct _RAYSHADER {
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
     PRANDOM Rng;
-    PSCENE Scene;
+    PRGB_SCENE RgbScene;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
     UINT8 CurrentDepth;
@@ -43,7 +43,7 @@ PRAYSHADER
 RayShaderAllocateInternal(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PSCENE Scene,
+    _In_ PRGB_SCENE RgbScene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_opt_ PCOLOR3 PathThroughputPointer,
@@ -62,7 +62,7 @@ RayShaderAllocateInternal(
     RAY TemporaryRay;
 
     ASSERT(ShadeRayRoutine != NULL);
-    ASSERT(Scene != NULL);
+    ASSERT(RgbScene != NULL);
     ASSERT(Rng != NULL);
     ASSERT(IsNormalFloat(Epsilon) != FALSE);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
@@ -94,7 +94,7 @@ RayShaderAllocateInternal(
     {
         NextRayShader = RayShaderAllocateInternal(Context,
                                                   ShadeRayRoutine,
-                                                  Scene,
+                                                  RgbScene,
                                                   Rng,
                                                   Epsilon,
                                                   PathThroughputPointer,
@@ -136,13 +136,13 @@ RayShaderAllocateInternal(
     }
 
     RandomReference(Rng);
-    SceneReference(Scene);
+    RgbSceneReference(RgbScene);
 
     RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
     RayShader->MaximumContinueProbability = MaximumContinueProbability;
     RayShader->Rng = Rng;
-    RayShader->Scene = Scene;
+    RayShader->RgbScene = RgbScene;
     RayShader->RayTracer = RayTracer;
     RayShader->Epsilon = Epsilon;
     RayShader->CurrentDepth = CurrentDepth;
@@ -237,7 +237,7 @@ PRAYSHADER
 RayShaderAllocate(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PSCENE Scene,
+    _In_ PRGB_SCENE RgbScene,
     _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -249,7 +249,7 @@ RayShaderAllocate(
     PRAYSHADER RayShader;
 
     if (ShadeRayRoutine == NULL ||
-        Scene == NULL ||
+        RgbScene == NULL ||
         Rng == NULL ||
         IsNormalFloat(Epsilon) == FALSE ||
         IsFiniteFloat(Epsilon) == FALSE ||
@@ -269,7 +269,7 @@ RayShaderAllocate(
 
     RayShader = RayShaderAllocateInternal(Context,
                                           ShadeRayRoutine,
-                                          Scene,
+                                          RgbScene,
                                           Rng,
                                           Epsilon,
                                           NULL,
@@ -311,6 +311,7 @@ RayShaderTraceRayMontecarlo(
     COLOR4 HitColor;
     FLOAT Distance;
     ISTATUS Status;
+    PCSCENE Scene;
 
     if (RayShader == NULL ||
         Color == NULL)
@@ -358,8 +359,9 @@ RayShaderTraceRayMontecarlo(
         return Status;
     }
 
-    Status = SceneTrace(RayShader->Scene,
-                        RayTracer);
+    Scene = (PSCENE) RayShader->RgbScene;
+
+    Status = SceneTrace(Scene, RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -399,6 +401,8 @@ RayShaderTraceRayMontecarlo(
                                          &ModelToWorld);
             continue;
         }
+
+        RgbShape = (PCRGB_SHAPE) ShapeHit->Shape;
 
         Texture = RgbShapeGetTexture(RgbShape, ShapeHit->FaceHit);
 
@@ -505,6 +509,6 @@ RayShaderFree(
 
     RayTracerFree(RayShader->RayTracer);
     RandomDereference(RayShader->Rng);
-    SceneDereference(RayShader->Scene);
+    RgbSceneDereference(RayShader->RgbScene);
     free(RayShader);
 }

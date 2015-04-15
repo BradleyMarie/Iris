@@ -39,9 +39,6 @@ typedef struct _RGB_SCENE_VTABLE {
 
 typedef CONST RGB_SCENE_VTABLE *PCRGB_SCENE_VTABLE;
 
-typedef struct _RGB_SCENE RGB_SCENE, *PRGB_SCENE;
-typedef CONST RGB_SCENE *PCRGB_SCENE;
-
 //
 // Functions
 //
