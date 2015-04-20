@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_spectrumcompositor.h
+    irisphysx_spectrumcompositor.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_
-#define _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_
+#ifndef _SPECTRUM_COMPOSITOR_IRIS_PHYSX_
+#define _SPECTRUM_COMPOSITOR_IRIS_PHYSX_
 
-#include <irisshadingmodel.h>
+#include <irisphysx.h>
 
 //
 // Types
@@ -30,7 +30,7 @@ typedef CONST SPECTRUM_COMPOSITOR *PCSPECTRUM_COMPOSITOR;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -41,7 +41,7 @@ SpectrumCompositorAddSpectrums(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -52,7 +52,7 @@ SpectrumCompositorAttenuateSpectrum(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -64,7 +64,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -73,4 +73,4 @@ SpectrumCompositorAddReflection(
     _Out_ PCSPECTRUM *ReflectedSpectrum
     );
 
-#endif // _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_
+#endif // _SPECTRUM_COMPOSITOR_IRIS_PHYSX_

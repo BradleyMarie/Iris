@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_spectrumcompositor.h
+    irisphysx_spectrumcompositor.h
 
 Abstract:
 
@@ -13,10 +13,10 @@ Abstract:
 
 --*/
 
-#ifndef _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_INTERNAL_
-#define _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_INTERNAL_
+#ifndef _SPECTRUM_COMPOSITOR_IRIS_PHYSX_INTERNAL_
+#define _SPECTRUM_COMPOSITOR_IRIS_PHYSX_INTERNAL_
 
-#include <irisshadingmodelp.h>
+#include <irisphysxp.h>
 #include "../../iris/src/inc/iris_staticallocator.h"
 
 //
@@ -144,4 +144,4 @@ SpectrumCompositorDestroy(
     IrisStaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
 }
 
-#endif // _SPECTRUM_COMPOSITOR_IRIS_SHADING_MODEL_INTERNAL_
+#endif // _SPECTRUM_COMPOSITOR_IRIS_PHYSX_INTERNAL_

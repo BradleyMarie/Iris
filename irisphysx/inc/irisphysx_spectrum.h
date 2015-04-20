@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_spectrum.h
+    irisphysx_spectrum.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SPECTRUM_IRIS_SHADING_MODEL_
-#define _SPECTRUM_IRIS_SHADING_MODEL_
+#ifndef _SPECTRUM_IRIS_PHYSX_
+#define _SPECTRUM_IRIS_PHYSX_
 
-#include <irisshadingmodel.h>
+#include <irisphysx.h>
 
 //
 // Types
@@ -47,7 +47,7 @@ typedef CONST SPECTRUM *PCSPECTRUM;
 
 _Check_return_
 _Ret_maybenull_
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 PSPECTRUM
 SpectrumAllocate(
     _In_ PCSPECTRUM_VTABLE SpectrumVTable,
@@ -58,7 +58,7 @@ SpectrumAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumSample(
     _In_ PCSPECTRUM Spectrum,
@@ -66,16 +66,16 @@ SpectrumSample(
     _Out_ PFLOAT Intensity
     );
 
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 VOID
 SpectrumReference(
     _In_opt_ PSPECTRUM Spectrum
     );
 
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 VOID
 SpectrumDereference(
     _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
     );
 
-#endif // _SPECTRUM_IRIS_SHADING_MODEL_
+#endif // _SPECTRUM_IRIS_PHYSX_

@@ -40,7 +40,7 @@ PCNORMAL
     );
 
 typedef struct _RGB_SHAPE_VTABLE {
-    SHAPE_VTABLE ShapeVTable;
+    BOUNDED_SHAPE_VTABLE BoundedShapeVTable;
     PRGB_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
     PRGB_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
 } RGB_SHAPE_VTABLE, *PRGB_SHAPE_VTABLE;
@@ -63,6 +63,17 @@ RgbShapeAllocate(
     _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISRGBAPI
+ISTATUS 
+RgbShapeCheckBounds(
+    _In_ PCRGB_SHAPE RgbShape,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
     );
 
 _Ret_opt_

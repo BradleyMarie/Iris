@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_reflector.h
+    irisphysx_reflector.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _REFLECTOR_IRIS_SHADING_MODEL_
-#define _REFLECTOR_IRIS_SHADING_MODEL_
+#ifndef _REFLECTOR_IRIS_PHYSX_
+#define _REFLECTOR_IRIS_PHYSX_
 
-#include <irisshadingmodel.h>
+#include <irisphysx.h>
 
 //
 // Types
@@ -48,7 +48,7 @@ typedef CONST REFLECTOR *PCREFLECTOR;
 
 _Check_return_
 _Ret_maybenull_
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 PREFLECTOR
 ReflectorAllocate(
     _In_ PCREFLECTOR_VTABLE ReflectorVTable,
@@ -59,7 +59,7 @@ ReflectorAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 ReflectorReflect(
     _In_ PCREFLECTOR Reflector,
@@ -68,16 +68,16 @@ ReflectorReflect(
     _Out_ PFLOAT OutgoingIntensity
     );
 
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 VOID
 ReflectorReference(
     _In_opt_ PREFLECTOR Reflector
     );
 
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 VOID
 ReflectorDereference(
     _In_opt_ _Post_invalid_ PREFLECTOR Reflector
     );
 
-#endif // _REFLECTOR_IRIS_SHADING_MODEL_
+#endif // _REFLECTOR_IRIS_PHYSX_

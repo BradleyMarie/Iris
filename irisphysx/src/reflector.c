@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisshadingmodelp.h>
+#include <irisphysxp.h>
 
 //
 // Types

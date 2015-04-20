@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisshadingmodelp.h>
+#include <irisphysxp.h>
 
 //
 // Static Functions
@@ -345,7 +345,7 @@ ReflectionSpectrumInitialize(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -431,7 +431,7 @@ SpectrumCompositorAddSpectrums(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -504,7 +504,7 @@ SpectrumCompositorAttenuateSpectrum(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
@@ -594,7 +594,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSHADINGMODELAPI
+IRISPHYSXAPI
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,

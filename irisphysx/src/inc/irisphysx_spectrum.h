@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_spectrum.h
+    irisphysx_spectrum.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SPECTRUM_IRIS_SHADING_MODEL_INTERNAL_
-#define _SPECTRUM_IRIS_SHADING_MODEL_INTERNAL_
+#ifndef _SPECTRUM_IRIS_PHYSX_INTERNAL_
+#define _SPECTRUM_IRIS_PHYSX_INTERNAL_
 
-#include <irisshadingmodelp.h>
+#include <irisphysxp.h>
 
 //
 // Types
@@ -27,4 +27,4 @@ struct _SPECTRUM {
     PVOID Data;
 };
 
-#endif // _SPECTRUM_IRIS_SHADING_MODEL_INTERNAL_
+#endif // _SPECTRUM_IRIS_PHYSX_INTERNAL_

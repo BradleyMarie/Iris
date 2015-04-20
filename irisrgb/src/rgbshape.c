@@ -30,12 +30,36 @@ RgbShapeAllocate(
 {
     PSHAPE Shape;
 
-    Shape = ShapeAllocate(&RgbShapeVTable->ShapeVTable,
+    Shape = ShapeAllocate(&RgbShapeVTable->BoundedShapeVTable .ShapeVTable,
                           Data,
                           DataSizeInBytes,
                           DataAlignment);
 
     return (PRGB_SHAPE) Shape;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISRGBAPI
+ISTATUS 
+RgbShapeCheckBounds(
+    _In_ PCRGB_SHAPE RgbShape,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    )
+{
+    PCBOUNDED_SHAPE BoundedShape;
+    ISTATUS Status;
+
+    BoundedShape = (PCBOUNDED_SHAPE) RgbShape;
+
+    Status = BoundedShapeCheckBounds(BoundedShape,
+                                     ModelToWorld,
+                                     WorldAlignedBoundingBox,
+                                     IsInsideBox);
+
+    return Status;
 }
 
 _Ret_opt_
