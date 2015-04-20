@@ -6,7 +6,8 @@ add_library(irisadvanced SHARED
     src/visibilitytester.c
     src/random.c
     src/normal.c
-    src/scene.c)
+    src/scene.c
+    src/boundedshape.c)
 
 target_link_libraries(irisadvanced 
     iris)
