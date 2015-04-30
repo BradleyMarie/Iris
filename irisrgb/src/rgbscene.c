@@ -4,11 +4,11 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    scene.c
+    rgbscene.c
 
 Abstract:
 
-    This file contains the function definitions for the SCENE type.
+    This file contains the function definitions for the RGB_SCENE type.
 
 --*/
 
@@ -53,10 +53,14 @@ RgbSceneAddObject(
     PSCENE Scene;
     PVOID Data;
 
-    if (RgbScene == NULL ||
-        RgbShape == NULL)
+    if (RgbScene == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (RgbShape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     Scene = (PSCENE) RgbScene;

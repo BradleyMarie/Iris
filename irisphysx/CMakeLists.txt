@@ -5,7 +5,11 @@ include_directories(../iris/inc ../irisadvanced/inc inc src/inc)
 add_library(irisphysx SHARED
     src/reflector.c
     src/spectrum.c
-    src/spectrumcompositor.c)
+    src/spectrumcompositor.c
+    src/texture.c
+    src/material.c
+    src/shape.c
+    src/scene.c)
 
 target_link_libraries(irisphysx 
     iris

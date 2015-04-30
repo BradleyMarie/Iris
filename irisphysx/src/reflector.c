@@ -89,16 +89,29 @@ ReflectorReflect(
 {
     ISTATUS Status;
 
-    if (Reflector == NULL ||
-        IsNormalFloat(Wavelength) == FALSE ||
-        IsFiniteFloat(Wavelength) == FALSE ||
-        IsPositiveFloat(Wavelength) == FALSE ||
-        IsNormalFloat(IncomingIntensity) == FALSE ||
-        IsFiniteFloat(IncomingIntensity) == FALSE ||
-        IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) == FALSE ||
-        OutgoingIntensity == NULL)
+    if (Reflector == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Wavelength) == FALSE ||
+        IsFiniteFloat(Wavelength) == FALSE ||
+        IsPositiveFloat(Wavelength) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (IsNormalFloat(IncomingIntensity) == FALSE ||
+        IsFiniteFloat(IncomingIntensity) == FALSE ||
+        IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    
+    if (OutgoingIntensity == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     Status = Reflector->VTable->ReflectRoutine(Reflector->Data,

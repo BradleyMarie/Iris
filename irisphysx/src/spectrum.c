@@ -78,13 +78,21 @@ SpectrumSample(
 {
     ISTATUS Status;
 
-    if (Spectrum == NULL ||
-        IsNormalFloat(Wavelength) == FALSE ||
-        IsFiniteFloat(Wavelength) == FALSE ||
-        IsPositiveFloat(Wavelength) == FALSE ||
-        Intensity == NULL)
+    if (Spectrum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Wavelength) == FALSE ||
+        IsFiniteFloat(Wavelength) == FALSE ||
+        IsPositiveFloat(Wavelength) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (Intensity == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     Status = Spectrum->VTable->SampleRoutine(Spectrum->Data,

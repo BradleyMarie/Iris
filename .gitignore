@@ -45,6 +45,7 @@ CMakeCache.txt
 # Project files
 *.sublime-project
 *.sublime-workspace
+launch.json
 
 # Images
 *.pfm
