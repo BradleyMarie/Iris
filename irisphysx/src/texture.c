@@ -76,7 +76,9 @@ SpectrumTextureLookup(
     _In_ POINT3 WorldHitPoint,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _Out_ PCMATERIAL *Material
+    _Out_ PCEMISSIVE_LIGHT *EmissiveLight,
+    _Out_ PCDIRECT_LIGHT *DirectLight,
+    _Out_ PCINDIRECT_LIGHT *IndirectLight
     )
 {
     ISTATUS Status;
@@ -86,16 +88,28 @@ SpectrumTextureLookup(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    if (Texture == NULL)
+    if (EmissiveLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
     
+    if (DirectLight == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (IndirectLight == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
     Status = StaticSpectrumTextureLookup(Texture,
                                          WorldHitPoint,
                                          ModelHitPoint,
                                          AdditionalData,
-                                         Material);
+                                         EmissiveLight,
+                                         DirectLight,
+                                         IndirectLight);
                                          
     return Status;
 }

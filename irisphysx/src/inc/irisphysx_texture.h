@@ -28,8 +28,8 @@ struct _SPECTRUM_TEXTURE {
 };
 
 #ifdef _IRIS_PHYSX_EXPORT_SPECTRUM_TEXTURE_ROUTINES_
-#define SpectrumTextureLookup(Texture, WorldHitPoint, ModelHitPoint, AdditionalData, Material) \
-        StaticSpectrumTextureLookup(Texture, WorldHitPoint, ModelHitPoint, AdditionalData, Material)
+#define SpectrumTextureLookup(Texture, WorldHitPoint, ModelHitPoint, AdditionalData, EmimssiveLight, DirectLight, IndirectLight) \
+        StaticSpectrumTextureLookup(Texture, WorldHitPoint, ModelHitPoint, AdditionalData, EmimssiveLight, DirectLight, IndirectLight)
 #endif
 
 //
@@ -45,19 +45,25 @@ SpectrumTextureLookup(
     _In_ POINT3 WorldHitPoint,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _Out_ PCMATERIAL *Material
+    _Out_ PCEMISSIVE_LIGHT *EmissiveLight,
+    _Out_ PCDIRECT_LIGHT *DirectLight,
+    _Out_ PCINDIRECT_LIGHT *IndirectLight
     )
 {
     ISTATUS Status;
     
     ASSERT(Texture != NULL);
-    ASSERT(Material != NULL);
+    ASSERT(EmissiveLight != NULL);
+    ASSERT(DirectLight != NULL);
+    ASSERT(IndirectLight != NULL);
     
     Status = Texture->VTable->LookupRoutine(Texture->Data,
                                             WorldHitPoint,
                                             ModelHitPoint,
                                             AdditionalData,
-                                            Material);
+                                            EmissiveLight,
+                                            DirectLight,
+                                            IndirectLight);
                                            
     return Status;
 }

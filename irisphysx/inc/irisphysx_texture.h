@@ -30,7 +30,9 @@ ISTATUS
     _In_ POINT3 WorldHitPoint,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _Out_ PCMATERIAL *Material
+    _Out_ PCEMISSIVE_LIGHT *EmissiveLight,
+    _Out_ PCDIRECT_LIGHT *DirectLight,
+    _Out_ PCINDIRECT_LIGHT *IndirectLight
     );
 
 typedef struct _SPECTRUM_TEXTURE_VTABLE {
@@ -67,7 +69,9 @@ SpectrumTextureLookup(
     _In_ POINT3 WorldHitPoint,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _Out_ PCMATERIAL *Material
+    _Out_ PCEMISSIVE_LIGHT *EmissiveLight,
+    _Out_ PCDIRECT_LIGHT *DirectLight,
+    _Out_ PCINDIRECT_LIGHT *IndirectLight
     );
 
 IRISPHYSXAPI

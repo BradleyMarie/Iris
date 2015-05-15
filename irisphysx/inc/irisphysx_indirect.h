@@ -4,16 +4,16 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisphysx_material.h
+    irisphysx_indirect.h
 
 Abstract:
 
-    This file contains the definitions for the MATERIAL type.
+    This file contains the definitions for the INDIRECT_LIGHT type.
 
 --*/
 
-#ifndef _MATERIAL_IRIS_PHYSX_
-#define _MATERIAL_IRIS_PHYSX_
+#ifndef _INDIRECT_LIGHT_IRIS_PHYSX_
+#define _INDIRECT_LIGHT_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -25,26 +25,27 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PMATERIAL_SAMPLE_ROUTINE)(
+(*PINDIRECT_LIGHT_SAMPLE_ROUTINE)(
     _In_ PCVOID Context,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _In_ PCVECTOR3 WorldNormalizedNormal,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PRANDOM Rng,
+    _Inout_ PVOID RayTracer,
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _Out_ PCSPECTRUM *Output
     );
 
-typedef struct _MATERIAL_VTABLE {
-    PMATERIAL_SAMPLE_ROUTINE SampleRoutine;
+typedef struct _INDIRECT_LIGHT_VTABLE {
+    PINDIRECT_LIGHT_SAMPLE_ROUTINE SampleRoutine;
     PFREE_ROUTINE FreeRoutine;
-} MATERIAL_VTABLE, *PMATERIAL_VTABLE;
+} INDIRECT_LIGHT_VTABLE, *PINDIRECT_LIGHT_VTABLE;
 
-typedef CONST MATERIAL_VTABLE *PCMATERIAL_VTABLE;
+typedef CONST INDIRECT_LIGHT_VTABLE *PCINDIRECT_LIGHT_VTABLE;
 
-typedef struct _MATERIAL MATERIAL, *PMATERIAL;
-typedef CONST MATERIAL *PCMATERIAL;
+typedef struct _INDIRECT_LIGHT INDIRECT_LIGHT, *PINDIRECT_LIGHT;
+typedef CONST INDIRECT_LIGHT *PCINDIRECT_LIGHT;
 
 //
 // Functions
@@ -53,9 +54,9 @@ typedef CONST MATERIAL *PCMATERIAL;
 _Check_return_
 _Ret_maybenull_
 IRISPHYSXAPI
-PMATERIAL
-MaterialAllocate(
-    _In_ PCMATERIAL_VTABLE MaterialVTable,
+PINDIRECT_LIGHT
+IndirectLightAllocate(
+    _In_ PCINDIRECT_LIGHT_VTABLE IndirectLightVTable,
     _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
@@ -65,27 +66,28 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-MaterialSample(
-    _In_ PCMATERIAL Material,
+IndirectLightSample(
+    _In_ PCINDIRECT_LIGHT IndirectLight,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _In_ PCVECTOR3 WorldNormalizedNormal,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PRANDOM Rng,
+    _Inout_ PVOID RayTracer,
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _Out_ PCSPECTRUM *Output
     );
 
 IRISPHYSXAPI
 VOID
-MaterialReference(
-    _In_opt_ PMATERIAL Material
+IndirectLightReference(
+    _In_opt_ PINDIRECT_LIGHT IndirectLight
     );
 
 IRISPHYSXAPI
 VOID
-MaterialDereference(
-    _In_opt_ _Post_invalid_ PMATERIAL Material
+IndirectLightDereference(
+    _In_opt_ _Post_invalid_ PINDIRECT_LIGHT IndirectLight
     );
 
-#endif // _MATERIAL_IRIS_PHYSX_
+#endif // _INDIRECT_LIGHT_IRIS_PHYSX_
