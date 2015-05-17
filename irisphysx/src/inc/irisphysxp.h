@@ -19,6 +19,5 @@ Abstract:
 
 #include "irisphysx_spectrum.h"
 #include "irisphysx_spectrumcompositor.h"
-#include "irisphysx_texture.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_

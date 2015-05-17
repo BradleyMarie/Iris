@@ -24,25 +24,15 @@ Abstract:
 typedef
 _Check_return_
 _Ret_opt_
-PCSPECTRUM_TEXTURE
-(*PSPECTRUM_SHAPE_GET_TEXTURE_ROUTINE)(
-    _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit
-    );
-
-typedef
-_Check_return_
-_Ret_opt_
-PCNORMAL 
-(*PSPECTRUM_SHAPE_GET_NORMAL_ROUTINE)(
+PCSPECTRUM_SHADER
+(*PSPECTRUM_SHAPE_GET_SHADER_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
 
 typedef struct _SPECTRUM_SHAPE_VTABLE {
     BOUNDED_SHAPE_VTABLE BoundedShapeVTable;
-    PSPECTRUM_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
-    PSPECTRUM_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
+    PSPECTRUM_SHAPE_GET_SHADER_ROUTINE GetShaderRoutine;
 } SPECTRUM_SHAPE_VTABLE, *PSPECTRUM_SHAPE_VTABLE;
 
 typedef CONST SPECTRUM_SHAPE_VTABLE *PCSPECTRUM_SHAPE_VTABLE;
@@ -78,16 +68,8 @@ SpectrumShapeCheckBounds(
 
 _Ret_opt_
 IRISPHYSXAPI
-PCSPECTRUM_TEXTURE
-SpectrumShapeGetTexture(
-    _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
-    );
-
-_Ret_opt_
-IRISPHYSXAPI
-PCNORMAL
-SpectrumShapeGetNormal(
+PCSPECTRUM_SHADER
+SpectrumShapeGetShader(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     );

@@ -62,7 +62,7 @@ SpectrumShapeCheckBounds(
 }
 
 _Ret_opt_
-PCSPECTRUM_TEXTURE
+PCSPECTRUM_SHADER
 SpectrumShapeGetTexture(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
@@ -70,7 +70,7 @@ SpectrumShapeGetTexture(
 {
     PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
     PCSHAPE_VTABLE ShapeVTable;
-    PCSPECTRUM_TEXTURE Texture;
+    PCSPECTRUM_SHADER Shader;
     PCSHAPE Shape;
     PCVOID Data;
 
@@ -87,40 +87,9 @@ SpectrumShapeGetTexture(
 
     SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
 
-    Texture = SpectrumShapeVTable->GetTextureRoutine(Data, FaceHit);
+    Shader = SpectrumShapeVTable->GetShaderRoutine(Data, FaceHit);
 
-    return Texture;
-}
-
-_Ret_opt_
-PCNORMAL
-SpectrumShapeGetNormal(
-    _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
-    )
-{
-    PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
-    PCSHAPE_VTABLE ShapeVTable;
-    PCNORMAL Normal;
-    PCSHAPE Shape;
-    PCVOID Data;
-
-    if (SpectrumShape == NULL)
-    {
-        return NULL;
-    }
-
-    Shape = (PCSHAPE) SpectrumShape;
-
-    Data = ShapeGetData(Shape);
-
-    ShapeVTable = ShapeGetVTable(Shape);
-
-    SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
-
-    Normal = SpectrumShapeVTable->GetNormalRoutine(Data, FaceHit);
-
-    return Normal;
+    return Shader;
 }
 
 VOID

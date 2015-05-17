@@ -6,10 +6,7 @@ add_library(irisphysx SHARED
     src/reflector.c
     src/spectrum.c
     src/spectrumcompositor.c
-    src/texture.c
-    src/emissive.c
-    src/direct.c
-    src/indirect.c
+    src/shader.c
     src/shape.c
     src/scene.c)
 
