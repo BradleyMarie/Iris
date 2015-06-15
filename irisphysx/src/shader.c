@@ -80,35 +80,76 @@ SpectrumShaderAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumShaderSample(
+SpectrumShaderForwardShade(
     _In_ PCSPECTRUM_SHADER SpectrumShader,
     _In_ POINT3 WorldHitPoint,
     _In_ POINT3 ModelHitPoint,
     _In_ VECTOR3 WorldViewer,
-    _In_reads_opt_(2) PCRAY WorldDifferentials[2],
+    _In_ RAY WorldXDifferential,
+    _In_ RAY WorldYDifferential,
     _In_ FLOAT Distance,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PRANDOM Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
-    _Inout_ PVOID RayTracer,
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _Inout_ PVOID RayTracer,
     _Out_ PCSPECTRUM *Output
     )
 {
     ISTATUS Status;
     
-    Status = SpectrumShader->VTable->SampleRoutine(SpectrumShader->Data,
-                                                   WorldHitPoint,
-                                                   ModelHitPoint,
-                                                   WorldViewer,
-                                                   WorldDifferentials,
-                                                   Distance,
-                                                   AdditionalData,
-                                                   Rng,
-                                                   VisibilityTester,
-                                                   RayTracer,
-                                                   Compositor,
-                                                   Output);
+    Status = SpectrumShader->VTable->ForwardShadingRoutine(SpectrumShader->Data,
+                                                           WorldHitPoint,
+                                                           ModelHitPoint,
+                                                           WorldViewer,
+                                                           WorldXDifferential,
+                                                           WorldYDifferential,
+                                                           Distance,
+                                                           AdditionalData,
+                                                           Rng,
+                                                           VisibilityTester,
+                                                           Compositor,
+                                                           RayTracer,
+                                                           Output);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumShaderBackwardShade(
+    _In_ PCSPECTRUM_SHADER SpectrumShader,
+    _In_ POINT3 WorldHitPoint,
+    _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 WorldViewer,
+    _In_ RAY WorldXDifferential,
+    _In_ RAY WorldYDifferential,
+    _In_ FLOAT Distance,
+    _In_opt_ PCVOID AdditionalData,
+    _Inout_ PRANDOM Rng,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _Inout_ PVOID RayTracer,
+    _Inout_ PVOID BackwardRayTracer,
+    _In_ PCSPECTRUM IncomingLight
+    )
+{
+    ISTATUS Status;
+    
+    Status = SpectrumShader->VTable->BackwardShadingRoutine(SpectrumShader->Data,
+                                                            WorldHitPoint,
+                                                            ModelHitPoint,
+                                                            WorldViewer,
+                                                            WorldXDifferential,
+                                                            WorldYDifferential,
+                                                            Distance,
+                                                            AdditionalData,
+                                                            Rng,
+                                                            VisibilityTester,
+                                                            Compositor,
+                                                            BackwardRayTracer,
+                                                            IncomingLight);
 
     return Status;
 }
