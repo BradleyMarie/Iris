@@ -17,7 +17,6 @@ Abstract:
 #define _SPECTRUM_COMPOSITOR_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
-#include "../../iris/src/inc/iris_staticallocator.h"
 
 //
 // Types
@@ -57,10 +56,10 @@ typedef struct _REFLECTION_SPECTRUM {
 typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
 
 struct _SPECTRUM_COMPOSITOR {
-    IRIS_STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
-    IRIS_STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
-    IRIS_STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
-    IRIS_STATIC_MEMORY_ALLOCATOR SumSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR SumSpectrumAllocator;
 };
 
 //
@@ -79,41 +78,41 @@ SpectrumCompositorInitialize(
 
     ASSERT(Compositor != NULL);
 
-    Status = IrisStaticMemoryAllocatorInitialize(&Compositor->ReflectionSpectrumAllocator,
-                                                 sizeof(REFLECTION_SPECTRUM));
+    Status = StaticMemoryAllocatorInitialize(&Compositor->ReflectionSpectrumAllocator,
+                                             sizeof(REFLECTION_SPECTRUM));
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = IrisStaticMemoryAllocatorInitialize(&Compositor->AttenuatedSpectrumAllocator,
-                                                 sizeof(ATTENUATED_SPECTRUM));
+    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedSpectrumAllocator,
+                                             sizeof(ATTENUATED_SPECTRUM));
 
     if (Status != ISTATUS_SUCCESS)
     {
-        IrisStaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
         return Status;
     }
 
-    Status = IrisStaticMemoryAllocatorInitialize(&Compositor->FmaSpectrumAllocator,
-                                                 sizeof(FMA_SPECTRUM));
+    Status = StaticMemoryAllocatorInitialize(&Compositor->FmaSpectrumAllocator,
+                                             sizeof(FMA_SPECTRUM));
 
     if (Status != ISTATUS_SUCCESS)
     {
-        IrisStaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
-        IrisStaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
         return Status;
     }
 
-    Status = IrisStaticMemoryAllocatorInitialize(&Compositor->SumSpectrumAllocator,
-                                                 sizeof(SUM_SPECTRUM));
+    Status = StaticMemoryAllocatorInitialize(&Compositor->SumSpectrumAllocator,
+                                             sizeof(SUM_SPECTRUM));
 
     if (Status != ISTATUS_SUCCESS)
     {
-        IrisStaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
-        IrisStaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
-        IrisStaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
         return Status;
     }
 
@@ -126,10 +125,10 @@ SpectrumCompositorClear(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor
     )
 {
-    IrisStaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
-    IrisStaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
-    IrisStaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
-    IrisStaticMemoryAllocatorFreeAll(&Compositor->SumSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->SumSpectrumAllocator);
 }
 
 SFORCEINLINE
@@ -138,10 +137,10 @@ SpectrumCompositorDestroy(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor
     )
 {
-    IrisStaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
-    IrisStaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
-    IrisStaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
-    IrisStaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
 }
 
 #endif // _SPECTRUM_COMPOSITOR_IRIS_PHYSX_INTERNAL_

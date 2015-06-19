@@ -23,7 +23,7 @@ Abstract:
 //
 
 typedef struct _SHARED_HIT_DATA_ALLOCATOR {
-    IRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
 } SHARED_HIT_DATA_ALLOCATOR, *PSHARED_HIT_DATA_ALLOCATOR;
 
 //
@@ -38,15 +38,15 @@ SharedHitDataAllocatorInitialize(
     _Out_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )
 {
-    PIRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
     ISTATUS Status;
 
     ASSERT(Allocator != NULL);
 
     SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
 
-    Status = IrisStaticMemoryAllocatorInitialize(SharedHitDataAllocator,
-                                                 sizeof(SHARED_HIT_DATA));
+    Status = StaticMemoryAllocatorInitialize(SharedHitDataAllocator,
+                                             sizeof(SHARED_HIT_DATA));
 
     return Status;
 }
@@ -59,14 +59,14 @@ SharedHitDataAllocatorAllocate(
     _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )
 {
-    PIRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
     PVOID Allocation;
 
     ASSERT(Allocator != NULL);
 
     SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(SharedHitDataAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(SharedHitDataAllocator);
 
     return (PSHARED_HIT_DATA) Allocation;
 }
@@ -77,13 +77,13 @@ SharedHitDataAllocatorFreeLastAllocation(
     _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )
 {
-    PIRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
 
     ASSERT(Allocator != NULL);
 
     SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
 
-    IrisStaticMemoryAllocatorFreeLastAllocation(SharedHitDataAllocator);
+    StaticMemoryAllocatorFreeLastAllocation(SharedHitDataAllocator);
 }
 
 SFORCEINLINE
@@ -92,13 +92,13 @@ SharedHitDataAllocatorFreeAll(
     _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )
 {
-    PIRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
 
     ASSERT(Allocator != NULL);
 
     SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
 
-    IrisStaticMemoryAllocatorFreeAll(SharedHitDataAllocator);
+    StaticMemoryAllocatorFreeAll(SharedHitDataAllocator);
 }
 
 SFORCEINLINE
@@ -107,13 +107,13 @@ SharedHitDataAllocatorDestroy(
     _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )
 {
-    PIRIS_STATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
 
     ASSERT(Allocator != NULL);
 
     SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
 
-    IrisStaticMemoryAllocatorDestroy(SharedHitDataAllocator);
+    StaticMemoryAllocatorDestroy(SharedHitDataAllocator);
 }
 
 #endif // _SHARED_HIT_DATA_ALLOCATOR_IRIS_

@@ -30,8 +30,8 @@ ShapeHitAllocatorAllocateInternal(
     )
 {
     PSHAPE_HIT_ALLOCATOR_ALLOCATION ShapeHitAllocatorAllocation;
-    PIRIS_DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
-    PIRIS_STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
+    PDYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
+    PSTATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
     PINTERNAL_SHAPE_HIT InternalShapeHit;
     PSHAPE_HIT_LIST ShapeHitList;
     PSHAPE_HIT ShapeHit;
@@ -58,7 +58,7 @@ ShapeHitAllocatorAllocateInternal(
 
     ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(ShapeHitAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(ShapeHitAllocator);
 
     if (Allocation == NULL)
     {
@@ -75,12 +75,12 @@ ShapeHitAllocatorAllocateInternal(
     {
         AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
 
-        Allocation = IrisDynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
-                                                        AdditionalDataSizeInBytes);
+        Allocation = DynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
+                                                    AdditionalDataSizeInBytes);
 
         if (Allocation == NULL)
         {
-            IrisStaticMemoryAllocatorFreeLastAllocation(ShapeHitAllocator);
+            StaticMemoryAllocatorFreeLastAllocation(ShapeHitAllocator);
             return ISTATUS_ALLOCATION_FAILED;
         }
 

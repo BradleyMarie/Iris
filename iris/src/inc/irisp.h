@@ -28,16 +28,15 @@ Abstract:
 #endif
 
 #include <iris.h>
+#include <iriscommon_pointerlist.h>
+#include <iriscommon_constpointerlist.h>
+#include <iriscommon_dynamicallocator.h>
+#include <iriscommon_staticallocator.h>
 
-#include "iris_types.h"
 #include "iris_matrix.h"
 #include "iris_vector.h"
 #include "iris_point.h"
 #include "iris_ray.h"
-#include "iris_pointerlist.h"
-#include "iris_constpointerlist.h"
-#include "iris_dynamicallocator.h"
-#include "iris_staticallocator.h"
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_sharedhitdataallocator.h"

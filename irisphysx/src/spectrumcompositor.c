@@ -412,7 +412,7 @@ SpectrumCompositorAddSpectrums(
                                                         Sum);
     }
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(&Compositor->SumSpectrumAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->SumSpectrumAllocator);
 
     if (Allocation == NULL)
     {
@@ -485,7 +485,7 @@ SpectrumCompositorAttenuateSpectrum(
         Attenuation *= SpectrumAsAttenuatedSpectrum->Attenuation;
     }
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(&Compositor->AttenuatedSpectrumAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->AttenuatedSpectrumAllocator);
 
     if (Allocation == NULL)
     {
@@ -574,7 +574,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
         Attenuation *= AttenuatedSpectrum->Attenuation;
     }
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(&Compositor->FmaSpectrumAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->FmaSpectrumAllocator);
 
     if (Allocation == NULL)
     {
@@ -626,7 +626,7 @@ SpectrumCompositorAddReflection(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Allocation = IrisStaticMemoryAllocatorAllocate(&Compositor->ReflectionSpectrumAllocator);
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->ReflectionSpectrumAllocator);
 
     if (Allocation == NULL)
     {

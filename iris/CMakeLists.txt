@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 
-include_directories(inc src/inc)
+include_directories(inc src/inc ../iriscommon)
 
 add_library(iris SHARED
     src/matrix.c

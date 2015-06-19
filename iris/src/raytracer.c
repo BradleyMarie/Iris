@@ -21,7 +21,7 @@ Abstract:
 struct _RAYTRACER {
     SHAPE_HIT_ALLOCATOR ShapeHitAllocator;
     SHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
-    IRIS_CONSTANT_POINTER_LIST HitList;
+    CONSTANT_POINTER_LIST HitList;
     SIZE_T HitIndex;
     RAY CurrentRay;
 };
@@ -86,7 +86,7 @@ RayTracerAllocate(
         return NULL;
     }
 
-    Status = IrisConstantPointerListInitialize(&RayTracer->HitList);
+    Status = ConstantPointerListInitialize(&RayTracer->HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -99,7 +99,7 @@ RayTracerAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        IrisConstantPointerListDestroy(&RayTracer->HitList);
+        ConstantPointerListDestroy(&RayTracer->HitList);
         ShapeHitAllocatorDestroy(&RayTracer->ShapeHitAllocator);
         free(RayTracer);
         return NULL;
@@ -121,7 +121,7 @@ RayTracerSetRay(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
-    PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCONSTANT_POINTER_LIST PointerList;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
     if (RayTracer == NULL)
@@ -140,7 +140,7 @@ RayTracerSetRay(
 
     SharedHitDataAllocatorFreeAll(SharedHitDataAllocator);
     ShapeHitAllocatorFreeAll(ShapeHitAllocator);
-    IrisConstantPointerListClear(PointerList);
+    ConstantPointerListClear(PointerList);
 
     RayTracer->HitIndex = 0;
 
@@ -187,7 +187,7 @@ RayTracerTraceShape(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
-    PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
     PINTERNAL_SHAPE_HIT InternalShapeHit;
@@ -242,8 +242,8 @@ RayTracerTraceShape(
 
         InternalShapeHit->SharedHitData = SharedHitData;
 
-        Status = IrisConstantPointerListAddPointer(PointerList,
-                                                   InternalShapeHit);
+        Status = ConstantPointerListAddPointer(PointerList,
+                                               InternalShapeHit);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -267,7 +267,7 @@ RayTracerTraceShapeWithTransform(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
-    PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
     PINTERNAL_SHAPE_HIT InternalShapeHit;
@@ -336,8 +336,8 @@ RayTracerTraceShapeWithTransform(
 
         InternalShapeHit->SharedHitData = SharedHitData;
 
-        Status = IrisConstantPointerListAddPointer(PointerList,
-                                                   InternalShapeHit);
+        Status = ConstantPointerListAddPointer(PointerList,
+                                               InternalShapeHit);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -360,8 +360,8 @@ RayTracerSort(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    IrisConstantPointerListSort(&RayTracer->HitList,
-                                RayTracerInternalShapeHitPointerCompare);
+    ConstantPointerListSort(&RayTracer->HitList,
+                            RayTracerInternalShapeHitPointerCompare);
 
     return ISTATUS_SUCCESS;
 }
@@ -374,7 +374,7 @@ RayTracerGetNextShapeHit(
     _Out_ PCSHAPE_HIT *ShapeHit
     )
 {
-    PCIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCCONSTANT_POINTER_LIST PointerList;
     PCINTERNAL_SHAPE_HIT InternalShapeHit;
     PCVOID ValueAtIndex;
     SIZE_T CurrentIndex;
@@ -388,7 +388,7 @@ RayTracerGetNextShapeHit(
 
     PointerList = &RayTracer->HitList;
 
-    HitCount = IrisConstantPointerListGetSize(PointerList);
+    HitCount = ConstantPointerListGetSize(PointerList);
     CurrentIndex = RayTracer->HitIndex;
 
     if (HitCount == CurrentIndex)
@@ -396,8 +396,8 @@ RayTracerGetNextShapeHit(
         return ISTATUS_NO_MORE_DATA;
     }
 
-    ValueAtIndex = IrisConstantPointerListRetrieveAtIndex(PointerList,
-                                                          CurrentIndex);
+    ValueAtIndex = ConstantPointerListRetrieveAtIndex(PointerList,
+                                                      CurrentIndex);
 
     RayTracer->HitIndex = CurrentIndex + 1;
 
@@ -421,7 +421,7 @@ RayTracerGetNextHit(
     _Out_opt_ PCMATRIX *ModelToWorld
     )
 {
-    PCIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCCONSTANT_POINTER_LIST PointerList;
     PCSHARED_HIT_DATA SharedHitData;
     PCINTERNAL_SHAPE_HIT InternalShapeHit;
     PPOINT3 WorldHitPointPointer;
@@ -438,7 +438,7 @@ RayTracerGetNextHit(
 
     PointerList = &RayTracer->HitList;
 
-    HitCount = IrisConstantPointerListGetSize(PointerList);
+    HitCount = ConstantPointerListGetSize(PointerList);
     CurrentIndex = RayTracer->HitIndex;
 
     if (HitCount == CurrentIndex)
@@ -446,8 +446,8 @@ RayTracerGetNextHit(
         return ISTATUS_NO_MORE_DATA;
     }
 
-    ValueAtIndex = IrisConstantPointerListRetrieveAtIndex(PointerList,
-                                                          CurrentIndex);
+    ValueAtIndex = ConstantPointerListRetrieveAtIndex(PointerList,
+                                                      CurrentIndex);
 
     RayTracer->HitIndex = CurrentIndex + 1;
 
@@ -540,7 +540,7 @@ RayTracerFree(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
-    PIRIS_CONSTANT_POINTER_LIST PointerList;
+    PCONSTANT_POINTER_LIST PointerList;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
 
     if (RayTracer == NULL)
@@ -554,7 +554,7 @@ RayTracerFree(
 
     SharedHitDataAllocatorDestroy(SharedHitDataAllocator);
     ShapeHitAllocatorDestroy(ShapeHitAllocator);
-    IrisConstantPointerListDestroy(PointerList);
+    ConstantPointerListDestroy(PointerList);
 
     free(RayTracer);
 }
