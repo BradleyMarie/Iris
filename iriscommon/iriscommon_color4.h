@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisrgb_color4.h
+    iriscommon_color4.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _COLOR4_IRIS_RGB_
-#define _COLOR4_IRIS_RGB_
+#ifndef _IRIS_COMMON_COLOR4_
+#define _IRIS_COMMON_COLOR4_
 
-#include <irisrgb.h>
+#include <irisadvanced.h>
 
 //
 // Types
@@ -213,4 +213,4 @@ Color4InitializeTransparent(
     return Color;
 }
 
-#endif // _COLOR4_IRIS_RGB_
+#endif // _IRIS_COMMON_COLOR4_

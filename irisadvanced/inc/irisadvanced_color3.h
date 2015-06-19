@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisrgb_color3.h
+    irisadvanced_color3.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _COLOR3_IRIS_RGB_
-#define _COLOR3_IRIS_RGB_
+#ifndef _IRIS_ADVANCED_COLOR3_
+#define _IRIS_ADVANCED_COLOR3_
 
-#include <irisrgb.h>
+#include <iris.h>
 
 //
 // Types
@@ -280,4 +280,4 @@ Color3InitializeWhite(
     return Color;
 }
 
-#endif // _COLOR3_IRIS_RGB_
+#endif // _IRIS_ADVANCED_COLOR3_

@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_RGB_INTERNAL_HEADER_
 #define _IRIS_RGB_INTERNAL_HEADER_
 
+#include <iriscommon_color4.h>
 #include <irisrgb.h>
 
 #include "irisrgb_surfacenormal.h"

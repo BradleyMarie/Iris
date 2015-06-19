@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    listscene.h
+    iriscommon_listscene.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _LIST_SCENE_IRIS_SCENES_
-#define _LIST_SCENE_IRIS_SCENES_
+#ifndef _IRIS_COMMON_LIST_SCENE_
+#define _IRIS_COMMON_LIST_SCENE_
 
 #include <iris.h>
 
@@ -201,4 +201,6 @@ ListSceneTrace(
     return ISTATUS_SUCCESS;
 }
 
-#endif // _LIST_SCENE_IRIS_SCENES_
+#undef LIST_SCENE_INTIAL_SIZE
+
+#endif // _IRIS_COMMON_LIST_SCENE_

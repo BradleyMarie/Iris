@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc inc src/inc)
+include_directories(../iris/inc ../irisadvanced/inc ../iriscommon inc src/inc)
 
 add_library(irisrgb SHARED
     src/surfacenormal.c

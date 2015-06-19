@@ -19,8 +19,6 @@ Abstract:
 
 #include "irisrgb_api.h"
 #include "irisrgb_types.h"
-#include "irisrgb_color3.h"
-#include "irisrgb_color4.h"
 #include "irisrgb_surfacenormal.h"
 #include "irisrgb_rayshader.h"
 #include "irisrgb_emissive.h"

@@ -25,7 +25,9 @@ TextureShaderShadeShader(
     _In_opt_ PCTRANSLUCENT_SHADER TranslucentShader
     )
 {
+    COLOR3 HitColor;
     ISTATUS Status;
+    FLOAT Alpha;
 
     if (TextureShader == NULL)
     {
@@ -45,9 +47,33 @@ TextureShaderShadeShader(
                                             EmissiveShader,
                                             DirectShader,
                                             IndirectShader,
-                                            TranslucentShader,
                                             TextureShader->SurfaceNormal,
-                                            TextureShader->Color);
+                                            &HitColor);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (TranslucentShader != NULL)
+    {
+        Status = TranslucentShaderShade(TranslucentShader,
+                                        TextureShader->WorldHit,
+                                        TextureShader->ModelHit,
+                                        TextureShader->AdditionalData,
+                                        &Alpha);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+    }
+    else
+    {
+        Alpha = (FLOAT) 1.0f;
+    }
+
+    *TextureShader->Color = Color4InitializeFromColor3(HitColor, Alpha);
 
     return Status;
 }
