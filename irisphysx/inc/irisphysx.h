@@ -16,11 +16,9 @@ Abstract:
 #define _IRIS_PHYSX_HEADER_
 
 #include <irisadvanced.h>
+#include <irisspectrum.h>
 
 #include "irisphysx_api.h"
-#include "irisphysx_spectrum.h"
-#include "irisphysx_reflector.h"
-#include "irisphysx_spectrumcompositor.h"
 #include "irisphysx_shader.h"
 #include "irisphysx_shape.h"
 #include "irisphysx_scene.h"

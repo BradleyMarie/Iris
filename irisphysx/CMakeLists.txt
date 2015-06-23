@@ -1,18 +1,16 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc ../iriscommon inc src/inc)
+include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../iriscommon inc src/inc)
 
 add_library(irisphysx SHARED
-    src/reflector.c
-    src/spectrum.c
-    src/spectrumcompositor.c
     src/shader.c
     src/shape.c
     src/scene.c)
 
 target_link_libraries(irisphysx 
     iris
-    irisadvanced)
+    irisadvanced
+    irisspectrum)
 
 generate_export_header(irisphysx
     BASE_NAME irisphysx

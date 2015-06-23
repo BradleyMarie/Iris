@@ -18,7 +18,4 @@ Abstract:
 #include <irisphysx.h>
 #include <iriscommon_staticallocator.h>
 
-#include "irisphysx_spectrum.h"
-#include "irisphysx_spectrumcompositor.h"
-
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_
