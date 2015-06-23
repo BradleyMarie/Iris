@@ -21,7 +21,7 @@ Abstract:
 #include "irisadvanced_rng.h"
 #include "irisadvanced_normal.h"
 #include "irisadvanced_boundingbox.h"
-#include "irisadvanced_boundedshape.h"
+#include "irisadvanced_advancedshape.h"
 #include "irisadvanced_scene.h"
 #include "irisadvanced_visibilitytester.h"
 #include "irisadvanced_color3.h"

@@ -7,7 +7,7 @@ add_library(irisadvanced SHARED
     src/random.c
     src/normal.c
     src/scene.c
-    src/boundedshape.c)
+    src/advancedshape.c)
 
 target_link_libraries(irisadvanced 
     iris)

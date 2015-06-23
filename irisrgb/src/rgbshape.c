@@ -30,7 +30,7 @@ RgbShapeAllocate(
 {
     PSHAPE Shape;
 
-    Shape = ShapeAllocate(&RgbShapeVTable->BoundedShapeVTable .ShapeVTable,
+    Shape = ShapeAllocate(&RgbShapeVTable->AdvancedShapeVTable.ShapeVTable,
                           Data,
                           DataSizeInBytes,
                           DataAlignment);
@@ -49,15 +49,15 @@ RgbShapeCheckBounds(
     _Out_ PBOOL IsInsideBox
     )
 {
-    PCBOUNDED_SHAPE BoundedShape;
+    PCADVANCED_SHAPE AdvancedShape;
     ISTATUS Status;
 
-    BoundedShape = (PCBOUNDED_SHAPE) RgbShape;
+    AdvancedShape = (PCADVANCED_SHAPE) RgbShape;
 
-    Status = BoundedShapeCheckBounds(BoundedShape,
-                                     ModelToWorld,
-                                     WorldAlignedBoundingBox,
-                                     IsInsideBox);
+    Status = AdvancedShapeCheckBounds(AdvancedShape,
+                                      ModelToWorld,
+                                      WorldAlignedBoundingBox,
+                                      IsInsideBox);
 
     return Status;
 }

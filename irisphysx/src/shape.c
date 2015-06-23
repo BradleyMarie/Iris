@@ -30,7 +30,7 @@ SpectrumShapeAllocate(
 {
     PSHAPE Shape;
 
-    Shape = ShapeAllocate(&SpectrumShapeVTable->BoundedShapeVTable.ShapeVTable,
+    Shape = ShapeAllocate(&SpectrumShapeVTable->AdvancedShapeVTable.ShapeVTable,
                           Data,
                           DataSizeInBytes,
                           DataAlignment);
@@ -48,15 +48,15 @@ SpectrumShapeCheckBounds(
     _Out_ PBOOL IsInsideBox
     )
 {
-    PCBOUNDED_SHAPE BoundedShape;
+    PCADVANCED_SHAPE AdvancedShape;
     ISTATUS Status;
 
-    BoundedShape = (PCBOUNDED_SHAPE) SpectrumShape;
+    AdvancedShape = (PCADVANCED_SHAPE) SpectrumShape;
 
-    Status = BoundedShapeCheckBounds(BoundedShape,
-                                     ModelToWorld,
-                                     WorldAlignedBoundingBox,
-                                     IsInsideBox);
+    Status = AdvancedShapeCheckBounds(AdvancedShape,
+                                      ModelToWorld,
+                                      WorldAlignedBoundingBox,
+                                      IsInsideBox);
 
     return Status;
 }
