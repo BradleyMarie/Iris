@@ -21,6 +21,21 @@ Abstract:
 namespace Iris {
 
 //
+// Forward Declarations
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS 
+ShapeTrace(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
+    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    );
+
+//
 // Types
 //
 
@@ -138,9 +153,9 @@ private:
         _In_ SIZE_T AdditionalDataSizeInBytes
         );
     
+    friend
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
-    friend
     ISTATUS 
     ShapeTrace(
         _In_opt_ PCVOID Context, 

@@ -64,7 +64,7 @@ ConstantPointerListInitialize(
 
     PointerList->PointerListCapacity = ListCapacity;
     PointerList->PointerListSize = 0;
-    PointerList->PointerList = List;
+    PointerList->PointerList = (PCVOID *) List;
 
     return ISTATUS_SUCCESS;
 }

@@ -28,6 +28,7 @@ Abstract:
 #define _In_range_(low, hi)
 #define _In_reads_(size)
 #define _In_reads_opt_(size)
+#define _In_reads_bytes_(size)
 #define _In_reads_bytes_opt_(size)
 
 #define _Field_size_(size) 
@@ -41,12 +42,14 @@ Abstract:
 #define _Inout_opt_
 #define _Inout_updates_(size)
 
+#define _Pre_invalid_
 #define _Pre_maybenull_
 #define _Post_invalid_
 
 #define _Post_writable_byte_size_(size)
 
 #define _Out_
+#define _Out_opt_
 #define _Out_writes_(size)
 #define _Out_range_(min, max)
 
@@ -57,11 +60,15 @@ Abstract:
 
 #define _Deref_post_null_
 
+#define _Ret_
+#define _Ret_opt_
 #define _Ret_range_(min, max)
 
 #define _Success_(expr)
 #define _Check_return_
 #define _Ret_maybenull_
+
+#define _When_(expr0,expr1)
 
 #endif // _SAL_IRIS_
 

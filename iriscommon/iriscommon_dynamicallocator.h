@@ -145,7 +145,7 @@ DynamicMemoryAllocatorAllocate(
         Allocator->AllocationListTail = DynamicAllocation;
     }
 
-    return (PCHAR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
+    return (PVOID) ((PUINT8) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION));
 }
 
 SFORCEINLINE
@@ -185,4 +185,4 @@ DynamicMemoryAllocatorDestroy(
     }
 }
 
-#endif _IRIS_COMMON_DYNAMIC_MEMORY_ALLOCATOR_
+#endif // _IRIS_COMMON_DYNAMIC_MEMORY_ALLOCATOR_

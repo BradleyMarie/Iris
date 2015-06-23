@@ -17,6 +17,7 @@ Abstract:
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "iris_api.h"
 #include "iris_annotations.h"

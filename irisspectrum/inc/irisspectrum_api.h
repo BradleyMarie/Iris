@@ -9,20 +9,20 @@
 #  ifndef IRISSPECTRUMAPI
 #    ifdef irisspectrum_EXPORTS
         /* We are building this library */
-#      define IRISSPECTRUMAPI __declspec(dllexport)
+#      define IRISSPECTRUMAPI __attribute__((visibility("default")))
 #    else
         /* We are using this library */
-#      define IRISSPECTRUMAPI __declspec(dllimport)
+#      define IRISSPECTRUMAPI __attribute__((visibility("default")))
 #    endif
 #  endif
 
 #  ifndef IRISSPECTRUM_NO_EXPORT
-#    define IRISSPECTRUM_NO_EXPORT 
+#    define IRISSPECTRUM_NO_EXPORT __attribute__((visibility("hidden")))
 #  endif
 #endif
 
 #ifndef IRISSPECTRUM_DEPRECATED
-#  define IRISSPECTRUM_DEPRECATED __declspec(deprecated)
+#  define IRISSPECTRUM_DEPRECATED __attribute__ ((__deprecated__))
 #endif
 
 #ifndef IRISSPECTRUM_DEPRECATED_EXPORT

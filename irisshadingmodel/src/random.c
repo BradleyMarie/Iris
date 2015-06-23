@@ -18,7 +18,7 @@ Abstract:
 // Types
 //
 
-typedef struct _RANDOM {
+struct _RANDOM {
     PCRANDOM_VTABLE RandomVTable;
     SIZE_T ReferenceCount;
     PVOID Data;

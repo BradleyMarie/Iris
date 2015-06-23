@@ -177,7 +177,7 @@ PhongDirectShaderShade(
     PhongShader = (PCPHONG_SHADER) Context;
 
     Status = PhongShader->LightSelectionRoutine(Context,
-                                                PhongShader->Lights,
+                                                (PCVOID CONST *) PhongShader->Lights,
                                                 PhongShader->NumberOfLights,
                                                 PhongDirectShaderShadeLight,
                                                 WorldHitPoint,

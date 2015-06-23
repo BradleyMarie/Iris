@@ -206,6 +206,7 @@ TriangleTraceTriangle(
 }
 
 STATIC
+VOID
 TriangleFree(
     _In_ _Post_invalid_ PVOID Context
     )

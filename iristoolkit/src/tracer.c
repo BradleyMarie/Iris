@@ -357,7 +357,7 @@ CommonTracerAllocateInternal(
 
     RandomReference(Rng);
 
-    Tracer->TracerHeader.FreeRoutine = TracerFree;
+    Tracer->TracerHeader.FreeRoutine = CommonTracerFree;
     Tracer->TracerHeader.RayShader = RayShader;
     Tracer->VisibilityTester = VisibilityTester;
     Tracer->Rng = Rng;

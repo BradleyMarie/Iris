@@ -76,7 +76,7 @@ public:
                 DeletionFunction(Data);
             }
 
-            References = ToData.References;
+            References = ToCopy.References;
 
             *References += 1;
 

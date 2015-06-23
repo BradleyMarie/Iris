@@ -196,7 +196,6 @@ IrisAlignedMalloc(
     PVOID *OriginalAllocationPointer;
     SIZE_T AllocationAlignment;
     SIZE_T AllocationSize;
-    PVOID Allocation;
     ISTATUS Status;
 
     if (SizeInBytes == 0 || Alignment < sizeof(PVOID))

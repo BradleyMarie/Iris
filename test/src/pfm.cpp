@@ -66,7 +66,7 @@ WritePfm(
     Scale = (IsLittleEndian()) ? (FLOAT) -1.0 : (FLOAT) 1.0;
 
     fprintf(File, "PF\n");
-    fprintf(File, "%u %u\n", Width, Height);
+    fprintf(File, "%zu %zu\n", Width, Height);
     fprintf(File, "%lf\n", Scale);
 
     for (RowIndex = 0; RowIndex < Height; RowIndex++)

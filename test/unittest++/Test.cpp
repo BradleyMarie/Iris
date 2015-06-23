@@ -7,7 +7,7 @@
 #include "ExecuteTest.h"
 
 #ifdef UNITTEST_POSIX
-    #include "Posix/SignalTranslator.h"
+    #include "posix/SignalTranslator.h"
 #endif
 
 namespace UnitTest {

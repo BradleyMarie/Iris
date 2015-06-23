@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisshadingmodel_random.h
+    random.c
 
 Abstract:
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-typedef struct _RANDOM {
-    PCRANDOM_VTABLE RandomVTable;
+struct _RANDOM {
+    PCRANDOM_VTABLE VTable;
     SIZE_T ReferenceCount;
     PVOID Data;
 };
@@ -65,7 +65,7 @@ RandomAllocate(
 
     Random = (PRANDOM) HeaderAllocation;
 
-    Random->RandomVTable = RandomVTable;
+    Random->VTable = RandomVTable;
     Random->Data = DataAllocation;
     Random->ReferenceCount = 1;
 
@@ -98,10 +98,10 @@ RandomGenerateFloat(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Status = Rng->RandomVTable->GenerateFloatRoutine(Rng->Data,
-                                                     Minimum,
-                                                     Maximum,
-                                                     RandomValue);
+    Status = Rng->VTable->GenerateFloatRoutine(Rng->Data,
+                                               Minimum,
+                                               Maximum,
+                                               RandomValue);
 
     return Status;
 }
@@ -123,10 +123,10 @@ RandomGenerateIndex(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    Status = Rng->RandomVTable->GenerateIndexRoutine(Rng->Data,
-                                                     Minimum,
-                                                     Maximum,
-                                                     RandomValue);
+    Status = Rng->VTable->GenerateIndexRoutine(Rng->Data,
+                                               Minimum,
+                                               Maximum,
+                                               RandomValue);
 
     return Status;
 }
@@ -160,7 +160,7 @@ RandomDereference(
 
     if (Random->ReferenceCount == 0)
     {
-        FreeRoutine = Random->RandomVTable->FreeRoutine;
+        FreeRoutine = Random->VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {

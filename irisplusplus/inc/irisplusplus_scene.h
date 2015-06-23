@@ -21,6 +21,29 @@ Abstract:
 namespace Iris {
 
 //
+// Forward Declarations
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS 
+SceneTrace(
+    _In_ PCVOID Context, 
+    _In_ RAY IrisWorldRay,
+    _Inout_ PSCENE_TRACER IrisSceneTracer
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS 
+SceneAddObject(
+    _Inout_ PVOID Context,
+    _In_ PSCENE_OBJECT SceneObject
+    );
+
+//
 // Types
 //
 

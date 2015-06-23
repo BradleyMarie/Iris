@@ -10,7 +10,7 @@
 #ifndef UNITTEST_POSIX
 	#define UNITTEST_THROW_SIGNALS
 #else
-	#include "Posix/SignalTranslator.h"
+	#include "posix/SignalTranslator.h"
 #endif
 
 #ifdef TEST

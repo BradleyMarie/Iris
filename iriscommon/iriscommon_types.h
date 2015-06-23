@@ -24,4 +24,4 @@ COMPARISON_RESULT
     _In_ PCVOID Element1
     );
 
-#endif _IRIS_COMMON_TYPES_
+#endif // _IRIS_COMMON_TYPES_

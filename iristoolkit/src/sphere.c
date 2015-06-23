@@ -224,6 +224,7 @@ SphereTraceSphere(
 }
 
 STATIC
+VOID
 SphereFree(
     _In_ _Post_invalid_ PVOID Context
     )
