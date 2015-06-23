@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1) 
+cmake_minimum_required (VERSION 3.2) 
 project (iris)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
