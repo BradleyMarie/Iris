@@ -20,5 +20,7 @@ Abstract:
 
 #include "irisspectrum_spectrum.h"
 #include "irisspectrum_spectrumcompositor.h"
+#include "irisspectrum_reflector.h"
+#include "irisspectrum_reflectorcompositor.h"
 
 #endif // _IRIS_SPECTRUM_INTERNAL_HEADER_

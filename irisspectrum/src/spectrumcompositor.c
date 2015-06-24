@@ -201,7 +201,7 @@ ZeroSpectrumSample(
     _Out_ PFLOAT Intensity
     )
 {
-    ASSERT(Context != NULL);
+    ASSERT(Context == NULL);
     ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsPositiveFloat(Wavelength) != FALSE);

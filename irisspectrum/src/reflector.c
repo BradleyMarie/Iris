@@ -15,16 +15,6 @@ Abstract:
 #include <irisspectrump.h>
 
 //
-// Types
-//
-
-struct _REFLECTOR {
-    PCREFLECTOR_VTABLE VTable;
-    SIZE_T ReferenceCount;
-    PVOID Data;
-};
-
-//
 // Functions
 //
 

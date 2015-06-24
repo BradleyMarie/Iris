@@ -5,7 +5,8 @@ include_directories(../iris/inc ../irisadvanced/inc ../iriscommon inc src/inc)
 add_library(irisspectrum SHARED
     src/spectrum.c
     src/reflector.c
-    src/spectrumcompositor.c)
+    src/spectrumcompositor.c
+    src/reflectorcompositor.c)
 
 target_link_libraries(irisspectrum 
     iris
