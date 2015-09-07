@@ -46,15 +46,14 @@ typedef CONST LIST_SCENE *PCLIST_SCENE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-ListSceneAllocate(
+ListSceneInitialize(
     _Out_ PLIST_SCENE Output
     )
 {
     PLIST_SCENE_OBJECT Objects;
-    PSCENE Scene;
 
     ASSERT(Output != NULL);
 
@@ -69,7 +68,7 @@ ListSceneAllocate(
     Output->ObjectsSize = 0;
     Output->ObjectsCapacity = LIST_SCENE_INTIAL_SIZE;
 
-    return Scene;
+    return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
