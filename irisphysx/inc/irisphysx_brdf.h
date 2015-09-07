@@ -52,42 +52,9 @@ ISTATUS
     _Out_ PFLOAT Pdf
     );
 
-typedef
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-(*PBRDF_APROXIMATE_ALL_OUTGOING)(
-    _In_ PCVOID Context,
-    _In_ VECTOR3 Incoming,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
-    _In_ UINT32 NumberOfSamples,
-    _Inout_ PRANDOM Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
-    _Out_ PFLOAT Pdf
-    );
-
-typedef
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-(*PBRDF_APROXIMATE_ALL_DIRECTIONS)(
-    _In_ PCVOID Context,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
-    _In_ UINT32 NumberOfSamples,
-    _Inout_ PRANDOM Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
-    _Out_ PFLOAT Pdf
-    );
-
 typedef struct _BRDF_VTABLE {
     PBRDF_SAMPLE SampleRoutine;
     PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
-    PBRDF_APROXIMATE_ALL_OUTGOING AproximateAllOutgoing;
-    PBRDF_APROXIMATE_ALL_DIRECTIONS AproximateAllDirections;
     PFREE_ROUTINE FreeRoutine;
 } BRDF_VTABLE, *PBRDF_VTABLE;
 
@@ -137,37 +104,6 @@ BrdfComputeReflectance(
     _In_ VECTOR3 Outgoing,
     _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
-    _Out_ PFLOAT Pdf
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS
-BrdfAproximateAllOutgoing(
-    _In_ PCBRDF Brdf,
-    _In_ VECTOR3 Incoming,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
-    _In_ UINT32 NumberOfSamples,
-    _Inout_ PRANDOM Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
-    _Out_ PFLOAT Pdf
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS
-BrdfAproximateAllDirections(
-    _In_ PCBRDF Brdf,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
-    _In_ UINT32 NumberOfSamples,
-    _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
