@@ -4,16 +4,16 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisphysx_rgbshape.h
+    irisphysx_shape.h
 
 Abstract:
 
-    This file contains the definitions for the SPECTRUM_SHAPE type.
+    This file contains the definitions for the PHYSX_SHAPE type.
 
 --*/
 
-#ifndef _SPECTRUM_SHAPE_IRIS_PHYSX_
-#define _SPECTRUM_SHAPE_IRIS_PHYSX_
+#ifndef _PHYSX_SHAPE_IRIS_PHYSX_
+#define _PHYSX_SHAPE_IRIS_PHYSX_
 
 #include <irisphysx.h>
 

@@ -20,7 +20,6 @@ Abstract:
 
 #include "irisphysx_api.h"
 #include "irisphysx_brdf.h"
-#include "irisphysx_shader.h"
 #include "irisphysx_shape.h"
 #include "irisphysx_scene.h"
 
