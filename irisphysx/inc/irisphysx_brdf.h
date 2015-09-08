@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the BRDF_SHADER type.
+    This file contains the definitions for the BRDF type.
 
 --*/
 
-#ifndef _BRDF_SHADER_IRIS_PHYSX_
-#define _BRDF_SHADER_IRIS_PHYSX_
+#ifndef _BRDF_IRIS_PHYSX_
+#define _BRDF_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -32,7 +32,7 @@ ISTATUS
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     );
@@ -48,7 +48,7 @@ ISTATUS
     _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     );
 
@@ -89,7 +89,7 @@ BrdfSample(
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     );
@@ -105,7 +105,7 @@ BrdfComputeReflectance(
     _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     );
 
@@ -121,4 +121,4 @@ BrdfDereference(
     _In_opt_ _Post_invalid_ PBRDF Brdf
     );
 
-#endif // _BRDF_SHADER_IRIS_PHYSX_
+#endif // _BRDF_IRIS_PHYSX_

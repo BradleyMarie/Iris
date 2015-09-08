@@ -5,7 +5,8 @@ include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisc
 add_library(irisphysx SHARED
     src/shape.c
     src/scene.c
-    src/brdf.c)
+    src/brdf.c
+    src/light.c)
 
 target_link_libraries(irisphysx 
     iris

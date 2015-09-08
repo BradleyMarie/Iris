@@ -24,15 +24,15 @@ Abstract:
 typedef
 _Check_return_
 _Ret_opt_
-PCSPECTRUM_SHADER
-(*PSPECTRUM_SHAPE_GET_SHADER_ROUTINE)(
+PCBRDF
+(*PSPECTRUM_SHAPE_GET_BRDF_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
 
 typedef struct _SPECTRUM_SHAPE_VTABLE {
     ADVANCED_SHAPE_VTABLE AdvancedShapeVTable;
-    PSPECTRUM_SHAPE_GET_SHADER_ROUTINE GetShaderRoutine;
+    PSPECTRUM_SHAPE_GET_BRDF_ROUTINE GetBRDFRoutine;
 } SPECTRUM_SHAPE_VTABLE, *PSPECTRUM_SHAPE_VTABLE;
 
 typedef CONST SPECTRUM_SHAPE_VTABLE *PCSPECTRUM_SHAPE_VTABLE;
@@ -68,8 +68,8 @@ SpectrumShapeCheckBounds(
 
 _Ret_opt_
 IRISPHYSXAPI
-PCSPECTRUM_SHADER
-SpectrumShapeGetShader(
+PCBRDF
+SpectrumShapeGetBRDF(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     );

@@ -87,7 +87,7 @@ BrdfSample(
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -162,7 +162,7 @@ BrdfComputeReflectance(
     _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PREFLECTOR *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     )
 {
