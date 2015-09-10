@@ -71,18 +71,13 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorReflect(
-    _In_ PCREFLECTOR Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Wavelength,
     _In_ FLOAT IncomingIntensity,
     _Out_ PFLOAT OutgoingIntensity
     )
 {
     ISTATUS Status;
-
-    if (Reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
 
     if (IsNormalFloat(Wavelength) == FALSE ||
         IsFiniteFloat(Wavelength) == FALSE ||
@@ -98,10 +93,15 @@ ReflectorReflect(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    
     if (OutgoingIntensity == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Reflector == NULL)
+    {
+        *OutgoingIntensity = (FLOAT) 0.0f;
+        return ISTATUS_SUCCESS;
     }
 
     Status = Reflector->VTable->ReflectRoutine(Reflector->Data,

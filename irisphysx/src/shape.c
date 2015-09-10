@@ -92,6 +92,38 @@ SpectrumShapeGetBRDF(
     return Brdf;
 }
 
+_Ret_opt_
+IRISPHYSXAPI
+PCLIGHT
+SpectrumShapeGetLight(
+    _In_ PCSPECTRUM_SHAPE SpectrumShape,
+    _In_ UINT32 FaceHit
+    )
+{
+    PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
+    PCSHAPE_VTABLE ShapeVTable;
+    PCSHAPE Shape;
+    PCLIGHT Light;
+    PCVOID Data;
+
+    if (SpectrumShape == NULL)
+    {
+        return NULL;
+    }
+
+    Shape = (PCSHAPE) SpectrumShape;
+
+    Data = ShapeGetData(Shape);
+
+    ShapeVTable = ShapeGetVTable(Shape);
+
+    SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
+
+    Light = SpectrumShapeVTable->GetLightRoutine(Data, FaceHit);
+
+    return Light;   
+}
+
 VOID
 SpectrumShapeReference(
     _In_opt_ PCSPECTRUM_SHAPE SpectrumShape

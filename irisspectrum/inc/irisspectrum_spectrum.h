@@ -61,7 +61,7 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
 ISTATUS
 SpectrumSample(
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Wavelength,
     _Out_ PFLOAT Intensity
     );

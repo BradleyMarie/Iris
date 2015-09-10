@@ -34,8 +34,8 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _Out_ PCSPECTRUM *Sum
     );
 
@@ -45,7 +45,7 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation,
     _Out_ PCSPECTRUM *AttenuatedSpectrum
     );
@@ -56,8 +56,8 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
     _Out_ PCSPECTRUM *AttenuatedSum
     );
@@ -68,8 +68,8 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum,
-    _In_ PCREFLECTOR Reflector,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
     _Out_ PCSPECTRUM *ReflectedSpectrum
     );
 

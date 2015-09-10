@@ -32,9 +32,19 @@ ISTATUS
     _In_ BOOL Premultiplied
     );
 
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+(*PSPECTRUM_SCENE_ADD_LIGHT_ROUTINE)(
+    _Inout_ PVOID Context,
+    _In_ PLIGHT Light
+    );
+
 typedef struct _SPECTRUM_SCENE_VTABLE {
     SCENE_VTABLE SceneVTable;
     PSPECTRUM_SCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
+    PSPECTRUM_SCENE_ADD_LIGHT_ROUTINE AddLightRoutine;
 } SPECTRUM_SCENE_VTABLE, *PSPECTRUM_SCENE_VTABLE;
 
 typedef CONST SPECTRUM_SCENE_VTABLE *PCSPECTRUM_SCENE_VTABLE;
@@ -89,6 +99,15 @@ SpectrumSceneAddWorldObject(
 
     return Status;
 }
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS 
+SpectrumSceneAddLight(
+    _Inout_ PSPECTRUM_SCENE SpectrumScene,
+    _In_ PLIGHT Light
+    );
 
 IRISPHYSXAPI
 VOID

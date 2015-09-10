@@ -208,17 +208,6 @@ CONST STATIC REFLECTOR_VTABLE SumReflectorVTable = {
     NULL
 };
 
-CONST STATIC REFLECTOR_VTABLE ZeroReflectorVTable = {
-    ZeroReflectorReflect,
-    NULL
-};
-
-STATIC REFLECTOR ZeroReflector = {
-    &ZeroReflectorVTable,
-    0,
-    NULL
-};
-
 //
 // Initialization Functions
 //
@@ -234,9 +223,7 @@ FmaReflectorInitialize(
 {
     ASSERT(FmaReflector != NULL);
     ASSERT(Reflector0 != NULL);
-    ASSERT(Reflector0 != &ZeroReflector);
     ASSERT(Reflector1 != NULL);
-    ASSERT(Reflector1 != &ZeroReflector);
     ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
@@ -259,7 +246,6 @@ AttenuatedReflectorInitialize(
 {
     ASSERT(AttenuatedReflector != NULL);
     ASSERT(Reflector != NULL);
-    ASSERT(Reflector != &ZeroReflector);
     ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
@@ -281,9 +267,7 @@ SumReflectorInitialize(
 {
     ASSERT(SumReflector != NULL);
     ASSERT(Reflector0 != NULL);
-    ASSERT(Reflector0 != &ZeroReflector);
     ASSERT(Reflector1 != NULL);
-    ASSERT(Reflector1 != &ZeroReflector);
 
     SumReflector->ReflectorHeader.VTable = &SumReflectorVTable;
     SumReflector->ReflectorHeader.ReferenceCount = 0;
@@ -301,8 +285,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_ PCREFLECTOR Reflector0,
-    _In_ PCREFLECTOR Reflector1,
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
     _Out_ PCREFLECTOR *Sum
     )
 {
@@ -315,28 +299,18 @@ ReflectorCompositorAddReflections(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Reflector0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (Reflector1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     if (Sum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector0 == &ZeroReflector)
+    if (Reflector0 == NULL)
     {
         *Sum = Reflector1;
         return ISTATUS_SUCCESS;
     }
 
-    if (Reflector1 == &ZeroReflector)
+    if (Reflector1 == NULL)
     {
         *Sum = Reflector0;
         return ISTATUS_SUCCESS;
@@ -386,7 +360,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAttenuateReflection(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_ PCREFLECTOR Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
     _Out_ PCREFLECTOR *AttenuatedReflectorOutput
     )
@@ -400,11 +374,6 @@ ReflectorCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if(IsNormalFloat(Attenuation) != FALSE ||
        IsFiniteFloat(Attenuation) != FALSE);
     {
@@ -416,10 +385,10 @@ ReflectorCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == &ZeroReflector ||
+    if (Reflector == NULL ||
         IsZeroFloat(Attenuation) != FALSE)
     {
-        *AttenuatedReflectorOutput = &ZeroReflector;
+        *AttenuatedReflectorOutput = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -458,8 +427,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAttenuatedAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_ PCREFLECTOR Reflector0,
-    _In_ PCREFLECTOR Reflector1,
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
     _In_ FLOAT Attenuation,
     _Out_ PCREFLECTOR *AttenuatedSum
     )
@@ -473,16 +442,6 @@ ReflectorCompositorAttenuatedAddReflections(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Reflector0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (Reflector1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     if(IsNormalFloat(Attenuation) != FALSE ||
        IsFiniteFloat(Attenuation) != FALSE);
     {
@@ -494,7 +453,7 @@ ReflectorCompositorAttenuatedAddReflections(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Reflector0 == &ZeroReflector)
+    if (Reflector0 == NULL)
     {
         return ReflectorCompositorAttenuateReflection(Compositor,
                                                       Reflector1,
@@ -502,7 +461,7 @@ ReflectorCompositorAttenuatedAddReflections(
                                                       AttenuatedSum);
     }
 
-    if (Reflector1 == &ZeroReflector ||
+    if (Reflector1 == NULL ||
         IsZeroFloat(Attenuation) != FALSE)
     {
         *AttenuatedSum = Reflector0;

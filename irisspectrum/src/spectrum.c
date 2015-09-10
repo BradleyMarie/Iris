@@ -71,17 +71,12 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumSample(
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Wavelength,
     _Out_ PFLOAT Intensity
     )
 {
     ISTATUS Status;
-
-    if (Spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
 
     if (IsNormalFloat(Wavelength) == FALSE ||
         IsFiniteFloat(Wavelength) == FALSE ||
@@ -93,6 +88,12 @@ SpectrumSample(
     if (Intensity == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Spectrum == NULL)
+    {
+        *Intensity = (FLOAT) 0.0f;
+        return ISTATUS_SUCCESS;
     }
 
     Status = Spectrum->VTable->SampleRoutine(Spectrum->Data,

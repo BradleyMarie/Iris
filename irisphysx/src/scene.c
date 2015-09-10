@@ -77,6 +77,41 @@ SpectrumSceneAddObject(
     return Status;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS 
+SpectrumSceneAddLight(
+    _Inout_ PSPECTRUM_SCENE SpectrumScene,
+    _In_ PLIGHT Light
+    )
+{
+    PCSPECTRUM_SCENE_VTABLE SpectrumSceneVTable;
+    ISTATUS Status;
+    PSCENE Scene;
+    PVOID Data;
+
+    if (SpectrumScene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Scene = (PSCENE) SpectrumScene;
+
+    SpectrumSceneVTable = (PCSPECTRUM_SCENE_VTABLE) SceneGetVTable(Scene);
+
+    Data = SceneGetData(Scene);
+
+    Status = SpectrumSceneVTable->AddLightRoutine(Data, Light);
+
+    return Status;   
+}
+
 VOID
 SpectrumSceneReference(
     _In_opt_ PSPECTRUM_SCENE SpectrumScene

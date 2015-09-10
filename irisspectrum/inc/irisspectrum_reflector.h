@@ -62,7 +62,7 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
 ISTATUS
 ReflectorReflect(
-    _In_ PCREFLECTOR Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Wavelength,
     _In_ FLOAT IncomingIntensity,
     _Out_ PFLOAT OutgoingIntensity

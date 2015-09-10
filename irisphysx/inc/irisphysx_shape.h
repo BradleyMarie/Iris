@@ -30,9 +30,19 @@ PCBRDF
     _In_ UINT32 FaceHit
     );
 
+typedef
+_Check_return_
+_Ret_opt_
+PCLIGHT
+(*PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE)(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 FaceHit
+    );
+
 typedef struct _SPECTRUM_SHAPE_VTABLE {
     ADVANCED_SHAPE_VTABLE AdvancedShapeVTable;
     PSPECTRUM_SHAPE_GET_BRDF_ROUTINE GetBRDFRoutine;
+    PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE GetLightRoutine;
 } SPECTRUM_SHAPE_VTABLE, *PSPECTRUM_SHAPE_VTABLE;
 
 typedef CONST SPECTRUM_SHAPE_VTABLE *PCSPECTRUM_SHAPE_VTABLE;
@@ -70,6 +80,14 @@ _Ret_opt_
 IRISPHYSXAPI
 PCBRDF
 SpectrumShapeGetBRDF(
+    _In_ PCSPECTRUM_SHAPE SpectrumShape,
+    _In_ UINT32 FaceHit
+    );
+
+_Ret_opt_
+IRISPHYSXAPI
+PCLIGHT
+SpectrumShapeGetLight(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     );

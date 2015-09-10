@@ -236,17 +236,6 @@ CONST STATIC SPECTRUM_VTABLE ReflectionSpectrumVTable = {
     NULL
 };
 
-CONST STATIC SPECTRUM_VTABLE ZeroSpectrumVTable = {
-    ZeroSpectrumSample,
-    NULL
-};
-
-STATIC SPECTRUM ZeroSpectrum = {
-    &ZeroSpectrumVTable,
-    0,
-    NULL
-};
-
 //
 // Initialization Functions
 //
@@ -262,9 +251,7 @@ FmaSpectrumInitialize(
 {
     ASSERT(FmaSpectrum != NULL);
     ASSERT(Spectrum0 != NULL);
-    ASSERT(Spectrum0 != &ZeroSpectrum);
     ASSERT(Spectrum1 != NULL);
-    ASSERT(Spectrum1 != &ZeroSpectrum);
     ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
@@ -287,7 +274,6 @@ AttenuatedSpectrumInitialize(
 {
     ASSERT(AttenuatedSpectrum != NULL);
     ASSERT(Spectrum != NULL);
-    ASSERT(Spectrum != &ZeroSpectrum);
     ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
@@ -309,9 +295,7 @@ SumSpectrumInitialize(
 {
     ASSERT(SumSpectrum != NULL);
     ASSERT(Spectrum0 != NULL);
-    ASSERT(Spectrum0 != &ZeroSpectrum);
     ASSERT(Spectrum1 != NULL);
-    ASSERT(Spectrum1 != &ZeroSpectrum);
 
     SumSpectrum->SpectrumHeader.VTable = &SumSpectrumVTable;
     SumSpectrum->SpectrumHeader.ReferenceCount = 0;
@@ -348,8 +332,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _Out_ PCSPECTRUM *Sum
     )
 {
@@ -362,28 +346,18 @@ SpectrumCompositorAddSpectrums(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Spectrum0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (Spectrum1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     if (Sum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Spectrum0 == &ZeroSpectrum)
+    if (Spectrum0 == NULL)
     {
         *Sum = Spectrum1;
         return ISTATUS_SUCCESS;
     }
 
-    if (Spectrum1 == &ZeroSpectrum)
+    if (Spectrum1 == NULL)
     {
         *Sum = Spectrum0;
         return ISTATUS_SUCCESS;
@@ -433,7 +407,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation,
     _Out_ PCSPECTRUM *AttenuatedSpectrumOutput
     )
@@ -447,11 +421,6 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if(IsNormalFloat(Attenuation) != FALSE ||
        IsFiniteFloat(Attenuation) != FALSE);
     {
@@ -463,10 +432,10 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Spectrum == &ZeroSpectrum ||
+    if (Spectrum == NULL ||
         IsZeroFloat(Attenuation) != FALSE)
     {
-        *AttenuatedSpectrumOutput = &ZeroSpectrum;
+        *AttenuatedSpectrumOutput = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -505,8 +474,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
     _Out_ PCSPECTRUM *AttenuatedSum
     )
@@ -520,16 +489,6 @@ SpectrumCompositorAttenuatedAddSpectrums(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Spectrum0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (Spectrum1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     if(IsNormalFloat(Attenuation) != FALSE ||
        IsFiniteFloat(Attenuation) != FALSE);
     {
@@ -541,7 +500,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Spectrum0 == &ZeroSpectrum)
+    if (Spectrum0 == NULL)
     {
         return SpectrumCompositorAttenuateSpectrum(Compositor,
                                                    Spectrum1,
@@ -549,7 +508,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
                                                    AttenuatedSum);
     }
 
-    if (Spectrum1 == &ZeroSpectrum ||
+    if (Spectrum1 == NULL ||
         IsZeroFloat(Attenuation) != FALSE)
     {
         *AttenuatedSum = Spectrum0;
@@ -607,19 +566,11 @@ SpectrumCompositorAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Spectrum == NULL)
+    if (Spectrum == NULL ||
+        Reflector == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (Reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (ReflectedSpectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        *ReflectedSpectrum = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     Allocation = StaticMemoryAllocatorAllocate(&Compositor->ReflectionSpectrumAllocator);
