@@ -83,7 +83,7 @@ ISTATUS
 LightSample(
     _In_ PCLIGHT Light,
     _In_ POINT3 HitPoint,
-    _Inout_ PVOID VisibilityTester,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM Rng,
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _Out_ PCSPECTRUM *Spectrum,

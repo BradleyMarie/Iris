@@ -65,4 +65,4 @@ VisibilityTesterFree(
     _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
     );
 
-#endif // _RANDOM_IRIS_ADVANCED_
+#endif // _VISIBILITY_TESTER_IRIS_ADVANCED_
