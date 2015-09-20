@@ -37,6 +37,7 @@ CMakeCache.txt
 *.unsuccessfulbuild
 *.exp
 *.user
+*.stackdump
 
 # Log files
 *.tlog
