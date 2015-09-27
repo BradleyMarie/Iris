@@ -195,12 +195,12 @@ SphereTraceSphere(
                                        0,
                                        ShapeHitList);
 
+#if defined(ENABLE_CSG_SUPPORT)
+
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
-
-#if defined(ENABLE_CSG_SUPPORT)
 
     Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
                 LengthOfRaySquared;
@@ -213,14 +213,9 @@ SphereTraceSphere(
                                        0,
                                        ShapeHitList);
 
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
 #endif // defined(ENABLE_CSG_SUPPORT)
 
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 STATIC
