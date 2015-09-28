@@ -21,6 +21,7 @@ Abstract:
 #include "irisphysx_api.h"
 #include "irisphysx_brdf.h"
 #include "irisphysx_light.h"
+#include "irisphysx_texture.h"
 #include "irisphysx_shape.h"
 #include "irisphysx_scene.h"
 

@@ -24,8 +24,8 @@ Abstract:
 typedef
 _Check_return_
 _Ret_opt_
-PCBRDF
-(*PSPECTRUM_SHAPE_GET_BRDF_ROUTINE)(
+PCTEXTURE
+(*PSPECTRUM_SHAPE_GET_TEXTURE_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit
     );
@@ -41,7 +41,7 @@ PCLIGHT
 
 typedef struct _SPECTRUM_SHAPE_VTABLE {
     ADVANCED_SHAPE_VTABLE AdvancedShapeVTable;
-    PSPECTRUM_SHAPE_GET_BRDF_ROUTINE GetBRDFRoutine;
+    PSPECTRUM_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
     PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE GetLightRoutine;
 } SPECTRUM_SHAPE_VTABLE, *PSPECTRUM_SHAPE_VTABLE;
 
@@ -78,8 +78,8 @@ SpectrumShapeCheckBounds(
 
 _Ret_opt_
 IRISPHYSXAPI
-PCBRDF
-SpectrumShapeGetBRDF(
+PCTEXTURE
+SpectrumShapeGetTexture(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     );

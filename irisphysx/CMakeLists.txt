@@ -6,7 +6,8 @@ add_library(irisphysx SHARED
     src/shape.c
     src/scene.c
     src/brdf.c
-    src/light.c)
+    src/light.c
+    src/texture.c)
 
 target_link_libraries(irisphysx 
     iris

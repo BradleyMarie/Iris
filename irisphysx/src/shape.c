@@ -62,8 +62,8 @@ SpectrumShapeCheckBounds(
 }
 
 _Ret_opt_
-PCBRDF
-SpectrumShapeGetBRDF(
+PCTEXTURE
+SpectrumShapeGetTexture(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     )
@@ -72,7 +72,7 @@ SpectrumShapeGetBRDF(
     PCSHAPE_VTABLE ShapeVTable;
     PCSHAPE Shape;
     PCVOID Data;
-    PCBRDF Brdf;
+    PCTEXTURE Texture;
 
     if (SpectrumShape == NULL)
     {
@@ -87,9 +87,9 @@ SpectrumShapeGetBRDF(
 
     SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
 
-    Brdf = SpectrumShapeVTable->GetBRDFRoutine(Data, FaceHit);
+    Texture = SpectrumShapeVTable->GetTextureRoutine(Data, FaceHit);
 
-    return Brdf;
+    return Texture;
 }
 
 _Ret_opt_
