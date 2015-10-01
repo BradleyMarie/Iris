@@ -62,8 +62,8 @@ SpectrumShapeCheckBounds(
 }
 
 _Ret_opt_
-PCTEXTURE
-SpectrumShapeGetTexture(
+PCMATERIAL
+SpectrumShapeGetMaterial(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
     _In_ UINT32 FaceHit
     )
@@ -72,7 +72,7 @@ SpectrumShapeGetTexture(
     PCSHAPE_VTABLE ShapeVTable;
     PCSHAPE Shape;
     PCVOID Data;
-    PCTEXTURE Texture;
+    PCMATERIAL Material;
 
     if (SpectrumShape == NULL)
     {
@@ -87,9 +87,9 @@ SpectrumShapeGetTexture(
 
     SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
 
-    Texture = SpectrumShapeVTable->GetTextureRoutine(Data, FaceHit);
+    Material = SpectrumShapeVTable->GetMaterialRoutine(Data, FaceHit);
 
-    return Texture;
+    return Material;
 }
 
 _Ret_opt_
