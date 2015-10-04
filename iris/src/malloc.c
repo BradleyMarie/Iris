@@ -161,7 +161,6 @@ IrisAlignedMalloc(
     SIZE_T AlignmentMinusOne;
     PVOID Allocation;
 
-
 #if __STDC_VERSION__ >= 201112L
     
     if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
