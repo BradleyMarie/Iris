@@ -15,16 +15,6 @@ Abstract:
 #include <irisphysxp.h>
 
 //
-// Types
-//
-
-struct _BRDF {
-    PCBRDF_VTABLE VTable;
-    SIZE_T ReferenceCount;
-    PVOID Data;
-};
-
-//
 // Functions
 //
 

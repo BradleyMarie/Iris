@@ -59,6 +59,11 @@ IrisAlignedMallocWithHeader(
 
     if (DataSizeInBytes != 0)
     {
+        if (DataAlignment < sizeof(PVOID))
+        {
+            return NULL;
+        }
+        
         DataAlignmentMinusOne = DataAlignment - 1;
 
         if (DataAlignment & DataAlignmentMinusOne)

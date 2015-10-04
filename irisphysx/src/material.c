@@ -87,6 +87,7 @@ MaterialSample(
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
+    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Out_ PBRDF *Brdf
     )
 {
@@ -107,9 +108,14 @@ MaterialSample(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
     
-    if (Brdf == NULL)
+    if (BrdfAllocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+    
+    if (Brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
     
     Status = Material->VTable->SampleRoutine(Material->Data,
@@ -117,6 +123,7 @@ MaterialSample(
                                              AdditionalData,
                                              ShapeSurfaceNormal,
                                              ModelToWorld,
+                                             BrdfAllocator,
                                              Brdf);
     
     return ISTATUS_SUCCESS;

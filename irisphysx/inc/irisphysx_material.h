@@ -31,6 +31,7 @@ ISTATUS
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ShapeSurfaceNormal,
     _In_ PCMATRIX ModelToWorld,
+    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Out_ PBRDF *Brdf
     );
 
@@ -69,6 +70,7 @@ MaterialSample(
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
+    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Out_ PBRDF *Brdf
     );
 

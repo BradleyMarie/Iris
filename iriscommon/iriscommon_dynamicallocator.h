@@ -59,12 +59,14 @@ DynamicMemoryAllocatorInitialize(
     Allocator->NextAllocation = NULL;
 }
 
-_When_(SizeInBytes != 0, _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(SizeInBytes))
+_Check_return_ 
+_Ret_maybenull_ 
+_Post_writable_byte_size_(SizeInBytes)
 SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _In_ SIZE_T SizeInBytes
+    _In_range_(1, SIZE_T_MAX) SIZE_T SizeInBytes
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;

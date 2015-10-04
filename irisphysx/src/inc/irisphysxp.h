@@ -17,5 +17,8 @@ Abstract:
 
 #include <irisphysx.h>
 #include <iriscommon_staticallocator.h>
+#include <iriscommon_dynamicallocator.h>
+
+#include "irisphysx_brdf.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_
