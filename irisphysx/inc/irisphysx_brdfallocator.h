@@ -37,16 +37,17 @@ BrdfAllocatorCreate(
     );
 
 _Check_return_
-_Ret_maybenull_
+_Success_(Return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PCBRDF
+ISTATUS
 BrdfAllocatorAllocate(
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _In_ PBRDF_SAMPLE SampleRoutine,
     _In_ PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine,
     _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _In_ SIZE_T DataAlignment,
+    _Out_ PCBRDF *Brdf
     );
 
 IRISPHYSXAPI

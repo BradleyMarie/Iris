@@ -55,18 +55,83 @@ BrdfAllocatorCreate(
 }
 
 _Check_return_
-_Ret_maybenull_
-PCBRDF
+_Success_(Return == ISTATUS_SUCCESS)
+ISTATUS
 BrdfAllocatorAllocate(
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _In_ PBRDF_SAMPLE SampleRoutine,
     _In_ PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine,
     _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _In_ SIZE_T DataAlignment,
+    _Out_ PCBRDF *Brdf
     )
 {
-    return NULL;
+    PRUNTIME_ALLOCATED_BRDF_HEADER AllocatedBrdf;
+    PVOID DataDestination;
+    PVOID Header;
+    
+    if (BrdfAllocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (SampleRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (ComputeReflectanceRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (DataSizeInBytes != 0)
+    {
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+        
+        if (DataAlignment & DataAlignment - 1 ||
+            DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+    }
+    
+    if (Brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    Header = DynamicMemoryAllocatorAllocateWithHeader(&BrdfAllocator->Allocator,
+                                                      sizeof(RUNTIME_ALLOCATED_BRDF_HEADER),
+                                                      sizeof(PVOID),
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataDestination);
+                                                      
+    if (Header == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    AllocatedBrdf = (PRUNTIME_ALLOCATED_BRDF_HEADER) Header;
+    
+    AllocatedBrdf->BrdfVTable.SampleRoutine = SampleRoutine;
+    AllocatedBrdf->BrdfVTable.ComputeReflectanceRoutine = ComputeReflectanceRoutine;
+    AllocatedBrdf->BrdfVTable.FreeRoutine = NULL;
+    
+    AllocatedBrdf->BrdfHeader.VTable = &AllocatedBrdf->BrdfVTable;
+    AllocatedBrdf->BrdfHeader.ReferenceCount = 0;
+    AllocatedBrdf->BrdfHeader.Data = DataDestination;
+    
+    memcpy(DataDestination, Data, DataSizeInBytes);
+    
+    *Brdf = &AllocatedBrdf->BrdfHeader;
+
+    return ISTATUS_SUCCESS;
 }
 
 VOID
