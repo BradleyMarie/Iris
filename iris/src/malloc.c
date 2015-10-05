@@ -32,17 +32,17 @@ IrisAlignedMallocWithHeader(
     _When_(DataSizeInBytes == 0, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
     )
 {
-    SIZE_T HeaderAlignmentMinusOne;
-    SIZE_T DataAlignmentMinusOne;
     SIZE_T AlignHeaderWithDataPadding;
     SIZE_T AlignHeaderWithHeaderPadding;
+    SIZE_T HeaderAlignmentMinusOne;
+    SIZE_T DataAlignmentMinusOne;
     SIZE_T AllocationSize;
     SIZE_T HeaderPadding;
     PUINT8 Allocation;
     SIZE_T Status;
 
     if (HeaderSizeInBytes == 0 ||
-        HeaderAlignment < sizeof(PVOID) ||
+        HeaderAlignment == 0 ||
         DataPointer == NULL)
     {
         return NULL;
@@ -50,7 +50,8 @@ IrisAlignedMallocWithHeader(
 
     HeaderAlignmentMinusOne = HeaderAlignment - 1;
 
-    if (HeaderAlignment & HeaderAlignmentMinusOne)
+    if (HeaderAlignment & HeaderAlignmentMinusOne ||
+        HeaderAlignmentMinusOne & HeaderSizeInBytes)
     {
         return NULL;
     }
@@ -59,14 +60,15 @@ IrisAlignedMallocWithHeader(
 
     if (DataSizeInBytes != 0)
     {
-        if (DataAlignment < sizeof(PVOID))
+        if (DataAlignment == 0)
         {
             return NULL;
         }
         
         DataAlignmentMinusOne = DataAlignment - 1;
 
-        if (DataAlignment & DataAlignmentMinusOne)
+        if (DataAlignment & DataAlignmentMinusOne ||
+            DataAlignmentMinusOne & DataSizeInBytes)
         {
             return NULL;
         }
@@ -163,14 +165,15 @@ IrisAlignedMalloc(
 
 #if __STDC_VERSION__ >= 201112L
     
-    if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
+    if (SizeInBytes == 0 || Alignment == 0)
     {
         return NULL;
     }
 
     AlignmentMinusOne = Alignment - 1;
 
-    if (Alignment & AlignmentMinusOne)
+    if (Alignment & AlignmentMinusOne ||
+        SizeInBytes & AlignmentMinusOne)
     {
         return NULL;
     }
@@ -179,14 +182,15 @@ IrisAlignedMalloc(
 
 #elif _MSC_VER
 
-    if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
+    if (SizeInBytes == 0 || Alignment == 0)
     {
         return NULL;
     }
 
     AlignmentMinusOne = Alignment - 1;
 
-    if (Alignment & AlignmentMinusOne)
+    if (Alignment & AlignmentMinusOne ||
+        SizeInBytes & AlignmentMinusOne)
     {
         return NULL;
     }
@@ -196,40 +200,47 @@ IrisAlignedMalloc(
 #else
 
     PVOID OriginalAllocation;
-    PUINT8 AllocationAsByteArray;
     PVOID *OriginalAllocationPointer;
-    SIZE_T AllocationAlignment;
+    UINT_PTR AllocationAsUIntPtr;
+    UINT_PTR HeaderStartOffset;
+    UINT_PTR DataAlignmentOffset;
+    UINT_PTR DataOffset;
+    UINT_PTR DataStart;
     SIZE_T AllocationSize;
     ISTATUS Status;
 
-    if (SizeInBytes == 0 || Alignment < sizeof(PVOID))
+    if (SizeInBytes == 0 || Alignment == 0)
     {
         return NULL;
     }
 
     AlignmentMinusOne = Alignment - 1;
 
-    if (Alignment & AlignmentMinusOne)
+    if (Alignment & AlignmentMinusOne ||
+        SizeInBytes & AlignmentMinusOne)
     {
         return NULL;
     }
 
     Status = CheckedAddSizeT(SizeInBytes,
-                             AlignmentMinusOne,
-                             &AllocationSize);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return NULL;
-    }
-
-    Status = CheckedAddSizeT(AllocationSize,
                              sizeof(PVOID),
                              &AllocationSize);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return NULL;
+    }
+
+    if (Alignment > sizeof(PVOID))
+    {
+        Status = CheckedAddSizeT(AllocationSize,
+                                 AlignmentMinusOne,
+                                 &AllocationSize);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return NULL;
+        }
     }
 
     OriginalAllocation = malloc(AllocationSize);
@@ -239,19 +250,36 @@ IrisAlignedMalloc(
         return NULL;
     }
 
-    AllocationAsByteArray = (PUINT8) OriginalAllocation + sizeof(PVOID);
-    AllocationAlignment = (UINT_PTR) AllocationAsByteArray % Alignment;
+    ASSERT((UINT_PTR) OriginalAllocation % sizeof(PVOID) == 0);
 
-    if (AllocationAlignment != 0)
+    AllocationAsUIntPtr = (UINT_PTR) OriginalAllocation;
+
+    HeaderStartOffset = AllocationAsUIntPtr % sizeof(PVOID);
+
+    if (HeaderStartOffset != 0)
     {
-        AllocationAsByteArray += Alignment - AllocationAlignment;
+        HeaderStartOffset = sizeof(PVOID) - HeaderStartOffset;
     }
 
-    OriginalAllocationPointer = (PVOID*) AllocationAsByteArray - 1;
+    DataStart = AllocationAsUIntPtr + sizeof(PVOID) + HeaderStartOffset;
+
+    DataAlignmentOffset = DataStart % Alignment;
+
+    if (DataAlignmentOffset != 0)
+    {
+        DataAlignmentOffset = Alignment - DataAlignmentOffset;
+    }
+
+    DataStart += DataAlignmentOffset;
+
+    DataOffset = DataStart - AllocationAsUIntPtr;
+
+    Allocation = (PVOID) ((PUINT8) OriginalAllocation + DataOffset);
+
+    OriginalAllocationPointer = (PVOID*) ((PUINT8) Allocation + (DataOffset & (sizeof(PVOID) - 1)));
+    OriginalAllocationPointer -= 1;
 
     *OriginalAllocationPointer = OriginalAllocation;
-
-    Allocation = (PVOID) AllocationAsByteArray;
 
 #endif
 
@@ -274,13 +302,16 @@ IrisAlignedFree(
 #else
 
     PVOID *OriginalAllocationPointer;
+    UINT_PTR Header;
 
     if (Data == NULL)
     {
         return;
     }
 
-    OriginalAllocationPointer = (PVOID*) Data - 1;
+    Header = (sizeof(PVOID) - 1) & (UINT_PTR) Data;
+
+    OriginalAllocationPointer = (PVOID*) Header - 1;
 
     free(*OriginalAllocationPointer);
 

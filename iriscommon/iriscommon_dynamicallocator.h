@@ -66,12 +66,16 @@ SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _In_range_(1, SIZE_T_MAX) SIZE_T SizeInBytes
+    _Pre_satisfies_(SizeInBytes != 0) SIZE_T SizeInBytes,
+    _In_ SIZE_T Alignment
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;
     PDYNAMIC_MEMORY_ALLOCATION OlderAllocation;
     PDYNAMIC_MEMORY_ALLOCATION DynamicAllocation;
+    UINT_PTR WritableMemoryStartAddress;
+    UINT_PTR OffsetToAlignedAddress;
+    SIZE_T AlignmentMinusOne;
     SIZE_T AllocationSize;
     PVOID Allocation;
     ISTATUS Status;
@@ -79,6 +83,7 @@ DynamicMemoryAllocatorAllocate(
 
     ASSERT(Allocator != NULL);
     ASSERT(SizeInBytes != 0);
+    ASSERT((Alignment & (Alignment - 1)) == 0);
 
     Status = CheckedAddSizeT(SizeInBytes, 
                              sizeof(DYNAMIC_MEMORY_ALLOCATION),
@@ -93,14 +98,38 @@ DynamicMemoryAllocatorAllocate(
     {
         DynamicAllocation = Allocator->NextAllocation;
 
-        if (DynamicAllocation->SizeInBytes < SizeInBytes)
+        WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
+
+        OffsetToAlignedAddress = WritableMemoryStartAddress % Alignment;
+
+        if (OffsetToAlignedAddress != 0)
         {
+            OffsetToAlignedAddress = Alignment - OffsetToAlignedAddress;
+        }
+
+        if (DynamicAllocation->SizeInBytes < OffsetToAlignedAddress + SizeInBytes)
+        {
+            if (Alignment <= sizeof(PVOID))
+            {
+                AlignmentMinusOne = 0;
+            }
+            else
+            {
+                AlignmentMinusOne = Alignment - 1;
+            }
+
+            Status = CheckedAddSizeT(SizeInBytes, 
+                                     AlignmentMinusOne,
+                                     &AllocationSize);
+
             Resized = realloc(DynamicAllocation, AllocationSize);
 
             if (Resized == NULL)
             {
                 return NULL;
             }
+
+            ASSERT((UINT_PTR) Resized % sizeof(PVOID) == 0);
 
             DynamicAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Resized;
 
@@ -118,18 +147,42 @@ DynamicMemoryAllocatorAllocate(
             }
 
             DynamicAllocation->SizeInBytes = SizeInBytes;
+
+            WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
+
+            OffsetToAlignedAddress = WritableMemoryStartAddress % Alignment;
+
+            if (OffsetToAlignedAddress != 0)
+            {
+                OffsetToAlignedAddress = Alignment - OffsetToAlignedAddress;
+            }
         }
 
         Allocator->NextAllocation = DynamicAllocation->OlderAllocation;
     }
     else
-    {        
+    {
+        if (Alignment <= sizeof(PVOID))
+        {
+            AlignmentMinusOne = 0;
+        }
+        else
+        {
+            AlignmentMinusOne = Alignment - 1;
+        }
+
+        Status = CheckedAddSizeT(SizeInBytes, 
+                                 AlignmentMinusOne,
+                                 &AllocationSize);
+
         Allocation = malloc(AllocationSize);
 
         if (Allocation == NULL)
         {
             return NULL;
         }
+
+        ASSERT((UINT_PTR) Allocation % sizeof(PVOID) == 0);
 
         DynamicAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Allocation;
 
@@ -145,9 +198,68 @@ DynamicMemoryAllocatorAllocate(
         DynamicAllocation->SizeInBytes = SizeInBytes;
 
         Allocator->AllocationListTail = DynamicAllocation;
+
+        WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
+
+        OffsetToAlignedAddress = WritableMemoryStartAddress % Alignment;
+
+        if (OffsetToAlignedAddress != 0)
+        {
+            OffsetToAlignedAddress = Alignment - OffsetToAlignedAddress;
+        }
     }
 
-    return (PVOID) ((PUINT8) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION));
+    return (PVOID) ((PUINT8) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION) + OffsetToAlignedAddress);
+}
+
+_Check_return_ 
+_Ret_maybenull_ 
+_Post_writable_byte_size_(HeaderSizeInBytes)
+SFORCEINLINE
+PVOID
+DynamicMemoryAllocatorAllocateWithHeader(
+    _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
+    _In_ SIZE_T HeaderSizeInBytes,
+    _In_ SIZE_T HeaderAlignment,
+    _In_ SIZE_T DataSizeInBytes,
+    _In_ SIZE_T DataAlignment,
+    _When_(DataSizeInBytes == 0, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
+    )
+{
+    SIZE_T AllocationAlignment;
+    SIZE_T AllocationSize;
+    PVOID Header;
+
+    ASSERT(Allocator != NULL);
+    ASSERT(HeaderSizeInBytes != 0);
+    ASSERT((HeaderAlignment & (HeaderAlignment - 1)) == 0);
+    ASSERT(DataPointer != NULL);
+
+    if (HeaderAlignment > DataAlignment)
+    {
+        AllocationAlignment = HeaderAlignment;
+    }
+    else
+    {
+        AllocationAlignment = DataAlignment;
+    }
+
+    AllocationSize = HeaderSizeInBytes + DataSizeInBytes;
+
+    AllocationSize += AllocationAlignment - (AllocationSize % AllocationAlignment);
+
+    Header = DynamicMemoryAllocatorAllocate(Allocator,
+                                            AllocationSize,
+                                            AllocationAlignment);
+
+    if (Header == NULL)
+    {
+        return NULL;
+    }
+
+    *DataPointer = (PVOID) ((PUINT8) Header + HeaderSizeInBytes + (AllocationAlignment - HeaderSizeInBytes % AllocationAlignment));
+
+    return Header;
 }
 
 SFORCEINLINE

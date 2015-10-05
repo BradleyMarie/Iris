@@ -59,6 +59,7 @@ ShapeHitAllocatorAllocate(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment,
     _Out_ PSHAPE_HIT_LIST *ShapeHitList
     );
 
@@ -73,6 +74,7 @@ ShapeHitAllocatorAllocateWithHitPoint(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment,
     _In_ POINT3 HitPoint,
     _Out_ PSHAPE_HIT_LIST *ShapeHitList
     );

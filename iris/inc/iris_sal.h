@@ -69,6 +69,7 @@ Abstract:
 #define _Ret_maybenull_
 
 #define _When_(expr0,expr1)
+#define _Pre_satisfies(exor0)
 
 #endif // _SAL_IRIS_
 

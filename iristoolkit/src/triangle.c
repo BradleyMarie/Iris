@@ -199,6 +199,7 @@ TriangleTraceTriangle(
                                                    Face,
                                                    &BarycentricCoordinates,
                                                    sizeof(BARYCENTRIC_COORDINATES),
+                                                   sizeof(FLOAT),
                                                    Hit,
                                                    ShapeHitList);
 

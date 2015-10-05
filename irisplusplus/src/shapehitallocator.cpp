@@ -28,7 +28,8 @@ ShapeHitAllocator::Allocate(
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,    
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSizeInBytes
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment
     )
 {
     PSHAPE_HIT_LIST Result;
@@ -40,6 +41,7 @@ ShapeHitAllocator::Allocate(
                                        FaceHit,
                                        AdditionalData,
                                        AdditionalDataSizeInBytes,
+                                       AdditionalDataAlignment,
                                        &Result);
 
     switch (Status)
@@ -67,7 +69,8 @@ ShapeHitAllocator::Allocate(
     _In_ INT32 FaceHit,
     _In_ POINT3 & HitPoint,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-    _In_ SIZE_T AdditionalDataSizeInBytes
+    _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment
     )
 {
     PSHAPE_HIT_LIST Result;
@@ -79,6 +82,7 @@ ShapeHitAllocator::Allocate(
                                                    FaceHit,
                                                    AdditionalData,
                                                    AdditionalDataSizeInBytes,
+                                                   AdditionalDataAlignment,
                                                    HitPoint,
                                                    &Result);
 

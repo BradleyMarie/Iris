@@ -193,6 +193,7 @@ SphereTraceSphere(
                                        Face0,
                                        NULL,
                                        0,
+                                       0,
                                        ShapeHitList);
 
 #if defined(ENABLE_CSG_SUPPORT)
@@ -210,6 +211,7 @@ SphereTraceSphere(
                                        Distance1,
                                        Face1,
                                        NULL,
+                                       0,
                                        0,
                                        ShapeHitList);
 

@@ -25,6 +25,7 @@ ShapeHitAllocatorAllocateInternal(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment,
     _In_opt_ PPOINT3 ModelHitPoint,
     _Out_ PSHAPE_HIT_LIST *OutputShapeHitList
     )
@@ -76,7 +77,8 @@ ShapeHitAllocatorAllocateInternal(
         AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
 
         Allocation = DynamicMemoryAllocatorAllocate(AdditionalDataAllocator,
-                                                    AdditionalDataSizeInBytes);
+                                                    AdditionalDataSizeInBytes,
+                                                    AdditionalDataAlignment);
 
         if (Allocation == NULL)
         {
@@ -125,6 +127,7 @@ ShapeHitAllocatorAllocate(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment,
     _Out_ PSHAPE_HIT_LIST *ShapeHitList
     )
 {
@@ -141,6 +144,7 @@ ShapeHitAllocatorAllocate(
                                                FaceHit,
                                                AdditionalData,
                                                AdditionalDataSizeInBytes,
+                                               AdditionalDataAlignment,
                                                NULL,
                                                ShapeHitList);
 
@@ -157,6 +161,7 @@ ShapeHitAllocatorAllocateWithHitPoint(
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
+    _In_ SIZE_T AdditionalDataAlignment,
     _In_ POINT3 HitPoint,
     _Out_ PSHAPE_HIT_LIST *ShapeHitList
     )
@@ -174,6 +179,7 @@ ShapeHitAllocatorAllocateWithHitPoint(
                                                FaceHit,
                                                AdditionalData,
                                                AdditionalDataSizeInBytes,
+                                               AdditionalDataAlignment,
                                                &HitPoint,
                                                ShapeHitList);
 

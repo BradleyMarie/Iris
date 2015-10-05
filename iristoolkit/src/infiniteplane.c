@@ -126,6 +126,7 @@ InfinitePlaneTraceInfinitePlane(
                                            INFINITE_PLANE_FRONT_FACE,
                                            NULL,
                                            0,
+                                           0,
                                            ShapeHitList);
     }
     else
@@ -135,6 +136,7 @@ InfinitePlaneTraceInfinitePlane(
                                            Distance,
                                            INFINITE_PLANE_BACK_FACE,
                                            NULL,
+                                           0,
                                            0,
                                            ShapeHitList);
     }

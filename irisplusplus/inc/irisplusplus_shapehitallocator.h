@@ -57,6 +57,7 @@ public:
                                           FaceHit,
                                           IrisHitPoint,
                                           NULL,
+                                          0,
                                           0);
 
         return Output;
@@ -80,7 +81,8 @@ public:
                                           FaceHit,
                                           IrisHitPoint,
                                           static_cast<PCVOID>(AdditionalData),
-                                          sizeof(T));
+                                          sizeof(T),
+                                          sizeof(PVOID));
 
         return Output;
     }
@@ -97,6 +99,7 @@ public:
                                           Distance,
                                           FaceHit,
                                           NULL,
+                                          0,
                                           0);
 
         return Output;
@@ -116,7 +119,8 @@ public:
                                           Distance,
                                           FaceHit,
                                           static_cast<PCVOID>(AdditionalData),
-                                          sizeof(T));
+                                          sizeof(T),
+                                          sizeof(PVOID));
 
         return Output;
     }
@@ -138,7 +142,8 @@ private:
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,    
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-        _In_ SIZE_T AdditionalDataSizeInBytes
+        _In_ SIZE_T AdditionalDataSizeInBytes,
+        _In_ SIZE_T AdditionalDataAlignment
         );
 
     _Ret_
@@ -150,7 +155,8 @@ private:
         _In_ INT32 FaceHit,
         _In_ POINT3 & HitPoint,
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-        _In_ SIZE_T AdditionalDataSizeInBytes
+        _In_ SIZE_T AdditionalDataSizeInBytes,
+        _In_ SIZE_T AdditionalDataAlignment
         );
     
     friend
