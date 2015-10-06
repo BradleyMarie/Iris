@@ -37,7 +37,7 @@ BrdfAllocatorCreate(
     );
 
 _Check_return_
-_Success_(Return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
 BrdfAllocatorAllocate(

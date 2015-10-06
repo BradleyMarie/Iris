@@ -38,6 +38,8 @@ ShapeHitAllocatorAllocateInternal(
     PSHAPE_HIT ShapeHit;
     PVOID Allocation;
 
+    ASSERT(OutputShapeHitList != NULL);
+
     if (Allocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -49,13 +51,24 @@ ShapeHitAllocatorAllocateInternal(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (AdditionalData == NULL &&
-        AdditionalDataSizeInBytes != 0)
+    if (AdditionalDataSizeInBytes != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        if (AdditionalData == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+        
+        if (AdditionalDataAlignment == 0 ||
+            AdditionalDataAlignment & AdditionalDataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;    
+        }
+        
+        if (AdditionalDataSizeInBytes % AdditionalDataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
-
-    ASSERT(OutputShapeHitList != NULL);
 
     ShapeHitAllocator = &Allocator->ShapeHitAllocator;
 
@@ -65,12 +78,6 @@ ShapeHitAllocatorAllocateInternal(
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
-
-    ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
-
-    ShapeHitList = &ShapeHitAllocatorAllocation->ShapeHitList;
-    InternalShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit;
-    ShapeHit = &InternalShapeHit->ShapeHit;
 
     if (AdditionalDataSizeInBytes != 0)
     {
@@ -92,6 +99,12 @@ ShapeHitAllocatorAllocateInternal(
     {
         Allocation = NULL;
     }
+
+    ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
+
+    ShapeHitList = &ShapeHitAllocatorAllocation->ShapeHitList;
+    InternalShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit;
+    ShapeHit = &InternalShapeHit->ShapeHit;
 
     ShapeHit->Shape = Allocator->CurrentShape;
     ShapeHit->Distance = Distance;
@@ -167,6 +180,11 @@ ShapeHitAllocatorAllocateWithHitPoint(
     )
 {
     ISTATUS Status;
+
+    if (PointValidate(HitPoint) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
 
     if (ShapeHitList == NULL)
     {

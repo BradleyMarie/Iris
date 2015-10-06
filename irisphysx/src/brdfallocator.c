@@ -55,7 +55,7 @@ BrdfAllocatorCreate(
 }
 
 _Check_return_
-_Success_(Return == ISTATUS_SUCCESS)
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 BrdfAllocatorAllocate(
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
@@ -93,10 +93,15 @@ BrdfAllocatorAllocate(
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
         
-        if (DataAlignment & DataAlignment - 1 ||
-            DataSizeInBytes % DataAlignment != 0)
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
         {
-            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;    
+        }
+        
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
         }
     }
     

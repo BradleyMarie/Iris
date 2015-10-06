@@ -50,7 +50,7 @@ typedef struct _DYNAMIC_MEMORY_ALLOCATOR {
 SFORCEINLINE
 VOID
 DynamicMemoryAllocatorInitialize(
-    _Out_ PDYNAMIC_MEMORY_ALLOCATOR Allocator
+    _Pre_invalid_ _Post_valid_ PDYNAMIC_MEMORY_ALLOCATOR Allocator
     )
 {
     ASSERT(Allocator != NULL);
@@ -66,8 +66,8 @@ SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _Pre_satisfies_(SizeInBytes != 0) SIZE_T SizeInBytes,
-    _In_ SIZE_T Alignment
+    _Pre_satisfies_(SizeInBytes != 0 && SizeInBytes % Alignment == 0) SIZE_T SizeInBytes,
+    _Pre_satisfies_(Alignment != 0 && (Alignment & (Alignment - 1)) == 0) SIZE_T Alignment
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;
@@ -83,20 +83,10 @@ DynamicMemoryAllocatorAllocate(
     PVOID Resized;
 
     ASSERT(Allocator != NULL);
-    
-    if (SizeInBytes == 0 ||
-        Alignment == 0)
-    {
-        return NULL;
-    }
-
-    AlignmentMinusOne = Alignment - 1;
-    
-    if (Alignment & AlignmentMinusOne ||
-        SizeInBytes % Alignment != 0)
-    {
-        return NULL;
-    }
+    ASSERT(SizeInBytes != 0);
+    ASSERT(Alignment != 0);
+    ASSERT((Alignment & (Alignment - 1)) != 0);
+    ASSERT(SizeInBytes % Alignment == 0);
 
     Status = CheckedAddSizeT(SizeInBytes, 
                              sizeof(DYNAMIC_MEMORY_ALLOCATION),
@@ -133,6 +123,8 @@ DynamicMemoryAllocatorAllocate(
         {
             if (Alignment > sizeof(PVOID))
             {
+                AlignmentMinusOne = Alignment - 1;
+                
                 Status = CheckedAddSizeT(SizeInBytes, 
                                          AlignmentMinusOne,
                                          &AllocationSize);
@@ -185,6 +177,8 @@ DynamicMemoryAllocatorAllocate(
     {
         if (Alignment > sizeof(PVOID))
         {
+            AlignmentMinusOne = Alignment - 1;
+            
             Status = CheckedAddSizeT(SizeInBytes, 
                                      AlignmentMinusOne,
                                      &AllocationSize);
@@ -233,17 +227,18 @@ DynamicMemoryAllocatorAllocate(
 }
 
 _Check_return_ 
-_Ret_maybenull_ 
+_Success_(return != NULL)
+_Ret_maybenull_
 _Post_writable_byte_size_(HeaderSizeInBytes)
 SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocateWithHeader(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _In_ SIZE_T HeaderSizeInBytes,
-    _In_ SIZE_T HeaderAlignment,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
+    _Pre_satisfies_(HeaderSizeInBytes != 0 && HeaderSizeInBytes % HeaderAlignment == 0)  SIZE_T HeaderSizeInBytes,
+    _Pre_satisfies_(HeaderAlignment != 0 && (HeaderAlignment & (HeaderAlignment - 1)) == 0) SIZE_T HeaderAlignment,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes == 0 && DataPointer != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
     )
 {
     SIZE_T AllocationSize;
@@ -252,6 +247,10 @@ DynamicMemoryAllocatorAllocateWithHeader(
     PVOID Header;
 
     ASSERT(Allocator != NULL);
+    ASSERT(HeaderSizeInBytes != 0);
+    ASSERT(HeaderAlignment != 0);
+    ASSERT((HeaderAlignment & (HeaderAlignment - 1)) != 0);
+    ASSERT(HeaderSizeInBytes % HeaderAlignment == 0);
 
     if (DataSizeInBytes == 0)
     {
@@ -267,16 +266,10 @@ DynamicMemoryAllocatorAllocateWithHeader(
         return Header;    
     }
     
-    if (HeaderSizeInBytes == 0 ||
-        HeaderAlignment == 0 ||
-        HeaderAlignment & (HeaderAlignment - 1) ||
-        HeaderSizeInBytes % HeaderAlignment != 0 ||
-        DataAlignment & (DataAlignment - 1) ||
-        DataSizeInBytes % DataAlignment != 0 ||
-        DataPointer == NULL)
-    {
-        return NULL;
-    }
+    ASSERT(DataAlignment != 0);
+    ASSERT((DataAlignment & (DataAlignment- 1)) != 0);
+    ASSERT(DataSizeInBytes % DataAlignment == 0);
+    ASSERT(DataPointer != NULL);
 
     Status = CheckedAddSizeT(HeaderSizeInBytes,
                              DataSizeInBytes,
@@ -333,7 +326,7 @@ DynamicMemoryAllocatorFreeAll(
 SFORCEINLINE
 VOID
 DynamicMemoryAllocatorDestroy(
-    _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator
+    _Post_invalid_ PDYNAMIC_MEMORY_ALLOCATOR Allocator
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NextAllocation;
