@@ -172,10 +172,14 @@ DynamicMemoryAllocatorAllocateWithHeader(
     _When_(DataSizeInBytes == 0 && DataPointer != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
     )
 {
+    PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;
+    PDYNAMIC_MEMORY_ALLOCATION OlderAllocation;
+    PDYNAMIC_MEMORY_ALLOCATION NextAllocation;
     SIZE_T AllocationSize;
-    SIZE_T HeaderPadding;
-    ISTATUS Status;
+    PVOID AllocationHeader;
     PVOID Header;
+    PVOID Data;
+    BOOL Success;
 
     ASSERT(Allocator != NULL);
     ASSERT(HeaderSizeInBytes != 0);
@@ -201,50 +205,83 @@ DynamicMemoryAllocatorAllocateWithHeader(
         return Header;    
     }
 
-    Status = CheckedAddSizeT(HeaderSizeInBytes,
-                             DataSizeInBytes,
-                             &AllocationSize);
-                             
-    if (Status != ISTATUS_SUCCESS)
+    if (Allocator->NextAllocation != NULL)
     {
-        return NULL;
-    }
+        Success = IrisAlignedResizeWithTwoHeader(Allocator->NextAllocation,
+                                                 Allocator->NextAllocation->SizeInBytes,
+                                                 sizeof(DYNAMIC_MEMORY_ALLOCATION),
+                                                 _Alignof(DYNAMIC_MEMORY_ALLOCATION),
+                                                 &AllocationHeader,
+                                                 HeaderSizeInBytes,
+                                                 HeaderAlignment,
+                                                 &Header,
+                                                 DataSizeInBytes,
+                                                 DataAlignment,
+                                                 &Data,
+                                                 &AllocationSize);
 
-    if (DataAlignment <= HeaderAlignment)
-    { 
-        HeaderPadding = 0;
-        
-        Header = DynamicMemoryAllocatorAllocate(Allocator,
-                                                AllocationSize,
-                                                HeaderAlignment);
+        if (Success == FALSE)
+        {
+            return NULL;
+        }
+
+        NextAllocation = (PDYNAMIC_MEMORY_ALLOCATION) AllocationHeader;
+
+        if (Allocator->NextAllocation != NextAllocation)
+        {
+            OlderAllocation = NextAllocation->OlderAllocation;
+            NewerAllocation = NextAllocation->NewerAllocation;
+
+            if (OlderAllocation != NULL)
+            {
+                OlderAllocation->NewerAllocation = NextAllocation;
+            }
+
+            if (NewerAllocation != NULL)
+            {
+                NewerAllocation->OlderAllocation = NextAllocation;
+            }
+
+            NextAllocation->SizeInBytes = AllocationSize;
+        }
+
+        Allocator->NextAllocation = NextAllocation->OlderAllocation;
     }
     else
     {
-        HeaderPadding = HeaderSizeInBytes % DataAlignment;
-        
-        if (HeaderPadding != 0)
+        Success = IrisAlignedAllocWithTwoHeaders(sizeof(DYNAMIC_MEMORY_ALLOCATION),
+                                                 _Alignof(DYNAMIC_MEMORY_ALLOCATION),
+                                                 &AllocationHeader,
+                                                 HeaderSizeInBytes,
+                                                 HeaderAlignment,
+                                                 &Header,
+                                                 DataSizeInBytes,
+                                                 DataAlignment,
+                                                 &Data,
+                                                 &AllocationSize);
+
+        if (Success == FALSE)
         {
-            Status = CheckedAddSizeT(AllocationSize,
-                                     DataAlignment - HeaderPadding,
-                                     &AllocationSize);
-
-            if (Status != ISTATUS_SUCCESS)
-            {
-                return NULL;
-            }
+            return NULL;
         }
-        
-        Header = DynamicMemoryAllocatorAllocate(Allocator,
-                                                AllocationSize,
-                                                DataAlignment);
+
+        NextAllocation = (PDYNAMIC_MEMORY_ALLOCATION) AllocationHeader;
+
+        OlderAllocation = Allocator->AllocationListTail;
+
+        if (OlderAllocation != NULL)
+        {
+            OlderAllocation->NewerAllocation = NextAllocation;
+        }
+
+        NextAllocation->OlderAllocation = OlderAllocation;
+        NextAllocation->NewerAllocation = NULL;
+        NextAllocation->SizeInBytes = AllocationSize;
+
+        Allocator->AllocationListTail = NextAllocation;
     }
 
-    if (Header == NULL)
-    {
-        return NULL;
-    }
-
-    *DataPointer = (PVOID) ((PUINT8) Header + HeaderSizeInBytes + HeaderPadding);
+    *DataPointer = Data;
 
     return Header;
 }
