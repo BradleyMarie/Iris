@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_ADVANCED_HEADER_
 
 #include <iris.h>
+#include <iriscommon_malloc.h>
 
 #include "irisadvanced_api.h"
 #include "irisadvanced_rng.h"

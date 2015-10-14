@@ -51,14 +51,15 @@ typedef CONST LIGHT *PCLIGHT;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PLIGHT
+ISTATUS
 LightAllocate(
     _In_ PCLIGHT_VTABLE LightVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _Out_ PLIGHT *Light
     );
 
 _Check_return_

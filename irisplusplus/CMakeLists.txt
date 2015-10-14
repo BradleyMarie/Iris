@@ -37,5 +37,4 @@ if (ENABLE_CSG)
 endif()
 
 set_property(TARGET irisplusplus PROPERTY CXX_STANDARD 11)
-
 set_property(TARGET irisplusplus PROPERTY CXX_STANDARD_REQUIRED ON)

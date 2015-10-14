@@ -79,6 +79,8 @@ ShapeHitAllocatorAllocateInternal(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
+
     if (AdditionalDataSizeInBytes != 0)
     {
         AdditionalDataAllocator = &Allocator->AdditionalDataAllocator;
@@ -99,8 +101,6 @@ ShapeHitAllocatorAllocateInternal(
     {
         Allocation = NULL;
     }
-
-    ShapeHitAllocatorAllocation = (PSHAPE_HIT_ALLOCATOR_ALLOCATION) Allocation;
 
     ShapeHitList = &ShapeHitAllocatorAllocation->ShapeHitList;
     InternalShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit;

@@ -17,3 +17,6 @@ generate_export_header(irisspectrum
     EXPORT_MACRO_NAME IRISSPECTRUMAPI
     EXPORT_FILE_NAME inc/irisspectrum_api.h
     STATIC_DEFINE IRISSPECTRUM_BUILT_AS_STATIC)
+
+set_property(TARGET irisspectrum PROPERTY C_STANDARD 11)
+set_property(TARGET irisspectrum PROPERTY C_STANDARD_REQUIRED ON)

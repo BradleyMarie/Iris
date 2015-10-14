@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvanced.h>
+#include <irisadvancedp.h>
 
 //
 // Types
@@ -29,52 +29,77 @@ struct _SCENE {
 //
 
 _Check_return_
-_Ret_maybenull_
-PSCENE
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SceneAllocate(
-    _In_ PCSCENE_VTABLE SceneVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
-    )
+	_In_ PCSCENE_VTABLE SceneVTable,
+	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+	_Out_ PSCENE *Scene
+	)
 {
-    PVOID HeaderAllocation;
-    PVOID DataAllocation;
-    PSCENE Scene;
+	BOOL AllocationSuccessful;
+	PVOID HeaderAllocation;
+	PVOID DataAllocation;
+	PSCENE AllocatedScene;
 
-    if (SceneVTable == NULL)
-    {
-        return NULL;
-    }
+	if (SceneVTable == NULL)
+	{
+		return ISTATUS_INVALID_ARGUMENT_00;
+	}
 
-    if (Data == NULL && DataSizeInBytes == 0)
-    {
-        return NULL;
-    }
+	if (DataSizeInBytes != 0)
+	{
+		if (Data == NULL)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+		}
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(SCENE),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
+		if (DataAlignment == 0 ||
+			DataAlignment & DataAlignment - 1)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+		}
 
-    if (HeaderAllocation == NULL)
-    {
-        return NULL;
-    }
+		if (DataSizeInBytes % DataAlignment != 0)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+		}
+	}
 
-    Scene = (PSCENE) HeaderAllocation;
+	if (Scene == NULL)
+	{
+		return ISTATUS_INVALID_ARGUMENT_04;
+	}
 
-    Scene->VTable = SceneVTable;
-    Scene->ReferenceCount = 1;
-    Scene->Data = DataAllocation;
+	AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(SCENE),
+		  											  _Alignof(SCENE),
+													  &HeaderAllocation,
+													  DataSizeInBytes,
+													  DataAlignment,
+													  &DataAllocation,
+													  NULL);
+
+	if (AllocationSuccessful == FALSE)
+	{
+		return ISTATUS_ALLOCATION_FAILED;
+	}
+
+	AllocatedScene = (PSCENE) HeaderAllocation;
+
+	AllocatedScene->VTable = SceneVTable;
+	AllocatedScene->ReferenceCount = 1;
+	AllocatedScene->Data = DataAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    return Scene;
+	*Scene = AllocatedScene;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_

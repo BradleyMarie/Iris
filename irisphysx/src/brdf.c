@@ -19,52 +19,77 @@ Abstract:
 //
 
 _Check_return_
-_Ret_maybenull_
-PBRDF
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 BrdfAllocate(
-    _In_ PCBRDF_VTABLE BrdfVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
-    )
+	_In_ PCBRDF_VTABLE BrdfVTable,
+	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+	_Out_ PBRDF *Brdf
+	)
 {
+    BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PBRDF Brdf;
+    PBRDF AllocatedBrdf;
 
     if (BrdfVTable == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Data == NULL && DataSizeInBytes == 0)
+    if (DataSizeInBytes != 0)
     {
-        return NULL;
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(BRDF),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
-
-    if (HeaderAllocation == NULL)
+    if (Brdf == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Brdf = (PBRDF) HeaderAllocation;
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(BRDF),
+                                                      _Alignof(BRDF),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
 
-    Brdf->VTable = BrdfVTable;
-    Brdf->Data = DataAllocation;
-    Brdf->ReferenceCount = 1;
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedBrdf = (PBRDF) HeaderAllocation;
+
+    AllocatedBrdf->VTable = BrdfVTable;
+    AllocatedBrdf->Data = DataAllocation;
+    AllocatedBrdf->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    return Brdf;
+    *Brdf = AllocatedBrdf;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_

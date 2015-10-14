@@ -57,14 +57,15 @@ typedef CONST SPECTRUM_SCENE *PCSPECTRUM_SCENE;
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PSPECTRUM_SCENE
+ISTATUS
 SpectrumSceneAllocate(
     _In_ PCSPECTRUM_SCENE_VTABLE SpectrumSceneVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _Out_ PSPECTRUM_SCENE *Scene
     );
 
 _Check_return_

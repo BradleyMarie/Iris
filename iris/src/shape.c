@@ -19,52 +19,77 @@ Abstract:
 //
 
 _Check_return_
-_Ret_opt_
-PSHAPE
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 ShapeAllocate(
     _In_ PCSHAPE_VTABLE ShapeVTable,
-    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
-    _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _Out_ PSHAPE *Shape
     )
 {
-    PSHAPE Shape;
+    BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
+    PSHAPE AllocatedShape;
 
     if (ShapeVTable == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Data == NULL && DataSizeInBytes != 0)
+    if (DataSizeInBytes != 0)
     {
-        return NULL;
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(SHAPE),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
-
-    if (HeaderAllocation == NULL)
+    if (Shape == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Shape = (PSHAPE) HeaderAllocation;
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(SHAPE),
+                                                      _Alignof(SHAPE),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
 
-    Shape->VTable = ShapeVTable;
-    Shape->ReferenceCount = 1;
-    Shape->Data = DataAllocation;
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedShape = (PSHAPE) HeaderAllocation;
+
+    AllocatedShape->VTable = ShapeVTable;
+    AllocatedShape->ReferenceCount = 1;
+    AllocatedShape->Data = DataAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    return Shape;
+    *Shape = AllocatedShape;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Ret_
@@ -81,8 +106,7 @@ ShapeGetVTable(
     return Shape->VTable;
 }
 
-_Check_return_
-_Ret_opt_
+_Ret_
 PCVOID
 ShapeGetData(
     _In_ PCSHAPE Shape

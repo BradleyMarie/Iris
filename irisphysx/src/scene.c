@@ -19,23 +19,28 @@ Abstract:
 //
 
 _Check_return_
-_Ret_maybenull_
-PSPECTRUM_SCENE
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 SpectrumSceneAllocate(
     _In_ PCSPECTRUM_SCENE_VTABLE SpectrumSceneVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _Out_ PSPECTRUM_SCENE *SpectrumScene
     )
 {
-    PSCENE Scene;
+	ISTATUS Status;
+	PSCENE *Scene;
 
-    Scene = SceneAllocate(&SpectrumSceneVTable->SceneVTable,
-                          Data,
-                          DataSizeInBytes,
-                          DataAlignment);
+    Scene = (PSCENE *) SpectrumScene;
 
-    return (PSPECTRUM_SCENE) Scene;
+	Status = SceneAllocate(&SpectrumSceneVTable->SceneVTable,
+                           Data,
+                           DataSizeInBytes,
+                           DataAlignment,
+                           Scene);
+
+	return Status;
 }
 
 _Check_return_

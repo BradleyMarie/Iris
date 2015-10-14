@@ -55,14 +55,15 @@ typedef CONST SPECTRUM_SHAPE *PCSPECTRUM_SHAPE;
 //
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PSPECTRUM_SHAPE
+ISTATUS
 SpectrumShapeAllocate(
     _In_ PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable,
-    _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
-    _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+    _Out_ PSPECTRUM_SHAPE *Shape
     );
 
 _Check_return_

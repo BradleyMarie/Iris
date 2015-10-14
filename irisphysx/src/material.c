@@ -29,52 +29,77 @@ struct _MATERIAL {
 //
 
 _Check_return_
-_Ret_maybenull_
-PMATERIAL
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 MaterialAllocate(
-    _In_ PCMATERIAL_VTABLE MaterialVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
-    )
+	_In_ PCMATERIAL_VTABLE MaterialVTable,
+	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+	_Out_ PMATERIAL *Material
+	)
 {
+    BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PMATERIAL Material;
+    PMATERIAL AllocatedMaterial;
 
     if (MaterialVTable == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Data == NULL && DataSizeInBytes == 0)
+    if (DataSizeInBytes != 0)
     {
-        return NULL;
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(MATERIAL),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
-
-    if (HeaderAllocation == NULL)
+    if (Material == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Material = (PMATERIAL) HeaderAllocation;
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(MATERIAL),
+                                                      _Alignof(MATERIAL),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
 
-    Material->VTable = MaterialVTable;
-    Material->Data = DataAllocation;
-    Material->ReferenceCount = 1;
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedMaterial = (PMATERIAL) HeaderAllocation;
+
+    AllocatedMaterial->VTable = MaterialVTable;
+    AllocatedMaterial->Data = DataAllocation;
+    AllocatedMaterial->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    return Material;
+    *Material = AllocatedMaterial;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_

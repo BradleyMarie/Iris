@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvanced.h>
+#include <irisadvancedp.h>
 
 struct _VISIBILITY_TESTER {
     PRAYTRACER RayTracer;

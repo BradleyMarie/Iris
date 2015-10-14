@@ -28,6 +28,7 @@ Abstract:
 #endif
 
 #include <iris.h>
+#include <iriscommon_malloc.h>
 #include <iriscommon_pointerlist.h>
 #include <iriscommon_constpointerlist.h>
 #include <iriscommon_dynamicallocator.h>

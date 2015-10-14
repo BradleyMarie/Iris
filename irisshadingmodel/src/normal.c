@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisshadingmodel.h>
+#include <irisshadingmodelp.h>
 
 //
 // Types

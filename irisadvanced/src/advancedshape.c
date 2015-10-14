@@ -12,30 +12,35 @@ Abstract:
 
 --*/
 
-#include <irisadvanced.h>
+#include <irisadvancedp.h>
 
 //
 // Functions
 //
 
 _Check_return_
-_Ret_maybenull_
-PADVANCED_SHAPE
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 AdvancedShapeAllocate(
-    _In_ PCADVANCED_SHAPE_VTABLE AdvancedShapeVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
+	_In_ PCADVANCED_SHAPE_VTABLE AdvancedShapeVTable,
+	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+	_Out_ PADVANCED_SHAPE *AdvancedShape
     )
 {
-    PSHAPE Shape;
+	ISTATUS Status;
+	PSHAPE *Shape;
 
-    Shape = ShapeAllocate(&AdvancedShapeVTable->ShapeVTable,
-                          Data,
-                          DataSizeInBytes,
-                          DataAlignment);
+	Shape = (PSHAPE *) AdvancedShape;
 
-    return (PADVANCED_SHAPE) Shape;
+	Status = ShapeAllocate(&AdvancedShapeVTable->ShapeVTable,
+                           Data,
+                           DataSizeInBytes,
+                           DataAlignment,
+						   Shape);
+
+    return Status;
 }
 
 _Check_return_

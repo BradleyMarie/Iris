@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvanced.h>
+#include <irisadvancedp.h>
 
 //
 // Types
@@ -29,52 +29,77 @@ struct _RANDOM {
 //
 
 _Check_return_
-_Ret_maybenull_
-PRANDOM
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 RandomAllocate(
-    _In_ PCRANDOM_VTABLE RandomVTable,
-    _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _In_ SIZE_T DataAlignment
-    )
+	_In_ PCRANDOM_VTABLE RandomVTable,
+	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
+	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
+	_Out_ PRANDOM *Rng
+	)
 {
-    PVOID HeaderAllocation;
-    PVOID DataAllocation;
-    PRANDOM Random;
+	BOOL AllocationSuccessful;
+	PVOID HeaderAllocation;
+	PVOID DataAllocation;
+	PRANDOM AllocatedRng;
 
-    if (RandomVTable == NULL)
-    {
-        return NULL;
-    }
+	if (RandomVTable == NULL)
+	{
+		return ISTATUS_INVALID_ARGUMENT_00;
+	}
 
-    if (Data == NULL && DataSizeInBytes == 0)
-    {
-        return NULL;
-    }
+	if (DataSizeInBytes != 0)
+	{
+		if (Data == NULL)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+		}
 
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(RANDOM),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
+		if (DataAlignment == 0 ||
+			DataAlignment & DataAlignment - 1)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+		}
 
-    if (HeaderAllocation == NULL)
-    {
-        return NULL;
-    }
+		if (DataSizeInBytes % DataAlignment != 0)
+		{
+			return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+		}
+	}
 
-    Random = (PRANDOM) HeaderAllocation;
+	if (Rng == NULL)
+	{
+		return ISTATUS_INVALID_ARGUMENT_04;
+	}
 
-    Random->VTable = RandomVTable;
-    Random->Data = DataAllocation;
-    Random->ReferenceCount = 1;
+	AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(RANDOM),
+													  _Alignof(RANDOM),
+													  &HeaderAllocation,
+												  	  DataSizeInBytes,
+													  DataAlignment,
+													  &DataAllocation,
+													  NULL);
+
+	if (AllocationSuccessful == FALSE)
+	{
+		return ISTATUS_ALLOCATION_FAILED;
+	}
+
+	AllocatedRng = (PRANDOM) HeaderAllocation;
+
+	AllocatedRng->VTable = RandomVTable;
+	AllocatedRng->Data = DataAllocation;
+	AllocatedRng->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    return Random;
+	*Rng = AllocatedRng;
+
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS

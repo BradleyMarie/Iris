@@ -85,7 +85,7 @@ DynamicMemoryAllocatorAllocate(
     ASSERT(Allocator != NULL);
     ASSERT(SizeInBytes != 0);
     ASSERT(Alignment != 0);
-    ASSERT((Alignment & (Alignment - 1)) != 0);
+    ASSERT((Alignment & (Alignment - 1)) == 0);
     ASSERT(SizeInBytes % Alignment == 0);
 
     Status = CheckedAddSizeT(SizeInBytes, 

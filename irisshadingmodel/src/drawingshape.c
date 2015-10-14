@@ -28,12 +28,14 @@ DrawingShapeAllocate(
     _In_ SIZE_T DataAlignment
     )
 {
+    ISTATUS Status;
     PSHAPE Shape;
 
-    Shape = ShapeAllocate(&DrawingShapeVTable->ShapeVTable,
-                          Data,
-                          DataSizeInBytes,
-                          DataAlignment);
+    Status = ShapeAllocate(&DrawingShapeVTable->ShapeVTable,
+                           Data,
+                           DataSizeInBytes,
+                           DataAlignment,
+                           &Shape);
 
     return (PDRAWING_SHAPE) Shape;
 }
