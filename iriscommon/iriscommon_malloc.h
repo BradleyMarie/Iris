@@ -83,8 +83,8 @@ IrisAlignedAllocWithHeader(
     SIZE_T AllocateWithHeaderAlignmentPadding;
     SIZE_T AllocateWithDataAlignmentPadding;
     SIZE_T AllocationAlignment;
-    SIZE_T AllocationPadding;
     SIZE_T AllocationSize;
+    SIZE_T HeaderPadding;
     PUINT8 Allocation;
     SIZE_T Status;
 
@@ -115,23 +115,28 @@ IrisAlignedAllocWithHeader(
 
             if (AllocateWithDataAlignmentPadding < AllocateWithHeaderAlignmentPadding)
             {
-                AllocationPadding = AllocateWithDataAlignmentPadding;
+                HeaderPadding = AllocateWithDataAlignmentPadding;
                 AllocationAlignment = DataAlignment;
             }
             else
             {
-                AllocationPadding = AllocateWithHeaderAlignmentPadding;
+                HeaderPadding = AllocateWithHeaderAlignmentPadding;
                 AllocationAlignment = HeaderAlignment;
             }
 
-            Status = CheckedAddSizeT(AllocationPadding,
-                                     AllocationPadding,
+            Status = CheckedAddSizeT(AllocationSize,
+                                     HeaderPadding,
                                      &AllocationSize);
 
             if (Status != ISTATUS_SUCCESS)
             {
                 return FALSE;
             }
+        }
+        else
+        {
+            AllocationAlignment = HeaderAlignment;
+            HeaderPadding = 0;
         }
 
         Status = CheckedAddSizeT(AllocationSize,
@@ -166,7 +171,7 @@ IrisAlignedAllocWithHeader(
     }
     else
     {
-        *Data = (PVOID) (Allocation + HeaderSizeInBytes + AllocationPadding);
+        *Data = (PVOID) (Allocation + HeaderSizeInBytes + HeaderPadding);
     }
 
     if (ActualAllocationSize != NULL)
