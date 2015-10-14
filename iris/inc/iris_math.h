@@ -246,6 +246,31 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
+CheckedAddUIntPtrAndSizeT(
+    _In_ UINT_PTR Addend0,
+    _In_ SIZE_T Addend1,
+    _Out_ PUINT_PTR Sum
+    )
+{
+    if (Sum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT;
+    }
+
+    if (UINTPTR_MAX - Addend0 < Addend1)
+    {
+        return ISTATUS_INTEGER_OVERFLOW;
+    }
+
+    *Sum = Addend0 + Addend1;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
 CheckedAddUInt64(
     _In_ UINT64 Addend0,
     _In_ UINT64 Addend1,

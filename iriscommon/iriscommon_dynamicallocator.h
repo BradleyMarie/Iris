@@ -72,15 +72,11 @@ DynamicMemoryAllocatorAllocate(
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;
     PDYNAMIC_MEMORY_ALLOCATION OlderAllocation;
-    PDYNAMIC_MEMORY_ALLOCATION DynamicAllocation;
-    UINT_PTR WritableMemoryStartAddress;
-    SIZE_T AlignmentMinusOne;
+    PDYNAMIC_MEMORY_ALLOCATION NextAllocation;
+    PVOID Header;
+    PVOID Data;
     SIZE_T AllocationSize;
-    SIZE_T HeaderPadding;
-    SIZE_T RequiredSpace;
-    PVOID Allocation;
-    ISTATUS Status;
-    PVOID Resized;
+    BOOL Success;
 
     ASSERT(Allocator != NULL);
     ASSERT(SizeInBytes != 0);
@@ -88,142 +84,77 @@ DynamicMemoryAllocatorAllocate(
     ASSERT((Alignment & (Alignment - 1)) == 0);
     ASSERT(SizeInBytes % Alignment == 0);
 
-    Status = CheckedAddSizeT(SizeInBytes, 
-                             sizeof(DYNAMIC_MEMORY_ALLOCATION),
-                             &AllocationSize);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return NULL;
-    }
-
     if (Allocator->NextAllocation != NULL)
     {
-        DynamicAllocation = Allocator->NextAllocation;
+        Success = IrisAlignedResizeWithHeader(Allocator->NextAllocation,
+                                              Allocator->NextAllocation->SizeInBytes,
+                                              sizeof(DYNAMIC_MEMORY_ALLOCATION),
+                                              _Alignof(DYNAMIC_MEMORY_ALLOCATION),
+                                              &Header,
+                                              SizeInBytes,
+                                              Alignment,
+                                              &Data,
+                                              &AllocationSize);
 
-        WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
-
-        HeaderPadding = WritableMemoryStartAddress % Alignment;
-
-        if (HeaderPadding != 0)
-        {
-            HeaderPadding = Alignment - HeaderPadding;
-        }
-
-        Status = CheckedAddSizeT(SizeInBytes,
-                                 HeaderPadding,
-                                 &RequiredSpace);
-                                 
-        if (Status != ISTATUS_SUCCESS)
+        if (Success == FALSE)
         {
             return NULL;
         }
 
-        if (DynamicAllocation->SizeInBytes < RequiredSpace)
+        NextAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Header;
+
+        if (Allocator->NextAllocation != NextAllocation)
         {
-            if (Alignment > sizeof(PVOID))
-            {
-                AlignmentMinusOne = Alignment - 1;
-                
-                Status = CheckedAddSizeT(SizeInBytes, 
-                                         AlignmentMinusOne,
-                                         &AllocationSize);
-                                        
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    return NULL;
-                }
-            }
-
-            Resized = realloc(DynamicAllocation, AllocationSize);
-
-            if (Resized == NULL)
-            {
-                return NULL;
-            }
-
-            ASSERT((UINT_PTR) Resized % sizeof(PVOID) == 0);
-
-            DynamicAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Resized;
-
-            OlderAllocation = DynamicAllocation->OlderAllocation;
-            NewerAllocation = DynamicAllocation->NewerAllocation;
+            OlderAllocation = NextAllocation->OlderAllocation;
+            NewerAllocation = NextAllocation->NewerAllocation;
 
             if (OlderAllocation != NULL)
             {
-                OlderAllocation->NewerAllocation = DynamicAllocation;
+                OlderAllocation->NewerAllocation = NextAllocation;
             }
 
             if (NewerAllocation != NULL)
             {
-                NewerAllocation->OlderAllocation = DynamicAllocation;
+                NewerAllocation->OlderAllocation = NextAllocation;
             }
 
-            DynamicAllocation->SizeInBytes = SizeInBytes;
-
-            WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
-
-            HeaderPadding = WritableMemoryStartAddress % Alignment;
-
-            if (HeaderPadding != 0)
-            {
-                HeaderPadding = Alignment - HeaderPadding;
-            }
+            NextAllocation->SizeInBytes = AllocationSize;
         }
 
-        Allocator->NextAllocation = DynamicAllocation->OlderAllocation;
+        Allocator->NextAllocation = NextAllocation->OlderAllocation;
     }
     else
     {
-        if (Alignment > sizeof(PVOID))
-        {
-            AlignmentMinusOne = Alignment - 1;
-            
-            Status = CheckedAddSizeT(SizeInBytes, 
-                                     AlignmentMinusOne,
-                                     &AllocationSize);
-                                    
-            if (Status != ISTATUS_SUCCESS)
-            {
-                return NULL;
-            }
-        }
+        Success = IrisAlignedAllocWithHeader(sizeof(DYNAMIC_MEMORY_ALLOCATION),
+                                             _Alignof(DYNAMIC_MEMORY_ALLOCATION),
+                                             &Header,
+                                             SizeInBytes,
+                                             Alignment,
+                                             &Data,
+                                             &AllocationSize);
 
-        Allocation = malloc(AllocationSize);
-
-        if (Allocation == NULL)
+        if (Success == FALSE)
         {
             return NULL;
         }
 
-        ASSERT((UINT_PTR) Allocation % sizeof(PVOID) == 0);
-
-        DynamicAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Allocation;
+        NextAllocation = (PDYNAMIC_MEMORY_ALLOCATION) Header;
 
         OlderAllocation = Allocator->AllocationListTail;
 
         if (OlderAllocation != NULL)
         {
-            OlderAllocation->NewerAllocation = DynamicAllocation;
+            OlderAllocation->NewerAllocation = NextAllocation;
         }
 
-        DynamicAllocation->OlderAllocation = OlderAllocation;
-        DynamicAllocation->NewerAllocation = NULL;
-        DynamicAllocation->SizeInBytes = SizeInBytes;
+        NextAllocation->OlderAllocation = OlderAllocation;
+        NextAllocation->NewerAllocation = NULL;
+        NextAllocation->SizeInBytes = AllocationSize;
 
-        Allocator->AllocationListTail = DynamicAllocation;
-
-        WritableMemoryStartAddress = (UINT_PTR) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION);
-
-        HeaderPadding = WritableMemoryStartAddress % Alignment;
-
-        if (HeaderPadding != 0)
-        {
-            HeaderPadding = Alignment - HeaderPadding;
-        }
+        Allocator->AllocationListTail = NextAllocation;
     }
 
-    return (PVOID) ((PUINT8) DynamicAllocation + sizeof(DYNAMIC_MEMORY_ALLOCATION) + HeaderPadding);
+    return Data;
 }
 
 _Check_return_ 
@@ -249,8 +180,12 @@ DynamicMemoryAllocatorAllocateWithHeader(
     ASSERT(Allocator != NULL);
     ASSERT(HeaderSizeInBytes != 0);
     ASSERT(HeaderAlignment != 0);
-    ASSERT((HeaderAlignment & (HeaderAlignment - 1)) != 0);
+    ASSERT((HeaderAlignment & (HeaderAlignment - 1)) == 0);
     ASSERT(HeaderSizeInBytes % HeaderAlignment == 0);
+    ASSERT(DataSizeInBytes == 0 || DataAlignment != 0);
+    ASSERT(DataSizeInBytes == 0 || DataPointer != NULL);
+    ASSERT(DataSizeInBytes == 0 || (DataAlignment & (DataAlignment - 1)) == 0);
+    ASSERT(DataSizeInBytes == 0 || DataSizeInBytes % DataAlignment == 0);
 
     if (DataSizeInBytes == 0)
     {
@@ -265,11 +200,6 @@ DynamicMemoryAllocatorAllocateWithHeader(
                               
         return Header;    
     }
-    
-    ASSERT(DataAlignment != 0);
-    ASSERT((DataAlignment & (DataAlignment- 1)) != 0);
-    ASSERT(DataSizeInBytes % DataAlignment == 0);
-    ASSERT(DataPointer != NULL);
 
     Status = CheckedAddSizeT(HeaderSizeInBytes,
                              DataSizeInBytes,
@@ -294,7 +224,14 @@ DynamicMemoryAllocatorAllocateWithHeader(
         
         if (HeaderPadding != 0)
         {
-            AllocationSize += DataAlignment - (HeaderPadding);
+            Status = CheckedAddSizeT(AllocationSize,
+                                     DataAlignment - HeaderPadding,
+                                     &AllocationSize);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                return NULL;
+            }
         }
         
         Header = DynamicMemoryAllocatorAllocate(Allocator,
@@ -343,7 +280,7 @@ DynamicMemoryAllocatorDestroy(
     {
         Temp = NextAllocation->OlderAllocation;
 
-        free(NextAllocation);
+        IrisAlignedFree(NextAllocation);
 
         NextAllocation = Temp;
     }

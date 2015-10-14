@@ -76,7 +76,7 @@ IrisAlignedAllocWithHeader(
     _Deref_post_bytecap_(HeaderSizeInBytes) PVOID *Header,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_bytecap_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {
@@ -103,22 +103,13 @@ IrisAlignedAllocWithHeader(
     {
         if (HeaderAlignment < DataAlignment)
         {
-            AlignHeaderWithHeaderPadding = HeaderSizeInBytes % HeaderAlignment;
-
-            if (AlignHeaderWithHeaderPadding == 0)
-            {
-                AlignHeaderWithHeaderPadding = DataAlignment - HeaderAlignment;
-            }
-            else
-            {
-                AlignHeaderWithHeaderPadding = DataAlignment - AlignHeaderWithHeaderPadding;
-            }
+            AlignHeaderWithHeaderPadding = DataAlignment - HeaderAlignment;
 
             AlignHeaderWithDataPadding = HeaderSizeInBytes % DataAlignment;
 
-            if (AlignHeaderWithHeaderPadding != 0)
+            if (AlignHeaderWithDataPadding != 0)
             {
-                AlignHeaderWithHeaderPadding = DataAlignment - AlignHeaderWithDataPadding;
+                AlignHeaderWithDataPadding = DataAlignment - AlignHeaderWithDataPadding;
             }
 
             if (AlignHeaderWithDataPadding < AlignHeaderWithHeaderPadding)
@@ -201,15 +192,16 @@ IrisAlignedResizeWithHeader(
     _Deref_post_bytecap_(HeaderSizeInBytes) PVOID *Header,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_bytecap_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {
-    SIZE_T OffsetFromLastDataAlignment;
-    SIZE_T DataAlignmentMinusOne;
     SIZE_T AllocationSize;
     SIZE_T HeaderPadding;
+    UINT_PTR HeaderStart;
+    UINT_PTR HeaderEnd;
     UINT_PTR DataStart;
+    UINT_PTR DataEnd;
     ISTATUS Status;
     BOOL Result;
 
@@ -224,8 +216,7 @@ IrisAlignedResizeWithHeader(
     ASSERT(DataSizeInBytes == 0 || (DataAlignment & (DataAlignment - 1)) == 0);
     ASSERT(DataSizeInBytes == 0 || DataSizeInBytes % DataAlignment == 0);
 
-    if (OriginalHeader == NULL ||
-        (HeaderAlignment - 1) & (UINT_PTR) OriginalHeader)
+    if (OriginalHeader == NULL || (HeaderAlignment - 1) & (UINT_PTR) OriginalHeader)
     {
         Result = IrisAlignedAllocWithHeader(HeaderSizeInBytes,
                                             HeaderAlignment,
@@ -243,80 +234,69 @@ IrisAlignedResizeWithHeader(
         return Result;
     }
 
-    if (DataSizeInBytes == 0)
-    {
-        if (HeaderSizeInBytes <= OriginalAllocationSize)
-        {
-            *Header = OriginalHeader;
+    HeaderStart = (UINT_PTR) OriginalHeader;
 
-            if (Data != NULL)
-            {
-                *Data = NULL;
-            }
+    Status = CheckedAddUIntPtrAndSizeT(HeaderStart,
+                                       HeaderSizeInBytes,
+                                       &HeaderEnd);
 
-            if (ActualAllocationSize != NULL)
-            {
-                *ActualAllocationSize = OriginalAllocationSize;
-            }
-
-            return TRUE;
-        }
-
-        Result = IrisAlignedAllocWithHeader(HeaderSizeInBytes,
-                                            HeaderAlignment,
-                                            Header,
-                                            DataSizeInBytes,
-                                            DataAlignment,
-                                            Data,
-                                            ActualAllocationSize);
-
-        if (Result != FALSE)
-        {
-            IrisAlignedFree(OriginalHeader);
-        }
-
-        return Result;
-    }
-    
-    DataAlignmentMinusOne = DataAlignment - 1;
-
-    Status = CheckedAddSizeT(HeaderSizeInBytes,
-                             DataSizeInBytes,
-                             &AllocationSize);
-                             
     if (Status != ISTATUS_SUCCESS)
     {
         return FALSE;
     }
 
-    DataStart = (UINT_PTR) OriginalHeader + HeaderSizeInBytes;
-
-    OffsetFromLastDataAlignment = DataAlignmentMinusOne & DataStart;
-
-    if (OffsetFromLastDataAlignment != 0)
+    if (DataSizeInBytes != 0)
     {
-        HeaderPadding = DataAlignment - OffsetFromLastDataAlignment;
+        if (HeaderAlignment < DataAlignment)
+        {
+            HeaderPadding = HeaderEnd & (DataAlignment - 1);
 
-        Status = CheckedAddSizeT(HeaderSizeInBytes,
-                                 HeaderPadding,
-                                 &AllocationSize);
-                                 
+            if (HeaderPadding != 0)
+            {
+                HeaderPadding = DataAlignment - HeaderPadding;
+            }
+
+            Status = CheckedAddUIntPtrAndSizeT(HeaderEnd,
+                                               HeaderPadding,
+                                               &DataStart);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                return FALSE;
+            }
+        }
+        else
+        {
+            DataStart = HeaderEnd;
+        }
+
+        Status = CheckedAddUIntPtrAndSizeT(DataStart,
+                                           DataSizeInBytes,
+                                           &DataEnd);
+
         if (Status != ISTATUS_SUCCESS)
         {
             return FALSE;
         }
 
-        DataStart += HeaderPadding;
+        AllocationSize = DataEnd - HeaderStart;
+    }
+    else
+    {
+        AllocationSize = HeaderSizeInBytes;
     }
 
     if (AllocationSize <= OriginalAllocationSize)
     {
         *Header = OriginalHeader;
-        *Data = (PVOID) DataStart;
 
-        if (Data != NULL)
+        if (DataSizeInBytes == 0 && Data != NULL)
         {
             *Data = NULL;
+        }
+        else
+        {
+            *Data = (PVOID) DataStart;
         }
 
         if (ActualAllocationSize != NULL)
