@@ -70,7 +70,7 @@ SpectrumSceneAddObject(
 
     Scene = (PSCENE) SpectrumScene;
 
-    SpectrumSceneVTable = (PCSPECTRUM_SCENE_VTABLE)SceneGetVTable(Scene);
+    SpectrumSceneVTable = (PCSPECTRUM_SCENE_VTABLE) SceneGetVTable(Scene);
 
     Data = SceneGetData(Scene);
 

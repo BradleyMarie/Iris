@@ -553,8 +553,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_ PCSPECTRUM Spectrum,
-    _In_ PCREFLECTOR Reflector,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
     _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {

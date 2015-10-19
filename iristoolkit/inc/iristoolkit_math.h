@@ -109,6 +109,7 @@ IrisToolkitTransformVector(
     return TransformedVector;
 }
 
+_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
 IrisToolkitCosineSampleHemisphere(

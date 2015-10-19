@@ -134,8 +134,7 @@ SceneGetVTable(
     return Scene->VTable;
 }
 
-_Check_return_
-_Ret_opt_
+_Ret_
 PVOID
 SceneGetData(
     _In_ PSCENE Scene

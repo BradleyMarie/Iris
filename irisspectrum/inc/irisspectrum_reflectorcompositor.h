@@ -46,7 +46,7 @@ ISTATUS
 ReflectorCompositorAttenuateReflection(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _In_opt_ PCREFLECTOR Reflector,
-    _In_opt_ FLOAT Attenuation,
+    _In_ FLOAT Attenuation,
     _Out_ PCREFLECTOR *AttenuatedReflector
     );
 

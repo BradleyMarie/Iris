@@ -69,7 +69,7 @@ StaticMemoryAllocatorInitialize(
 
 _Check_return_
 _Ret_maybenull_
-_Post_writable_byte_size_(Allocator->AllocationSize)
+_Post_writable_byte_size_(_Inexpressible_(Allocator->AllocationSize))
 SFORCEINLINE
 PVOID
 StaticMemoryAllocatorAllocate(

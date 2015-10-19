@@ -72,8 +72,7 @@ SceneGetVTable(
     _In_ PCSCENE Scene
     );
 
-_Check_return_
-_Ret_opt_
+_Ret_
 IRISADVANCEDAPI
 PVOID
 SceneGetData(

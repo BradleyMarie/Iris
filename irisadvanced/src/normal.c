@@ -108,7 +108,7 @@ ISTATUS
 NormalComputeNormal(
     _In_ PCNORMAL Normal, 
     _In_ POINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_opt_ PCVOID AdditionalData,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -164,8 +164,8 @@ IRISADVANCEDAPI
 ISTATUS
 NormalComputeNormalAndTransform(
     _In_ PCNORMAL Normal,
-    _In_opt_ POINT3 ModelHitPoint,
-    _In_ PCVOID AdditionalData,
+    _In_ POINT3 ModelHitPoint,
+    _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Out_ PVECTOR3 SurfaceNormal
     )
