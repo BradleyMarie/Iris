@@ -22,12 +22,12 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 BrdfAllocate(
-	_In_ PCBRDF_VTABLE BrdfVTable,
-	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-	_Out_ PBRDF *Brdf
-	)
+    _In_ PCBRDF_VTABLE BrdfVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PBRDF *Brdf
+    )
 {
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;

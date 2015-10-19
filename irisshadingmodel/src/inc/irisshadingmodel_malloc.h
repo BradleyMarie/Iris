@@ -28,11 +28,11 @@ _Post_writable_byte_size_(HeaderSizeInBytes)
 SFORCEINLINE
 PVOID
 IrisAlignedMallocWithHeader(
-    _Pre_satisfies_(HeaderSizeInBytes != 0 && HeaderSizeInBytes % HeaderAlignment == 0)  SIZE_T HeaderSizeInBytes,
-    _Pre_satisfies_(HeaderAlignment != 0 && (HeaderAlignment & (HeaderAlignment - 1)) == 0) SIZE_T HeaderAlignment,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_bytecap_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T HeaderSizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && HeaderSizeInBytes % _Curr_ == 0) SIZE_T HeaderAlignment,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(Data != NULL, _Deref_post_null_)) PVOID *Data
     )
 {
     PVOID HeaderAllocation;

@@ -66,8 +66,8 @@ SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _Pre_satisfies_(SizeInBytes != 0 && SizeInBytes % Alignment == 0) SIZE_T SizeInBytes,
-    _Pre_satisfies_(Alignment != 0 && (Alignment & (Alignment - 1)) == 0) SIZE_T Alignment
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ -1)) == 0 && SizeInBytes % _Curr_ == 0) SIZE_T Alignment
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;
@@ -165,11 +165,11 @@ SFORCEINLINE
 PVOID
 DynamicMemoryAllocatorAllocateWithHeader(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
-    _Pre_satisfies_(HeaderSizeInBytes != 0 && HeaderSizeInBytes % HeaderAlignment == 0)  SIZE_T HeaderSizeInBytes,
-    _Pre_satisfies_(HeaderAlignment != 0 && (HeaderAlignment & (HeaderAlignment - 1)) == 0) SIZE_T HeaderAlignment,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && DataPointer != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Outptr_result_bytebuffer_(DataSizeInBytes)) PVOID *DataPointer
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T HeaderSizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ -1)) == 0 && HeaderSizeInBytes % _Curr_ == 0) SIZE_T HeaderAlignment,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(DataPointer != NULL, _Deref_post_null_)) PVOID *DataPointer
     )
 {
     PDYNAMIC_MEMORY_ALLOCATION NewerAllocation;

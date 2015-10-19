@@ -22,25 +22,25 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumShapeAllocate(
-	_In_ PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable,
-	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-	_Out_ PSPECTRUM_SHAPE *SpectrumShape
-	)
+    _In_ PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PSPECTRUM_SHAPE *SpectrumShape
+    )
 {
     PADVANCED_SHAPE *AdvancedShape;
-	ISTATUS Status;
+    ISTATUS Status;
 
     AdvancedShape = (PADVANCED_SHAPE *) SpectrumShape;
 
-	Status = AdvancedShapeAllocate(&SpectrumShapeVTable->AdvancedShapeVTable,
+    Status = AdvancedShapeAllocate(&SpectrumShapeVTable->AdvancedShapeVTable,
                                    Data,
                                    DataSizeInBytes,
                                    DataAlignment,
                                    AdvancedShape);
 
-	return Status;
+    return Status;
 }
 
 _Check_return_

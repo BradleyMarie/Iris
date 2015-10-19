@@ -40,22 +40,19 @@ IrisAlignedFree(
 
 _Check_return_
 _Ret_maybenull_ 
-_Post_writable_byte_size_(SizeInBytes)
 SFORCEINLINE
 PVOID
 IrisAlignedAlloc(
-    _Pre_satisfies_(SizeInBytes != 0 && SizeInBytes % Alignment == 0)  SIZE_T SizeInBytes,
-    _Pre_satisfies_(Alignment != 0 && (Alignment & (Alignment - 1)) == 0) SIZE_T Alignment
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ -1)) == 0 && SizeInBytes % _Curr_ == 0) SIZE_T Alignment
     )
 {
     PVOID Allocation;
 
-    if (SizeInBytes == 0 ||
-        Alignment == 0 ||
-        Alignment & (Alignment - 1))
-    {
-        return NULL;
-    }
+    ASSERT(SizeInBytes != 0);
+    ASSERT(Alignment != 0);
+    ASSERT((Alignment & (Alignment - 1)) == 0);
+    ASSERT(SizeInBytes % Alignment == 0);
 
 #ifndef _MSVC_VER
     Allocation = _aligned_malloc(SizeInBytes, Alignment);
@@ -71,12 +68,12 @@ _Success_(return != FALSE)
 SFORCEINLINE
 BOOL
 IrisAlignedAllocWithHeader(
-    _Pre_satisfies_(HeaderSizeInBytes != 0 && HeaderSizeInBytes % HeaderAlignment == 0)  SIZE_T HeaderSizeInBytes,
-    _Pre_satisfies_(HeaderAlignment != 0 && (HeaderAlignment & (HeaderAlignment - 1)) == 0) SIZE_T HeaderAlignment,
-    _Deref_post_bytecap_(HeaderSizeInBytes) PVOID *Header,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T HeaderSizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && HeaderSizeInBytes % _Curr_ == 0) SIZE_T HeaderAlignment,
+    _Outptr_result_bytebuffer_(HeaderSizeInBytes) PVOID *Header,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(Data != NULL, _Deref_post_null_)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {
@@ -164,7 +161,7 @@ IrisAlignedAllocWithHeader(
         return FALSE;
     }
 
-    *Header = Allocation;
+    *Header = (PVOID) Allocation;
     *Data = (PVOID) (Allocation + HeaderSizeInBytes + HeaderPadding);
 
     if (ActualAllocationSize != NULL)
@@ -180,14 +177,14 @@ _Success_(return != FALSE)
 SFORCEINLINE
 BOOL
 IrisAlignedResizeWithHeader(
-    _Pre_opt_bytecap_(OriginalAllocationSize) _Post_invalid_ PVOID OriginalHeader,
+    _Pre_opt_bytecount_(OriginalAllocationSize) _Post_invalid_ PVOID OriginalHeader,
     _When_(OriginalHeader != NULL, _In_) SIZE_T OriginalAllocationSize,
-    _Pre_satisfies_(HeaderSizeInBytes != 0 && HeaderSizeInBytes % HeaderAlignment == 0) SIZE_T HeaderSizeInBytes,
-    _Pre_satisfies_(HeaderAlignment != 0 && (HeaderAlignment & (HeaderAlignment - 1)) == 0) SIZE_T HeaderAlignment,
-    _Deref_post_bytecap_(HeaderSizeInBytes) PVOID *Header,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T HeaderSizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && HeaderSizeInBytes % _Curr_ == 0) SIZE_T HeaderAlignment,
+    _Outptr_result_bytebuffer_(HeaderSizeInBytes) PVOID *Header,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(Data != NULL, _Deref_post_null_)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {
@@ -331,15 +328,15 @@ _Success_(return != FALSE)
 SFORCEINLINE
 BOOL
 IrisAlignedAllocWithTwoHeaders(
-    _Pre_satisfies_(Header0SizeInBytes != 0 && Header0SizeInBytes % Header0Alignment == 0)  SIZE_T Header0SizeInBytes,
-    _Pre_satisfies_(Header0Alignment != 0 && (Header0Alignment & (Header0Alignment - 1)) == 0) SIZE_T Header0Alignment,
-    _Deref_post_bytecap_(Header0SizeInBytes) PVOID *Header0,
-    _Pre_satisfies_(Header1SizeInBytes != 0 && Header1SizeInBytes % Header1Alignment == 0)  SIZE_T Header1SizeInBytes,
-    _Pre_satisfies_(Header1Alignment != 0 && (Header1Alignment & (Header1Alignment - 1)) == 0) SIZE_T Header1Alignment,
-    _Deref_post_bytecap_(Header1SizeInBytes) PVOID *Header1,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T Header0SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && Header0SizeInBytes % _Curr_ == 0) SIZE_T Header0Alignment,
+    _Outptr_result_bytebuffer_(Header0SizeInBytes) PVOID *Header0,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T Header1SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && Header1SizeInBytes % _Curr_ == 0) SIZE_T Header1Alignment,
+    _Outptr_result_bytebuffer_(Header1SizeInBytes) PVOID *Header1,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(Data != NULL, _Deref_post_null_)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {
@@ -468,7 +465,7 @@ IrisAlignedAllocWithTwoHeaders(
         return FALSE;
     }
 
-    *Header0 = Allocation;
+    *Header0 = (PVOID) Allocation;
     *Header1 = (PVOID) (Allocation + Header0SizeInBytes + Header0Padding);
     *Data = (PVOID) (Allocation + 
                      Header0SizeInBytes + 
@@ -489,17 +486,17 @@ _Success_(return != FALSE)
 SFORCEINLINE
 BOOL
 IrisAlignedResizeWithTwoHeader(
-    _Pre_opt_bytecap_(OriginalAllocationSize) _Post_invalid_ PVOID OriginalHeader,
+    _Pre_opt_bytecount_(OriginalAllocationSize) _Post_invalid_ PVOID OriginalHeader,
     _When_(OriginalHeader != NULL, _In_) SIZE_T OriginalAllocationSize,
-    _Pre_satisfies_(Header0SizeInBytes != 0 && Header0SizeInBytes % Header0Alignment == 0)  SIZE_T Header0SizeInBytes,
-    _Pre_satisfies_(Header0Alignment != 0 && (Header0Alignment & (Header0Alignment - 1)) == 0) SIZE_T Header0Alignment,
-    _Deref_post_bytecap_(Header0SizeInBytes) PVOID *Header0,
-    _Pre_satisfies_(Header1SizeInBytes != 0 && Header1SizeInBytes % Header1Alignment == 0)  SIZE_T Header1SizeInBytes,
-    _Pre_satisfies_(Header1Alignment != 0 && (Header1Alignment & (Header1Alignment - 1)) == 0) SIZE_T Header1Alignment,
-    _Deref_post_bytecap_(Header1SizeInBytes) PVOID *Header1,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-    _When_(DataSizeInBytes == 0 && Data != NULL, _Deref_post_null_) _When_(DataSizeInBytes != 0, _Deref_post_bytecap_(DataSizeInBytes)) PVOID *Data,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T Header0SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && Header0SizeInBytes % _Curr_ == 0) SIZE_T Header0Alignment,
+    _Outptr_result_bytebuffer_(Header0SizeInBytes) PVOID *Header0,
+    _In_ _Pre_satisfies_(_Curr_ != 0) SIZE_T Header1SizeInBytes,
+    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && Header1SizeInBytes % _Curr_ == 0) SIZE_T Header1Alignment,
+    _Outptr_result_bytebuffer_(Header1SizeInBytes) PVOID *Header1,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _When_(DataSizeInBytes != 0, _Out_ _Deref_post_bytecap_(DataSizeInBytes)) _When_(DataSizeInBytes == 0, _Out_opt_ _When_(Data != NULL, _Deref_post_null_)) PVOID *Data,
     _Out_opt_ PSIZE_T ActualAllocationSize
     )
 {

@@ -32,72 +32,72 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 NormalAllocate(
-	_In_ PCNORMAL_VTABLE NormalVTable,
-	_When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_(DataSizeInBytes % DataAlignment == 0)) SIZE_T DataSizeInBytes,
-	_When_(DataSizeInBytes != 0, _Pre_satisfies_((DataAlignment & (DataAlignment - 1)) == 0)) SIZE_T DataAlignment,
-	_Out_ PNORMAL *Normal
-	)
+    _In_ PCNORMAL_VTABLE NormalVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PNORMAL *Normal
+    )
 {
-	BOOL AllocationSuccessful;
-	PVOID HeaderAllocation;
-	PVOID DataAllocation;
-	PNORMAL AllocatedNormal;
+    BOOL AllocationSuccessful;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
+    PNORMAL AllocatedNormal;
 
-	if (NormalVTable == NULL)
-	{
-		return ISTATUS_INVALID_ARGUMENT_00;
-	}
+    if (NormalVTable == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
 
-	if (DataSizeInBytes != 0)
-	{
-		if (Data == NULL)
-		{
-			return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-		}
+    if (DataSizeInBytes != 0)
+    {
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
 
-		if (DataAlignment == 0 ||
-			DataAlignment & DataAlignment - 1)
-		{
-			return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
-		}
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
 
-		if (DataSizeInBytes % DataAlignment != 0)
-		{
-			return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
-		}
-	}
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
+    }
 
-	if (Normal == NULL)
-	{
-		return ISTATUS_INVALID_ARGUMENT_04;
-	}
+    if (Normal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
 
-	AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(NORMAL),
-			   										  _Alignof(NORMAL),
-													  &HeaderAllocation,
-													  DataSizeInBytes,
-													  DataAlignment,
-													  &DataAllocation,
-													  NULL);
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(NORMAL),
+                                                         _Alignof(NORMAL),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
 
-	if (AllocationSuccessful == FALSE)
-	{
-		return ISTATUS_ALLOCATION_FAILED;
-	}
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
 
     AllocatedNormal = (PNORMAL) HeaderAllocation;
 
-	AllocatedNormal->VTable = NormalVTable;
-	AllocatedNormal->Data = DataAllocation;
-	AllocatedNormal->ReferenceCount = 1;
+    AllocatedNormal->VTable = NormalVTable;
+    AllocatedNormal->Data = DataAllocation;
+    AllocatedNormal->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-	*Normal = AllocatedNormal;
+    *Normal = AllocatedNormal;
 
     return ISTATUS_SUCCESS;
 }
