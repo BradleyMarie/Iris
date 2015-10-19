@@ -376,6 +376,11 @@ IrisAlignedAllocWithTwoHeaders(
                                              Header1,
                                              ActualAllocationSize);
 
+        if (Success != FALSE && Data != NULL)
+        {
+            *Data = NULL;
+        }
+
         return Success;
     }
 
@@ -655,12 +660,12 @@ IrisAlignedResizeWithTwoHeader(
         }
         else
         {
-            Header1End = DataStart;
+            DataStart = Header1End;
         }
     }
     else
     {
-        Header1End = DataStart;
+        DataStart = Header1End;
     }
 
     Status = CheckedAddUIntPtrAndSizeT(DataStart,

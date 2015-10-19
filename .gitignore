@@ -38,6 +38,8 @@ CMakeCache.txt
 *.exp
 *.user
 *.stackdump
+*.nativecodeanalysis.xml
+*.nativecodeanalysis.all.xml
 
 # Log files
 *.tlog
