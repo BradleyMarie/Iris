@@ -25,4 +25,6 @@ Abstract:
 #include "irisshadingmodel_scene.h"
 #include "irisshadingmodel_textureshader.h"
 
+#define ISTATUS_INVALID_ARGUMENT     0x05 // Old Error
+
 #endif // _IRIS_SHADING_MODEL_INTERNAL_HEADER_

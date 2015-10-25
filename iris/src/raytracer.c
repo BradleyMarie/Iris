@@ -357,7 +357,7 @@ RayTracerSort(
 {
     if (RayTracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
     ConstantPointerListSort(&RayTracer->HitList,
@@ -380,10 +380,14 @@ RayTracerGetNextShapeHit(
     SIZE_T CurrentIndex;
     SIZE_T HitCount;
 
-    if (RayTracer == NULL ||
-        ShapeHit == NULL)
+    if (RayTracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (ShapeHit == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PointerList = &RayTracer->HitList;
@@ -430,10 +434,14 @@ RayTracerGetNextHit(
     SIZE_T CurrentIndex;
     SIZE_T HitCount;
 
-    if (RayTracer == NULL ||
-        ShapeHit == NULL)
+    if (RayTracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (ShapeHit == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PointerList = &RayTracer->HitList;

@@ -22,6 +22,8 @@ Abstract:
 #define TRIANGLE_FRONT_FACE 0
 #define TRIANGLE_BACK_FACE  1
 
+#define ISTATUS_INVALID_ARGUMENT     0x05 // Old Error
+
 //
 // Types
 //

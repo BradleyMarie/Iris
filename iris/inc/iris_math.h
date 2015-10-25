@@ -84,7 +84,7 @@ CheckedMultiplySizeT(
 
     if (Product == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RawProduct = Multiplicand0 * Multiplicand1;
@@ -114,7 +114,7 @@ CheckedMultiplyUInt64(
 
     if (Product == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RawProduct = Multiplicand0 * Multiplicand1;
@@ -144,7 +144,7 @@ CheckedMultiplyUInt8(
 
     if (Product == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RawProduct = (UINT16) Multiplicand0 * (UINT16) Multiplicand1;
@@ -173,7 +173,7 @@ CheckedMultiplyUInt16(
 
     if (Product == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RawProduct = (UINT32) Multiplicand0 * (UINT32) Multiplicand1;
@@ -202,7 +202,7 @@ CheckedMultiplyUInt32(
 
     if (Product == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RawProduct = (UINT64) Multiplicand0 * (UINT64) Multiplicand1;
@@ -229,7 +229,7 @@ CheckedAddSizeT(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (SIZE_MAX - Addend0 < Addend1)
@@ -254,7 +254,7 @@ CheckedAddUIntPtrAndSizeT(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (UINTPTR_MAX - Addend0 < Addend1)
@@ -279,7 +279,7 @@ CheckedAddUInt64(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (UINT64_MAX - Addend0 < Addend1)
@@ -304,7 +304,7 @@ CheckedAddUInt32(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (UINT32_MAX - Addend0 < Addend1)
@@ -329,7 +329,7 @@ CheckedAddUInt16(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (UINT16_MAX - Addend0 < Addend1)
@@ -354,7 +354,7 @@ CheckedAddUInt8(
 {
     if (Sum == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (UINT8_MAX - Addend0 < Addend1)

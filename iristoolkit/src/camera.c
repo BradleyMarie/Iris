@@ -14,6 +14,8 @@ Abstract:
 
 #include <iristoolkitp.h>
 
+#define ISTATUS_INVALID_ARGUMENT     0x05 // Old Error
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC

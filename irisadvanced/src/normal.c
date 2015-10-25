@@ -114,10 +114,14 @@ NormalComputeNormal(
 {
     ISTATUS Status;
 
-    if (Normal == NULL ||
-        SurfaceNormal == NULL)
+    if (Normal == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (SurfaceNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
     
     Status = Normal->VTable->ComputeNormalRoutine(Normal->Data,
@@ -172,10 +176,14 @@ NormalComputeNormalAndTransform(
 {
     ISTATUS Status;
 
-    if (Normal == NULL ||
-        SurfaceNormal == NULL)
+    if (Normal == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (SurfaceNormal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     Status = Normal->VTable->ComputeNormalRoutine(Normal->Data,
@@ -236,7 +244,12 @@ NormalPrenormalized(
 {
     if (Normal == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (Prenormalized == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     *Prenormalized = Normal->VTable->Prenormalized;

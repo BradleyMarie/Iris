@@ -94,17 +94,26 @@ FramebufferSetPixel(
 {
     SIZE_T RowSize;
 
-    if (Framebuffer == NULL || 
-        Framebuffer->Columns <= Column)
+    if (Framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
     RowSize = Framebuffer->Rows;
 
     if (RowSize <= Row)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (Color3Validate(Color) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Framebuffer->Columns <= Column)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     Framebuffer->Pixels[Row * RowSize + Column] = Color;
@@ -123,18 +132,26 @@ FramebufferGetPixel(
 {
     SIZE_T RowSize;
 
-    if (Framebuffer == NULL || 
-        Color == NULL ||
-        Framebuffer->Columns <= Column)
+    if (Framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
     RowSize = Framebuffer->Rows;
 
     if (RowSize <= Row)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Framebuffer->Columns <= Column)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Color == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     *Color = Framebuffer->Pixels[Row * RowSize + Column];
@@ -149,11 +166,19 @@ FramebufferGetDimensions(
     _Out_ PSIZE_T Columns
     )
 {
-    if (Framebuffer == NULL ||
-        Rows == NULL ||
-        Columns == NULL)
+    if (Framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Rows == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Columns == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     *Rows = Framebuffer->Rows;

@@ -112,15 +112,31 @@ RandomGenerateFloat(
 {
     ISTATUS Status;
 
-    if (Rng == NULL ||
-        IsNormalFloat(Minimum) == FALSE ||
-        IsFiniteFloat(Minimum) == FALSE ||
-        IsNormalFloat(Maximum) == FALSE ||
-        IsFiniteFloat(Maximum) == FALSE ||
-        Minimum > Maximum ||
-        RandomValue == NULL)
+    if (Rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsNormalFloat(Minimum) == FALSE ||
+        IsFiniteFloat(Minimum) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Maximum) == FALSE ||
+        IsFiniteFloat(Maximum) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Minimum > Maximum)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     Status = Rng->VTable->GenerateFloatRoutine(Rng->Data,
@@ -141,11 +157,19 @@ RandomGenerateIndex(
 {
     ISTATUS Status;
 
-    if (Rng == NULL ||
-        Minimum > Maximum ||
-        RandomValue == NULL)
+    if (Rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Minimum > Maximum)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     Status = Rng->VTable->GenerateIndexRoutine(Rng->Data,

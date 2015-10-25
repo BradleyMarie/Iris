@@ -58,6 +58,25 @@ Color3InitializeFromComponents(
 }
 
 SFORCEINLINE
+BOOL
+Color3Validate(
+    _In_ COLOR3 Color
+    )
+{
+    if (IsNormalFloat(Color.Red) == FALSE ||
+        IsFiniteFloat(Color.Red) == FALSE ||
+        IsNormalFloat(Color.Green) == FALSE ||
+        IsFiniteFloat(Color.Green) == FALSE ||
+        IsNormalFloat(Color.Blue) == FALSE ||
+        IsFiniteFloat(Color.Blue) == FALSE)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+SFORCEINLINE
 COLOR3
 Color3Add(
     _In_ COLOR3 Addend0,
