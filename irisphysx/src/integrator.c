@@ -4,23 +4,23 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    scene.c
+    irisphysx_integrator.h
 
 Abstract:
 
-    This file contains the function definitions for the SCENE type.
+    This file contains the definitions for the INTEGRATOR type.
 
 --*/
 
-#include <irisadvancedp.h>
+#include <irisphysxp.h>
 
 //
 // Types
 //
 
-struct _SCENE {
-    PCSCENE_VTABLE VTable;
-    SIZE_T ReferenceCount;
+struct _INTEGRATOR {
+    PCINTEGRATOR_VTABLE VTable;
+    SPECTRUM_RAYTRACER RayTracer;
     PVOID Data;
 };
 
@@ -31,20 +31,21 @@ struct _SCENE {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SceneAllocate(
-    _In_ PCSCENE_VTABLE SceneVTable,
+IntegratorAllocate(
+    _In_ PCINTEGRATOR_VTABLE IntegratorVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PSCENE *Scene
+    _Out_ PINTEGRATOR *Integrator
     )
 {
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PSCENE AllocatedScene;
+    PINTEGRATOR AllocatedIntegrator;
+    ISTATUS Status;
 
-    if (SceneVTable == NULL)
+    if (IntegratorVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -68,13 +69,13 @@ SceneAllocate(
         }
     }
 
-    if (Scene == NULL)
+    if (Integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(SCENE),
-                                                      _Alignof(SCENE),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(INTEGRATOR),
+                                                      _Alignof(INTEGRATOR),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -86,104 +87,73 @@ SceneAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedScene = (PSCENE) HeaderAllocation;
+    AllocatedIntegrator = (PINTEGRATOR) HeaderAllocation;
 
-    AllocatedScene->VTable = SceneVTable;
-    AllocatedScene->ReferenceCount = 1;
-    AllocatedScene->Data = DataAllocation;
+    AllocatedIntegrator->VTable = IntegratorVTable;
+    AllocatedIntegrator->Data = DataAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    *Scene = AllocatedScene;
+    Status = SpectrumRayTracerInitialize(&AllocatedIntegrator->RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        IrisAlignedFree(HeaderAllocation);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    *Integrator = AllocatedIntegrator;
 
     return ISTATUS_SUCCESS;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
-SceneTrace(
-    _In_ PCSCENE Scene,
-    _Inout_ PRAYTRACER RayTracer
+ISTATUS
+IntegratorIntegrate(
+    _In_ PINTEGRATOR Integrator,
+    _In_ RAY WorldRay,
+    _Out_ PSPECTRUM *Spectrum
     )
 {
     ISTATUS Status;
 
-    ASSERT(Scene != NULL);
-    ASSERT(RayTracer != NULL);
+    if (Integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
 
-    Status = Scene->VTable->TraceRoutine(Scene->Data, RayTracer);
+    if (RayValidate(WorldRay) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
+                                                  WorldRay,
+                                                  &Integrator->RayTracer,
+                                                  Spectrum);
 
     return Status;
 }
 
-_Ret_
-PCSCENE_VTABLE
-SceneGetVTable(
-    _In_ PCSCENE Scene
-    )
-{
-    if (Scene == NULL)
-    {
-        return NULL;
-    }
-
-    return Scene->VTable;
-}
-
-_Ret_
-PVOID
-SceneGetData(
-    _In_ PSCENE Scene
-    )
-{
-    if (Scene == NULL)
-    {
-        return NULL;
-    }
-
-    return Scene->Data;
-}
-
 VOID
-SceneReference(
-    _In_opt_ PSCENE Scene
+IntegratorFree(
+    _In_opt_ _Post_invalid_ PINTEGRATOR Integrator
     )
 {
-    if (Scene == NULL)
+    if (Integrator == NULL)
     {
         return;
     }
 
-    Scene->ReferenceCount += 1;
-}
-
-VOID
-SceneDereference(
-    _In_opt_ _Post_invalid_ PSCENE Scene
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-
-    if (Scene == NULL)
-    {
-        return;
-    }
-
-    Scene->ReferenceCount -= 1;
-
-    if (Scene->ReferenceCount == 0)
-    {
-        FreeRoutine = Scene->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Scene->Data);
-        }
-
-        IrisAlignedFree(Scene);
-    }
+    SpectrumRayTracerDestroy(&Integrator->RayTracer);
+    IrisAlignedFree(Integrator);
 }

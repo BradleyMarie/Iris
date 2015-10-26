@@ -76,7 +76,7 @@ RandomAllocate(
     AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(RANDOM),
                                                       _Alignof(RANDOM),
                                                       &HeaderAllocation,
-                                                        DataSizeInBytes,
+                                                      DataSizeInBytes,
                                                       DataAlignment,
                                                       &DataAllocation,
                                                       NULL);

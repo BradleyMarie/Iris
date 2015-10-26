@@ -74,7 +74,7 @@ NormalAllocate(
     }
 
     AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(NORMAL),
-                                                         _Alignof(NORMAL),
+                                                      _Alignof(NORMAL),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,

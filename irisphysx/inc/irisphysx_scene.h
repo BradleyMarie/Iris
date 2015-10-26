@@ -65,7 +65,16 @@ SpectrumSceneAllocate(
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PSPECTRUM_SCENE *Scene
+    _Out_ PSPECTRUM_SCENE *SpectrumScene
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS 
+SpectrumSceneTrace(
+    _In_ PSPECTRUM_SCENE SpectrumScene,
+    _Inout_ PSPECTRUM_RAYTRACER RayTracer
     );
 
 _Check_return_

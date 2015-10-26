@@ -20,5 +20,6 @@ Abstract:
 #include <iriscommon_dynamicallocator.h>
 
 #include "irisphysx_brdf.h"
+#include "irisphysx_raytracer.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_
