@@ -150,6 +150,7 @@ IntegratorIntegrate(
     }
 
     BrdfAllocatorFreeAll(&Integrator->BrdfAllocator);
+    SpectrumCompositorClear(Integrator->SpectrumCompositor);
 
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
@@ -173,5 +174,6 @@ IntegratorFree(
 
     SpectrumRayTracerDestroy(&Integrator->RayTracer);
     BrdfAllocatorDestroy(&Integrator->BrdfAllocator);
+    SpectrumCompositorFree(Integrator->SpectrumCompositor);
     IrisAlignedFree(Integrator);
 }
