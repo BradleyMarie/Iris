@@ -25,34 +25,9 @@ typedef struct _RUNTIME_ALLOCATED_BRDF_HEADER {
 
 typedef CONST RUNTIME_ALLOCATED_BRDF_HEADER *PCRUNTIME_ALLOCATED_BRDF_HEADER;
 
-struct _BRDF_ALLOCATOR {
-    DYNAMIC_MEMORY_ALLOCATOR Allocator;
-};
-
 //
 // Functions
 //
-
-_Check_return_
-_Ret_maybenull_
-PBRDF_ALLOCATOR
-BrdfAllocatorCreate(
-    VOID
-    )
-{
-    PBRDF_ALLOCATOR Allocator;
-    
-    Allocator = (PBRDF_ALLOCATOR) malloc(sizeof(BRDF_ALLOCATOR));
-    
-    if (Allocator == NULL)
-    {
-        return NULL;
-    }
-    
-    DynamicMemoryAllocatorInitialize(&Allocator->Allocator);
-    
-    return Allocator;
-}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -137,32 +112,4 @@ BrdfAllocatorAllocate(
     *Brdf = &AllocatedBrdf->BrdfHeader;
 
     return ISTATUS_SUCCESS;
-}
-
-VOID
-BrdfAllocatorFreeAll(
-    _Inout_opt_ PBRDF_ALLOCATOR BrdfAllocator
-    )
-{
-    if (BrdfAllocator == NULL)
-    {
-        return;
-    }
-    
-    DynamicMemoryAllocatorFreeAll(&BrdfAllocator->Allocator);
-}
-
-VOID
-BrdfAllocatorDestroy(
-    _Pre_maybenull_ _Post_invalid_ PBRDF_ALLOCATOR BrdfAllocator
-    )
-{
-    if (BrdfAllocator == NULL)
-    {
-        return;
-    }
-    
-    DynamicMemoryAllocatorDestroy(&BrdfAllocator->Allocator);
-    
-    free(BrdfAllocator);
 }

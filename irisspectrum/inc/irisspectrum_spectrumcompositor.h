@@ -73,4 +73,26 @@ SpectrumCompositorAddReflection(
     _Out_ PCSPECTRUM *ReflectedSpectrum
     );
 
+_Check_return_
+_Ret_maybenull_
+IRISSPECTRUMAPI
+PSPECTRUM_COMPOSITOR
+SpectrumCompositorAllocate(
+    VOID
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSPECTRUMAPI
+ISTATUS
+SpectrumCompositorClear(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor
+    );
+
+IRISSPECTRUMAPI
+VOID
+SpectrumCompositorFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_COMPOSITOR Compositor
+    );
+    
 #endif // _SPECTRUM_COMPOSITOR_IRIS_SPECTRUM_

@@ -21,6 +21,8 @@ Abstract:
 struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE VTable;
     SPECTRUM_RAYTRACER RayTracer;
+    BRDF_ALLOCATOR BrdfAllocator;
+    PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PVOID Data;
 };
 
@@ -105,6 +107,17 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    AllocatedIntegrator->SpectrumCompositor = SpectrumCompositorAllocate();
+
+    if (AllocatedIntegrator->SpectrumCompositor == NULL)
+    {
+        SpectrumRayTracerDestroy(&AllocatedIntegrator->RayTracer);
+        IrisAlignedFree(HeaderAllocation);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    BrdfAllocatorInitialize(&AllocatedIntegrator->BrdfAllocator);
+
     *Integrator = AllocatedIntegrator;
 
     return ISTATUS_SUCCESS;
@@ -136,9 +149,13 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
+    BrdfAllocatorFreeAll(&Integrator->BrdfAllocator);
+
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
                                                   &Integrator->RayTracer,
+                                                  &Integrator->BrdfAllocator,
+                                                  Integrator->SpectrumCompositor,
                                                   Spectrum);
 
     return Status;
@@ -155,5 +172,6 @@ IntegratorFree(
     }
 
     SpectrumRayTracerDestroy(&Integrator->RayTracer);
+    BrdfAllocatorDestroy(&Integrator->BrdfAllocator);
     IrisAlignedFree(Integrator);
 }

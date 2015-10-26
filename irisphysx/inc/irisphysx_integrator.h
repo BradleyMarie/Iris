@@ -29,6 +29,8 @@ ISTATUS
     _In_ PCVOID Context, 
     _In_ RAY WorldRay,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
+    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
+    _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Out_ PSPECTRUM *Spectrum
     );
 

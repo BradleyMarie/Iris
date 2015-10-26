@@ -16,6 +16,50 @@ Abstract:
 #include <irisspectrump.h>
 
 //
+// Types
+//
+
+typedef struct _FMA_SPECTRUM {
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum0;
+    PCSPECTRUM Spectrum1;
+    FLOAT Attenuation;
+} FMA_SPECTRUM, *PFMA_SPECTRUM;
+
+typedef CONST FMA_SPECTRUM *PCFMA_SPECTRUM;
+
+typedef struct _ATTENUATED_SPECTRUM {
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
+    FLOAT Attenuation;
+} ATTENUATED_SPECTRUM, *PATTENUATED_SPECTRUM;
+
+typedef CONST ATTENUATED_SPECTRUM *PCATTENUATED_SPECTRUM;
+
+typedef struct _SUM_SPECTRUM {
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum0;
+    PCSPECTRUM Spectrum1;
+} SUM_SPECTRUM, *PSUM_SPECTRUM;
+
+typedef CONST SUM_SPECTRUM *PCSUM_SPECTRUM;
+
+typedef struct _REFLECTION_SPECTRUM {
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
+    PCREFLECTOR Reflector;
+} REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
+
+typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
+
+struct _SPECTRUM_COMPOSITOR {
+    STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR SumSpectrumAllocator;
+};
+
+//
 // Static Functions
 //
 
@@ -588,4 +632,100 @@ SpectrumCompositorAddReflection(
 
     *ReflectedSpectrum = (PCSPECTRUM) ReflectionSpectrum;
     return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Ret_maybenull_
+PSPECTRUM_COMPOSITOR
+SpectrumCompositorAllocate(
+    VOID
+    )
+{
+    PSPECTRUM_COMPOSITOR Compositor;
+    ISTATUS Status;
+    
+    Compositor = (PSPECTRUM_COMPOSITOR) malloc(sizeof(SPECTRUM_COMPOSITOR));
+    
+    if (Compositor == NULL)
+    {
+        return NULL;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->ReflectionSpectrumAllocator,
+                                             sizeof(REFLECTION_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return NULL;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedSpectrumAllocator,
+                                             sizeof(ATTENUATED_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        return NULL;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->FmaSpectrumAllocator,
+                                             sizeof(FMA_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        return NULL;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->SumSpectrumAllocator,
+                                             sizeof(SUM_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+        return NULL;
+    }
+
+    return Compositor;    
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorClear(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    if (Compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    StaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->SumSpectrumAllocator);
+    
+    return ISTATUS_SUCCESS;
+}
+
+VOID
+SpectrumCompositorFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    if (Compositor == NULL)
+    {
+        return;
+    }
+    
+    StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
+    
+    free(Compositor);
 }
