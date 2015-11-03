@@ -34,6 +34,7 @@ VisibilityTesterAllocate(
     POINT3 TemporaryOrigin;
     PRAYTRACER RayTracer;
     RAY TemporaryRay;
+    ISTATUS Status;
 
     if (Scene == NULL)
     {
@@ -63,9 +64,9 @@ VisibilityTesterAllocate(
     TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    RayTracer = RayTracerAllocate(TemporaryRay);
+    Status = RayTracerAllocate(TemporaryRay, &RayTracer);
 
-    if (RayTracer == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
         free(Tester);
         return ISTATUS_ALLOCATION_FAILED;

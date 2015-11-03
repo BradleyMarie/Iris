@@ -57,10 +57,11 @@ RayTracerInternalShapeHitPointerCompare(
 //
 
 _Check_return_
-_Ret_opt_
-PRAYTRACER
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 RayTracerAllocate(
-    _In_ RAY Ray
+    _In_ RAY Ray,
+    _Out_ PRAYTRACER *Result
     )
 {
     PRAYTRACER RayTracer;
@@ -68,14 +69,19 @@ RayTracerAllocate(
 
     if (RayValidate(Ray) == FALSE)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     RayTracer = (PRAYTRACER) malloc(sizeof(RAYTRACER));
 
     if (RayTracer == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     Status = ShapeHitAllocatorInitialize(&RayTracer->ShapeHitAllocator);
@@ -83,7 +89,7 @@ RayTracerAllocate(
     if (Status != ISTATUS_SUCCESS)
     {
         free(RayTracer);
-        return NULL;
+        return Status;
     }
 
     Status = ConstantPointerListInitialize(&RayTracer->HitList);
@@ -92,7 +98,7 @@ RayTracerAllocate(
     {
         ShapeHitAllocatorDestroy(&RayTracer->ShapeHitAllocator);
         free(RayTracer);
-        return NULL;
+        return Status;
     }
 
     Status = SharedHitDataAllocatorInitialize(&RayTracer->SharedHitDataAllocator);
@@ -102,13 +108,15 @@ RayTracerAllocate(
         ConstantPointerListDestroy(&RayTracer->HitList);
         ShapeHitAllocatorDestroy(&RayTracer->ShapeHitAllocator);
         free(RayTracer);
-        return NULL;
+        return Status;
     }
 
     RayTracer->CurrentRay = Ray;
     RayTracer->HitIndex = 0;
 
-    return RayTracer;
+    *Result = RayTracer;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_

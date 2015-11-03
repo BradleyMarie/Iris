@@ -20,7 +20,6 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
 ISTATUS
 SpectrumRayTracerSetRay(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
@@ -44,7 +43,6 @@ SpectrumRayTracerSetRay(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
 ISTATUS
 SpectrumRayTracerGetRay(
     _In_ PSPECTRUM_RAYTRACER RayTracer,
@@ -63,7 +61,6 @@ SpectrumRayTracerGetRay(
     return Status;
 }
 
-IRISPHYSXAPI
 ISTATUS
 SpectrumRayTracerSort(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer
@@ -83,7 +80,6 @@ SpectrumRayTracerSort(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
 ISTATUS
 SpectrumRayTracerGetNextHit(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,

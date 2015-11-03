@@ -38,6 +38,7 @@ SpectrumRayTracerInitialize(
     POINT3 InitialOrigin;
     RAY InitialRay;
     PRAYTRACER RayTracer;
+    ISTATUS Status;
 
     ASSERT(SpectrumRayTracer != NULL);
     
@@ -51,11 +52,11 @@ SpectrumRayTracerInitialize(
 
     InitialRay = RayCreate(InitialOrigin, InitialDirection);
 
-    RayTracer = RayTracerAllocate(InitialRay);
+    Status = RayTracerAllocate(InitialRay, &RayTracer);
 
-    if (RayTracer == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
     }
 
     SpectrumRayTracer->RayTracer = RayTracer;

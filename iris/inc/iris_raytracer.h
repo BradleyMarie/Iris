@@ -29,11 +29,12 @@ typedef CONST RAYTRACER *PCRAYTRACER;
 //
 
 _Check_return_
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISAPI
-PRAYTRACER
+ISTATUS
 RayTracerAllocate(
-    _In_ RAY Ray
+    _In_ RAY Ray,
+    _Out_ PRAYTRACER *RayTracer
     );
 
 _Check_return_

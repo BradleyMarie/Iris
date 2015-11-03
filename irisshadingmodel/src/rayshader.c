@@ -60,6 +60,7 @@ RayShaderAllocateInternal(
     PRAYSHADER RayShader;
     PRAYTRACER RayTracer;
     RAY TemporaryRay;
+    ISTATUS Status;
 
     ASSERT(ShadeRayRoutine != NULL);
     ASSERT(Scene != NULL);
@@ -119,9 +120,9 @@ RayShaderAllocateInternal(
     TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    RayTracer = RayTracerAllocate(TemporaryRay);
+    Status = RayTracerAllocate(TemporaryRay, &RayTracer);
 
-    if (RayTracer == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
         RayShaderFree(NextRayShader);
         free(RayShader);
