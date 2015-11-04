@@ -105,6 +105,8 @@ ReflectorCompositorClear(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor
     )
 {
+    ASSERT(Compositor != NULL);
+
     StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectorAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->FmaReflectorAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->SumReflectorAllocator);
@@ -113,9 +115,11 @@ ReflectorCompositorClear(
 SFORCEINLINE
 VOID
 ReflectorCompositorDestroy(
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor
+    _In_ _Post_invalid_ PREFLECTOR_COMPOSITOR Compositor
     )
 {
+    ASSERT(Compositor != NULL);
+
     StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectorAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->FmaReflectorAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->SumReflectorAllocator);

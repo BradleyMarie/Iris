@@ -31,6 +31,7 @@ ISTATUS
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
+    _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
     _Out_ PSPECTRUM *Spectrum
     );
 

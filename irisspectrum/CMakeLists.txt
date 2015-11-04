@@ -6,7 +6,9 @@ add_library(irisspectrum SHARED
     src/spectrum.c
     src/reflector.c
     src/spectrumcompositor.c
-    src/reflectorcompositor.c)
+    src/reflectorcompositor.c
+    src/spectrumcompositorowner.c
+    src/reflectorcompositorowner.c)
 
 target_link_libraries(irisspectrum 
     iris

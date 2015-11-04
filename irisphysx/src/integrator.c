@@ -22,7 +22,8 @@ struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE VTable;
     SPECTRUM_RAYTRACER RayTracer;
     BRDF_ALLOCATOR BrdfAllocator;
-    PSPECTRUM_COMPOSITOR SpectrumCompositor;
+    PSPECTRUM_COMPOSITOR_OWNER SpectrumCompositorOwner;
+    PREFLECTOR_COMPOSITOR_OWNER ReflectorCompositorOwner;
     PVOID Data;
 };
 
@@ -104,16 +105,26 @@ IntegratorAllocate(
     if (Status != ISTATUS_SUCCESS)
     {
         IrisAlignedFree(HeaderAllocation);
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
     }
 
-    AllocatedIntegrator->SpectrumCompositor = SpectrumCompositorAllocate();
+    Status = SpectrumCompositorOwnerAllocate(&AllocatedIntegrator->SpectrumCompositorOwner);
 
-    if (AllocatedIntegrator->SpectrumCompositor == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
         SpectrumRayTracerDestroy(&AllocatedIntegrator->RayTracer);
         IrisAlignedFree(HeaderAllocation);
-        return ISTATUS_ALLOCATION_FAILED;
+        return Status;
+    }
+
+    Status = ReflectorCompositorOwnerAllocate(&AllocatedIntegrator->ReflectorCompositorOwner);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        SpectrumCompositorOwnerFree(AllocatedIntegrator->SpectrumCompositorOwner);
+        SpectrumRayTracerDestroy(&AllocatedIntegrator->RayTracer);
+        IrisAlignedFree(HeaderAllocation);
+        return Status;
     }
 
     BrdfAllocatorInitialize(&AllocatedIntegrator->BrdfAllocator);
@@ -132,6 +143,8 @@ IntegratorIntegrate(
     _Out_ PSPECTRUM *Spectrum
     )
 {
+    PREFLECTOR_COMPOSITOR ReflectorCompositor;
+    PSPECTRUM_COMPOSITOR SpectrumCompositor;
     ISTATUS Status;
 
     if (Integrator == NULL)
@@ -150,13 +163,18 @@ IntegratorIntegrate(
     }
 
     BrdfAllocatorFreeAll(&Integrator->BrdfAllocator);
-    SpectrumCompositorClear(Integrator->SpectrumCompositor);
+    SpectrumCompositorOwnerClear(Integrator->SpectrumCompositorOwner);
+    ReflectorCompositorOwnerClear(Integrator->ReflectorCompositorOwner);
+
+    ReflectorCompositor = ReflectorCompositorOwnerGetCompositor(Integrator->ReflectorCompositorOwner);
+    SpectrumCompositor = SpectrumCompositorOwnerGetCompositor(Integrator->SpectrumCompositorOwner);
 
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
                                                   &Integrator->RayTracer,
                                                   &Integrator->BrdfAllocator,
-                                                  Integrator->SpectrumCompositor,
+                                                  SpectrumCompositor,
+                                                  ReflectorCompositor,
                                                   Spectrum);
 
     return Status;
@@ -174,6 +192,7 @@ IntegratorFree(
 
     SpectrumRayTracerDestroy(&Integrator->RayTracer);
     BrdfAllocatorDestroy(&Integrator->BrdfAllocator);
-    SpectrumCompositorFree(Integrator->SpectrumCompositor);
+    SpectrumCompositorOwnerFree(Integrator->SpectrumCompositorOwner);
+    ReflectorCompositorOwnerFree(Integrator->ReflectorCompositorOwner);
     IrisAlignedFree(Integrator);
 }
