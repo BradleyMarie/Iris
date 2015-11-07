@@ -33,5 +33,6 @@ Abstract:
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_raytracer.h"
+#include "iris_raytracerowner.h"
 
 #endif // _IRIS_HEADER_

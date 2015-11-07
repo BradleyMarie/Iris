@@ -21,6 +21,7 @@ Abstract:
 //
 
 struct _SPECTRUM_RAYTRACER {
+    PRAYTRACER_OWNER RayTracerOwner;
     PRAYTRACER RayTracer;
 };
 
@@ -37,7 +38,7 @@ SpectrumRayTracerInitialize(
     VECTOR3 InitialDirection;
     POINT3 InitialOrigin;
     RAY InitialRay;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_OWNER RayTracerOwner;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer != NULL);
@@ -52,14 +53,15 @@ SpectrumRayTracerInitialize(
 
     InitialRay = RayCreate(InitialOrigin, InitialDirection);
 
-    Status = RayTracerAllocate(InitialRay, &RayTracer);
+    Status = RayTracerOwnerAllocate(InitialRay, &RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    SpectrumRayTracer->RayTracer = RayTracer;
+    SpectrumRayTracer->RayTracerOwner = RayTracerOwner;
+    SpectrumRayTracer->RayTracer = RayTracerOwnerGetRayTracer(RayTracerOwner);
 
     return ISTATUS_SUCCESS;
 }
@@ -70,7 +72,7 @@ SpectrumRayTracerDestroy(
     _In_ _Post_invalid_ PSPECTRUM_RAYTRACER SpectrumRayTracer
     )
 {
-    RayTracerFree(SpectrumRayTracer->RayTracer);
+    RayTracerOwnerFree(SpectrumRayTracer->RayTracerOwner);
 }
 
 #endif // _SPECTRUM_RAYTRACER_IRIS_PHYSX_INTERNAL_

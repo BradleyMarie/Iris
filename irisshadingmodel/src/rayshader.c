@@ -24,7 +24,7 @@ struct _RAYSHADER {
     FLOAT MaximumContinueProbability;
     PRANDOM Rng;
     PSCENE Scene;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_OWNER RayTracerOwner;
     FLOAT Epsilon;
     UINT8 CurrentDepth;
     PCVOID Context;
@@ -58,7 +58,7 @@ RayShaderAllocateInternal(
     PRAYSHADER NextRayShader;
     POINT3 TemporaryOrigin;
     PRAYSHADER RayShader;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_OWNER RayTracerOwner;
     RAY TemporaryRay;
     ISTATUS Status;
 
@@ -120,7 +120,7 @@ RayShaderAllocateInternal(
     TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    Status = RayTracerAllocate(TemporaryRay, &RayTracer);
+    Status = RayTracerOwnerAllocate(TemporaryRay, &RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -144,7 +144,7 @@ RayShaderAllocateInternal(
     RayShader->MaximumContinueProbability = MaximumContinueProbability;
     RayShader->Rng = Rng;
     RayShader->Scene = Scene;
-    RayShader->RayTracer = RayTracer;
+    RayShader->RayTracerOwner = RayTracerOwner;
     RayShader->Epsilon = Epsilon;
     RayShader->CurrentDepth = CurrentDepth;
     RayShader->Context = Context;
@@ -351,14 +351,16 @@ RayShaderTraceRayMontecarlo(
         }
     }
 
-    RayTracer = RayShader->RayTracer;
-
-    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
+    Status = RayTracerOwnerSetRay(RayShader->RayTracerOwner, 
+                                  WorldRay, 
+                                  TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
+
+    RayTracer = RayTracerOwnerGetRayTracer(RayShader->RayTracerOwner);
 
     Status = SceneTrace(RayShader->Scene,
                         RayTracer);
@@ -369,14 +371,14 @@ RayShaderTraceRayMontecarlo(
         return Status;
     }
 
-    RayTracerSort(RayTracer);
+    RayTracerOwnerSort(RayShader->RayTracerOwner);
 
-    Status = RayTracerGetNextHit(RayTracer,
-                                 &ShapeHit,
-                                 &ModelViewer,
-                                 &ModelHitPoint,
-                                 &WorldHitPoint,
-                                 &ModelToWorld);
+    Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
+                                      &ShapeHit,
+                                      &ModelViewer,
+                                      &ModelHitPoint,
+                                      &WorldHitPoint,
+                                      &ModelToWorld);
 
     if (Status == ISTATUS_NO_MORE_DATA)
     {
@@ -393,12 +395,12 @@ RayShaderTraceRayMontecarlo(
 
         if (Distance <= RayShader->Epsilon)
         {
-            Status = RayTracerGetNextHit(RayTracer,
-                                         &ShapeHit,
-                                         &ModelViewer,
-                                         &ModelHitPoint,
-                                         &WorldHitPoint,
-                                         &ModelToWorld);
+            Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
+                                              &ShapeHit,
+                                              &ModelViewer,
+                                              &ModelHitPoint,
+                                              &WorldHitPoint,
+                                              &ModelToWorld);
             continue;
         }
 
@@ -409,12 +411,12 @@ RayShaderTraceRayMontecarlo(
 
         if (Texture == NULL)
         {
-            Status = RayTracerGetNextHit(RayTracer,
-                                         &ShapeHit,
-                                         &ModelViewer,
-                                         &ModelHitPoint,
-                                         &WorldHitPoint,
-                                         &ModelToWorld);
+            Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
+                                              &ShapeHit,
+                                              &ModelViewer,
+                                              &ModelHitPoint,
+                                              &WorldHitPoint,
+                                              &ModelToWorld);
             continue;
         }
 
@@ -469,12 +471,12 @@ RayShaderTraceRayMontecarlo(
 
         BlendedColor = Color4Over(BlendedColor, HitColor);
 
-        Status = RayTracerGetNextHit(RayTracer,
-                                     &ShapeHit,
-                                     &ModelViewer,
-                                     &ModelHitPoint,
-                                     &WorldHitPoint,
-                                     &ModelToWorld);
+        Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
+                                          &ShapeHit,
+                                          &ModelViewer,
+                                          &ModelHitPoint,
+                                          &WorldHitPoint,
+                                          &ModelToWorld);
     }
 
     *Color = Color3InitializeFromColor4(BlendedColor);
@@ -510,7 +512,7 @@ RayShaderFree(
         RayShaderFree(NextRayShader);
     }
 
-    RayTracerFree(RayShader->RayTracer);
+    RayTracerOwnerFree(RayShader->RayTracerOwner);
     RandomDereference(RayShader->Rng);
     SceneDereference(RayShader->Scene);
     free(RayShader);

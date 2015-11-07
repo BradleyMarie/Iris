@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the SCENE_OBJECT type.
+    This file contains the definitions for the RAYTRACER type.
 
 --*/
 
@@ -32,34 +32,6 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerAllocate(
-    _In_ RAY Ray,
-    _Out_ PRAYTRACER *RayTracer
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
-RayTracerSetRay(
-    _Inout_ PRAYTRACER RayTracer,
-    _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
-RayTracerGetRay(
-    _In_ PRAYTRACER RayTracer,
-    _Out_ PRAY Ray
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
 RayTracerTraceShape(
     _Inout_ PRAYTRACER RayTracer,
     _In_ PCSHAPE Shape
@@ -76,38 +48,13 @@ RayTracerTraceShapeWithTransform(
     _In_ BOOL Premultiplied
     );
 
-IRISAPI
-ISTATUS
-RayTracerSort(
-    _Inout_ PRAYTRACER RayTracer
-    );
-
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerGetNextShapeHit(
-    _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCSHAPE_HIT *ShapeHit
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
-RayTracerGetNextHit(
-    _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCSHAPE_HIT *ShapeHit,
-    _Out_opt_ PVECTOR3 ModelViewer,
-    _Out_opt_ PPOINT3 ModelHitPoint,
-    _Out_opt_ PPOINT3 WorldHitPoint,
-    _Out_opt_ PCMATRIX *ModelToWorld
-    );
-
-IRISAPI
-VOID
-RayTracerFree(
-    _In_opt_ _Post_invalid_ PRAYTRACER RayTracer
+RayTracerGetRay(
+    _In_ PRAYTRACER RayTracer,
+    _Out_ PRAY Ray
     );
 
 #endif // _RAYTRACER_IRIS_

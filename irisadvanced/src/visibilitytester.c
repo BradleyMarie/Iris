@@ -14,11 +14,20 @@ Abstract:
 
 #include <irisadvancedp.h>
 
+//
+// Types
+//
+
 struct _VISIBILITY_TESTER {
+    PRAYTRACER_OWNER RayTracerOwner;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
     PSCENE Scene;
 };
+
+//
+// Public Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -29,10 +38,10 @@ VisibilityTesterAllocate(
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
 {
+    PRAYTRACER_OWNER RayTracerOwner;
     VECTOR3 TemporaryDirection;
     PVISIBILITY_TESTER Tester;
     POINT3 TemporaryOrigin;
-    PRAYTRACER RayTracer;
     RAY TemporaryRay;
     ISTATUS Status;
 
@@ -64,7 +73,7 @@ VisibilityTesterAllocate(
     TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
     TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
 
-    Status = RayTracerAllocate(TemporaryRay, &RayTracer);
+    Status = RayTracerOwnerAllocate(TemporaryRay, &RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -75,7 +84,8 @@ VisibilityTesterAllocate(
     SceneReference(Scene);
 
     Tester->Scene = Scene;
-    Tester->RayTracer = RayTracer;
+    Tester->RayTracerOwner = RayTracerOwner;
+    Tester->RayTracer = RayTracerOwnerGetRayTracer(RayTracerOwner);
     Tester->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
 
     *VisibilityTester = Tester;
@@ -93,7 +103,7 @@ VisibilityTesterTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
+    PRAYTRACER_OWNER RayTracerOwner;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -118,30 +128,26 @@ VisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    RayTracer = Tester->RayTracer;
+    RayTracerOwner = Tester->RayTracerOwner;
 
-    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
-
-    switch (Status)
-    {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            return ISTATUS_INVALID_ARGUMENT_01;
-        default:
-            ASSERT(FALSE);
-            return Status;
-    }
-
-    Status = SceneTrace(Tester->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerSetRay(Tester->RayTracerOwner, 
+                                  WorldRay, 
+                                  TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+    Status = SceneTrace(Tester->Scene,
+                        Tester->RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
 
     if (Status == ISTATUS_NO_MORE_DATA)
     {
@@ -164,7 +170,7 @@ VisibilityTesterTestVisibility(
             return ISTATUS_SUCCESS;
         }
 
-        Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+        Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
     } while (Status == ISTATUS_SUCCESS);
 
     *Visible = TRUE;
@@ -184,7 +190,7 @@ VisibilityTesterTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
+    PRAYTRACER_OWNER RayTracerOwner;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -202,30 +208,24 @@ VisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    RayTracer = Tester->RayTracer;
+    RayTracerOwner = Tester->RayTracerOwner;
 
-    Status = RayTracerSetRay(RayTracer, WorldRay, TRUE);
-
-    switch (Status)
-    {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            return ISTATUS_INVALID_ARGUMENT_01;
-        default:
-            ASSERT(FALSE);
-            return Status;
-    }
-
-    Status = SceneTrace(Tester->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerSetRay(RayTracerOwner, WorldRay, TRUE);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+    Status = SceneTrace(Tester->Scene,
+                        Tester->RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
 
     if (Status == ISTATUS_NO_MORE_DATA)
     {
@@ -241,7 +241,7 @@ VisibilityTesterTestVisibilityAnyDistance(
             return ISTATUS_SUCCESS;
         }
 
-        Status = RayTracerGetNextShapeHit(RayTracer, &ShapeHit);
+        Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
     } while (Status == ISTATUS_SUCCESS);
 
     *Visible = TRUE;
@@ -258,7 +258,7 @@ VisibilityTesterFree(
         return;
     }
 
-    RayTracerFree(Tester->RayTracer);
+    RayTracerOwnerFree(Tester->RayTracerOwner);
     SceneDereference(Tester->Scene);
     free(Tester);
 }

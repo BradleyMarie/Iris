@@ -34,9 +34,9 @@ SpectrumRayTracerSetRay(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Status = RayTracerSetRay(RayTracer->RayTracer,
-                             Ray,
-                             NormalizeRay);
+    Status = RayTracerOwnerSetRay(RayTracer->RayTracerOwner,
+                                  Ray,
+                                  NormalizeRay);
 
     return Status;
 }
@@ -73,7 +73,7 @@ SpectrumRayTracerSort(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Status = RayTracerSort(RayTracer->RayTracer);
+    Status = RayTracerOwnerSort(RayTracer->RayTracerOwner);
 
     return Status;
 }
@@ -100,12 +100,12 @@ SpectrumRayTracerGetNextHit(
 
     IrisShapeHit = (PCSHAPE_HIT *) ShapeHit;
 
-    Status = RayTracerGetNextHit(RayTracer->RayTracer, 
-                                 IrisShapeHit,
-                                 ModelViewer,
-                                 ModelHitPoint,
-                                 WorldHitPoint,
-                                 ModelToWorld);
+    Status = RayTracerOwnerGetNextHit(RayTracer->RayTracerOwner, 
+                                      IrisShapeHit,
+                                      ModelViewer,
+                                      ModelHitPoint,
+                                      WorldHitPoint,
+                                      ModelToWorld);
 
     return Status;
 }
