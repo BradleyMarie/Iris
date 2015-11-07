@@ -20,6 +20,7 @@ Abstract:
 
 #include "irisadvanced_api.h"
 #include "irisadvanced_rng.h"
+#include "irisadvanced_rngowner.h"
 #include "irisadvanced_normal.h"
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_advancedshape.h"

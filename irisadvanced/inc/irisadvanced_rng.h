@@ -54,18 +54,6 @@ typedef CONST RANDOM *PCRANDOM;
 // Functions
 //
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
-ISTATUS
-RandomAllocate(
-    _In_ PCRANDOM_VTABLE RandomVTable,
-    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PRANDOM *Rng
-    );
-
 IRISADVANCEDAPI
 ISTATUS
 RandomGenerateFloat(
@@ -82,18 +70,6 @@ RandomGenerateIndex(
     _In_ SIZE_T Minimum,
     _In_ SIZE_T Maximum,
     _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
-    );
-
-IRISADVANCEDAPI
-VOID
-RandomReference(
-    _In_opt_ PRANDOM Random
-    );
-
-IRISADVANCEDAPI
-VOID
-RandomDereference(
-    _In_opt_ _Post_invalid_ PRANDOM Random
     );
 
 #endif // _RANDOM_IRIS_ADVANCED_

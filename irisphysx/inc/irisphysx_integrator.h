@@ -33,6 +33,7 @@ ISTATUS
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
+    _Inout_ PRANDOM Rng,
     _Out_ PSPECTRUM *Spectrum
     );
 
@@ -71,6 +72,7 @@ IntegratorIntegrate(
     _In_ PCSPECTRUM_SCENE Scene,
     _In_ FLOAT VisibilityEpsilon,
     _In_ RAY WorldRay,
+    _Inout_ PRANDOM Rng,
     _Out_ PSPECTRUM *Spectrum
     );
 

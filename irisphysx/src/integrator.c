@@ -144,6 +144,7 @@ IntegratorIntegrate(
     _In_ PCSPECTRUM_SCENE SpectrumScene,
     _In_ FLOAT VisibilityEpsilon,
     _In_ RAY WorldRay,
+    _Inout_ PRANDOM Rng,
     _Out_ PSPECTRUM *Spectrum
     )
 {
@@ -176,9 +177,14 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Spectrum == NULL)
+    if (Rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (Integrator->VisibilityTesterOwner == NULL)
@@ -221,6 +227,7 @@ IntegratorIntegrate(
                                                   &Integrator->BrdfAllocator,
                                                   SpectrumCompositor,
                                                   ReflectorCompositor,
+                                                  Rng,
                                                   Spectrum);
 
     return Status;

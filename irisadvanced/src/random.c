@@ -20,16 +20,20 @@ Abstract:
 
 struct _RANDOM {
     PCRANDOM_VTABLE VTable;
-    SIZE_T ReferenceCount;
     PVOID Data;
 };
 
+struct _RANDOM_OWNER {
+    PRANDOM Random;  
+};
+
 //
-// Functions
+// Random Static Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
 ISTATUS
 RandomAllocate(
     _In_ PCRANDOM_VTABLE RandomVTable,
@@ -43,6 +47,8 @@ RandomAllocate(
     PVOID HeaderAllocation;
     PVOID DataAllocation;
     PRANDOM AllocatedRng;
+
+    ASSERT(Rng != NULL);
 
     if (RandomVTable == NULL)
     {
@@ -68,11 +74,6 @@ RandomAllocate(
         }
     }
 
-    if (Rng == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
     AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(RANDOM),
                                                       _Alignof(RANDOM),
                                                       &HeaderAllocation,
@@ -90,7 +91,6 @@ RandomAllocate(
 
     AllocatedRng->VTable = RandomVTable;
     AllocatedRng->Data = DataAllocation;
-    AllocatedRng->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
@@ -101,6 +101,30 @@ RandomAllocate(
 
     return ISTATUS_SUCCESS;
 }
+
+SFORCEINLINE
+VOID
+RandomFree(
+    _In_ _Post_invalid_ PRANDOM Random
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+
+    ASSERT(Random != NULL);
+    
+    FreeRoutine = Random->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(Random->Data);
+    }
+
+    IrisAlignedFree(Random);
+}
+
+///
+// Random Public Functions
+//
 
 ISTATUS
 RandomGenerateFloat(
@@ -180,42 +204,78 @@ RandomGenerateIndex(
     return Status;
 }
 
-VOID
-RandomReference(
-    _In_opt_ PRANDOM Random
+//
+// RandomOwner Public Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+RandomOwnerAllocate(
+    _In_ PCRANDOM_VTABLE RandomVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PRANDOM_OWNER *Result
     )
 {
-    if (Random == NULL)
+    PRANDOM_OWNER RandomOwner;
+    PRANDOM Random;
+    ISTATUS Status;
+    
+    Status = RandomAllocate(RandomVTable,
+                            Data,
+                            DataSizeInBytes,
+                            DataAlignment,
+                            &Random);
+                            
+    if (Status != ISTATUS_SUCCESS)
     {
-        return;
+        return Status;
     }
-
-    Random->ReferenceCount += 1;
+    
+    RandomOwner = (PRANDOM_OWNER) malloc(sizeof(RANDOM_OWNER));
+    
+    if (RandomOwner != NULL)
+    {
+        RandomFree(Random);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    RandomOwner->Random = Random;
+    
+    *Result = RandomOwner;
+    
+    return ISTATUS_SUCCESS;
 }
 
-VOID
-RandomDereference(
-    _In_opt_ _Post_invalid_ PRANDOM Random
+_Ret_
+IRISADVANCEDAPI
+PRANDOM
+RandomOwnerGetRandom(
+    _In_ PRANDOM_OWNER RandomOwner
     )
 {
-    PFREE_ROUTINE FreeRoutine;
+    if (RandomOwner == NULL)
+    {
+        return NULL;
+    }    
+    
+    return RandomOwner->Random;
+}
 
-    if (Random == NULL)
+IRISADVANCEDAPI
+VOID
+RandomOwnerFree(
+    _In_opt_ _Post_invalid_ PRANDOM_OWNER RandomOwner
+    )
+{
+    if (RandomOwner == NULL)
     {
         return;
     }
-
-    Random->ReferenceCount -= 1;
-
-    if (Random->ReferenceCount == 0)
-    {
-        FreeRoutine = Random->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Random->Data);
-        }
-
-        IrisAlignedFree(Random);
-    }
+    
+    RandomFree(RandomOwner->Random);
+    free(RandomOwner);
 }

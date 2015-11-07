@@ -74,5 +74,5 @@ SpectrumRayTracerOwnerDestroy(
 {
     SpectrumRayTracerDestroy(&SpectrumRayTracerOwner->RayTracer);
 }
-
+ 
 #endif // _SPECTRUM_RAYTRACER_OWNER_IRIS_PHYSX_INTERNAL_
