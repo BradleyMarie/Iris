@@ -21,13 +21,16 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumRayTracerSetRay(
+SpectrumRayTracerTraceRay(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _In_ RAY Ray,
     _In_ BOOL NormalizeRay
     )
 {
     ISTATUS Status;
+    PSCENE Scene;
+
+    ASSERT(RayTracer->Scene != NULL);
 
     if (RayTracer == NULL)
     {
@@ -38,25 +41,9 @@ SpectrumRayTracerSetRay(
                                   Ray,
                                   NormalizeRay);
 
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-SpectrumRayTracerGetRay(
-    _In_ PSPECTRUM_RAYTRACER RayTracer,
-    _Out_ PRAY Ray
-    )
-{
-    ISTATUS Status;
-
-    if (RayTracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    Status = RayTracerGetRay(RayTracer->RayTracer, Ray);
+    Scene = (PSCENE) RayTracer->Scene;
+    
+    Status = SceneTrace(Scene, RayTracer->RayTracer);
 
     return Status;
 }

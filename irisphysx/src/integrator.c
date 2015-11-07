@@ -139,6 +139,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 IntegratorIntegrate(
     _In_ PINTEGRATOR Integrator,
+    _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY WorldRay,
     _Out_ PSPECTRUM *Spectrum
     )
@@ -151,15 +152,20 @@ IntegratorIntegrate(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    if (RayValidate(WorldRay) == FALSE)
+    
+    if (Scene == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (Spectrum == NULL)
+    if (RayValidate(WorldRay) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     BrdfAllocatorFreeAll(&Integrator->BrdfAllocator);
@@ -168,6 +174,8 @@ IntegratorIntegrate(
 
     ReflectorCompositor = ReflectorCompositorOwnerGetCompositor(Integrator->ReflectorCompositorOwner);
     SpectrumCompositor = SpectrumCompositorOwnerGetCompositor(Integrator->SpectrumCompositorOwner);
+
+    SpectrumRayTracerSetScene(&Integrator->RayTracer, Scene);
 
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,

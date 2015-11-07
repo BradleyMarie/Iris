@@ -72,15 +72,6 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS 
-SpectrumSceneTrace(
-    _In_ PSPECTRUM_SCENE SpectrumScene,
-    _Inout_ PSPECTRUM_RAYTRACER RayTracer
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS 
 SpectrumSceneAddObject(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
     _In_ PSPECTRUM_SHAPE SpectrumShape,

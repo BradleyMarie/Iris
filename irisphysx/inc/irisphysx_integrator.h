@@ -67,6 +67,7 @@ IRISPHYSXAPI
 ISTATUS
 IntegratorIntegrate(
     _In_ PINTEGRATOR Integrator,
+    _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY WorldRay,
     _Out_ PSPECTRUM *Spectrum
     );

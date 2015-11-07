@@ -46,34 +46,6 @@ SpectrumSceneAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-SpectrumSceneTrace(
-    _In_ PSPECTRUM_SCENE SpectrumScene,
-    _Inout_ PSPECTRUM_RAYTRACER RayTracer
-    )
-{
-    ISTATUS Status;
-    PSCENE Scene;
-
-    if (SpectrumScene == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-    
-    if (RayTracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    Scene = (PSCENE) SpectrumScene;
-
-    Status = SceneTrace(Scene, RayTracer->RayTracer);
-
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
 SpectrumSceneAddObject(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
     _In_ PSPECTRUM_SHAPE SpectrumShape,

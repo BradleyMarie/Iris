@@ -42,19 +42,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-SpectrumRayTracerSetRay(
+SpectrumRayTracerTraceRay(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _In_ RAY Ray,
     _In_ BOOL NormalizeRay
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS
-SpectrumRayTracerGetRay(
-    _In_ PSPECTRUM_RAYTRACER RayTracer,
-    _Out_ PRAY Ray
     );
 
 IRISPHYSXAPI
