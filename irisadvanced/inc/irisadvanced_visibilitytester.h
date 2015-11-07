@@ -32,16 +32,6 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISADVANCEDAPI
 ISTATUS
-VisibilityTesterAllocate(
-    _In_ PSCENE Scene,
-    _In_ FLOAT Epsilon,
-    _Out_ PVISIBILITY_TESTER *VisibilityTester
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
-ISTATUS
 VisibilityTesterTestVisibility(
     _In_ PVISIBILITY_TESTER Tester,
     _In_ RAY WorldRay,
@@ -57,12 +47,6 @@ VisibilityTesterTestVisibilityAnyDistance(
     _In_ PVISIBILITY_TESTER Tester,
     _In_ RAY WorldRay,
     _Out_ PBOOL Visible
-    );
-
-IRISADVANCEDAPI
-VOID
-VisibilityTesterFree(
-    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
     );
 
 #endif // _VISIBILITY_TESTER_IRIS_ADVANCED_

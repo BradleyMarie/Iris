@@ -22,6 +22,7 @@ struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE VTable;
     SPECTRUM_RAYTRACER RayTracer;
     BRDF_ALLOCATOR BrdfAllocator;
+    PVISIBILITY_TESTER_OWNER VisibilityTesterOwner;
     PSPECTRUM_COMPOSITOR_OWNER SpectrumCompositorOwner;
     PREFLECTOR_COMPOSITOR_OWNER ReflectorCompositorOwner;
     PVOID Data;
@@ -128,6 +129,7 @@ IntegratorAllocate(
     }
 
     BrdfAllocatorInitialize(&AllocatedIntegrator->BrdfAllocator);
+    AllocatedIntegrator->VisibilityTesterOwner = NULL;
 
     *Integrator = AllocatedIntegrator;
 
@@ -139,33 +141,65 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 IntegratorIntegrate(
     _In_ PINTEGRATOR Integrator,
-    _In_ PCSPECTRUM_SCENE Scene,
+    _In_ PCSPECTRUM_SCENE SpectrumScene,
+    _In_ FLOAT VisibilityEpsilon,
     _In_ RAY WorldRay,
     _Out_ PSPECTRUM *Spectrum
     )
 {
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
+    PVISIBILITY_TESTER VisibilityTester;
     ISTATUS Status;
+    PCSCENE Scene;
 
     if (Integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    if (Scene == NULL)
+    if (SpectrumScene == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (RayValidate(WorldRay) == FALSE)
+    if (IsNormalFloat(VisibilityEpsilon) == FALSE ||
+        IsFiniteFloat(VisibilityEpsilon) == FALSE ||
+        VisibilityEpsilon < (FLOAT) 0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Spectrum == NULL)
+    if (RayValidate(WorldRay) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (Integrator->VisibilityTesterOwner == NULL)
+    {
+        Status = VisibilityTesterOwnerAllocate(&Integrator->VisibilityTesterOwner);
+                                               
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+    }
+
+    Scene = (PCSCENE) SpectrumScene;
+
+    Status = VisibilityTesterOwnerGetVisibilityTester(Integrator->VisibilityTesterOwner,
+                                                      Scene,
+                                                      VisibilityEpsilon,
+                                                      &VisibilityTester);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
     }
 
     BrdfAllocatorFreeAll(&Integrator->BrdfAllocator);
@@ -175,11 +209,12 @@ IntegratorIntegrate(
     ReflectorCompositor = ReflectorCompositorOwnerGetCompositor(Integrator->ReflectorCompositorOwner);
     SpectrumCompositor = SpectrumCompositorOwnerGetCompositor(Integrator->SpectrumCompositorOwner);
 
-    SpectrumRayTracerSetScene(&Integrator->RayTracer, Scene);
+    SpectrumRayTracerSetScene(&Integrator->RayTracer, SpectrumScene);
 
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
                                                   &Integrator->RayTracer,
+                                                  VisibilityTester,
                                                   &Integrator->BrdfAllocator,
                                                   SpectrumCompositor,
                                                   ReflectorCompositor,
@@ -202,5 +237,6 @@ IntegratorFree(
     BrdfAllocatorDestroy(&Integrator->BrdfAllocator);
     SpectrumCompositorOwnerFree(Integrator->SpectrumCompositorOwner);
     ReflectorCompositorOwnerFree(Integrator->ReflectorCompositorOwner);
+    VisibilityTesterOwnerFree(Integrator->VisibilityTesterOwner);
     IrisAlignedFree(Integrator);
 }

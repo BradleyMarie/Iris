@@ -22,52 +22,32 @@ struct _VISIBILITY_TESTER {
     PRAYTRACER_OWNER RayTracerOwner;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
-    PSCENE Scene;
+    PCSCENE Scene;
+};
+
+struct _VISIBILITY_TESTER_OWNER {
+    VISIBILITY_TESTER VisibilityTester;  
 };
 
 //
-// Public Functions
+// VisibilityTester Static Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
 ISTATUS
-VisibilityTesterAllocate(
-    _In_ PSCENE Scene,
-    _In_ FLOAT Epsilon,
-    _Out_ PVISIBILITY_TESTER *VisibilityTester
+VisibilityTesterInitialize(
+    _Out_ PVISIBILITY_TESTER Tester
     )
 {
     PRAYTRACER_OWNER RayTracerOwner;
     VECTOR3 TemporaryDirection;
-    PVISIBILITY_TESTER Tester;
     POINT3 TemporaryOrigin;
     RAY TemporaryRay;
     ISTATUS Status;
 
-    if (Scene == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (IsNormalFloat(Epsilon) == FALSE ||
-        IsFiniteFloat(Epsilon) == FALSE ||
-        Epsilon < (FLOAT) 0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (VisibilityTester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    Tester = (PVISIBILITY_TESTER) malloc(sizeof(VISIBILITY_TESTER));
-
-    if (Tester == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
+    ASSERT(Tester != NULL);
 
     TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
     TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
@@ -77,21 +57,49 @@ VisibilityTesterAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        free(Tester);
         return Status;
     }
 
-    SceneReference(Scene);
-
-    Tester->Scene = Scene;
+    Tester->Scene = NULL;
     Tester->RayTracerOwner = RayTracerOwner;
     Tester->RayTracer = RayTracerOwnerGetRayTracer(RayTracerOwner);
-    Tester->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
-
-    *VisibilityTester = Tester;
+    Tester->Epsilon = (FLOAT) 0.0;
 
     return ISTATUS_SUCCESS;
 }
+
+SFORCEINLINE
+VOID
+VisibilityTesterSetSceneAndEpsilon(
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _In_ PCSCENE Scene,
+    _In_ FLOAT Epsilon
+    )
+{
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Scene != NULL);
+    ASSERT(IsNormalFloat(Epsilon) != FALSE);
+    ASSERT(IsFiniteFloat(Epsilon) != FALSE);
+    ASSERT(Epsilon < (FLOAT) 0.0);
+    
+    VisibilityTester->Scene = Scene;
+    VisibilityTester->Epsilon = Epsilon;
+}
+
+SFORCEINLINE
+VOID
+VisibilityTesterDestroy(
+    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
+    )
+{
+    ASSERT(Tester != NULL);
+
+    RayTracerOwnerFree(Tester->RayTracerOwner);
+}
+
+//
+// VisibilityTester Public Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -248,17 +256,125 @@ VisibilityTesterTestVisibilityAnyDistance(
     return ISTATUS_SUCCESS;
 }
 
+//
+// VisibilityTesterOwner Public Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+VisibilityTesterOwnerAllocate(
+    _Out_ PVISIBILITY_TESTER_OWNER *Result
+    )
+{
+    PVISIBILITY_TESTER_OWNER VisibilityTesterOwner;
+    ISTATUS Status;
+
+    if (Result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    VisibilityTesterOwner = (PVISIBILITY_TESTER_OWNER) malloc(sizeof(VISIBILITY_TESTER_OWNER));
+    
+    if (VisibilityTesterOwner == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    Status = VisibilityTesterInitialize(&VisibilityTesterOwner->VisibilityTester);
+                                        
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+VisibilityTesterOwnerGetVisibilityTester(
+    _In_ PVISIBILITY_TESTER_OWNER VisibilityTesterOwner,
+    _In_ PCSCENE Scene,
+    _In_ FLOAT Epsilon,
+    _Out_ PVISIBILITY_TESTER *VisibilityTester
+    )
+{
+    if (VisibilityTesterOwner == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Epsilon) == FALSE ||
+        IsFiniteFloat(Epsilon) == FALSE ||
+        Epsilon < (FLOAT) 0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (VisibilityTester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    VisibilityTesterSetSceneAndEpsilon(&VisibilityTesterOwner->VisibilityTester,
+                                       Scene,
+                                       Epsilon);
+
+    *VisibilityTester = &VisibilityTesterOwner->VisibilityTester;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+VisibilityTesterOwnerSetSceneAndEpsilon(
+    _Inout_ PVISIBILITY_TESTER_OWNER VisibilityTesterOwner,
+    _In_ PSCENE Scene,
+    _In_ FLOAT Epsilon
+    )
+{
+    if (VisibilityTesterOwner == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsNormalFloat(Epsilon) == FALSE ||
+        IsFiniteFloat(Epsilon) == FALSE ||
+        Epsilon < (FLOAT) 0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    VisibilityTesterSetSceneAndEpsilon(&VisibilityTesterOwner->VisibilityTester,
+                                       Scene,
+                                       Epsilon);
+                                       
+    return ISTATUS_SUCCESS;
+}
+
+IRISADVANCEDAPI
 VOID
-VisibilityTesterFree(
-    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER Tester
+VisibilityTesterOwnerFree(
+    _In_opt_ _Post_invalid_ PVISIBILITY_TESTER_OWNER Tester
     )
 {
     if (Tester == NULL)
     {
         return;
     }
-
-    RayTracerOwnerFree(Tester->RayTracerOwner);
-    SceneDereference(Tester->Scene);
+    
+    VisibilityTesterDestroy(&Tester->VisibilityTester);
     free(Tester);
 }

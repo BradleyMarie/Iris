@@ -29,6 +29,7 @@ ISTATUS
     _In_ PCVOID Context, 
     _In_ RAY WorldRay,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
+    _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
@@ -68,6 +69,7 @@ ISTATUS
 IntegratorIntegrate(
     _In_ PINTEGRATOR Integrator,
     _In_ PCSPECTRUM_SCENE Scene,
+    _In_ FLOAT VisibilityEpsilon,
     _In_ RAY WorldRay,
     _Out_ PSPECTRUM *Spectrum
     );
