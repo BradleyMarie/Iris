@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #ifndef _BRDF_IRIS_PHYSX_INTERNAL_
+#define _BRDF_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 

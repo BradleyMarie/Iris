@@ -20,7 +20,7 @@ Abstract:
 
 struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE VTable;
-    SPECTRUM_RAYTRACER RayTracer;
+    SPECTRUM_RAYTRACER_OWNER RayTracerOwner;
     BRDF_ALLOCATOR BrdfAllocator;
     PVISIBILITY_TESTER_OWNER VisibilityTesterOwner;
     PSPECTRUM_COMPOSITOR_OWNER SpectrumCompositorOwner;
@@ -101,7 +101,7 @@ IntegratorAllocate(
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    Status = SpectrumRayTracerInitialize(&AllocatedIntegrator->RayTracer);
+    Status = SpectrumRayTracerOwnerInitialize(&AllocatedIntegrator->RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -113,7 +113,7 @@ IntegratorAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        SpectrumRayTracerDestroy(&AllocatedIntegrator->RayTracer);
+        SpectrumRayTracerOwnerDestroy(&AllocatedIntegrator->RayTracerOwner);
         IrisAlignedFree(HeaderAllocation);
         return Status;
     }
@@ -123,7 +123,7 @@ IntegratorAllocate(
     if (Status != ISTATUS_SUCCESS)
     {
         SpectrumCompositorOwnerFree(AllocatedIntegrator->SpectrumCompositorOwner);
-        SpectrumRayTracerDestroy(&AllocatedIntegrator->RayTracer);
+        SpectrumRayTracerOwnerDestroy(&AllocatedIntegrator->RayTracerOwner);
         IrisAlignedFree(HeaderAllocation);
         return Status;
     }
@@ -150,6 +150,7 @@ IntegratorIntegrate(
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PVISIBILITY_TESTER VisibilityTester;
+    PSPECTRUM_RAYTRACER RayTracer;
     ISTATUS Status;
     PCSCENE Scene;
 
@@ -209,11 +210,13 @@ IntegratorIntegrate(
     ReflectorCompositor = ReflectorCompositorOwnerGetCompositor(Integrator->ReflectorCompositorOwner);
     SpectrumCompositor = SpectrumCompositorOwnerGetCompositor(Integrator->SpectrumCompositorOwner);
 
-    SpectrumRayTracerSetScene(&Integrator->RayTracer, SpectrumScene);
+    SpectrumRayTracerOwnerGetRayTracer(&Integrator->RayTracerOwner,
+                                       SpectrumScene,
+                                       &RayTracer);
 
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
-                                                  &Integrator->RayTracer,
+                                                  RayTracer,
                                                   VisibilityTester,
                                                   &Integrator->BrdfAllocator,
                                                   SpectrumCompositor,
@@ -233,7 +236,7 @@ IntegratorFree(
         return;
     }
 
-    SpectrumRayTracerDestroy(&Integrator->RayTracer);
+    SpectrumRayTracerOwnerDestroy(&Integrator->RayTracerOwner);
     BrdfAllocatorDestroy(&Integrator->BrdfAllocator);
     SpectrumCompositorOwnerFree(Integrator->SpectrumCompositorOwner);
     ReflectorCompositorOwnerFree(Integrator->ReflectorCompositorOwner);

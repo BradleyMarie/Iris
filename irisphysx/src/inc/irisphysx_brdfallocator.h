@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #ifndef _BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#define _BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 

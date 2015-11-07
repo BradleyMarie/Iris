@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #ifndef _SPECTRUM_RAYTRACER_IRIS_PHYSX_INTERNAL_
+#define _SPECTRUM_RAYTRACER_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
