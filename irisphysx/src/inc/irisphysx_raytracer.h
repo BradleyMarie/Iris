@@ -22,7 +22,6 @@ Abstract:
 
 struct _SPECTRUM_RAYTRACER {
     PRAYTRACER_OWNER RayTracerOwner;
-    PRAYTRACER RayTracer;
     PCSPECTRUM_SCENE Scene;
 };
 
@@ -62,7 +61,6 @@ SpectrumRayTracerInitialize(
     }
 
     SpectrumRayTracer->RayTracerOwner = RayTracerOwner;
-    SpectrumRayTracer->RayTracer = RayTracerOwnerGetRayTracer(RayTracerOwner);
     SpectrumRayTracer->Scene = NULL;
 
     return ISTATUS_SUCCESS;

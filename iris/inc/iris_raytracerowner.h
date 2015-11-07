@@ -37,21 +37,15 @@ RayTracerOwnerAllocate(
     _Out_ PRAYTRACER_OWNER *RayTracerOwner
     );
 
-_Ret_
-IRISAPI
-PRAYTRACER
-RayTracerOwnerGetRayTracer(
-    _In_ PRAYTRACER_OWNER RayTracerOwner
-    );
-
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerSetRay(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerOwnerGetRayTracer(
+    _In_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
+    _In_ BOOL NormalizeRay,
+    _Out_ PRAYTRACER *RayTracer
     );
 
 _Check_return_

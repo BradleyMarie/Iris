@@ -97,6 +97,8 @@ VisibilityTesterTestVisibility(
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
+    ASSERT(Tester->Scene != NULL);
+
     //
     // Ray is validated by RayTracerSetRay
     //
@@ -118,20 +120,15 @@ VisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = RayTracerOwnerSetRay(Tester->RayTracerOwner, WorldRay, TRUE);
+    Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner, 
+                                        WorldRay, 
+                                        TRUE, 
+                                        &RayTracer);
 
-    switch (Status)
+    if (Status != ISTATUS_SUCCESS)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            return ISTATUS_INVALID_ARGUMENT_01;
-        default:
-            ASSERT(FALSE);
-            return Status;
+        return Status;
     }
-
-    RayTracer = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner);
 
     Status = SceneTrace(Tester->Scene,
                         RayTracer);
@@ -189,6 +186,8 @@ VisibilityTesterTestVisibilityAnyDistance(
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
+    ASSERT(Tester->Scene != NULL);
+
     //
     // Ray is validated by RayTracerSetRay
     //
@@ -203,20 +202,15 @@ VisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    Status = RayTracerOwnerSetRay(Tester->RayTracerOwner, WorldRay, TRUE);
+    Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner,
+                                        WorldRay,
+                                        TRUE,
+                                        &RayTracer);
 
-    switch (Status)
+    if (Status != ISTATUS_SUCCESS)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            return ISTATUS_INVALID_ARGUMENT_01;
-        default:
-            ASSERT(FALSE);
-            return Status;
+        return Status;
     }
-
-    RayTracer = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner);
 
     Status = SceneTrace(Tester->Scene,
                         RayTracer);

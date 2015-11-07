@@ -351,16 +351,15 @@ RayShaderTraceRayMontecarlo(
         }
     }
 
-    Status = RayTracerOwnerSetRay(RayShader->RayTracerOwner, 
-                                  WorldRay, 
-                                  TRUE);
+    Status = RayTracerOwnerGetRayTracer(RayShader->RayTracerOwner,
+                                        WorldRay,
+                                        TRUE,
+                                        &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
-
-    RayTracer = RayTracerOwnerGetRayTracer(RayShader->RayTracerOwner);
 
     Status = SceneTrace(RayShader->Scene,
                         RayTracer);

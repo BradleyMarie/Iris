@@ -22,28 +22,35 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumRayTracerTraceRay(
-    _Inout_ PSPECTRUM_RAYTRACER RayTracer,
+    _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
     _In_ RAY Ray,
     _In_ BOOL NormalizeRay
     )
 {
+    PRAYTRACER RayTracer;
     ISTATUS Status;
     PSCENE Scene;
 
-    ASSERT(RayTracer->Scene != NULL);
+    ASSERT(SpectrumRayTracer->Scene != NULL);
 
-    if (RayTracer == NULL)
+    if (SpectrumRayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Status = RayTracerOwnerSetRay(RayTracer->RayTracerOwner,
-                                  Ray,
-                                  NormalizeRay);
+    Status = RayTracerOwnerGetRayTracer(SpectrumRayTracer->RayTracerOwner,
+                                        Ray,
+                                        TRUE,
+                                        &RayTracer);
 
-    Scene = (PSCENE) RayTracer->Scene;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Scene = (PSCENE) SpectrumRayTracer->Scene;
     
-    Status = SceneTrace(Scene, RayTracer->RayTracer);
+    Status = SceneTrace(Scene, RayTracer);
 
     return Status;
 }

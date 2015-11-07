@@ -384,27 +384,14 @@ RayTracerOwnerAllocate(
     return ISTATUS_SUCCESS;
 }
 
-_Ret_
-PRAYTRACER
-RayTracerOwnerGetRayTracer(
-    _In_ PRAYTRACER_OWNER RayTracerOwner
-    )
-{
-    if (RayTracerOwner == NULL)
-    {
-        return NULL;
-    }
-
-    return &RayTracerOwner->RayTracer;
-}
-
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerSetRay(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerOwnerGetRayTracer(
+    _In_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
+    _In_ BOOL NormalizeRay,
+    _Out_ PRAYTRACER *RayTracer
     )
 {
     if (RayTracerOwner == NULL)
@@ -417,9 +404,16 @@ RayTracerOwnerSetRay(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (RayTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
     RayTracerSetRay(&RayTracerOwner->RayTracer,
                     Ray,
                     NormalizeRay);
+
+    *RayTracer = &RayTracerOwner->RayTracer;
 
     return ISTATUS_SUCCESS;
 }

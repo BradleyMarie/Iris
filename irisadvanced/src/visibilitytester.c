@@ -20,7 +20,6 @@ Abstract:
 
 struct _VISIBILITY_TESTER {
     PRAYTRACER_OWNER RayTracerOwner;
-    PRAYTRACER RayTracer;
     FLOAT Epsilon;
     PCSCENE Scene;
 };
@@ -62,7 +61,6 @@ VisibilityTesterInitialize(
 
     Tester->Scene = NULL;
     Tester->RayTracerOwner = RayTracerOwner;
-    Tester->RayTracer = RayTracerOwnerGetRayTracer(RayTracerOwner);
     Tester->Epsilon = (FLOAT) 0.0;
 
     return ISTATUS_SUCCESS;
@@ -112,8 +110,11 @@ VisibilityTesterTestVisibility(
     )
 {
     PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
+
+    ASSERT(Tester->Scene != NULL);
 
     //
     // Ray is validated by RayTracerSetRay
@@ -138,9 +139,10 @@ VisibilityTesterTestVisibility(
 
     RayTracerOwner = Tester->RayTracerOwner;
 
-    Status = RayTracerOwnerSetRay(Tester->RayTracerOwner, 
-                                  WorldRay, 
-                                  TRUE);
+    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
+                                        WorldRay,
+                                        TRUE,
+                                        &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -148,7 +150,7 @@ VisibilityTesterTestVisibility(
     }
 
     Status = SceneTrace(Tester->Scene,
-                        Tester->RayTracer);
+                        RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -199,8 +201,11 @@ VisibilityTesterTestVisibilityAnyDistance(
     )
 {
     PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
+
+    ASSERT(Tester->Scene != NULL);
 
     //
     // Ray is validated by RayTracerSetRay
@@ -218,7 +223,10 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     RayTracerOwner = Tester->RayTracerOwner;
 
-    Status = RayTracerOwnerSetRay(RayTracerOwner, WorldRay, TRUE);
+    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
+                                        WorldRay,
+                                        TRUE,
+                                        &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -226,7 +234,7 @@ VisibilityTesterTestVisibilityAnyDistance(
     }
 
     Status = SceneTrace(Tester->Scene,
-                        Tester->RayTracer);
+                        RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
