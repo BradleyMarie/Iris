@@ -26,21 +26,45 @@ SpectrumSceneAllocate(
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PSPECTRUM_SCENE *SpectrumScene
+    _Out_ PSPECTRUM_SCENE *Result
     )
 {
+    PSPECTRUM_SCENE SpectrumScene;
     ISTATUS Status;
-    PSCENE *Scene;
 
-    Scene = (PSCENE *) SpectrumScene;
+    SpectrumScene = malloc(sizeof(SPECTRUM_SCENE));
+    
+    if (SpectrumScene == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    Status = PointerListInitialize(&SpectrumScene->Lights);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        free(SpectrumScene);
+        return Status;
+    }
 
     Status = SceneAllocate(&SpectrumSceneVTable->SceneVTable,
                            Data,
                            DataSizeInBytes,
                            DataAlignment,
-                           Scene);
+                           &SpectrumScene->Scene);
 
-    return Status;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        PointerListDestroy(&SpectrumScene->Lights);
+        free(SpectrumScene);
+        return Status;
+    }
+    
+    SpectrumScene->ReferenceCount = 1;
+    
+    *Result = SpectrumScene;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
@@ -68,7 +92,7 @@ SpectrumSceneAddObject(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    Scene = (PSCENE) SpectrumScene;
+    Scene = SpectrumScene->Scene;
 
     SpectrumSceneVTable = (PCSPECTRUM_SCENE_VTABLE) SceneGetVTable(Scene);
 
@@ -84,18 +108,14 @@ SpectrumSceneAddObject(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
 ISTATUS 
 SpectrumSceneAddLight(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
     _In_ PLIGHT Light
     )
 {
-    PCSPECTRUM_SCENE_VTABLE SpectrumSceneVTable;
     ISTATUS Status;
-    PSCENE Scene;
-    PVOID Data;
-
+    
     if (SpectrumScene == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -106,15 +126,74 @@ SpectrumSceneAddLight(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    Scene = (PSCENE) SpectrumScene;
+    Status = PointerListAddPointer(&SpectrumScene->Lights,
+                                   Light);
+                                   
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
-    SpectrumSceneVTable = (PCSPECTRUM_SCENE_VTABLE) SceneGetVTable(Scene);
+    LightReference(Light);
 
-    Data = SceneGetData(Scene);
+    return ISTATUS_SUCCESS;   
+}
 
-    Status = SpectrumSceneVTable->AddLightRoutine(Data, Light);
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+SpectrumSceneLightCount(
+    _Inout_ PSPECTRUM_SCENE SpectrumScene,
+    _Out_ PSIZE_T NumberOfLights
+    )
+{
+    if (SpectrumScene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (NumberOfLights == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    *NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
+    
+    return ISTATUS_SUCCESS;
+}
 
-    return Status;   
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+SpectrumSceneGetLight(
+    _Inout_ PCSPECTRUM_SCENE SpectrumScene,
+    _In_ SIZE_T Index,
+    _Out_ PCLIGHT *Light
+    )
+{
+    SIZE_T NumberOfLights;
+    
+    if (SpectrumScene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
+    
+    if (NumberOfLights < Index)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    *Light = (PCLIGHT) PointerListRetrieveAtIndex(&SpectrumScene->Lights,
+                                                  Index);
+                                                  
+    return ISTATUS_SUCCESS;
 }
 
 VOID
@@ -122,11 +201,12 @@ SpectrumSceneReference(
     _In_opt_ PSPECTRUM_SCENE SpectrumScene
     )
 {
-    PSCENE Scene;
+    if (SpectrumScene == NULL)
+    {
+        return;
+    }
 
-    Scene = (PSCENE) SpectrumScene;
-
-    SceneReference(Scene); 
+    SpectrumScene->ReferenceCount += 1;
 }
 
 VOID
@@ -134,9 +214,30 @@ SpectrumSceneDereference(
     _In_opt_ _Post_invalid_ PSPECTRUM_SCENE SpectrumScene
     )
 {
-    PSCENE Scene;
+    SIZE_T NumberOfLights;
+    SIZE_T Index;
+    PLIGHT Light;
+    
+    if (SpectrumScene == NULL)
+    {
+        return;
+    }
 
-    Scene = (PSCENE) SpectrumScene;
+    SpectrumScene->ReferenceCount -= 1;
 
-    SceneDereference(Scene);   
+    if (SpectrumScene->ReferenceCount == 0)
+    {
+        NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
+        
+        for (Index = 0; Index < NumberOfLights; Index++)
+        {
+            Light = (PLIGHT) PointerListRetrieveAtIndex(&SpectrumScene->Lights,
+                                                        Index);
+            LightDereference(Light);
+        }
+        
+        PointerListDestroy(&SpectrumScene->Lights);
+        SceneDereference(SpectrumScene->Scene);
+        free(SpectrumScene);
+    } 
 }

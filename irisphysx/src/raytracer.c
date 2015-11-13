@@ -29,7 +29,6 @@ SpectrumRayTracerTraceRay(
 {
     PRAYTRACER RayTracer;
     ISTATUS Status;
-    PSCENE Scene;
 
     ASSERT(SpectrumRayTracer->Scene != NULL);
 
@@ -47,10 +46,9 @@ SpectrumRayTracerTraceRay(
     {
         return Status;
     }
-
-    Scene = (PSCENE) SpectrumRayTracer->Scene;
     
-    Status = SceneTrace(Scene, RayTracer);
+    Status = SceneTrace(SpectrumRayTracer->Scene->Scene,
+                        RayTracer);
 
     return Status;
 }

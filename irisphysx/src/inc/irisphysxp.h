@@ -18,9 +18,11 @@ Abstract:
 #include <irisphysx.h>
 #include <iriscommon_staticallocator.h>
 #include <iriscommon_dynamicallocator.h>
+#include <iriscommon_pointerlist.h>
 
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
+#include "irisphysx_scene.h"
 #include "irisphysx_raytracer.h"
 #include "irisphysx_raytracerowner.h"
 
