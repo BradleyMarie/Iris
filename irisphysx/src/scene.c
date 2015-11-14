@@ -139,63 +139,6 @@ SpectrumSceneAddLight(
     return ISTATUS_SUCCESS;   
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
-SpectrumSceneLightCount(
-    _Inout_ PSPECTRUM_SCENE SpectrumScene,
-    _Out_ PSIZE_T NumberOfLights
-    )
-{
-    if (SpectrumScene == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-    
-    if (NumberOfLights == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    *NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
-    
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
-SpectrumSceneGetLight(
-    _Inout_ PCSPECTRUM_SCENE SpectrumScene,
-    _In_ SIZE_T Index,
-    _Out_ PCLIGHT *Light
-    )
-{
-    SIZE_T NumberOfLights;
-    
-    if (SpectrumScene == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-    
-    NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
-    
-    if (NumberOfLights < Index)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    if (Light == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    *Light = (PCLIGHT) PointerListRetrieveAtIndex(&SpectrumScene->Lights,
-                                                  Index);
-                                                  
-    return ISTATUS_SUCCESS;
-}
-
 VOID
 SpectrumSceneReference(
     _In_opt_ PSPECTRUM_SCENE SpectrumScene

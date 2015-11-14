@@ -100,25 +100,6 @@ SpectrumSceneAddLight(
     _In_ PLIGHT Light
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS 
-SpectrumSceneLightCount(
-    _Inout_ PSPECTRUM_SCENE SpectrumScene,
-    _Out_ PSIZE_T NumberOfLights
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS 
-SpectrumSceneGetLight(
-    _Inout_ PCSPECTRUM_SCENE SpectrumScene,
-    _In_ SIZE_T Index,
-    _Out_ PCLIGHT *Light
-    );
-
 IRISPHYSXAPI
 VOID
 SpectrumSceneReference(

@@ -28,6 +28,8 @@ ISTATUS
 (*PINTEGRATOR_INTEGRATE_ROUTINE)(
     _In_ PCVOID Context, 
     _In_ RAY WorldRay,
+    _In_reads_(NumberOfLights) PCLIGHT *Lights,
+    _In_ SIZE_T NumberOfLights,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,

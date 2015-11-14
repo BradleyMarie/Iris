@@ -152,6 +152,8 @@ IntegratorIntegrate(
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PVISIBILITY_TESTER VisibilityTester;
     PSPECTRUM_RAYTRACER RayTracer;
+    SIZE_T NumberOfLights;
+    PCLIGHT *Lights;
     ISTATUS Status;
     PCSCENE Scene;
 
@@ -220,8 +222,14 @@ IntegratorIntegrate(
                                        SpectrumScene,
                                        &RayTracer);
 
+    SpectrumSceneGetLights(SpectrumScene,
+                           &Lights,
+                           &NumberOfLights);
+
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
+                                                  Lights,
+                                                  NumberOfLights,
                                                   RayTracer,
                                                   VisibilityTester,
                                                   &Integrator->BrdfAllocator,

@@ -27,4 +27,24 @@ struct _SPECTRUM_SCENE {
     SIZE_T ReferenceCount;
 };
 
+//
+// Functions
+//
+
+SFORCEINLINE
+VOID 
+SpectrumSceneGetLights(
+    _In_ PCSPECTRUM_SCENE SpectrumScene,
+    _Outptr_result_buffer_(NumberOfLights) PCLIGHT *Lights[],
+    _Out_ PSIZE_T NumberOfLights
+    )
+{
+    ASSERT(SpectrumScene != NULL);
+    ASSERT(Lights != NULL);
+    ASSERT(NumberOfLights != NULL);
+    
+    *NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
+    *Lights = (PCLIGHT *) PointerListGetData(&SpectrumScene->Lights);
+}
+
 #endif // _SPECTRUM_SCENE_IRIS_PHYSX_INTERNAL_
