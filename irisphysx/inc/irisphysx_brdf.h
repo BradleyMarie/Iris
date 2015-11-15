@@ -28,8 +28,6 @@ ISTATUS
 (*PBRDF_SAMPLE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -45,8 +43,6 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
@@ -55,7 +51,6 @@ ISTATUS
 typedef struct _BRDF_VTABLE {
     PBRDF_SAMPLE SampleRoutine;
     PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
-    PFREE_ROUTINE FreeRoutine;
 } BRDF_VTABLE, *PBRDF_VTABLE;
 
 typedef CONST BRDF_VTABLE *PCBRDF_VTABLE;
@@ -71,23 +66,9 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfAllocate(
-    _In_ PCBRDF_VTABLE BrdfVTable,
-    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PBRDF *Brdf
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS
 BrdfSample(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
     _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -103,23 +84,9 @@ BrdfComputeReflectance(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _In_ VECTOR3 ShapeNormal,
-    _In_ VECTOR3 ShadingNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
-    );
-
-IRISPHYSXAPI
-VOID
-BrdfReference(
-    _In_opt_ PBRDF Brdf
-    );
-
-IRISPHYSXAPI
-VOID
-BrdfDereference(
-    _In_opt_ _Post_invalid_ PBRDF Brdf
     );
 
 #endif // _BRDF_IRIS_PHYSX_
