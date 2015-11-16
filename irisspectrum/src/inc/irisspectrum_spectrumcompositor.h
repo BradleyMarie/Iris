@@ -55,7 +55,17 @@ typedef struct _REFLECTION_SPECTRUM {
 
 typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
 
+typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
+    PCREFLECTOR Reflector;
+    FLOAT Attenuation;
+} ATTENUATED_REFLECTION_SPECTRUM, *PATTENUATED_REFLECTION_SPECTRUM;
+
+typedef CONST ATTENUATED_REFLECTION_SPECTRUM *PCATTENUATED_REFLECTION_SPECTRUM;
+
 struct _SPECTRUM_COMPOSITOR {
+    STATIC_MEMORY_ALLOCATOR AttenuatedReflectionSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
@@ -116,6 +126,18 @@ SpectrumCompositorInitialize(
         return Status;
     }
 
+    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedReflectionSpectrumAllocator,
+                                             sizeof(ATTENUATED_REFLECTION_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+        return Status;
+    }
+
     return ISTATUS_SUCCESS;    
 }
 
@@ -127,6 +149,7 @@ SpectrumCompositorClear(
 {
     ASSERT(Compositor != NULL);
     
+    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectionSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
@@ -141,6 +164,7 @@ SpectrumCompositorDestroy(
 {
     ASSERT(Compositor != NULL);
     
+    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);

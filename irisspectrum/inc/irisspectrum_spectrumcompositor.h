@@ -73,4 +73,16 @@ SpectrumCompositorAddReflection(
     _Out_ PCSPECTRUM *ReflectedSpectrum
     );
     
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSPECTRUMAPI
+ISTATUS
+SpectrumCompositorAttenuatedAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM *ReflectedSpectrum
+    );
+
 #endif // _SPECTRUM_COMPOSITOR_IRIS_SPECTRUM_
