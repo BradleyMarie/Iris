@@ -64,10 +64,7 @@ Abstract:
 #define IsFiniteFloat(number) (_finite(number) != 0)
 
 #else
-
-#define IsNormalFloat(number) TRUE
-#define IsFiniteFloat(number) TRUE
-
+#error Support for Infinite Number Detection Required
 #endif
 
 _Check_return_

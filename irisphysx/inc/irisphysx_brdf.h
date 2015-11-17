@@ -45,8 +45,8 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
+    _In_ VECTOR3 ShapeNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
@@ -103,8 +103,8 @@ BrdfComputeReflectance(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
+    _In_ VECTOR3 ShapeNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf

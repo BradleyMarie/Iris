@@ -36,8 +36,19 @@ ISTATUS
     _Out_ PFLOAT Pdf
     );
 
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PLIGHT_EMISSIVE)(
+    _In_ PCVOID Context,
+    _In_ RAY ToLight,
+    _Out_ PCSPECTRUM *Spectrum
+    );
+
 typedef struct _LIGHT_VTABLE {
     PLIGHT_SAMPLE SampleRoutine;
+    PLIGHT_EMISSIVE EmissiveRoutine;
     PFREE_ROUTINE FreeRoutine;
 } LIGHT_VTABLE, *PLIGHT_VTABLE;
 
@@ -75,6 +86,16 @@ LightSample(
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+LightComputeEmissive(
+    _In_ PCLIGHT Light,
+    _In_ RAY ToLight,
+    _Out_ PCSPECTRUM *Spectrum
     );
 
 IRISPHYSXAPI

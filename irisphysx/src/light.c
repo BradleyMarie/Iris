@@ -170,6 +170,39 @@ LightSample(
     return Status;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+LightComputeEmissive(
+    _In_ PCLIGHT Light,
+    _In_ RAY ToLight,
+    _Out_ PCSPECTRUM *Spectrum
+    )
+{
+    ISTATUS Status;
+
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (RayValidate(ToLight) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    Status = Light->VTable->EmissiveRoutine(Light->Data,
+                                            ToLight,
+                                            Spectrum);
+
+    return Status;
+}
+
 VOID
 LightReference(
     _In_opt_ PLIGHT Light

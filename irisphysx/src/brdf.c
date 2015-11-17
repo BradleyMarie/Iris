@@ -174,8 +174,8 @@ BrdfComputeReflectance(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _In_ VECTOR3 ShapeNormal,
     _In_ VECTOR3 ShadingNormal,
+    _In_ VECTOR3 ShapeNormal,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
@@ -198,12 +198,12 @@ BrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (VectorValidate(ShapeNormal) == FALSE)
+    if (VectorValidate(ShadingNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (VectorValidate(ShadingNormal) == FALSE)
+    if (VectorValidate(ShapeNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -226,8 +226,8 @@ BrdfComputeReflectance(
     Status = Brdf->VTable->ComputeReflectanceRoutine(Brdf->Data,
                                                      Incoming,
                                                      Outgoing,
-                                                     ShapeNormal,
                                                      ShadingNormal,
+                                                     ShapeNormal,
                                                      Compositor,
                                                      Reflector,
                                                      Pdf);
