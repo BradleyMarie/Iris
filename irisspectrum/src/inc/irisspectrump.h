@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_SPECTRUM_INTERNAL_HEADER_
 
 #include <irisspectrum.h>
+#include <iriscommon_malloc.h>
 #include <iriscommon_staticallocator.h>
 
 #include "irisspectrum_spectrum.h"

@@ -40,15 +40,29 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PLIGHT_EMISSIVE)(
+(*PLIGHT_COMPUTE_EMISSIVE)(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PLIGHT_COMPUTE_EMISSIVE_WITH_PDF)(
+    _In_ PCVOID Context,
+    _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
+    _Out_ PCSPECTRUM *Spectrum,
+    _Out_ PFLOAT Pdf
     );
 
 typedef struct _LIGHT_VTABLE {
     PLIGHT_SAMPLE SampleRoutine;
-    PLIGHT_EMISSIVE EmissiveRoutine;
+    PLIGHT_COMPUTE_EMISSIVE ComputeEmissiveRoutine;
+    PLIGHT_COMPUTE_EMISSIVE_WITH_PDF ComputeEmissiveWithPdfRoutine;
     PFREE_ROUTINE FreeRoutine;
 } LIGHT_VTABLE, *PLIGHT_VTABLE;
 
@@ -95,7 +109,20 @@ ISTATUS
 LightComputeEmissive(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+LightComputeEmissiveWithPdf(
+    _In_ PCLIGHT Light,
+    _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
+    _Out_ PCSPECTRUM *Spectrum,
+    _Out_ PFLOAT Pdf
     );
 
 IRISPHYSXAPI

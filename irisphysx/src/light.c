@@ -176,6 +176,7 @@ ISTATUS
 LightComputeEmissive(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
@@ -191,14 +192,68 @@ LightComputeEmissive(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (Spectrum == NULL)
+    if (Tester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    Status = Light->VTable->EmissiveRoutine(Light->Data,
-                                            ToLight,
-                                            Spectrum);
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    Status = Light->VTable->ComputeEmissiveRoutine(Light->Data,
+                                                   ToLight,
+                                                   Tester,
+                                                   Spectrum);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+LightComputeEmissiveWithPdf(
+    _In_ PCLIGHT Light,
+    _In_ RAY ToLight,
+    _Inout_ PVISIBILITY_TESTER Tester,
+    _Out_ PCSPECTRUM *Spectrum,
+    _Out_ PFLOAT Pdf
+    )
+{
+    ISTATUS Status;
+
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (RayValidate(ToLight) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (Tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    Status = Light->VTable->ComputeEmissiveWithPdfRoutine(Light->Data,
+                                                          ToLight,
+                                                          Tester,
+                                                          Spectrum,
+                                                          Pdf);
 
     return Status;
 }

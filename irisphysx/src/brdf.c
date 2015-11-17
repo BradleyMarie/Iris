@@ -87,6 +87,53 @@ BrdfComputeReflectance(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
+    _Out_ PCREFLECTOR *Reflector
+    )
+{
+    ISTATUS Status;
+
+    if (Brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (VectorValidate(Incoming) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (VectorValidate(Outgoing) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    Status = Brdf->VTable->ComputeReflectanceRoutine(Brdf->Data,
+                                                     Incoming,
+                                                     Outgoing,
+                                                     Compositor,
+                                                     Reflector);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+BrdfComputeReflectanceWithPdf(
+    _In_ PCBRDF Brdf,
+    _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 Outgoing,
+    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     )
@@ -123,12 +170,12 @@ BrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Status = Brdf->VTable->ComputeReflectanceRoutine(Brdf->Data,
-                                                     Incoming,
-                                                     Outgoing,
-                                                     Compositor,
-                                                     Reflector,
-                                                     Pdf);
+    Status = Brdf->VTable->ComputeReflectanceWithPdfRoutine(Brdf->Data,
+                                                            Incoming,
+                                                            Outgoing,
+                                                            Compositor,
+                                                            Reflector,
+                                                            Pdf);
 
     return Status;
 }

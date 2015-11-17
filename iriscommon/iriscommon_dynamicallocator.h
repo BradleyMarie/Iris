@@ -24,6 +24,7 @@ Abstract:
 #define _IRIS_COMMON_DYNAMIC_MEMORY_ALLOCATOR_
 
 #include <iris.h>
+#include "iriscommon_malloc.h"
 
 //
 // Types

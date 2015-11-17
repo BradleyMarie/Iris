@@ -33,7 +33,7 @@ PowerHeuristic(
 
     ASSERT(IsNormalFloat(nf) != FALSE);
     ASSERT(IsFiniteFloat(nf) != FALSE);
-    ASSERT(IsNormalFloat(fdf) != FALSE);
+    ASSERT(IsNormalFloat(fPdf) != FALSE);
     ASSERT(IsFiniteFloat(fPdf) != FALSE);
     ASSERT(IsNormalFloat(ng) != FALSE);
     ASSERT(IsFiniteFloat(ng) != FALSE);
@@ -62,12 +62,11 @@ ComputeDirectLighting(
     _Inout_ PRANDOM Rng,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
-    _Out_ PSPECTRUM *Spectrum
+    _Out_ PCSPECTRUM *Spectrum
     )
 {
-    PCSPECTRUM_SHAPE_HIT ShapeHit;
     PSPECTRUM LightSpectrum;
-    PREFLECTOR Reflector;
+    PCREFLECTOR Reflector;
     FLOAT Attenuation;
     FLOAT DotProduct;
     VECTOR3 ToCamera;
@@ -78,6 +77,7 @@ ComputeDirectLighting(
     ISTATUS Status;
     FLOAT LightPdf;
     FLOAT BrdfPdf;
+    FLOAT Weight;
 
     Status = LightSample(Light,
                          WorldHitPoint,
@@ -130,12 +130,18 @@ ComputeDirectLighting(
                                                            LightSpectrum,
                                                            Reflector,
                                                            DotProduct,
-                                                           &Spectrum);
+                                                           Spectrum);
 
         return Status;
     }
 
-    if (LighPdf > (FLOAT) 0.0f)
+    //
+    // Light is an area light
+    //
+        
+    ToCamera = VectorNegate(IncidentDirection);
+
+    if (LightPdf > (FLOAT) 0.0f)
     {
         Status = BrdfComputeReflectanceWithPdf(Brdf,
                                                ToCamera,
@@ -179,8 +185,10 @@ ComputeDirectLighting(
     {
         Output = NULL;
     }
-        
-    ToCamera = VectorNegate(IncidentDirection);
+     
+    //
+    // Sample the BRDF
+    //
 
     Status = BrdfSample(Brdf,
                         ToCamera,
@@ -195,102 +203,76 @@ ComputeDirectLighting(
         return Status;
     }
 
-    if (Reflector == NULL || BsdfPdf <= (FLOAT) 0.0f)
+    if (Reflector == NULL || BrdfPdf <= (FLOAT) 0.0f)
     {
         *Spectrum = Output;
         return ISTATUS_SUCCESS;
     }
+    
+    RayToLight = RayCreate(WorldHitPoint, ToLight);
 
-/*
-    if (!(sampledType & BSDF_SPECULAR)) {
-        lightPdf = light->Pdf(p, wi);
-        if (lightPdf == 0.)
-            return Ld;
-        weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
-    } 
-    else
-        weight = 1.;
-*/
-
-    if (IsFiniteFloat(BsdfPdf) == FALSE)
+    if (IsFiniteFloat(BrdfPdf) == FALSE)
     {
-        Weight = (FLOAT) 1.0f;
+        Status = LightComputeEmissive(Light,
+                                      RayToLight,
+                                      VisibilityTester,
+                                      &Emissive);
+
+        if (Emissive == NULL)
+        {
+            *Spectrum = Output;
+            return ISTATUS_SUCCESS;
+        }
+
+        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
+
+        Attenuation = DotProduct / BrdfPdf;
     }
     else if (LightPdf)
     {
-        
+        Status = LightComputeEmissiveWithPdf(Light,
+                                             RayToLight,
+                                             VisibilityTester,
+                                             &Emissive,
+                                             &LightPdf);
+
+        if (Emissive == NULL || LightPdf <= (FLOAT) 0.0)
+        {
+            *Spectrum = Output;
+            return ISTATUS_SUCCESS;
+        }
+
+        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
+
+        Weight = PowerHeuristic((FLOAT) 1.0f, 
+                                BrdfPdf,
+                                (FLOAT) 1.0f,
+                                LightPdf);
+
+        Attenuation = (DotProduct * Weight) / BrdfPdf;
     }
-    
-    RayToLight = RayCreate(WorldHitPoint, ToLight);
-    
-    Status = SpectrumRayTracerTraceRay(RayTracer,
-                                       RayToLight,
-                                       TRUE);
-                                       
+
+    Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
+                                                       Emissive,
+                                                       Reflector,
+                                                       Attenuation,
+                                                       &Emissive);
+
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
-    
-    SpectrumRayTracerSort(RayTracer);
-    
-    Status = SpectrumRayTracerGetNextHit(RayTracer,
-                                         &ShapeHit,
-                                         NULL,
-                                         NULL,
-                                         NULL,
-                                         NULL);
-                                         
-    if (Status != ISTATUS_NO_MORE_DATA)
-    {
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        Light = SpectrumShapeGetLight(ShapeHit->Shape,
-                                      ShapeHit->FaceHit);
-    }
 
-    Status = LightComputeEmissive(Light,
-                                  RayToLight,
-                                  &Emissive);         
-    
+    Status = SpectrumCompositorAddSpectrums(SpectrumCompositor,
+                                            Output,
+                                            Emissive,
+                                            &Output);
+                                            
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
-    
-    if (Emissive != NULL)
-    {
-        Attenuation = (DotProduct * Weight) / BsdfPdf;
 
-        Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
-                                                           Emissive,
-                                                           Reflector,
-                                                           Attenuation,
-                                                           &Emissive);
-
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        if (Emissive != NULL)
-        {
-            Status = SpectrumCompositorAddSpectrums(SpectrumCompositor,
-                                                    Output,
-                                                    Emissive,
-                                                    &Output);
-                                                    
-            if (Status != ISTATUS_SUCCESS)
-            {
-                return Status;
-            }
-        }
-    }
-    
     *Spectrum = Output;
-    
     return ISTATUS_SUCCESS;
 }
