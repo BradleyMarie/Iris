@@ -195,6 +195,53 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
+AttenuatedReflectionSpectrumSample(
+    _In_ PCVOID Context,
+    _In_ FLOAT Wavelength,
+    _Out_ PFLOAT Intensity
+    )
+{
+    PCATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum;
+    FLOAT ReflectedIntensity;
+    FLOAT SpectrumIntensity;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(IsNormalFloat(Wavelength) != FALSE);
+    ASSERT(IsFiniteFloat(Wavelength) != FALSE);
+    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(Intensity != NULL);
+
+    AttenuatedReflectionSpectrum = (PCATTENUATED_REFLECTION_SPECTRUM) Context;
+
+    Status = SpectrumSample(AttenuatedReflectionSpectrum->Spectrum,
+                            Wavelength,
+                            &SpectrumIntensity);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = ReflectorReflect(AttenuatedReflectionSpectrum->Reflector,
+                              Wavelength,
+                              SpectrumIntensity,
+                              &ReflectedIntensity);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Intensity = ReflectedIntensity * AttenuatedReflectionSpectrum->Attenuation;
+
+    return ISTATUS_SUCCESS; 
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
 ZeroSpectrumSample(
     _In_ PCVOID Context,
     _In_ FLOAT Wavelength,
@@ -233,6 +280,11 @@ CONST STATIC SPECTRUM_VTABLE SumSpectrumVTable = {
 
 CONST STATIC SPECTRUM_VTABLE ReflectionSpectrumVTable = {
     ReflectionSpectrumSample,
+    NULL
+};
+
+CONST STATIC SPECTRUM_VTABLE AttenuatedReflectionSpectrumVTable = {
+    AttenuatedReflectionSpectrumSample,
     NULL
 };
 
@@ -321,6 +373,30 @@ ReflectionSpectrumInitialize(
     ReflectionSpectrum->SpectrumHeader.Data = ReflectionSpectrum;
     ReflectionSpectrum->Spectrum = Spectrum;
     ReflectionSpectrum->Reflector = Reflector;
+}
+
+STATIC
+VOID
+AttenuatedReflectionSpectrumInitialize(
+    _Out_ PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum,
+    _In_ PCSPECTRUM Spectrum,
+    _In_ PCREFLECTOR Reflector,
+    _In_ FLOAT Attenuation
+    )
+{
+    ASSERT(AttenuatedReflectionSpectrum != NULL);
+    ASSERT(Spectrum != NULL);
+    ASSERT(Reflector != NULL);
+    ASSERT(IsNormalFloat(Attenuation) != FALSE);
+    ASSERT(IsFiniteFloat(Attenuation) != FALSE);
+    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+
+    AttenuatedReflectionSpectrum->SpectrumHeader.VTable = &ReflectionSpectrumVTable;
+    AttenuatedReflectionSpectrum->SpectrumHeader.ReferenceCount = 0;
+    AttenuatedReflectionSpectrum->SpectrumHeader.Data = AttenuatedReflectionSpectrum;
+    AttenuatedReflectionSpectrum->Spectrum = Spectrum;
+    AttenuatedReflectionSpectrum->Reflector = Reflector;
+    AttenuatedReflectionSpectrum->Attenuation = Attenuation;
 }
 
 //
@@ -587,5 +663,67 @@ SpectrumCompositorAddReflection(
                                  Reflector);
 
     *ReflectedSpectrum = (PCSPECTRUM) ReflectionSpectrum;
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAttenuatedAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM *ReflectedSpectrum
+    )
+{
+    PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum;
+    PVOID Allocation;
+    ISTATUS Status;
+
+    if (Compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if(IsNormalFloat(Attenuation) != FALSE ||
+       IsFiniteFloat(Attenuation) != FALSE);
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Spectrum == NULL ||
+        Reflector == NULL ||
+        IsZeroFloat(Attenuation))
+    {
+        *ReflectedSpectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (Attenuation == (FLOAT) 1.0f)
+    {
+        Status = SpectrumCompositorAddReflection(Compositor,
+                                                 Spectrum,
+                                                 Reflector,
+                                                 ReflectedSpectrum);
+
+        return Status;
+    }
+
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->AttenuatedReflectionSpectrumAllocator);
+
+    if (Allocation == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AttenuatedReflectionSpectrum = (PATTENUATED_REFLECTION_SPECTRUM) Allocation;
+
+    AttenuatedReflectionSpectrumInitialize(AttenuatedReflectionSpectrum,
+                                           Spectrum,
+                                           Reflector,
+                                           Attenuation);
+
+    *ReflectedSpectrum = (PCSPECTRUM) AttenuatedReflectionSpectrum;
     return ISTATUS_SUCCESS;
 }

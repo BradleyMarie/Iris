@@ -15,17 +15,6 @@ Abstract:
 #include <irisphysxp.h>
 
 //
-// Types
-//
-
-typedef struct _RUNTIME_ALLOCATED_BRDF_HEADER {
-    BRDF_VTABLE BrdfVTable;
-    BRDF BrdfHeader;
-} RUNTIME_ALLOCATED_BRDF_HEADER, *PRUNTIME_ALLOCATED_BRDF_HEADER;
-
-typedef CONST RUNTIME_ALLOCATED_BRDF_HEADER *PCRUNTIME_ALLOCATED_BRDF_HEADER;
-
-//
 // Functions
 //
 
@@ -34,15 +23,14 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 BrdfAllocatorAllocate(
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _In_ PBRDF_SAMPLE SampleRoutine,
-    _In_ PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine,
+    _In_ PCBRDF_VTABLE BrdfVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PCBRDF *Brdf
     )
 {
-    PRUNTIME_ALLOCATED_BRDF_HEADER AllocatedBrdf;
+    PBRDF AllocatedBrdf;
     PVOID DataDestination;
     PVOID Header;
     
@@ -51,14 +39,9 @@ BrdfAllocatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    if (SampleRoutine == NULL)
+    if (BrdfVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    if (ComputeReflectanceRoutine == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
     
     if (DataSizeInBytes != 0)
@@ -82,12 +65,12 @@ BrdfAllocatorAllocate(
     
     if (Brdf == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     Header = DynamicMemoryAllocatorAllocateWithHeader(&BrdfAllocator->Allocator,
-                                                      sizeof(RUNTIME_ALLOCATED_BRDF_HEADER),
-                                                      sizeof(PVOID),
+                                                      sizeof(BRDF),
+                                                      _Alignof(BRDF),
                                                       DataSizeInBytes,
                                                       DataAlignment,
                                                       &DataDestination);
@@ -97,19 +80,15 @@ BrdfAllocatorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    AllocatedBrdf = (PRUNTIME_ALLOCATED_BRDF_HEADER) Header;
+    AllocatedBrdf = (PBRDF) Header;
     
-    AllocatedBrdf->BrdfVTable.SampleRoutine = SampleRoutine;
-    AllocatedBrdf->BrdfVTable.ComputeReflectanceRoutine = ComputeReflectanceRoutine;
-    AllocatedBrdf->BrdfVTable.FreeRoutine = NULL;
-    
-    AllocatedBrdf->BrdfHeader.VTable = &AllocatedBrdf->BrdfVTable;
-    AllocatedBrdf->BrdfHeader.ReferenceCount = 0;
-    AllocatedBrdf->BrdfHeader.Data = DataDestination;
+    AllocatedBrdf->VTable = BrdfVTable;
+    AllocatedBrdf->ReferenceCount = 0;
+    AllocatedBrdf->Data = DataDestination;
     
     memcpy(DataDestination, Data, DataSizeInBytes);
     
-    *Brdf = &AllocatedBrdf->BrdfHeader;
+    *Brdf = AllocatedBrdf;
 
     return ISTATUS_SUCCESS;
 }
