@@ -3,7 +3,6 @@ include(GenerateExportHeader)
 include_directories(../iris/inc inc src/inc ../iriscommon)
 
 add_library(irisadvanced SHARED
-    src/visibilitytester.c
     src/random.c
     src/normal.c
     src/scene.c

@@ -10,7 +10,8 @@ add_library(irisphysx SHARED
     src/material.c
     src/brdfallocator.c
     src/raytracer.c
-    src/integrator.c)
+    src/integrator.c
+    src/visibilitytester.c)
 
 target_link_libraries(irisphysx 
     iris

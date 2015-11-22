@@ -24,8 +24,6 @@ Abstract:
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_advancedshape.h"
 #include "irisadvanced_scene.h"
-#include "irisadvanced_visibilitytester.h"
-#include "irisadvanced_visibilitytesterowner.h"
 #include "irisadvanced_color3.h"
 
 #endif // _IRIS_ADVANCED_HEADER_

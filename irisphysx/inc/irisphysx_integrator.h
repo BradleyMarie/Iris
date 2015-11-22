@@ -31,7 +31,7 @@ ISTATUS
     _In_reads_(NumberOfLights) PCLIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
-    _Inout_ PVISIBILITY_TESTER VisibilityTester,
+    _Inout_ PSPECTRUM_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
