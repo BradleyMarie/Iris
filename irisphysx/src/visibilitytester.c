@@ -172,6 +172,11 @@ SpectrumVisibilityTesterTestLightVisibility(
         return ISTATUS_SUCCESS;
     }
 
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
     ClosestShapeHit = ShapeHit;
 
     do
@@ -183,6 +188,11 @@ SpectrumVisibilityTesterTestLightVisibility(
 
         Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
     } while (Status == ISTATUS_SUCCESS);
+
+    if (Status != ISTATUS_NO_MORE_DATA)
+    {
+        return Status;
+    }
 
     ClosestShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
 

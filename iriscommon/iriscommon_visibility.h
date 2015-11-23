@@ -72,6 +72,11 @@ RayTracerOwnerTestVisibility(
         return ISTATUS_SUCCESS;
     }
 
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
     if (Epsilon < DistanceToObject &&
         IsFiniteFloat(DistanceToObject) != FALSE)
     {
@@ -89,6 +94,11 @@ RayTracerOwnerTestVisibility(
 
         Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
     } while (Status == ISTATUS_SUCCESS);
+
+    if (Status != ISTATUS_NO_MORE_DATA)
+    {
+        return Status;
+    }
 
     *Visible = TRUE;
     return ISTATUS_SUCCESS;
@@ -145,6 +155,11 @@ RayTracerOwnerTestVisibilityAnyDistance(
         return ISTATUS_SUCCESS;
     }
 
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
     do
     {
         if (Epsilon < ShapeHit->Distance)
@@ -155,6 +170,11 @@ RayTracerOwnerTestVisibilityAnyDistance(
 
         Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
     } while (Status == ISTATUS_SUCCESS);
+
+    if (Status != ISTATUS_NO_MORE_DATA)
+    {
+        return Status;
+    }
 
     *Visible = TRUE;
     return ISTATUS_SUCCESS;
