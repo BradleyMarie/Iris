@@ -114,7 +114,7 @@ TEST(VectorNormalize)
                            (FLOAT) 0.267261,
                            (FLOAT) 0.534522);
 
-    Vector1 = VectorNormalize(Vector1, NULL);
+    Vector1 = VectorNormalize(Vector1, NULL, NULL);
 
     CHECK_EQUAL(Vector2, Vector1);
 }

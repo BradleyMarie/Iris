@@ -349,6 +349,7 @@ PointPhongLightShade(
                                            WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             NULL,
                                              &DistanceToLight);
 
     if (PointPhongLight->CastsShadows != FALSE)
@@ -466,6 +467,7 @@ AttenuatedPointPhongLightShade(
                                            WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             NULL,
                                              &DistanceToLight);
 
     if (AttenuatedPointPhongLight->CastsShadows != FALSE)
@@ -589,6 +591,7 @@ PointPhongSpotLightShade(
                                            WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             NULL,
                                              &DistanceToLight);
 
     if (PointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
@@ -737,6 +740,7 @@ AttenuatedPointPhongSpotLightShade(
                                            WorldHitPoint);
 
     NormalizedWorldToLight = VectorNormalize(NormalizedWorldToLight,
+                                             NULL,
                                              &DistanceToLight);
 
     if (AttenuatedPointPhongSpotLight->SpotLightCutoff < (FLOAT) 1.0)
@@ -954,7 +958,7 @@ DirectionalPhongLightAllocate(
     PhongLight->Specular = Specular;
     PhongLight->CastsShadows = CastsShadows;
 
-    PhongLight->WorldDirectionToLight = VectorNormalize(WorldDirectionToLight, NULL);
+    PhongLight->WorldDirectionToLight = VectorNormalize(WorldDirectionToLight, NULL, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1086,7 +1090,7 @@ PointPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }
@@ -1146,7 +1150,7 @@ AttenuatedPhongSpotLightAllocate(
     PhongLight->SpotLightExponent = SpotLightExponent;
     PhongLight->SpotLightCutoff = SpotLightCutoff;
 
-    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL);
+    PhongLight->WorldSpotLightDirection = VectorNormalize(WorldSpotLightDirection, NULL, NULL);
 
     return (PPHONG_LIGHT) PhongLight;
 }

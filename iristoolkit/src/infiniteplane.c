@@ -202,7 +202,7 @@ InfinitePlaneAllocate(
         return NULL;
     }
 
-    SurfaceNormal = VectorNormalize(SurfaceNormal, NULL);
+    SurfaceNormal = VectorNormalize(SurfaceNormal, NULL, NULL);
 
     InfinitePlane.Vertex = Vertex;
     InfinitePlane.SurfaceNormal = SurfaceNormal;

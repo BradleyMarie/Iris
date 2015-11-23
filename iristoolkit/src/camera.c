@@ -166,7 +166,7 @@ StaticPinholeCameraRender(
 
                     Direction = PointSubtract(RayOrigin, PinholeLocation);
 
-                    Direction = VectorNormalize(Direction, NULL);
+                    Direction = VectorNormalize(Direction, NULL, NULL);
 
                     WorldRay = RayCreate(RayOrigin, Direction);
 
@@ -272,18 +272,18 @@ PinholeCameraRender(
         return ISTATUS_INVALID_ARGUMENT;
     }
 
-    NormalizedCameraDirection = VectorNormalize(CameraDirection, NULL);
+    NormalizedCameraDirection = VectorNormalize(CameraDirection, NULL, NULL);
 
-    NormalizedUpVector = VectorNormalize(Up, NULL);
+    NormalizedUpVector = VectorNormalize(Up, NULL, NULL);
 
     ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, Up);
 
-    ImagePlaneWidthVector = VectorNormalize(ImagePlaneWidthVector, NULL);
+    ImagePlaneWidthVector = VectorNormalize(ImagePlaneWidthVector, NULL, NULL);
 
     ImagePlaneHeightVector = VectorCrossProduct(CameraDirection,
                                                 ImagePlaneWidthVector);
 
-    ImagePlaneHeightVector = VectorNormalize(ImagePlaneHeightVector, NULL);
+    ImagePlaneHeightVector = VectorNormalize(ImagePlaneHeightVector, NULL, NULL);
 
     ImagePlaneWidthVector = VectorScale(ImagePlaneWidthVector,
                                         ImagePlaneWidth);

@@ -77,7 +77,7 @@ RayNormalize(
     VECTOR3 NormalizedDirection;
     RAY NormalizedRay;
 
-    NormalizedDirection = VectorNormalize(Ray.Direction, NULL);
+    NormalizedDirection = VectorNormalize(Ray.Direction, NULL, NULL);
     NormalizedRay = RayCreate(Ray.Origin, Ray.Direction);
 
     return NormalizedRay;

@@ -739,7 +739,7 @@ MatrixpAllocateRotation(
     ASSERT(IsZeroFloat(VectorLength(Axis)) == FALSE);
     ASSERT(Matrix != NULL);
 
-    NormalizedAxis = VectorNormalize(Axis, NULL);
+    NormalizedAxis = VectorNormalize(Axis, NULL, NULL);
 
     Sin = SinFloat(Theta * IRIS_PI / (FLOAT) 180.0);
     Cos = CosFloat(Theta * IRIS_PI / (FLOAT) 180.0);

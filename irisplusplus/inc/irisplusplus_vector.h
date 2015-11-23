@@ -105,23 +105,24 @@ public:
     {
         VECTOR3 Normalized;
 
-        VectorNormalize(ToNormalize.Data, NULL);
+        VectorNormalize(ToNormalize.Data, NULL, NULL);
 
         return Vector(Normalized);
     }
 
     static 
-    std::pair<Vector, FLOAT> 
+    std::tuple<Vector, FLOAT, FLOAT> 
     NormalizeWithLength(
         _In_ const Vector & ToNormalize
         )
     {
         VECTOR3 Normalized;
+        FLOAT OldLengthSquared;
         FLOAT OldLength;
 
-        Normalized = VectorNormalize(ToNormalize.Data, &OldLength);
+        Normalized = VectorNormalize(ToNormalize.Data, &OldLengthSquared, &OldLength);
 
-        return std::make_pair(Vector(Normalized), OldLength);
+        return std::make_tuple(Vector(Normalized), OldLengthSquared, OldLength);
     }
 
     static 

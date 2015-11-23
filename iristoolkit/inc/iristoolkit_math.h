@@ -70,7 +70,7 @@ IrisToolkitGenerateOrthogonalVector(
     OrthogonalVector = VectorCrossProduct(NormalizedVector,
                                           OrthogonalVector);
 
-    OrthogonalVector = VectorNormalize(OrthogonalVector, NULL);
+    OrthogonalVector = VectorNormalize(OrthogonalVector, NULL, NULL);
 
     return OrthogonalVector;
 }

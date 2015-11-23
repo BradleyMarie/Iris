@@ -17,8 +17,10 @@ Abstract:
 
 #include <iris.h>
 #include <irisadvanced.h>
+#include <irisspectrum.h>
 #include <irisphysx.h>
 
 #include "irisphysxtoolkit_api.h"
+#include "irisphysxtoolkit_pointlight.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_

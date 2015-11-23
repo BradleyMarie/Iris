@@ -242,14 +242,23 @@ SFORCEINLINE
 VECTOR3
 VectorNormalize(
     _In_ VECTOR3 Vector,
+    _Out_opt_ PFLOAT OldLengthSquared,
     _Out_opt_ PFLOAT OldLength
     )
 {
     VECTOR3 Normalized;
+    FLOAT LengthSquared;
     FLOAT Length;
     FLOAT Scalar;
 
-    Length = VectorLength(Vector);
+    LengthSquared = VectorDotProduct(Vector, Vector);
+
+    if (OldLengthSquared != NULL)
+    {
+        *OldLengthSquared = LengthSquared;
+    }
+
+    Length = SqrtFloat(LengthSquared);
 
     if (OldLength != NULL)
     {
@@ -361,7 +370,7 @@ VectorReflect(
 
     Reflected = VectorScale(Normal, Scalar);
     Reflected = VectorSubtract(Incident, Reflected);
-    Reflected = VectorNormalize(Reflected, NULL);
+    Reflected = VectorNormalize(Reflected, NULL, NULL);
 
     return Reflected;
 }
@@ -376,7 +385,7 @@ VectorHalfAngle(
     VECTOR3 Result;
 
     Result = VectorAdd(Vector0, Vector1);
-    Result = VectorNormalize(Result, NULL);
+    Result = VectorNormalize(Result, NULL, NULL);
 
     return Result;
 }

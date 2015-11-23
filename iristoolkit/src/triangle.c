@@ -288,7 +288,7 @@ TriangleInitialize(
     Triangle->B = B;
     Triangle->C = C;
 
-    Triangle->SurfaceNormal = VectorNormalize(CrossProduct, NULL);
+    Triangle->SurfaceNormal = VectorNormalize(CrossProduct, NULL, NULL);
     Triangle->DominantAxis = VectorDominantAxis(Triangle->SurfaceNormal);
 
     if (FrontFaceSurfaceNormal != NULL)

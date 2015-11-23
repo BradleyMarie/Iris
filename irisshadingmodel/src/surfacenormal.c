@@ -146,7 +146,7 @@ SurfaceNormalGetNormalizedWorldNormal(
         return Status;
     }
 
-    *NormalizedWorldNormal = VectorNormalize(*NormalizedWorldNormal, NULL);
+    *NormalizedWorldNormal = VectorNormalize(*NormalizedWorldNormal, NULL, NULL);
 
     SurfaceNormal->NormalizedWorldNormal = *NormalizedWorldNormal;
     SurfaceNormal->NormalizedWorldNormalValid = TRUE;
@@ -188,7 +188,7 @@ SurfaceNormalGetNormalizedModelNormal(
         return Status;
     }
 
-    *NormalizedModelNormal = VectorNormalize(*NormalizedModelNormal, NULL);
+    *NormalizedModelNormal = VectorNormalize(*NormalizedModelNormal, NULL, NULL);
 
     SurfaceNormal->NormalizedModelNormal = *NormalizedModelNormal;
     SurfaceNormal->NormalizedModelNormalValid = TRUE;

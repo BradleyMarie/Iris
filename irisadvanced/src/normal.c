@@ -156,7 +156,7 @@ NormalComputeNormalAndNormalize(
 
     if (Normal->VTable->Prenormalized == FALSE)
     {
-        *SurfaceNormal = VectorNormalize(*SurfaceNormal, NULL);
+        *SurfaceNormal = VectorNormalize(*SurfaceNormal, NULL, NULL);
     }
 
     return ISTATUS_SUCCESS;
@@ -229,7 +229,7 @@ NormalComputeNormalAndTransformAndNormalize(
 
     if (Normal->VTable->Prenormalized == FALSE)
     {
-        *SurfaceNormal = VectorNormalize(*SurfaceNormal, NULL);
+        *SurfaceNormal = VectorNormalize(*SurfaceNormal, NULL, NULL);
     }
 
     return ISTATUS_SUCCESS;

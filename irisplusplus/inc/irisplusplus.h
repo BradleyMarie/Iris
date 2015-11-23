@@ -31,6 +31,7 @@ extern "C" {
 #include <utility>
 #include <memory>
 #include <atomic>
+#include <tuple>
 #include <new>
 
 //
