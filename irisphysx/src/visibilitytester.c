@@ -103,3 +103,91 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
 
     return ISTATUS_SUCCESS;
 }
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+SpectrumVisibilityTesterTestLightVisibility(
+    _In_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _In_ RAY WorldRay,
+    _In_ PCLIGHT Light,
+    _Out_ PBOOL Visible
+    )
+{
+    PRAYTRACER_OWNER RayTracerOwner;
+    PCSPECTRUM_SHAPE ClosestShape;
+    PCSHAPE_HIT ClosestShapeHit;
+    PRAYTRACER RayTracer;
+    PCSHAPE_HIT ShapeHit;
+    PCLIGHT ClosestLight;
+    ISTATUS Status;
+
+    ASSERT(Tester->Scene != NULL);
+
+    //
+    // Ray is validated by RayTracerOwnerGetRayTracer
+    //
+
+    if (Tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Visible == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    RayTracerOwner = Tester->RayTracerOwner;
+
+    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
+                                        WorldRay,
+                                        TRUE,
+                                        &RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = SceneTrace(Tester->Scene, RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, 
+                                           &ShapeHit);
+
+    if (Status == ISTATUS_NO_MORE_DATA)
+    {
+        *Visible = FALSE;
+        return ISTATUS_SUCCESS;
+    }
+
+    ClosestShapeHit = ShapeHit;
+
+    do
+    {
+        if (ShapeHit->Distance < ClosestShapeHit->Distance)
+        {
+            ClosestShapeHit = ShapeHit;
+        }
+
+        Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
+    } while (Status == ISTATUS_SUCCESS);
+
+    ClosestShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
+
+    ClosestLight = SpectrumShapeGetLight(ClosestShape, ShapeHit->FaceHit);
+    *Visible = (ClosestLight == Light) ? TRUE : FALSE;
+    
+    return ISTATUS_SUCCESS;
+}

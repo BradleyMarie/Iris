@@ -46,4 +46,15 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+SpectrumVisibilityTesterTestLightVisibility(
+    _In_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _In_ RAY WorldRay,
+    _In_ PCLIGHT Light,
+    _Out_ PBOOL Visible
+    );
+
 #endif // _SPECTRUM_VISIBILITY_TESTER_IRIS_PHYSX_
