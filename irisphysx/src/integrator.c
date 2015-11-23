@@ -226,6 +226,8 @@ IntegratorIntegrate(
                            &Lights,
                            &NumberOfLights);
 
+    WorldRay = RayNormalize(WorldRay);
+
     Status = Integrator->VTable->IntegrateRoutine(Integrator->Data,
                                                   WorldRay,
                                                   Lights,

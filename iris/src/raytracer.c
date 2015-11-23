@@ -106,8 +106,7 @@ SFORCEINLINE
 VOID
 RayTracerSetRay(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
+    _In_ RAY Ray
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
@@ -126,15 +125,7 @@ RayTracerSetRay(
     ConstantPointerListClear(PointerList);
 
     RayTracer->HitIndex = 0;
-
-    if (NormalizeRay != FALSE)
-    {
-        RayTracer->CurrentRay = RayNormalize(Ray);
-    }
-    else
-    {
-        RayTracer->CurrentRay = Ray;
-    }
+    RayTracer->CurrentRay = Ray;
 }
 
 SFORCEINLINE
@@ -390,7 +381,6 @@ ISTATUS
 RayTracerOwnerGetRayTracer(
     _In_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ RAY Ray,
-    _In_ BOOL NormalizeRay,
     _Out_ PRAYTRACER *RayTracer
     )
 {
@@ -409,9 +399,7 @@ RayTracerOwnerGetRayTracer(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    RayTracerSetRay(&RayTracerOwner->RayTracer,
-                    Ray,
-                    NormalizeRay);
+    RayTracerSetRay(&RayTracerOwner->RayTracer, Ray);
 
     *RayTracer = &RayTracerOwner->RayTracer;
 
@@ -649,6 +637,84 @@ RayTracerTraceShapeWithTransform(
 
     Status = ShapeTraceShape(Shape,
                              TraceRay,
+                             ShapeHitAllocator,
+                             &ShapeHitList);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (ShapeHitList == NULL)
+    {
+        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
+        SharedHitData = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    while (ShapeHitList != NULL)
+    {
+        InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
+
+        InternalShapeHit->SharedHitData = SharedHitData;
+
+        Status = ConstantPointerListAddPointer(PointerList,
+                                               InternalShapeHit);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+
+        ShapeHitList = ShapeHitList->NextShapeHit;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RayTracerTracePremultipliedShapeWithTransform(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ PCSHAPE Shape,
+    _In_opt_ PCMATRIX ModelToWorld
+    )
+{
+    PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
+    PCONSTANT_POINTER_LIST PointerList;
+    PSHARED_HIT_DATA SharedHitData;
+    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    PINTERNAL_SHAPE_HIT InternalShapeHit;
+    PSHAPE_HIT_LIST ShapeHitList;
+    ISTATUS Status;
+
+    if (RayTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
+    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    PointerList = &RayTracer->HitList;
+
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = ModelToWorld;
+    SharedHitData->Premultiplied = TRUE;
+
+    Status = ShapeTraceShape(Shape,
+                             RayTracer->CurrentRay,
                              ShapeHitAllocator,
                              &ShapeHitList);
 

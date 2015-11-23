@@ -49,7 +49,6 @@ RayTracerOwnerTestVisibility(
 
     Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
                                         WorldRay,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
@@ -132,7 +131,6 @@ RayTracerOwnerTestVisibilityAnyDistance(
 
     Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
                                         WorldRay,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

@@ -44,7 +44,6 @@ ISTATUS
 RayTracerOwnerGetRayTracer(
     _In_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ RAY Ray,
-    _In_ BOOL NormalizeRay,
     _Out_ PRAYTRACER *RayTracer
     );
 

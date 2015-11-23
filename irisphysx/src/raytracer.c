@@ -23,8 +23,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumRayTracerTraceRay(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
-    _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
+    _In_ RAY Ray
     )
 {
     PRAYTRACER RayTracer;
@@ -39,7 +38,6 @@ SpectrumRayTracerTraceRay(
 
     Status = RayTracerOwnerGetRayTracer(SpectrumRayTracer->RayTracerOwner,
                                         Ray,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

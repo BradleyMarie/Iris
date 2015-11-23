@@ -120,9 +120,10 @@ VisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
+    WorldRay = RayNormalize(WorldRay);
+
     Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner, 
                                         WorldRay, 
-                                        TRUE, 
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
@@ -202,9 +203,10 @@ VisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
+    WorldRay = RayNormalize(WorldRay);
+
     Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner,
                                         WorldRay,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

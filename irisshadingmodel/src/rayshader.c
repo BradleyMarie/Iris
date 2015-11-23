@@ -351,9 +351,10 @@ RayShaderTraceRayMontecarlo(
         }
     }
 
+    WorldRay = RayNormalize(WorldRay);
+
     Status = RayTracerOwnerGetRayTracer(RayShader->RayTracerOwner,
                                         WorldRay,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

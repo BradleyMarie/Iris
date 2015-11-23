@@ -148,7 +148,6 @@ SpectrumVisibilityTesterTestLightVisibility(
 
     Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
                                         WorldRay,
-                                        TRUE,
                                         &RayTracer);
 
     if (Status != ISTATUS_SUCCESS)

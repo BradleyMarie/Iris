@@ -44,8 +44,7 @@ IRISPHYSXAPI
 ISTATUS
 SpectrumRayTracerTraceRay(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
-    _In_ RAY Ray,
-    _In_ BOOL NormalizeRay
+    _In_ RAY Ray
     );
 
 IRISPHYSXAPI
