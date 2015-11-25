@@ -169,7 +169,6 @@ VectorScale(
 
     ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
-    ASSERT(IsZeroFloat(Scalar) == FALSE);
 
     X = Vector.X * Scalar;
     Y = Vector.Y * Scalar;
@@ -239,40 +238,6 @@ VectorLength(
 }
 
 SFORCEINLINE
-VECTOR3
-VectorNormalize(
-    _In_ VECTOR3 Vector,
-    _Out_opt_ PFLOAT OldLengthSquared,
-    _Out_opt_ PFLOAT OldLength
-    )
-{
-    VECTOR3 Normalized;
-    FLOAT LengthSquared;
-    FLOAT Length;
-    FLOAT Scalar;
-
-    LengthSquared = VectorDotProduct(Vector, Vector);
-
-    if (OldLengthSquared != NULL)
-    {
-        *OldLengthSquared = LengthSquared;
-    }
-
-    Length = SqrtFloat(LengthSquared);
-
-    if (OldLength != NULL)
-    {
-        *OldLength = Length;
-    }
-
-    Scalar = (FLOAT) 1.0 / Length;
-
-    Normalized = VectorScale(Vector, Scalar);
-
-    return Normalized;
-}
-
-SFORCEINLINE
 BOOL
 VectorValidate(
     _In_ VECTOR3 Vector
@@ -299,6 +264,42 @@ VectorValidate(
 }
 
 SFORCEINLINE
+VECTOR3
+VectorNormalize(
+    _In_ VECTOR3 Vector,
+    _Out_opt_ PFLOAT OldLengthSquared,
+    _Out_opt_ PFLOAT OldLength
+    )
+{
+    VECTOR3 Normalized;
+    FLOAT LengthSquared;
+    FLOAT Length;
+    FLOAT Scalar;
+
+    ASSERT(VectorValidate(Vector) != FALSE);
+
+    LengthSquared = VectorDotProduct(Vector, Vector);
+
+    if (OldLengthSquared != NULL)
+    {
+        *OldLengthSquared = LengthSquared;
+    }
+
+    Length = SqrtFloat(LengthSquared);
+
+    if (OldLength != NULL)
+    {
+        *OldLength = Length;
+    }
+
+    Scalar = (FLOAT) 1.0 / Length;
+
+    Normalized = VectorScale(Vector, Scalar);
+
+    return Normalized;
+}
+
+SFORCEINLINE
 VECTOR_AXIS
 VectorDominantAxis(
     _In_ VECTOR3 Vector
@@ -307,6 +308,8 @@ VectorDominantAxis(
     FLOAT AbsoluteValueX;
     FLOAT AbsoluteValueY;
     FLOAT AbsoluteValueZ;
+
+    ASSERT(VectorValidate(Vector) != FALSE);
 
     AbsoluteValueX = AbsFloat(Vector.X);
     AbsoluteValueY = AbsFloat(Vector.Y);
@@ -337,6 +340,8 @@ VectorDiminishedAxis(
     FLOAT AbsoluteValueY;
     FLOAT AbsoluteValueZ;
 
+    ASSERT(VectorValidate(Vector) != FALSE);
+
     AbsoluteValueX = AbsFloat(Vector.X);
     AbsoluteValueY = AbsFloat(Vector.Y);
     AbsoluteValueZ = AbsFloat(Vector.Z);
@@ -365,6 +370,9 @@ VectorReflect(
 {
     VECTOR3 Reflected;
     FLOAT Scalar;
+
+    ASSERT(VectorValidate(Incident) != FALSE);
+    ASSERT(VectorValidate(Normal) != FALSE);
 
     Scalar = (FLOAT) 2.0 * VectorDotProduct(Normal, Incident);
 

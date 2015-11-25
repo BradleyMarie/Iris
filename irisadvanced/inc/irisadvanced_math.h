@@ -1,21 +1,21 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    iristoolkit_math.h
+    irisadvanced_math.h
 
 Abstract:
 
-    This file contains the prototypes for the camera routines.
+    This module includes the Iris Advanced math routines
 
 --*/
 
-#ifndef _MATH_IRIS_TOOLKIT_
-#define _MATH_IRIS_TOOLKIT_
+#ifndef _MATH_IRIS_ADVANCED_HEADER_
+#define _MATH_IRIS_ADVANCED_HEADER_
 
-#include <iristoolkit.h>
+#include <irisadvanced.h>
 
 //
 // Functions
@@ -23,12 +23,14 @@ Abstract:
 
 SFORCEINLINE
 VECTOR3
-IrisToolkitGenerateOrthogonalVector(
+IrisAdvancedCreateOrthogonalVector(
     _In_ VECTOR3 NormalizedVector
     )
 {
     VECTOR3 OrthogonalVector;
     VECTOR_AXIS ShortestAxis;
+
+    ASSERT(VectorValidate(NormalizedVector));
 
     ShortestAxis = VectorDiminishedAxis(NormalizedVector);
 
@@ -61,7 +63,7 @@ IrisToolkitGenerateOrthogonalVector(
 
 SFORCEINLINE
 VECTOR3
-IrisToolkitTransformVector(
+IrisAdvancedTransformVector(
     _In_ VECTOR3 NormalizedNormal,
     _In_ VECTOR3 VectorToTransform
     )
@@ -73,7 +75,10 @@ IrisToolkitTransformVector(
     FLOAT Y;
     FLOAT Z;
 
-    OrthogonalVector = IrisToolkitGenerateOrthogonalVector(NormalizedNormal);
+    ASSERT(VectorValidate(NormalizedNormal) != FALSE);
+    ASSERT(VectorValidate(VectorToTransform) != FALSE);
+
+    OrthogonalVector = IrisAdvancedCreateOrthogonalVector(NormalizedNormal);
     CrossProduct = VectorCrossProduct(NormalizedNormal, OrthogonalVector);
 
     X = OrthogonalVector.X * VectorToTransform.X + 
@@ -96,7 +101,7 @@ IrisToolkitTransformVector(
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-IrisToolkitCosineSampleHemisphere(
+IrisAdvancedCosineSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
     _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
@@ -112,6 +117,7 @@ IrisToolkitCosineSampleHemisphere(
     FLOAT Y;
     FLOAT Z;
 
+    ASSERT(VectorValidate(NormalizedNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(RandomVector != NULL);
 
@@ -149,9 +155,9 @@ IrisToolkitCosineSampleHemisphere(
 
     Result = VectorCreate(X, Y, Z);
 
-    *RandomVector = IrisToolkitTransformVector(NormalizedNormal, Result);
+    *RandomVector = IrisAdvancedTransformVector(NormalizedNormal, Result);
 
     return ISTATUS_SUCCESS;
 }
 
-#endif // _MATH_IRIS_TOOLKIT_
+#endif // _MATH_IRIS_ADVANCED_HEADER_

@@ -25,5 +25,6 @@ Abstract:
 #include "irisadvanced_advancedshape.h"
 #include "irisadvanced_scene.h"
 #include "irisadvanced_color3.h"
+#include "irisadvanced_math.h"
 
 #endif // _IRIS_ADVANCED_HEADER_

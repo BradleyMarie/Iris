@@ -22,17 +22,28 @@ Abstract:
 #ifndef _MATH_IRIS_
 #define _MATH_IRIS_
 
+//
+// Constants
+//
+
+#define IRIS_INV_TWO_PI ((FLOAT) (1.0 / (2.0 * 3.14159265358979323846264338327950288419716939)))
+#define IRIS_TWO_PI ((FLOAT) (2.0 * 3.14159265358979323846264338327950288419716939))
+#define IRIS_INV_PI ((FLOAT) (1.0 / 3.14159265358979323846264338327950288419716939))
 #define IRIS_PI ((FLOAT) 3.14159265358979323846264338327950288419716939)
+
+//
+// Macros
+//
 
 #define SqrtFloat(number) sqrtf(number)
 #define AbsFloat(number) fabsf(number)
-#define CosFloat(number) cosf(number)
-#define SinFloat(number) sinf(number)
+#define CosineFloat(number) cosf(number)
+#define SineFloat(number) sinf(number)
 #define PowFloat(base, exponent) powf(base, exponent)
 #define FloorFloat(number) floorf(number)
 #define ModFloat(number, modulo) fmodf(number, modulo)
 #define IsNaNFloat(number) isnan(number)
-#define IsInfFloat(number) isinf(number)
+#define IsInfiniteFloat(number) isinf(number)
 #define IsZeroFloat(number) (number == (FLOAT) 0.0)
 #define IsPositiveFloat(number) (number > (FLOAT) 0.0)
 #define IsNegativeFloat(number) (number < (FLOAT) 0.0)
@@ -64,8 +75,15 @@ Abstract:
 #define IsFiniteFloat(number) (_finite(number) != 0)
 
 #else
-#error Support for Infinite Number Detection Required
+
+#define IsNormalFloat(number) TRUE
+#define IsFiniteFloat(number) (IsInfiniteFloat(number) == FALSE)
+
 #endif
+
+//
+// Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)

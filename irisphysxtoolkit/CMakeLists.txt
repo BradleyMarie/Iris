@@ -5,7 +5,8 @@ include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisp
 add_library(irisphysxtoolkit SHARED
     src/lighting.c
     src/pointlight.c
-    src/mirrorbrdf.c)
+    src/mirrorbrdf.c
+    src/lambertianbrdf.c)
 
 target_link_libraries(irisphysxtoolkit 
     iris 

@@ -4,11 +4,11 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    mirrorbrdf.h
+    lambertianbrdf.h
 
 Abstract:
 
-    This file contains the definitions for SPECTRUM_MIRROR_BRDF type.
+    This file contains the definitions for SPECRUM_LAMBERTIAN_BRDF type.
 
 --*/
 
@@ -18,12 +18,12 @@ Abstract:
 // Types
 //
 
-typedef struct _SPECTRUM_MIRROR_BRDF {
+typedef struct _SPECRUM_LAMBERTIAN_BRDF {
     PCREFLECTOR Reflectance;
     VECTOR3 SurfaceNormal;
-} SPECTRUM_MIRROR_BRDF, *PSPECTRUM_MIRROR_BRDF;
+} SPECRUM_LAMBERTIAN_BRDF, *PSPECRUM_LAMBERTIAN_BRDF;
 
-typedef CONST SPECTRUM_MIRROR_BRDF *PCSPECTRUM_MIRROR_BRDF;
+typedef CONST SPECRUM_LAMBERTIAN_BRDF *PCSPECRUM_LAMBERTIAN_BRDF;
 
 //
 // Static Functions
@@ -33,7 +33,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-SpectrumMirrorBrdfSample(
+SpectrumLambertianBrdfSample(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM Rng,
@@ -43,7 +43,9 @@ SpectrumMirrorBrdfSample(
     _Out_ PFLOAT Pdf
     )
 {
-    PCSPECTRUM_MIRROR_BRDF Brdf;
+    PCSPECRUM_LAMBERTIAN_BRDF Brdf;
+    PCREFLECTOR LocalReflector;
+    ISTATUS Status;
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
@@ -53,11 +55,30 @@ SpectrumMirrorBrdfSample(
     ASSERT(Outgoing != NULL);
     ASSERT(Pdf != NULL);
 
-    Brdf = (PCSPECTRUM_MIRROR_BRDF) Context;
+    Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    *Reflector = Brdf->Reflectance;
-    *Outgoing = VectorReflect(Incoming, Brdf->SurfaceNormal);
-    *Pdf = (FLOAT) INFINITY;
+    Status = ReflectorCompositorAttenuateReflection(Compositor,
+                                                    Brdf->Reflectance,
+                                                    IRIS_INV_PI,
+                                                    &LocalReflector);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = IrisAdvancedCosineSampleHemisphere(Brdf->SurfaceNormal,
+                                                Rng,
+                                                Outgoing);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Reflector = LocalReflector;
+
+    *Pdf = IRIS_INV_PI * VectorDotProduct(Brdf->SurfaceNormal, *Outgoing);
 
     return ISTATUS_SUCCESS;
 }
@@ -66,7 +87,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-SpectrumMirrorBrdfComputeReflectance(
+SpectrumLambertianBrdfComputeReflectance(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
@@ -74,22 +95,30 @@ SpectrumMirrorBrdfComputeReflectance(
     _Out_ PCREFLECTOR *Reflector
     )
 {
+    PCSPECRUM_LAMBERTIAN_BRDF Brdf;
+    ISTATUS Status;
+
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
 
-    *Reflector = NULL;
+    Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    return ISTATUS_SUCCESS;
+    Status = ReflectorCompositorAttenuateReflection(Compositor,
+                                                    Brdf->Reflectance,
+                                                    IRIS_INV_PI,
+                                                    Reflector);
+
+    return Status;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-SpectrumMirrorBrdfComputeReflectanceWithPdf(
+SpectrumLambertianBrdfComputeReflectanceWithPdf(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
@@ -98,6 +127,9 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
     _Out_ PFLOAT Pdf
     )
 {
+    PCSPECRUM_LAMBERTIAN_BRDF Brdf;
+    ISTATUS Status;
+
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
@@ -105,20 +137,24 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
     ASSERT(Reflector != NULL);
     ASSERT(Pdf != NULL);
 
-    *Reflector = NULL;
-    *Pdf = (FLOAT) 0.0f;
+    Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    return ISTATUS_SUCCESS;
+    Status = ReflectorCompositorAttenuateReflection(Compositor,
+                                                    Brdf->Reflectance,
+                                                    IRIS_INV_PI,
+                                                    Reflector);
+
+    return Status;
 }
 
 //
 // Static Variables
 //
 
-CONST STATIC BRDF_VTABLE SpectrumMirrorBrdfVTable = {
-    SpectrumMirrorBrdfSample,
-    SpectrumMirrorBrdfComputeReflectance,
-    SpectrumMirrorBrdfComputeReflectanceWithPdf
+CONST STATIC BRDF_VTABLE SpectrumLambertianBrdfVTable = {
+    SpectrumLambertianBrdfSample,
+    SpectrumLambertianBrdfComputeReflectance,
+    SpectrumLambertianBrdfComputeReflectanceWithPdf
 };
 
 //
@@ -128,14 +164,14 @@ CONST STATIC BRDF_VTABLE SpectrumMirrorBrdfVTable = {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumMirrorBrdfAllocate(
+SpectrumLambertianBrdfAllocate(
     _In_ PBRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
     _In_ VECTOR3 SurfaceNormal,
     _Out_ PCBRDF *Brdf
     )
 {
-    SPECTRUM_MIRROR_BRDF BrdfData;
+    SPECRUM_LAMBERTIAN_BRDF BrdfData;
     ISTATUS Status;
 
     if (Allocator == NULL)
@@ -162,10 +198,10 @@ SpectrumMirrorBrdfAllocate(
     BrdfData.SurfaceNormal = SurfaceNormal;
 
     Status = BrdfAllocatorAllocate(Allocator,
-                                   &SpectrumMirrorBrdfVTable,
+                                   &SpectrumLambertianBrdfVTable,
                                    &BrdfData,
-                                   sizeof(SPECTRUM_MIRROR_BRDF),
-                                   _Alignof(SPECTRUM_MIRROR_BRDF),
+                                   sizeof(SPECRUM_LAMBERTIAN_BRDF),
+                                   _Alignof(SPECRUM_LAMBERTIAN_BRDF),
                                    Brdf);
 
     if (Status != ISTATUS_SUCCESS)

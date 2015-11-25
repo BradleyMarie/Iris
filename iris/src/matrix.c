@@ -741,8 +741,8 @@ MatrixpAllocateRotation(
 
     NormalizedAxis = VectorNormalize(Axis, NULL, NULL);
 
-    Sin = SinFloat(Theta * IRIS_PI / (FLOAT) 180.0);
-    Cos = CosFloat(Theta * IRIS_PI / (FLOAT) 180.0);
+    Sin = SineFloat(Theta * IRIS_PI / (FLOAT) 180.0);
+    Cos = CosineFloat(Theta * IRIS_PI / (FLOAT) 180.0);
     Ic = 1.0f - Cos;
 
     M00 = NormalizedAxis.X * NormalizedAxis.X * Ic + Cos;
