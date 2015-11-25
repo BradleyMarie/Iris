@@ -22,5 +22,6 @@ Abstract:
 
 #include "irisphysxtoolkit_api.h"
 #include "irisphysxtoolkit_pointlight.h"
+#include "irisphysxtoolkit_mirrorbrdf.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_

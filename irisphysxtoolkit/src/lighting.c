@@ -69,7 +69,6 @@ ComputeDirectLighting(
     PCREFLECTOR Reflector;
     FLOAT Attenuation;
     FLOAT DotProduct;
-    VECTOR3 ToCamera;
     PSPECTRUM Output;
     PSPECTRUM Emissive;
     VECTOR3 ToLight;
@@ -104,11 +103,9 @@ ComputeDirectLighting(
             *Spectrum = NULL;
             return ISTATUS_SUCCESS;
         }
-        
-        ToCamera = VectorNegate(IncidentDirection);
 
         Status = BrdfComputeReflectance(Brdf,
-                                        ToCamera,
+                                        IncidentDirection,
                                         ToLight,
                                         ReflectorCompositor,
                                         &Reflector);
@@ -138,13 +135,11 @@ ComputeDirectLighting(
     //
     // Light is an area light
     //
-        
-    ToCamera = VectorNegate(IncidentDirection);
 
     if (LightPdf > (FLOAT) 0.0f)
     {
         Status = BrdfComputeReflectanceWithPdf(Brdf,
-                                               ToCamera,
+                                               IncidentDirection,
                                                ToLight,
                                                ReflectorCompositor,
                                                &Reflector,
@@ -191,7 +186,7 @@ ComputeDirectLighting(
     //
 
     Status = BrdfSample(Brdf,
-                        ToCamera,
+                        IncidentDirection,
                         Rng,
                         ReflectorCompositor,
                         &Reflector,
@@ -233,7 +228,7 @@ ComputeDirectLighting(
 
         Attenuation = DotProduct / BrdfPdf;
     }
-    else if (LightPdf)
+    else
     {
         Status = LightComputeEmissiveWithPdf(Light,
                                              RayToLight,
