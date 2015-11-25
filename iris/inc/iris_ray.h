@@ -95,13 +95,6 @@ RayValidate(
         return FALSE;
     }
 
-    if (IsZeroFloat(Ray.Direction.X) != FALSE &&
-        IsZeroFloat(Ray.Direction.Y) != FALSE &&
-        IsZeroFloat(Ray.Direction.Z) != FALSE)
-    {
-        return FALSE;
-    }
-
     return TRUE;
 }
 
