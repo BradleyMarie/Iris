@@ -299,7 +299,7 @@ FmaSpectrumInitialize(
     ASSERT(Spectrum0 != NULL);
     ASSERT(Spectrum1 != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
     FmaSpectrum->SpectrumHeader.VTable = &FmaSpectrumVTable;
     FmaSpectrum->SpectrumHeader.ReferenceCount = 0;
@@ -320,7 +320,7 @@ AttenuatedSpectrumInitialize(
     ASSERT(AttenuatedSpectrum != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
     AttenuatedSpectrum->SpectrumHeader.VTable = &AttenuatedSpectrumVTable;
     AttenuatedSpectrum->SpectrumHeader.ReferenceCount = 0;
@@ -380,7 +380,7 @@ AttenuatedReflectionSpectrumInitialize(
     ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
     AttenuatedReflectionSpectrum->SpectrumHeader.VTable = &ReflectionSpectrumVTable;
     AttenuatedReflectionSpectrum->SpectrumHeader.ReferenceCount = 0;
@@ -499,7 +499,7 @@ SpectrumCompositorAttenuateSpectrum(
     }
 
     if (Spectrum == NULL ||
-        IsZeroFloat(Attenuation) != FALSE)
+        IsNotZeroFloat(Attenuation) == FALSE)
     {
         *AttenuatedSpectrumOutput = NULL;
         return ISTATUS_SUCCESS;
@@ -574,7 +574,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
     }
 
     if (Spectrum1 == NULL ||
-        IsZeroFloat(Attenuation) != FALSE)
+        IsNotZeroFloat(Attenuation) == FALSE)
     {
         *AttenuatedSum = Spectrum0;
         return ISTATUS_SUCCESS;
@@ -682,7 +682,7 @@ SpectrumCompositorAttenuatedAddReflection(
 
     if (Spectrum == NULL ||
         Reflector == NULL ||
-        IsZeroFloat(Attenuation) != FALSE)
+        IsNotZeroFloat(Attenuation) == FALSE)
     {
         *ReflectedSpectrum = NULL;
         return ISTATUS_SUCCESS;

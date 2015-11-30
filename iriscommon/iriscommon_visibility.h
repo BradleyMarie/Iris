@@ -40,6 +40,7 @@ RayTracerOwnerTestVisibility(
 
     ASSERT(RayTracerOwner != NULL);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon) != FALSE);
     ASSERT(Scene != NULL);
     ASSERT(IsFiniteFloat(DistanceToObject) != FALSE);
     ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
@@ -123,6 +124,7 @@ RayTracerOwnerTestVisibilityAnyDistance(
 
     ASSERT(RayTracerOwner != NULL);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon) != FALSE);
     ASSERT(Scene != NULL);
     ASSERT(Visible != NULL);
 

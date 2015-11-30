@@ -37,7 +37,7 @@ PointCreateScaled(
     POINT3 Point;
     FLOAT Scalar;
 
-    ASSERT(IsZeroFloat(W) == FALSE);
+    ASSERT(IsNotZeroFloat(W) != FALSE);
 
     ASSERT(IsFiniteFloat(X) != FALSE);
     ASSERT(IsFiniteFloat(Y) != FALSE);

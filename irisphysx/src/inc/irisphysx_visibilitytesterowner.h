@@ -63,7 +63,7 @@ SpectrumVisibilityTesterOwnerSetSceneAndEpsilon(
     ASSERT(VisibilityTesterOwner != NULL);
     ASSERT(Scene != NULL);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(Epsilon) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon) != FALSE);
     
     SpectrumVisibilityTesterSetSceneAndEpsilon(&VisibilityTesterOwner->VisibilityTester,
                                                Scene,
@@ -86,7 +86,7 @@ SpectrumVisibilityTesterOwnerGetVisibilityTester(
     ASSERT(VisibilityTesterOwner != NULL);
     ASSERT(Scene != NULL);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(Epsilon) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon) != FALSE);
     ASSERT(VisibilityTester != NULL);
 
     SpectrumVisibilityTesterSetSceneAndEpsilon(&VisibilityTesterOwner->VisibilityTester,

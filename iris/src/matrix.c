@@ -32,7 +32,7 @@ MatrixpDivideRow(
     ASSERT(0 <= Row);
     ASSERT(Row <= 3);
     ASSERT(IsFiniteFloat(Divisor) != FALSE);
-    ASSERT(IsZeroFloat(Divisor) == FALSE);
+    ASSERT(IsNotZeroFloat(Divisor) != FALSE);
 
     Scalar = (FLOAT) 1.0 / Divisor;
 
@@ -754,9 +754,9 @@ MatrixAllocateRotation(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (IsZeroFloat(X) != FALSE &&
-        IsZeroFloat(Y) != FALSE &&
-        IsZeroFloat(Z) != FALSE)
+    if (IsNotZeroFloat(X) == FALSE &&
+        IsNotZeroFloat(Y) == FALSE &&
+        IsNotZeroFloat(Z) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }

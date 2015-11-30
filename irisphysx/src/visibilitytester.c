@@ -43,7 +43,7 @@ SpectrumVisibilityTesterTestVisibility(
     }
 
     if (IsFiniteFloat(DistanceToObject) == FALSE ||
-        IsGreaterThanZeroFloat(DistanceToObject) == FALSE)
+        IsGreaterThanOrEqualToZeroFloat(DistanceToObject) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

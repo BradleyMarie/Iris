@@ -217,7 +217,7 @@ FmaReflectorInitialize(
     ASSERT(Reflector0 != NULL);
     ASSERT(Reflector1 != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
     FmaReflector->ReflectorHeader.VTable = &FmaReflectorVTable;
     FmaReflector->ReflectorHeader.ReferenceCount = 0;
@@ -238,7 +238,7 @@ AttenuatedReflectorInitialize(
     ASSERT(AttenuatedReflector != NULL);
     ASSERT(Reflector != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsZeroFloat(Attenuation) == FALSE);
+    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
     AttenuatedReflector->ReflectorHeader.VTable = &AttenuatedReflectorVTable;
     AttenuatedReflector->ReflectorHeader.ReferenceCount = 0;
@@ -375,7 +375,7 @@ ReflectorCompositorAttenuateReflection(
     }
 
     if (Reflector == NULL ||
-        IsZeroFloat(Attenuation) != FALSE)
+        IsNotZeroFloat(Attenuation) == FALSE)
     {
         *AttenuatedReflectorOutput = NULL;
         return ISTATUS_SUCCESS;
@@ -450,7 +450,7 @@ ReflectorCompositorAttenuatedAddReflections(
     }
 
     if (Reflector1 == NULL ||
-        IsZeroFloat(Attenuation) != FALSE)
+        IsNotZeroFloat(Attenuation) == FALSE)
     {
         *AttenuatedSum = Reflector0;
         return ISTATUS_SUCCESS;

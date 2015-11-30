@@ -178,7 +178,7 @@ IntegratorIntegrate(
     }
 
     if (IsFiniteFloat(VisibilityEpsilon) == FALSE ||
-        IsGreaterThanZeroFloat(VisibilityEpsilon) == FALSE)
+        IsGreaterThanOrEqualToZeroFloat(VisibilityEpsilon) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
