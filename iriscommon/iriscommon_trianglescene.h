@@ -136,15 +136,14 @@ TriangleSceneTraceXDominatedTriangles(
 
             Distance /= -DotProduct;
 
-            if (IsNormalFloat(Distance) == FALSE ||
-                IsFiniteFloat(Distance) == FALSE)
+            if (IsInfiniteFloat(Distance) != FALSE)
             {
                 continue;
             }
 
     #if !defined(ENABLE_CSG_SUPPORT)
 
-            if (Distance < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(Distance) != FALSE)
             {
                 continue;
             }
@@ -177,14 +176,14 @@ TriangleSceneTraceXDominatedTriangles(
                                                     BarycentricCoordinates.Coordinates[1] - 
                                                     BarycentricCoordinates.Coordinates[2];
 
-            if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
             {
                 continue;
             }
 
-            Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+            Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
             Triangle.BitFields.DominantAxis = VECTOR_X_AXIS;
             Triangle.BitFields.Index = Index;
 
@@ -222,15 +221,14 @@ TriangleSceneTraceXDominatedTriangles(
 
         Distance /= -DotProduct;
 
-        if (IsNormalFloat(Distance) == FALSE ||
-            IsFiniteFloat(Distance) == FALSE)
+        if (IsInfiniteFloat(Distance) != FALSE)
         {
             continue;
         }
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-        if (Distance < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(Distance) != FALSE)
         {
             continue;
         }
@@ -263,14 +261,14 @@ TriangleSceneTraceXDominatedTriangles(
                                                 BarycentricCoordinates.Coordinates[1] - 
                                                 BarycentricCoordinates.Coordinates[2];
 
-        if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
         {
             continue;
         }
 
-        Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+        Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
         Triangle.BitFields.DominantAxis = VECTOR_X_AXIS;
         Triangle.BitFields.Index = Index;
 
@@ -349,15 +347,14 @@ TriangleSceneTraceYDominatedTriangles(
 
             Distance /= -DotProduct;
 
-            if (IsNormalFloat(Distance) == FALSE ||
-                IsFiniteFloat(Distance) == FALSE)
+            if (IsInfiniteFloat(Distance) != FALSE)
             {
                 continue;
             }
 
     #if !defined(ENABLE_CSG_SUPPORT)
 
-            if (Distance < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(Distance) != FALSE)
             {
                 continue;
             }
@@ -390,14 +387,14 @@ TriangleSceneTraceYDominatedTriangles(
                                                     BarycentricCoordinates.Coordinates[1] - 
                                                     BarycentricCoordinates.Coordinates[2];
 
-            if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
             {
                 continue;
             }
 
-            Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+            Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
             Triangle.BitFields.DominantAxis = VECTOR_Y_AXIS;
             Triangle.BitFields.Index = Index;
 
@@ -435,15 +432,14 @@ TriangleSceneTraceYDominatedTriangles(
 
         Distance /= -DotProduct;
 
-        if (IsNormalFloat(Distance) == FALSE ||
-            IsFiniteFloat(Distance) == FALSE)
+        if (IsInfiniteFloat(Distance) != FALSE)
         {
             continue;
         }
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-        if (Distance < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(Distance) != FALSE)
         {
             continue;
         }
@@ -476,14 +472,14 @@ TriangleSceneTraceYDominatedTriangles(
                                                 BarycentricCoordinates.Coordinates[1] - 
                                                 BarycentricCoordinates.Coordinates[2];
 
-        if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
         {
             continue;
         }
 
-        Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+        Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
         Triangle.BitFields.DominantAxis = VECTOR_Y_AXIS;
         Triangle.BitFields.Index = Index;
 
@@ -562,15 +558,14 @@ TriangleSceneTraceZDominatedTriangles(
 
             Distance /= -DotProduct;
 
-            if (IsNormalFloat(Distance) == FALSE ||
-                IsFiniteFloat(Distance) == FALSE)
+            if (IsInfiniteFloat(Distance) != FALSE)
             {
                 continue;
             }
 
     #if !defined(ENABLE_CSG_SUPPORT)
 
-            if (Distance < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(Distance) != FALSE)
             {
                 continue;
             }
@@ -603,14 +598,14 @@ TriangleSceneTraceZDominatedTriangles(
                                                     BarycentricCoordinates.Coordinates[1] - 
                                                     BarycentricCoordinates.Coordinates[2];
 
-            if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-                BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+            if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+                IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
             {
                 continue;
             }
 
-            Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+            Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
             Triangle.BitFields.DominantAxis = VECTOR_Z_AXIS;
             Triangle.BitFields.Index = Index;
 
@@ -648,15 +643,14 @@ TriangleSceneTraceZDominatedTriangles(
 
         Distance /= -DotProduct;
 
-        if (IsNormalFloat(Distance) == FALSE ||
-            IsFiniteFloat(Distance) == FALSE)
+        if (IsInfiniteFloat(Distance) != FALSE)
         {
             continue;
         }
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-        if (Distance < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(Distance) != FALSE)
         {
             continue;
         }
@@ -689,14 +683,14 @@ TriangleSceneTraceZDominatedTriangles(
                                                 BarycentricCoordinates.Coordinates[1] - 
                                                 BarycentricCoordinates.Coordinates[2];
 
-        if (BarycentricCoordinates.Coordinates[0] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[1] < (FLOAT) 0.0 || 
-            BarycentricCoordinates.Coordinates[2] < (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[0]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[1]) != FALSE || 
+            IsLessThanZeroFloat(BarycentricCoordinates.Coordinates[2]) != FALSE)
         {
             continue;
         }
 
-        Triangle.BitFields.Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+        Triangle.BitFields.Face = (IsGreaterThanZeroFloat(DotProduct) != FALSE) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
         Triangle.BitFields.DominantAxis = VECTOR_Z_AXIS;
         Triangle.BitFields.Index = Index;
 

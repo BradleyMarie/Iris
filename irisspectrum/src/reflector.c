@@ -104,15 +104,13 @@ ReflectorReflect(
 {
     ISTATUS Status;
 
-    if (IsNormalFloat(Wavelength) == FALSE ||
-        IsFiniteFloat(Wavelength) == FALSE ||
-        IsPositiveFloat(Wavelength) == FALSE)
+    if (IsFiniteFloat(Wavelength) == FALSE ||
+        IsGreaterThanOrEqualToZeroFloat(Wavelength) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    if (IsNormalFloat(IncomingIntensity) == FALSE ||
-        IsFiniteFloat(IncomingIntensity) == FALSE ||
+    if (IsFiniteFloat(IncomingIntensity) == FALSE ||
         IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;

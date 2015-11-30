@@ -35,9 +35,8 @@ FmaSpectrumSample(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     FmaSpectrum = (PCFMA_SPECTRUM) Context;
@@ -82,9 +81,8 @@ AttenuatedSpectrumSample(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     AttenuatedSpectrum = (PCATTENUATED_SPECTRUM) Context;
@@ -118,9 +116,8 @@ SumSpectrumSample(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     SumSpectrum = (PCSUM_SPECTRUM) Context;
@@ -162,9 +159,8 @@ ReflectionSpectrumSample(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     ReflectionSpectrum = (PCREFLECTION_SPECTRUM) Context;
@@ -207,9 +203,8 @@ AttenuatedReflectionSpectrumSample(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     AttenuatedReflectionSpectrum = (PCATTENUATED_REFLECTION_SPECTRUM) Context;
@@ -249,9 +244,8 @@ ZeroSpectrumSample(
     )
 {
     ASSERT(Context == NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
     *Intensity = (FLOAT) 0.0;
@@ -304,7 +298,6 @@ FmaSpectrumInitialize(
     ASSERT(FmaSpectrum != NULL);
     ASSERT(Spectrum0 != NULL);
     ASSERT(Spectrum1 != NULL);
-    ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
 
@@ -326,7 +319,6 @@ AttenuatedSpectrumInitialize(
 {
     ASSERT(AttenuatedSpectrum != NULL);
     ASSERT(Spectrum != NULL);
-    ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
 
@@ -387,7 +379,6 @@ AttenuatedReflectionSpectrumInitialize(
     ASSERT(AttenuatedReflectionSpectrum != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
-    ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
 
@@ -497,8 +488,7 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsNormalFloat(Attenuation) != FALSE ||
-       IsFiniteFloat(Attenuation) != FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE);
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -565,8 +555,7 @@ SpectrumCompositorAttenuatedAddSpectrums(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsNormalFloat(Attenuation) != FALSE ||
-       IsFiniteFloat(Attenuation) != FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE);
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -686,15 +675,14 @@ SpectrumCompositorAttenuatedAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsNormalFloat(Attenuation) != FALSE ||
-       IsFiniteFloat(Attenuation) != FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE);
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (Spectrum == NULL ||
         Reflector == NULL ||
-        IsZeroFloat(Attenuation))
+        IsZeroFloat(Attenuation) != FALSE)
     {
         *ReflectedSpectrum = NULL;
         return ISTATUS_SUCCESS;

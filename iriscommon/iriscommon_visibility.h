@@ -39,12 +39,10 @@ RayTracerOwnerTestVisibility(
     ISTATUS Status;
 
     ASSERT(RayTracerOwner != NULL);
-    ASSERT(IsNormalFloat(Epsilon) != FALSE);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
     ASSERT(Scene != NULL);
-    ASSERT(IsNormalFloat(DistanceToObject) != FALSE);
     ASSERT(IsFiniteFloat(DistanceToObject) != FALSE);
-    ASSERT(DistanceToObject >= (FLOAT) 0.0f);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
     ASSERT(Visible != NULL);
 
     Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
@@ -124,7 +122,6 @@ RayTracerOwnerTestVisibilityAnyDistance(
     ISTATUS Status;
 
     ASSERT(RayTracerOwner != NULL);
-    ASSERT(IsNormalFloat(Epsilon) != FALSE);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
     ASSERT(Scene != NULL);
     ASSERT(Visible != NULL);

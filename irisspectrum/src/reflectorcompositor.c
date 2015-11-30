@@ -36,12 +36,10 @@ FmaReflectorReflect(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
-    ASSERT(IsNormalFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsPositiveFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     FmaReflector = (PCFMA_REFLECTOR) Context;
@@ -89,12 +87,10 @@ AttenuatedReflectorReflect(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
-    ASSERT(IsNormalFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsPositiveFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     AttenuatedReflector = (PCATTENUATED_REFLECTOR) Context;
@@ -130,12 +126,10 @@ SumReflectorReflect(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
-    ASSERT(IsNormalFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsPositiveFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     SumReflector = (PCSUM_REFLECTOR) Context;
@@ -176,12 +170,10 @@ ZeroReflectorReflect(
     )
 {
     ASSERT(Context == NULL);
-    ASSERT(IsNormalFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsPositiveFloat(Wavelength) != FALSE);
-    ASSERT(IsNormalFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsPositiveFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     *OutgoingIntensity = (FLOAT) 0.0;
@@ -224,7 +216,6 @@ FmaReflectorInitialize(
     ASSERT(FmaReflector != NULL);
     ASSERT(Reflector0 != NULL);
     ASSERT(Reflector1 != NULL);
-    ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
 
@@ -246,7 +237,6 @@ AttenuatedReflectorInitialize(
 {
     ASSERT(AttenuatedReflector != NULL);
     ASSERT(Reflector != NULL);
-    ASSERT(IsNormalFloat(Attenuation) != FALSE);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsZeroFloat(Attenuation) == FALSE);
 
@@ -374,8 +364,7 @@ ReflectorCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsNormalFloat(Attenuation) != FALSE ||
-       IsFiniteFloat(Attenuation) != FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE);
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -442,8 +431,7 @@ ReflectorCompositorAttenuatedAddReflections(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsNormalFloat(Attenuation) != FALSE ||
-       IsFiniteFloat(Attenuation) != FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE);
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }

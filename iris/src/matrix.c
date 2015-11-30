@@ -31,7 +31,6 @@ MatrixpDivideRow(
     ASSERT(Matrix != NULL);
     ASSERT(0 <= Row);
     ASSERT(Row <= 3);
-    ASSERT(IsNormalFloat(Divisor) != FALSE);
     ASSERT(IsFiniteFloat(Divisor) != FALSE);
     ASSERT(IsZeroFloat(Divisor) == FALSE);
 
@@ -57,7 +56,6 @@ MatrixpScaledSubtractRow(
     ASSERT(ConstantRow <= 3);
     ASSERT(0 <= ModifiedRow);
     ASSERT(ModifiedRow <= 3);
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     Matrix[ModifiedRow][0] -= Matrix[ConstantRow][0] * Scalar;
@@ -116,37 +114,21 @@ MatrixpInitialize(
     )
 {
     ASSERT(Matrix != NULL);
-    ASSERT(IsNormalFloat(M00) != FALSE);
     ASSERT(IsFiniteFloat(M00) != FALSE);
-    ASSERT(IsNormalFloat(M01) != FALSE);
     ASSERT(IsFiniteFloat(M01) != FALSE);
-    ASSERT(IsNormalFloat(M02) != FALSE);
     ASSERT(IsFiniteFloat(M02) != FALSE);
-    ASSERT(IsNormalFloat(M03) != FALSE);
     ASSERT(IsFiniteFloat(M03) != FALSE);
-    ASSERT(IsNormalFloat(M10) != FALSE);
     ASSERT(IsFiniteFloat(M10) != FALSE);
-    ASSERT(IsNormalFloat(M11) != FALSE);
     ASSERT(IsFiniteFloat(M11) != FALSE);
-    ASSERT(IsNormalFloat(M12) != FALSE);
     ASSERT(IsFiniteFloat(M12) != FALSE);
-    ASSERT(IsNormalFloat(M13) != FALSE);
     ASSERT(IsFiniteFloat(M13) != FALSE);
-    ASSERT(IsNormalFloat(M20) != FALSE);
     ASSERT(IsFiniteFloat(M20) != FALSE);
-    ASSERT(IsNormalFloat(M21) != FALSE);
     ASSERT(IsFiniteFloat(M21) != FALSE);
-    ASSERT(IsNormalFloat(M22) != FALSE);
     ASSERT(IsFiniteFloat(M22) != FALSE);
-    ASSERT(IsNormalFloat(M23) != FALSE);
     ASSERT(IsFiniteFloat(M23) != FALSE);
-    ASSERT(IsNormalFloat(M30) != FALSE);
     ASSERT(IsFiniteFloat(M30) != FALSE);
-    ASSERT(IsNormalFloat(M31) != FALSE);
     ASSERT(IsFiniteFloat(M31) != FALSE);
-    ASSERT(IsNormalFloat(M32) != FALSE);
     ASSERT(IsFiniteFloat(M32) != FALSE);
-    ASSERT(IsNormalFloat(M33) != FALSE);
     ASSERT(IsFiniteFloat(M33) != FALSE);
     ASSERT(Inverse != NULL);
 
@@ -200,37 +182,21 @@ MatrixpInvert(
     SIZE_T RowIndex;
 
     ASSERT(Inverse != NULL);
-    ASSERT(IsNormalFloat(M00) != FALSE);
     ASSERT(IsFiniteFloat(M00) != FALSE);
-    ASSERT(IsNormalFloat(M01) != FALSE);
     ASSERT(IsFiniteFloat(M01) != FALSE);
-    ASSERT(IsNormalFloat(M02) != FALSE);
     ASSERT(IsFiniteFloat(M02) != FALSE);
-    ASSERT(IsNormalFloat(M03) != FALSE);
     ASSERT(IsFiniteFloat(M03) != FALSE);
-    ASSERT(IsNormalFloat(M10) != FALSE);
     ASSERT(IsFiniteFloat(M10) != FALSE);
-    ASSERT(IsNormalFloat(M11) != FALSE);
     ASSERT(IsFiniteFloat(M11) != FALSE);
-    ASSERT(IsNormalFloat(M12) != FALSE);
     ASSERT(IsFiniteFloat(M12) != FALSE);
-    ASSERT(IsNormalFloat(M13) != FALSE);
     ASSERT(IsFiniteFloat(M13) != FALSE);
-    ASSERT(IsNormalFloat(M20) != FALSE);
     ASSERT(IsFiniteFloat(M20) != FALSE);
-    ASSERT(IsNormalFloat(M21) != FALSE);
     ASSERT(IsFiniteFloat(M21) != FALSE);
-    ASSERT(IsNormalFloat(M22) != FALSE);
     ASSERT(IsFiniteFloat(M22) != FALSE);
-    ASSERT(IsNormalFloat(M23) != FALSE);
     ASSERT(IsFiniteFloat(M23) != FALSE);
-    ASSERT(IsNormalFloat(M30) != FALSE);
     ASSERT(IsFiniteFloat(M30) != FALSE);
-    ASSERT(IsNormalFloat(M31) != FALSE);
     ASSERT(IsFiniteFloat(M31) != FALSE);
-    ASSERT(IsNormalFloat(M32) != FALSE);
     ASSERT(IsFiniteFloat(M32) != FALSE);
-    ASSERT(IsNormalFloat(M33) != FALSE);
     ASSERT(IsFiniteFloat(M33) != FALSE);
 
     Inverse[0][0] = (FLOAT) 1.0;
@@ -358,98 +324,82 @@ MatrixAllocate(
     PINVERTIBLE_MATRIX InvertibleMatrix;
     ISTATUS Status;
 
-    if (IsNormalFloat(M00) == FALSE ||
-        IsFiniteFloat(M00) == FALSE)
+    if (IsFiniteFloat(M00) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(M01) == FALSE ||
-        IsFiniteFloat(M01) == FALSE)
+    if (IsFiniteFloat(M01) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(M02) == FALSE ||
-        IsFiniteFloat(M02) == FALSE)
+    if (IsFiniteFloat(M02) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (IsNormalFloat(M03) == FALSE ||
-        IsFiniteFloat(M03) == FALSE)
+    if (IsFiniteFloat(M03) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (IsNormalFloat(M10) == FALSE ||
-        IsFiniteFloat(M10) == FALSE)
+    if (IsFiniteFloat(M10) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (IsNormalFloat(M11) == FALSE ||
-        IsFiniteFloat(M11) == FALSE)
+    if (IsFiniteFloat(M11) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (IsNormalFloat(M12) == FALSE ||
-        IsFiniteFloat(M12) == FALSE)
+    if (IsFiniteFloat(M12) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (IsNormalFloat(M13) == FALSE ||
-        IsFiniteFloat(M13) == FALSE)
+    if (IsFiniteFloat(M13) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (IsNormalFloat(M20) == FALSE ||
-        IsFiniteFloat(M20) == FALSE)
+    if (IsFiniteFloat(M20) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_08;
     }
 
-    if (IsNormalFloat(M21) == FALSE ||
-        IsFiniteFloat(M21) == FALSE)
+    if (IsFiniteFloat(M21) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_09;
     }
 
-    if (IsNormalFloat(M22) == FALSE ||
-        IsFiniteFloat(M22) == FALSE)
+    if (IsFiniteFloat(M22) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_10;
     }
 
-    if (IsNormalFloat(M23) == FALSE ||
-        IsFiniteFloat(M23) == FALSE)
+    if (IsFiniteFloat(M23) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_11;
     }
 
-    if (IsNormalFloat(M30) == FALSE ||
-        IsFiniteFloat(M30) == FALSE)
+    if (IsFiniteFloat(M30) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_12;
     }
 
-    if (IsNormalFloat(M31) == FALSE ||
-        IsFiniteFloat(M31) == FALSE)
+    if (IsFiniteFloat(M31) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_13;
     }
 
-    if (IsNormalFloat(M32) == FALSE ||
-        IsFiniteFloat(M32) == FALSE)
+    if (IsFiniteFloat(M32) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_14;
     }
 
-    if (IsNormalFloat(M33) == FALSE ||
-        IsFiniteFloat(M33) == FALSE)
+    if (IsFiniteFloat(M33) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_15;
     }
@@ -548,20 +498,17 @@ MatrixAllocateTranslation(
 {
     PINVERTIBLE_MATRIX InvertibleMatrix;
 
-    if (IsNormalFloat(X) == FALSE ||
-        IsFiniteFloat(X) == FALSE)
+    if (IsFiniteFloat(X) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Y) == FALSE ||
-        IsFiniteFloat(Y) == FALSE)
+    if (IsFiniteFloat(Y) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Z) == FALSE ||
-        IsFiniteFloat(Z) == FALSE)
+    if (IsFiniteFloat(Z) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -632,20 +579,17 @@ MatrixAllocateScalar(
 {
     PINVERTIBLE_MATRIX InvertibleMatrix;
 
-    if (IsNormalFloat(X) == FALSE ||
-        IsFiniteFloat(X) == FALSE)
+    if (IsFiniteFloat(X) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Y) == FALSE ||
-        IsFiniteFloat(Y) == FALSE)
+    if (IsFiniteFloat(Y) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Z) == FALSE ||
-        IsFiniteFloat(Z) == FALSE)
+    if (IsFiniteFloat(Z) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -728,15 +672,8 @@ MatrixpAllocateRotation(
     FLOAT Sin;
     ISTATUS Status;
 
-    ASSERT(IsNormalFloat(Theta) != FALSE);
     ASSERT(IsFiniteFloat(Theta) != FALSE);
-    ASSERT(IsNormalFloat(Axis.X) != FALSE);
-    ASSERT(IsFiniteFloat(Axis.X) != FALSE);
-    ASSERT(IsNormalFloat(Axis.Y) != FALSE);
-    ASSERT(IsFiniteFloat(Axis.Y) != FALSE);
-    ASSERT(IsNormalFloat(Axis.Z) != FALSE);
-    ASSERT(IsFiniteFloat(Axis.Z) != FALSE);
-    ASSERT(IsZeroFloat(VectorLength(Axis)) == FALSE);
+    ASSERT(VectorValidate(Axis) != FALSE);
     ASSERT(Matrix != NULL);
 
     NormalizedAxis = VectorNormalize(Axis, NULL, NULL);
@@ -790,29 +727,24 @@ MatrixAllocateRotation(
     )
 {
     VECTOR3 Axis;
-    FLOAT Length;
     ISTATUS Status;
 
-    if (IsNormalFloat(Theta) == FALSE || 
-        IsFiniteFloat(Theta) == FALSE)
+    if (IsFiniteFloat(Theta) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(X) == FALSE || 
-        IsFiniteFloat(X) == FALSE)
+    if (IsFiniteFloat(X) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Y) == FALSE || 
-        IsFiniteFloat(Y) == FALSE)
+    if (IsFiniteFloat(Y) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (IsNormalFloat(Z) == FALSE || 
-        IsFiniteFloat(Z) == FALSE)
+    if (IsFiniteFloat(Z) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -822,13 +754,14 @@ MatrixAllocateRotation(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Axis = VectorCreate(X, Y, Z);
-    Length = VectorLength(Axis);
-
-    if (IsZeroFloat(Length) != FALSE)
+    if (IsZeroFloat(X) != FALSE &&
+        IsZeroFloat(Y) != FALSE &&
+        IsZeroFloat(Z) != FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
+
+    Axis = VectorCreate(X, Y, Z);
 
     Status = MatrixpAllocateRotation(Theta, Axis, Matrix);
 
@@ -856,38 +789,32 @@ MatrixAllocateOrthographic(
     FLOAT Ty;
     FLOAT Tz;
 
-    if (IsNormalFloat(Left) == FALSE ||
-        IsFiniteFloat(Left) == FALSE)
+    if (IsFiniteFloat(Left) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Right) == FALSE ||
-        IsFiniteFloat(Right) == FALSE)
+    if (IsFiniteFloat(Right) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Bottom) == FALSE ||
-        IsFiniteFloat(Bottom) == FALSE)
+    if (IsFiniteFloat(Bottom) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (IsNormalFloat(Top) == FALSE ||
-        IsFiniteFloat(Top) == FALSE)
+    if (IsFiniteFloat(Top) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (IsNormalFloat(Near) == FALSE ||
-        IsFiniteFloat(Near) == FALSE)
+    if (IsFiniteFloat(Near) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (IsNormalFloat(Far) == FALSE ||
-        IsFiniteFloat(Far) == FALSE)
+    if (IsFiniteFloat(Far) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
@@ -962,40 +889,34 @@ MatrixAllocateFrustum(
     FLOAT Sx;
     FLOAT Sy;
 
-    if (IsNormalFloat(Left) == FALSE ||
-        IsFiniteFloat(Left) == FALSE)
+    if (IsFiniteFloat(Left) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Right) == FALSE ||
-        IsFiniteFloat(Right) == FALSE)
+    if (IsFiniteFloat(Right) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Bottom) == FALSE ||
-        IsFiniteFloat(Bottom) == FALSE)
+    if (IsFiniteFloat(Bottom) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (IsNormalFloat(Top) == FALSE ||
-        IsFiniteFloat(Top) == FALSE)
+    if (IsFiniteFloat(Top) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (IsNormalFloat(Near) == FALSE ||
-        IsFiniteFloat(Near) == FALSE ||
-        Near <= (FLOAT) 0.0)
+    if (IsFiniteFloat(Near) == FALSE ||
+        IsGreaterThanOrEqualToZeroFloat(Near) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (IsNormalFloat(Far) == FALSE ||
-        IsFiniteFloat(Far) == FALSE ||
-        Far <= (FLOAT) 0.0)
+    if (IsFiniteFloat(Far) == FALSE ||
+        IsGreaterThanOrEqualToZeroFloat(Far) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }

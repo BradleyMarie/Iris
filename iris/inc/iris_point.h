@@ -43,12 +43,9 @@ PointCreate(
 {
     POINT3 Point;
 
-    ASSERT(IsNormalFloat(X));
-    ASSERT(IsFiniteFloat(X));
-    ASSERT(IsNormalFloat(Y));
-    ASSERT(IsFiniteFloat(Y));
-    ASSERT(IsNormalFloat(Z));
-    ASSERT(IsFiniteFloat(Z));
+    ASSERT(IsFiniteFloat(X) != FALSE);
+    ASSERT(IsFiniteFloat(Y) != FALSE);
+    ASSERT(IsFiniteFloat(Z) != FALSE);
 
     Point.X = X;
     Point.Y = Y;
@@ -133,7 +130,6 @@ PointVectorAddScaled(
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     X = FmaFloat(Scalar, Vector.X, Point.X);
@@ -171,11 +167,8 @@ PointValidate(
     _In_ POINT3 Point
     )
 {
-    if (IsNormalFloat(Point.X) == FALSE ||
-        IsFiniteFloat(Point.X) == FALSE ||
-        IsNormalFloat(Point.Y) == FALSE ||
+    if (IsFiniteFloat(Point.X) == FALSE ||
         IsFiniteFloat(Point.Y) == FALSE ||
-        IsNormalFloat(Point.Z) == FALSE ||
         IsFiniteFloat(Point.Z) == FALSE)
     {
         return FALSE;

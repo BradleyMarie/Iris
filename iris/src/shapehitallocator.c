@@ -45,8 +45,7 @@ ShapeHitAllocatorAllocateInternal(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Distance) == FALSE ||
-        IsFiniteFloat(Distance) == FALSE)
+    if (IsFiniteFloat(Distance) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

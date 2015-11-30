@@ -76,9 +76,8 @@ SpectrumVisibilityTesterSetSceneAndEpsilon(
 {
     ASSERT(VisibilityTester != NULL);
     ASSERT(Scene != NULL);
-    ASSERT(IsNormalFloat(Epsilon) != FALSE);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
-    ASSERT(Epsilon < (FLOAT) 0.0);
+    ASSERT(IsGreaterThanZeroFloat(Epsilon) != FALSE);
     
     VisibilityTester->Scene = Scene;
     VisibilityTester->Epsilon = Epsilon;

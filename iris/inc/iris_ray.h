@@ -58,8 +58,7 @@ RayEndpoint(
 {
     POINT3 Endpoint;
 
-    ASSERT(IsNormalFloat(Distance));
-    ASSERT(IsFiniteFloat(Distance));
+    ASSERT(IsFiniteFloat(Distance) != FALSE);
 
     Endpoint = PointVectorAddScaled(Ray.Origin,
                                     Ray.Direction,

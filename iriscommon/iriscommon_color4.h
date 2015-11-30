@@ -45,15 +45,11 @@ Color4InitializeFromComponents(
 {
     COLOR4 Color;
 
-    ASSERT(IsNormalFloat(Red));
-    ASSERT(IsFiniteFloat(Red));
-    ASSERT(IsNormalFloat(Green));
-    ASSERT(IsFiniteFloat(Green));
-    ASSERT(IsNormalFloat(Blue));
-    ASSERT(IsFiniteFloat(Blue));
-    ASSERT(IsNormalFloat(Alpha));
-    ASSERT(IsFiniteFloat(Alpha));
-    ASSERT((FLOAT) 0.0 <= Alpha);
+    ASSERT(IsFiniteFloat(Red) != FALSE);
+    ASSERT(IsFiniteFloat(Green) != FALSE);
+    ASSERT(IsFiniteFloat(Blue) != FALSE);
+    ASSERT(IsFiniteFloat(Alpha) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Alpha) != FALSE);
     ASSERT(Alpha <= (FLOAT) 1.0);
 
     Color.Red = Red;
@@ -73,7 +69,7 @@ Color4InitializeFromColor3(
 {
     COLOR4 Color;
 
-    ASSERT((FLOAT) 0.0 <= Alpha);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Alpha) != FALSE);
     ASSERT(Alpha <= (FLOAT) 1.0);
 
     Color = Color4InitializeFromComponents(Color3.Red,
@@ -158,8 +154,7 @@ Color4ScaleByScalar(
     FLOAT Blue;
     FLOAT Alpha;
 
-    ASSERT(IsNormalFloat(Scalar));
-    ASSERT(IsFiniteFloat(Scalar));
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     Red = Color.Red * Scalar;
     Green = Color.Green * Scalar;

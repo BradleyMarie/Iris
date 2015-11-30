@@ -39,14 +39,10 @@ PointCreateScaled(
 
     ASSERT(IsZeroFloat(W) == FALSE);
 
-    ASSERT(IsNormalFloat(X));
-    ASSERT(IsFiniteFloat(X));
-    ASSERT(IsNormalFloat(Y));
-    ASSERT(IsFiniteFloat(Y));
-    ASSERT(IsNormalFloat(Z));
-    ASSERT(IsFiniteFloat(Z));
-    ASSERT(IsNormalFloat(W));
-    ASSERT(IsFiniteFloat(W));
+    ASSERT(IsFiniteFloat(X) != FALSE);
+    ASSERT(IsFiniteFloat(Y) != FALSE);
+    ASSERT(IsFiniteFloat(Z) != FALSE);
+    ASSERT(IsFiniteFloat(W) != FALSE);
 
     Scalar = (FLOAT) 1.0 / W;
 

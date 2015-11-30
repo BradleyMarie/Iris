@@ -43,12 +43,9 @@ Color3InitializeFromComponents(
 {
     COLOR3 Color;
 
-    ASSERT(IsNormalFloat(Red));
-    ASSERT(IsFiniteFloat(Red));
-    ASSERT(IsNormalFloat(Green));
-    ASSERT(IsFiniteFloat(Green));
-    ASSERT(IsNormalFloat(Blue));
-    ASSERT(IsFiniteFloat(Blue));
+    ASSERT(IsFiniteFloat(Red) != FALSE);
+    ASSERT(IsFiniteFloat(Green) != FALSE);
+    ASSERT(IsFiniteFloat(Blue) != FALSE);
 
     Color.Red = Red;
     Color.Green = Green;
@@ -63,11 +60,8 @@ Color3Validate(
     _In_ COLOR3 Color
     )
 {
-    if (IsNormalFloat(Color.Red) == FALSE ||
-        IsFiniteFloat(Color.Red) == FALSE ||
-        IsNormalFloat(Color.Green) == FALSE ||
+    if (IsFiniteFloat(Color.Red) == FALSE ||
         IsFiniteFloat(Color.Green) == FALSE ||
-        IsNormalFloat(Color.Blue) == FALSE ||
         IsFiniteFloat(Color.Blue) == FALSE)
     {
         return FALSE;
@@ -110,7 +104,6 @@ Color3AddScaled(
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     Red = FmaFloat(Scalar, Addend1.Red, Addend0.Red);
@@ -176,8 +169,7 @@ Color3ScaleByScalar(
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(IsNormalFloat(Scalar));
-    ASSERT(IsFiniteFloat(Scalar));
+    ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     Red = Color.Red * Scalar;
     Green = Color.Green * Scalar;
@@ -200,9 +192,9 @@ Color3DivideByColor(
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(IsZeroFloat(Divisor.Red));
-    ASSERT(IsZeroFloat(Divisor.Green));
-    ASSERT(IsZeroFloat(Divisor.Blue));
+    ASSERT(IsNotZeroFloat(Divisor.Red) != FALSE);
+    ASSERT(IsNotZeroFloat(Divisor.Green) != FALSE);
+    ASSERT(IsNotZeroFloat(Divisor.Blue) != FALSE);
 
     Red = Dividend.Red / Divisor.Red;
     Green = Dividend.Green / Divisor.Green;
@@ -226,9 +218,8 @@ Color3DivideByScalar(
     FLOAT Green;
     FLOAT Blue;
 
-    ASSERT(IsNormalFloat(Divisor));
-    ASSERT(IsFiniteFloat(Divisor));
-    ASSERT(IsZeroFloat(Divisor) != TRUE);
+    ASSERT(IsFiniteFloat(Divisor) != FALSE);
+    ASSERT(IsNotZeroFloat(Divisor) != FALSE);
 
     Inverse = (FLOAT) 1.0 / Divisor;
 
@@ -262,9 +253,9 @@ Color3IsBlack(
 {
     BOOL Result;
 
-    Result = IsZeroFloat(Color.Red) &&
-             IsZeroFloat(Color.Green) &&
-             IsZeroFloat(Color.Blue);
+    Result = IsZeroFloat(Color.Red) != FALSE &&
+             IsZeroFloat(Color.Green) != FALSE &&
+             IsZeroFloat(Color.Blue) != FALSE;
 
     return Result;
 }

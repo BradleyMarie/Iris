@@ -141,14 +141,12 @@ RandomGenerateFloat(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(Minimum) == FALSE ||
-        IsFiniteFloat(Minimum) == FALSE)
+    if (IsFiniteFloat(Minimum) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (IsNormalFloat(Maximum) == FALSE ||
-        IsFiniteFloat(Maximum) == FALSE)
+    if (IsFiniteFloat(Maximum) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }

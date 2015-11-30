@@ -21,4 +21,6 @@ typedef CONST DRAWING_SHAPE *PCDRAWING_SHAPE;
 typedef struct _SCENE SCENE, *PSCENE;
 typedef CONST SCENE *PCSCENE;
 
+#define IsNormalFloat(number) TRUE
+
 #endif // _TYPES_IRIS_SHADING_MODEL_

@@ -45,8 +45,9 @@ Abstract:
 #define IsNaNFloat(number) isnan(number)
 #define IsInfiniteFloat(number) isinf(number)
 #define IsZeroFloat(number) (number == (FLOAT) 0.0)
-#define IsPositiveFloat(number) (number > (FLOAT) 0.0)
-#define IsNegativeFloat(number) (number < (FLOAT) 0.0)
+#define IsNotZeroFloat(number) (number != (FLOAT) 0.0)
+#define IsGreaterThanZeroFloat(number) (number > (FLOAT) 0.0)
+#define IsLessThanZeroFloat(number) (number < (FLOAT) 0.0)
 #define IsGreaterThanOrEqualToZeroFloat(number) (number >= (FLOAT) 0.0)
 #define IsLessThanOrEqualToZeroFloat(number) (number <= (FLOAT) 0.0)
 
@@ -55,6 +56,7 @@ Abstract:
 #define MaxFloat(number0, number1) fmaxf(number0, number1)
 #define MinFloat(number0, number1) fminf(number0, number1)
 #define FmaFloat(m0, m1, a0) fmaf(m0, m1, a0)
+#define IsFiniteFloat(number) isfinite(number)
 
 #else
 
@@ -62,22 +64,15 @@ Abstract:
 #define MinFloat(number0, number1) ((number0 < number1) ? number0 : number1)
 #define FmaFloat(m0, m1, a0) ((m0 * m1) + a0)
 
-#endif
+#if _MSC_VER
 
-#if __STDC_VERSION__ >= 199901L
-
-#define IsNormalFloat(number) isnormal(number)
-#define IsFiniteFloat(number) isfinite(number)
-
-#elif _MSC_VER
-
-#define IsNormalFloat(number) (_isnan(number) == 0)
 #define IsFiniteFloat(number) (_finite(number) != 0)
 
 #else
 
-#define IsNormalFloat(number) TRUE
 #define IsFiniteFloat(number) (IsInfiniteFloat(number) == FALSE)
+
+#endif
 
 #endif
 

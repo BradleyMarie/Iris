@@ -42,9 +42,8 @@ SpectrumVisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsNormalFloat(DistanceToObject) == FALSE ||
-        IsFiniteFloat(DistanceToObject) == FALSE ||
-        DistanceToObject < (FLOAT) 0.0)
+    if (IsFiniteFloat(DistanceToObject) == FALSE ||
+        IsGreaterThanZeroFloat(DistanceToObject) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

@@ -54,11 +54,8 @@ VectorCreate(
 {
     VECTOR3 Result;
 
-    ASSERT(IsNormalFloat(X) != FALSE);
     ASSERT(IsFiniteFloat(X) != FALSE);
-    ASSERT(IsNormalFloat(Y) != FALSE);
     ASSERT(IsFiniteFloat(Y) != FALSE);
-    ASSERT(IsNormalFloat(Z) != FALSE);
     ASSERT(IsFiniteFloat(Z) != FALSE);
 
     Result.X = X;
@@ -122,7 +119,6 @@ VectorAddScaled(
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     X = FmaFloat(Scalar, Addend1.X, Addend0.X);
@@ -167,7 +163,6 @@ VectorScale(
     FLOAT Y;
     FLOAT Z;
 
-    ASSERT(IsNormalFloat(Scalar) != FALSE);
     ASSERT(IsFiniteFloat(Scalar) != FALSE);
 
     X = Vector.X * Scalar;
@@ -243,18 +238,15 @@ VectorValidate(
     _In_ VECTOR3 Vector
     )
 {
-    if (IsZeroFloat(Vector.X) != FALSE &&
-        IsZeroFloat(Vector.Y) != FALSE &&
-        IsZeroFloat(Vector.Z) != FALSE)
+    if (IsNotZeroFloat(Vector.X) == FALSE &&
+        IsNotZeroFloat(Vector.Y) == FALSE &&
+        IsNotZeroFloat(Vector.Z) == FALSE)
     {
         return FALSE;
     }
 
-    if (IsNormalFloat(Vector.X) == FALSE ||
-        IsFiniteFloat(Vector.X) == FALSE ||
-        IsNormalFloat(Vector.Y) == FALSE ||
+    if (IsFiniteFloat(Vector.X) == FALSE ||
         IsFiniteFloat(Vector.Y) == FALSE ||
-        IsNormalFloat(Vector.Z) == FALSE ||
         IsFiniteFloat(Vector.Z) == FALSE)
     {
         return FALSE;

@@ -103,9 +103,8 @@ SpectrumSample(
 {
     ISTATUS Status;
 
-    if (IsNormalFloat(Wavelength) == FALSE ||
-        IsFiniteFloat(Wavelength) == FALSE ||
-        IsPositiveFloat(Wavelength) == FALSE)
+    if (IsFiniteFloat(Wavelength) == FALSE ||
+        IsGreaterThanZeroFloat(Wavelength) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }

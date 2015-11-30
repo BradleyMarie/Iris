@@ -31,13 +31,9 @@ PowerHeuristic(
     FLOAT F;
     FLOAT G;
 
-    ASSERT(IsNormalFloat(nf) != FALSE);
     ASSERT(IsFiniteFloat(nf) != FALSE);
-    ASSERT(IsNormalFloat(fPdf) != FALSE);
     ASSERT(IsFiniteFloat(fPdf) != FALSE);
-    ASSERT(IsNormalFloat(ng) != FALSE);
     ASSERT(IsFiniteFloat(ng) != FALSE);
-    ASSERT(IsNormalFloat(gPdf) != FALSE);
     ASSERT(IsFiniteFloat(gPdf) != FALSE);
 
     F = nf * fPdf;
@@ -65,6 +61,7 @@ ComputeDirectLighting(
     _Out_ PCSPECTRUM *Spectrum
     )
 {
+    BOOL IsGreaterThanZero;
     PSPECTRUM LightSpectrum;
     PCREFLECTOR Reflector;
     FLOAT Attenuation;
@@ -96,9 +93,12 @@ ComputeDirectLighting(
     // Light sampling routine is a delta function
     //
 
-    if (IsFiniteFloat(LightPdf) == FALSE)
+    IsGreaterThanZero = IsGreaterThanZeroFloat(LightPdf);
+
+    if (IsInfiniteFloat(LightPdf) != FALSE)
     {
-        if (LightSpectrum == NULL)
+        if (IsGreaterThanZero == FALSE ||
+            LightSpectrum == NULL)
         {
             *Spectrum = NULL;
             return ISTATUS_SUCCESS;
@@ -136,7 +136,7 @@ ComputeDirectLighting(
     // Light is an area light
     //
 
-    if (LightPdf > (FLOAT) 0.0f)
+    if (IsGreaterThanZero != FALSE)
     {
         Status = BrdfComputeReflectanceWithPdf(Brdf,
                                                IncidentDirection,
@@ -198,7 +198,8 @@ ComputeDirectLighting(
         return Status;
     }
 
-    if (Reflector == NULL || BrdfPdf <= (FLOAT) 0.0f)
+    if (IsLessThanZeroFloat(BrdfPdf) != FALSE ||
+        Reflector == NULL)
     {
         *Spectrum = Output;
         return ISTATUS_SUCCESS;
@@ -206,7 +207,7 @@ ComputeDirectLighting(
     
     RayToLight = RayCreate(WorldHitPoint, ToLight);
 
-    if (IsFiniteFloat(BrdfPdf) == FALSE)
+    if (IsInfiniteFloat(BrdfPdf) != FALSE)
     {
         Status = LightComputeEmissive(Light,
                                       RayToLight,
@@ -241,7 +242,8 @@ ComputeDirectLighting(
             return Status;
         }
 
-        if (Emissive == NULL || LightPdf <= (FLOAT) 0.0)
+        if (IsLessThanZeroFloat(LightPdf) != FALSE ||
+            Emissive == NULL)
         {
             *Spectrum = Output;
             return ISTATUS_SUCCESS;
