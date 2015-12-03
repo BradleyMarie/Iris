@@ -85,7 +85,7 @@ TriangleXDominantTraceTriangle(
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-    if (IsGreaterThanOrEqualToZero(Distance) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -101,7 +101,7 @@ TriangleXDominantTraceTriangle(
                                             (Triangle->B.Z * Triangle->C.Y - 
                                              Triangle->B.Y * Triangle->C.Z);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -112,7 +112,7 @@ TriangleXDominantTraceTriangle(
                                             (Triangle->C.Z * Triangle->B.Y - 
                                              Triangle->C.Y * Triangle->B.Z);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -122,7 +122,7 @@ TriangleXDominantTraceTriangle(
                                             BarycentricCoordinates.Coordinates[1] - 
                                             BarycentricCoordinates.Coordinates[2];
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -180,7 +180,7 @@ TriangleYDominantTraceTriangle(
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-    if (IsGreaterThanOrEqualToZero(Distance) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -196,7 +196,7 @@ TriangleYDominantTraceTriangle(
                                             (Triangle->B.X * Triangle->C.Z - 
                                              Triangle->B.Z * Triangle->C.X);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -207,7 +207,7 @@ TriangleYDominantTraceTriangle(
                                             (Triangle->C.X * Triangle->B.Z - 
                                              Triangle->C.Z * Triangle->B.X);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -218,7 +218,7 @@ TriangleYDominantTraceTriangle(
                                             BarycentricCoordinates.Coordinates[2];
 
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -275,7 +275,7 @@ TriangleZDominantTraceTriangle(
 
 #if !defined(ENABLE_CSG_SUPPORT)
 
-    if (IsGreaterThanOrEqualToZero(Distance) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -291,7 +291,7 @@ TriangleZDominantTraceTriangle(
                                             (Triangle->B.Y * Triangle->C.X - 
                                              Triangle->B.X * Triangle->C.Y);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[0]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -302,7 +302,7 @@ TriangleZDominantTraceTriangle(
                                             (Triangle->C.Y * Triangle->B.X - 
                                              Triangle->C.X * Triangle->B.Y);
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[1]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -312,7 +312,7 @@ TriangleZDominantTraceTriangle(
                                             BarycentricCoordinates.Coordinates[1] - 
                                             BarycentricCoordinates.Coordinates[2];
 
-    if (GreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
+    if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates.Coordinates[2]) == FALSE)
     {
         *ShapeHitList = NULL;
         return ISTATUS_SUCCESS;
@@ -379,16 +379,16 @@ TriangleCheckBounds(
     ASSERT(Triangle != NULL);
     ASSERT(IsInsideBox != NULL);
 
-    TransformedVertex0 = VectorMatrixMultiply(ModelToWorld, Triangle->Vertex0);
+    TransformedVertex0 = PointMatrixMultiply(ModelToWorld, Triangle->Vertex0);
 
     if (BoundingBoxContainsPoint(WorldAlignedBoundingBox, TransformedVertex0) != FALSE)
     {
         *IsInsideBox = TRUE;
         return ISTATUS_SUCCESS;
     }
-
-    TransformedVertex1 = PointAdd(Triangle->Vertex0, Triangle->B);
-    TransformedVertex1 = VectorMatrixMultiply(ModelToWorld, TransformedVertex1);
+    
+    TransformedVertex1 = PointVectorAdd(Triangle->Vertex0, Triangle->B);
+    TransformedVertex1 = PointMatrixMultiply(ModelToWorld, TransformedVertex1);
 
     if (BoundingBoxContainsPoint(WorldAlignedBoundingBox, TransformedVertex1) != FALSE)
     {
@@ -396,8 +396,8 @@ TriangleCheckBounds(
         return ISTATUS_SUCCESS;
     }
 
-    TransformedVertex2 = PointAdd(Triangle->Vertex0, Triangle->C);
-    TransformedVertex2 = VectorMatrixMultiply(ModelToWorld, TransformedVertex2);
+    TransformedVertex2 = PointVectorAdd(Triangle->Vertex0, Triangle->C);
+    TransformedVertex2 = PointMatrixMultiply(ModelToWorld, TransformedVertex2);
 
     if (BoundingBoxContainsPoint(WorldAlignedBoundingBox, TransformedVertex2) != FALSE)
     {

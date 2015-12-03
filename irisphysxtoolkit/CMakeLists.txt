@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisphysx/inc inc src/inc)
+include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisphysx/inc ../iriscommon/ inc src/inc)
 
 add_library(irisphysxtoolkit SHARED
     src/lighting.c
