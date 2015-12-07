@@ -133,15 +133,19 @@ PointerListGetSize(
 }
 
 SFORCEINLINE
-_Ret_count_(PointerListGetSize(PointerList))
-PVOID *
+VOID
 PointerListGetData(
-    _In_ PCPOINTER_LIST PointerList
+    _In_ PCPOINTER_LIST PointerList,
+	_Outptr_result_buffer_(*Size) PVOID *Data[],
+	_Out_ PSIZE_T Size
     )
 {
     ASSERT(PointerList != NULL);
+	ASSERT(Data != NULL);
+	ASSERT(Size != NULL);
 
-    return PointerList->PointerList;
+	*Data = PointerList->PointerList;
+	*Size = PointerList->PointerListSize;
 }
 
 SFORCEINLINE

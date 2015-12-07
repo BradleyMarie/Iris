@@ -39,12 +39,17 @@ SpectrumSceneGetLights(
     _Out_ PSIZE_T NumberOfLights
     )
 {
+	PVOID **PointerArray;
+
     ASSERT(SpectrumScene != NULL);
     ASSERT(Lights != NULL);
     ASSERT(NumberOfLights != NULL);
     
-    *NumberOfLights = PointerListGetSize(&SpectrumScene->Lights);
-    *Lights = (PCLIGHT *) PointerListGetData(&SpectrumScene->Lights);
+	PointerArray = (PVOID **) Lights;
+
+	PointerListGetData(&SpectrumScene->Lights,
+		               PointerArray,
+					   NumberOfLights);
 }
 
 #endif // _SPECTRUM_SCENE_IRIS_PHYSX_INTERNAL_
