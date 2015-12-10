@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisshadingmodel/inc inc src/inc)
+include_directories(../iris/inc ../irisshadingmodel/inc ../iriscommon inc src/inc)
 
 add_library(iristoolkit SHARED
     src/triangle.c
