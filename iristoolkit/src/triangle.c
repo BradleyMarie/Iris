@@ -246,10 +246,10 @@ IrisToolkitTriangleInitialize(
                                 Vertex2,
                                 DominantAxis);
 
-	if (Status != ISTATUS_SUCCESS)
-	{
-		return Status;
-	}
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     Triangle->Textures[TRIANGLE_FRONT_FACE] = FrontTexture;
     Triangle->Textures[TRIANGLE_BACK_FACE] = BackTexture;
