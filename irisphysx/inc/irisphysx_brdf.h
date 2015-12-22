@@ -62,8 +62,11 @@ ISTATUS
 
 typedef struct _BRDF_VTABLE {
     PBRDF_SAMPLE SampleRoutine;
+    PBRDF_SAMPLE SampleRoutineWithLambertianFalloff;
     PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
+    PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutineWithLambertianFalloff;
     PBRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutine;
+    PBRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutineWithLambertianFalloff;
 } BRDF_VTABLE, *PBRDF_VTABLE;
 
 typedef CONST BRDF_VTABLE *PCBRDF_VTABLE;
@@ -93,6 +96,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
+BrdfSampleWithLambertianFalloff(
+    _In_ PCBRDF Brdf,
+    _In_ VECTOR3 Incoming,
+    _Inout_ PRANDOM Rng,
+    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
+    _Out_ PCREFLECTOR *Reflector,
+    _Out_ PVECTOR3 Outgoing,
+    _Out_ PFLOAT Pdf
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
 BrdfComputeReflectance(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
@@ -105,7 +122,32 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
+BrdfComputeReflectanceWithLambertianFalloff(
+    _In_ PCBRDF Brdf,
+    _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 Outgoing,
+    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
+    _Out_ PCREFLECTOR *Reflector
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
 BrdfComputeReflectanceWithPdf(
+    _In_ PCBRDF Brdf,
+    _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 Outgoing,
+    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
+    _Out_ PCREFLECTOR *Reflector,
+    _Out_ PFLOAT Pdf
+    );
+    
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+BrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,

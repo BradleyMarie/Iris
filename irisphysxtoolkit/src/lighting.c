@@ -52,7 +52,6 @@ ComputeDirectLighting(
     _In_ PCBRDF Brdf,
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 IncidentDirection,
-    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM Rng,
@@ -65,7 +64,6 @@ ComputeDirectLighting(
     PSPECTRUM LightSpectrum;
     PCREFLECTOR Reflector;
     FLOAT Attenuation;
-    FLOAT DotProduct;
     PSPECTRUM Output;
     PSPECTRUM Emissive;
     VECTOR3 ToLight;
@@ -104,11 +102,11 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        Status = BrdfComputeReflectance(Brdf,
-                                        IncidentDirection,
-                                        ToLight,
-                                        ReflectorCompositor,
-                                        &Reflector);
+        Status = BrdfComputeReflectanceWithLambertianFalloff(Brdf,
+                                                             IncidentDirection,
+                                                             ToLight,
+                                                             ReflectorCompositor,
+                                                             &Reflector);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -121,13 +119,10 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
-
-        Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
-                                                           LightSpectrum,
-                                                           Reflector,
-                                                           DotProduct,
-                                                           Spectrum);
+        Status = SpectrumCompositorAddReflection(SpectrumCompositor,
+                                                 LightSpectrum,
+                                                 Reflector,
+                                                 Spectrum);
 
         return Status;
     }
@@ -138,12 +133,12 @@ ComputeDirectLighting(
 
     if (IsGreaterThanZero != FALSE)
     {
-        Status = BrdfComputeReflectanceWithPdf(Brdf,
-                                               IncidentDirection,
-                                               ToLight,
-                                               ReflectorCompositor,
-                                               &Reflector,
-                                               &BrdfPdf);
+        Status = BrdfComputeReflectanceWithPdfWithLambertianFalloff(Brdf,
+                                                                    IncidentDirection,
+                                                                    ToLight,
+                                                                    ReflectorCompositor,
+                                                                    &Reflector,
+                                                                    &BrdfPdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -156,14 +151,12 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
-
         Weight = PowerHeuristic((FLOAT) 1.0f, 
                                 BrdfPdf,
                                 (FLOAT) 1.0f,
                                 LightPdf);
 
-        Attenuation = (DotProduct * Weight) / LightPdf;
+        Attenuation = Weight / LightPdf;
 
         Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
                                                            LightSpectrum,
@@ -185,13 +178,13 @@ ComputeDirectLighting(
     // Sample the BRDF
     //
 
-    Status = BrdfSample(Brdf,
-                        IncidentDirection,
-                        Rng,
-                        ReflectorCompositor,
-                        &Reflector,
-                        &ToLight,
-                        &BrdfPdf);
+    Status = BrdfSampleWithLambertianFalloff(Brdf,
+                                             IncidentDirection,
+                                             Rng,
+                                             ReflectorCompositor,
+                                             &Reflector,
+                                             &ToLight,
+                                             &BrdfPdf);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -225,9 +218,7 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
-
-        Attenuation = DotProduct / BrdfPdf;
+        Attenuation = BrdfPdf;
     }
     else
     {
@@ -249,14 +240,12 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        DotProduct = VectorDotProduct(SurfaceNormal, ToLight);
-
         Weight = PowerHeuristic((FLOAT) 1.0f, 
                                 BrdfPdf,
                                 (FLOAT) 1.0f,
                                 LightPdf);
 
-        Attenuation = (DotProduct * Weight) / BrdfPdf;
+        Attenuation = Weight / BrdfPdf;
     }
 
     Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
