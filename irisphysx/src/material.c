@@ -110,7 +110,7 @@ MaterialSample(
     _In_ PCMATERIAL Material,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 ShapeSurfaceNormal,
+    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Out_ PBRDF *Brdf
@@ -128,7 +128,7 @@ MaterialSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    if (VectorValidate(ShapeSurfaceNormal) == FALSE)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -146,7 +146,7 @@ MaterialSample(
     Status = Material->VTable->SampleRoutine(Material->Data,
                                              ModelHitPoint,
                                              AdditionalData,
-                                             ShapeSurfaceNormal,
+                                             SurfaceNormal,
                                              ModelToWorld,
                                              BrdfAllocator,
                                              Brdf);

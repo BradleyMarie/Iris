@@ -6,7 +6,8 @@ add_library(irisphysxtoolkit SHARED
     src/lighting.c
     src/pointlight.c
     src/mirrorbrdf.c
-    src/lambertianbrdf.c)
+    src/lambertianbrdf.c
+    src/lambertianmaterial.c)
 
 target_link_libraries(irisphysxtoolkit 
     iris 

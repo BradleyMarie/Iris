@@ -69,7 +69,7 @@ MaterialSample(
     _In_ PCMATERIAL Material,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 ShapeSurfaceNormal,
+    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
     _Out_ PBRDF *Brdf

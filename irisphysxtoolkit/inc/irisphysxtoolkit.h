@@ -23,5 +23,7 @@ Abstract:
 #include "irisphysxtoolkit_api.h"
 #include "irisphysxtoolkit_pointlight.h"
 #include "irisphysxtoolkit_mirrorbrdf.h"
+#include "irisphysxtoolkit_lambertianbrdf.h"
+#include "irisphysxtoolkit_lambertianmaterial.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_
