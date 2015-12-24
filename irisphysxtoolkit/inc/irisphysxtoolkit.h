@@ -25,5 +25,6 @@ Abstract:
 #include "irisphysxtoolkit_mirrorbrdf.h"
 #include "irisphysxtoolkit_lambertianbrdf.h"
 #include "irisphysxtoolkit_lambertianmaterial.h"
+#include "irisphysxtoolkit_triangle.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_

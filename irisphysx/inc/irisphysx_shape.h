@@ -22,21 +22,21 @@ Abstract:
 //
 
 typedef
-_Check_return_
-_Ret_opt_
-PCMATERIAL
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 (*PSPECTRUM_SHAPE_GET_MATERIAL_ROUTINE)(
     _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCMATERIAL *Material
     );
 
 typedef
-_Check_return_
-_Ret_opt_
-PCLIGHT
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 (*PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE)(
     _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCLIGHT *Light
     );
 
 typedef struct _SPECTRUM_SHAPE_VTABLE {
@@ -77,20 +77,22 @@ SpectrumShapeCheckBounds(
     _Out_ PBOOL IsInsideBox
     );
 
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PCMATERIAL
+ISTATUS
 SpectrumShapeGetMaterial(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCMATERIAL *Material
     );
 
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PCLIGHT
+ISTATUS
 SpectrumShapeGetLight(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCLIGHT *Light
     );
 
 IRISPHYSXAPI

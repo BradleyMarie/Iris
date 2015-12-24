@@ -66,22 +66,30 @@ SpectrumShapeCheckBounds(
     return Status;
 }
 
-_Ret_opt_
-PCMATERIAL
+
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
 SpectrumShapeGetMaterial(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCMATERIAL *Material
     )
 {
     PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
     PCSHAPE_VTABLE ShapeVTable;
+    ISTATUS Status;
     PCSHAPE Shape;
     PCVOID Data;
-    PCMATERIAL Material;
 
     if (SpectrumShape == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Material == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     Shape = (PCSHAPE) SpectrumShape;
@@ -92,28 +100,37 @@ SpectrumShapeGetMaterial(
 
     SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
 
-    Material = SpectrumShapeVTable->GetMaterialRoutine(Data, FaceHit);
+    Status = SpectrumShapeVTable->GetMaterialRoutine(Data, 
+                                                     FaceHit, 
+                                                     Material);
 
-    return Material;
+    return Status;
 }
 
-_Ret_opt_
+_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
-PCLIGHT
+ISTATUS
 SpectrumShapeGetLight(
     _In_ PCSPECTRUM_SHAPE SpectrumShape,
-    _In_ UINT32 FaceHit
+    _In_ UINT32 FaceHit,
+    _Outptr_result_maybenull_ PCLIGHT *Light
     )
 {
+    PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE GetLightRoutine;
     PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
     PCSHAPE_VTABLE ShapeVTable;
+    ISTATUS Status;
     PCSHAPE Shape;
-    PCLIGHT Light;
     PCVOID Data;
 
     if (SpectrumShape == NULL)
     {
-        return NULL;
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     Shape = (PCSHAPE) SpectrumShape;
@@ -124,9 +141,19 @@ SpectrumShapeGetLight(
 
     SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
 
-    Light = SpectrumShapeVTable->GetLightRoutine(Data, FaceHit);
+    GetLightRoutine = SpectrumShapeVTable->GetLightRoutine;
 
-    return Light;   
+    if (GetLightRoutine == NULL)
+    {
+        *Light = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    Status = GetLightRoutine(Data, 
+                             FaceHit,
+                             Light);
+
+    return Status;   
 }
 
 VOID

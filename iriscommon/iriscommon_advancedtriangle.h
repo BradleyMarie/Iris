@@ -30,17 +30,19 @@ TriangleComputeNormal(
     )
 {
     ASSERT(Triangle != NULL);
-    ASSERT(PointValidate(ModelHitPoint) != FALSE);
-    ASSERT(FaceHit == TRIANGLE_FRONT_FACE || FaceHit == TRIANGLE_BACK_FACE);
     ASSERT(SurfaceNormal != NULL);
 
     if (FaceHit == TRIANGLE_FRONT_FACE)
     {
         *SurfaceNormal = Triangle->SurfaceNormal;
     }
-    else
+    else if (FaceHit == TRIANGLE_BACK_FACE)
     {
         *SurfaceNormal = VectorNegate(Triangle->SurfaceNormal);
+    }
+    else
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     return ISTATUS_SUCCESS;

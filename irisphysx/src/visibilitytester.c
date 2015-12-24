@@ -194,7 +194,7 @@ SpectrumVisibilityTesterTestLightVisibility(
 
     ClosestShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
 
-    ClosestLight = SpectrumShapeGetLight(ClosestShape, ShapeHit->FaceHit);
+    SpectrumShapeGetLight(ClosestShape, ShapeHit->FaceHit, &ClosestLight);
     *Visible = (ClosestLight == Light) ? TRUE : FALSE;
     
     return ISTATUS_SUCCESS;
