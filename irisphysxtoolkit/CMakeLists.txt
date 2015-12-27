@@ -9,7 +9,8 @@ add_library(irisphysxtoolkit SHARED
     src/lambertianbrdf.c
     src/lambertianmaterial.c
     src/triangle.c
-    src/listscene.c)
+    src/listscene.c
+    src/sphere.c)
 
 target_link_libraries(irisphysxtoolkit 
     iris 

@@ -63,6 +63,7 @@ TriangleXDominantTraceTriangle(
     VECTOR3 Temp;
 
     ASSERT(Triangle != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -158,6 +159,7 @@ TriangleYDominantTraceTriangle(
     VECTOR3 Temp;
 
     ASSERT(Triangle != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -252,6 +254,7 @@ TriangleZDominantTraceTriangle(
     VECTOR3 Temp;
 
     ASSERT(Triangle != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 

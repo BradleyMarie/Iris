@@ -21,7 +21,6 @@ Abstract:
 
 typedef struct _PHYSX_TRIANGLE {
     PMATERIAL Materials[2];
-    PLIGHT Lights[2];
     TRIANGLE Data;
 } PHYSX_TRIANGLE, *PPHYSX_TRIANGLE;
 
@@ -134,6 +133,7 @@ PhysxTriangleXTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -162,6 +162,7 @@ PhysxTriangleYTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -190,6 +191,7 @@ PhysxTriangleZTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -339,6 +341,7 @@ PhysxLightTriangleXTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -367,6 +370,7 @@ PhysxLightTriangleYTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -395,6 +399,7 @@ PhysxLightTriangleZTraceTriangle(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
@@ -576,8 +581,6 @@ PhysxTriangleAllocate(
         
         Triangle.Materials[TRIANGLE_FRONT_FACE] = FrontMaterial;
         Triangle.Materials[TRIANGLE_BACK_FACE] = BackMaterial;
-        Triangle.Lights[TRIANGLE_FRONT_FACE] = FrontLight;
-        Triangle.Lights[TRIANGLE_BACK_FACE] = BackLight;
         
         Data = &Triangle;
         DataSize = sizeof(PHYSX_TRIANGLE);

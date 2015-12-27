@@ -27,5 +27,6 @@ Abstract:
 #include "irisphysxtoolkit_lambertianmaterial.h"
 #include "irisphysxtoolkit_triangle.h"
 #include "irisphysxtoolkit_listscene.h"
+#include "irisphysxtoolkit_sphere.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_
