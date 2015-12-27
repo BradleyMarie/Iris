@@ -34,7 +34,7 @@ typedef struct _LIST_SCENE_OBJECT {
 } LIST_SCENE_OBJECT, *PLIST_SCENE_OBJECT;
 
 typedef struct _LIST_SCENE {
-    _Field_size_(ObjectsCapacity) PLIST_SCENE_OBJECT *Objects;
+    _Field_size_(ObjectsCapacity) PLIST_SCENE_OBJECT Objects;
     SIZE_T ObjectsCapacity;
     SIZE_T ObjectsSize;
 } LIST_SCENE, *PLIST_SCENE;
@@ -83,8 +83,6 @@ ListSceneDestroy(
 
     ASSERT(ListScene != NULL);
 
-    ListScene = (PLIST_SCENE) Context;
-
     ListSize = ListScene->ObjectsSize;
     Objects = ListScene->Objects;
     
@@ -106,14 +104,13 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 ListSceneAddObject(
-    _Inout_ PLIST_SCENE ListScene
+    _Inout_ PLIST_SCENE ListScene,
     _In_ PSHAPE Shape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
 {
     PLIST_SCENE_OBJECT Objects;
-    PLIST_SCENE ListScene;
     SIZE_T NewCapacity;
     SIZE_T ListSize;
     ISTATUS Status;
@@ -157,8 +154,13 @@ ListSceneAddObject(
         Objects = ListScene->Objects;
     }
 
-    Objects[ListSize] = SceneObject;
     ListScene->ObjectsSize = ListSize + 1;
+
+    Objects[ListSize].Shape = Shape;
+    Objects[ListSize].ModelToWorld = ModelToWorld;
+    Objects[ListSize].Premultiplied = Premultiplied;
+
+    MatrixReference(ModelToWorld);
 
     return ISTATUS_SUCCESS;
 }
@@ -168,8 +170,7 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
 ListSceneTrace(
-    _Inout_ PCLIST_SCENE ListScene
-    _In_ RAY WorldRay,
+    _Inout_ PCLIST_SCENE ListScene,
     _Inout_ PRAYTRACER RayTracer
     )
 {

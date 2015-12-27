@@ -29,8 +29,8 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
-    _When_(BackMaterial == NULL, _In_) _When_(BackMaterial != NULL, _In_opt_) PMATERIAL FrontMaterial,
-    _When_(FrontMaterial == NULL, _In_) _When_(FrontMaterial != NULL, _In_opt_) PMATERIAL BackMaterial,
+    _In_opt_ PMATERIAL FrontMaterial,
+    _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
     _Out_ PSPECTRUM_SHAPE *Shape
