@@ -33,7 +33,6 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
 RayTracerOwnerAllocate(
-    _In_ RAY Ray,
     _Out_ PRAYTRACER_OWNER *RayTracerOwner
     );
 

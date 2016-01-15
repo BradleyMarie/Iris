@@ -1,8 +1,6 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc 
-    ../irisshadingmodel/inc 
-    ../iristoolkit/inc
+include_directories(../iris/inc
     inc 
     src/inc)
 
@@ -10,19 +8,11 @@ add_library(irisplusplus SHARED
     src/shape.cpp
     src/matrix.cpp
     src/shapehitallocator.cpp
-    src/normal.cpp
-    src/texture.cpp
-    src/translucentshader.cpp
-    src/emissiveshader.cpp
-    src/random.cpp
-    src/visibilitytester.cpp
-    src/scene.cpp
-    src/surfacenormal.cpp)
+    src/raytracer.cpp
+    src/raytracerowner.cpp)
 
-target_link_libraries(irisplusplus
-    iristoolkit 
-    iris 
-    irisshadingmodel)
+target_link_libraries(irisplusplus 
+    iris)
 
 generate_export_header(irisplusplus
     BASE_NAME irisplusplus

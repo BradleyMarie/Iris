@@ -41,18 +41,11 @@ SpectrumVisibilityTesterInitialize(
     )
 {
     PRAYTRACER_OWNER RayTracerOwner;
-    VECTOR3 TemporaryDirection;
-    POINT3 TemporaryOrigin;
-    RAY TemporaryRay;
     ISTATUS Status;
 
     ASSERT(Tester != NULL);
 
-    TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
-    TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
-
-    Status = RayTracerOwnerAllocate(TemporaryRay, &RayTracerOwner);
+    Status = RayTracerOwnerAllocate(&RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {

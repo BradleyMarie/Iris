@@ -16,17 +16,18 @@ Abstract:
 #define _IRIS_PLUS_PLUS_HEADER_
 
 //
-// Include IrisToolkit
+// Include Iris
 //
 
 extern "C" {
-#include <iristoolkit.h>
+#include <iris.h>
 }
 
 //
 // Include C++ standard library headers
 //
 
+#include <functional>
 #include <stdexcept>
 #include <utility>
 #include <memory>
@@ -44,16 +45,9 @@ extern "C" {
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"
 #include "irisplusplus_irispointer.h"
-#include "irisplusplus_refcountedptr.h"
 #include "irisplusplus_shapehitallocator.h"
-#include "irisplusplus_normal.h"
-#include "irisplusplus_texture.h"
 #include "irisplusplus_shape.h"
-#include "irisplusplus_translucentshader.h"
-#include "irisplusplus_emissiveshader.h"
-#include "irisplusplus_rng.h"
-#include "irisplusplus_scene.h"
-#include "irisplusplus_visibilitytester.h"
-#include "irisplusplus_surfacenormal.h"
+#include "irisplusplus_raytracer.h"
+#include "irisplusplus_raytracerowner.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

@@ -360,12 +360,12 @@ Matrix::ReadContents(
     _Out_writes_(4) FLOAT Contents[4][4]
     )
 {
-    if (Contents == NULL)
+    if (Contents == nullptr)
     {
         throw std::invalid_argument("Contents");
     }
 
-    if (Data == NULL)
+    if (Data == nullptr)
     {
         Contents[0][0] = (FLOAT) 1.0;
         Contents[0][1] = (FLOAT) 0.0;
@@ -414,8 +414,8 @@ operator*(
     PMATRIX IrisMatrix;
     ISTATUS Status;
 
-    if (Multiplicand0.Data == NULL && 
-        Multiplicand1.Data == NULL)
+    if (Multiplicand0.Data == nullptr && 
+        Multiplicand1.Data == nullptr)
     {
         return Matrix::Identity();
     }

@@ -33,8 +33,17 @@ protected:
 
 public:
     _Ret_
-    PDRAWING_SHAPE
-    AsPDRAWING_SHAPE(
+    PSHAPE
+    AsPSHAPE(
+        void
+        )
+    {
+        return Data;
+    }
+
+    _Ret_
+    PCSHAPE
+    AsPCSHAPE(
         void
         ) const
     {
@@ -49,22 +58,6 @@ public:
         _Inout_ ShapeHitAllocator & HitAllocator
         ) const = 0;
 
-    _Check_return_
-    _Ret_opt_
-    virtual
-    PCTEXTURE
-    GetTexture(
-        _In_ UINT32 FaceHit
-        ) const = 0;
-
-    _Check_return_
-    _Ret_opt_
-    virtual
-    PCNORMAL
-    GetNormal(
-        _In_ UINT32 FaceHit
-        ) const = 0;
-
     virtual
     ~Shape(
         void
@@ -72,11 +65,11 @@ public:
     { }
 
 private:
-    PDRAWING_SHAPE Data;
+    PSHAPE Data;
 
     IRISPLUSPLUSAPI
     Shape(
-        _In_ PDRAWING_SHAPE DrawingShape
+        _In_ PSHAPE ShapePtr
         );
 
     IRISPLUSPLUSAPI
@@ -103,7 +96,7 @@ public:
     static
     IrisPointer<Shape>
     Create(
-        _In_ PDRAWING_SHAPE DrawingShape
+        _In_ PSHAPE ShapePtr
         );
 
     _Ret_
@@ -113,24 +106,6 @@ public:
     Trace(
         _In_ Ray ModelRay,
         _Inout_ ShapeHitAllocator & HitAllocator
-        ) const;
-
-    _Check_return_
-    _Ret_opt_
-    IRISPLUSPLUSAPI
-    virtual
-    PCTEXTURE
-    GetTexture(
-        _In_ UINT32 FaceHit
-        ) const;
-
-    _Check_return_
-    _Ret_opt_
-    IRISPLUSPLUSAPI
-    virtual
-    PCNORMAL
-    GetNormal(
-        _In_ UINT32 FaceHit
         ) const;
 
     IRISPLUSPLUSAPI
@@ -149,7 +124,7 @@ public:
 
 private:
     CShape(
-        _In_ PDRAWING_SHAPE DrawingShape
+        _In_ PSHAPE ShapePtr
         );
 
     std::atomic_size_t References;

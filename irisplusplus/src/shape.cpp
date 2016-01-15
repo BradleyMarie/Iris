@@ -43,36 +43,6 @@ ShapeTrace(
     return ISTATUS_SUCCESS;
 }
 
-_Check_return_ 
-_Ret_opt_
-static
-PCTEXTURE
-ShapeGetTexture(
-    _In_opt_ PCVOID Context,
-    _In_ UINT32 FaceHit
-    )
-{
-    assert(Context != NULL);
-
-    const Shape *ShapePointer = static_cast<const Shape*>(Context);
-    return ShapePointer->GetTexture(FaceHit);
-}
-
-_Check_return_
-_Ret_opt_
-static
-PCNORMAL
-ShapeGetNormal(
-    _In_opt_ PCVOID Context,
-    _In_ UINT32 FaceHit
-    )
-{
-    assert(Context != NULL);
-
-    const Shape *ShapePointer = static_cast<const Shape*>(Context);
-    return ShapePointer->GetNormal(FaceHit);
-}
-
 static
 VOID
 ShapeFree(
@@ -89,10 +59,8 @@ ShapeFree(
 // Static Variables
 //
 
-const static DRAWING_SHAPE_VTABLE InteropVTable = {
-    { NULL, ShapeFree },
-    ShapeGetTexture,
-    ShapeGetNormal
+const static SHAPE_VTABLE InteropVTable = {
+    ShapeTrace, ShapeFree
 };
 
 //
@@ -105,23 +73,22 @@ Shape::Shape(
 {
     Shape *ShapePointer = this;
 
-    PDRAWING_SHAPE DrawingShape = DrawingShapeAllocate(&InteropVTable,
-                                                       &ShapePointer,
-                                                       sizeof(Shape*),
-                                                       sizeof(Shape*));
+    ISTATUS Success = ShapeAllocate(&InteropVTable,
+                                    &ShapePointer,
+                                    sizeof(Shape*),
+                                    alignof(Shape*),
+                                    &Data);
 
-    if (DrawingShape == NULL)
+    if (Success != ISTATUS_SUCCESS)
     {
         throw std::bad_alloc();
     }
-
-    Data = DrawingShape;
 }
 
 Shape::Shape(
-    _In_ PDRAWING_SHAPE DrawingShape
+    _In_ PSHAPE ShapePtr
     )
-: Data(DrawingShape)
+: Data(ShapePtr)
 { }
 
 void
@@ -129,7 +96,7 @@ Shape::Reference(
     void
     )
 {
-    DrawingShapeReference(Data);
+    ShapeReference(Data);
 }
 
 void 
@@ -137,13 +104,13 @@ Shape::Dereference(
     void
     )
 {
-    DrawingShapeDereference(Data);
+    ShapeDereference(Data);
 }
 
 CShape::CShape(
-    _In_ PDRAWING_SHAPE DrawingShape
+    _In_ PSHAPE ShapePtr
     )
-: Shape(DrawingShape), References(1)
+: Shape(ShapePtr), References(1)
 { }
 
 _Ret_
@@ -156,37 +123,17 @@ CShape::Trace(
     throw std::logic_error("Impossible Path");
 }
 
-_Check_return_
-_Ret_opt_
-PCTEXTURE
-CShape::GetTexture(
-    _In_ UINT32 FaceHit
-    ) const
-{
-    return DrawingShapeGetTexture(Data, FaceHit);
-}
-
-_Check_return_
-_Ret_opt_
-PCNORMAL
-CShape::GetNormal(
-    _In_ UINT32 FaceHit
-    ) const
-{
-    return DrawingShapeGetNormal(Data, FaceHit);
-}
-
 IrisPointer<Shape>
 CShape::Create(
-    _In_ PDRAWING_SHAPE DrawingShape
+    _In_ PSHAPE ShapePtr
     )
 {
-    if (DrawingShape == NULL)
+    if (ShapePtr == NULL)
     {
-        throw std::invalid_argument("DrawingShape");
+        throw std::invalid_argument("ShapePtr");
     }
 
-    CShape* Allocated = new CShape(DrawingShape);
+    CShape* Allocated = new CShape(ShapePtr);
     return IrisPointer<Shape>(Allocated);
 }
 

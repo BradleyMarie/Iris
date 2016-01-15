@@ -29,11 +29,8 @@ VisibilityTesterAllocate(
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
 {
-    VECTOR3 TemporaryDirection;
-    PVISIBILITY_TESTER Tester;
-    POINT3 TemporaryOrigin;
     PRAYTRACER_OWNER RayTracerOwner;
-    RAY TemporaryRay;
+    PVISIBILITY_TESTER Tester;
     ISTATUS Status;
 
     if (Scene == NULL)
@@ -60,11 +57,7 @@ VisibilityTesterAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
-    TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
-
-    Status = RayTracerOwnerAllocate(TemporaryRay, &RayTracerOwner);
+    Status = RayTracerOwnerAllocate(&RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {

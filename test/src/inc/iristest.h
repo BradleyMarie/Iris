@@ -19,6 +19,11 @@ Abstract:
 #include <iostream>
 #include <cstdio>
 #include <cmath>
+#include <atomic>
+
+extern "C" {
+#include <iristoolkit.h>
+}
 
 #include <irisplusplus.h>
 

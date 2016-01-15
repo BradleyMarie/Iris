@@ -117,7 +117,10 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
 
 CONST STATIC BRDF_VTABLE SpectrumMirrorBrdfVTable = {
     SpectrumMirrorBrdfSample,
+    SpectrumMirrorBrdfSample,
     SpectrumMirrorBrdfComputeReflectance,
+    SpectrumMirrorBrdfComputeReflectance,
+    SpectrumMirrorBrdfComputeReflectanceWithPdf,
     SpectrumMirrorBrdfComputeReflectanceWithPdf
 };
 

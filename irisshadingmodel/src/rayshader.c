@@ -54,12 +54,9 @@ RayShaderAllocateInternal(
     _In_ UINT8 CurrentDepth
     )
 {
-    VECTOR3 TemporaryDirection;
     PRAYSHADER NextRayShader;
-    POINT3 TemporaryOrigin;
     PRAYSHADER RayShader;
     PRAYTRACER_OWNER RayTracerOwner;
-    RAY TemporaryRay;
     ISTATUS Status;
 
     ASSERT(ShadeRayRoutine != NULL);
@@ -116,11 +113,7 @@ RayShaderAllocateInternal(
         NextRayShader = NULL;
     }
 
-    TemporaryDirection = VectorCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 1.0);
-    TemporaryOrigin = PointCreate((FLOAT) 0.0, (FLOAT) 0.0, (FLOAT) 0.0);
-    TemporaryRay = RayCreate(TemporaryOrigin, TemporaryDirection);
-
-    Status = RayTracerOwnerAllocate(TemporaryRay, &RayTracerOwner);
+    Status = RayTracerOwnerAllocate(&RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {

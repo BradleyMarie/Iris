@@ -112,7 +112,7 @@ public:
         void
         )
     {
-        return Matrix(NULL);
+        return Matrix(nullptr);
     }
 
     PMATRIX
@@ -170,11 +170,11 @@ public:
         MatrixDereference(Data);
     }
 
-    friend 
+    friend
     IRISPLUSPLUSAPI
-    Matrix 
+    Matrix
     operator*(
-        _In_ const Matrix & Multiplicand0, 
+        _In_ const Matrix & Multiplicand0,
         _In_ const Matrix & Multiplicand1
         );
 

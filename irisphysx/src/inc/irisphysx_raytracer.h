@@ -36,25 +36,12 @@ SpectrumRayTracerInitialize(
     _Out_ PSPECTRUM_RAYTRACER SpectrumRayTracer
     )
 {
-    VECTOR3 InitialDirection;
-    POINT3 InitialOrigin;
-    RAY InitialRay;
     PRAYTRACER_OWNER RayTracerOwner;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer != NULL);
-    
-    InitialOrigin = PointCreate((FLOAT) 0.0f, 
-                                (FLOAT) 0.0f, 
-                                (FLOAT) 0.0f);
 
-    InitialDirection = VectorCreate((FLOAT) 0.0f, 
-                                    (FLOAT) 0.0f, 
-                                    (FLOAT) 1.0f);
-
-    InitialRay = RayCreate(InitialOrigin, InitialDirection);
-
-    Status = RayTracerOwnerAllocate(InitialRay, &RayTracerOwner);
+    Status = RayTracerOwnerAllocate(&RayTracerOwner);
 
     if (Status != ISTATUS_SUCCESS)
     {

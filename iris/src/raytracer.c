@@ -61,14 +61,12 @@ _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
 RayTracerInitialize(
-    _Out_ PRAYTRACER RayTracer,
-    _In_ RAY Ray
+    _Out_ PRAYTRACER RayTracer
     )
 {
     ISTATUS Status;
 
     ASSERT(RayTracer != NULL);
-    ASSERT(RayValidate(Ray) != FALSE);
 
     Status = ShapeHitAllocatorInitialize(&RayTracer->ShapeHitAllocator);
 
@@ -94,7 +92,6 @@ RayTracerInitialize(
         return Status;
     }
 
-    RayTracer->CurrentRay = Ray;
     RayTracer->HitIndex = 0;
 
     return ISTATUS_SUCCESS;
@@ -337,21 +334,15 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerOwnerAllocate(
-    _In_ RAY Ray,
     _Out_ PRAYTRACER_OWNER *Result
     )
 {
     PRAYTRACER_OWNER RayTracerOwner;
     ISTATUS Status;
 
-    if (RayValidate(Ray) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (Result == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
     RayTracerOwner = (PRAYTRACER_OWNER) malloc(sizeof(RAYTRACER_OWNER));
@@ -361,7 +352,7 @@ RayTracerOwnerAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = RayTracerInitialize(&RayTracerOwner->RayTracer, Ray);
+    Status = RayTracerInitialize(&RayTracerOwner->RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
