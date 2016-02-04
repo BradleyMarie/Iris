@@ -30,26 +30,15 @@ ISTATUS
     _In_ PSCENE_OBJECT SceneObject
     );
 
-typedef
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
-(*PSCENE_TRACE_ROUTINE)(
-    _In_ PCVOID Context, 
-    _In_ RAY WorldRay,
-    _Inout_ PSCENE_TRACER SceneTracer
-    );
-
-typedef struct _SCENE_VTABLE {
+typedef struct _COLOR_SCENE_VTABLE {
+    SCENE_VTABLE SceneVTable;
     PSCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
-    PSCENE_TRACE_ROUTINE TraceRoutine;
-    PFREE_ROUTINE FreeRoutine;
-} SCENE_VTABLE, *PSCENE_VTABLE;
+} COLOR_SCENE_VTABLE, *PCOLOR_SCENE_VTABLE;
 
-typedef CONST SCENE_VTABLE *PCSCENE_VTABLE;
+typedef CONST COLOR_SCENE_VTABLE *PCCOLOR_SCENE_VTABLE;
 
-typedef struct _SCENE SCENE, *PSCENE;
-typedef CONST SCENE *PCSCENE;
+typedef struct _SCENE COLOR_SCENE, *PCOLOR_SCENE;
+typedef CONST COLOR_SCENE *PCCOLOR_SCENE;
 
 //
 // Functions
@@ -58,9 +47,9 @@ typedef CONST SCENE *PCSCENE;
 _Check_return_
 _Ret_maybenull_
 IRISSHADINGMODELAPI
-PSCENE
-SceneAllocate(
-    _In_ PCSCENE_VTABLE SceneVTable,
+PCOLOR_SCENE
+ColorSceneAllocate(
+    _In_ PCCOLOR_SCENE_VTABLE SceneVTable,
     _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
@@ -70,8 +59,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS 
-SceneAddObject(
-    _Inout_ PSCENE Scene,
+ColorSceneAddObject(
+    _Inout_ PCOLOR_SCENE Scene,
     _In_ PDRAWING_SHAPE DrawingShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
@@ -81,27 +70,27 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-SceneAddWorldObject(
-    _Inout_ PSCENE Scene,
+ColorSceneAddWorldObject(
+    _Inout_ PCOLOR_SCENE Scene,
     _In_ PDRAWING_SHAPE DrawingShape
     )
 {
     ASSERT(Scene != NULL);
     ASSERT(DrawingShape != NULL);
 
-    return SceneAddObject(Scene, DrawingShape, NULL, TRUE);
+    return ColorSceneAddObject(Scene, DrawingShape, NULL, TRUE);
 }
 
 IRISSHADINGMODELAPI
 VOID
-SceneReference(
-    _In_opt_ PSCENE Scene
+ColorSceneReference(
+    _In_opt_ PCOLOR_SCENE Scene
     );
 
 IRISSHADINGMODELAPI
 VOID
-SceneDereference(
-    _In_opt_ _Post_invalid_ PSCENE Scene
+ColorSceneDereference(
+    _In_opt_ _Post_invalid_ PCOLOR_SCENE Scene
     );
 
 #endif // _SCENE_IRIS_SHADING_MODEL_

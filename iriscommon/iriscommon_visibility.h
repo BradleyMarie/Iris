@@ -34,7 +34,6 @@ RayTracerOwnerTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -46,16 +45,9 @@ RayTracerOwnerTestVisibility(
     ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
     ASSERT(Visible != NULL);
 
-    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
-                                        WorldRay,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(Scene, RayTracer);
+    Status = RayTracerOwnerTraceScene(RayTracerOwner,
+                                      Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -118,7 +110,6 @@ RayTracerOwnerTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -128,16 +119,9 @@ RayTracerOwnerTestVisibilityAnyDistance(
     ASSERT(Scene != NULL);
     ASSERT(Visible != NULL);
 
-    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
-                                        WorldRay,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(Scene, RayTracer);
+    Status = RayTracerOwnerTraceScene(RayTracerOwner,
+                                      Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

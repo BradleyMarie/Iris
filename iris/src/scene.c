@@ -12,17 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvancedp.h>
-
-//
-// Types
-//
-
-struct _SCENE {
-    PCSCENE_VTABLE VTable;
-    SIZE_T ReferenceCount;
-    PVOID Data;
-};
+#include <irisp.h>
 
 //
 // Functions
@@ -100,24 +90,6 @@ SceneAllocate(
     *Scene = AllocatedScene;
 
     return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS 
-SceneTrace(
-    _In_ PCSCENE Scene,
-    _Inout_ PRAYTRACER RayTracer
-    )
-{
-    ISTATUS Status;
-
-    ASSERT(Scene != NULL);
-    ASSERT(RayTracer != NULL);
-
-    Status = Scene->VTable->TraceRoutine(Scene->Data, RayTracer);
-
-    return Status;
 }
 
 _Ret_

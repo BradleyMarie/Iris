@@ -117,7 +117,6 @@ SpectrumVisibilityTesterTestLightVisibility(
     PRAYTRACER_OWNER RayTracerOwner;
     PCSPECTRUM_SHAPE ClosestShape;
     PCSHAPE_HIT ClosestShapeHit;
-    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     PCLIGHT ClosestLight;
     ISTATUS Status;
@@ -145,16 +144,9 @@ SpectrumVisibilityTesterTestLightVisibility(
 
     RayTracerOwner = Tester->RayTracerOwner;
 
-    Status = RayTracerOwnerGetRayTracer(RayTracerOwner,
-                                        WorldRay,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(Tester->Scene, RayTracer);
+    Status = RayTracerOwnerTraceScene(RayTracerOwner,
+                                      Tester->Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

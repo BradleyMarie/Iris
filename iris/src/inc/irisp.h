@@ -41,5 +41,6 @@ Abstract:
 #include "iris_shapehitallocator.h"
 #include "iris_shape.h"
 #include "iris_sharedhitdataallocator.h"
+#include "iris_scene.h"
 
 #endif // _IRIS_INTERNAL_HEADER_

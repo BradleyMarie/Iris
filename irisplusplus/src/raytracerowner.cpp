@@ -39,34 +39,6 @@ RayTracerOwner::RayTracerOwner(
     }
 }
 
-void
-RayTracerOwner::Trace(
-    _In_ Ray ToTrace,
-    _In_ std::function<void(RayTracer &)> TraceRoutine
-    )
-{
-    PRAYTRACER RayTracerPtr;
-    
-    ISTATUS Status = RayTracerOwnerGetRayTracer(Data,
-                                                ToTrace.AsRAY(), 
-                                                &RayTracerPtr);
-    
-    switch (Status)
-    {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            throw std::invalid_argument("ToTrace");
-            break;
-        default:
-            ASSERT(false);
-    }
-    
-    RayTracer Tracer(RayTracerPtr);
-
-    TraceRoutine(Tracer);
-}
-
 RayTracerOwner::~RayTracerOwner(
     void
     )

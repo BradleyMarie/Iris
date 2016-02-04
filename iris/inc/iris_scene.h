@@ -4,7 +4,7 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_scene.h
+    iris_scene.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _SCENE_IRIS_ADVANCED_
-#define _SCENE_IRIS_ADVANCED_
+#ifndef _SCENE_IRIS_
+#define _SCENE_IRIS_
 
-#include <irisadvanced.h>
+#include <iris.h>
 
 //
 // Types
@@ -46,7 +46,7 @@ typedef CONST SCENE *PCSCENE;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISAPI
 ISTATUS
 SceneAllocate(
     _In_ PCSCENE_VTABLE SceneVTable,
@@ -56,39 +56,30 @@ SceneAllocate(
     _Out_ PSCENE *Scene
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
-ISTATUS 
-SceneTrace(
-    _In_ PCSCENE Scene,
-    _Inout_ PRAYTRACER RayTracer
-    );
-
 _Ret_
-IRISADVANCEDAPI
+IRISAPI
 PCSCENE_VTABLE
 SceneGetVTable(
     _In_ PCSCENE Scene
     );
 
 _Ret_
-IRISADVANCEDAPI
+IRISAPI
 PVOID
 SceneGetData(
     _In_ PSCENE Scene
     );
 
-IRISADVANCEDAPI
+IRISAPI
 VOID
 SceneReference(
     _In_opt_ PSCENE Scene
     );
 
-IRISADVANCEDAPI
+IRISAPI
 VOID
 SceneDereference(
     _In_opt_ _Post_invalid_ PSCENE Scene
     );
 
-#endif // _SCENE_IRIS_ADVANCED_
+#endif // _SCENE_IRIS_

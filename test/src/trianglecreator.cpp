@@ -80,10 +80,10 @@ CreateFlatQuad(
         return false;
     }
 
-    Status = SceneAddObject(Scene,
-                            Triangle0,
-                            ModelToWorld,
-                            Premultiplied);
+    Status = ColorSceneAddObject(Scene,
+                                 Triangle0,
+                                 ModelToWorld,
+                                 Premultiplied);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -94,10 +94,10 @@ CreateFlatQuad(
         return false;
     }
 
-    Status = SceneAddObject(Scene,
-                            Triangle1,
-                            ModelToWorld,
-                            Premultiplied);
+    Status = ColorSceneAddObject(Scene,
+                                 Triangle1,
+                                 ModelToWorld,
+                                 Premultiplied);
 
     if (Status != ISTATUS_SUCCESS)
     {

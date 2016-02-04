@@ -86,7 +86,6 @@ VisibilityTesterTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -115,17 +114,9 @@ VisibilityTesterTestVisibility(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner, 
-                                        WorldRay, 
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(Tester->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerTraceScene(Tester->RayTracerOwner,
+                                      Tester->Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -176,7 +167,6 @@ VisibilityTesterTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PRAYTRACER RayTracer;
     PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
@@ -198,17 +188,9 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerGetRayTracer(Tester->RayTracerOwner,
-                                        WorldRay,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(Tester->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerTraceScene(Tester->RayTracerOwner,
+                                      Tester->Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -21,7 +21,12 @@ Abstract:
 // Types
 //
 
-typedef struct _SCENE_OBJECT SCENE_OBJECT, *PSCENE_OBJECT;
+typedef struct _SCENE_OBJECT {
+    PDRAWING_SHAPE Shape;
+    PMATRIX ModelToWorld;
+    BOOL Premultiplied;
+} SCENE_OBJECT, *PSCENE_OBJECT;
+
 typedef CONST SCENE_OBJECT *PCSCENE_OBJECT;
 
 //

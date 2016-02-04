@@ -30,13 +30,6 @@ public:
     RayTracerOwner(
         void
         );
-
-    IRISPLUSPLUSAPI
-    void
-    Trace(
-        _In_ Ray ToTrace,
-        _In_ std::function<void(RayTracer &)> TraceRoutine
-        );
         
     IRISPLUSPLUSAPI
     ~RayTracerOwner(

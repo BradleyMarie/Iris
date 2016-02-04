@@ -103,9 +103,8 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 ListSceneTrace(
-    _In_ PCVOID Context, 
-    _In_ RAY WorldRay,
-    _Inout_ PSCENE_TRACER SceneTracer
+    _In_ PCVOID Context,
+    _Inout_ PRAYTRACER RayTracer
     )
 {
     PSCENE_OBJECT *Objects;
@@ -115,7 +114,7 @@ ListSceneTrace(
     SIZE_T Index;
 
     ASSERT(Context != NULL);
-    ASSERT(SceneTracer != NULL);
+    ASSERT(RayTracer != NULL);
 
     ListScene = (PLIST_SCENE) Context;
 
@@ -124,7 +123,10 @@ ListSceneTrace(
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = SceneTracerTraceGeometry(SceneTracer, Objects[Index]);
+        Status = RayTracerTraceShapeWithTransform(RayTracer,
+                                                  (PSHAPE) Objects[Index]->Shape,
+                                                  Objects[Index]->ModelToWorld,
+                                                  Objects[Index]->Premultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -165,10 +167,10 @@ ListSceneFree(
 // Static variables
 //
 
-STATIC SCENE_VTABLE ListSceneVTable = {
-    ListSceneAddObject,
-    ListSceneTrace,
-    ListSceneFree
+STATIC COLOR_SCENE_VTABLE ListSceneVTable = {
+    { ListSceneTrace,
+      ListSceneFree },
+    ListSceneAddObject
 };
 
 //
@@ -177,7 +179,7 @@ STATIC SCENE_VTABLE ListSceneVTable = {
 
 _Check_return_
 _Ret_maybenull_
-PSCENE
+PCOLOR_SCENE
 ListSceneAllocate(
     VOID
     )
@@ -196,11 +198,11 @@ ListSceneAllocate(
     ListScene.Objects = Objects;
     ListScene.ObjectsSize = 0;
     ListScene.ObjectsCapacity = LIST_SCENE_INTIAL_SIZE;
-
-    Scene = SceneAllocate(&ListSceneVTable,
-                          &ListScene,
-                          sizeof(LIST_SCENE),
-                          sizeof(PVOID));
+    
+    Scene = ColorSceneAllocate(&ListSceneVTable,
+                               &ListScene,
+                               sizeof(LIST_SCENE),
+                               sizeof(PVOID));
 
     if (Scene == NULL)
     {

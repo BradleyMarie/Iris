@@ -50,7 +50,7 @@ TEST(RenderConstantRedWorldSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Sphere);
+    Status = ColorSceneAddWorldObject(Scene, Sphere);
     
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -121,7 +121,7 @@ TEST(RenderConstantRedModelSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, NULL, FALSE);
+    Status = ColorSceneAddObject(Scene, Sphere, NULL, FALSE);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -192,7 +192,7 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddObject(Scene, Sphere, NULL, TRUE);
+    Status = ColorSceneAddObject(Scene, Sphere, NULL, TRUE);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -268,7 +268,7 @@ TEST(RenderConstantRedWorldTriangle)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Triangle);
+    Status = ColorSceneAddWorldObject(Scene, Triangle);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -366,7 +366,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Triangle);
+    Status = ColorSceneAddWorldObject(Scene, Triangle);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -469,7 +469,7 @@ TEST(RenderPhongWorldSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Sphere);
+    Status = ColorSceneAddWorldObject(Scene, Sphere);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -544,7 +544,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Sphere);
+    Status = ColorSceneAddWorldObject(Scene, Sphere);
 
     SphereCenter2 = PointCreate((FLOAT)-1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
@@ -563,7 +563,7 @@ TEST(RenderPerfectSpecularWorldSphere)
                             NULL,
                             NULL);
 
-    Status = SceneAddWorldObject(Scene, Sphere);
+    Status = ColorSceneAddWorldObject(Scene, Sphere);
 
     Rng = MultiplyWithCarryRngAllocate();
 
@@ -809,11 +809,11 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Scene = ListSceneAllocate();
 
-    Status = SceneAddWorldObject(Scene, Sphere0);
+    Status = ColorSceneAddWorldObject(Scene, Sphere0);
 
-    Status = SceneAddWorldObject(Scene, Sphere1);
+    Status = ColorSceneAddWorldObject(Scene, Sphere1);
 
-    Status = SceneAddWorldObject(Scene, InfinitePlane);
+    Status = ColorSceneAddWorldObject(Scene, InfinitePlane);
 
     Rng = MultiplyWithCarryRngAllocate();
 

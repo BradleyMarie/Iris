@@ -23,7 +23,6 @@ Abstract:
 #include "irisadvanced_normal.h"
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_advancedshape.h"
-#include "irisadvanced_scene.h"
 #include "irisadvanced_color3.h"
 #include "irisadvanced_math.h"
 

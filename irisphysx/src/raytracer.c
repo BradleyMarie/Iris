@@ -26,7 +26,6 @@ SpectrumRayTracerTraceRay(
     _In_ RAY Ray
     )
 {
-    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer->Scene != NULL);
@@ -36,17 +35,9 @@ SpectrumRayTracerTraceRay(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Status = RayTracerOwnerGetRayTracer(SpectrumRayTracer->RayTracerOwner,
-                                        Ray,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-    
-    Status = SceneTrace(SpectrumRayTracer->Scene->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerTraceScene(SpectrumRayTracer->RayTracerOwner,
+                                      SpectrumRayTracer->Scene->Scene,
+                                      Ray);
 
     return Status;
 }

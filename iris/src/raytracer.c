@@ -367,32 +367,34 @@ RayTracerOwnerAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerGetRayTracer(
+RayTracerOwnerTraceScene(
     _In_ PRAYTRACER_OWNER RayTracerOwner,
-    _In_ RAY Ray,
-    _Out_ PRAYTRACER *RayTracer
+    _In_ PCSCENE Scene,
+    _In_ RAY Ray
     )
 {
+    ISTATUS Status;
+
     if (RayTracerOwner == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (RayValidate(Ray) == FALSE)
+    if (Scene == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (RayTracer == NULL)
+    if (RayValidate(Ray) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     RayTracerSetRay(&RayTracerOwner->RayTracer, Ray);
 
-    *RayTracer = &RayTracerOwner->RayTracer;
+    Status = SceneTrace(Scene, &RayTracerOwner->RayTracer);
 
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 ISTATUS

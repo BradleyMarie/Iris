@@ -297,7 +297,6 @@ RayShaderTraceRayMontecarlo(
     PCSHAPE_HIT ShapeHit;
     POINT3 WorldHitPoint;
     POINT3 ModelHitPoint;
-    PRAYTRACER RayTracer;
     VECTOR3 ModelViewer;
     COLOR4 BlendedColor;
     PCTEXTURE Texture;
@@ -346,17 +345,9 @@ RayShaderTraceRayMontecarlo(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerGetRayTracer(RayShader->RayTracerOwner,
-                                        WorldRay,
-                                        &RayTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = SceneTrace(RayShader->Scene,
-                        RayTracer);
+    Status = RayTracerOwnerTraceScene(RayShader->RayTracerOwner,
+                                      RayShader->Scene,
+                                      WorldRay);
 
     if (Status != ISTATUS_SUCCESS)
     {

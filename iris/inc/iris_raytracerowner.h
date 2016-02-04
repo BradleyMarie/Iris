@@ -40,19 +40,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerGetRayTracer(
+RayTracerOwnerTraceScene(
     _In_ PRAYTRACER_OWNER RayTracerOwner,
-    _In_ RAY Ray,
-    _Out_ PRAYTRACER *RayTracer
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
-RayTracerOwnerGetRay(
-    _In_ PRAYTRACER_OWNER RayTracerOwner,
-    _Out_ PRAY Ray
+    _In_ PCSCENE Scene,
+    _In_ RAY Ray
     );
 
 IRISAPI

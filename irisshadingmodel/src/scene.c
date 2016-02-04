@@ -20,65 +20,45 @@ Abstract:
 
 _Check_return_
 _Ret_maybenull_
-PSCENE
-SceneAllocate(
-    _In_ PCSCENE_VTABLE SceneVTable,
+PCOLOR_SCENE
+ColorSceneAllocate(
+    _In_ PCCOLOR_SCENE_VTABLE SceneVTable,
     _In_reads_bytes_(DataSizeInBytes) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
     )
 {
-    PVOID HeaderAllocation;
-    PVOID DataAllocation;
+    ISTATUS Status;
     PSCENE Scene;
 
-    if (SceneVTable == NULL)
+    Status = SceneAllocate(&SceneVTable->SceneVTable,
+                           Data,
+                           DataSizeInBytes,
+                           DataAlignment,
+                           &Scene);
+
+    if (Status != ISTATUS_SUCCESS)
     {
         return NULL;
     }
 
-    if (Data == NULL && DataSizeInBytes == 0)
-    {
-        return NULL;
-    }
-
-    HeaderAllocation = IrisAlignedMallocWithHeader(sizeof(SCENE),
-                                                   sizeof(PVOID),
-                                                   DataSizeInBytes,
-                                                   DataAlignment,
-                                                   &DataAllocation);
-
-    if (HeaderAllocation == NULL)
-    {
-        return NULL;
-    }
-
-    Scene = (PSCENE) HeaderAllocation;
-
-    Scene->VTable = SceneVTable;
-    Scene->ReferenceCount = 1;
-    Scene->Data = DataAllocation;
-
-    if (DataSizeInBytes != 0)
-    {
-        memcpy(DataAllocation, Data, DataSizeInBytes);
-    }
-
-    return Scene;
+    return (PCOLOR_SCENE) Scene;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-SceneAddObject(
-    _Inout_ PSCENE Scene,
+ColorSceneAddObject(
+    _Inout_ PCOLOR_SCENE Scene,
     _In_ PDRAWING_SHAPE DrawingShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
 {
+    PCCOLOR_SCENE_VTABLE SceneVTable;
     PSCENE_OBJECT SceneObject;
     ISTATUS Status;
+    PVOID Data;
 
     if (Scene == NULL ||
         DrawingShape == NULL)
@@ -95,47 +75,29 @@ SceneAddObject(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = Scene->VTable->AddObjectRoutine(Scene->Data, SceneObject);
+    SceneVTable = (PCCOLOR_SCENE_VTABLE) SceneGetVTable(Scene);
+
+    Data = SceneGetData(Scene);
+
+    Status = SceneVTable->AddObjectRoutine(Data, SceneObject);
 
     return Status;
 }
 
 VOID
-SceneReference(
-    _In_opt_ PSCENE Scene
+ColorSceneReference(
+    _In_opt_ PCOLOR_SCENE ColorScene
     )
 {
-    if (Scene == NULL)
-    {
-        return;
-    }
-
-    Scene->ReferenceCount += 1;
+    PSCENE Scene = (PSCENE) ColorScene;
+    SceneReference(Scene);
 }
 
 VOID
-SceneDereference(
-    _In_opt_ _Post_invalid_ PSCENE Scene
+ColorSceneDereference(
+    _In_opt_ _Post_invalid_ PCOLOR_SCENE ColorScene
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-
-    if (Scene == NULL)
-    {
-        return;
-    }
-
-    Scene->ReferenceCount -= 1;
-
-    if (Scene->ReferenceCount == 0)
-    {
-        FreeRoutine = Scene->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Scene->Data);
-        }
-
-        IrisAlignedFree(Scene);
-    }
+    PSCENE Scene = (PSCENE) ColorScene;
+    SceneDereference(Scene);
 }
