@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <irisshadingmodelp.h>
+#include <iriscommon_visibility.h>
 
 struct _VISIBILITY_TESTER {
     PRAYTRACER_OWNER RayTracerOwner;
@@ -86,7 +87,6 @@ VisibilityTesterTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
     ASSERT(Tester->Scene != NULL);
@@ -114,43 +114,14 @@ VisibilityTesterTestVisibility(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerTraceScene(Tester->RayTracerOwner,
-                                      Tester->Scene,
-                                      WorldRay);
+    Status = RayTracerOwnerTestVisibility(Tester->RayTracerOwner,
+                                          WorldRay,
+                                          Tester->Epsilon,
+                                          Tester->Scene,
+                                          DistanceToObject,
+                                          Visible);
 
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = RayTracerOwnerGetNextShapeHit(Tester->RayTracerOwner, &ShapeHit);
-
-    if (Status == ISTATUS_NO_MORE_DATA)
-    {
-        *Visible = TRUE;
-        return ISTATUS_SUCCESS;
-    }
-
-    if (Tester->Epsilon < DistanceToObject &&
-        IsFiniteFloat(DistanceToObject) != FALSE)
-    {
-        DistanceToObject -= Tester->Epsilon;
-    }
-
-    do
-    {
-        if (Tester->Epsilon < ShapeHit->Distance &&
-            ShapeHit->Distance < DistanceToObject)
-        {
-            *Visible = FALSE;
-            return ISTATUS_SUCCESS;
-        }
-
-        Status = RayTracerOwnerGetNextShapeHit(Tester->RayTracerOwner, &ShapeHit);
-    } while (Status == ISTATUS_SUCCESS);
-
-    *Visible = TRUE;
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 //
@@ -167,7 +138,6 @@ VisibilityTesterTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PCSHAPE_HIT ShapeHit;
     ISTATUS Status;
 
     ASSERT(Tester->Scene != NULL);
@@ -188,36 +158,13 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerTraceScene(Tester->RayTracerOwner,
-                                      Tester->Scene,
-                                      WorldRay);
+    Status = RayTracerOwnerTestVisibilityAnyDistance(Tester->RayTracerOwner,
+                                                     WorldRay,
+                                                     Tester->Epsilon,
+                                                     Tester->Scene,
+                                                     Visible);
 
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = RayTracerOwnerGetNextShapeHit(Tester->RayTracerOwner, &ShapeHit);
-
-    if (Status == ISTATUS_NO_MORE_DATA)
-    {
-        *Visible = TRUE;
-        return ISTATUS_SUCCESS;
-    }
-
-    do
-    {
-        if (Tester->Epsilon < ShapeHit->Distance)
-        {
-            *Visible = FALSE;
-            return ISTATUS_SUCCESS;
-        }
-
-        Status = RayTracerOwnerGetNextShapeHit(Tester->RayTracerOwner, &ShapeHit);
-    } while (Status == ISTATUS_SUCCESS);
-
-    *Visible = TRUE;
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 VOID

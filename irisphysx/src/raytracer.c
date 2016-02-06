@@ -21,11 +21,16 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumRayTracerTraceRay(
+SpectrumRayTracerTraceSceneFindClosestHit(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
-    _In_ RAY Ray
+    _In_ PCSPECTRUM_SCENE Scene,
+    _In_ RAY Ray,
+    _In_ FLOAT MinimumDistance,
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
     )
 {
+    PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer->Scene != NULL);
@@ -34,59 +39,47 @@ SpectrumRayTracerTraceRay(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    Status = RayTracerOwnerTraceScene(SpectrumRayTracer->RayTracerOwner,
-                                      SpectrumRayTracer->Scene->Scene,
-                                      Ray);
-
-    return Status;
-}
-
-ISTATUS
-SpectrumRayTracerSort(
-    _Inout_ PSPECTRUM_RAYTRACER RayTracer
-    )
-{
-    ISTATUS Status;
-
-    if (RayTracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    Status = RayTracerOwnerSort(RayTracer->RayTracerOwner);
-
+    
+    ProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE) SpectrumProcessHitRoutine;
+    
+    Status = RayTracerOwnerTraceSceneFindClosestHitWithData(SpectrumRayTracer->RayTracerOwner,
+                                                            SpectrumRayTracer->Scene->Scene,
+                                                            Ray,
+                                                            MinimumDistance,
+                                                            ProcessHitRoutine,
+                                                            ProcessHitRoutineContext);
+                                                            
     return Status;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumRayTracerGetNextHit(
-    _Inout_ PSPECTRUM_RAYTRACER RayTracer,
-    _Out_ PCSPECTRUM_SHAPE_HIT *ShapeHit,
-    _Out_opt_ PVECTOR3 ModelViewer,
-    _Out_opt_ PPOINT3 ModelHitPoint,
-    _Out_opt_ PPOINT3 WorldHitPoint,
-    _Out_opt_ PCMATRIX *ModelToWorld
+SpectrumRayTracerTraceSceneFindAllHits(
+    _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
+    _In_ PCSPECTRUM_SCENE Scene,
+    _In_ RAY Ray,
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
     )
 {
-    PCSHAPE_HIT *IrisShapeHit;
+    PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine;
     ISTATUS Status;
 
-    if (RayTracer == NULL)
+    ASSERT(SpectrumRayTracer->Scene != NULL);
+
+    if (SpectrumRayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    IrisShapeHit = (PCSHAPE_HIT *) ShapeHit;
-
-    Status = RayTracerOwnerGetNextHit(RayTracer->RayTracerOwner, 
-                                      IrisShapeHit,
-                                      ModelViewer,
-                                      ModelHitPoint,
-                                      WorldHitPoint,
-                                      ModelToWorld);
-
+    
+    ProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE) SpectrumProcessHitRoutine;
+    
+    Status = RayTracerOwnerTraceSceneFindAllHits(SpectrumRayTracer->RayTracerOwner,
+                                                 SpectrumRayTracer->Scene->Scene,
+                                                 Ray,
+                                                 ProcessHitRoutine,
+                                                 ProcessHitRoutineContext);
+                                                            
     return Status;
 }

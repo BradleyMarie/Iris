@@ -30,7 +30,7 @@ public:
     RayTracerOwner(
         void
         );
-        
+    
     IRISPLUSPLUSAPI
     ~RayTracerOwner(
         void

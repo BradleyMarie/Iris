@@ -139,13 +139,12 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-RayTracerGetNextShapeHit(
+RayTracerGetNextInternalHit(
     _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCSHAPE_HIT *ShapeHit
+    _Out_ PCINTERNAL_SHAPE_HIT *ShapeHit
     )
 {
     PCCONSTANT_POINTER_LIST PointerList;
-    PCINTERNAL_SHAPE_HIT InternalShapeHit;
     PCVOID ValueAtIndex;
     SIZE_T CurrentIndex;
     SIZE_T HitCount;
@@ -168,7 +167,98 @@ RayTracerGetNextShapeHit(
 
     RayTracer->HitIndex = CurrentIndex + 1;
 
-    InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
+    *ShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+VOID
+RayTracerComputeHitData(
+    _In_ PCRAYTRACER RayTracer,
+    _In_ PCINTERNAL_SHAPE_HIT InternalShapeHit,
+    _Out_ PCSHAPE_HIT *ShapeHit,
+    _Out_ PCMATRIX *ModelToWorld,
+    _Out_ PVECTOR3 ModelViewer,
+    _Out_ PPOINT3 ModelHit,
+    _Out_ PPOINT3 WorldHit
+    )
+{
+    PCSHARED_HIT_DATA SharedHitData;
+
+    ASSERT(InternalShapeHit != NULL);
+    ASSERT(ShapeHit != NULL);
+    ASSERT(ModelToWorld != NULL);
+    ASSERT(ModelViewer != NULL);
+    ASSERT(ModelHit != NULL);
+    ASSERT(WorldHit != NULL);
+
+    SharedHitData = InternalShapeHit->SharedHitData;
+
+    *ShapeHit = &InternalShapeHit->ShapeHit;
+    *ModelToWorld = SharedHitData->ModelToWorld;
+    
+    if (SharedHitData->Premultiplied != FALSE)
+    {
+        if (InternalShapeHit->ModelHitPointValid != FALSE)
+        {
+            *WorldHit = InternalShapeHit->ModelHitPoint;
+        }
+        else
+        {
+            *WorldHit = RayEndpoint(RayTracer->CurrentRay,
+                                    InternalShapeHit->ShapeHit.Distance);
+        }
+        
+        *ModelHit = PointMatrixMultiply(SharedHitData->ModelToWorld,
+                                        *WorldHit);
+
+        *ModelViewer = VectorMatrixInverseMultiply(SharedHitData->ModelToWorld,
+                                                   RayTracer->CurrentRay.Direction);
+    }
+    else
+    {
+        if (InternalShapeHit->ModelHitPointValid != FALSE)
+        {
+            *ModelHit = InternalShapeHit->ModelHitPoint;
+        }
+        else
+        {
+            *ModelHit = RayEndpoint(SharedHitData->ModelRay,
+                                    InternalShapeHit->ShapeHit.Distance);
+        }
+
+        *ModelViewer = SharedHitData->ModelRay.Direction;
+
+        *WorldHit = RayEndpoint(RayTracer->CurrentRay,
+                                InternalShapeHit->ShapeHit.Distance);
+    }
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+RayTracerGetNextShapeHit(
+    _Inout_ PRAYTRACER RayTracer,
+    _Out_ PCSHAPE_HIT *ShapeHit
+    )
+{
+    PCINTERNAL_SHAPE_HIT InternalShapeHit;
+    ISTATUS Status;
+ 
+    ASSERT(RayTracer != NULL);
+    ASSERT(ShapeHit != NULL);
+    
+    Status = RayTracerGetNextInternalHit(RayTracer,
+                                         &InternalShapeHit);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
 
     *ShapeHit = &InternalShapeHit->ShapeHit;
 
@@ -182,126 +272,38 @@ ISTATUS
 RayTracerGetNextHit(
     _Inout_ PRAYTRACER RayTracer,
     _Out_ PCSHAPE_HIT *ShapeHit,
-    _Out_opt_ PVECTOR3 ModelViewer,
-    _Out_opt_ PPOINT3 ModelHitPoint,
-    _Out_opt_ PPOINT3 WorldHitPoint,
-    _Out_opt_ PCMATRIX *ModelToWorld
+    _Out_ PCMATRIX *ModelToWorld,
+    _Out_ PVECTOR3 ModelViewer,
+    _Out_ PPOINT3 ModelHit,
+    _Out_ PPOINT3 WorldHit
     )
 {
-    PCCONSTANT_POINTER_LIST PointerList;
-    PCSHARED_HIT_DATA SharedHitData;
     PCINTERNAL_SHAPE_HIT InternalShapeHit;
-    PPOINT3 WorldHitPointPointer;
-    POINT3 LocalWorldHitPoint;
-    PCVOID ValueAtIndex;
-    SIZE_T CurrentIndex;
-    SIZE_T HitCount;
-
-    if (RayTracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (ShapeHit == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    PointerList = &RayTracer->HitList;
-
-    HitCount = ConstantPointerListGetSize(PointerList);
-    CurrentIndex = RayTracer->HitIndex;
-
-    if (HitCount == CurrentIndex)
-    {
-        return ISTATUS_NO_MORE_DATA;
-    }
-
-    ValueAtIndex = ConstantPointerListRetrieveAtIndex(PointerList,
-                                                      CurrentIndex);
-
-    RayTracer->HitIndex = CurrentIndex + 1;
-
-    InternalShapeHit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
-
-    SharedHitData = InternalShapeHit->SharedHitData;
-
-    *ShapeHit = &InternalShapeHit->ShapeHit;
-
-    if (ModelToWorld != NULL)
-    {
-        *ModelToWorld = SharedHitData->ModelToWorld;
-    }
+    ISTATUS Status;
+ 
+    ASSERT(RayTracer != NULL);
+    ASSERT(ShapeHit != NULL);
+    ASSERT(ModelToWorld != NULL);
+    ASSERT(ModelViewer != NULL);
+    ASSERT(ModelHit != NULL);
+    ASSERT(WorldHit != NULL);
     
-    if (SharedHitData->Premultiplied != FALSE)
+    Status = RayTracerGetNextInternalHit(RayTracer,
+                                         &InternalShapeHit);
+
+    if (Status != ISTATUS_SUCCESS)
     {
-        if (ModelHitPoint != NULL ||
-            WorldHitPoint != NULL)
-        {
-            if (ModelHitPoint == NULL)
-            {
-                WorldHitPointPointer = &LocalWorldHitPoint;
-            }
-            else
-            {
-                WorldHitPointPointer = ModelHitPoint;
-            }
-
-            if (InternalShapeHit->ModelHitPointValid != FALSE)
-            {
-                *WorldHitPointPointer = InternalShapeHit->ModelHitPoint;
-            }
-            else
-            {
-                *WorldHitPointPointer = RayEndpoint(RayTracer->CurrentRay,
-                                                    InternalShapeHit->ShapeHit.Distance);
-            }
-
-            if (WorldHitPoint != NULL)
-            {
-                *WorldHitPoint = *WorldHitPointPointer;
-            }
-
-            if (ModelHitPoint != NULL)
-            {
-                *ModelHitPoint = PointMatrixMultiply(SharedHitData->ModelToWorld,
-                                                     *WorldHitPointPointer);
-            }
-        }
-        
-        if (ModelViewer != NULL)
-        {
-            *ModelViewer = VectorMatrixInverseMultiply(SharedHitData->ModelToWorld,
-                                                       RayTracer->CurrentRay.Direction);
-        }
-    }
-    else
-    {
-        if (ModelHitPoint != NULL)
-        {
-            if (InternalShapeHit->ModelHitPointValid != FALSE)
-            {
-                *ModelHitPoint = InternalShapeHit->ModelHitPoint;
-            }
-            else
-            {
-                *ModelHitPoint = RayEndpoint(SharedHitData->ModelRay,
-                                             InternalShapeHit->ShapeHit.Distance);
-            }
-        }
-
-        if (ModelViewer != NULL)
-        {
-            *ModelViewer = SharedHitData->ModelRay.Direction;
-        }
-
-        if (WorldHitPoint != NULL)
-        {
-            *WorldHitPoint = RayEndpoint(RayTracer->CurrentRay, 
-                                         InternalShapeHit->ShapeHit.Distance);
-        }
+        return Status;
     }
 
+    RayTracerComputeHitData(RayTracer,
+                            InternalShapeHit,
+                            ShapeHit,
+                            ModelToWorld,
+                            ModelViewer,
+                            ModelHit,
+                            WorldHit);
+                                     
     return ISTATUS_SUCCESS;
 }
 
@@ -366,13 +368,20 @@ RayTracerOwnerAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
-RayTracerOwnerTraceScene(
-    _In_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerOwnerTraceSceneFindClosestHit(
+    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ PCSCENE Scene,
-    _In_ RAY Ray
+    _In_ RAY Ray,
+    _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
     )
 {
+    PCSHAPE_HIT ClosestHit;
+    PCSHAPE_HIT ShapeHit;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     if (RayTracerOwner == NULL)
@@ -389,87 +398,329 @@ RayTracerOwnerTraceScene(
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
+    
+    if (IsLessThanZeroFloat(MinimumDistance) != FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+    
+    if (ProcessHitRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+    
+    RayTracer = &RayTracerOwner->RayTracer;
 
-    RayTracerSetRay(&RayTracerOwner->RayTracer, Ray);
+    RayTracerSetRay(RayTracer, Ray);
 
-    Status = SceneTrace(Scene, &RayTracerOwner->RayTracer);
-
+    Status = SceneTrace(Scene, RayTracer);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+    
+    Status = RayTracerGetNextShapeHit(RayTracer,
+                                      &ClosestHit);
+    
+    if (Status != ISTATUS_NO_MORE_DATA)
+    {
+        return ISTATUS_SUCCESS;
+    }
+    
+    while (TRUE)
+    {
+        Status = RayTracerGetNextShapeHit(RayTracer,
+                                          &ShapeHit);
+                                          
+        if (Status == ISTATUS_NO_MORE_DATA)
+        {
+            break;
+        }
+        
+        if (ShapeHit->Distance > MinimumDistance &&
+            ShapeHit->Distance < ClosestHit->Distance)
+        {
+            ClosestHit = ShapeHit;
+        }
+    }
+    
+    Status = ProcessHitRoutine(ProcessHitRoutineContext, 
+                               ShapeHit);
+    
+    if (Status == ISTATUS_NO_MORE_DATA)
+    {
+        return ISTATUS_SUCCESS;
+    }
+    
     return Status;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
 ISTATUS
-RayTracerOwnerSort(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner
+RayTracerOwnerTraceSceneFindClosestHitWithData(
+    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+    _In_ PCSCENE Scene,
+    _In_ RAY Ray,
+    _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
     )
 {
+    PCINTERNAL_SHAPE_HIT InternalShapeHit;
+    PCINTERNAL_SHAPE_HIT ClosestHit;
+    PCMATRIX ModelToWorld;
+    PRAYTRACER RayTracer;
+    PCSHAPE_HIT ShapeHit;
+    VECTOR3 ModelViewer;
+    POINT3 ModelHit;
+    POINT3 WorldHit;
+    ISTATUS Status;
+
     if (RayTracerOwner == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    RayTracerSort(&RayTracerOwner->RayTracer);
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
 
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (IsLessThanZeroFloat(MinimumDistance) != FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+    
+    if (ProcessHitRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    RayTracer = &RayTracerOwner->RayTracer;
+    
+    RayTracerSetRay(RayTracer, Ray);
+
+    Status = SceneTrace(Scene, RayTracer);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+    
+    Status = RayTracerGetNextInternalHit(RayTracer,
+                                         &ClosestHit);
+    
+    if (Status != ISTATUS_NO_MORE_DATA)
+    {
+        return ISTATUS_SUCCESS;
+    }
+    
+    while (TRUE)
+    {
+        Status = RayTracerGetNextInternalHit(RayTracer,
+                                             &InternalShapeHit);
+                                          
+        if (Status == ISTATUS_NO_MORE_DATA)
+        {
+            break;
+        }
+        
+        if (InternalShapeHit->ShapeHit.Distance > MinimumDistance &&
+            InternalShapeHit->ShapeHit.Distance < ClosestHit->ShapeHit.Distance)
+        {
+            ClosestHit = InternalShapeHit;
+        }
+    }
+    
+    RayTracerComputeHitData(RayTracer,
+                            ClosestHit,
+                            &ShapeHit,
+                            &ModelToWorld,
+                            &ModelViewer,
+                            &ModelHit,
+                            &WorldHit);
+    
+    Status = ProcessHitRoutine(ProcessHitRoutineContext, 
+                               ShapeHit,
+                               ModelToWorld,
+                               ModelViewer,
+                               ModelHit,
+                               WorldHit);
+    
+    if (Status == ISTATUS_NO_MORE_DATA)
+    {
+        return ISTATUS_SUCCESS;
+    }
+    
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RayTracerOwnerTraceSceneFindAllHitsUnsorted(
+    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+    _In_ PCSCENE Scene,
+    _In_ RAY Ray,
+    _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
+    )
+{
+    PCSHAPE_HIT ShapeHit;
+    PRAYTRACER RayTracer;
+    ISTATUS Status;
+
+    if (RayTracerOwner == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (ProcessHitRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    RayTracer = &RayTracerOwner->RayTracer;
+    
+    RayTracerSetRay(RayTracer, Ray);
+
+    Status = SceneTrace(Scene, RayTracer);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+    
+    Status = RayTracerGetNextShapeHit(RayTracer,
+                                      &ShapeHit);
+    
+    while (Status != ISTATUS_NO_MORE_DATA)
+    {
+        Status = ProcessHitRoutine(ProcessHitRoutineContext, 
+                                   ShapeHit);
+        
+        if (Status == ISTATUS_NO_MORE_DATA)
+        {
+            break;
+        }
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+        
+        Status = RayTracerGetNextShapeHit(RayTracer,
+                                          &ShapeHit);
+    }
+    
     return ISTATUS_SUCCESS;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerGetNextShapeHit(
+RayTracerOwnerTraceSceneFindAllHits(
     _Inout_ PRAYTRACER_OWNER RayTracerOwner,
-    _Out_ PCSHAPE_HIT *ShapeHit
+    _In_ PCSCENE Scene,
+    _In_ RAY Ray,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitRoutineContext
     )
 {
+    PCMATRIX ModelToWorld;
+    PCSHAPE_HIT ShapeHit;
+    PRAYTRACER RayTracer;
+    VECTOR3 ModelViewer;
+    POINT3 ModelHit;
+    POINT3 WorldHit;
     ISTATUS Status;
 
     if (RayTracerOwner == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    if (ShapeHit == NULL)
+    if (ProcessHitRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = RayTracerGetNextShapeHit(&RayTracerOwner->RayTracer,
-                                      ShapeHit);
+    RayTracer = &RayTracerOwner->RayTracer;
+    
+    RayTracerSetRay(RayTracer, Ray);
 
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-RayTracerOwnerGetNextHit(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
-    _Out_ PCSHAPE_HIT *ShapeHit,
-    _Out_opt_ PVECTOR3 ModelViewer,
-    _Out_opt_ PPOINT3 ModelHitPoint,
-    _Out_opt_ PPOINT3 WorldHitPoint,
-    _Out_opt_ PCMATRIX *ModelToWorld
-    )
-{
-    ISTATUS Status;
-
-    if (RayTracerOwner == NULL)
+    Status = SceneTrace(Scene, RayTracer);
+    
+    if (Status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return Status;
     }
+    
+    RayTracerSort(RayTracer);
+    
+    Status = RayTracerGetNextHit(RayTracer,
+                                 &ShapeHit,
+                                 &ModelToWorld,
+                                 &ModelViewer,
+                                 &ModelHit,
+                                 &WorldHit);
 
-    if (ShapeHit == NULL)
+    while (Status != ISTATUS_NO_MORE_DATA)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        Status = ProcessHitRoutine(ProcessHitRoutineContext, 
+                                   ShapeHit,
+                                   ModelToWorld,
+                                   ModelViewer,
+                                   ModelHit,
+                                   WorldHit);
+        
+        if (Status == ISTATUS_NO_MORE_DATA)
+        {
+            break;
+        }
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+        
+        Status = RayTracerGetNextHit(RayTracer,
+                                     &ShapeHit,
+                                     &ModelToWorld,
+                                     &ModelViewer,
+                                     &ModelHit,
+                                     &WorldHit);
     }
-
-    Status = RayTracerGetNextHit(&RayTracerOwner->RayTracer,
-                                 ShapeHit,
-                                 ModelViewer,
-                                 ModelHitPoint,
-                                 WorldHitPoint,
-                                 ModelToWorld);
-
-    return Status;
+    
+    return ISTATUS_SUCCESS;
 }
 
 IRISAPI

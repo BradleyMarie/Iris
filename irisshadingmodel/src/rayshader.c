@@ -33,6 +33,12 @@ struct _RAYSHADER {
     COLOR3 OldPathThroughput;
 };
 
+typedef struct _RAYSHADER_PROCESS_HIT_CONTEXT {
+    PRAYSHADER RayShader;
+    RAY WorldRay;
+    COLOR4 BlendedColor;
+} RAYSHADER_PROCESS_HIT_CONTEXT, *PRAYSHADER_PROCESS_HIT_CONTEXT;
+
 //
 // Static Functions
 //
@@ -221,6 +227,108 @@ RayShaderPushPathThroughputAndComputeContinueProbability(
     *ContinueProbability = RayContinueProbability;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RayShaderProcessHit(
+    _Inout_opt_ PVOID Context,
+    _In_ PCSHAPE_HIT ShapeHit,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint
+    )
+{
+    PRAYSHADER_PROCESS_HIT_CONTEXT RayShaderProcessHitContext;
+    PSURFACE_NORMAL SurfaceNormalPointer;
+    SURFACE_NORMAL SurfaceNormal;
+    PCDRAWING_SHAPE DrawingShape;
+    TEXTURE_SHADER TextureShader;
+    PCVOID AdditionalData;
+    PCTEXTURE Texture;
+    PCNORMAL Normal;
+    COLOR4 HitColor;
+    FLOAT Distance;
+    ISTATUS Status;
+
+    RayShaderProcessHitContext = (PRAYSHADER_PROCESS_HIT_CONTEXT) Context;
+
+    Distance = ShapeHit->Distance;
+
+    if (Distance <= RayShaderProcessHitContext->RayShader->Epsilon)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    DrawingShape = (PCDRAWING_SHAPE) ShapeHit->Shape;
+
+    Texture = DrawingShapeGetTexture(DrawingShape,
+                                     ShapeHit->FaceHit);
+
+    if (Texture == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    Normal = DrawingShapeGetNormal(DrawingShape,
+                                   ShapeHit->FaceHit);
+
+    AdditionalData = ShapeHit->AdditionalData;
+
+    if (Normal != NULL)
+    {
+        SurfaceNormalInitialize(&SurfaceNormal,
+                                Normal,
+                                ModelHitPoint,
+                                ModelToWorld,
+                                AdditionalData);
+
+        SurfaceNormalPointer = &SurfaceNormal;
+    }
+    else
+    {
+        SurfaceNormalPointer = NULL;
+    }
+
+    TextureShaderInitialize(&TextureShader,
+                            RayShaderProcessHitContext->RayShader->ShadeRayRoutine,
+                            RayShaderProcessHitContext->RayShader->Context,
+                            RayShaderProcessHitContext->RayShader->NextRayShader,
+                            RayShaderProcessHitContext->RayShader->CurrentDepth,
+                            Distance,
+                            RayShaderProcessHitContext->WorldRay.Direction,
+                            WorldHitPoint,
+                            ModelViewer,
+                            ModelHitPoint,
+                            ModelToWorld,
+                            AdditionalData,
+                            SurfaceNormalPointer,
+                            &HitColor);
+
+    HitColor = Color4InitializeTransparent();
+
+    Status = TextureShade(Texture,
+                          WorldHitPoint,
+                          ModelHitPoint,
+                          AdditionalData,
+                          &TextureShader);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    RayShaderProcessHitContext->BlendedColor = Color4Over(RayShaderProcessHitContext->BlendedColor, 
+                                                          HitColor);
+
+    if (RayShaderProcessHitContext->BlendedColor.Alpha >= (FLOAT) 1.0)
+    {
+        return ISTATUS_NO_MORE_DATA;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Functions
 //
@@ -287,23 +395,9 @@ RayShaderTraceRayMontecarlo(
     _Out_ PCOLOR3 Color
     )
 {
-    PSURFACE_NORMAL SurfaceNormalPointer;
-    SURFACE_NORMAL SurfaceNormal;
-    PCDRAWING_SHAPE DrawingShape;
-    TEXTURE_SHADER TextureShader;
+    RAYSHADER_PROCESS_HIT_CONTEXT ProcessHitContext;
     FLOAT ContinueProbability;
-    PCVOID AdditionalData;
-    PCMATRIX ModelToWorld;
-    PCSHAPE_HIT ShapeHit;
-    POINT3 WorldHitPoint;
-    POINT3 ModelHitPoint;
-    VECTOR3 ModelViewer;
-    COLOR4 BlendedColor;
-    PCTEXTURE Texture;
     FLOAT NextRandom;
-    PCNORMAL Normal;
-    COLOR4 HitColor;
-    FLOAT Distance;
     ISTATUS Status;
 
     if (RayShader == NULL ||
@@ -345,9 +439,15 @@ RayShaderTraceRayMontecarlo(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerTraceScene(RayShader->RayTracerOwner,
-                                      RayShader->Scene,
-                                      WorldRay);
+    ProcessHitContext.WorldRay = WorldRay;
+    ProcessHitContext.BlendedColor = Color4InitializeTransparent();
+    ProcessHitContext.RayShader = RayShader;
+
+    Status = RayTracerOwnerTraceSceneFindAllHits(RayShader->RayTracerOwner,
+                                                 RayShader->Scene,
+                                                 WorldRay,
+                                                 RayShaderProcessHit,
+                                                 &ProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -355,115 +455,7 @@ RayShaderTraceRayMontecarlo(
         return Status;
     }
 
-    RayTracerOwnerSort(RayShader->RayTracerOwner);
-
-    Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
-                                      &ShapeHit,
-                                      &ModelViewer,
-                                      &ModelHitPoint,
-                                      &WorldHitPoint,
-                                      &ModelToWorld);
-
-    if (Status == ISTATUS_NO_MORE_DATA)
-    {
-        RayShaderPopPathThroughput(RayShader);
-        *Color = Color3InitializeBlack();
-        return ISTATUS_SUCCESS;
-    }
-
-    BlendedColor = Color4InitializeTransparent();
-
-    while (Status == ISTATUS_SUCCESS && BlendedColor.Alpha < (FLOAT) 1.0)
-    {
-        Distance = ShapeHit->Distance;
-
-        if (Distance <= RayShader->Epsilon)
-        {
-            Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
-                                              &ShapeHit,
-                                              &ModelViewer,
-                                              &ModelHitPoint,
-                                              &WorldHitPoint,
-                                              &ModelToWorld);
-            continue;
-        }
-
-        DrawingShape = (PCDRAWING_SHAPE) ShapeHit->Shape;
-
-        Texture = DrawingShapeGetTexture(DrawingShape,
-                                         ShapeHit->FaceHit);
-
-        if (Texture == NULL)
-        {
-            Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
-                                              &ShapeHit,
-                                              &ModelViewer,
-                                              &ModelHitPoint,
-                                              &WorldHitPoint,
-                                              &ModelToWorld);
-            continue;
-        }
-
-        Normal = DrawingShapeGetNormal(DrawingShape,
-                                       ShapeHit->FaceHit);
-
-        AdditionalData = ShapeHit->AdditionalData;
-
-        if (Normal != NULL)
-        {
-            SurfaceNormalInitialize(&SurfaceNormal,
-                                    Normal,
-                                    ModelHitPoint,
-                                    ModelToWorld,
-                                    AdditionalData);
-
-            SurfaceNormalPointer = &SurfaceNormal;
-        }
-        else
-        {
-            SurfaceNormalPointer = NULL;
-        }
-
-        TextureShaderInitialize(&TextureShader,
-                                RayShader->ShadeRayRoutine,
-                                RayShader->Context,
-                                RayShader->NextRayShader,
-                                RayShader->CurrentDepth,
-                                Distance,
-                                WorldRay.Direction,
-                                WorldHitPoint,
-                                ModelViewer,
-                                ModelHitPoint,
-                                ModelToWorld,
-                                AdditionalData,
-                                SurfaceNormalPointer,
-                                &HitColor);
-
-        HitColor = Color4InitializeTransparent();
-
-        Status = TextureShade(Texture,
-                              WorldHitPoint,
-                              ModelHitPoint,
-                              AdditionalData,
-                              &TextureShader);
-
-        if (Status != ISTATUS_SUCCESS)
-        {
-            RayShaderPopPathThroughput(RayShader);
-            return Status;
-        }
-
-        BlendedColor = Color4Over(BlendedColor, HitColor);
-
-        Status = RayTracerOwnerGetNextHit(RayShader->RayTracerOwner,
-                                          &ShapeHit,
-                                          &ModelViewer,
-                                          &ModelHitPoint,
-                                          &WorldHitPoint,
-                                          &ModelToWorld);
-    }
-
-    *Color = Color3InitializeFromColor4(BlendedColor);
+    *Color = Color3InitializeFromColor4(ProcessHitContext.BlendedColor);
 
     if (ContinueProbability < (FLOAT) 1.0)
     {

@@ -18,8 +18,46 @@ Abstract:
 #include <iris.h>
 
 //
+// Types
+//
+
+typedef struct _VISIBILITY_TEST_ANY_DISTANCE_CONTEXT {
+    FLOAT Epsilon;
+    BOOL Visible;
+} VISIBILITY_TEST_ANY_DISTANCE_CONTEXT, *PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT;
+
+typedef struct _VISIBILITY_TEST_CONTEXT {
+    FLOAT DistanceToObject;
+    FLOAT Epsilon;
+    BOOL Visible;
+} VISIBILITY_TEXT_CONTEXT, *PVISIBILITY_TEST_CONTEXT;
+
+//
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+VisibilityCheckerRoutine(
+    _Inout_ PVOID Context,
+    _In_ PCSHAPE_HIT ShapeHit
+    )
+{
+    PVISIBILITY_TEST_CONTEXT TestContext;
+    
+    TestContext = (PVISIBILITY_TEST_CONTEXT) Context;
+    
+    if (TestContext->Epsilon < ShapeHit->Distance &&
+        ShapeHit->Distance < TestContext->DistanceToObject)
+    {
+        TestContext->Visible = FALSE;
+        return ISTATUS_NO_MORE_DATA;
+    }
+    
+    return ISTATUS_SUCCESS;
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -34,7 +72,7 @@ RayTracerOwnerTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    PCSHAPE_HIT ShapeHit;
+    VISIBILITY_TEXT_CONTEXT Context;
     ISTATUS Status;
 
     ASSERT(RayTracerOwner != NULL);
@@ -45,58 +83,57 @@ RayTracerOwnerTestVisibility(
     ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
     ASSERT(Visible != NULL);
 
-    Status = RayTracerOwnerTraceScene(RayTracerOwner,
-                                      Scene,
-                                      WorldRay);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
-
-    if (Status == ISTATUS_NO_MORE_DATA)
-    {
-        *Visible = TRUE;
-        return ISTATUS_SUCCESS;
-    }
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
     if (Epsilon < DistanceToObject &&
         IsFiniteFloat(DistanceToObject) != FALSE)
     {
         DistanceToObject -= Epsilon;
     }
 
-    do
-    {
-        if (Epsilon < ShapeHit->Distance &&
-            ShapeHit->Distance < DistanceToObject)
-        {
-            *Visible = FALSE;
-            return ISTATUS_SUCCESS;
-        }
+    Context.DistanceToObject = DistanceToObject;
+    Context.Epsilon = Epsilon;
+    Context.Visible = TRUE;
 
-        Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
-    } while (Status == ISTATUS_SUCCESS);
+    Status = RayTracerOwnerTraceSceneFindAllHitsUnsorted(RayTracerOwner,
+                                                         Scene,
+                                                         WorldRay,
+                                                         VisibilityCheckerRoutine,
+                                                         &Context);
 
-    if (Status != ISTATUS_NO_MORE_DATA)
+    if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    *Visible = TRUE;
+    *Visible = Context.Visible;
     return ISTATUS_SUCCESS;
 }
 
 //
 // This is needed since not all C environments support the INFINITY macro
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+VisibilityCheckerLessThanInfinityRoutine(
+    _Inout_ PVOID Context,
+    _In_ PCSHAPE_HIT ShapeHit
+    )
+{
+    PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT TestContext;
+    
+    TestContext = (PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT) Context;
+    
+    if (TestContext->Epsilon < ShapeHit->Distance &&
+        IsInfiniteFloat(ShapeHit->Distance) != FALSE)
+    {
+        TestContext->Visible = FALSE;
+        return ISTATUS_NO_MORE_DATA;
+    }
+    
+    return ISTATUS_SUCCESS;
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -110,7 +147,7 @@ RayTracerOwnerTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    PCSHAPE_HIT ShapeHit;
+    VISIBILITY_TEST_ANY_DISTANCE_CONTEXT Context;
     ISTATUS Status;
 
     ASSERT(RayTracerOwner != NULL);
@@ -119,45 +156,21 @@ RayTracerOwnerTestVisibilityAnyDistance(
     ASSERT(Scene != NULL);
     ASSERT(Visible != NULL);
 
-    Status = RayTracerOwnerTraceScene(RayTracerOwner,
-                                      Scene,
-                                      WorldRay);
+    Context.Epsilon = Epsilon;
+    Context.Visible = TRUE;
+
+    Status = RayTracerOwnerTraceSceneFindAllHitsUnsorted(RayTracerOwner,
+                                                         Scene,
+                                                         WorldRay,
+                                                         VisibilityCheckerLessThanInfinityRoutine,
+                                                         &Context);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
-
-    if (Status == ISTATUS_NO_MORE_DATA)
-    {
-        *Visible = TRUE;
-        return ISTATUS_SUCCESS;
-    }
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    do
-    {
-        if (Epsilon < ShapeHit->Distance)
-        {
-            *Visible = FALSE;
-            return ISTATUS_SUCCESS;
-        }
-
-        Status = RayTracerOwnerGetNextShapeHit(RayTracerOwner, &ShapeHit);
-    } while (Status == ISTATUS_SUCCESS);
-
-    if (Status != ISTATUS_NO_MORE_DATA)
-    {
-        return Status;
-    }
-
-    *Visible = TRUE;
+    *Visible = Context.Visible;
     return ISTATUS_SUCCESS;
 }
 
