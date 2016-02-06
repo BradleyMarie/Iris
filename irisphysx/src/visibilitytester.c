@@ -19,14 +19,31 @@ Abstract:
 // Types
 //
 
-typedef struct _TEST_LIGHT_VISIBILITY {
+typedef struct _TEST_LIGHT_VISIBILITY_CONTEXT {
     PCLIGHT TargetLight;
     BOOL Visible;
-} TEST_LIGHT_VISIBILITY, *PTEST_LIGHT_VISIBILITY;
+} TEST_LIGHT_VISIBILITY_CONTEXT, *PTEST_LIGHT_VISIBILITY_CONTEXT;
 
 //
 // Functions
 //
+
+SFORCEINLINE
+TEST_LIGHT_VISIBILITY_CONTEXT
+SpectrumVisibilityTesterCreateContext(
+    _In_ PCLIGHT TargetLight,
+    _In_ BOOL Visible
+    )
+{
+    TEST_LIGHT_VISIBILITY_CONTEXT Context;
+
+    ASSERT(TargetLight != NULL);
+
+    Context.TargetLight = TargetLight;
+    Context.Visible = Visible;
+
+    return Context;
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -42,19 +59,9 @@ SpectrumVisibilityTesterTestVisibility(
 
     ASSERT(Tester->Scene != NULL);
 
-    //
-    // Ray is validated by RayTracerTestOwnerVisibility
-    //
-
     if (Tester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (IsFiniteFloat(DistanceToObject) == FALSE ||
-        IsGreaterThanOrEqualToZeroFloat(DistanceToObject) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (Visible == NULL)
@@ -63,13 +70,28 @@ SpectrumVisibilityTesterTestVisibility(
     }
 
     Status = RayTracerOwnerTestVisibility(Tester->RayTracerOwner,
-                                          WorldRay,
-                                          Tester->Epsilon,
                                           Tester->Scene,
+                                          WorldRay,
                                           DistanceToObject,
+                                          Tester->Epsilon,
                                           Visible);
 
-    return ISTATUS_SUCCESS;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        if (Status == ISTATUS_INVALID_ARGUMENT_02)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (Status == ISTATUS_INVALID_ARGUMENT_03)
+        {
+            return ISTATUS_INVALID_ARGUMENT_02;
+        }
+
+        return Status;
+    }
+
+    return Status;
 }
 
 //
@@ -89,10 +111,6 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
 
     ASSERT(Tester->Scene != NULL);
 
-    //
-    // Ray is validated by RayTracerTestOwnerVisibilityAnyDistance
-    //
-
     if (Tester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -104,12 +122,17 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
     }
 
     Status = RayTracerOwnerTestVisibilityAnyDistance(Tester->RayTracerOwner,
+                                                     Tester->Scene,
                                                      WorldRay,
                                                      Tester->Epsilon,
-                                                     Tester->Scene,
                                                      Visible);
 
-    return ISTATUS_SUCCESS;
+    if (Status == ISTATUS_INVALID_ARGUMENT_02)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    return Status;
 }
 
 _Check_return_
@@ -121,11 +144,11 @@ SpectrumVisibilityTesterCheckLight(
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
-    PTEST_LIGHT_VISIBILITY TestContext;
+    PTEST_LIGHT_VISIBILITY_CONTEXT TestContext;
     PCSPECTRUM_SHAPE SpectrumShape;
     PCLIGHT ClosestLight;
     
-    TestContext = (PTEST_LIGHT_VISIBILITY) Context;
+    TestContext = (PTEST_LIGHT_VISIBILITY_CONTEXT) Context;
     SpectrumShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
 
     SpectrumShapeGetLight(SpectrumShape, ShapeHit->FaceHit, &ClosestLight);
@@ -150,15 +173,11 @@ SpectrumVisibilityTesterTestLightVisibility(
     _Out_ PBOOL Visible
     )
 {
-    TEST_LIGHT_VISIBILITY TestLightContext;
+    TEST_LIGHT_VISIBILITY_CONTEXT TestLightContext;
     PRAYTRACER_OWNER RayTracerOwner;
     ISTATUS Status;
 
     ASSERT(Tester->Scene != NULL);
-
-    //
-    // Ray is validated by RayTracerOwnerGetRayTracer
-    //
 
     if (Tester == NULL)
     {
@@ -177,8 +196,7 @@ SpectrumVisibilityTesterTestLightVisibility(
 
     RayTracerOwner = Tester->RayTracerOwner;
 
-    TestLightContext.TargetLight = Light;
-    TestLightContext.Visible = FALSE;
+    TestLightContext = SpectrumVisibilityTesterCreateContext(Light, FALSE);
 
     Status = RayTracerOwnerTraceSceneFindClosestHit(RayTracerOwner,
                                                     Tester->Scene,
@@ -189,6 +207,16 @@ SpectrumVisibilityTesterTestLightVisibility(
     
     if (Status != ISTATUS_SUCCESS)
     {
+        if (Status == ISTATUS_INVALID_ARGUMENT_02)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (Status == ISTATUS_INVALID_ARGUMENT_03)
+        {
+            return ISTATUS_INVALID_ARGUMENT_02;
+        }
+
         return Status;
     }
     

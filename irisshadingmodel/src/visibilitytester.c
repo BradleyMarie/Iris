@@ -115,10 +115,10 @@ VisibilityTesterTestVisibility(
     WorldRay = RayNormalize(WorldRay);
 
     Status = RayTracerOwnerTestVisibility(Tester->RayTracerOwner,
-                                          WorldRay,
-                                          Tester->Epsilon,
                                           Tester->Scene,
+                                          WorldRay,
                                           DistanceToObject,
+                                          Tester->Epsilon,
                                           Visible);
 
     return Status;
@@ -159,9 +159,9 @@ VisibilityTesterTestVisibilityAnyDistance(
     WorldRay = RayNormalize(WorldRay);
 
     Status = RayTracerOwnerTestVisibilityAnyDistance(Tester->RayTracerOwner,
+                                                     Tester->Scene,
                                                      WorldRay,
                                                      Tester->Epsilon,
-                                                     Tester->Scene,
                                                      Visible);
 
     return Status;
