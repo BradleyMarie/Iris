@@ -59,22 +59,22 @@ public:
     IRISPLUSPLUSAPI
     void
     Trace(
-        _In_ PCSHAPE ShapePtr
+        _In_ const Shape & ShapeRef
         );
 
     IRISPLUSPLUSAPI
     void
     Trace(
-        _In_ PCSHAPE ShapePtr,
-        _In_ PCMATRIX MatrixPtr
+        _In_ const Shape & ShapeRef,
+        _In_ const Matrix & MatrixRef
         );
 
     IRISPLUSPLUSAPI
     void
     Trace(
-        _In_ PCSHAPE ShapePtr,
-        _In_ PCMATRIX MatrixPtr,
-        _In_ BOOL Premultiplied
+        _In_ const Shape & ShapeRef,
+        _In_ const Matrix & MatrixRef,
+        _In_ bool Premultiplied
         );
 
 private:

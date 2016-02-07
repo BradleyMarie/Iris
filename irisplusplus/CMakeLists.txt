@@ -5,6 +5,7 @@ include_directories(../iris/inc
     src/inc)
 
 add_library(irisplusplus SHARED
+    src/utility.cpp
     src/shape.cpp
     src/matrix.cpp
     src/shapehitallocator.cpp

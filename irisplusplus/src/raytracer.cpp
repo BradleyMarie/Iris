@@ -14,7 +14,6 @@ Abstract:
 --*/
 
 #include <irisplusplus.h>
-#include <sstream>
 
 namespace Iris {
 
@@ -24,54 +23,48 @@ namespace Iris {
 
 void
 RayTracer::Trace(
-    _In_ PCSHAPE ShapePtr
+    _In_ const Shape & ShapeRef
     )
 {
-    ISTATUS Status = RayTracerTraceShape(Data, ShapePtr);
+    ISTATUS Status = RayTracerTraceShape(Data, ShapeRef.AsPCSHAPE());
     
     if (Status != ISTATUS_SUCCESS)
     {
-        std::ostringstream error;
-        error << "Iris Error: " << Status;
-        throw std::runtime_error(error.str());
+        throw std::runtime_error(ISTATUSToCString(Status));
     }
 }
 
 void
 RayTracer::Trace(
-    _In_ PCSHAPE ShapePtr,
-    _In_ PCMATRIX MatrixPtr
+    _In_ const Shape & ShapeRef,
+    _In_ const Matrix & MatrixRef
     )
 {
-    ISTATUS Status = RayTracerTracePremultipliedShapeWithTransform(Data, 
-                                                                   ShapePtr,
-                                                                   MatrixPtr);
+    ISTATUS Status = RayTracerTracePremultipliedShapeWithTransform(Data,
+                                                                   ShapeRef.AsPCSHAPE(),
+                                                                   MatrixRef.AsPCMATRIX());
     
     if (Status != ISTATUS_SUCCESS)
     {
-        std::ostringstream error;
-        error << "Iris Error: " << Status;
-        throw std::runtime_error(error.str());
+        throw std::runtime_error(ISTATUSToCString(Status));
     }
 }
 
 void
 RayTracer::Trace(
-    _In_ PCSHAPE ShapePtr,
-    _In_ PCMATRIX MatrixPtr,
-    _In_ BOOL Premultiplied
+    _In_ const Shape & ShapeRef,
+    _In_ const Matrix & MatrixRef,
+    _In_ bool Premultiplied
     )
 {
     ISTATUS Status = RayTracerTraceShapeWithTransform(Data, 
-                                                      ShapePtr,
-                                                      MatrixPtr,
-                                                      Premultiplied);
+                                                      ShapeRef.AsPCSHAPE(),
+                                                      MatrixRef.AsPCMATRIX(),
+                                                      Premultiplied ? TRUE : FALSE);
                                                       
     if (Status != ISTATUS_SUCCESS)
     {
-        std::ostringstream error;
-        error << "Iris Error: " << Status;
-        throw std::runtime_error(error.str());
+        throw std::runtime_error(ISTATUSToCString(Status));
     }
 }
 

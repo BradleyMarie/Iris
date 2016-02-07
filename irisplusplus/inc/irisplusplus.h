@@ -40,6 +40,7 @@ extern "C" {
 //
 
 #include "irisplusplus_api.h"
+#include "irisplusplus_utility.h"
 #include "irisplusplus_matrix.h"
 #include "irisplusplus_vector.h"
 #include "irisplusplus_point.h"
@@ -48,6 +49,7 @@ extern "C" {
 #include "irisplusplus_shapehitallocator.h"
 #include "irisplusplus_shape.h"
 #include "irisplusplus_raytracer.h"
+#include "irisplusplus_scene.h"
 #include "irisplusplus_raytracerowner.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

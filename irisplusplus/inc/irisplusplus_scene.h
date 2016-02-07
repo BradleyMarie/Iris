@@ -24,7 +24,7 @@ namespace Iris {
 // Types
 //
 
-class RayTracer final {
+class Scene final {
 private:
     Scene(
         _In_ PSCENE ScenePtr
