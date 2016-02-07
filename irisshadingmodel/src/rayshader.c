@@ -443,11 +443,11 @@ RayShaderTraceRayMontecarlo(
     ProcessHitContext.BlendedColor = Color4InitializeTransparent();
     ProcessHitContext.RayShader = RayShader;
 
-    Status = RayTracerOwnerTraceSceneFindAllHits(RayShader->RayTracerOwner,
-                                                 RayShader->Scene,
-                                                 WorldRay,
-                                                 RayShaderProcessHit,
-                                                 &ProcessHitContext);
+    Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(RayShader->RayTracerOwner,
+                                                                          RayShader->Scene,
+                                                                          WorldRay,
+                                                                          RayShaderProcessHit,
+                                                                          &ProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {

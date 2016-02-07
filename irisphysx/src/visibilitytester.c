@@ -19,23 +19,23 @@ Abstract:
 // Types
 //
 
-typedef struct _TEST_LIGHT_VISIBILITY_CONTEXT {
+typedef struct _SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT {
     PCLIGHT TargetLight;
     BOOL Visible;
-} TEST_LIGHT_VISIBILITY_CONTEXT, *PTEST_LIGHT_VISIBILITY_CONTEXT;
+} SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT, *PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT;
 
 //
-// Functions
+// Static Functions
 //
 
 SFORCEINLINE
-TEST_LIGHT_VISIBILITY_CONTEXT
-SpectrumVisibilityTesterCreateContext(
+SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT
+SpectrumVisibilityTesterTestLightVisibilityProcessHitCreateContext(
     _In_ PCLIGHT TargetLight,
     _In_ BOOL Visible
     )
 {
-    TEST_LIGHT_VISIBILITY_CONTEXT Context;
+    SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT Context;
 
     ASSERT(TargetLight != NULL);
 
@@ -44,6 +44,36 @@ SpectrumVisibilityTesterCreateContext(
 
     return Context;
 }
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+SpectrumVisibilityTesterTestLightVisibilityProcessHit(
+    _Inout_ PVOID Context,
+    _In_ PCSHAPE_HIT ShapeHit
+    )
+{
+    PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
+    PCSPECTRUM_SHAPE SpectrumShape;
+    PCLIGHT ClosestLight;
+    
+    TestContext = (PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
+    SpectrumShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
+
+    SpectrumShapeGetLight(SpectrumShape, ShapeHit->FaceHit, &ClosestLight);
+    
+    if (ClosestLight == TestContext->TargetLight)
+    {
+        TestContext->Visible = TRUE;
+    }
+    
+    return ISTATUS_SUCCESS;
+}
+
+//
+// Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -137,43 +167,16 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-SpectrumVisibilityTesterCheckLight(
-    _Inout_ PVOID Context,
-    _In_ PCSHAPE_HIT ShapeHit
-    )
-{
-    PTEST_LIGHT_VISIBILITY_CONTEXT TestContext;
-    PCSPECTRUM_SHAPE SpectrumShape;
-    PCLIGHT ClosestLight;
-    
-    TestContext = (PTEST_LIGHT_VISIBILITY_CONTEXT) Context;
-    SpectrumShape = (PCSPECTRUM_SHAPE) ShapeHit->Shape;
-
-    SpectrumShapeGetLight(SpectrumShape, ShapeHit->FaceHit, &ClosestLight);
-    
-    if (ClosestLight == TestContext->TargetLight)
-    {
-        TestContext->Visible = TRUE;
-    }
-    
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
 SpectrumVisibilityTesterTestLightVisibility(
     _In_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _In_ RAY WorldRay,
-    _In_ FLOAT MinimumDistance,
     _In_ PCLIGHT Light,
     _Out_ PBOOL Visible
     )
 {
-    TEST_LIGHT_VISIBILITY_CONTEXT TestLightContext;
+    SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
     PRAYTRACER_OWNER RayTracerOwner;
     ISTATUS Status;
 
@@ -196,14 +199,14 @@ SpectrumVisibilityTesterTestLightVisibility(
 
     RayTracerOwner = Tester->RayTracerOwner;
 
-    TestLightContext = SpectrumVisibilityTesterCreateContext(Light, FALSE);
+    ProcessHitContext = SpectrumVisibilityTesterTestLightVisibilityProcessHitCreateContext(Light, FALSE);
 
-    Status = RayTracerOwnerTraceSceneFindClosestHit(RayTracerOwner,
-                                                    Tester->Scene,
-                                                    WorldRay,
-                                                    MinimumDistance,
-                                                    SpectrumVisibilityTesterCheckLight,
-                                                    &TestLightContext);
+    Status = RayTracerOwnerTraceSceneProcessClosestHit(RayTracerOwner,
+                                                       Tester->Scene,
+                                                       WorldRay,
+                                                       Tester->Epsilon,
+                                                       SpectrumVisibilityTesterTestLightVisibilityProcessHit,
+                                                       &ProcessHitContext);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -212,15 +215,10 @@ SpectrumVisibilityTesterTestLightVisibility(
             return ISTATUS_INVALID_ARGUMENT_01;
         }
 
-        if (Status == ISTATUS_INVALID_ARGUMENT_03)
-        {
-            return ISTATUS_INVALID_ARGUMENT_02;
-        }
-
         return Status;
     }
     
-    *Visible = TestLightContext.Visible;
+    *Visible = ProcessHitContext.Visible;
     
     return ISTATUS_SUCCESS;
 }

@@ -34,7 +34,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE)(
+(*PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE)(
     _Inout_opt_ PVOID Context, 
     _In_ PCSHAPE_HIT ShapeHit,
     _In_ PCMATRIX ModelToWorld,
@@ -62,50 +62,50 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneFindClosestHit(
+RayTracerOwnerTraceSceneProcessClosestHit(
     _Inout_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneFindClosestHitWithData(
+RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
     _Inout_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneFindAllHitsUnsorted(
+RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
     _Inout_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneFindAllHits(
+RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER_OWNER RayTracerOwner,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 IRISAPI

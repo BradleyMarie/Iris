@@ -55,25 +55,25 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-SpectrumRayTracerTraceSceneFindClosestHit(
+SpectrumRayTracerTraceSceneProcessClosestHit(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
     _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
-    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-SpectrumRayTracerTraceSceneFindAllHits(
+SpectrumRayTracerTraceSceneProcessAllHitsInOrder(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
     _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY Ray,
-    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     );
 
 #endif // _SPECTRUM_RAYTRACER_IRIS_PHYSX_

@@ -21,16 +21,16 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumRayTracerTraceSceneFindClosestHit(
+SpectrumRayTracerTraceSceneProcessClosestHit(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
     _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
-    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine;
+    PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE IrisProcessHitRoutine;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer->Scene != NULL);
@@ -40,14 +40,14 @@ SpectrumRayTracerTraceSceneFindClosestHit(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    ProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE) SpectrumProcessHitRoutine;
+    IrisProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE) ProcessHitRoutine;
     
-    Status = RayTracerOwnerTraceSceneFindClosestHitWithData(SpectrumRayTracer->RayTracerOwner,
-                                                            SpectrumRayTracer->Scene->Scene,
-                                                            Ray,
-                                                            MinimumDistance,
-                                                            ProcessHitRoutine,
-                                                            ProcessHitRoutineContext);
+    Status = RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(SpectrumRayTracer->RayTracerOwner,
+                                                                      SpectrumRayTracer->Scene->Scene,
+                                                                      Ray,
+                                                                      MinimumDistance,
+                                                                      IrisProcessHitRoutine,
+                                                                      ProcessHitContext);
                                                             
     return Status;
 }
@@ -55,15 +55,15 @@ SpectrumRayTracerTraceSceneFindClosestHit(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumRayTracerTraceSceneFindAllHits(
+SpectrumRayTracerTraceSceneProcessAllHitsInOrder(
     _Inout_ PSPECTRUM_RAYTRACER SpectrumRayTracer,
     _In_ PCSPECTRUM_SCENE Scene,
     _In_ RAY Ray,
-    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE SpectrumProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitRoutineContext
+    _In_ PSPECTRUM_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE ProcessHitRoutine;
+    PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE IrisProcessHitRoutine;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer->Scene != NULL);
@@ -73,13 +73,13 @@ SpectrumRayTracerTraceSceneFindAllHits(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    ProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_DATA_ROUTINE) SpectrumProcessHitRoutine;
+    IrisProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE) ProcessHitRoutine;
     
-    Status = RayTracerOwnerTraceSceneFindAllHits(SpectrumRayTracer->RayTracerOwner,
-                                                 SpectrumRayTracer->Scene->Scene,
-                                                 Ray,
-                                                 ProcessHitRoutine,
-                                                 ProcessHitRoutineContext);
+    Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(SpectrumRayTracer->RayTracerOwner,
+                                                                          SpectrumRayTracer->Scene->Scene,
+                                                                          Ray,
+                                                                          IrisProcessHitRoutine,
+                                                                          ProcessHitContext);
                                                             
     return Status;
 }

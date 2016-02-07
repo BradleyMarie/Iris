@@ -53,7 +53,6 @@ ISTATUS
 SpectrumVisibilityTesterTestLightVisibility(
     _In_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _In_ RAY WorldRay,
-    _In_ FLOAT MinimumDistance,
     _In_ PCLIGHT Light,
     _Out_ PBOOL Visible
     );

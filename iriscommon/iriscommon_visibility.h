@@ -21,30 +21,30 @@ Abstract:
 // Types
 //
 
-typedef struct _VISIBILITY_TEST_ANY_DISTANCE_CONTEXT {
+typedef struct _RAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT {
     FLOAT MinimumDistance;
     BOOL Visible;
-} VISIBILITY_TEST_ANY_DISTANCE_CONTEXT, *PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT;
+} RAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT, *PRAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT;
 
-typedef struct _VISIBILITY_TEST_CONTEXT {
+typedef struct _RAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT {
     FLOAT DistanceToObject;
     FLOAT Epsilon;
     BOOL Visible;
-} VISIBILITY_TEXT_CONTEXT, *PVISIBILITY_TEST_CONTEXT;
+} RAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT, *PRAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT;
 
 //
 // Functions
 //
 
 SFORCEINLINE
-VISIBILITY_TEXT_CONTEXT
-VisibilityTesterTestCreateContext(
+RAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT
+RayTracerOwnerTestVisibilityProcessHitCreateContext(
     _In_ FLOAT DistanceToObject,
     _In_ FLOAT Epsilon,
     _In_ BOOL Visible
     )
 {
-    VISIBILITY_TEXT_CONTEXT Context;
+    RAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
 
     ASSERT(IsFiniteFloat(DistanceToObject) != FALSE);
     ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
@@ -62,14 +62,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-VisibilityCheckerRoutine(
+RayTracerOwnerTestVisibilityProcessHit(
     _Inout_ PVOID Context,
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
-    PVISIBILITY_TEST_CONTEXT TestContext;
+    PRAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
     
-    TestContext = (PVISIBILITY_TEST_CONTEXT) Context;
+    TestContext = (PRAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
     
     if (TestContext->Epsilon < ShapeHit->Distance &&
         ShapeHit->Distance < TestContext->DistanceToObject)
@@ -94,7 +94,7 @@ RayTracerOwnerTestVisibility(
     _Out_ PBOOL Visible
     )
 {
-    VISIBILITY_TEXT_CONTEXT Context;
+    RAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
 
     if (IsFiniteFloat(DistanceToObject) == FALSE ||
@@ -120,15 +120,15 @@ RayTracerOwnerTestVisibility(
         DistanceToObject -= Epsilon;
     }
 
-    Context = VisibilityTesterTestCreateContext(DistanceToObject,
-                                                Epsilon,
-                                                TRUE);
+    Context = RayTracerOwnerTestVisibilityProcessHitCreateContext(DistanceToObject,
+                                                                  Epsilon,
+                                                                  TRUE);
 
-    Status = RayTracerOwnerTraceSceneFindAllHitsUnsorted(RayTracerOwner,
-                                                         Scene,
-                                                         WorldRay,
-                                                         VisibilityCheckerRoutine,
-                                                         &Context);
+    Status = RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(RayTracerOwner,
+                                                              Scene,
+                                                              WorldRay,
+                                                              RayTracerOwnerTestVisibilityProcessHit,
+                                                              &Context);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -144,13 +144,13 @@ RayTracerOwnerTestVisibility(
 //
 
 SFORCEINLINE
-VISIBILITY_TEST_ANY_DISTANCE_CONTEXT
-VisibilityTesterTestAnyDistanceCreateContext(
+RAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT
+RayTracerOwnerTestVisibilityAnyDistanceProcessHitCreateContext(
     _In_ FLOAT MinimumDistance,
     _In_ BOOL Visible
     )
 {
-    VISIBILITY_TEST_ANY_DISTANCE_CONTEXT Context;
+    RAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
 
     ASSERT(IsFiniteFloat(MinimumDistance) != FALSE);
     ASSERT(IsGreaterThanOrEqualToZeroFloat(MinimumDistance) != FALSE);
@@ -165,14 +165,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-VisibilityCheckerLessThanInfinityRoutine(
+RayTracerOwnerTestVisibilityAnyDistanceProcessHit(
     _Inout_ PVOID Context,
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
-    PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT TestContext;
+    PRAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT TestContext;
     
-    TestContext = (PVISIBILITY_TEST_ANY_DISTANCE_CONTEXT) Context;
+    TestContext = (PRAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT) Context;
     
     if (TestContext->MinimumDistance < ShapeHit->Distance &&
         IsInfiniteFloat(ShapeHit->Distance) != FALSE)
@@ -196,7 +196,7 @@ RayTracerOwnerTestVisibilityAnyDistance(
     _Out_ PBOOL Visible
     )
 {
-    VISIBILITY_TEST_ANY_DISTANCE_CONTEXT Context;
+    RAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
 
     if (IsFiniteFloat(MinimumDistance) == FALSE ||
@@ -210,13 +210,13 @@ RayTracerOwnerTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Context = VisibilityTesterTestAnyDistanceCreateContext(MinimumDistance, TRUE);
+    Context = RayTracerOwnerTestVisibilityAnyDistanceProcessHitCreateContext(MinimumDistance, TRUE);
 
-    Status = RayTracerOwnerTraceSceneFindAllHitsUnsorted(RayTracerOwner,
-                                                         Scene,
-                                                         WorldRay,
-                                                         VisibilityCheckerLessThanInfinityRoutine,
-                                                         &Context);
+    Status = RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(RayTracerOwner,
+                                                              Scene,
+                                                              WorldRay,
+                                                              RayTracerOwnerTestVisibilityAnyDistanceProcessHit,
+                                                              &Context);
 
     if (Status != ISTATUS_SUCCESS)
     {
