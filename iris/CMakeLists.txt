@@ -3,6 +3,7 @@ include(GenerateExportHeader)
 include_directories(inc src/inc ../iriscommon)
 
 add_library(iris SHARED
+    src/matrixreference.c
     src/matrix.c
     src/raytracer.c
     src/scene.c

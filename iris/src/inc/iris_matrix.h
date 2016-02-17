@@ -23,20 +23,9 @@ Abstract:
 
 typedef struct _INVERTIBLE_MATRIX INVERTIBLE_MATRIX, *PINVERTIBLE_MATRIX;
 
-typedef struct _MATRIX {
-    FLOAT M[4][4];
-    struct _MATRIX *Inverse;
-    PINVERTIBLE_MATRIX InvertibleMatrix;
-} MATRIX, *PMATRIX;
-
-typedef CONST MATRIX *PCMATRIX;
-
-struct _INVERTIBLE_MATRIX {
-    MATRIX Matrix;
-    MATRIX Inverse;
-    SIZE_T ReferenceCount;
+struct _MATRIX {
+    MATRIX_REFERENCE MatrixReference;
+    PINVERTIBLE_MATRIX InvertibleMatrix;    
 };
-
-typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
 
 #endif // _MATRIX_IRIS_INTERNAL_

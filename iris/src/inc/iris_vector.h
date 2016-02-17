@@ -33,8 +33,8 @@ Abstract:
 
 SFORCEINLINE
 VECTOR3
-VectorMatrixMultiply(
-    _In_opt_ PCMATRIX Matrix,
+VectorMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
     _In_ VECTOR3 Vector
     )
 {
@@ -67,8 +67,42 @@ VectorMatrixMultiply(
 
 SFORCEINLINE
 VECTOR3
-VectorMatrixTransposedMultiply(
+VectorMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    X = Matrix->MatrixReference.M[0][0] * Vector.X + 
+        Matrix->MatrixReference.M[0][1] * Vector.Y + 
+        Matrix->MatrixReference.M[0][2] * Vector.Z;
+
+    Y = Matrix->MatrixReference.M[1][0] * Vector.X + 
+        Matrix->MatrixReference.M[1][1] * Vector.Y + 
+        Matrix->MatrixReference.M[1][2] * Vector.Z;
+
+    Z = Matrix->MatrixReference.M[2][0] * Vector.X + 
+        Matrix->MatrixReference.M[2][1] * Vector.Y + 
+        Matrix->MatrixReference.M[2][2] * Vector.Z;
+
+    Product = VectorCreate(X, Y, Z);
+
+    return Product;
+}
+
+SFORCEINLINE
+VECTOR3
+VectorMatrixReferenceTransposedMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
     _In_ VECTOR3 Vector
     )
 {
@@ -101,6 +135,40 @@ VectorMatrixTransposedMultiply(
 
 SFORCEINLINE
 VECTOR3
+VectorMatrixTransposedMultiply(
+    _In_opt_ PCMATRIX Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    X = Matrix->MatrixReference.M[0][0] * Vector.X + 
+        Matrix->MatrixReference.M[1][0] * Vector.Y + 
+        Matrix->MatrixReference.M[2][0] * Vector.Z;
+
+    Y = Matrix->MatrixReference.M[0][1] * Vector.X + 
+        Matrix->MatrixReference.M[1][1] * Vector.Y + 
+        Matrix->MatrixReference.M[2][1] * Vector.Z;
+
+    Z = Matrix->MatrixReference.M[0][2] * Vector.X + 
+        Matrix->MatrixReference.M[1][2] * Vector.Y + 
+        Matrix->MatrixReference.M[2][2] * Vector.Z;
+
+    Product = VectorCreate(X, Y, Z);
+
+    return Product;
+}
+
+SFORCEINLINE
+VECTOR3
 VectorMatrixInverseMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ VECTOR3 Vector
@@ -113,7 +181,7 @@ VectorMatrixInverseMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixMultiply(Matrix->Inverse, Vector);
+    Product = VectorMatrixReferenceMultiply(Matrix->MatrixReference.Inverse, Vector);
 
     return Product;
 }
@@ -132,7 +200,7 @@ VectorMatrixInverseTransposedMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixTransposedMultiply(Matrix->Inverse, Vector);
+    Product = VectorMatrixReferenceTransposedMultiply(Matrix->MatrixReference.Inverse, Vector);
 
     return Product;
 }

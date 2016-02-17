@@ -59,6 +59,8 @@ RayMatrixInverseMultiply(
     _In_ RAY Multiplicand1
     )
 {
+    VECTOR3 MultipliedDirection;
+    POINT3 MultipliedOrigin;
     RAY Product;
 
     if (Multiplicand0 == NULL)
@@ -66,7 +68,13 @@ RayMatrixInverseMultiply(
         return Multiplicand1;
     }
 
-    Product = RayMatrixMultiply(Multiplicand0->Inverse, Multiplicand1);
+    MultipliedOrigin = PointMatrixInverseMultiply(Multiplicand0,
+                                                  Multiplicand1.Origin);
+
+    MultipliedDirection = VectorMatrixInverseMultiply(Multiplicand0,
+                                                      Multiplicand1.Direction);
+
+    Product = RayCreate(MultipliedOrigin, MultipliedDirection);
 
     return Product;
 }

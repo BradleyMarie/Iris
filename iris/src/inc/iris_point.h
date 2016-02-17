@@ -55,6 +55,49 @@ PointCreateScaled(
 
 SFORCEINLINE
 POINT3
+PointMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    )
+{
+    POINT3 Product;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+    FLOAT W;
+
+    if (Matrix == NULL)
+    {
+        return Point;
+    }
+
+    X = Matrix->M[0][0] * Point.X +
+        Matrix->M[0][1] * Point.Y +
+        Matrix->M[0][2] * Point.Z +
+        Matrix->M[0][3];
+
+    Y = Matrix->M[1][0] * Point.X +
+        Matrix->M[1][1] * Point.Y +
+        Matrix->M[1][2] * Point.Z +
+        Matrix->M[1][3];
+
+    Z = Matrix->M[2][0] * Point.X +
+        Matrix->M[2][1] * Point.Y +
+        Matrix->M[2][2] * Point.Z +
+        Matrix->M[2][3];
+
+    W = Matrix->M[3][0] * Point.X +
+        Matrix->M[3][1] * Point.Y +
+        Matrix->M[3][2] * Point.Z +
+        Matrix->M[3][3];
+
+    Product = PointCreateScaled(X, Y, Z, W);
+
+    return Product;
+}
+
+SFORCEINLINE
+POINT3
 PointMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ POINT3 Point
@@ -71,25 +114,25 @@ PointMatrixMultiply(
         return Point;
     }
 
-    X = Matrix->M[0][0] * Point.X + 
-        Matrix->M[0][1] * Point.Y + 
-        Matrix->M[0][2] * Point.Z +
-        Matrix->M[0][3];
+    X = Matrix->MatrixReference.M[0][0] * Point.X + 
+        Matrix->MatrixReference.M[0][1] * Point.Y + 
+        Matrix->MatrixReference.M[0][2] * Point.Z +
+        Matrix->MatrixReference.M[0][3];
 
-    Y = Matrix->M[1][0] * Point.X + 
-        Matrix->M[1][1] * Point.Y + 
-        Matrix->M[1][2] * Point.Z +
-        Matrix->M[1][3];
+    Y = Matrix->MatrixReference.M[1][0] * Point.X + 
+        Matrix->MatrixReference.M[1][1] * Point.Y + 
+        Matrix->MatrixReference.M[1][2] * Point.Z +
+        Matrix->MatrixReference.M[1][3];
 
-    Z = Matrix->M[2][0] * Point.X + 
-        Matrix->M[2][1] * Point.Y + 
-        Matrix->M[2][2] * Point.Z +
-        Matrix->M[2][3];
+    Z = Matrix->MatrixReference.M[2][0] * Point.X + 
+        Matrix->MatrixReference.M[2][1] * Point.Y + 
+        Matrix->MatrixReference.M[2][2] * Point.Z +
+        Matrix->MatrixReference.M[2][3];
 
-    W = Matrix->M[3][0] * Point.X + 
-        Matrix->M[3][1] * Point.Y + 
-        Matrix->M[3][2] * Point.Z + 
-        Matrix->M[3][3];
+    W = Matrix->MatrixReference.M[3][0] * Point.X + 
+        Matrix->MatrixReference.M[3][1] * Point.Y + 
+        Matrix->MatrixReference.M[3][2] * Point.Z + 
+        Matrix->MatrixReference.M[3][3];
 
     Product = PointCreateScaled(X, Y, Z, W);
 
@@ -110,7 +153,7 @@ PointMatrixInverseMultiply(
         return Point;
     }
 
-    Product = PointMatrixMultiply(Matrix->Inverse, Point);
+    Product = PointMatrixReferenceMultiply(Matrix->MatrixReference.Inverse, Point);
 
     return Product;
 }
