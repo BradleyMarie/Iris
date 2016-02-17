@@ -394,6 +394,34 @@ VectorHalfAngle(
 
 IRISAPI
 VECTOR3
+VectorMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
+VectorMatrixReferenceTransposedMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
+VectorMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
+VectorMatrixReferenceInverseTransposedMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    );
+
+IRISAPI
+VECTOR3
 VectorMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ VECTOR3 Vector

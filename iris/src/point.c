@@ -16,6 +16,24 @@ Abstract:
 #include <irisp.h>
 
 POINT3
+PointMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    )
+{
+    return StaticPointMatrixReferenceMultiply(Matrix, Point);
+}
+
+POINT3
+PointMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    )
+{
+    return StaticPointMatrixReferenceInverseMultiply(Matrix, Point);
+}
+
+POINT3
 PointMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ POINT3 Point

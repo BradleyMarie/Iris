@@ -18,6 +18,18 @@ Abstract:
 #define _VECTOR_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
+#define VectorMatrixReferenceMultiply(Matrix, Vector) \
+        StaticVectorMatrixReferenceMultiply(Matrix, Vector)
+
+#define VectorMatrixReferenceTransposedMultiply(Matrix, Vector) \
+        StaticVectorMatrixReferenceTransposedMultiply(Matrix, Vector)
+
+#define VectorMatrixReferenceInverseMultiply(Matrix, Vector) \
+        StaticVectorMatrixReferenceInverseMultiply(Matrix, Vector)
+
+#define VectorMatrixReferenceInverseTransposedMultiply(Matrix, Vector) \
+        StaticVectorMatrixReferenceInverseTransposedMultiply(Matrix, Vector)
+
 #define VectorMatrixMultiply(Matrix, Vector) \
         StaticVectorMatrixMultiply(Matrix, Vector)
 
@@ -73,28 +85,13 @@ VectorMatrixMultiply(
     )
 {
     VECTOR3 Product;
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
 
     if (Matrix == NULL)
     {
         return Vector;
     }
 
-    X = Matrix->MatrixReference.M[0][0] * Vector.X + 
-        Matrix->MatrixReference.M[0][1] * Vector.Y + 
-        Matrix->MatrixReference.M[0][2] * Vector.Z;
-
-    Y = Matrix->MatrixReference.M[1][0] * Vector.X + 
-        Matrix->MatrixReference.M[1][1] * Vector.Y + 
-        Matrix->MatrixReference.M[1][2] * Vector.Z;
-
-    Z = Matrix->MatrixReference.M[2][0] * Vector.X + 
-        Matrix->MatrixReference.M[2][1] * Vector.Y + 
-        Matrix->MatrixReference.M[2][2] * Vector.Z;
-
-    Product = VectorCreate(X, Y, Z);
+    Product = VectorMatrixReferenceMultiply(&Matrix->MatrixReference, Vector);
 
     return Product;
 }
@@ -141,28 +138,32 @@ VectorMatrixTransposedMultiply(
     )
 {
     VECTOR3 Product;
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
 
     if (Matrix == NULL)
     {
         return Vector;
     }
 
-    X = Matrix->MatrixReference.M[0][0] * Vector.X + 
-        Matrix->MatrixReference.M[1][0] * Vector.Y + 
-        Matrix->MatrixReference.M[2][0] * Vector.Z;
+    Product = VectorMatrixReferenceTransposedMultiply(&Matrix->MatrixReference, Vector);
 
-    Y = Matrix->MatrixReference.M[0][1] * Vector.X + 
-        Matrix->MatrixReference.M[1][1] * Vector.Y + 
-        Matrix->MatrixReference.M[2][1] * Vector.Z;
+    return Product;
+}
 
-    Z = Matrix->MatrixReference.M[0][2] * Vector.X + 
-        Matrix->MatrixReference.M[1][2] * Vector.Y + 
-        Matrix->MatrixReference.M[2][2] * Vector.Z;
+SFORCEINLINE
+VECTOR3
+VectorMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
 
-    Product = VectorCreate(X, Y, Z);
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    Product = VectorMatrixReferenceMultiply(Matrix->Inverse, Vector);
 
     return Product;
 }
@@ -181,7 +182,26 @@ VectorMatrixInverseMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixReferenceMultiply(Matrix->MatrixReference.Inverse, Vector);
+    Product = VectorMatrixReferenceInverseMultiply(&Matrix->MatrixReference, Vector);
+
+    return Product;
+}
+
+SFORCEINLINE
+VECTOR3
+VectorMatrixReferenceInverseTransposedMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ VECTOR3 Vector
+    )
+{
+    VECTOR3 Product;
+
+    if (Matrix == NULL)
+    {
+        return Vector;
+    }
+
+    Product = VectorMatrixReferenceTransposedMultiply(Matrix->Inverse, Vector);
 
     return Product;
 }
@@ -200,12 +220,16 @@ VectorMatrixInverseTransposedMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixReferenceTransposedMultiply(Matrix->MatrixReference.Inverse, Vector);
+    Product = VectorMatrixReferenceInverseTransposedMultiply(&Matrix->MatrixReference, Vector);
 
     return Product;
 }
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
+#undef VectorMatrixReferenceMultiply
+#undef VectorMatrixReferenceTransposedMultiply
+#undef VectorMatrixReferenceInverseMultiply
+#undef VectorMatrixReferenceInverseTransposedMultiply
 #undef VectorMatrixMultiply
 #undef VectorMatrixTransposedMultiply
 #undef VectorMatrixInverseMultiply

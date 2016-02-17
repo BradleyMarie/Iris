@@ -15,7 +15,7 @@ Abstract:
 #include <irisp.h>
 
 //
-// Functions
+// Internal Functions
 //
 
 _Check_return_
@@ -106,6 +106,62 @@ MatrixReferencePairInitialize(
     Matrix->M[3][3] = M33;
 
     Matrix->Inverse = Inverse;
+
+    return ISTATUS_SUCCESS;
+}
+
+//
+// Public Functions
+//
+
+_Ret_opt_
+IRISAPI
+PCMATRIX_REFERENCE
+MatrixReferenceGetInverse(
+    _In_opt_ PCMATRIX_REFERENCE MatrixReference
+    )
+{
+    if (MatrixReference == NULL)
+    {
+        return NULL;
+    }
+    
+    return MatrixReference->Inverse;
+}
+
+IRISAPI
+ISTATUS
+MatrixReferenceReadContents(
+    _In_ PCMATRIX_REFERENCE MatrixReference,
+    _Out_writes_(4) FLOAT Contents[4][4]
+    )
+{
+    if (MatrixReference == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Contents == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Contents[0][0] = MatrixReference->M[0][0];
+    Contents[0][1] = MatrixReference->M[0][1];
+    Contents[0][2] = MatrixReference->M[0][2];
+    Contents[0][3] = MatrixReference->M[0][3];
+    Contents[1][0] = MatrixReference->M[1][0];
+    Contents[1][1] = MatrixReference->M[1][1];
+    Contents[1][2] = MatrixReference->M[1][2];
+    Contents[1][3] = MatrixReference->M[1][3];
+    Contents[2][0] = MatrixReference->M[2][0];
+    Contents[2][1] = MatrixReference->M[2][1];
+    Contents[2][2] = MatrixReference->M[2][2];
+    Contents[2][3] = MatrixReference->M[2][3];
+    Contents[3][0] = MatrixReference->M[3][0];
+    Contents[3][1] = MatrixReference->M[3][1];
+    Contents[3][2] = MatrixReference->M[3][2];
+    Contents[3][3] = MatrixReference->M[3][3];
 
     return ISTATUS_SUCCESS;
 }

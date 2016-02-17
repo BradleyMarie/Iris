@@ -18,6 +18,12 @@ Abstract:
 #define _POINT_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
+#define PointMatrixReferenceMultiply(Matrix, Vector) \
+        StaticPointMatrixReferenceMultiply(Matrix, Vector)
+
+#define PointMatrixReferenceInverseMultiply(Matrix, Vector) \
+        StaticPointMatrixReferenceInverseMultiply(Matrix, Vector)
+
 #define PointMatrixMultiply(Matrix, Vector) \
         StaticPointMatrixMultiply(Matrix, Vector)
 
@@ -104,37 +110,32 @@ PointMatrixMultiply(
     )
 {
     POINT3 Product;
-    FLOAT X;
-    FLOAT Y;
-    FLOAT Z;
-    FLOAT W;
+    
+    if (Matrix == NULL)
+    {
+        return Point;
+    }
+
+    Product = PointMatrixReferenceMultiply(&Matrix->MatrixReference, Point);
+    
+    return Product;
+}
+
+SFORCEINLINE
+POINT3
+PointMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    )
+{
+    POINT3 Product;
 
     if (Matrix == NULL)
     {
         return Point;
     }
 
-    X = Matrix->MatrixReference.M[0][0] * Point.X + 
-        Matrix->MatrixReference.M[0][1] * Point.Y + 
-        Matrix->MatrixReference.M[0][2] * Point.Z +
-        Matrix->MatrixReference.M[0][3];
-
-    Y = Matrix->MatrixReference.M[1][0] * Point.X + 
-        Matrix->MatrixReference.M[1][1] * Point.Y + 
-        Matrix->MatrixReference.M[1][2] * Point.Z +
-        Matrix->MatrixReference.M[1][3];
-
-    Z = Matrix->MatrixReference.M[2][0] * Point.X + 
-        Matrix->MatrixReference.M[2][1] * Point.Y + 
-        Matrix->MatrixReference.M[2][2] * Point.Z +
-        Matrix->MatrixReference.M[2][3];
-
-    W = Matrix->MatrixReference.M[3][0] * Point.X + 
-        Matrix->MatrixReference.M[3][1] * Point.Y + 
-        Matrix->MatrixReference.M[3][2] * Point.Z + 
-        Matrix->MatrixReference.M[3][3];
-
-    Product = PointCreateScaled(X, Y, Z, W);
+    Product = PointMatrixReferenceMultiply(Matrix->Inverse, Point);
 
     return Product;
 }
@@ -153,12 +154,14 @@ PointMatrixInverseMultiply(
         return Point;
     }
 
-    Product = PointMatrixReferenceMultiply(Matrix->MatrixReference.Inverse, Point);
+    Product = PointMatrixReferenceInverseMultiply(Matrix->MatrixReference.Inverse, Point);
 
     return Product;
 }
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
+#undef PointMatrixReferenceMultiply
+#undef PointMatrixReferenceInverseMultiply
 #undef PointMatrixMultiply
 #undef PointMatrixInverseMultiply
 #endif

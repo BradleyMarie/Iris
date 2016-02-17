@@ -18,6 +18,12 @@ Abstract:
 #define _RAY_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_RAY_ROUTINES_
+#define RayMatrixReferenceMultiply(Matrix, Vector) \
+        StaticRayMatrixReferenceMultiply(Matrix, Vector)
+
+#define RayMatrixReferenceInverseMultiply(Matrix, Vector) \
+        StaticRayMatrixReferenceInverseMultiply(Matrix, Vector)
+
 #define RayMatrixMultiply(Matrix, Vector) \
         StaticRayMatrixMultiply(Matrix, Vector)
 
@@ -27,8 +33,8 @@ Abstract:
 
 SFORCEINLINE
 RAY
-RayMatrixMultiply(
-    _In_opt_ PCMATRIX Multiplicand0,
+RayMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Multiplicand0,
     _In_ RAY Multiplicand1
     )
 {
@@ -41,13 +47,51 @@ RayMatrixMultiply(
         return Multiplicand1;
     }
 
-    MultipliedOrigin = PointMatrixMultiply(Multiplicand0,
-                                           Multiplicand1.Origin);
+    MultipliedOrigin = PointMatrixReferenceMultiply(Multiplicand0,
+                                                    Multiplicand1.Origin);
 
-    MultipliedDirection = VectorMatrixMultiply(Multiplicand0,
-                                               Multiplicand1.Direction);
+    MultipliedDirection = VectorMatrixReferenceMultiply(Multiplicand0,
+                                                        Multiplicand1.Direction);
 
     Product = RayCreate(MultipliedOrigin, MultipliedDirection);
+
+    return Product;
+}
+
+SFORCEINLINE
+RAY
+RayMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Multiplicand0,
+    _In_ RAY Multiplicand1
+    )
+{
+    RAY Product;
+
+    if (Multiplicand0 == NULL)
+    {
+        return Multiplicand1;
+    }
+
+    Product = RayMatrixReferenceMultiply(Multiplicand0->Inverse, Multiplicand1);
+
+    return Product;
+}
+
+SFORCEINLINE
+RAY
+RayMatrixMultiply(
+    _In_opt_ PCMATRIX Multiplicand0,
+    _In_ RAY Multiplicand1
+    )
+{
+    RAY Product;
+
+    if (Multiplicand0 == NULL)
+    {
+        return Multiplicand1;
+    }
+
+    Product = RayMatrixReferenceMultiply(&Multiplicand0->MatrixReference, Multiplicand1);
 
     return Product;
 }
@@ -59,8 +103,6 @@ RayMatrixInverseMultiply(
     _In_ RAY Multiplicand1
     )
 {
-    VECTOR3 MultipliedDirection;
-    POINT3 MultipliedOrigin;
     RAY Product;
 
     if (Multiplicand0 == NULL)
@@ -68,18 +110,14 @@ RayMatrixInverseMultiply(
         return Multiplicand1;
     }
 
-    MultipliedOrigin = PointMatrixInverseMultiply(Multiplicand0,
-                                                  Multiplicand1.Origin);
-
-    MultipliedDirection = VectorMatrixInverseMultiply(Multiplicand0,
-                                                      Multiplicand1.Direction);
-
-    Product = RayCreate(MultipliedOrigin, MultipliedDirection);
+    Product = RayMatrixReferenceMultiply(Multiplicand0->MatrixReference.Inverse, Multiplicand1);
 
     return Product;
 }
 
 #ifdef _IRIS_EXPORT_RAY_ROUTINES_
+#undef RayMatrixReferenceMultiply
+#undef RayMatrixReferenceInverseMultiply
 #undef RayMatrixMultiply
 #undef RayMatrixInverseMultiply
 #endif

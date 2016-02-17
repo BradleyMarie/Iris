@@ -181,6 +181,20 @@ PointValidate(
 
 IRISAPI
 POINT3
+PointMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    );
+
+IRISAPI
+POINT3
+PointMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Matrix,
+    _In_ POINT3 Point
+    );
+
+IRISAPI
+POINT3
 PointMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ POINT3 Point

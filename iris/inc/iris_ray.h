@@ -101,6 +101,20 @@ RayValidate(
 
 IRISAPI
 RAY
+RayMatrixReferenceMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Multiplicand0,
+    _In_ RAY Multiplicand1
+    );
+
+IRISAPI
+RAY
+RayMatrixReferenceInverseMultiply(
+    _In_opt_ PCMATRIX_REFERENCE Multiplicand0,
+    _In_ RAY Multiplicand1
+    );
+
+IRISAPI
+RAY
 RayMatrixMultiply(
     _In_opt_ PCMATRIX Multiplicand0,
     _In_ RAY Multiplicand1
