@@ -46,7 +46,7 @@ public:
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX, const Vector &, const Point & , const Point &)> ProcessHitRoutine
+        _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point & , const Point &)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -62,7 +62,7 @@ public:
     TraceAllHitsInOrder(
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX, const Vector &, const Point & , const Point &)> ProcessHitRoutine
+        _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point & , const Point &)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -87,7 +87,7 @@ private:
     ProcessHitsWithCoordinatesAdapter(
         _Inout_opt_ PVOID Context, 
         _In_ PCSHAPE_HIT ShapeHit,
-        _In_ PCMATRIX ModelToWorld,
+        _In_ PCMATRIX_REFERENCE ModelToWorld,
         _In_ VECTOR3 ModelViewer,
         _In_ POINT3 ModelHitPoint,
         _In_ POINT3 WorldHitPoint

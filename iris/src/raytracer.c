@@ -179,7 +179,7 @@ VOID
 RayTracerComputeHitData(
     _In_ PCRAYTRACER RayTracer,
     _In_ PCINTERNAL_SHAPE_HIT Hit,
-    _Out_ PCMATRIX *ModelToWorld,
+    _Out_ PCMATRIX_REFERENCE *ModelToWorld,
     _Out_ PVECTOR3 ModelViewer,
     _Out_ PPOINT3 ModelHit,
     _Out_ PPOINT3 WorldHit
@@ -210,11 +210,11 @@ RayTracerComputeHitData(
                                     Hit->ShapeHit.Distance);
         }
         
-        *ModelHit = PointMatrixMultiply(SharedHitData->ModelToWorld,
-                                        *WorldHit);
+        *ModelHit = PointMatrixReferenceMultiply(SharedHitData->ModelToWorld,
+                                                 *WorldHit);
 
-        *ModelViewer = VectorMatrixInverseMultiply(SharedHitData->ModelToWorld,
-                                                   RayTracer->CurrentRay.Direction);
+        *ModelViewer = VectorMatrixReferenceInverseMultiply(SharedHitData->ModelToWorld,
+                                                            RayTracer->CurrentRay.Direction);
     }
     else
     {
@@ -406,9 +406,9 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
 {
     PCINTERNAL_SHAPE_HIT ClosestHit;
     PCINTERNAL_SHAPE_HIT CurrentHit;
+    PCMATRIX_REFERENCE ModelToWorld;
     FLOAT ClosestDistance;
     FLOAT CurrentDistance;
-    PCMATRIX ModelToWorld;
     PRAYTRACER RayTracer;
     VECTOR3 ModelViewer;
     POINT3 ModelHit;
@@ -585,7 +585,7 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PCMATRIX ModelToWorld;
+    PCMATRIX_REFERENCE ModelToWorld;
     PCINTERNAL_SHAPE_HIT CurrentHit;
     PRAYTRACER RayTracer;
     VECTOR3 ModelViewer;
@@ -770,6 +770,7 @@ RayTracerTraceShapeWithTransform(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
+    PCMATRIX_REFERENCE ModelToWorldReference;
     PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
@@ -799,7 +800,8 @@ RayTracerTraceShapeWithTransform(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    SharedHitData->ModelToWorld = ModelToWorld;
+    ModelToWorldReference = &ModelToWorld->MatrixReference;
+    SharedHitData->ModelToWorld = ModelToWorldReference;
 
     if (Premultiplied != FALSE)
     {   
@@ -810,8 +812,8 @@ RayTracerTraceShapeWithTransform(
     {
         SharedHitData->Premultiplied = FALSE;
 
-        SharedHitData->ModelRay = RayMatrixInverseMultiply(ModelToWorld,
-                                                           RayTracer->CurrentRay);
+        SharedHitData->ModelRay = RayMatrixReferenceInverseMultiply(ModelToWorldReference,
+                                                                    RayTracer->CurrentRay);
 
         TraceRay = SharedHitData->ModelRay;
     }
@@ -863,6 +865,7 @@ RayTracerTracePremultipliedShapeWithTransform(
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
+    PCMATRIX_REFERENCE ModelToWorldReference;
     PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
     PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
@@ -890,8 +893,10 @@ RayTracerTracePremultipliedShapeWithTransform(
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
-
-    SharedHitData->ModelToWorld = ModelToWorld;
+    
+    ModelToWorldReference = &ModelToWorld->MatrixReference;
+    
+    SharedHitData->ModelToWorld = ModelToWorldReference;
     SharedHitData->Premultiplied = TRUE;
 
     Status = ShapeTraceShape(Shape,

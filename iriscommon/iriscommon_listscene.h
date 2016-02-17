@@ -89,7 +89,7 @@ ListSceneDestroy(
     for (Index = 0; Index < ListSize; Index++)
     {
         ShapeDereference(Objects[Index].Shape);
-        MatrixDereference(Objects[Index].ModelToWorld);
+        MatrixRelease(Objects[Index].ModelToWorld);
     }
 
     free(Objects);
@@ -160,7 +160,7 @@ ListSceneAddObject(
     Objects[ListSize].ModelToWorld = ModelToWorld;
     Objects[ListSize].Premultiplied = Premultiplied;
 
-    MatrixReference(ModelToWorld);
+    MatrixRetain(ModelToWorld);
 
     return ISTATUS_SUCCESS;
 }

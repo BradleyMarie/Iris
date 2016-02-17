@@ -397,9 +397,9 @@ Matrix::operator=(
 {
     if (this != &ToCopy)
     {
-        MatrixDereference(Data);
+        MatrixRelease(Data);
         Data = ToCopy.Data;
-        MatrixReference(Data);
+        MatrixRetain(Data);
     }
 
     return *this;

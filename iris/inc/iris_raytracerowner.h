@@ -37,7 +37,7 @@ ISTATUS
 (*PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE)(
     _Inout_opt_ PVOID Context, 
     _In_ PCSHAPE_HIT ShapeHit,
-    _In_ PCMATRIX ModelToWorld,
+    _In_ PCMATRIX_REFERENCE ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint

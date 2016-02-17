@@ -31,7 +31,7 @@ struct _SURFACE_NORMAL {
     VECTOR3 WorldNormal;
     VECTOR3 ModelNormal;
     PCNORMAL Normal;
-    PCMATRIX ModelToWorld;
+    PCMATRIX_REFERENCE ModelToWorld;
     POINT3 ModelHit;
     PCVOID AdditionalData;
     BOOL Prenormalized;
@@ -47,7 +47,7 @@ SurfaceNormalInitialize(
     _Out_ PSURFACE_NORMAL SurfaceNormal,
     _In_ PCNORMAL Normal,
     _In_ POINT3 ModelHit,
-    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX_REFERENCE ModelToWorld,
     _In_opt_ PCVOID AdditionalData
     )
 {

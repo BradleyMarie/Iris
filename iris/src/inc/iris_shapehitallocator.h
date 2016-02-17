@@ -22,7 +22,7 @@ Abstract:
 //
 
 typedef struct _SHARED_HIT_DATA {
-    PCMATRIX ModelToWorld;
+    PCMATRIX_REFERENCE ModelToWorld;
     BOOL Premultiplied;
     RAY ModelRay;
 } SHARED_HIT_DATA, *PSHARED_HIT_DATA;

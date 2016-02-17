@@ -996,14 +996,14 @@ MatrixAllocateProduct(
 
     if (Multiplicand0 == NULL)
     {
-        MatrixReference(Multiplicand1);
+        MatrixRetain(Multiplicand1);
         *Result = Multiplicand1;
         return ISTATUS_SUCCESS;
     }
 
     if (Multiplicand1 == NULL)
     {
-        MatrixReference(Multiplicand0);
+        MatrixRetain(Multiplicand0);
         *Result = Multiplicand0;
         return ISTATUS_SUCCESS;
     }
@@ -1159,7 +1159,7 @@ MatrixReadContents(
 }
 
 VOID
-MatrixReference(
+MatrixRetain(
     _In_opt_ PMATRIX Matrix
     )
 {
@@ -1172,7 +1172,7 @@ MatrixReference(
 }
 
 VOID
-MatrixDereference(
+MatrixRelease(
     _In_opt_ _Post_invalid_ PMATRIX Matrix
     )
 {

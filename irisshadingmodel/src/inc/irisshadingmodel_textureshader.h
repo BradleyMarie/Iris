@@ -31,7 +31,7 @@ struct _TEXTURE_SHADER {
     POINT3 WorldHit;
     VECTOR3 ModelViewer;
     POINT3 ModelHit;
-    PCMATRIX ModelToWorld;
+    PCMATRIX_REFERENCE ModelToWorld;
     PCVOID AdditionalData;
     PSURFACE_NORMAL SurfaceNormal;
     PCOLOR4 Color;
@@ -54,7 +54,7 @@ TextureShaderInitialize(
     _In_ POINT3 WorldHit,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHit,
-    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX_REFERENCE ModelToWorld,
     _In_ PCVOID AdditionalData,
     _In_opt_ PSURFACE_NORMAL SurfaceNormal,
     _Pre_invalid_ PCOLOR4 Color

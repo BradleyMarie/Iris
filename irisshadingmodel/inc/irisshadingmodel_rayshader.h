@@ -59,7 +59,7 @@ ISTATUS
     _In_ POINT3 WorldHit,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHit,
-    _In_opt_ PCMATRIX ModelToWorld,
+    _In_opt_ PCMATRIX_REFERENCE ModelToWorld,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCEMISSIVE_SHADER EmissiveShader,
     _In_opt_ PCDIRECT_SHADER DirectShader,

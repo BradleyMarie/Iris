@@ -140,13 +140,13 @@ MatrixReadContents(
 
 IRISAPI
 VOID
-MatrixReference(
+MatrixRetain(
     _In_opt_ PMATRIX Matrix
     );
 
 IRISAPI
 VOID
-MatrixDereference(
+MatrixRelease(
     _In_opt_ _Post_invalid_ PMATRIX Matrix
     );
 

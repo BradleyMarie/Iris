@@ -154,7 +154,7 @@ public:
         )
     : Data(ToCopy.Data)
     {
-        MatrixReference(Data);
+        MatrixRetain(Data);
     }    
 
     IRISPLUSPLUSAPI
@@ -167,7 +167,7 @@ public:
         void
         )
     {
-        MatrixDereference(Data);
+        MatrixRelease(Data);
     }
 
     friend
