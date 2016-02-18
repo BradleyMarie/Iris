@@ -42,6 +42,7 @@ extern "C" {
 #include "irisplusplus_api.h"
 #include "irisplusplus_utility.h"
 #include "irisplusplus_matrix.h"
+#include "irisplusplus_matrixreference.h"
 #include "irisplusplus_vector.h"
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"

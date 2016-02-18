@@ -43,8 +43,8 @@ public:
     static
     Point
     AddScaled(
-        _In_ const Point & Addend0, 
-        _In_ const Vector & Addend1, 
+        _In_ Point Addend0, 
+        _In_ Vector Addend1, 
         _In_ FLOAT Scalar
         )
     {
@@ -65,8 +65,8 @@ public:
     static
     Point
     SubtractScaled(
-        _In_ const Point & Minuend, 
-        _In_ const Vector & Subtrahend, 
+        _In_ Point Minuend, 
+        _In_ Vector Subtrahend, 
         _In_ FLOAT Scalar
         )
     {
@@ -88,7 +88,7 @@ public:
     Point
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ const Point & Multiplicand1
+        _In_ Point Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -100,6 +100,26 @@ public:
 
         IrisResult = PointMatrixInverseMultiply(IrisMultiplicand0,
                                                 IrisMultiplicand1);
+
+        return Point(IrisResult);
+    }
+
+    static
+    Point
+    InverseMultiply(
+        _In_ MatrixReference Multiplicand0,
+        _In_ Point Multiplicand1
+        )
+    {
+        PCMATRIX_REFERENCE IrisMultiplicand0;
+        POINT3 IrisMultiplicand1;
+        POINT3 IrisResult;
+
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand1 = Multiplicand1.AsPOINT3();
+
+        IrisResult = PointMatrixReferenceInverseMultiply(IrisMultiplicand0,
+                                                         IrisMultiplicand1);
 
         return Point(IrisResult);
     }
@@ -169,8 +189,8 @@ static
 inline 
 Point 
 operator+(
-    _In_ const Point & Addend0, 
-    _In_ const Vector & Addend1
+    _In_ Point Addend0, 
+    _In_ Vector Addend1
     )
 {
     POINT3 IrisAddend0;
@@ -189,8 +209,8 @@ static
 inline
 Point 
 operator-(
-    _In_ const Point & Minuend, 
-    _In_ const Vector & Subtrahend
+    _In_ Point Minuend, 
+    _In_ Vector Subtrahend
     )
 {
     POINT3 IrisMinuend;
@@ -210,7 +230,7 @@ inline
 Point
 operator*(
     _In_ const Matrix & Multiplicand0,
-    _In_ const Point & Multiplicand1
+    _In_ Point Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;
@@ -222,6 +242,27 @@ operator*(
 
     IrisResult = PointMatrixMultiply(IrisMultiplicand0,
                                      IrisMultiplicand1);
+
+    return Point(IrisResult);
+}
+
+static
+inline
+Point
+operator*(
+    _In_ MatrixReference Multiplicand0,
+    _In_ Point Multiplicand1
+    )
+{
+    PCMATRIX_REFERENCE IrisMultiplicand0;
+    POINT3 IrisMultiplicand1;
+    POINT3 IrisResult;
+
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+    IrisMultiplicand1 = Multiplicand1.AsPOINT3();
+
+    IrisResult = PointMatrixReferenceMultiply(IrisMultiplicand0,
+                                              IrisMultiplicand1);
 
     return Point(IrisResult);
 }

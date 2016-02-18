@@ -46,7 +46,7 @@ public:
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point & , const Point &)> ProcessHitRoutine
+        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -62,7 +62,7 @@ public:
     TraceAllHitsInOrder(
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point & , const Point &)> ProcessHitRoutine
+        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI

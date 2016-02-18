@@ -8,6 +8,7 @@ add_library(irisplusplus SHARED
     src/utility.cpp
     src/shape.cpp
     src/matrix.cpp
+    src/matrixreference.cpp
     src/shapehitallocator.cpp
     src/raytracer.cpp
     src/raytracerowner.cpp)

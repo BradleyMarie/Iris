@@ -90,7 +90,7 @@ public:
     static 
     Ray 
     Normalize(
-        _In_ const Ray & ToNormalize
+        _In_ Ray ToNormalize
         )
     {
         RAY IrisResult;
@@ -104,7 +104,7 @@ public:
     Ray
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ const Ray & Multiplicand1
+        _In_ Ray Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -120,6 +120,26 @@ public:
         return Ray(IrisResult);
     }
 
+    static
+    Ray
+    InverseMultiply(
+        _In_ MatrixReference Multiplicand0,
+        _In_ Ray Multiplicand1
+        )
+    {
+        PCMATRIX_REFERENCE IrisMultiplicand0;
+        RAY IrisMultiplicand1;
+        RAY IrisResult;
+
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand1 = Multiplicand1.AsRAY();
+
+        IrisResult = RayMatrixReferenceInverseMultiply(IrisMultiplicand0,
+                                                       IrisMultiplicand1);
+
+        return Ray(IrisResult);
+    }
+
 private:
     const RAY Data;
 };
@@ -129,7 +149,7 @@ inline
 Ray
 operator*(
     _In_ const Matrix & Multiplicand0,
-    _In_ const Ray & Multiplicand1
+    _In_ Ray Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;
@@ -141,6 +161,27 @@ operator*(
 
     IrisResult = RayMatrixMultiply(IrisMultiplicand0,
                                    IrisMultiplicand1);
+
+    return Ray(IrisResult);
+}
+
+static
+inline
+Ray
+operator*(
+    _In_ MatrixReference Multiplicand0,
+    _In_ Ray Multiplicand1
+    )
+{
+    PCMATRIX_REFERENCE IrisMultiplicand0;
+    RAY IrisMultiplicand1;
+    RAY IrisResult;
+
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+    IrisMultiplicand1 = Multiplicand1.AsRAY();
+
+    IrisResult = RayMatrixReferenceMultiply(IrisMultiplicand0,
+                                            IrisMultiplicand1);
 
     return Ray(IrisResult);
 }

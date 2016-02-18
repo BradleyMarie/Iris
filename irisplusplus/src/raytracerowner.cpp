@@ -59,14 +59,14 @@ ProcessHitsWithCoordinatesAdapter(
     _In_ POINT3 WorldHitPoint
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
 
     bool Stop = (*ProcessHitRoutine)(Hit->ShapeReference,
                                      Hit->Distance,
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
                                      Hit->AdditionalDataSizeInBytes,
-                                     ModelToWorldReference,
+                                     MatrixReference(ModelToWorldReference),
                                      Vector(ModelViewer),
                                      Point(ModelHitPoint),
                                      Point(WorldHitPoint));
@@ -140,7 +140,7 @@ RayTracerOwner::TraceClosestHit(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(Data,
@@ -202,7 +202,7 @@ void
 RayTracerOwner::TraceAllHitsInOrder(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,
