@@ -7,7 +7,7 @@ add_library(iris SHARED
     src/matrix.c
     src/raytracer.c
     src/scene.c
-    src/shapehitallocator.c
+    src/hitallocator.c
     src/point.c
     src/vector.c
     src/ray.c

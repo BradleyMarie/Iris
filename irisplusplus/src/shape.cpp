@@ -28,18 +28,18 @@ ISTATUS
 ShapeTrace(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR IrisHitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     assert(Context != NULL);
     assert(IrisHitAllocator != NULL);
-    assert(ShapeHitList != NULL);
+    assert(HitList != NULL);
 
     ShapeHitAllocator HitAllocator(IrisHitAllocator);
 
     const Shape *ShapePointer = static_cast<const Shape*>(Context);
-    *ShapeHitList = ShapePointer->Trace(Ray, HitAllocator);
+    *HitList = ShapePointer->Trace(Ray, HitAllocator);
     return ISTATUS_SUCCESS;
 }
 
@@ -114,7 +114,7 @@ CShape::CShape(
 { }
 
 _Ret_
-PSHAPE_HIT_LIST
+PHIT_LIST
 CShape::Trace(
     _In_ Ray ModelRay,
     _Inout_ ShapeHitAllocator & HitAllocator

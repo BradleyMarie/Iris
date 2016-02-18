@@ -37,20 +37,20 @@ ISTATUS
 ShapeTraceShape(
     _In_ PCSHAPE Shape, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     ISTATUS Status;
 
     ASSERT(Shape != NULL);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Status = ShapeReferenceTrace(&Shape->ShapeReference,
                                  Ray,
-                                 ShapeHitAllocator,
-                                 ShapeHitList);
+                                 HitAllocator,
+                                 HitList);
                                  
     return Status;
 }

@@ -28,8 +28,8 @@ ISTATUS
 (*PSHAPE_TRACE_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     );
 
 typedef struct _SHAPE_VTABLE {

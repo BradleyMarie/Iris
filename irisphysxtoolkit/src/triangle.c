@@ -125,8 +125,8 @@ ISTATUS
 PhysxTriangleXTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_TRIANGLE Triangle;
@@ -134,15 +134,15 @@ PhysxTriangleXTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
     Status = TriangleXDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -154,8 +154,8 @@ ISTATUS
 PhysxTriangleYTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_TRIANGLE Triangle;
@@ -163,15 +163,15 @@ PhysxTriangleYTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
     Status = TriangleYDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -183,8 +183,8 @@ ISTATUS
 PhysxTriangleZTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_TRIANGLE Triangle;
@@ -192,15 +192,15 @@ PhysxTriangleZTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
     Status = TriangleZDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -333,8 +333,8 @@ ISTATUS
 PhysxLightTriangleXTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_LIGHT_TRIANGLE Triangle;
@@ -342,15 +342,15 @@ PhysxLightTriangleXTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
     Status = TriangleXDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -362,8 +362,8 @@ ISTATUS
 PhysxLightTriangleYTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_LIGHT_TRIANGLE Triangle;
@@ -371,15 +371,15 @@ PhysxLightTriangleYTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
     Status = TriangleYDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -391,8 +391,8 @@ ISTATUS
 PhysxLightTriangleZTraceTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_LIGHT_TRIANGLE Triangle;
@@ -400,15 +400,15 @@ PhysxLightTriangleZTraceTriangle(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
     Status = TriangleZDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }

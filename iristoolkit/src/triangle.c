@@ -90,23 +90,23 @@ ISTATUS
 TriangleTraceXTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCIRISTOOLKIT_TRIANGLE Triangle;
     ISTATUS Status;
 
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
     ASSERT(Context != NULL);
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
     Status = TriangleXDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -118,23 +118,23 @@ ISTATUS
 TriangleTraceYTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCIRISTOOLKIT_TRIANGLE Triangle;
     ISTATUS Status;
 
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
     ASSERT(Context != NULL);
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
     Status = TriangleYDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }
@@ -146,23 +146,23 @@ ISTATUS
 TriangleTraceZTriangle(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCIRISTOOLKIT_TRIANGLE Triangle;
     ISTATUS Status;
 
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
     ASSERT(Context != NULL);
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
     Status = TriangleZDominantTraceTriangle(&Triangle->Data,
                                             Ray,
-                                            ShapeHitAllocator,
-                                            ShapeHitList);
+                                            HitAllocator,
+                                            HitList);
 
     return Status;
 }

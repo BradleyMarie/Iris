@@ -52,7 +52,7 @@ public:
 
     _Ret_
     virtual
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Trace(
         _In_ Ray ModelRay,
         _Inout_ ShapeHitAllocator & HitAllocator
@@ -102,7 +102,7 @@ public:
     _Ret_
     IRISPLUSPLUSAPI
     virtual
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Trace(
         _In_ Ray ModelRay,
         _Inout_ ShapeHitAllocator & HitAllocator

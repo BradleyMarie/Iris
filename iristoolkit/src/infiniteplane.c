@@ -91,8 +91,8 @@ ISTATUS
 InfinitePlaneTraceInfinitePlane(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     FLOAT Distance;
@@ -101,8 +101,8 @@ InfinitePlaneTraceInfinitePlane(
     ISTATUS Status;
     VECTOR3 Temp;
 
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
     ASSERT(Context != NULL);
 
     InfinitePlane = (PCINFINITE_PLANE) Context;
@@ -114,31 +114,31 @@ InfinitePlaneTraceInfinitePlane(
 
     if (Distance < (FLOAT) 0.0)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     if (DotProduct < (FLOAT) 0.0)
     {
-        Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                           NULL,
-                                           Distance,
-                                           INFINITE_PLANE_FRONT_FACE,
-                                           NULL,
-                                           0,
-                                           0,
-                                           ShapeHitList);
+        Status = HitAllocatorAllocate(HitAllocator,
+                                      NULL,
+                                      Distance,
+                                      INFINITE_PLANE_FRONT_FACE,
+                                      NULL,
+                                      0,
+                                      0,
+                                      HitList);
     }
     else
     {
-        Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                           NULL,
-                                           Distance,
-                                           INFINITE_PLANE_BACK_FACE,
-                                           NULL,
-                                           0,
-                                           0,
-                                           ShapeHitList);
+        Status = HitAllocatorAllocate(HitAllocator,
+                                      NULL,
+                                      Distance,
+                                      INFINITE_PLANE_BACK_FACE,
+                                      NULL,
+                                      0,
+                                      0,
+                                      HitList);
     }
 
     return Status;

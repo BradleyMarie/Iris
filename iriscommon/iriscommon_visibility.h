@@ -64,15 +64,15 @@ STATIC
 ISTATUS
 RayTracerOwnerTestVisibilityProcessHit(
     _Inout_ PVOID Context,
-    _In_ PCSHAPE_HIT ShapeHit
+    _In_ PCHIT Hit
     )
 {
     PRAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
     
     TestContext = (PRAYTRACER_OWNER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
     
-    if (TestContext->Epsilon < ShapeHit->Distance &&
-        ShapeHit->Distance < TestContext->DistanceToObject)
+    if (TestContext->Epsilon < Hit->Distance &&
+        Hit->Distance < TestContext->DistanceToObject)
     {
         TestContext->Visible = FALSE;
         return ISTATUS_NO_MORE_DATA;
@@ -167,15 +167,15 @@ STATIC
 ISTATUS
 RayTracerOwnerTestVisibilityAnyDistanceProcessHit(
     _Inout_ PVOID Context,
-    _In_ PCSHAPE_HIT ShapeHit
+    _In_ PCHIT Hit
     )
 {
     PRAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT TestContext;
     
     TestContext = (PRAYTRACER_OWNER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT) Context;
     
-    if (TestContext->MinimumDistance < ShapeHit->Distance &&
-        IsInfiniteFloat(ShapeHit->Distance) != FALSE)
+    if (TestContext->MinimumDistance < Hit->Distance &&
+        IsInfiniteFloat(Hit->Distance) != FALSE)
     {
         TestContext->Visible = FALSE;
         return ISTATUS_NO_MORE_DATA;

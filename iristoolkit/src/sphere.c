@@ -91,8 +91,8 @@ ISTATUS
 SphereTraceSphere(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     VECTOR3 CenterToRayOrigin;
@@ -113,8 +113,8 @@ SphereTraceSphere(
 
 #endif // defined(ENABLE_CSG_SUPPORT)
 
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
     ASSERT(Context != NULL);
 
     Sphere = (PCSPHERE) Context;
@@ -140,7 +140,7 @@ SphereTraceSphere(
         // Misses sphere completely
         //
 
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -150,7 +150,7 @@ SphereTraceSphere(
         // Hits One Point
         //
 
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -187,14 +187,14 @@ SphereTraceSphere(
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
-    Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                       NULL,
-                                       Distance0,
-                                       Face0,
-                                       NULL,
-                                       0,
-                                       0,
-                                       ShapeHitList);
+    Status = HitAllocatorAllocate(HitAllocator,
+                                  NULL,
+                                  Distance0,
+                                  Face0,
+                                  NULL,
+                                  0,
+                                  0,
+                                  HitList);
 
 #if defined(ENABLE_CSG_SUPPORT)
 
@@ -206,14 +206,14 @@ SphereTraceSphere(
     Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
                 LengthOfRaySquared;
 
-    Status = ShapeHitAllocatorAllocate(ShapeHitAllocator,
-                                       *ShapeHitList,
-                                       Distance1,
-                                       Face1,
-                                       NULL,
-                                       0,
-                                       0,
-                                       ShapeHitList);
+    Status = HitAllocatorAllocate(HitAllocator,
+                                  *HitList,
+                                  Distance1,
+                                  Face1,
+                                  NULL,
+                                  0,
+                                  0,
+                                  HitList);
 
 #endif // defined(ENABLE_CSG_SUPPORT)
 

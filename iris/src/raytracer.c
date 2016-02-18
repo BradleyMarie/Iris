@@ -19,7 +19,7 @@ Abstract:
 //
 
 struct _RAYTRACER {
-    SHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    HIT_ALLOCATOR HitAllocator;
     SHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     CONSTANT_POINTER_LIST HitList;
     SIZE_T HitIndex;
@@ -36,22 +36,22 @@ struct _RAYTRACER_OWNER {
 
 STATIC
 COMPARISON_RESULT
-RayTracerInternalShapeHitPointerCompare(
+RayTracerInternalHitPointerCompare(
     _In_ PCVOID Hit0,
     _In_ PCVOID Hit1
     )
 {
-    PCINTERNAL_SHAPE_HIT *InternalShapeHit0;
-    PCINTERNAL_SHAPE_HIT *InternalShapeHit1;
+    PCINTERNAL_HIT *InternalHit0;
+    PCINTERNAL_HIT *InternalHit1;
     COMPARISON_RESULT Result;
 
     ASSERT(Hit0 != NULL);
     ASSERT(Hit1 != NULL);
 
-    InternalShapeHit0 = (PCINTERNAL_SHAPE_HIT*) Hit0;
-    InternalShapeHit1 = (PCINTERNAL_SHAPE_HIT*) Hit1;
+    InternalHit0 = (PCINTERNAL_HIT*) Hit0;
+    InternalHit1 = (PCINTERNAL_HIT*) Hit1;
 
-    Result = InternalShapeHitCompare(*InternalShapeHit0, *InternalShapeHit1);
+    Result = InternalHitCompare(*InternalHit0, *InternalHit1);
 
     return Result;
 }
@@ -68,7 +68,7 @@ RayTracerInitialize(
 
     ASSERT(RayTracer != NULL);
 
-    Status = ShapeHitAllocatorInitialize(&RayTracer->ShapeHitAllocator);
+    Status = HitAllocatorInitialize(&RayTracer->HitAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -79,7 +79,7 @@ RayTracerInitialize(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        ShapeHitAllocatorDestroy(&RayTracer->ShapeHitAllocator);
+        HitAllocatorDestroy(&RayTracer->HitAllocator);
         return Status;
     }
 
@@ -88,7 +88,7 @@ RayTracerInitialize(
     if (Status != ISTATUS_SUCCESS)
     {
         ConstantPointerListDestroy(&RayTracer->HitList);
-        ShapeHitAllocatorDestroy(&RayTracer->ShapeHitAllocator);
+        HitAllocatorDestroy(&RayTracer->HitAllocator);
         return Status;
     }
 
@@ -106,17 +106,17 @@ RayTracerSetRay(
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PCONSTANT_POINTER_LIST PointerList;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    PHIT_ALLOCATOR HitAllocator;
 
     ASSERT(RayTracer != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
 
     SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    HitAllocator = &RayTracer->HitAllocator;
     PointerList = &RayTracer->HitList;
 
     SharedHitDataAllocatorFreeAll(SharedHitDataAllocator);
-    ShapeHitAllocatorFreeAll(ShapeHitAllocator);
+    HitAllocatorFreeAll(HitAllocator);
     ConstantPointerListClear(PointerList);
 
     RayTracer->HitIndex = 0;
@@ -132,7 +132,7 @@ RayTracerSort(
     ASSERT(RayTracer != NULL);
 
     ConstantPointerListSort(&RayTracer->HitList,
-                            RayTracerInternalShapeHitPointerCompare);
+                            RayTracerInternalHitPointerCompare);
 }
 
 _Check_return_
@@ -141,7 +141,7 @@ SFORCEINLINE
 ISTATUS
 RayTracerGetNextHit(
     _Inout_ PRAYTRACER RayTracer,
-    _Out_ PCINTERNAL_SHAPE_HIT *Hit
+    _Out_ PCINTERNAL_HIT *Hit
     )
 {
     PCCONSTANT_POINTER_LIST PointerList;
@@ -167,7 +167,7 @@ RayTracerGetNextHit(
 
     RayTracer->HitIndex = CurrentIndex + 1;
 
-    *Hit = (PCINTERNAL_SHAPE_HIT) ValueAtIndex;
+    *Hit = (PCINTERNAL_HIT) ValueAtIndex;
 
     return ISTATUS_SUCCESS;
 }
@@ -178,7 +178,7 @@ SFORCEINLINE
 VOID
 RayTracerComputeHitData(
     _In_ PCRAYTRACER RayTracer,
-    _In_ PCINTERNAL_SHAPE_HIT Hit,
+    _In_ PCINTERNAL_HIT Hit,
     _Out_ PCMATRIX_REFERENCE *ModelToWorld,
     _Out_ PVECTOR3 ModelViewer,
     _Out_ PPOINT3 ModelHit,
@@ -207,7 +207,7 @@ RayTracerComputeHitData(
         else
         {
             *WorldHit = RayEndpoint(RayTracer->CurrentRay,
-                                    Hit->ShapeHit.Distance);
+                                    Hit->Hit.Distance);
         }
         
         *ModelHit = PointMatrixReferenceMultiply(SharedHitData->ModelToWorld,
@@ -225,13 +225,13 @@ RayTracerComputeHitData(
         else
         {
             *ModelHit = RayEndpoint(SharedHitData->ModelRay,
-                                    Hit->ShapeHit.Distance);
+                                    Hit->Hit.Distance);
         }
 
         *ModelViewer = SharedHitData->ModelRay.Direction;
 
         *WorldHit = RayEndpoint(RayTracer->CurrentRay,
-                                Hit->ShapeHit.Distance);
+                                Hit->Hit.Distance);
     }
 }
 
@@ -243,16 +243,16 @@ RayTracerDestroy(
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PCONSTANT_POINTER_LIST PointerList;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
+    PHIT_ALLOCATOR HitAllocator;
 
     ASSERT(RayTracer != NULL);
 
     SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    HitAllocator = &RayTracer->HitAllocator;
     PointerList = &RayTracer->HitList;
 
     SharedHitDataAllocatorDestroy(SharedHitDataAllocator);
-    ShapeHitAllocatorDestroy(ShapeHitAllocator);
+    HitAllocatorDestroy(HitAllocator);
     ConstantPointerListDestroy(PointerList);
 }
 
@@ -307,8 +307,8 @@ RayTracerOwnerTraceSceneProcessClosestHit(
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PCINTERNAL_SHAPE_HIT CurrentHit;
-    PCINTERNAL_SHAPE_HIT ClosestHit;
+    PCINTERNAL_HIT CurrentHit;
+    PCINTERNAL_HIT ClosestHit;
     FLOAT ClosestDistance;
     FLOAT CurrentDistance;
     PRAYTRACER RayTracer;
@@ -358,7 +358,7 @@ RayTracerOwnerTraceSceneProcessClosestHit(
         return ISTATUS_SUCCESS;
     }
     
-    ClosestDistance = ClosestHit->ShapeHit.Distance;
+    ClosestDistance = ClosestHit->Hit.Distance;
     
     while (TRUE)
     {
@@ -370,7 +370,7 @@ RayTracerOwnerTraceSceneProcessClosestHit(
             return ISTATUS_SUCCESS;
         }
         
-        CurrentDistance = ClosestHit->ShapeHit.Distance;
+        CurrentDistance = ClosestHit->Hit.Distance;
         
         if (CurrentDistance > MinimumDistance &&
             CurrentDistance < ClosestDistance)
@@ -381,7 +381,7 @@ RayTracerOwnerTraceSceneProcessClosestHit(
     }
     
     Status = ProcessHitRoutine(ProcessHitContext,
-                               &ClosestHit->ShapeHit);
+                               &ClosestHit->Hit);
     
     if (Status == ISTATUS_NO_MORE_DATA)
     {
@@ -404,8 +404,8 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PCINTERNAL_SHAPE_HIT ClosestHit;
-    PCINTERNAL_SHAPE_HIT CurrentHit;
+    PCINTERNAL_HIT ClosestHit;
+    PCINTERNAL_HIT CurrentHit;
     PCMATRIX_REFERENCE ModelToWorld;
     FLOAT ClosestDistance;
     FLOAT CurrentDistance;
@@ -459,7 +459,7 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
         return ISTATUS_SUCCESS;
     }
     
-    ClosestDistance = ClosestHit->ShapeHit.Distance;
+    ClosestDistance = ClosestHit->Hit.Distance;
     
     while (TRUE)
     {
@@ -471,7 +471,7 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
             break;
         }
         
-        CurrentDistance = CurrentHit->ShapeHit.Distance;
+        CurrentDistance = CurrentHit->Hit.Distance;
         
         if (CurrentDistance > MinimumDistance &&
             CurrentDistance < ClosestDistance)
@@ -489,7 +489,7 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
                             &WorldHit);
     
     Status = ProcessHitRoutine(ProcessHitContext,
-                               &CurrentHit->ShapeHit,
+                               &CurrentHit->Hit,
                                ModelToWorld,
                                ModelViewer,
                                ModelHit,
@@ -514,7 +514,7 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PCINTERNAL_SHAPE_HIT CurrentHit;
+    PCINTERNAL_HIT CurrentHit;
     PRAYTRACER RayTracer;
     ISTATUS Status;
 
@@ -555,7 +555,7 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
     while (Status != ISTATUS_NO_MORE_DATA)
     {                            
         Status = ProcessHitRoutine(ProcessHitContext,
-                                   &CurrentHit->ShapeHit);
+                                   &CurrentHit->Hit);
         
         if (Status == ISTATUS_NO_MORE_DATA)
         {
@@ -586,7 +586,7 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
     )
 {
     PCMATRIX_REFERENCE ModelToWorld;
-    PCINTERNAL_SHAPE_HIT CurrentHit;
+    PCINTERNAL_HIT CurrentHit;
     PRAYTRACER RayTracer;
     VECTOR3 ModelViewer;
     POINT3 ModelHit;
@@ -639,7 +639,7 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
                                 &WorldHit);
 
         Status = ProcessHitRoutine(ProcessHitContext,
-                                   &CurrentHit->ShapeHit,
+                                   &CurrentHit->Hit,
                                    ModelToWorld,
                                    ModelViewer,
                                    ModelHit,
@@ -692,9 +692,9 @@ RayTracerTraceShape(
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    PINTERNAL_SHAPE_HIT InternalShapeHit;
-    PSHAPE_HIT_LIST ShapeHitList;
+    PHIT_ALLOCATOR HitAllocator;
+    PINTERNAL_HIT InternalHit;
+    PHIT_LIST HitList;
     ISTATUS Status;
 
     if (RayTracer == NULL)
@@ -708,7 +708,7 @@ RayTracerTraceShape(
     }
 
     SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    HitAllocator = &RayTracer->HitAllocator;
     PointerList = &RayTracer->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
@@ -724,36 +724,36 @@ RayTracerTraceShape(
 
     Status = ShapeTraceShape(Shape,
                              RayTracer->CurrentRay,
-                             ShapeHitAllocator,
-                             &ShapeHitList);
+                             HitAllocator,
+                             &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (ShapeHitList == NULL)
+    if (HitList == NULL)
     {
         SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
         SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    while (ShapeHitList != NULL)
+    while (HitList != NULL)
     {
-        InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
+        InternalHit = (PINTERNAL_HIT) HitList->Hit;
 
-        InternalShapeHit->SharedHitData = SharedHitData;
+        InternalHit->SharedHitData = SharedHitData;
 
         Status = ConstantPointerListAddPointer(PointerList,
-                                               InternalShapeHit);
+                                               InternalHit);
 
         if (Status != ISTATUS_SUCCESS)
         {
             return Status;
         }
 
-        ShapeHitList = ShapeHitList->NextShapeHit;
+        HitList = HitList->NextHit;
     }
 
     return ISTATUS_SUCCESS;
@@ -773,9 +773,9 @@ RayTracerTraceShapeWithTransform(
     PCMATRIX_REFERENCE ModelToWorldReference;
     PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    PINTERNAL_SHAPE_HIT InternalShapeHit;
-    PSHAPE_HIT_LIST ShapeHitList;
+    PHIT_ALLOCATOR HitAllocator;
+    PINTERNAL_HIT InternalHit;
+    PHIT_LIST HitList;
     ISTATUS Status;
     RAY TraceRay;
 
@@ -790,7 +790,7 @@ RayTracerTraceShapeWithTransform(
     }
 
     SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    HitAllocator = &RayTracer->HitAllocator;
     PointerList = &RayTracer->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
@@ -820,36 +820,36 @@ RayTracerTraceShapeWithTransform(
 
     Status = ShapeTraceShape(Shape,
                              TraceRay,
-                             ShapeHitAllocator,
-                             &ShapeHitList);
+                             HitAllocator,
+                             &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (ShapeHitList == NULL)
+    if (HitList == NULL)
     {
         SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
         SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    while (ShapeHitList != NULL)
+    while (HitList != NULL)
     {
-        InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
+        InternalHit = (PINTERNAL_HIT) HitList->Hit;
 
-        InternalShapeHit->SharedHitData = SharedHitData;
+        InternalHit->SharedHitData = SharedHitData;
 
         Status = ConstantPointerListAddPointer(PointerList,
-                                               InternalShapeHit);
+                                               InternalHit);
 
         if (Status != ISTATUS_SUCCESS)
         {
             return Status;
         }
 
-        ShapeHitList = ShapeHitList->NextShapeHit;
+        HitList = HitList->NextHit;
     }
 
     return ISTATUS_SUCCESS;
@@ -868,9 +868,9 @@ RayTracerTracePremultipliedShapeWithTransform(
     PCMATRIX_REFERENCE ModelToWorldReference;
     PCONSTANT_POINTER_LIST PointerList;
     PSHARED_HIT_DATA SharedHitData;
-    PSHAPE_HIT_ALLOCATOR ShapeHitAllocator;
-    PINTERNAL_SHAPE_HIT InternalShapeHit;
-    PSHAPE_HIT_LIST ShapeHitList;
+    PHIT_ALLOCATOR HitAllocator;
+    PINTERNAL_HIT InternalHit;
+    PHIT_LIST HitList;
     ISTATUS Status;
 
     if (RayTracer == NULL)
@@ -884,7 +884,7 @@ RayTracerTracePremultipliedShapeWithTransform(
     }
 
     SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    ShapeHitAllocator = &RayTracer->ShapeHitAllocator;
+    HitAllocator = &RayTracer->HitAllocator;
     PointerList = &RayTracer->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
@@ -901,36 +901,36 @@ RayTracerTracePremultipliedShapeWithTransform(
 
     Status = ShapeTraceShape(Shape,
                              RayTracer->CurrentRay,
-                             ShapeHitAllocator,
-                             &ShapeHitList);
+                             HitAllocator,
+                             &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (ShapeHitList == NULL)
+    if (HitList == NULL)
     {
         SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
         SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    while (ShapeHitList != NULL)
+    while (HitList != NULL)
     {
-        InternalShapeHit = (PINTERNAL_SHAPE_HIT) ShapeHitList->ShapeHit;
+        InternalHit = (PINTERNAL_HIT) HitList->Hit;
 
-        InternalShapeHit->SharedHitData = SharedHitData;
+        InternalHit->SharedHitData = SharedHitData;
 
         Status = ConstantPointerListAddPointer(PointerList,
-                                               InternalShapeHit);
+                                               InternalHit);
 
         if (Status != ISTATUS_SUCCESS)
         {
             return Status;
         }
 
-        ShapeHitList = ShapeHitList->NextShapeHit;
+        HitList = HitList->NextHit;
     }
 
     return ISTATUS_SUCCESS;

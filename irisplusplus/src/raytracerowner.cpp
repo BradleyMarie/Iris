@@ -27,16 +27,16 @@ static
 ISTATUS 
 ProcessHitsAdapter(
     _Inout_opt_ PVOID Context, 
-    _In_ PCSHAPE_HIT ShapeHit
+    _In_ PCHIT Hit
     )
 {
     auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
     
-    bool Stop = (*ProcessHitRoutine)(ShapeHit->ShapeReference,
-                                     ShapeHit->Distance,
-                                     ShapeHit->FaceHit,
-                                     ShapeHit->AdditionalData,
-                                     ShapeHit->AdditionalDataSizeInBytes);
+    bool Stop = (*ProcessHitRoutine)(Hit->ShapeReference,
+                                     Hit->Distance,
+                                     Hit->FaceHit,
+                                     Hit->AdditionalData,
+                                     Hit->AdditionalDataSizeInBytes);
 
     if (Stop)
     {
@@ -52,7 +52,7 @@ static
 ISTATUS 
 ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
-    _In_ PCSHAPE_HIT ShapeHit,
+    _In_ PCHIT Hit,
     _In_ PCMATRIX_REFERENCE ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
@@ -61,11 +61,11 @@ ProcessHitsWithCoordinatesAdapter(
 {
     auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> *>(Context);
 
-    bool Stop = (*ProcessHitRoutine)(ShapeHit->ShapeReference,
-                                     ShapeHit->Distance,
-                                     ShapeHit->FaceHit,
-                                     ShapeHit->AdditionalData,
-                                     ShapeHit->AdditionalDataSizeInBytes,
+    bool Stop = (*ProcessHitRoutine)(Hit->ShapeReference,
+                                     Hit->Distance,
+                                     Hit->FaceHit,
+                                     Hit->AdditionalData,
+                                     Hit->AdditionalDataSizeInBytes,
                                      ModelToWorld,
                                      Vector(ModelViewer),
                                      Point(ModelHitPoint),

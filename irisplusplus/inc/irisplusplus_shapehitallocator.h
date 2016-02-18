@@ -31,8 +31,8 @@ ISTATUS
 ShapeTrace(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR IrisHitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     );
 
 //
@@ -42,9 +42,9 @@ ShapeTrace(
 class ShapeHitAllocator {
 public:
     _Ret_
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const Point & HitPoint
@@ -52,22 +52,22 @@ public:
     {
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
-        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
-                                          Distance,
-                                          FaceHit,
-                                          IrisHitPoint,
-                                          NULL,
-                                          0,
-                                          0);
+        PHIT_LIST Output = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    IrisHitPoint,
+                                    NULL,
+                                    0,
+                                    0);
 
         return Output;
     }
 
     template<typename T>
     _Ret_
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const Point & HitPoint,
@@ -76,69 +76,69 @@ public:
     {
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
-        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
-                                          Distance,
-                                          FaceHit,
-                                          IrisHitPoint,
-                                          static_cast<PCVOID>(AdditionalData),
-                                          sizeof(T),
-                                          sizeof(PVOID));
+        PHIT_LIST Output = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    IrisHitPoint,
+                                    static_cast<PCVOID>(AdditionalData),
+                                    sizeof(T),
+                                    sizeof(PVOID));
 
         return Output;
     }
 
     _Ret_
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit
         )
     {
-        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
-                                          Distance,
-                                          FaceHit,
-                                          NULL,
-                                          0,
-                                          0);
+        PHIT_LIST Output = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    NULL,
+                                    0,
+                                    0);
 
         return Output;
     }
 
     template<typename T>
     _Ret_
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const T & AdditionalData
         )
     {
-        PSHAPE_HIT_LIST Output = Allocate(NextShapeHit,
-                                          Distance,
-                                          FaceHit,
-                                          static_cast<PCVOID>(AdditionalData),
-                                          sizeof(T),
-                                          sizeof(PVOID));
+        PHIT_LIST Output = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    static_cast<PCVOID>(AdditionalData),
+                                    sizeof(T),
+                                    sizeof(PVOID));
 
         return Output;
     }
 
 private:
-    PSHAPE_HIT_ALLOCATOR Data;
+    PHIT_ALLOCATOR Data;
 
     ShapeHitAllocator(
-        _In_ PSHAPE_HIT_ALLOCATOR HitAllocator
+        _In_ PHIT_ALLOCATOR HitAllocator
         )
     : Data(HitAllocator)
     { }
 
     _Ret_
     IRISPLUSPLUSAPI
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,    
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -148,9 +148,9 @@ private:
 
     _Ret_
     IRISPLUSPLUSAPI
-    PSHAPE_HIT_LIST
+    PHIT_LIST
     Allocate(
-        _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+        _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const POINT3 & HitPoint,
@@ -166,8 +166,8 @@ private:
     ShapeTrace(
         _In_opt_ PCVOID Context, 
         _In_ RAY Ray,
-        _Inout_ PSHAPE_HIT_ALLOCATOR IrisHitAllocator,
-        _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+        _Inout_ PHIT_ALLOCATOR IrisHitAllocator,
+        _Outptr_result_maybenull_ PHIT_LIST *HitList
         );
 };
 

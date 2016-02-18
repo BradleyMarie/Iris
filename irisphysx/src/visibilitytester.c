@@ -51,7 +51,7 @@ STATIC
 ISTATUS
 SpectrumVisibilityTesterTestLightVisibilityProcessHit(
     _Inout_ PVOID Context,
-    _In_ PCSHAPE_HIT ShapeHit
+    _In_ PCHIT Hit
     )
 {
     PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
@@ -59,9 +59,9 @@ SpectrumVisibilityTesterTestLightVisibilityProcessHit(
     PCLIGHT ClosestLight;
     
     TestContext = (PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
-    SpectrumShape = (PCSPECTRUM_SHAPE) ShapeHit->ShapeReference;
+    SpectrumShape = (PCSPECTRUM_SHAPE) Hit->ShapeReference;
 
-    SpectrumShapeGetLight(SpectrumShape, ShapeHit->FaceHit, &ClosestLight);
+    SpectrumShapeGetLight(SpectrumShape, Hit->FaceHit, &ClosestLight);
     
     if (ClosestLight == TestContext->TargetLight)
     {

@@ -52,22 +52,22 @@ ISTATUS
 ShapeReferenceTrace(
     _In_ PCSHAPE_REFERENCE ShapeReference, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     ISTATUS Status;
 
     ASSERT(ShapeReference != NULL);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
-    ShapeHitAllocatorSetCurrentShapeReference(ShapeHitAllocator, ShapeReference);
+    HitAllocatorSetCurrentShapeReference(HitAllocator, ShapeReference);
 
     Status = ShapeReference->VTable->TraceRoutine(ShapeReference->Data, 
                                                   Ray,
-                                                  ShapeHitAllocator,
-                                                  ShapeHitList);
+                                                  HitAllocator,
+                                                  HitList);
 
     return Status;
 }

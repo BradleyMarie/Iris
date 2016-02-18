@@ -22,9 +22,9 @@ namespace Iris {
 //
 
 _Ret_
-PSHAPE_HIT_LIST
+PHIT_LIST
 ShapeHitAllocator::Allocate(
-    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,    
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -32,17 +32,17 @@ ShapeHitAllocator::Allocate(
     _In_ SIZE_T AdditionalDataAlignment
     )
 {
-    PSHAPE_HIT_LIST Result;
+    PHIT_LIST Result;
     ISTATUS Status;
 
-    Status = ShapeHitAllocatorAllocate(Data,
-                                       NextShapeHit,
-                                       Distance,
-                                       FaceHit,
-                                       AdditionalData,
-                                       AdditionalDataSizeInBytes,
-                                       AdditionalDataAlignment,
-                                       &Result);
+    Status = HitAllocatorAllocate(Data,
+                                  NextHit,
+                                  Distance,
+                                  FaceHit,
+                                  AdditionalData,
+                                  AdditionalDataSizeInBytes,
+                                  AdditionalDataAlignment,
+                                  &Result);
 
     switch (Status)
     {
@@ -62,9 +62,9 @@ ShapeHitAllocator::Allocate(
 }
 
 _Ret_
-PSHAPE_HIT_LIST
+PHIT_LIST
 ShapeHitAllocator::Allocate(
-    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+    _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_ const POINT3 & HitPoint,
@@ -73,18 +73,18 @@ ShapeHitAllocator::Allocate(
     _In_ SIZE_T AdditionalDataAlignment
     )
 {
-    PSHAPE_HIT_LIST Result;
+    PHIT_LIST Result;
     ISTATUS Status;
 
-    Status = ShapeHitAllocatorAllocateWithHitPoint(Data,
-                                                   NextShapeHit,
-                                                   Distance,
-                                                   FaceHit,
-                                                   AdditionalData,
-                                                   AdditionalDataSizeInBytes,
-                                                   AdditionalDataAlignment,
-                                                   HitPoint,
-                                                   &Result);
+    Status = HitAllocatorAllocateWithHitPoint(Data,
+                                              NextHit,
+                                              Distance,
+                                              FaceHit,
+                                              AdditionalData,
+                                              AdditionalDataSizeInBytes,
+                                              AdditionalDataAlignment,
+                                              HitPoint,
+                                              &Result);
 
     switch (Status)
     {

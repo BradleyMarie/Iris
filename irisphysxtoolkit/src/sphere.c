@@ -125,8 +125,8 @@ ISTATUS
 PhysxSphereTrace(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_SPHERE Sphere;
@@ -134,15 +134,15 @@ PhysxSphereTrace(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Sphere = (PCPHYSX_SPHERE) Context;
 
     Status = SphereTrace(&Sphere->Data,
                          Ray,
-                         ShapeHitAllocator,
-                         ShapeHitList);
+                         HitAllocator,
+                         HitList);
 
     return Status;
 }
@@ -275,8 +275,8 @@ ISTATUS
 PhysxLightSphereTrace(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     PCPHYSX_LIGHT_SPHERE Sphere;
@@ -284,15 +284,15 @@ PhysxLightSphereTrace(
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
 
     Status = SphereTrace(&Sphere->Data,
                          Ray,
-                         ShapeHitAllocator,
-                         ShapeHitList);
+                         HitAllocator,
+                         HitList);
 
     return Status;
 }

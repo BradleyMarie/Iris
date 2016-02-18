@@ -232,7 +232,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayShaderProcessHit(
     _Inout_opt_ PVOID Context,
-    _In_ PCSHAPE_HIT ShapeHit,
+    _In_ PCHIT Hit,
     _In_ PCMATRIX_REFERENCE ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
@@ -253,17 +253,17 @@ RayShaderProcessHit(
 
     RayShaderProcessHitContext = (PRAYSHADER_PROCESS_HIT_CONTEXT) Context;
 
-    Distance = ShapeHit->Distance;
+    Distance = Hit->Distance;
 
     if (Distance <= RayShaderProcessHitContext->RayShader->Epsilon)
     {
         return ISTATUS_SUCCESS;
     }
 
-    DrawingShape = (PCDRAWING_SHAPE) ShapeHit->ShapeReference;
+    DrawingShape = (PCDRAWING_SHAPE) Hit->ShapeReference;
 
     Texture = DrawingShapeGetTexture(DrawingShape,
-                                     ShapeHit->FaceHit);
+                                     Hit->FaceHit);
 
     if (Texture == NULL)
     {
@@ -271,9 +271,9 @@ RayShaderProcessHit(
     }
 
     Normal = DrawingShapeGetNormal(DrawingShape,
-                                   ShapeHit->FaceHit);
+                                   Hit->FaceHit);
 
-    AdditionalData = ShapeHit->AdditionalData;
+    AdditionalData = Hit->AdditionalData;
 
     if (Normal != NULL)
     {

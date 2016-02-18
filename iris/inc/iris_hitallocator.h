@@ -4,16 +4,16 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    iris_shapehitallocator.h
+    iris_hitallocator.h
 
 Abstract:
 
-    This module implements the SHAPE_HIT_ALLOCATOR public functions.
+    This module implements the HIT_ALLOCATOR public functions.
 
 --*/
 
-#ifndef _IRIS_SHAPE_HIT_ALLOCATOR_
-#define _IRIS_SHAPE_HIT_ALLOCATOR_
+#ifndef _IRIS_HIT_ALLOCATOR_
+#define _IRIS_HIT_ALLOCATOR_
 
 #include <iris.h>
 
@@ -24,25 +24,25 @@ Abstract:
 typedef struct _SHAPE_REFERENCE SHAPE_REFERENCE, *PSHAPE_REFERENCE;
 typedef CONST SHAPE_REFERENCE *PCSHAPE_REFERENCE;
 
-typedef struct _SHAPE_HIT_ALLOCATOR SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
-typedef CONST SHAPE_HIT_ALLOCATOR *PCSHAPE_HIT_ALLOCATOR;
+typedef struct _HIT_ALLOCATOR HIT_ALLOCATOR, *PHIT_ALLOCATOR;
+typedef CONST HIT_ALLOCATOR *PCHIT_ALLOCATOR;
 
-typedef struct _SHAPE_HIT {
+typedef struct _HIT {
     PCSHAPE_REFERENCE ShapeReference;
     FLOAT Distance;
     INT32 FaceHit;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;
     SIZE_T AdditionalDataSizeInBytes;
-} SHAPE_HIT, *PSHAPE_HIT;
+} HIT, *PHIT;
 
-typedef CONST SHAPE_HIT *PCSHAPE_HIT;
+typedef CONST HIT *PCHIT;
 
-typedef struct _SHAPE_HIT_LIST {
-    struct _SHAPE_HIT_LIST *NextShapeHit;
-    PCSHAPE_HIT ShapeHit;
-} SHAPE_HIT_LIST, *PSHAPE_HIT_LIST;
+typedef struct _HIT_LIST {
+    struct _HIT_LIST *NextHit;
+    PCHIT Hit;
+} HIT_LIST, *PHIT_LIST;
 
-typedef CONST SHAPE_HIT_LIST *PCSHAPE_HIT_LIST;
+typedef CONST HIT_LIST *PCHIT_LIST;
 
 //
 // Functions
@@ -52,31 +52,31 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-ShapeHitAllocatorAllocate(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+HitAllocatorAllocate(
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ SIZE_T AdditionalDataAlignment,
-    _Out_ PSHAPE_HIT_LIST *ShapeHitList
+    _Out_ PHIT_LIST *HitList
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-ShapeHitAllocatorAllocateWithHitPoint(
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _In_opt_ PSHAPE_HIT_LIST NextShapeHit,
+HitAllocatorAllocateWithHitPoint(
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ SIZE_T AdditionalDataAlignment,
     _In_ POINT3 HitPoint,
-    _Out_ PSHAPE_HIT_LIST *ShapeHitList
+    _Out_ PHIT_LIST *HitList
     );
 
 #endif // _IRIS_SHAPE_HIT_ALLOCATOR_

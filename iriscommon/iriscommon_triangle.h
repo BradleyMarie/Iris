@@ -49,8 +49,8 @@ ISTATUS
 TriangleXDominantTraceTriangle(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     FLOAT BarycentricCoordinates[3];
@@ -64,8 +64,8 @@ TriangleXDominantTraceTriangle(
 
     ASSERT(Triangle != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Temp = PointSubtract(Ray.Origin, Triangle->Vertex0);
 
@@ -74,7 +74,7 @@ TriangleXDominantTraceTriangle(
 
     if (IsFiniteFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -82,7 +82,7 @@ TriangleXDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -92,24 +92,24 @@ TriangleXDominantTraceTriangle(
     P = PointSubtract(Hit, Triangle->Vertex0);
 
     BarycentricCoordinates[1] = (P.Z * Triangle->C.Y - 
-                                P.Y * Triangle->C.Z) /
+                                 P.Y * Triangle->C.Z) /
                                 (Triangle->B.Z * Triangle->C.Y - 
-                                Triangle->B.Y * Triangle->C.Z);
+                                 Triangle->B.Y * Triangle->C.Z);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[1]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     BarycentricCoordinates[2] = (P.Z * Triangle->B.Y - 
-                                P.Y * Triangle->B.Z) /
+                                 P.Y * Triangle->B.Z) /
                                 (Triangle->C.Z * Triangle->B.Y - 
-                                Triangle->C.Y * Triangle->B.Z);
+                                 Triangle->C.Y * Triangle->B.Z);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[2]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -119,21 +119,21 @@ TriangleXDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[0]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
 
-    Status = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
-                                                   NULL,
-                                                   Distance,
-                                                   Face,
-                                                   &BarycentricCoordinates,
-                                                   sizeof(BarycentricCoordinates),
-                                                   _Alignof(FLOAT),
-                                                   Hit,
-                                                   ShapeHitList);
+    Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
+                                              NULL,
+                                              Distance,
+                                              Face,
+                                              &BarycentricCoordinates,
+                                              sizeof(BarycentricCoordinates),
+                                              _Alignof(FLOAT),
+                                              Hit,
+                                              HitList);
 
     return Status;
 }
@@ -145,8 +145,8 @@ ISTATUS
 TriangleYDominantTraceTriangle(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     FLOAT BarycentricCoordinates[3];
@@ -160,8 +160,8 @@ TriangleYDominantTraceTriangle(
 
     ASSERT(Triangle != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Temp = PointSubtract(Ray.Origin, Triangle->Vertex0);
 
@@ -170,7 +170,7 @@ TriangleYDominantTraceTriangle(
 
     if (IsFiniteFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -178,7 +178,7 @@ TriangleYDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -188,24 +188,24 @@ TriangleYDominantTraceTriangle(
     P = PointSubtract(Hit, Triangle->Vertex0);
 
     BarycentricCoordinates[1] = (P.X * Triangle->C.Z - 
-                                P.Z * Triangle->C.X) /
+                                 P.Z * Triangle->C.X) /
                                 (Triangle->B.X * Triangle->C.Z - 
-                                Triangle->B.Z * Triangle->C.X);
+                                 Triangle->B.Z * Triangle->C.X);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[1]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     BarycentricCoordinates[2] = (P.X * Triangle->B.Z - 
-                                P.Z * Triangle->B.X) /
+                                 P.Z * Triangle->B.X) /
                                 (Triangle->C.X * Triangle->B.Z - 
-                                Triangle->C.Z * Triangle->B.X);
+                                 Triangle->C.Z * Triangle->B.X);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[2]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -215,20 +215,20 @@ TriangleYDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[0]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
     Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
 
-    Status = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
-                                                   NULL,
-                                                   Distance,
-                                                   Face,
-                                                   &BarycentricCoordinates,
-                                                   sizeof(BarycentricCoordinates),
-                                                   _Alignof(FLOAT),
-                                                   Hit,
-                                                   ShapeHitList);
+    Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
+                                              NULL,
+                                              Distance,
+                                              Face,
+                                              &BarycentricCoordinates,
+                                              sizeof(BarycentricCoordinates),
+                                              _Alignof(FLOAT),
+                                              Hit,
+                                              HitList);
 
     return Status;
 }
@@ -240,8 +240,8 @@ ISTATUS
 TriangleZDominantTraceTriangle(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
-    _Inout_ PSHAPE_HIT_ALLOCATOR ShapeHitAllocator,
-    _Outptr_result_maybenull_ PSHAPE_HIT_LIST *ShapeHitList
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
     FLOAT BarycentricCoordinates[3];
@@ -255,8 +255,8 @@ TriangleZDominantTraceTriangle(
 
     ASSERT(Triangle != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(ShapeHitAllocator != NULL);
-    ASSERT(ShapeHitList != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
 
     Temp = PointSubtract(Ray.Origin, Triangle->Vertex0);
 
@@ -265,7 +265,7 @@ TriangleZDominantTraceTriangle(
 
     if (IsFiniteFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -273,7 +273,7 @@ TriangleZDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(Distance) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -283,24 +283,24 @@ TriangleZDominantTraceTriangle(
     P = PointSubtract(Hit, Triangle->Vertex0);
 
     BarycentricCoordinates[1] = (P.Y * Triangle->C.X - 
-                                P.X * Triangle->C.Y) /
+                                 P.X * Triangle->C.Y) /
                                 (Triangle->B.Y * Triangle->C.X - 
-                                Triangle->B.X * Triangle->C.Y);
+                                 Triangle->B.X * Triangle->C.Y);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[1]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     BarycentricCoordinates[2] = (P.Y * Triangle->B.X - 
-                                P.X * Triangle->B.Y) /
+                                 P.X * Triangle->B.Y) /
                                 (Triangle->C.Y * Triangle->B.X - 
-                                Triangle->C.X * Triangle->B.Y);
+                                 Triangle->C.X * Triangle->B.Y);
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[2]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
@@ -310,21 +310,21 @@ TriangleZDominantTraceTriangle(
 
     if (IsGreaterThanOrEqualToZeroFloat(BarycentricCoordinates[0]) == FALSE)
     {
-        *ShapeHitList = NULL;
+        *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
 
     Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
 
-    Status = ShapeHitAllocatorAllocateWithHitPoint(ShapeHitAllocator,
-                                                   NULL,
-                                                   Distance,
-                                                   Face,
-                                                   &BarycentricCoordinates,
-                                                   sizeof(BarycentricCoordinates),
-                                                   _Alignof(FLOAT),
-                                                   Hit,
-                                                   ShapeHitList);
+    Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
+                                              NULL,
+                                              Distance,
+                                              Face,
+                                              &BarycentricCoordinates,
+                                              sizeof(BarycentricCoordinates),
+                                              _Alignof(FLOAT),
+                                              Hit,
+                                              HitList);
 
     return Status;
 }

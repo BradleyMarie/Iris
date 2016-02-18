@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PRAYTRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ PVOID Context, 
-    _In_ PCSHAPE_HIT ShapeHit
+    _In_ PCHIT Hit
     );
     
 typedef
@@ -36,7 +36,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE)(
     _Inout_opt_ PVOID Context, 
-    _In_ PCSHAPE_HIT ShapeHit,
+    _In_ PCHIT Hit,
     _In_ PCMATRIX_REFERENCE ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
