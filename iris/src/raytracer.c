@@ -179,7 +179,7 @@ VOID
 RayTracerComputeHitData(
     _In_ PCRAYTRACER RayTracer,
     _In_ PCINTERNAL_HIT Hit,
-    _Out_ PCMATRIX_REFERENCE *ModelToWorld,
+    _Out_ PCMATRIX_REFERENCE *ModelToWorldReference,
     _Out_ PVECTOR3 ModelViewer,
     _Out_ PPOINT3 ModelHit,
     _Out_ PPOINT3 WorldHit
@@ -189,14 +189,14 @@ RayTracerComputeHitData(
 
     ASSERT(RayTracer != NULL);
     ASSERT(Hit != NULL);
-    ASSERT(ModelToWorld != NULL);
+    ASSERT(ModelToWorldReference != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
     ASSERT(WorldHit != NULL);
 
     SharedHitData = Hit->SharedHitData;
 
-    *ModelToWorld = SharedHitData->ModelToWorld;
+    *ModelToWorldReference = SharedHitData->ModelToWorldReference;
     
     if (SharedHitData->Premultiplied != FALSE)
     {
@@ -210,10 +210,10 @@ RayTracerComputeHitData(
                                     Hit->Hit.Distance);
         }
         
-        *ModelHit = PointMatrixReferenceMultiply(SharedHitData->ModelToWorld,
+        *ModelHit = PointMatrixReferenceMultiply(SharedHitData->ModelToWorldReference,
                                                  *WorldHit);
 
-        *ModelViewer = VectorMatrixReferenceInverseMultiply(SharedHitData->ModelToWorld,
+        *ModelViewer = VectorMatrixReferenceInverseMultiply(SharedHitData->ModelToWorldReference,
                                                             RayTracer->CurrentRay.Direction);
     }
     else
@@ -718,7 +718,7 @@ RayTracerTraceShape(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    SharedHitData->ModelToWorld = NULL;
+    SharedHitData->ModelToWorldReference = NULL;
     SharedHitData->Premultiplied = TRUE;
     SharedHitData->ModelRay = RayTracer->CurrentRay;
 
@@ -801,7 +801,7 @@ RayTracerTraceShapeWithTransform(
     }
 
     ModelToWorldReference = &ModelToWorld->MatrixReference;
-    SharedHitData->ModelToWorld = ModelToWorldReference;
+    SharedHitData->ModelToWorldReference = ModelToWorldReference;
 
     if (Premultiplied != FALSE)
     {   
@@ -896,7 +896,7 @@ RayTracerTracePremultipliedShapeWithTransform(
     
     ModelToWorldReference = &ModelToWorld->MatrixReference;
     
-    SharedHitData->ModelToWorld = ModelToWorldReference;
+    SharedHitData->ModelToWorldReference = ModelToWorldReference;
     SharedHitData->Premultiplied = TRUE;
 
     Status = ShapeTraceShape(Shape,

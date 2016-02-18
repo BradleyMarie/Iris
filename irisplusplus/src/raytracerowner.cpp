@@ -53,7 +53,7 @@ ISTATUS
 ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit,
-    _In_ PCMATRIX_REFERENCE ModelToWorld,
+    _In_ PCMATRIX_REFERENCE ModelToWorldReference,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint
@@ -66,7 +66,7 @@ ProcessHitsWithCoordinatesAdapter(
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
                                      Hit->AdditionalDataSizeInBytes,
-                                     ModelToWorld,
+                                     ModelToWorldReference,
                                      Vector(ModelViewer),
                                      Point(ModelHitPoint),
                                      Point(WorldHitPoint));

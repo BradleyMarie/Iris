@@ -18,6 +18,18 @@ Abstract:
 #include <irisp.h>
 
 //
+// Macros
+//
+
+#ifdef _IRIS_EXPORT_SHAPE_REFERENCE_ROUTINES_
+#define ShapeReferenceGetVTable(Shape) \
+        StaticShapeReferenceGetVTable(Shape)
+
+#define ShapeReferenceGetData(Shape) \
+        StaticShapeReferenceGetData(Shape)
+#endif
+
+//
 // Types
 //
 
@@ -43,6 +55,36 @@ ShapeReferenceInitialize(
     
     ShapeReference->VTable = VTable;
     ShapeReference->Data = Data;
+}
+
+_Ret_
+SFORCEINLINE
+PCSHAPE_VTABLE
+ShapeReferenceGetVTable(
+    _In_ PCSHAPE_REFERENCE ShapeReference
+    )
+{
+    if (ShapeReference == NULL)
+    {
+        return NULL;
+    }
+
+    return ShapeReference->VTable;
+}
+
+_Ret_
+SFORCEINLINE
+PCVOID
+ShapeReferenceGetData(
+    _In_ PCSHAPE_REFERENCE ShapeReference
+    )
+{
+    if (ShapeReference == NULL)
+    {
+        return NULL;
+    }
+
+    return ShapeReference->Data;
 }
 
 _Check_return_
@@ -71,5 +113,28 @@ ShapeReferenceTrace(
 
     return Status;
 }
+
+SFORCEINLINE
+VOID
+ShapeReferenceDestroy(
+    _In_ _Post_invalid_ PSHAPE_REFERENCE ShapeReference
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+    
+    ASSERT(ShapeReference != NULL);
+    
+    FreeRoutine = ShapeReference->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(ShapeReference->Data);
+    }
+}
+
+#ifdef _IRIS_EXPORT_SHAPE_REFERENCE_ROUTINES_
+#undef ShapeReferenceGetVTable
+#undef ShapeReferenceGetData
+#endif
 
 #endif // _IRIS_SHAPE_INTERNAL_

@@ -12,6 +12,7 @@ Abstract:
 
 --*/
 
+#define _IRIS_EXPORT_SHAPE_REFERENCE_ROUTINES_
 #include <irisp.h>
 
 //
@@ -24,12 +25,11 @@ ShapeReferenceGetVTable(
     _In_ PCSHAPE_REFERENCE ShapeReference
     )
 {
-    if (ShapeReference == NULL)
-    {
-        return NULL;
-    }
-
-    return ShapeReference->VTable;
+    PCSHAPE_VTABLE Result;
+    
+    Result = StaticShapeReferenceGetVTable(ShapeReference);
+    
+    return Result;
 }
 
 _Ret_
@@ -38,10 +38,9 @@ ShapeReferenceGetData(
     _In_ PCSHAPE_REFERENCE ShapeReference
     )
 {
-    if (ShapeReference == NULL)
-    {
-        return NULL;
-    }
-
-    return ShapeReference->Data;
+    PCVOID Result;
+    
+    Result = StaticShapeReferenceGetData(ShapeReference);
+    
+    return Result;
 }

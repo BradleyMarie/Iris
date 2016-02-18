@@ -27,6 +27,10 @@ Abstract:
 #define _DISABLE_IRIS_POINT_EXPORTS_
 #endif
 
+#ifndef _IRIS_EXPORT_SHAPE_REFERENCE_ROUTINES_
+#define _DISABLE_IRIS_SHAPE_REFERENCE_EXPORTS_
+#endif
+
 #include <iris.h>
 #include <iriscommon_malloc.h>
 #include <iriscommon_pointerlist.h>

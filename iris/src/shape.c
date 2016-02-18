@@ -100,12 +100,16 @@ ShapeGetVTable(
     _In_ PCSHAPE Shape
     )
 {
+    PCSHAPE_VTABLE Result;
+    
     if (Shape == NULL)
     {
         return NULL;
     }
 
-    return Shape->ShapeReference.VTable;
+    Result = ShapeReferenceGetVTable(&Shape->ShapeReference);
+
+    return Result;
 }
 
 _Ret_
@@ -114,12 +118,16 @@ ShapeGetData(
     _In_ PCSHAPE Shape
     )
 {
+    PCVOID Result;
+    
     if (Shape == NULL)
     {
         return NULL;
     }
 
-    return Shape->ShapeReference.Data;
+    Result = ShapeReferenceGetData(&Shape->ShapeReference);
+
+    return Result;
 }
 
 VOID
@@ -140,8 +148,6 @@ ShapeRelease(
     _In_opt_ _Post_invalid_ PSHAPE Shape
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-
     if (Shape == NULL)
     {
         return;
@@ -151,13 +157,7 @@ ShapeRelease(
 
     if (Shape->ReferenceCount == 0)
     {
-        FreeRoutine = Shape->ShapeReference.VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Shape->ShapeReference.Data);
-        }
-
+        ShapeReferenceDestroy(&Shape->ShapeReference);
         IrisAlignedFree(Shape);
     }
 }

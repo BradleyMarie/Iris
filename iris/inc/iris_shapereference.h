@@ -22,6 +22,8 @@ Abstract:
 // Functions
 //
 
+#ifndef _DISABLE_IRIS_SHAPE_REFERENCE_EXPORTS_
+
 _Ret_
 IRISAPI
 PCSHAPE_VTABLE
@@ -35,5 +37,7 @@ PCVOID
 ShapeReferenceGetData(
     _In_ PCSHAPE_REFERENCE ShapeReference
     );
+
+#endif // _DISABLE_IRIS_SHAPE_REFERENCE_EXPORTS_
 
 #endif // _IRIS_SHAPE_REFERENCE_
