@@ -90,7 +90,7 @@ ColorSceneReference(
     )
 {
     PSCENE Scene = (PSCENE) ColorScene;
-    SceneReference(Scene);
+    SceneRetain(Scene);
 }
 
 VOID
@@ -99,5 +99,5 @@ ColorSceneDereference(
     )
 {
     PSCENE Scene = (PSCENE) ColorScene;
-    SceneDereference(Scene);
+    SceneRelease(Scene);
 }

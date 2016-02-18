@@ -136,7 +136,7 @@ RayShaderAllocateInternal(
     }
 
     RandomReference(Rng);
-    SceneReference(Scene);
+    SceneRetain(Scene);
 
     RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
@@ -260,7 +260,7 @@ RayShaderProcessHit(
         return ISTATUS_SUCCESS;
     }
 
-    DrawingShape = (PCDRAWING_SHAPE) ShapeHit->Shape;
+    DrawingShape = (PCDRAWING_SHAPE) ShapeHit->ShapeReference;
 
     Texture = DrawingShapeGetTexture(DrawingShape,
                                      ShapeHit->FaceHit);
@@ -490,6 +490,6 @@ RayShaderFree(
 
     RayTracerOwnerFree(RayShader->RayTracerOwner);
     RandomDereference(RayShader->Rng);
-    SceneDereference(RayShader->Scene);
+    SceneRelease(RayShader->Scene);
     free(RayShader);
 }

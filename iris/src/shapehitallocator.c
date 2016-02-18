@@ -105,7 +105,7 @@ ShapeHitAllocatorAllocateInternal(
     InternalShapeHit = &ShapeHitAllocatorAllocation->InternalShapeHit;
     ShapeHit = &InternalShapeHit->ShapeHit;
 
-    ShapeHit->Shape = Allocator->CurrentShape;
+    ShapeHit->ShapeReference = Allocator->CurrentShapeReference;
     ShapeHit->Distance = Distance;
     ShapeHit->FaceHit = FaceHit;
     ShapeHit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;

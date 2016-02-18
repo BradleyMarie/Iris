@@ -66,7 +66,7 @@ VisibilityTesterAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    SceneReference(Scene);
+    SceneRetain(Scene);
 
     Tester->Scene = Scene;
     Tester->RayTracerOwner = RayTracerOwner;
@@ -178,6 +178,6 @@ VisibilityTesterFree(
     }
 
     RayTracerOwnerFree(Tester->RayTracerOwner);
-    SceneDereference(Tester->Scene);
+    SceneRelease(Tester->Scene);
     free(Tester);
 }

@@ -23,15 +23,16 @@ namespace Iris {
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS 
-RayTracerOwner::ProcessHitsAdapter(
+ProcessHitsAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCSHAPE_HIT ShapeHit
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
     
-    bool Stop = (*ProcessHitRoutine)(ShapeHit->Shape,
+    bool Stop = (*ProcessHitRoutine)(ShapeHit->ShapeReference,
                                      ShapeHit->Distance,
                                      ShapeHit->FaceHit,
                                      ShapeHit->AdditionalData,
@@ -47,8 +48,9 @@ RayTracerOwner::ProcessHitsAdapter(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS 
-RayTracerOwner::ProcessHitsWithCoordinatesAdapter(
+ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCSHAPE_HIT ShapeHit,
     _In_ PCMATRIX_REFERENCE ModelToWorld,
@@ -57,9 +59,9 @@ RayTracerOwner::ProcessHitsWithCoordinatesAdapter(
     _In_ POINT3 WorldHitPoint
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> *>(Context);
 
-    bool Stop = (*ProcessHitRoutine)(ShapeHit->Shape,
+    bool Stop = (*ProcessHitRoutine)(ShapeHit->ShapeReference,
                                      ShapeHit->Distance,
                                      ShapeHit->FaceHit,
                                      ShapeHit->AdditionalData,
@@ -104,7 +106,7 @@ RayTracerOwner::TraceClosestHit(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessClosestHit(Data,
@@ -138,7 +140,7 @@ RayTracerOwner::TraceClosestHit(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(Data,
@@ -171,7 +173,7 @@ void
 RayTracerOwner::TraceAllHitsOutOfOrder(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(Data,
@@ -200,7 +202,7 @@ void
 RayTracerOwner::TraceAllHitsInOrder(
     _In_ const Scene & Scene,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(PCSHAPE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+    _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, PCMATRIX_REFERENCE, const Vector &, const Point &, const Point &)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,

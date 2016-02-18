@@ -180,7 +180,7 @@ SpectrumSceneDereference(
         }
         
         PointerListDestroy(&SpectrumScene->Lights);
-        SceneDereference(SpectrumScene->Scene);
+        SceneRelease(SpectrumScene->Scene);
         free(SpectrumScene);
     } 
 }

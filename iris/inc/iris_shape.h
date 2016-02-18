@@ -39,6 +39,9 @@ typedef struct _SHAPE_VTABLE {
 
 typedef CONST SHAPE_VTABLE *PCSHAPE_VTABLE;
 
+typedef struct _SHAPE SHAPE, *PSHAPE;
+typedef CONST SHAPE *PCSHAPE;
+
 //
 // Functions
 //
@@ -71,13 +74,13 @@ ShapeGetData(
 
 IRISAPI
 VOID
-ShapeReference(
+ShapeRetain(
     _In_opt_ PSHAPE Shape
     );
 
 IRISAPI
 VOID
-ShapeDereference(
+ShapeRelease(
     _In_opt_ _Post_invalid_ PSHAPE Shape
     );
 

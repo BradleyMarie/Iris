@@ -165,7 +165,7 @@ SpectrumShapeReference(
 
     Shape = (PSHAPE) SpectrumShape;
 
-    ShapeReference(Shape);
+    ShapeRetain(Shape);
 }
 
 VOID
@@ -177,5 +177,5 @@ SpectrumShapeDereference(
 
     Shape = (PSHAPE) SpectrumShape;
 
-    ShapeDereference(Shape);
+    ShapeRelease(Shape);
 }

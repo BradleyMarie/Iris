@@ -121,7 +121,7 @@ SceneGetData(
 }
 
 VOID
-SceneReference(
+SceneRetain(
     _In_opt_ PSCENE Scene
     )
 {
@@ -134,7 +134,7 @@ SceneReference(
 }
 
 VOID
-SceneDereference(
+SceneRelease(
     _In_opt_ _Post_invalid_ PSCENE Scene
     )
 {

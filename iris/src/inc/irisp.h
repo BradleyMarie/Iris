@@ -41,6 +41,7 @@ Abstract:
 #include "iris_point.h"
 #include "iris_ray.h"
 #include "iris_shapehitallocator.h"
+#include "iris_shapereference.h"
 #include "iris_shape.h"
 #include "iris_sharedhitdataallocator.h"
 #include "iris_scene.h"

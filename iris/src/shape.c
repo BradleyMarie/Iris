@@ -78,9 +78,11 @@ ShapeAllocate(
 
     AllocatedShape = (PSHAPE) HeaderAllocation;
 
-    AllocatedShape->VTable = ShapeVTable;
+    ShapeReferenceInitialize(ShapeVTable,
+                             DataAllocation,
+                             &AllocatedShape->ShapeReference);
+                             
     AllocatedShape->ReferenceCount = 1;
-    AllocatedShape->Data = DataAllocation;
 
     if (DataSizeInBytes != 0)
     {
@@ -103,7 +105,7 @@ ShapeGetVTable(
         return NULL;
     }
 
-    return Shape->VTable;
+    return Shape->ShapeReference.VTable;
 }
 
 _Ret_
@@ -117,11 +119,11 @@ ShapeGetData(
         return NULL;
     }
 
-    return Shape->Data;
+    return Shape->ShapeReference.Data;
 }
 
 VOID
-ShapeReference(
+ShapeRetain(
     _In_opt_ PSHAPE Shape
     )
 {
@@ -134,7 +136,7 @@ ShapeReference(
 }
 
 VOID
-ShapeDereference(
+ShapeRelease(
     _In_opt_ _Post_invalid_ PSHAPE Shape
     )
 {
@@ -149,11 +151,11 @@ ShapeDereference(
 
     if (Shape->ReferenceCount == 0)
     {
-        FreeRoutine = Shape->VTable->FreeRoutine;
+        FreeRoutine = Shape->ShapeReference.VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {
-            FreeRoutine(Shape->Data);
+            FreeRoutine(Shape->ShapeReference.Data);
         }
 
         IrisAlignedFree(Shape);

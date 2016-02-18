@@ -32,7 +32,7 @@ typedef CONST SHARED_HIT_DATA *PCSHARED_HIT_DATA;
 typedef struct _SHAPE_HIT_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     STATIC_MEMORY_ALLOCATOR ShapeHitAllocator;
-    PCSHAPE CurrentShape;
+    PCSHAPE_REFERENCE CurrentShapeReference;
 } SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
 
 typedef struct _INTERNAL_SHAPE_HIT {
@@ -124,15 +124,15 @@ ShapeHitAllocatorFreeAll(
 
 SFORCEINLINE
 VOID
-ShapeHitAllocatorSetCurrentShape(
+ShapeHitAllocatorSetCurrentShapeReference(
     _Inout_ PSHAPE_HIT_ALLOCATOR Allocator,
-    _In_ PCSHAPE Shape
+    _In_ PCSHAPE_REFERENCE ShapeReference
     )
 {
     ASSERT(Allocator != NULL);
-    ASSERT(Shape != NULL);
+    ASSERT(ShapeReference != NULL);
 
-    Allocator->CurrentShape = Shape;
+    Allocator->CurrentShapeReference = ShapeReference;
 }
 
 SFORCEINLINE

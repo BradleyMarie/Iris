@@ -29,6 +29,6 @@ SceneObjectFree(
     Shape = (PSHAPE) SceneObject->Shape;
 
     MatrixRelease(SceneObject->ModelToWorld);
-    ShapeDereference(Shape);
+    ShapeRelease(Shape);
     free(SceneObject);
 }

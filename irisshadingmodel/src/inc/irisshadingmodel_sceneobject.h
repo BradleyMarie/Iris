@@ -50,7 +50,7 @@ SceneObjectAllocate(
     SceneObject->Premultiplied = Premultiplied;
 
     MatrixRetain(ModelToWorld);
-    ShapeReference(Shape);
+    ShapeRetain(Shape);
 
     return SceneObject;
 }

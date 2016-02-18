@@ -137,7 +137,7 @@ AdvancedShapeReference(
 
     Shape = (PSHAPE) AdvancedShape;
 
-    ShapeReference(Shape);
+    ShapeRetain(Shape);
 }
 
 VOID
@@ -149,5 +149,5 @@ AdvancedShapeDereference(
 
     Shape = (PSHAPE) AdvancedShape;
 
-    ShapeDereference(Shape);
+    ShapeRelease(Shape);
 }

@@ -22,9 +22,8 @@ Abstract:
 //
 
 struct _SHAPE {
-    PCSHAPE_VTABLE VTable;
+    SHAPE_REFERENCE ShapeReference;
     SIZE_T ReferenceCount;
-    PVOID Data;
 };
 
 //
@@ -48,13 +47,11 @@ ShapeTraceShape(
     ASSERT(ShapeHitAllocator != NULL);
     ASSERT(ShapeHitList != NULL);
 
-    ShapeHitAllocatorSetCurrentShape(ShapeHitAllocator, Shape);
-
-    Status = Shape->VTable->TraceRoutine(Shape->Data, 
-                                         Ray,
-                                         ShapeHitAllocator,
-                                         ShapeHitList);
-
+    Status = ShapeReferenceTrace(&Shape->ShapeReference,
+                                 Ray,
+                                 ShapeHitAllocator,
+                                 ShapeHitList);
+                                 
     return Status;
 }
 

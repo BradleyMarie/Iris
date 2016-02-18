@@ -111,7 +111,7 @@ DrawingShapeReference(
 
     Shape = (PSHAPE) DrawingShape;
 
-    ShapeReference(Shape);
+    ShapeRetain(Shape);
 }
 
 VOID
@@ -123,5 +123,5 @@ DrawingShapeDereference(
 
     Shape = (PSHAPE) DrawingShape;
 
-    ShapeDereference(Shape);
+    ShapeRelease(Shape);
 }

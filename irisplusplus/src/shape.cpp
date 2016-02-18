@@ -96,7 +96,7 @@ Shape::Reference(
     void
     )
 {
-    ShapeReference(Data);
+    ShapeRetain(Data);
 }
 
 void 
@@ -104,7 +104,7 @@ Shape::Dereference(
     void
     )
 {
-    ShapeDereference(Data);
+    ShapeRelease(Data);
 }
 
 CShape::CShape(
