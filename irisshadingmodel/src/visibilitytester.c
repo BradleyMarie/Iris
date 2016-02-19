@@ -16,7 +16,7 @@ Abstract:
 #include <iriscommon_visibility.h>
 
 struct _VISIBILITY_TESTER {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     FLOAT Epsilon;
     PSCENE Scene;
 };
@@ -30,7 +30,7 @@ VisibilityTesterAllocate(
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
 {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     PVISIBILITY_TESTER Tester;
     ISTATUS Status;
 
@@ -58,7 +58,7 @@ VisibilityTesterAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = RayTracerOwnerAllocate(&RayTracerOwner);
+    Status = RayTracerAllocate(&RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -69,7 +69,7 @@ VisibilityTesterAllocate(
     SceneRetain(Scene);
 
     Tester->Scene = Scene;
-    Tester->RayTracerOwner = RayTracerOwner;
+    Tester->RayTracer = RayTracer;
     Tester->Epsilon = MaxFloat(Epsilon, (FLOAT) 0.0);
 
     *VisibilityTester = Tester;
@@ -114,12 +114,12 @@ VisibilityTesterTestVisibility(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerTestVisibility(Tester->RayTracerOwner,
-                                          Tester->Scene,
-                                          WorldRay,
-                                          DistanceToObject,
-                                          Tester->Epsilon,
-                                          Visible);
+    Status = RayTracerTestVisibility(Tester->RayTracer,
+                                     Tester->Scene,
+                                     WorldRay,
+                                     DistanceToObject,
+                                     Tester->Epsilon,
+                                     Visible);
 
     return Status;
 }
@@ -158,11 +158,11 @@ VisibilityTesterTestVisibilityAnyDistance(
 
     WorldRay = RayNormalize(WorldRay);
 
-    Status = RayTracerOwnerTestVisibilityAnyDistance(Tester->RayTracerOwner,
-                                                     Tester->Scene,
-                                                     WorldRay,
-                                                     Tester->Epsilon,
-                                                     Visible);
+    Status = RayTracerTestVisibilityAnyDistance(Tester->RayTracer,
+                                                Tester->Scene,
+                                                WorldRay,
+                                                Tester->Epsilon,
+                                                Visible);
 
     return Status;
 }
@@ -177,7 +177,7 @@ VisibilityTesterFree(
         return;
     }
 
-    RayTracerOwnerFree(Tester->RayTracerOwner);
+    RayTracerFree(Tester->RayTracer);
     SceneRelease(Tester->Scene);
     free(Tester);
 }

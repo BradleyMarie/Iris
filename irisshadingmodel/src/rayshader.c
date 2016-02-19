@@ -24,7 +24,7 @@ struct _RAYSHADER {
     FLOAT MaximumContinueProbability;
     PRANDOM Rng;
     PSCENE Scene;
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     FLOAT Epsilon;
     UINT8 CurrentDepth;
     PCVOID Context;
@@ -62,7 +62,7 @@ RayShaderAllocateInternal(
 {
     PRAYSHADER NextRayShader;
     PRAYSHADER RayShader;
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     ASSERT(ShadeRayRoutine != NULL);
@@ -119,7 +119,7 @@ RayShaderAllocateInternal(
         NextRayShader = NULL;
     }
 
-    Status = RayTracerOwnerAllocate(&RayTracerOwner);
+    Status = RayTracerAllocate(&RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -143,7 +143,7 @@ RayShaderAllocateInternal(
     RayShader->MaximumContinueProbability = MaximumContinueProbability;
     RayShader->Rng = Rng;
     RayShader->Scene = Scene;
-    RayShader->RayTracerOwner = RayTracerOwner;
+    RayShader->RayTracer = RayTracer;
     RayShader->Epsilon = Epsilon;
     RayShader->CurrentDepth = CurrentDepth;
     RayShader->Context = Context;
@@ -443,11 +443,11 @@ RayShaderTraceRayMontecarlo(
     ProcessHitContext.BlendedColor = Color4InitializeTransparent();
     ProcessHitContext.RayShader = RayShader;
 
-    Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(RayShader->RayTracerOwner,
-                                                                          RayShader->Scene,
-                                                                          WorldRay,
-                                                                          RayShaderProcessHit,
-                                                                          &ProcessHitContext);
+    Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(RayShader->RayTracer,
+                                                                     RayShader->Scene,
+                                                                     WorldRay,
+                                                                     RayShaderProcessHit,
+                                                                     &ProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -488,7 +488,7 @@ RayShaderFree(
         RayShaderFree(NextRayShader);
     }
 
-    RayTracerOwnerFree(RayShader->RayTracerOwner);
+    RayTracerFree(RayShader->RayTracer);
     RandomDereference(RayShader->Rng);
     SceneRelease(RayShader->Scene);
     free(RayShader);

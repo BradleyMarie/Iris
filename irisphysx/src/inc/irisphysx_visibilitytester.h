@@ -23,7 +23,7 @@ Abstract:
 //
 
 struct _SPECTRUM_VISIBILITY_TESTER {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     FLOAT Epsilon;
     PCSCENE Scene;
 };
@@ -40,12 +40,12 @@ SpectrumVisibilityTesterInitialize(
     _Out_ PSPECTRUM_VISIBILITY_TESTER Tester
     )
 {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     ASSERT(Tester != NULL);
 
-    Status = RayTracerOwnerAllocate(&RayTracerOwner);
+    Status = RayTracerAllocate(&RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -53,7 +53,7 @@ SpectrumVisibilityTesterInitialize(
     }
 
     Tester->Scene = NULL;
-    Tester->RayTracerOwner = RayTracerOwner;
+    Tester->RayTracer = RayTracer;
     Tester->Epsilon = (FLOAT) 0.0;
 
     return ISTATUS_SUCCESS;
@@ -84,7 +84,7 @@ SpectrumVisibilityTesterDestroy(
 {
     ASSERT(Tester != NULL);
 
-    RayTracerOwnerFree(Tester->RayTracerOwner);
+    RayTracerFree(Tester->RayTracer);
 }
 
 #endif // _SPECTRUM_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_

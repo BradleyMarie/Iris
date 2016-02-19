@@ -22,7 +22,7 @@ Abstract:
 //
 
 struct _SPECTRUM_RAYTRACER {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     PCSPECTRUM_SCENE Scene;
 };
 
@@ -36,19 +36,19 @@ SpectrumRayTracerInitialize(
     _Out_ PSPECTRUM_RAYTRACER SpectrumRayTracer
     )
 {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     ASSERT(SpectrumRayTracer != NULL);
 
-    Status = RayTracerOwnerAllocate(&RayTracerOwner);
+    Status = RayTracerAllocate(&RayTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    SpectrumRayTracer->RayTracerOwner = RayTracerOwner;
+    SpectrumRayTracer->RayTracer = RayTracer;
     SpectrumRayTracer->Scene = NULL;
 
     return ISTATUS_SUCCESS;
@@ -73,7 +73,7 @@ SpectrumRayTracerDestroy(
     _In_ _Post_invalid_ PSPECTRUM_RAYTRACER SpectrumRayTracer
     )
 {
-    RayTracerOwnerFree(SpectrumRayTracer->RayTracerOwner);
+    RayTracerFree(SpectrumRayTracer->RayTracer);
 }
 
 #endif // _SPECTRUM_RAYTRACER_IRIS_PHYSX_INTERNAL_

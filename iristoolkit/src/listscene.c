@@ -104,7 +104,7 @@ STATIC
 ISTATUS 
 ListSceneTrace(
     _In_ PCVOID Context,
-    _Inout_ PRAYTRACER RayTracer
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
     PSCENE_OBJECT *Objects;
@@ -114,7 +114,7 @@ ListSceneTrace(
     SIZE_T Index;
 
     ASSERT(Context != NULL);
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
 
     ListScene = (PLIST_SCENE) Context;
 
@@ -123,10 +123,10 @@ ListSceneTrace(
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = RayTracerTraceShapeWithTransform(RayTracer,
-                                                  (PSHAPE) Objects[Index]->Shape,
-                                                  Objects[Index]->ModelToWorld,
-                                                  Objects[Index]->Premultiplied);
+        Status = RayTracerReferenceTraceShapeWithTransform(RayTracerReference,
+                                                           (PSHAPE) Objects[Index]->Shape,
+                                                           Objects[Index]->ModelToWorld,
+                                                           Objects[Index]->Premultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {

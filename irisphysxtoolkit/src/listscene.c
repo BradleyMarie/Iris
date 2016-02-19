@@ -64,19 +64,19 @@ STATIC
 ISTATUS 
 PhysxListSceneTrace(
     _In_ PCVOID Context, 
-    _Inout_ PRAYTRACER RayTracer
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
     PPHYSX_LIST_SCENE Scene;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
     
     Scene = (PPHYSX_LIST_SCENE) Context;
     
     Status = ListSceneTrace(&Scene->Data,
-                            RayTracer);
+                            RayTracerReference);
     
     return Status;
 }

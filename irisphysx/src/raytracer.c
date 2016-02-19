@@ -42,12 +42,12 @@ SpectrumRayTracerTraceSceneProcessClosestHit(
     
     IrisProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE) ProcessHitRoutine;
     
-    Status = RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(SpectrumRayTracer->RayTracerOwner,
-                                                                      SpectrumRayTracer->Scene->Scene,
-                                                                      Ray,
-                                                                      MinimumDistance,
-                                                                      IrisProcessHitRoutine,
-                                                                      ProcessHitContext);
+    Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(SpectrumRayTracer->RayTracer,
+                                                                 SpectrumRayTracer->Scene->Scene,
+                                                                 Ray,
+                                                                 MinimumDistance,
+                                                                 IrisProcessHitRoutine,
+                                                                 ProcessHitContext);
                                                             
     return Status;
 }
@@ -75,11 +75,11 @@ SpectrumRayTracerTraceSceneProcessAllHitsInOrder(
     
     IrisProcessHitRoutine = (PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE) ProcessHitRoutine;
     
-    Status = RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(SpectrumRayTracer->RayTracerOwner,
-                                                                          SpectrumRayTracer->Scene->Scene,
-                                                                          Ray,
-                                                                          IrisProcessHitRoutine,
-                                                                          ProcessHitContext);
+    Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(SpectrumRayTracer->RayTracer,
+                                                                     SpectrumRayTracer->Scene->Scene,
+                                                                     Ray,
+                                                                     IrisProcessHitRoutine,
+                                                                     ProcessHitContext);
                                                             
     return Status;
 }

@@ -50,8 +50,8 @@ extern "C" {
 #include "irisplusplus_shapehitallocator.h"
 #include "irisplusplus_shapereference.h"
 #include "irisplusplus_shape.h"
-#include "irisplusplus_raytracer.h"
+#include "irisplusplus_raytracerreference.h"
 #include "irisplusplus_scene.h"
-#include "irisplusplus_raytracerowner.h"
+#include "irisplusplus_raytracer.h"
 
 #endif // _IRIS_PLUS_PLUS_HEADER_

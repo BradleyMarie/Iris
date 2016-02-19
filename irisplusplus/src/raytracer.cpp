@@ -18,54 +18,218 @@ Abstract:
 namespace Iris {
 
 //
+// Static Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+RayTracer::ProcessHitsAdapter(
+    _Inout_opt_ PVOID Context, 
+    _In_ PCHIT Hit
+    )
+{
+    auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
+    
+    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->ShapeReference),
+                                     Hit->Distance,
+                                     Hit->FaceHit,
+                                     Hit->AdditionalData,
+                                     Hit->AdditionalDataSizeInBytes);
+
+    if (Stop)
+    {
+        return ISTATUS_NO_MORE_DATA;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+RayTracer::ProcessHitsWithCoordinatesAdapter(
+    _Inout_opt_ PVOID Context, 
+    _In_ PCHIT Hit,
+    _In_ PCMATRIX_REFERENCE ModelToWorldReference,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint
+    )
+{
+    auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
+
+    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->ShapeReference),
+                                     Hit->Distance,
+                                     Hit->FaceHit,
+                                     Hit->AdditionalData,
+                                     Hit->AdditionalDataSizeInBytes,
+                                     MatrixReference(ModelToWorldReference),
+                                     Vector(ModelViewer),
+                                     Point(ModelHitPoint),
+                                     Point(WorldHitPoint));
+
+    if (Stop)
+    {
+        return ISTATUS_NO_MORE_DATA;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+//
 // Functions
 //
 
-void
-RayTracer::Trace(
-    _In_ const Shape & ShapeRef
+RayTracer::RayTracer(
+    void
     )
 {
-    ISTATUS Status = RayTracerTraceShape(Data, ShapeRef.AsPCSHAPE());
+    ISTATUS Status = RayTracerAllocate(&Data);
     
-    if (Status != ISTATUS_SUCCESS)
+    switch (Status)
     {
-        throw std::runtime_error(ISTATUSToCString(Status));
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        default:
+            ASSERT(false);
     }
 }
 
 void
-RayTracer::Trace(
-    _In_ const Shape & ShapeRef,
-    _In_ const Matrix & MatrixRef
+RayTracer::TraceClosestHit(
+    _In_ const Scene & Scene,
+    _In_ const Ray & WorldRay,
+    _In_ FLOAT MinimumDistance,
+    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
-    ISTATUS Status = RayTracerTracePremultipliedShapeWithTransform(Data,
-                                                                   ShapeRef.AsPCSHAPE(),
-                                                                   MatrixRef.AsPCMATRIX());
+    ISTATUS Status = RayTracerTraceSceneProcessClosestHit(Data,
+                                                          Scene.AsPCSCENE(),
+                                                          WorldRay.AsRAY(),
+                                                          MinimumDistance,
+                                                          ProcessHitsAdapter,
+                                                          &ProcessHitRoutine);
     
-    if (Status != ISTATUS_SUCCESS)
+    switch (Status)
     {
-        throw std::runtime_error(ISTATUSToCString(Status));
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("WorldRay");
+            break;
+        case ISTATUS_INVALID_ARGUMENT_03:
+            throw std::invalid_argument("MinimumDistance");
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+            break;
     }
 }
 
 void
-RayTracer::Trace(
-    _In_ const Shape & ShapeRef,
-    _In_ const Matrix & MatrixRef,
-    _In_ bool Premultiplied
+RayTracer::TraceClosestHit(
+    _In_ const Scene & Scene,
+    _In_ const Ray & WorldRay,
+    _In_ FLOAT MinimumDistance,
+    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
-    ISTATUS Status = RayTracerTraceShapeWithTransform(Data, 
-                                                      ShapeRef.AsPCSHAPE(),
-                                                      MatrixRef.AsPCMATRIX(),
-                                                      Premultiplied ? TRUE : FALSE);
-                                                      
-    if (Status != ISTATUS_SUCCESS)
+    ISTATUS Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(Data,
+                                                                         Scene.AsPCSCENE(),
+                                                                         WorldRay.AsRAY(),
+                                                                         MinimumDistance,
+                                                                         ProcessHitsWithCoordinatesAdapter,
+                                                                         &ProcessHitRoutine);
+
+    switch (Status)
     {
-        throw std::runtime_error(ISTATUSToCString(Status));
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("WorldRay");
+            break;
+        case ISTATUS_INVALID_ARGUMENT_03:
+            throw std::invalid_argument("MinimumDistance");
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+            break;
     }
+}
+
+void
+RayTracer::TraceAllHitsOutOfOrder(
+    _In_ const Scene & Scene,
+    _In_ const Ray & WorldRay,
+    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    )
+{
+    ISTATUS Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(Data,
+                                                                 Scene.AsPCSCENE(),
+                                                                 WorldRay.AsRAY(),
+                                                                 ProcessHitsAdapter,
+                                                                 &ProcessHitRoutine);
+
+    switch (Status)
+    {
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("WorldRay");
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+            break;
+    }
+}
+
+void
+RayTracer::TraceAllHitsInOrder(
+    _In_ const Scene & Scene,
+    _In_ const Ray & WorldRay,
+    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+    )
+{
+    ISTATUS Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,
+                                                                             Scene.AsPCSCENE(),
+                                                                             WorldRay.AsRAY(),
+                                                                             ProcessHitsWithCoordinatesAdapter,
+                                                                             &ProcessHitRoutine);
+
+    switch (Status)
+    {
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("WorldRay");
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+            break;
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+            break;
+    }
+}
+
+RayTracer::~RayTracer(
+    void
+    )
+{
+    RayTracerFree(Data);
 }
 
 } // namespace Iris

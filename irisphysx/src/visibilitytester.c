@@ -99,12 +99,12 @@ SpectrumVisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = RayTracerOwnerTestVisibility(Tester->RayTracerOwner,
-                                          Tester->Scene,
-                                          WorldRay,
-                                          DistanceToObject,
-                                          Tester->Epsilon,
-                                          Visible);
+    Status = RayTracerTestVisibility(Tester->RayTracer,
+                                     Tester->Scene,
+                                     WorldRay,
+                                     DistanceToObject,
+                                     Tester->Epsilon,
+                                     Visible);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -151,11 +151,11 @@ SpectrumVisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    Status = RayTracerOwnerTestVisibilityAnyDistance(Tester->RayTracerOwner,
-                                                     Tester->Scene,
-                                                     WorldRay,
-                                                     Tester->Epsilon,
-                                                     Visible);
+    Status = RayTracerTestVisibilityAnyDistance(Tester->RayTracer,
+                                                Tester->Scene,
+                                                WorldRay,
+                                                Tester->Epsilon,
+                                                Visible);
 
     if (Status == ISTATUS_INVALID_ARGUMENT_02)
     {
@@ -177,7 +177,7 @@ SpectrumVisibilityTesterTestLightVisibility(
     )
 {
     SPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     ASSERT(Tester->Scene != NULL);
@@ -197,16 +197,16 @@ SpectrumVisibilityTesterTestLightVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    RayTracerOwner = Tester->RayTracerOwner;
+    RayTracer = Tester->RayTracer;
 
     ProcessHitContext = SpectrumVisibilityTesterTestLightVisibilityProcessHitCreateContext(Light, FALSE);
 
-    Status = RayTracerOwnerTraceSceneProcessClosestHit(RayTracerOwner,
-                                                       Tester->Scene,
-                                                       WorldRay,
-                                                       Tester->Epsilon,
-                                                       SpectrumVisibilityTesterTestLightVisibilityProcessHit,
-                                                       &ProcessHitContext);
+    Status = RayTracerTraceSceneProcessClosestHit(RayTracer,
+                                                  Tester->Scene,
+                                                  WorldRay,
+                                                  Tester->Epsilon,
+                                                  SpectrumVisibilityTesterTestLightVisibilityProcessHit,
+                                                  &ProcessHitContext);
     
     if (Status != ISTATUS_SUCCESS)
     {

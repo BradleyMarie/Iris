@@ -4,11 +4,11 @@ Copyright (c) 2013 Brad Weinberger
 
 Module Name:
 
-    raytracerowner.c
+    raytracer.c
 
 Abstract:
 
-    This module implements the RAYTRACER_OWNER functions.
+    This module implements the raytracer functions.
 
 --*/
 
@@ -18,7 +18,7 @@ Abstract:
 // Types
 //
 
-struct _RAYTRACER {
+struct _RAYTRACER_REFERENCE {
     HIT_ALLOCATOR HitAllocator;
     SHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     CONSTANT_POINTER_LIST HitList;
@@ -26,17 +26,17 @@ struct _RAYTRACER {
     RAY CurrentRay;
 };
 
-struct _RAYTRACER_OWNER {
-    RAYTRACER RayTracer;
+struct _RAYTRACER {
+    RAYTRACER_REFERENCE RayTracerReference;
 };
 
 //
-// RayTracer Static Functions
+// RayTracerReference Static Functions
 //
 
 STATIC
 COMPARISON_RESULT
-RayTracerInternalHitPointerCompare(
+RayTracerReferenceInternalHitPointerCompare(
     _In_ PCVOID Hit0,
     _In_ PCVOID Hit1
     )
@@ -60,47 +60,47 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-RayTracerInitialize(
-    _Out_ PRAYTRACER RayTracer
+RayTracerReferenceInitialize(
+    _Out_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
     ISTATUS Status;
 
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
 
-    Status = HitAllocatorInitialize(&RayTracer->HitAllocator);
+    Status = HitAllocatorInitialize(&RayTracerReference->HitAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ConstantPointerListInitialize(&RayTracer->HitList);
+    Status = ConstantPointerListInitialize(&RayTracerReference->HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
-        HitAllocatorDestroy(&RayTracer->HitAllocator);
+        HitAllocatorDestroy(&RayTracerReference->HitAllocator);
         return Status;
     }
 
-    Status = SharedHitDataAllocatorInitialize(&RayTracer->SharedHitDataAllocator);
+    Status = SharedHitDataAllocatorInitialize(&RayTracerReference->SharedHitDataAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
-        ConstantPointerListDestroy(&RayTracer->HitList);
-        HitAllocatorDestroy(&RayTracer->HitAllocator);
+        ConstantPointerListDestroy(&RayTracerReference->HitList);
+        HitAllocatorDestroy(&RayTracerReference->HitAllocator);
         return Status;
     }
 
-    RayTracer->HitIndex = 0;
+    RayTracerReference->HitIndex = 0;
 
     return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
 VOID
-RayTracerSetRay(
-    _Inout_ PRAYTRACER RayTracer,
+RayTracerReferenceSetRay(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference,
     _In_ RAY Ray
     )
 {
@@ -108,39 +108,39 @@ RayTracerSetRay(
     PCONSTANT_POINTER_LIST PointerList;
     PHIT_ALLOCATOR HitAllocator;
 
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
 
-    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    HitAllocator = &RayTracer->HitAllocator;
-    PointerList = &RayTracer->HitList;
+    SharedHitDataAllocator = &RayTracerReference->SharedHitDataAllocator;
+    HitAllocator = &RayTracerReference->HitAllocator;
+    PointerList = &RayTracerReference->HitList;
 
     SharedHitDataAllocatorFreeAll(SharedHitDataAllocator);
     HitAllocatorFreeAll(HitAllocator);
     ConstantPointerListClear(PointerList);
 
-    RayTracer->HitIndex = 0;
-    RayTracer->CurrentRay = Ray;
+    RayTracerReference->HitIndex = 0;
+    RayTracerReference->CurrentRay = Ray;
 }
 
 SFORCEINLINE
 VOID
-RayTracerSort(
-    _Inout_ PRAYTRACER RayTracer
+RayTracerReferenceSort(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
 
-    ConstantPointerListSort(&RayTracer->HitList,
-                            RayTracerInternalHitPointerCompare);
+    ConstantPointerListSort(&RayTracerReference->HitList,
+                            RayTracerReferenceInternalHitPointerCompare);
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-RayTracerGetNextHit(
-    _Inout_ PRAYTRACER RayTracer,
+RayTracerReferenceGetNextHit(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference,
     _Out_ PCINTERNAL_HIT *Hit
     )
 {
@@ -149,13 +149,13 @@ RayTracerGetNextHit(
     SIZE_T CurrentIndex;
     SIZE_T HitCount;
 
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
     ASSERT(Hit != NULL);
 
-    PointerList = &RayTracer->HitList;
+    PointerList = &RayTracerReference->HitList;
 
     HitCount = ConstantPointerListGetSize(PointerList);
-    CurrentIndex = RayTracer->HitIndex;
+    CurrentIndex = RayTracerReference->HitIndex;
 
     if (HitCount == CurrentIndex)
     {
@@ -165,7 +165,7 @@ RayTracerGetNextHit(
     ValueAtIndex = ConstantPointerListRetrieveAtIndex(PointerList,
                                                       CurrentIndex);
 
-    RayTracer->HitIndex = CurrentIndex + 1;
+    RayTracerReference->HitIndex = CurrentIndex + 1;
 
     *Hit = (PCINTERNAL_HIT) ValueAtIndex;
 
@@ -176,8 +176,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 VOID
-RayTracerComputeHitData(
-    _In_ PCRAYTRACER RayTracer,
+RayTracerReferenceComputeHitData(
+    _In_ PCRAYTRACER_REFERENCE RayTracerReference,
     _In_ PCINTERNAL_HIT Hit,
     _Out_ PCMATRIX_REFERENCE *ModelToWorldReference,
     _Out_ PVECTOR3 ModelViewer,
@@ -187,7 +187,7 @@ RayTracerComputeHitData(
 {
     PCSHARED_HIT_DATA SharedHitData;
 
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
     ASSERT(Hit != NULL);
     ASSERT(ModelToWorldReference != NULL);
     ASSERT(ModelViewer != NULL);
@@ -206,7 +206,7 @@ RayTracerComputeHitData(
         }
         else
         {
-            *WorldHit = RayEndpoint(RayTracer->CurrentRay,
+            *WorldHit = RayEndpoint(RayTracerReference->CurrentRay,
                                     Hit->Hit.Distance);
         }
         
@@ -214,7 +214,7 @@ RayTracerComputeHitData(
                                                  *WorldHit);
 
         *ModelViewer = VectorMatrixReferenceInverseMultiply(SharedHitData->ModelToWorldReference,
-                                                            RayTracer->CurrentRay.Direction);
+                                                            RayTracerReference->CurrentRay.Direction);
     }
     else
     {
@@ -230,26 +230,26 @@ RayTracerComputeHitData(
 
         *ModelViewer = SharedHitData->ModelRay.Direction;
 
-        *WorldHit = RayEndpoint(RayTracer->CurrentRay,
+        *WorldHit = RayEndpoint(RayTracerReference->CurrentRay,
                                 Hit->Hit.Distance);
     }
 }
 
 SFORCEINLINE
 VOID
-RayTracerDestroy(
-    _In_ _Post_invalid_ PRAYTRACER RayTracer
+RayTracerReferenceDestroy(
+    _In_ _Post_invalid_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
     PCONSTANT_POINTER_LIST PointerList;
     PHIT_ALLOCATOR HitAllocator;
 
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
 
-    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    HitAllocator = &RayTracer->HitAllocator;
-    PointerList = &RayTracer->HitList;
+    SharedHitDataAllocator = &RayTracerReference->SharedHitDataAllocator;
+    HitAllocator = &RayTracerReference->HitAllocator;
+    PointerList = &RayTracerReference->HitList;
 
     SharedHitDataAllocatorDestroy(SharedHitDataAllocator);
     HitAllocatorDestroy(HitAllocator);
@@ -257,17 +257,17 @@ RayTracerDestroy(
 }
 
 //
-// RayTracerOwner Public Functions
+// RayTracer Public Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerAllocate(
-    _Out_ PRAYTRACER_OWNER *Result
+RayTracerAllocate(
+    _Out_ PRAYTRACER *Result
     )
 {
-    PRAYTRACER_OWNER RayTracerOwner;
+    PRAYTRACER RayTracer;
     ISTATUS Status;
 
     if (Result == NULL)
@@ -275,21 +275,21 @@ RayTracerOwnerAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    RayTracerOwner = (PRAYTRACER_OWNER) malloc(sizeof(RAYTRACER_OWNER));
+    RayTracer = (PRAYTRACER) malloc(sizeof(RAYTRACER));
 
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = RayTracerInitialize(&RayTracerOwner->RayTracer);
+    Status = RayTracerReferenceInitialize(&RayTracer->RayTracerReference);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    *Result = RayTracerOwner;
+    *Result = RayTracer;
 
     return ISTATUS_SUCCESS;
 }
@@ -298,8 +298,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneProcessClosestHit(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerTraceSceneProcessClosestHit(
+    _Inout_ PRAYTRACER RayTracer,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
@@ -311,10 +311,10 @@ RayTracerOwnerTraceSceneProcessClosestHit(
     PCINTERNAL_HIT ClosestHit;
     FLOAT ClosestDistance;
     FLOAT CurrentDistance;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_REFERENCE RayTracerReference;
     ISTATUS Status;
 
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -339,19 +339,19 @@ RayTracerOwnerTraceSceneProcessClosestHit(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
     
-    RayTracer = &RayTracerOwner->RayTracer;
+    RayTracerReference = &RayTracer->RayTracerReference;
 
-    RayTracerSetRay(RayTracer, Ray);
+    RayTracerReferenceSetRay(RayTracerReference, Ray);
 
-    Status = SceneTrace(Scene, RayTracer);
+    Status = SceneTrace(Scene, RayTracerReference);
     
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    Status = RayTracerGetNextHit(RayTracer,
-                                 &ClosestHit);
+    Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                          &ClosestHit);
     
     if (Status != ISTATUS_NO_MORE_DATA)
     {
@@ -362,8 +362,8 @@ RayTracerOwnerTraceSceneProcessClosestHit(
     
     while (TRUE)
     {
-        Status = RayTracerGetNextHit(RayTracer,
-                                     &CurrentHit);
+        Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                              &CurrentHit);
         
         if (Status != ISTATUS_NO_MORE_DATA)
         {
@@ -395,8 +395,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerTraceSceneProcessClosestHitWithCoordinates(
+    _Inout_ PRAYTRACER RayTracer,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
@@ -409,13 +409,13 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
     PCMATRIX_REFERENCE ModelToWorld;
     FLOAT ClosestDistance;
     FLOAT CurrentDistance;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_REFERENCE RayTracerReference;
     VECTOR3 ModelViewer;
     POINT3 ModelHit;
     POINT3 WorldHit;
     ISTATUS Status;
 
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -440,19 +440,19 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    RayTracer = &RayTracerOwner->RayTracer;
+    RayTracerReference = &RayTracer->RayTracerReference;
     
-    RayTracerSetRay(RayTracer, Ray);
+    RayTracerReferenceSetRay(RayTracerReference, Ray);
 
-    Status = SceneTrace(Scene, RayTracer);
+    Status = SceneTrace(Scene, RayTracerReference);
     
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    Status = RayTracerGetNextHit(RayTracer,
-                                 &ClosestHit);
+    Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                          &ClosestHit);
     
     if (Status != ISTATUS_NO_MORE_DATA)
     {
@@ -463,8 +463,8 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
     
     while (TRUE)
     {
-        Status = RayTracerGetNextHit(RayTracer,
-                                     &CurrentHit);
+        Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                              &CurrentHit);
                                           
         if (Status == ISTATUS_NO_MORE_DATA)
         {
@@ -481,12 +481,12 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
         }
     }
     
-    RayTracerComputeHitData(RayTracer,
-                            ClosestHit,
-                            &ModelToWorld,
-                            &ModelViewer,
-                            &ModelHit,
-                            &WorldHit);
+    RayTracerReferenceComputeHitData(RayTracerReference,
+                                     ClosestHit,
+                                     &ModelToWorld,
+                                     &ModelViewer,
+                                     &ModelHit,
+                                     &WorldHit);
     
     Status = ProcessHitRoutine(ProcessHitContext,
                                &CurrentHit->Hit,
@@ -506,8 +506,8 @@ RayTracerOwnerTraceSceneProcessClosestHitWithCoordinates(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerTraceSceneProcessAllHitsOutOfOrder(
+    _Inout_ PRAYTRACER RayTracer,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
@@ -515,10 +515,10 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
     )
 {
     PCINTERNAL_HIT CurrentHit;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_REFERENCE RayTracerReference;
     ISTATUS Status;
 
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -538,19 +538,19 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    RayTracer = &RayTracerOwner->RayTracer;
+    RayTracerReference = &RayTracer->RayTracerReference;
     
-    RayTracerSetRay(RayTracer, Ray);
+    RayTracerReferenceSetRay(RayTracerReference, Ray);
 
-    Status = SceneTrace(Scene, RayTracer);
+    Status = SceneTrace(Scene, RayTracerReference);
     
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    Status = RayTracerGetNextHit(RayTracer,
-                                 &CurrentHit);
+    Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                          &CurrentHit);
     
     while (Status != ISTATUS_NO_MORE_DATA)
     {                            
@@ -567,8 +567,8 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
             return Status;
         }
         
-        Status = RayTracerGetNextHit(RayTracer,
-                                     &CurrentHit);
+        Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                              &CurrentHit);
     }
     
     return ISTATUS_SUCCESS;
@@ -577,8 +577,8 @@ RayTracerOwnerTraceSceneProcessAllHitsOutOfOrder(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
-    _Inout_ PRAYTRACER_OWNER RayTracerOwner,
+RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
+    _Inout_ PRAYTRACER RayTracer,
     _In_ PCSCENE Scene,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
@@ -587,13 +587,13 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
 {
     PCMATRIX_REFERENCE ModelToWorld;
     PCINTERNAL_HIT CurrentHit;
-    PRAYTRACER RayTracer;
+    PRAYTRACER_REFERENCE RayTracerReference;
     VECTOR3 ModelViewer;
     POINT3 ModelHit;
     POINT3 WorldHit;
     ISTATUS Status;
 
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -613,30 +613,30 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    RayTracer = &RayTracerOwner->RayTracer;
+    RayTracerReference = &RayTracer->RayTracerReference;
     
-    RayTracerSetRay(RayTracer, Ray);
+    RayTracerReferenceSetRay(RayTracerReference, Ray);
 
-    Status = SceneTrace(Scene, RayTracer);
+    Status = SceneTrace(Scene, RayTracerReference);
     
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    RayTracerSort(RayTracer);
+    RayTracerReferenceSort(RayTracerReference);
     
-    Status = RayTracerGetNextHit(RayTracer,
-                                 &CurrentHit);
+    Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                          &CurrentHit);
 
     while (Status != ISTATUS_NO_MORE_DATA)
     {
-        RayTracerComputeHitData(RayTracer,
-                                CurrentHit,
-                                &ModelToWorld,
-                                &ModelViewer,
-                                &ModelHit,
-                                &WorldHit);
+        RayTracerReferenceComputeHitData(RayTracerReference,
+                                         CurrentHit,
+                                         &ModelToWorld,
+                                         &ModelViewer,
+                                         &ModelHit,
+                                         &WorldHit);
 
         Status = ProcessHitRoutine(ProcessHitContext,
                                    &CurrentHit->Hit,
@@ -655,8 +655,8 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
             return Status;
         }
         
-        Status = RayTracerGetNextHit(RayTracer,
-                                     &CurrentHit);
+        Status = RayTracerReferenceGetNextHit(RayTracerReference,
+                                              &CurrentHit);
     }
     
     return ISTATUS_SUCCESS;
@@ -664,28 +664,28 @@ RayTracerOwnerTraceSceneProcessAllHitsInOrderWithCoordinates(
 
 IRISAPI
 VOID
-RayTracerOwnerFree(
-    _In_opt_ _Post_invalid_ PRAYTRACER_OWNER RayTracerOwner
+RayTracerFree(
+    _In_opt_ _Post_invalid_ PRAYTRACER RayTracer
     )
 {
-    if (RayTracerOwner == NULL)
+    if (RayTracer == NULL)
     {
         return;
     }
 
-    RayTracerDestroy(&RayTracerOwner->RayTracer);
-    free(RayTracerOwner);
+    RayTracerReferenceDestroy(&RayTracer->RayTracerReference);
+    free(RayTracer);
 }
 
 //
-// RayTracer Public Functions
+// RayTracerReference Public Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerTraceShape(
-    _Inout_ PRAYTRACER RayTracer,
+RayTracerReferenceTraceShape(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference,
     _In_ PCSHAPE Shape
     )
 {
@@ -697,7 +697,7 @@ RayTracerTraceShape(
     PHIT_LIST HitList;
     ISTATUS Status;
 
-    if (RayTracer == NULL)
+    if (RayTracerReference == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -707,9 +707,9 @@ RayTracerTraceShape(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    HitAllocator = &RayTracer->HitAllocator;
-    PointerList = &RayTracer->HitList;
+    SharedHitDataAllocator = &RayTracerReference->SharedHitDataAllocator;
+    HitAllocator = &RayTracerReference->HitAllocator;
+    PointerList = &RayTracerReference->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
 
@@ -720,10 +720,10 @@ RayTracerTraceShape(
 
     SharedHitData->ModelToWorldReference = NULL;
     SharedHitData->Premultiplied = TRUE;
-    SharedHitData->ModelRay = RayTracer->CurrentRay;
+    SharedHitData->ModelRay = RayTracerReference->CurrentRay;
 
     Status = ShapeTraceShape(Shape,
-                             RayTracer->CurrentRay,
+                             RayTracerReference->CurrentRay,
                              HitAllocator,
                              &HitList);
 
@@ -762,8 +762,8 @@ RayTracerTraceShape(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerTraceShapeWithTransform(
-    _Inout_ PRAYTRACER RayTracer,
+RayTracerReferenceTraceShapeWithTransform(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference,
     _In_ PCSHAPE Shape,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
@@ -779,7 +779,7 @@ RayTracerTraceShapeWithTransform(
     ISTATUS Status;
     RAY TraceRay;
 
-    if (RayTracer == NULL)
+    if (RayTracerReference == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -789,9 +789,9 @@ RayTracerTraceShapeWithTransform(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    HitAllocator = &RayTracer->HitAllocator;
-    PointerList = &RayTracer->HitList;
+    SharedHitDataAllocator = &RayTracerReference->SharedHitDataAllocator;
+    HitAllocator = &RayTracerReference->HitAllocator;
+    PointerList = &RayTracerReference->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
 
@@ -806,14 +806,14 @@ RayTracerTraceShapeWithTransform(
     if (Premultiplied != FALSE)
     {   
         SharedHitData->Premultiplied = TRUE;
-        TraceRay = RayTracer->CurrentRay;
+        TraceRay = RayTracerReference->CurrentRay;
     }
     else
     {
         SharedHitData->Premultiplied = FALSE;
 
         SharedHitData->ModelRay = RayMatrixReferenceInverseMultiply(ModelToWorldReference,
-                                                                    RayTracer->CurrentRay);
+                                                                    RayTracerReference->CurrentRay);
 
         TraceRay = SharedHitData->ModelRay;
     }
@@ -858,8 +858,8 @@ RayTracerTraceShapeWithTransform(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerTracePremultipliedShapeWithTransform(
-    _Inout_ PRAYTRACER RayTracer,
+RayTracerReferenceTracePremultipliedShapeWithTransform(
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference,
     _In_ PCSHAPE Shape,
     _In_opt_ PCMATRIX ModelToWorld
     )
@@ -873,7 +873,7 @@ RayTracerTracePremultipliedShapeWithTransform(
     PHIT_LIST HitList;
     ISTATUS Status;
 
-    if (RayTracer == NULL)
+    if (RayTracerReference == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -883,9 +883,9 @@ RayTracerTracePremultipliedShapeWithTransform(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    SharedHitDataAllocator = &RayTracer->SharedHitDataAllocator;
-    HitAllocator = &RayTracer->HitAllocator;
-    PointerList = &RayTracer->HitList;
+    SharedHitDataAllocator = &RayTracerReference->SharedHitDataAllocator;
+    HitAllocator = &RayTracerReference->HitAllocator;
+    PointerList = &RayTracerReference->HitList;
 
     SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
 
@@ -900,7 +900,7 @@ RayTracerTracePremultipliedShapeWithTransform(
     SharedHitData->Premultiplied = TRUE;
 
     Status = ShapeTraceShape(Shape,
-                             RayTracer->CurrentRay,
+                             RayTracerReference->CurrentRay,
                              HitAllocator,
                              &HitList);
 
@@ -939,12 +939,12 @@ RayTracerTracePremultipliedShapeWithTransform(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RayTracerGetRay(
-    _In_ PRAYTRACER RayTracer,
+RayTracerReferenceGetRay(
+    _In_ PRAYTRACER_REFERENCE RayTracerReference,
     _Out_ PRAY Ray
     )
 {
-    if (RayTracer == NULL)
+    if (RayTracerReference == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -954,7 +954,7 @@ RayTracerGetRay(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    *Ray = RayTracer->CurrentRay;
+    *Ray = RayTracerReference->CurrentRay;
 
     return ISTATUS_SUCCESS;
 }

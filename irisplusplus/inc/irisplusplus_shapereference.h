@@ -44,7 +44,7 @@ private:
     : Data(ShapeRef)
     { }
     
-    friend class RayTracerOwner;
+    friend class RayTracer;
 };
 
 } // namespace Iris

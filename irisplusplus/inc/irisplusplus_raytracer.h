@@ -4,12 +4,12 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisplusplus_raytracer.h
+    irisplusplus_raytrace.h
 
 Abstract:
 
     This file contains the definitions for the 
-    Iris++ raytracer type.
+    Iris++ RayTracer type.
 
 --*/
 
@@ -25,62 +25,75 @@ namespace Iris {
 //
 
 class RayTracer final {
-private:
-    RayTracer(
-        _In_ PRAYTRACER RayTracerPtr
-        )
-    : Data(RayTracerPtr)
-    { }
-    
 public:
-    _Ret_
-    PRAYTRACER
-    AsPRAYTRACER(
+    IRISPLUSPLUSAPI
+    RayTracer(
         void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
+        );
+    
     IRISPLUSPLUSAPI
-    Ray
-    GetRay(
+    void
+    TraceClosestHit(
+        _In_ const Scene & Scene,
+        _In_ const Ray & WorldRay,
+        _In_ FLOAT MinimumDistance,
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        );
+    
+    IRISPLUSPLUSAPI
+    void
+    TraceClosestHit(
+        _In_ const Scene & Scene,
+        _In_ const Ray & WorldRay,
+        _In_ FLOAT MinimumDistance,
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        );
+    
+    IRISPLUSPLUSAPI
+    void
+    TraceAllHitsOutOfOrder(
+        _In_ const Scene & Scene,
+        _In_ const Ray & WorldRay,
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        );
+    
+    IRISPLUSPLUSAPI
+    void
+    TraceAllHitsInOrder(
+        _In_ const Scene & Scene,
+        _In_ const Ray & WorldRay,
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        );
+    
+    IRISPLUSPLUSAPI
+    ~RayTracer(
         void
-        ) const
-    {
-        RAY CurrentRay;
-        
-        RayTracerGetRay(Data, &CurrentRay);
-        
-        return Ray(CurrentRay);
-    }
-
-    IRISPLUSPLUSAPI
-    void
-    Trace(
-        _In_ const Shape & ShapeRef
-        );
-
-    IRISPLUSPLUSAPI
-    void
-    Trace(
-        _In_ const Shape & ShapeRef,
-        _In_ const Matrix & MatrixRef
-        );
-
-    IRISPLUSPLUSAPI
-    void
-    Trace(
-        _In_ const Shape & ShapeRef,
-        _In_ const Matrix & MatrixRef,
-        _In_ bool Premultiplied
         );
 
 private:
     PRAYTRACER Data;
     
-    friend class RayTracerOwner;
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    static
+    ISTATUS 
+    ProcessHitsAdapter(
+        _Inout_opt_ PVOID Context, 
+        _In_ PCHIT Hit
+        );
+        
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    static
+    ISTATUS 
+    ProcessHitsWithCoordinatesAdapter(
+        _Inout_opt_ PVOID Context, 
+        _In_ PCHIT Hit,
+        _In_ PCMATRIX_REFERENCE ModelToWorldReference,
+        _In_ VECTOR3 ModelViewer,
+        _In_ POINT3 ModelHitPoint,
+        _In_ POINT3 WorldHitPoint
+        );
 };
 
 } // namespace Iris

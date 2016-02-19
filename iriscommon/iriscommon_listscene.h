@@ -172,7 +172,7 @@ SFORCEINLINE
 ISTATUS 
 ListSceneTrace(
     _Inout_ PCLIST_SCENE ListScene,
-    _Inout_ PRAYTRACER RayTracer
+    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
     )
 {
     PLIST_SCENE_OBJECT Objects;
@@ -181,17 +181,17 @@ ListSceneTrace(
     SIZE_T Index;
 
     ASSERT(ListScene != NULL);
-    ASSERT(RayTracer != NULL);
+    ASSERT(RayTracerReference != NULL);
 
     ListSize = ListScene->ObjectsSize;
     Objects = ListScene->Objects;
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = RayTracerTraceShapeWithTransform(RayTracer, 
-                                                  Objects[Index].Shape,
-                                                  Objects[Index].ModelToWorld,
-                                                  Objects[Index].Premultiplied);
+        Status = RayTracerReferenceTraceShapeWithTransform(RayTracerReference,
+                                                           Objects[Index].Shape,
+                                                           Objects[Index].ModelToWorld,
+                                                           Objects[Index].Premultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {
