@@ -37,7 +37,7 @@ public:
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -46,7 +46,7 @@ public:
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -54,7 +54,7 @@ public:
     TraceAllHitsOutOfOrder(
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -62,7 +62,7 @@ public:
     TraceAllHitsInOrder(
         _In_ const Scene & Scene,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCSHAPE_REFERENCE, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -72,6 +72,28 @@ public:
 
 private:
     PRAYTRACER_OWNER Data;
+    
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    static
+    ISTATUS 
+    ProcessHitsAdapter(
+        _Inout_opt_ PVOID Context, 
+        _In_ PCHIT Hit
+        );
+        
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    static
+    ISTATUS 
+    ProcessHitsWithCoordinatesAdapter(
+        _Inout_opt_ PVOID Context, 
+        _In_ PCHIT Hit,
+        _In_ PCMATRIX_REFERENCE ModelToWorldReference,
+        _In_ VECTOR3 ModelViewer,
+        _In_ POINT3 ModelHitPoint,
+        _In_ POINT3 WorldHitPoint
+        );
 };
 
 } // namespace Iris
