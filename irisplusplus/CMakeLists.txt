@@ -10,6 +10,8 @@ add_library(irisplusplus SHARED
     src/shapebase.cpp
     src/matrix.cpp
     src/matrixreference.cpp
+    src/scene.cpp
+    src/scenebase.cpp
     src/raytracerreference.cpp
     src/raytracer.cpp)
 

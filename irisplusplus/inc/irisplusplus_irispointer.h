@@ -33,7 +33,7 @@ public:
         )
     : Data(Pointer)
     {
-        if (Pointer == NULL)
+        if (Pointer == nullptr)
         {
             throw std::invalid_argument("Pointer");
         }
@@ -44,7 +44,7 @@ public:
         )
     : Data(ToCopy.Data)
     {
-        Data->Reference();
+        Data->Retain();
     }
 
     T &
@@ -70,9 +70,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            Data->Dereference();
+            Data->Release();
             Data = ToCopy.Data;
-            Data->Reference();
+            Data->Retain();
         }
 
         return *this;
@@ -82,7 +82,7 @@ public:
         void
         )
     {
-        Data->Dereference();
+        Data->Release();
     }
 
 private:

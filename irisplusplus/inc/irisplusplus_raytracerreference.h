@@ -25,14 +25,13 @@ namespace Iris {
 //
 
 class RayTracerReference final {
-private:
+public:
     RayTracerReference(
         _In_ PRAYTRACER_REFERENCE RayTracerRef
         )
     : Data(RayTracerRef)
     { }
     
-public:
     _Ret_
     PRAYTRACER_REFERENCE
     AsPRAYTRACER_REFERENCE(

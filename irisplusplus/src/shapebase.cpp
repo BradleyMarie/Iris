@@ -36,13 +36,13 @@ ShapeBase::HitAllocator::Allocate(
     ISTATUS Status;
 
     Status = HitAllocatorAllocate(Data,
-                                    NextHit,
-                                    Distance,
-                                    FaceHit,
-                                    AdditionalData,
-                                    AdditionalDataSizeInBytes,
-                                    AdditionalDataAlignment,
-                                    &Result);
+                                  NextHit,
+                                  Distance,
+                                  FaceHit,
+                                  AdditionalData,
+                                  AdditionalDataSizeInBytes,
+                                  AdditionalDataAlignment,
+                                  &Result);
 
     switch (Status)
     {
@@ -77,14 +77,14 @@ ShapeBase::HitAllocator::Allocate(
     ISTATUS Status;
 
     Status = HitAllocatorAllocateWithHitPoint(Data,
-                                                NextHit,
-                                                Distance,
-                                                FaceHit,
-                                                AdditionalData,
-                                                AdditionalDataSizeInBytes,
-                                                AdditionalDataAlignment,
-                                                HitPoint,
-                                                &Result);
+                                              NextHit,
+                                              Distance,
+                                              FaceHit,
+                                              AdditionalData,
+                                              AdditionalDataSizeInBytes,
+                                              AdditionalDataAlignment,
+                                              HitPoint,
+                                              &Result);
 
     switch (Status)
     {
@@ -148,7 +148,7 @@ const SHAPE_VTABLE ShapeBase::InteropVTable = {
 };
 
 //
-// Functions
+// Protected Functions
 //
 
 ShapeBase::ShapeBase(

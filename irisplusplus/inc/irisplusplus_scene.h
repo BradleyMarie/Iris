@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
@@ -25,14 +25,19 @@ namespace Iris {
 //
 
 class Scene final {
-private:
+public:
     Scene(
-        _In_ PSCENE ScenePtr
+        _In_ PSCENE ScenePtr,
+        _In_ bool Retain
         )
     : Data(ScenePtr)
-    { }
+    { 
+        if (Retain)
+        {
+            SceneRetain(ScenePtr);
+        }
+    }
     
-public:
     _Ret_
     PSCENE
     AsPSCENE(
@@ -51,37 +56,21 @@ public:
         return Data;
     }
 
-    virtual
-    void
-    Trace(
-        _In_ const RayTracer & RayTracerRef
-        ) const = 0;
+    IRISPLUSPLUSAPI
+    Scene & 
+    operator=(
+        _In_ Scene & ToCopy
+        );
 
-    virtual
     ~Scene(
         void
         )
-    { }
+    { 
+        SceneRelease(Data);
+    }
 
 private:
     PSCENE Data;
-
-    IRISPLUSPLUSAPI
-    virtual
-    void
-    Reference(
-        void
-        );
-
-    IRISPLUSPLUSAPI
-    virtual
-    void 
-    Dereference(
-        void
-        );
-
-    friend class IrisPointer<Scene>;
-    friend class CScene;
 };
 
 } // namespace Iris

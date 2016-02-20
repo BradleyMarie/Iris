@@ -154,6 +154,14 @@ protected:
         friend class ShapeBase;
     };
 
+    _Ret_
+    virtual
+    PHIT_LIST
+    Trace(
+        _In_ Ray ModelRay,
+        _Inout_ HitAllocator & Allocator
+        ) const = 0;
+
 public:
     _Ret_
     PSHAPE
@@ -181,14 +189,6 @@ public:
     {
         return Shape(Data, true);
     }
-    
-    _Ret_
-    virtual
-    PHIT_LIST
-    Trace(
-        _In_ Ray ModelRay,
-        _Inout_ HitAllocator & Allocator
-        ) const = 0;
 
 private:
     virtual
