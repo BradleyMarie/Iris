@@ -4,12 +4,12 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    shapehitallocator.cpp
+    hitallocator.cpp
 
 Abstract:
 
     This file contains the definitions for the 
-    Iris++ shapehitallocator type.
+    Iris++ HitAllocator type.
 
 --*/
 
@@ -23,7 +23,7 @@ namespace Iris {
 
 _Ret_
 PHIT_LIST
-ShapeHitAllocator::Allocate(
+ShapeBase::HitAllocator::Allocate(
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,    
@@ -63,7 +63,7 @@ ShapeHitAllocator::Allocate(
 
 _Ret_
 PHIT_LIST
-ShapeHitAllocator::Allocate(
+ShapeBase::HitAllocator::Allocate(
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,

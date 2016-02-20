@@ -24,14 +24,29 @@ namespace Iris {
 // Types
 //
 
-class Shape {
-protected:
+class Shape final {
+public:
     IRISPLUSPLUSAPI
     Shape(
-        void
-        );
+        _In_ PSHAPE ShapePtr,
+        _In_ bool Retain
+        )
+    : Data(ShapePtr)
+    {
+        if (Retain)
+        {
+            ShapeRetain(ShapePtr);
+        }
+    }
 
-public:
+    Shape(
+        const Shape & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        ShapeRetain(Data);
+    }
+        
     _Ret_
     PSHAPE
     AsPSHAPE(
@@ -50,84 +65,22 @@ public:
         return Data;
     }
 
-    _Ret_
-    virtual
-    PHIT_LIST
-    Trace(
-        _In_ Ray ModelRay,
-        _Inout_ ShapeHitAllocator & HitAllocator
-        ) const = 0;
+    IRISPLUSPLUSAPI
+    Shape & 
+    operator=(
+        _In_ Shape & ToCopy
+        );
 
     virtual
     ~Shape(
         void
         )
-    { }
+    { 
+        ShapeRelease(Data);
+    }
 
 private:
     PSHAPE Data;
-
-    IRISPLUSPLUSAPI
-    Shape(
-        _In_ PSHAPE ShapePtr
-        );
-
-    IRISPLUSPLUSAPI
-    virtual
-    void
-    Reference(
-        void
-        );
-
-    IRISPLUSPLUSAPI
-    virtual
-    void 
-    Dereference(
-        void
-        );
-
-    friend class IrisPointer<Shape>;
-    friend class CShape;
-};
-
-class CShape final : public Shape {
-public:
-    IRISPLUSPLUSAPI
-    static
-    IrisPointer<Shape>
-    Create(
-        _In_ PSHAPE ShapePtr
-        );
-
-    _Ret_
-    IRISPLUSPLUSAPI
-    virtual
-    PHIT_LIST
-    Trace(
-        _In_ Ray ModelRay,
-        _Inout_ ShapeHitAllocator & HitAllocator
-        ) const;
-
-    IRISPLUSPLUSAPI
-    virtual
-    void
-    Reference(
-        void
-        );
-
-    IRISPLUSPLUSAPI
-    virtual
-    void 
-    Dereference(
-        void
-        );
-
-private:
-    CShape(
-        _In_ PSHAPE ShapePtr
-        );
-
-    std::atomic_size_t References;
 };
 
 } // namespace Iris

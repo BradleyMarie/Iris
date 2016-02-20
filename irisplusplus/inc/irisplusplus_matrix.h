@@ -150,7 +150,7 @@ public:
         );
 
     Matrix(
-        const Matrix & ToCopy
+        Matrix & ToCopy
         )
     : Data(ToCopy.Data)
     {
@@ -160,7 +160,7 @@ public:
     IRISPLUSPLUSAPI
     Matrix & 
     operator=(
-        _In_ const Matrix & ToCopy
+        _In_ Matrix & ToCopy
         );
 
     ~Matrix(
@@ -174,8 +174,8 @@ public:
     IRISPLUSPLUSAPI
     Matrix
     operator*(
-        _In_ const Matrix & Multiplicand0,
-        _In_ const Matrix & Multiplicand1
+        _In_ Matrix & Multiplicand0,
+        _In_ Matrix & Multiplicand1
         );
 
 private:
@@ -185,8 +185,8 @@ private:
 IRISPLUSPLUSAPI
 Matrix
 operator*(
-    _In_ const Matrix & Multiplicand0,
-    _In_ const Matrix & Multiplicand1
+    _In_ Matrix & Multiplicand0,
+    _In_ Matrix & Multiplicand1
     );
 
 } // namespace Iris

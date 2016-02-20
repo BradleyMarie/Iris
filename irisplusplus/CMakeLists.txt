@@ -7,9 +7,9 @@ include_directories(../iris/inc
 add_library(irisplusplus SHARED
     src/utility.cpp
     src/shape.cpp
+    src/shapebase.cpp
     src/matrix.cpp
     src/matrixreference.cpp
-    src/shapehitallocator.cpp
     src/raytracerreference.cpp
     src/raytracer.cpp)
 
