@@ -134,7 +134,7 @@ public:
     Matrix
     Inverse(
         void
-        )
+        ) const
     {
         PMATRIX IrisMatrix;
 
@@ -147,20 +147,28 @@ public:
     void
     ReadContents(
         _Out_writes_(4) FLOAT Contents[4][4]
-        );
+        ) const;
 
     Matrix(
-        Matrix & ToCopy
+        _In_ const Matrix & ToCopy
         )
     : Data(ToCopy.Data)
     {
         MatrixRetain(Data);
-    }    
+    }
+
+    Matrix(
+        _In_ Matrix && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
 
     IRISPLUSPLUSAPI
     Matrix & 
     operator=(
-        _In_ Matrix & ToCopy
+        _In_ const Matrix & ToCopy
         );
 
     ~Matrix(
@@ -174,8 +182,8 @@ public:
     IRISPLUSPLUSAPI
     Matrix
     operator*(
-        _In_ Matrix & Multiplicand0,
-        _In_ Matrix & Multiplicand1
+        _In_ const Matrix & Multiplicand0,
+        _In_ const Matrix & Multiplicand1
         );
 
 private:
@@ -185,8 +193,8 @@ private:
 IRISPLUSPLUSAPI
 Matrix
 operator*(
-    _In_ Matrix & Multiplicand0,
-    _In_ Matrix & Multiplicand1
+    _In_ const Matrix & Multiplicand0,
+    _In_ const Matrix & Multiplicand1
     );
 
 } // namespace Iris

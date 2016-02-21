@@ -20,7 +20,7 @@ namespace Iris {
 void
 MatrixReference::ReadContents(
     _Out_writes_(4) FLOAT Contents[4][4]
-    )
+    ) const
 {
     if (Contents == nullptr)
     {

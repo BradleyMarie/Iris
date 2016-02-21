@@ -19,7 +19,7 @@ namespace Iris {
 
 Scene & 
 Scene::operator=(
-    _In_ Scene & ToCopy
+    _In_ const Scene & ToCopy
     )
 {
     if (this != &ToCopy)

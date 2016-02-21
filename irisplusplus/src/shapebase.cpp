@@ -123,8 +123,8 @@ ShapeBase::Trace(
 
     HitAllocator Allocator(IrisHitAllocator);
 
-    const ShapeBase *ShapeBasePointer = static_cast<const ShapeBase*>(Context);
-    *HitList = ShapeBasePointer->Trace(Ray, Allocator);
+    const ShapeBase **ShapeBasePointer = (const ShapeBase**) Context;
+    *HitList = (*ShapeBasePointer)->Trace(Ray, Allocator);
     return ISTATUS_SUCCESS;
 }
 
@@ -135,8 +135,8 @@ ShapeBase::Free(
 {
     assert(Context != NULL);
 
-    const ShapeBase *ShapeBasePointer = static_cast<const ShapeBase*>(Context);
-    delete ShapeBasePointer;
+    const ShapeBase **ShapeBasePointer = (const ShapeBase**) Context;
+    delete *ShapeBasePointer;
 }
 
 //

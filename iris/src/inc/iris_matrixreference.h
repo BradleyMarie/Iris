@@ -148,22 +148,22 @@ MatrixReferencePairInitializeFromValues(
 
     Matrix->Inverse = Inverse;
     
-    Inverse->M[0][0] = M00;
-    Inverse->M[0][1] = M01;
-    Inverse->M[0][2] = M02;
-    Inverse->M[0][3] = M03;
-    Inverse->M[1][0] = M10;
-    Inverse->M[1][1] = M11;
-    Inverse->M[1][2] = M12;
-    Inverse->M[1][3] = M13;
-    Inverse->M[2][0] = M20;
-    Inverse->M[2][1] = M21;
-    Inverse->M[2][2] = M22;
-    Inverse->M[2][3] = M23;
-    Inverse->M[3][0] = M30;
-    Inverse->M[3][1] = M31;
-    Inverse->M[3][2] = M32;
-    Inverse->M[3][3] = M33;
+    Inverse->M[0][0] = I00;
+    Inverse->M[0][1] = I01;
+    Inverse->M[0][2] = I02;
+    Inverse->M[0][3] = I03;
+    Inverse->M[1][0] = I10;
+    Inverse->M[1][1] = I11;
+    Inverse->M[1][2] = I12;
+    Inverse->M[1][3] = I13;
+    Inverse->M[2][0] = I20;
+    Inverse->M[2][1] = I21;
+    Inverse->M[2][2] = I22;
+    Inverse->M[2][3] = I23;
+    Inverse->M[3][0] = I30;
+    Inverse->M[3][1] = I31;
+    Inverse->M[3][2] = I32;
+    Inverse->M[3][3] = I33;
 
     Inverse->Inverse = Matrix;
 }

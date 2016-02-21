@@ -34,8 +34,8 @@ SceneBase::Trace(
 
     RayTracerReference Tracer(RayTracerRef);
 
-    const SceneBase *SceneBasePtr = static_cast<const SceneBase*>(Context);
-    SceneBasePtr->Trace(Tracer);
+    const SceneBase **SceneBasePtr = (const SceneBase**) Context;
+    (*SceneBasePtr)->Trace(Tracer);
     return ISTATUS_SUCCESS;
 }
 
@@ -46,8 +46,8 @@ SceneBase::Free(
 {
     assert(Context != NULL);
 
-    const SceneBase *SceneBasePtr = static_cast<const SceneBase*>(Context);
-    delete SceneBasePtr;
+    const SceneBase **SceneBasePtr = (const SceneBase**) Context;
+    delete *SceneBasePtr;
 }
 
 //

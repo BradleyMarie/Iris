@@ -117,6 +117,15 @@ protected:
             return Output;
         }
 
+        HitAllocator(
+            _In_ const HitAllocator & HitAllocatorRef
+            ) = delete;
+
+        HitAllocator &
+        operator=(
+            _In_ const HitAllocator & HitAllocatorRef
+            ) = delete;
+
     private:
         PHIT_ALLOCATOR Data;
 
@@ -162,25 +171,7 @@ protected:
         _Inout_ HitAllocator & Allocator
         ) const = 0;
 
-public:
-    _Ret_
-    PSHAPE
-    AsPSHAPE(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
-    PCSHAPE
-    AsPCSHAPE(
-        void
-        ) const
-    {
-        return Data;
-    }
-    
+public:   
     _Ret_
     Shape
     AsShape(

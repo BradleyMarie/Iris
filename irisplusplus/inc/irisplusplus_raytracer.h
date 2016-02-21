@@ -65,6 +65,23 @@ public:
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
+    RayTracer(
+        _In_ RayTracer && ToMove
+        )
+    : Data(ToMove.Data)
+    { 
+        ToMove.Data = nullptr;
+    }
+    
+    RayTracer(
+        _In_ const RayTracer & RayTracerRef
+        ) = delete;
+        
+    RayTracer &
+    operator=(
+        _In_ const RayTracer & RayTracerRef
+        ) = delete;
+    
     IRISPLUSPLUSAPI
     ~RayTracer(
         void

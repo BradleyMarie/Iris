@@ -36,26 +36,22 @@ protected:
     Trace(
         _In_ RayTracerReference RayTracerRef
         ) const = 0;
-    
-public:
-    _Ret_
-    PSCENE
-    AsPSCENE(
+
+    virtual
+    ~SceneBase(
         void
         )
-    {
-        return Data;
-    }
+    { }
 
-    _Ret_
-    PCSCENE
-    AsPCSCENE(
-        void
-        ) const
-    {
-        return Data;
-    }
-
+public:
+    virtual
+    void
+    Add(
+        _In_ const Shape & ShapeRef,
+        _In_ const Matrix & ModelToWorldRef,
+        _In_ bool Premultiplied
+        ) = 0;
+        
     _Ret_
     Scene
     AsScene(
@@ -66,12 +62,6 @@ public:
     }
 
 private:
-    virtual
-    ~SceneBase(
-        void
-        )
-    { }
-
     void
     Retain(
         void

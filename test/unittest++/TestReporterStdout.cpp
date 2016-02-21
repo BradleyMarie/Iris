@@ -39,7 +39,7 @@ void TestReporterStdout::ReportSummary(int const totalTestCount, int const faile
 
     if (failureCount > 0)
     {
-        printf("Press enter to continue.\n", secondsElapsed);
+        printf("Press enter to continue.\n");
         getchar();
     }
 }

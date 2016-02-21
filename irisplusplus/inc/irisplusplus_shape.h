@@ -40,11 +40,19 @@ public:
     }
 
     Shape(
-        const Shape & ToCopy
+        _In_ const Shape & ToCopy
         )
     : Data(ToCopy.Data)
     {
         ShapeRetain(Data);
+    }
+
+    Shape(
+        _In_ Shape && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
     }
         
     _Ret_
@@ -68,7 +76,7 @@ public:
     IRISPLUSPLUSAPI
     Shape & 
     operator=(
-        _In_ Shape & ToCopy
+        _In_ const Shape & ToCopy
         );
 
     virtual

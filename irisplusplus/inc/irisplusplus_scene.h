@@ -38,6 +38,22 @@ public:
         }
     }
     
+    Scene(
+        _In_ const Scene & ToCopy
+        )
+    : Data(ToCopy.Data)
+    { 
+        SceneRetain(Data);
+    }
+    
+    Scene(
+        _In_ Scene && ToMove
+        )
+    : Data(ToMove.Data)
+    { 
+        ToMove.Data = nullptr;
+    }
+    
     _Ret_
     PSCENE
     AsPSCENE(
@@ -59,7 +75,7 @@ public:
     IRISPLUSPLUSAPI
     Scene & 
     operator=(
-        _In_ Scene & ToCopy
+        _In_ const Scene & ToCopy
         );
 
     ~Scene(

@@ -353,7 +353,7 @@ RayTracerTraceSceneProcessClosestHit(
     Status = RayTracerReferenceGetNextHit(RayTracerReference,
                                           &ClosestHit);
     
-    if (Status != ISTATUS_NO_MORE_DATA)
+    if (Status == ISTATUS_NO_MORE_DATA)
     {
         return ISTATUS_SUCCESS;
     }
@@ -365,9 +365,9 @@ RayTracerTraceSceneProcessClosestHit(
         Status = RayTracerReferenceGetNextHit(RayTracerReference,
                                               &CurrentHit);
         
-        if (Status != ISTATUS_NO_MORE_DATA)
+        if (Status == ISTATUS_NO_MORE_DATA)
         {
-            return ISTATUS_SUCCESS;
+            break;
         }
         
         CurrentDistance = ClosestHit->Hit.Distance;
@@ -454,7 +454,7 @@ RayTracerTraceSceneProcessClosestHitWithCoordinates(
     Status = RayTracerReferenceGetNextHit(RayTracerReference,
                                           &ClosestHit);
     
-    if (Status != ISTATUS_NO_MORE_DATA)
+    if (Status == ISTATUS_NO_MORE_DATA)
     {
         return ISTATUS_SUCCESS;
     }

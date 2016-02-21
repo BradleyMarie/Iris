@@ -56,7 +56,7 @@ public:
     void
     ReadContents(
         _Out_writes_(4) FLOAT Contents[4][4]
-        );
+        ) const;
 
 private:
     PCMATRIX_REFERENCE Data;

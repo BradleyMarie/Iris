@@ -358,7 +358,7 @@ Matrix::Frustum(
 void
 Matrix::ReadContents(
     _Out_writes_(4) FLOAT Contents[4][4]
-    )
+    ) const
 {
     if (Contents == nullptr)
     {
@@ -392,7 +392,7 @@ Matrix::ReadContents(
 
 Matrix & 
 Matrix::operator=(
-    _In_ Matrix & ToCopy
+    _In_ const Matrix & ToCopy
     )
 {
     if (this != &ToCopy)
@@ -407,8 +407,8 @@ Matrix::operator=(
 
 Matrix
 operator*(
-    _In_ Matrix & Multiplicand0,
-    _In_ Matrix & Multiplicand1
+    _In_ const Matrix & Multiplicand0,
+    _In_ const Matrix & Multiplicand1
     )
 {
     PMATRIX IrisMatrix;

@@ -19,7 +19,7 @@ namespace Iris {
 
 Shape & 
 Shape::operator=(
-    _In_ Shape & ToCopy
+    _In_ const Shape & ToCopy
     )
 {
     if (this != &ToCopy)

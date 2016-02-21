@@ -13,6 +13,11 @@ Abstract:
 --*/
 
 #include <iristest.h>
+#include <vector>
+
+#define _Alignof(_Type_) alignof(_Type_)
+#include <iriscommon_triangle.h>
+
 using namespace Iris;
 
 //
@@ -464,4 +469,196 @@ TEST(RayPlusPlusMatrixMultiply)
                                            (FLOAT) 1.0);
 
     CHECK_EQUAL(Multiplied, Transform * R);
+}
+
+//
+// Test Ray Tracing
+// 
+
+class ListScene final : public SceneBase {
+public:
+    static
+    IrisPointer<SceneBase>
+    Create(
+        void
+        )
+    {
+        return IrisPointer<SceneBase>(new ListScene());
+    }
+
+    virtual
+    void
+    Add(
+        _In_ const Shape & ShapeRef,
+        _In_ const Matrix & ModelToWorldRef,
+        _In_ bool Premultiplied
+        )
+    {
+        Shapes.push_back(ShapeRef);
+        Matrices.push_back(ModelToWorldRef);
+        IsPremultiplied.push_back(Premultiplied);
+    }
+
+protected:
+    virtual
+    void
+    Trace(
+        _In_ RayTracerReference RayTracerRef
+        ) const
+    {
+        for (size_t Index = 0; Index < Shapes.size(); Index++)
+        {
+            RayTracerRef.Trace(Shapes[Index], Matrices[Index], IsPremultiplied[Index]);
+        }
+    }
+
+private:
+    virtual 
+    ~ListScene() 
+    { }
+    
+    std::vector<Shape> Shapes;
+    std::vector<Matrix> Matrices;
+    std::vector<bool> IsPremultiplied;
+};
+
+class Triangle final {
+private:
+    const static SHAPE_VTABLE XTriangleHeader;
+    const static SHAPE_VTABLE YTriangleHeader;
+    const static SHAPE_VTABLE ZTriangleHeader;
+    
+public:
+    static
+    Shape
+    Create(
+        _In_ Point Vertex0,
+        _In_ Point Vertex1,
+        _In_ Point Vertex2
+        )
+    {
+        PSHAPE ShapePointer;
+        PCSHAPE_VTABLE VTable;
+        VECTOR_AXIS Axis;
+        TRIANGLE Data;
+        
+        ISTATUS Status = TriangleInitialize(&Data,
+                                            Vertex0.AsPOINT3(),
+                                            Vertex1.AsPOINT3(),
+                                            Vertex2.AsPOINT3(),
+                                            &Axis);
+                                            
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(ISTATUSToCString(Status));
+        }
+        
+        switch (Axis)
+        {
+            case VECTOR_X_AXIS:
+                VTable = &XTriangleHeader;
+                break;       
+            case VECTOR_Y_AXIS:
+                VTable = &YTriangleHeader;
+                break;                
+            default: // VECTOR_Z_AXIS
+                VTable = &ZTriangleHeader;
+                break;
+        }
+        
+        Status = ShapeAllocate(VTable,
+                               &Data,
+                               sizeof(TRIANGLE),
+                               alignof(TRIANGLE),
+                               &ShapePointer);
+                               
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(ISTATUSToCString(Status));
+        }
+        
+        return Shape(ShapePointer, false);
+    }
+};
+
+const SHAPE_VTABLE Triangle::XTriangleHeader = {
+    (PSHAPE_TRACE_ROUTINE) TriangleXDominantTraceTriangle, nullptr
+};
+
+const SHAPE_VTABLE Triangle::YTriangleHeader = {
+    (PSHAPE_TRACE_ROUTINE) TriangleYDominantTraceTriangle, nullptr
+};
+
+const SHAPE_VTABLE Triangle::ZTriangleHeader = {
+    (PSHAPE_TRACE_ROUTINE) TriangleZDominantTraceTriangle, nullptr
+};
+
+TEST(RayTracePlusPlusTestIdentityTriangle)
+{
+    IrisPointer<SceneBase> ScenePtr = ListScene::Create();
+
+    Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
+                                         Point(1.0f, 1.0f, -1.0f),
+                                         Point(-1.0f, -1.0f, -1.0f));
+
+    ScenePtr->Add(TrianglePtr, Matrix::Identity(), false);
+
+    Scene ScenePtrAsScene = ScenePtr->AsScene();
+    RayTracer Tracer;
+
+    std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+
+    bool FirstHitFound = false;
+
+    EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    {
+        CHECK_EQUAL((FLOAT) 1.0, Distance);
+        CHECK_EQUAL(0, FaceHit);
+        CHECK_EQUAL(true, !!AdditionalData);
+        CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
+        FirstHitFound = true;
+        return true;
+    };
+
+    Tracer.TraceClosestHit(ScenePtrAsScene,
+                           Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
+                           0.0f,
+                           EvaluateFirstHit);
+
+    CHECK_EQUAL(true, FirstHitFound);
+}
+
+TEST(RayTracePlusPlusTestTranslatedTriangle)
+{
+    IrisPointer<SceneBase> ScenePtr = ListScene::Create();
+
+    Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
+                                         Point(1.0f, 1.0f, -1.0f),
+                                         Point(-1.0f, -1.0f, -1.0f));
+
+    ScenePtr->Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
+
+    Scene ScenePtrAsScene = ScenePtr->AsScene();
+    RayTracer Tracer;
+
+    std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+
+    bool FirstHitFound = false;
+
+    EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    {
+        CHECK_EQUAL((FLOAT) 2.0, Distance);
+        CHECK_EQUAL(0, FaceHit);
+        CHECK_EQUAL(true, !!AdditionalData);
+        CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
+        FirstHitFound = true;
+        return true;
+    };
+
+    Tracer.TraceClosestHit(ScenePtrAsScene,
+                           Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
+                           0.0f,
+                           EvaluateFirstHit);
+
+    CHECK_EQUAL(true, FirstHitFound);
 }
