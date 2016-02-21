@@ -207,6 +207,26 @@ operator+(
 
 static
 inline
+Vector 
+operator-(
+    _In_ Point Minuend, 
+    _In_ Point Subtrahend
+    )
+{
+    POINT3 IrisMinuend;
+    POINT3 IrisSubtrahend;
+    VECTOR3 IrisResult;
+
+    IrisMinuend = Minuend.AsPOINT3();
+    IrisSubtrahend = Subtrahend.AsPOINT3();
+
+    IrisResult = PointSubtract(IrisMinuend, IrisSubtrahend);
+
+    return Vector(IrisResult);
+}
+
+static
+inline
 Point 
 operator-(
     _In_ Point Minuend, 

@@ -123,3 +123,84 @@ bool operator==(
            Ray1.Direction == Ray2.Direction && 
            Ray1.Time == Ray2.Time;
 }
+
+std::ostream & 
+operator<<(
+    std::ostream & OStream,
+    const Iris::Vector & V
+    )
+{
+    OStream << V.AsVECTOR3();
+
+    return OStream;
+}
+
+bool
+operator==(
+    const Iris::Vector & Vector1, 
+    const Iris::Vector & Vector2
+    )
+{
+    return Vector1.AsVECTOR3() == Vector2.AsVECTOR3();
+}
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::VectorAxis & Axis
+    )
+{
+    switch (Axis)
+    {
+        case Iris::VectorAxis::X:
+            OStream << "VectorAxis::X";
+            break;
+        case Iris::VectorAxis::Y:
+            OStream << "VectorAxis::Y";
+            break;
+        case Iris::VectorAxis::Z:
+            OStream << "VectorAxis::Z";
+            break;
+    }
+
+    return OStream;
+}
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::Point & P
+    )
+{
+    OStream << P.AsPOINT3();
+
+    return OStream;
+}
+
+bool
+operator==(
+    const Iris::Point & Point1,
+    const Iris::Point & Point2
+    )
+{
+    return Point1.AsPOINT3() == Point2.AsPOINT3();
+}
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::Ray & R
+    )
+{
+    OStream << R.AsRAY();
+    return OStream;
+}
+
+bool
+operator==(
+    const Iris::Ray & Ray1,
+    const Iris::Ray & Ray2
+    )
+{
+    return Ray1.AsRAY() == Ray2.AsRAY();
+}

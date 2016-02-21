@@ -39,18 +39,6 @@ public:
     : Data(IrisRay)
     { }
 
-    Point 
-    Endpoint(
-        _In_ FLOAT Distance
-        ) const
-    {
-        POINT3 IrisEndpoint;
-
-        IrisEndpoint = RayEndpoint(Data, Distance);
-
-        return Point(IrisEndpoint);
-    }
-
     RAY 
     AsRAY(
         void
@@ -85,6 +73,20 @@ public:
         Valid = RayValidate(Data);
 
         return (Valid != FALSE) ? true : false;
+    }
+
+    static
+    Point 
+    Endpoint(
+        _In_ Ray R,
+        _In_ FLOAT Distance
+        )
+    {
+        POINT3 IrisEndpoint;
+
+        IrisEndpoint = RayEndpoint(R.Data, Distance);
+
+        return Point(IrisEndpoint);
     }
 
     static 

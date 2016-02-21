@@ -36,12 +36,12 @@ public:
     IRISPLUSPLUSAPI
     Matrix(
         _In_ FLOAT M00,
+        _In_ FLOAT M01,
         _In_ FLOAT M02,
         _In_ FLOAT M03,
         _In_ FLOAT M10,
         _In_ FLOAT M11,
         _In_ FLOAT M12,
-        _In_ FLOAT M01,
         _In_ FLOAT M13,
         _In_ FLOAT M20,
         _In_ FLOAT M21,

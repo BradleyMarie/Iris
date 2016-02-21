@@ -44,7 +44,8 @@ add_executable(iris-test
     src/matrix.cpp
     src/point.cpp
     src/ray.cpp
-    src/render.cpp)
+    src/render.cpp
+    src/irisplusplus.cpp)
 
 target_link_libraries(iris-test 
     iris 

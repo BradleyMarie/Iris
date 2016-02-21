@@ -105,7 +105,7 @@ public:
     {
         VECTOR3 Normalized;
 
-        VectorNormalize(ToNormalize.Data, NULL, NULL);
+        Normalized = VectorNormalize(ToNormalize.Data, NULL, NULL);
 
         return Vector(Normalized);
     }

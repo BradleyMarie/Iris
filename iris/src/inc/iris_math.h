@@ -191,7 +191,8 @@ Float4x4InverseInitialize(
                 }
             }
 
-            if (IsZeroFloat(Matrix[RowIndex][ColumnIndex]) == FALSE)
+            if (RowIndex != 4 &&
+                IsZeroFloat(Matrix[RowIndex][ColumnIndex]) == FALSE)
             {
                 break;
             }

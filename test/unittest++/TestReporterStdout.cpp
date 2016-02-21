@@ -36,6 +36,12 @@ void TestReporterStdout::ReportSummary(int const totalTestCount, int const faile
         printf("Success: %d tests passed.\n", totalTestCount);
 
     printf("Test time: %.2f seconds.\n", secondsElapsed);
+
+    if (failureCount > 0)
+    {
+        printf("Press enter to continue.\n", secondsElapsed);
+        getchar();
+    }
 }
 
 }

@@ -52,4 +52,46 @@ bool operator==(
     const RAY & Ray2
     );
 
+std::ostream & 
+operator<<(
+    std::ostream & OStream,
+    const Iris::Vector & V
+    );
+
+bool
+operator==(
+    const Iris::Vector & Vector1, 
+    const Iris::Vector & Vector2
+    );
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::VectorAxis & Axis
+    );
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::Point & P
+    );
+
+bool
+operator==(
+    const Iris::Point & Point1,
+    const Iris::Point & Point2
+    );
+
+bool
+operator==(
+    const Iris::Ray & Ray1,
+    const Iris::Ray & Ray2
+    );
+
+std::ostream &
+operator<<(
+    std::ostream & OStream,
+    const Iris::Ray & R
+    );
+
 #endif // _IRIS_TEST_UTILITY_HEADER_
