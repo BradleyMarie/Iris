@@ -26,11 +26,6 @@ namespace Iris {
 
 class ShapeBase {
 protected:
-    IRISPLUSPLUSAPI
-    ShapeBase(
-        void
-        );
-
     class HitAllocator final {
     public:
         _Ret_
@@ -171,41 +166,21 @@ protected:
         _Inout_ HitAllocator & Allocator
         ) const = 0;
 
-public:   
-    _Ret_
+    IRISPLUSPLUSAPI
+    static
     Shape
-    AsShape(
-        void
-        ) const
-    {
-        return Shape(Data, true);
-    }
+    Create(
+        _In_ std::unique_ptr<ShapeBase> ShapeBasePtr
+        );
 
-private:
+public:    
     virtual
     ~ShapeBase(
         void
         )
     { }
     
-    void
-    Retain(
-        void
-        )
-    {
-        ShapeRetain(Data);
-    }
-        
-    void
-    Release(
-        void
-        )
-    {
-        ShapeRelease(Data);
-    }
-    
-    friend class IrisPointer<ShapeBase>;
-
+private:
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
     static
@@ -224,8 +199,6 @@ private:
         );
     
     const static SHAPE_VTABLE InteropVTable;
-
-    PSHAPE Data;
 };
 
 } // namespace Iris

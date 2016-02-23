@@ -26,59 +26,27 @@ namespace Iris {
 
 class SceneBase {
 protected:
-    IRISPLUSPLUSAPI
-    SceneBase(
-        void
-        );
-
     virtual
     void
     Trace(
         _In_ RayTracerReference RayTracerRef
         ) const = 0;
 
+    IRISPLUSPLUSAPI
+    static
+    Scene
+    Create(
+        _In_ std::unique_ptr<SceneBase> SceneBasePtr
+        );
+
+public:
     virtual
     ~SceneBase(
         void
         )
     { }
-
-public:
-    virtual
-    void
-    Add(
-        _In_ const Shape & ShapeRef,
-        _In_ const Matrix & ModelToWorldRef,
-        _In_ bool Premultiplied
-        ) = 0;
-        
-    _Ret_
-    Scene
-    AsScene(
-        void
-        )
-    {
-        return Scene(Data, true);
-    }
-
-private:
-    void
-    Retain(
-        void
-        )
-    {
-        SceneRetain(Data);
-    }
-
-    IRISPLUSPLUSAPI
-    void 
-    Release(
-        void
-        )
-    {
-        SceneRelease(Data);
-    }
-
+    
+private:        
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
     static
@@ -95,10 +63,6 @@ private:
         );
     
     const static SCENE_VTABLE InteropVTable;
-
-    friend class IrisPointer<SceneBase>;
-    
-    PSCENE Data;
 };
 
 } // namespace Iris

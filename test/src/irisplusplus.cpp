@@ -478,25 +478,12 @@ TEST(RayPlusPlusMatrixMultiply)
 class ListScene final : public SceneBase {
 public:
     static
-    IrisPointer<SceneBase>
+    Scene
     Create(
-        void
+        _In_ const ShapeCollection & Shapes
         )
     {
-        return IrisPointer<SceneBase>(new ListScene());
-    }
-
-    virtual
-    void
-    Add(
-        _In_ const Shape & ShapeRef,
-        _In_ const Matrix & ModelToWorldRef,
-        _In_ bool Premultiplied
-        )
-    {
-        Shapes.push_back(ShapeRef);
-        Matrices.push_back(ModelToWorldRef);
-        IsPremultiplied.push_back(Premultiplied);
+        return SceneBase::Create(std::unique_ptr<ListScene>(new ListScene(Shapes)));
     }
 
 protected:
@@ -513,10 +500,18 @@ protected:
     }
 
 private:
-    virtual 
-    ~ListScene() 
-    { }
-    
+    ListScene(
+        _In_ const ShapeCollection & Collection
+        )
+    {
+        for (auto & S : Collection)
+        {
+            Shapes.push_back(std::get<0>(S));
+            Matrices.push_back(std::get<1>(S));
+            IsPremultiplied.push_back(std::get<2>(S));
+        }
+    }
+
     std::vector<Shape> Shapes;
     std::vector<Matrix> Matrices;
     std::vector<bool> IsPremultiplied;
@@ -595,16 +590,16 @@ const SHAPE_VTABLE Triangle::ZTriangleHeader = {
 
 TEST(RayTracePlusPlusTestIdentityTriangle)
 {
-    IrisPointer<SceneBase> ScenePtr = ListScene::Create();
+    ShapeCollection Shapes;
+    RayTracer Tracer;
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
                                          Point(-1.0f, -1.0f, -1.0f));
 
-    ScenePtr->Add(TrianglePtr, Matrix::Identity(), false);
+    Shapes.Add(TrianglePtr, Matrix::Identity(), false);
 
-    Scene ScenePtrAsScene = ScenePtr->AsScene();
-    RayTracer Tracer;
+    Scene ScenePtr = ListScene::Create(Shapes);
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
@@ -620,7 +615,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
         return true;
     };
 
-    Tracer.TraceClosestHit(ScenePtrAsScene,
+    Tracer.TraceClosestHit(ScenePtr,
                            Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
                            0.0f,
                            EvaluateFirstHit);
@@ -630,16 +625,16 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
 
 TEST(RayTracePlusPlusTestTranslatedTriangle)
 {
-    IrisPointer<SceneBase> ScenePtr = ListScene::Create();
+    ShapeCollection Shapes;
+    RayTracer Tracer;
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
                                          Point(-1.0f, -1.0f, -1.0f));
 
-    ScenePtr->Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
+    Shapes.Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
 
-    Scene ScenePtrAsScene = ScenePtr->AsScene();
-    RayTracer Tracer;
+    Scene ScenePtr = ListScene::Create(Shapes);
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
@@ -655,7 +650,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
         return true;
     };
 
-    Tracer.TraceClosestHit(ScenePtrAsScene,
+    Tracer.TraceClosestHit(ScenePtr,
                            Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
                            0.0f,
                            EvaluateFirstHit);

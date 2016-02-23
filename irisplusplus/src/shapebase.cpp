@@ -139,6 +139,33 @@ ShapeBase::Free(
     delete *ShapeBasePointer;
 }
 
+Shape
+ShapeBase::Create(
+    _In_ std::unique_ptr<ShapeBase> ShapeBasePtr
+    )
+{
+    if (!ShapeBasePtr)
+    {
+        throw std::invalid_argument("ShapeBasePtr");    
+    }
+    
+    ShapeBase *UnmananagedShapeBasePtr = ShapeBasePtr.release();
+    PSHAPE ShapePtr;
+
+    ISTATUS Success = ShapeAllocate(&InteropVTable,
+                                    &UnmananagedShapeBasePtr,
+                                    sizeof(ShapeBase*),
+                                    alignof(ShapeBase*),
+                                    &ShapePtr);
+
+    if (Success != ISTATUS_SUCCESS)
+    {
+        throw std::bad_alloc();
+    }
+    
+    return Shape(ShapePtr, false);
+}
+
 //
 // Static Variables
 //
@@ -146,27 +173,5 @@ ShapeBase::Free(
 const SHAPE_VTABLE ShapeBase::InteropVTable = {
     ShapeBase::Trace, ShapeBase::Free
 };
-
-//
-// Protected Functions
-//
-
-ShapeBase::ShapeBase(
-    void
-    )
-{
-    ShapeBase *ShapeBasePointer = this;
-
-    ISTATUS Success = ShapeAllocate(&InteropVTable,
-                                    &ShapeBasePointer,
-                                    sizeof(ShapeBase*),
-                                    alignof(ShapeBase*),
-                                    &Data);
-
-    if (Success != ISTATUS_SUCCESS)
-    {
-        throw std::bad_alloc();
-    }
-}
 
 } // namespace Iris

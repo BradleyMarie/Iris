@@ -66,14 +66,6 @@ public:
         );
     
     RayTracer(
-        _In_ RayTracer && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
-    }
-    
-    RayTracer(
         _In_ const RayTracer & RayTracerRef
         ) = delete;
         

@@ -50,6 +50,33 @@ SceneBase::Free(
     delete *SceneBasePtr;
 }
 
+Scene
+SceneBase::Create(
+    _In_ std::unique_ptr<SceneBase> SceneBasePtr
+    )
+{
+    if (!SceneBasePtr)
+    {
+        throw std::invalid_argument("SceneBasePtr");
+    }
+    
+    SceneBase *UnmanagedSceneBasePtr = SceneBasePtr.release();
+    PSCENE ScenePtr;
+
+    ISTATUS Success = SceneAllocate(&InteropVTable,
+                                    &UnmanagedSceneBasePtr,
+                                    sizeof(SceneBase*),
+                                    alignof(SceneBase*),
+                                    &ScenePtr);
+
+    if (Success != ISTATUS_SUCCESS)
+    {
+        throw std::bad_alloc();
+    }
+    
+    return Scene(ScenePtr, false);
+}
+
 //
 // Static Variables
 //
@@ -57,27 +84,5 @@ SceneBase::Free(
 const SCENE_VTABLE SceneBase::InteropVTable = {
     SceneBase::Trace, SceneBase::Free
 };
-
-//
-// Protected Functions
-//
-
-SceneBase::SceneBase(
-    void
-    )
-{
-    SceneBase *SceneBasePtr = this;
-
-    ISTATUS Success = SceneAllocate(&InteropVTable,
-                                    &SceneBasePtr,
-                                    sizeof(SceneBase*),
-                                    alignof(SceneBase*),
-                                    &Data);
-
-    if (Success != ISTATUS_SUCCESS)
-    {
-        throw std::bad_alloc();
-    }
-}
 
 } // namespace Iris
