@@ -29,16 +29,18 @@ SpectrumShapeAllocate(
     _Out_ PSPECTRUM_SHAPE *SpectrumShape
     )
 {
-    PADVANCED_SHAPE *AdvancedShape;
+    PCSHAPE_VTABLE ShapeVTable;
+    PSHAPE *Shape;
     ISTATUS Status;
 
-    AdvancedShape = (PADVANCED_SHAPE *) SpectrumShape;
+    ShapeVTable = (PCSHAPE_VTABLE) SpectrumShapeVTable;
+    Shape = (PSHAPE *) SpectrumShape;
 
-    Status = AdvancedShapeAllocate(&SpectrumShapeVTable->AdvancedShapeVTable,
-                                   Data,
-                                   DataSizeInBytes,
-                                   DataAlignment,
-                                   AdvancedShape);
+    Status = ShapeAllocate(ShapeVTable,
+                           Data,
+                           DataSizeInBytes,
+                           DataAlignment,
+                           Shape);
 
     return Status;
 }
@@ -53,15 +55,34 @@ SpectrumShapeCheckBounds(
     _Out_ PBOOL IsInsideBox
     )
 {
-    PCADVANCED_SHAPE AdvancedShape;
+    PCSPECTRUM_SHAPE_VTABLE SpectrumShapeVTable;
+    PCSHAPE_VTABLE ShapeVTable;
     ISTATUS Status;
+    PCSHAPE Shape;
+    PCVOID Data;
 
-    AdvancedShape = (PCADVANCED_SHAPE) SpectrumShape;
+    if (SpectrumShape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
 
-    Status = AdvancedShapeCheckBounds(AdvancedShape,
-                                      ModelToWorld,
-                                      WorldAlignedBoundingBox,
-                                      IsInsideBox);
+    if (IsInsideBox == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    Shape = (PCSHAPE) SpectrumShape;
+
+    Data = ShapeGetData(Shape);
+
+    ShapeVTable = ShapeGetVTable(Shape);
+
+    SpectrumShapeVTable = (PCSPECTRUM_SHAPE_VTABLE) ShapeVTable;
+
+    Status = SpectrumShapeVTable->CheckBoundsRoutine(Data,
+                                                     ModelToWorld,
+                                                     WorldAlignedBoundingBox,
+                                                     IsInsideBox);
 
     return Status;
 }

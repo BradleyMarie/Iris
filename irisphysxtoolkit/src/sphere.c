@@ -320,17 +320,19 @@ PhysxLightSphereFree(
 //
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE SphereHeader = {
-    { { PhysxSphereTrace, PhysxSphereFree },
+    PhysxSphereTrace, 
+    PhysxSphereFree,
     PhysxSphereComputeNormal,
-    PhysxSphereGetBounds },
+    PhysxSphereGetBounds,
     PhysxSphereGetMaterial,
     NULL
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE LightSphereHeader = {
-    { { PhysxLightSphereTrace, PhysxLightSphereFree },
+    PhysxLightSphereTrace, 
+    PhysxLightSphereFree,
     PhysxLightSphereComputeNormal,
-    PhysxLightSphereGetBounds },
+    PhysxLightSphereGetBounds,
     PhysxLightSphereGetMaterial,
     PhysxLightSphereGetLight
 };

@@ -109,7 +109,7 @@ LightSample(
     _In_ PCLIGHT Light,
     _In_ POINT3 HitPoint,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,

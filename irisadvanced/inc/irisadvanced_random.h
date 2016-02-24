@@ -22,6 +22,7 @@ Abstract:
 //
 
 typedef
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PGENERATE_FLOAT_ROUTINE)(
     _In_ PVOID Context,
@@ -31,6 +32,7 @@ ISTATUS
     );
 
 typedef
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PGENERATE_INDEX_ROUTINE)(
     _In_ PVOID Context,
@@ -54,6 +56,26 @@ typedef CONST RANDOM *PCRANDOM;
 // Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+RandomAllocate(
+    _In_ PCRANDOM_VTABLE RandomVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PRANDOM *Rng
+    );
+
+_Ret_
+IRISADVANCEDAPI
+PRANDOM_REFERENCE
+RandomGetRandomReference(
+    _In_ PRANDOM Rng
+    );
+
+_Success_(return == ISTATUS_SUCCESS)
 IRISADVANCEDAPI
 ISTATUS
 RandomGenerateFloat(
@@ -63,6 +85,7 @@ RandomGenerateFloat(
     _Out_range_(Minimum, Maximum) PFLOAT RandomValue
     );
 
+_Success_(return == ISTATUS_SUCCESS)
 IRISADVANCEDAPI
 ISTATUS
 RandomGenerateIndex(
@@ -70,6 +93,12 @@ RandomGenerateIndex(
     _In_ SIZE_T Minimum,
     _In_ SIZE_T Maximum,
     _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
+    );
+
+IRISADVANCEDAPI
+VOID
+RandomFree(
+    _In_opt_ _Post_invalid_ PRANDOM Rng
     );
 
 #endif // _RANDOM_IRIS_ADVANCED_

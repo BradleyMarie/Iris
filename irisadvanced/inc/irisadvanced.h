@@ -18,11 +18,9 @@ Abstract:
 #include <iris.h>
 
 #include "irisadvanced_api.h"
-#include "irisadvanced_rng.h"
-#include "irisadvanced_rngowner.h"
-#include "irisadvanced_normal.h"
+#include "irisadvanced_randomreference.h"
+#include "irisadvanced_random.h"
 #include "irisadvanced_boundingbox.h"
-#include "irisadvanced_advancedshape.h"
 #include "irisadvanced_color3.h"
 #include "irisadvanced_math.h"
 

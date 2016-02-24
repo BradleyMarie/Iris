@@ -36,7 +36,7 @@ ISTATUS
 SpectrumMirrorBrdfSample(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
     _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,

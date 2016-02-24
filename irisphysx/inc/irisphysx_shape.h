@@ -22,6 +22,39 @@ Abstract:
 //
 
 typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PSPECTRUM_SHAPE_TRACE_ROUTINE)(
+    _In_opt_ PCVOID Context,
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PSPECTRUM_SHAPE_COMPUTE_NORMAL_ROUTINE)(
+    _In_ PCVOID Context,
+    _In_ POINT3 ModelHitPoint,
+    _In_ UINT32 FaceHit,
+    _Out_ PVECTOR3 SurfaceNormal
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PSPECTRUM_SHAPE_CHECK_BOUNDS_ROUTINE)(
+    _In_ PCVOID Context,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    );
+
+typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSPECTRUM_SHAPE_GET_MATERIAL_ROUTINE)(
@@ -40,7 +73,10 @@ ISTATUS
     );
 
 typedef struct _SPECTRUM_SHAPE_VTABLE {
-    ADVANCED_SHAPE_VTABLE AdvancedShapeVTable;
+    PSPECTRUM_SHAPE_TRACE_ROUTINE TraceRoutine;
+    PFREE_ROUTINE FreeRoutine;
+    PSPECTRUM_SHAPE_COMPUTE_NORMAL_ROUTINE ComputeNormalRoutine;
+    PSPECTRUM_SHAPE_CHECK_BOUNDS_ROUTINE CheckBoundsRoutine;
     PSPECTRUM_SHAPE_GET_MATERIAL_ROUTINE GetMaterialRoutine;
     PSPECTRUM_SHAPE_GET_LIGHT_ROUTINE GetLightRoutine;
 } SPECTRUM_SHAPE_VTABLE, *PSPECTRUM_SHAPE_VTABLE;

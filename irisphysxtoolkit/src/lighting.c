@@ -54,7 +54,7 @@ ComputeDirectLighting(
     _In_ VECTOR3 IncidentDirection,
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
     _Out_ PCSPECTRUM *Spectrum

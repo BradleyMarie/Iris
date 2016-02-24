@@ -3,9 +3,9 @@ include(GenerateExportHeader)
 include_directories(../iris/inc inc src/inc ../iriscommon)
 
 add_library(irisadvanced SHARED
+    src/randomreference.c
     src/random.c
-    src/normal.c
-    src/advancedshape.c)
+    src/math.c)
 
 target_link_libraries(irisadvanced 
     iris)

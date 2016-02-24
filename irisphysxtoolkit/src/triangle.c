@@ -436,49 +436,55 @@ PhysxLightTriangleFree(
 //
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE XTriangleHeader = {
-    { { PhysxTriangleXTraceTriangle, PhysxTriangleFree },
+    PhysxTriangleXTraceTriangle, 
+    PhysxTriangleFree,
     PhysxTriangleComputeNormal,
-    PhysxTriangleGetBounds },
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE YTriangleHeader = {
-    { { PhysxTriangleYTraceTriangle, PhysxTriangleFree },
+    PhysxTriangleYTraceTriangle, 
+    PhysxTriangleFree,
     PhysxTriangleComputeNormal,
-    PhysxTriangleGetBounds },
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE ZTriangleHeader = {
-    { { PhysxTriangleZTraceTriangle, PhysxTriangleFree },
+    PhysxTriangleZTraceTriangle, 
+    PhysxTriangleFree,
     PhysxTriangleComputeNormal,
-    PhysxTriangleGetBounds },
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE XLightTriangleHeader = {
-    { { PhysxLightTriangleXTraceTriangle, PhysxLightTriangleFree },
+    PhysxLightTriangleXTraceTriangle, 
+    PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleGetBounds },
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE YLightTriangleHeader = {
-    { { PhysxLightTriangleYTraceTriangle, PhysxLightTriangleFree },
+    PhysxLightTriangleYTraceTriangle, 
+    PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleGetBounds },
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE ZLightTriangleHeader = {
-    { { PhysxLightTriangleZTraceTriangle, PhysxLightTriangleFree },
+    PhysxLightTriangleZTraceTriangle, 
+    PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleGetBounds },
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
