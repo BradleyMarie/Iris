@@ -81,7 +81,7 @@ RandomReferenceGenerateFloat(
 
     if (IsFiniteFloat(Maximum) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (Minimum > Maximum)

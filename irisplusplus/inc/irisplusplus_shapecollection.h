@@ -28,9 +28,19 @@ namespace Iris {
 class ShapeCollection final {
 public:
     ShapeCollection(
+        _In_ ShapeCollection && ToMove
+        )
+    : Shapes(std::move(ToMove.Shapes))
+    { }
+
+    static
+    ShapeCollection
+    Create(
         void
         )
-    { }
+    {
+        return ShapeCollection();
+    }
 
     void
     Clear(
@@ -49,13 +59,9 @@ public:
     {
         Shapes.push_back(std::make_tuple(ToAdd, ModelToWorld, Premultiplied));
     }
-    
+
     ShapeCollection &
     operator=(
-        _In_ const ShapeCollection & Collection
-        ) = delete;
-    
-    ShapeCollection(
         _In_ const ShapeCollection & Collection
         ) = delete;
     
@@ -79,6 +85,11 @@ public:
     
 private:
     std::vector<std::tuple<Shape, Matrix, bool>> Shapes;
+
+    ShapeCollection(
+        void
+        )
+    { }
 };
 
 } // namespace Iris

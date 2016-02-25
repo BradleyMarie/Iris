@@ -590,8 +590,7 @@ const SHAPE_VTABLE Triangle::ZTriangleHeader = {
 
 TEST(RayTracePlusPlusTestIdentityTriangle)
 {
-    ShapeCollection Shapes;
-    RayTracer Tracer;
+    ShapeCollection Shapes = ShapeCollection::Create();
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
@@ -600,6 +599,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
     Shapes.Add(TrianglePtr, Matrix::Identity(), false);
 
     Scene ScenePtr = ListScene::Create(Shapes);
+    RayTracer Tracer = RayTracer::Create();
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
@@ -625,8 +625,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
 
 TEST(RayTracePlusPlusTestTranslatedTriangle)
 {
-    ShapeCollection Shapes;
-    RayTracer Tracer;
+    ShapeCollection Shapes = ShapeCollection::Create();
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
@@ -635,6 +634,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
     Shapes.Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
 
     Scene ScenePtr = ListScene::Create(Shapes);
+    RayTracer Tracer = RayTracer::Create();
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 

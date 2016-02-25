@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisplusplus.h>
+#include <irisplusplusp.h>
 
 namespace Iris {
 

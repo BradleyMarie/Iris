@@ -28,12 +28,8 @@ extern "C" {
 //
 
 #include <functional>
-#include <stdexcept>
-#include <utility>
 #include <memory>
-#include <atomic>
 #include <tuple>
-#include <new>
 
 //
 // Include Iris++ Headers

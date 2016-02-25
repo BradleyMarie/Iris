@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisplusplus.h>
+#include <irisplusplusp.h>
 
 namespace Iris {
 
@@ -117,9 +117,9 @@ ShapeBase::Trace(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
-    assert(Context != NULL);
-    assert(IrisHitAllocator != NULL);
-    assert(HitList != NULL);
+    assert(Context != nullptr);
+    assert(IrisHitAllocator != nullptr);
+    assert(HitList != nullptr);
 
     HitAllocator Allocator(IrisHitAllocator);
 
@@ -133,7 +133,7 @@ ShapeBase::Free(
     _In_ _Post_invalid_ PVOID Context
     )
 {
-    assert(Context != NULL);
+    assert(Context != nullptr);
 
     const ShapeBase **ShapeBasePointer = (const ShapeBase**) Context;
     delete *ShapeBasePointer;

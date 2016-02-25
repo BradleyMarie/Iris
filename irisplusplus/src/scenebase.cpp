@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisplusplus.h>
+#include <irisplusplusp.h>
 
 namespace Iris {
 
@@ -29,8 +29,8 @@ SceneBase::Trace(
     _Inout_ PRAYTRACER_REFERENCE RayTracerRef
     )
 {
-    assert(Context != NULL);
-    assert(RayTracerRef != NULL);
+    assert(Context != nullptr);
+    assert(RayTracerRef != nullptr);
 
     RayTracerReference Tracer(RayTracerRef);
 
@@ -44,7 +44,7 @@ SceneBase::Free(
     _In_ _Post_invalid_ PVOID Context
     )
 {
-    assert(Context != NULL);
+    assert(Context != nullptr);
 
     const SceneBase **SceneBasePtr = (const SceneBase**) Context;
     delete *SceneBasePtr;

@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisplusplus.h>
+#include <irisplusplusp.h>
 
 namespace Iris {
 
@@ -223,13 +223,6 @@ RayTracer::TraceAllHitsInOrder(
             throw std::runtime_error(ISTATUSToCString(Status));
             break;
     }
-}
-
-RayTracer::~RayTracer(
-    void
-    )
-{
-    RayTracerFree(Data);
 }
 
 } // namespace Iris

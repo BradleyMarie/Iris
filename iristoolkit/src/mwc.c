@@ -77,10 +77,9 @@ MultiplyWithCarryRngGenerateFloat(
 
     ASSERT(Rng != NULL);
     ASSERT(IsNormalFloat(Minimum));
-    ASSERT(IsFiniteFloat(Minimum));
     ASSERT(IsNormalFloat(Maximum));
-    ASSERT(IsFiniteFloat(Minimum));
     ASSERT(Minimum < Maximum);
+    ASSERT(RandomValue != NULL);
 
     MwcRng = (PMWC_RNG) Rng;
 
@@ -107,6 +106,7 @@ MultiplyWithCarryRngGenerateIndex(
 
     ASSERT(Rng != NULL);
     ASSERT(Minimum < Maximum);
+    ASSERT(RandomValue != NULL);
 
     MwcRng = (PMWC_RNG) Rng;
 

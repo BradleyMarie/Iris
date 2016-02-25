@@ -79,7 +79,6 @@ public:
         _In_ const Shape & ToCopy
         );
 
-    virtual
     ~Shape(
         void
         )

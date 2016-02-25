@@ -26,11 +26,23 @@ namespace Iris {
 
 class RayTracer final {
 public:
-    IRISPLUSPLUSAPI
     RayTracer(
+        _In_ RayTracer && ToMove
+        )
+        : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
+
+    static
+    RayTracer
+    Create(
         void
-        );
-    
+        )
+    {
+        return RayTracer();
+    }
+
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
@@ -64,9 +76,9 @@ public:
         _In_ const Ray & WorldRay,
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
-    
+        
     RayTracer(
-        _In_ const RayTracer & RayTracerRef
+        _In_ RayTracer & ToCopy
         ) = delete;
         
     RayTracer &
@@ -74,14 +86,21 @@ public:
         _In_ const RayTracer & RayTracerRef
         ) = delete;
     
-    IRISPLUSPLUSAPI
     ~RayTracer(
         void
-        );
+        )
+     {
+         RayTracerFree(Data);
+     }
 
 private:
     PRAYTRACER Data;
-    
+
+    IRISPLUSPLUSAPI
+    RayTracer(
+        void
+        );
+
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
     static

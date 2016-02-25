@@ -1,0 +1,32 @@
+include(GenerateExportHeader)
+
+include_directories(../iris/inc 
+    ../irisadvanced/inc 
+    ../irisplusplus/inc
+    inc 
+    src/inc)
+
+add_library(irisadvancedplusplus SHARED
+    src/randomreference.cpp
+    src/random.cpp
+    src/randombase.cpp)
+
+target_link_libraries(irisadvancedplusplus 
+    iris
+    irisadvanced
+    irisplusplus)
+
+generate_export_header(irisadvancedplusplus
+    BASE_NAME irisadvancedplusplus
+    EXPORT_MACRO_NAME IRISADVANCEDPLUSPLUSAPI
+    EXPORT_FILE_NAME inc/irisadvancedplusplus_api.h
+    STATIC_DEFINE IRISADVANCEDPLUSPLUS_BUILT_AS_STATIC)
+
+option(ENABLE_CSG "Enable constructive solid geometry" OFF)
+
+if (ENABLE_CSG)
+    add_definitions(-DENABLE_CSG_SUPPORT)
+endif()
+
+set_property(TARGET irisplusplus PROPERTY CXX_STANDARD 11)
+set_property(TARGET irisplusplus PROPERTY CXX_STANDARD_REQUIRED ON)
