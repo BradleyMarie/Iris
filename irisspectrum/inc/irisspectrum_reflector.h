@@ -69,15 +69,22 @@ ReflectorReflect(
     _Out_ PFLOAT OutgoingIntensity
     );
 
+_Ret_
+IRISSPECTRUMAPI
+PCREFLECTOR_REFERENCE
+ReflectorGetReflectorReference(
+    _In_ PCREFLECTOR Reflector
+    );
+
 IRISSPECTRUMAPI
 VOID
-ReflectorReference(
+ReflectorRetain(
     _In_opt_ PREFLECTOR Reflector
     );
 
 IRISSPECTRUMAPI
 VOID
-ReflectorDereference(
+ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR Reflector
     );
 

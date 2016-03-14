@@ -55,17 +55,17 @@ ComputeDirectLighting(
     _Inout_ PSPECTRUM_RAYTRACER RayTracer,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
-    _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
-    _Out_ PCSPECTRUM *Spectrum
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
+    _Out_ PCSPECTRUM_REFERENCE *Spectrum
     )
 {
     BOOL IsGreaterThanZero;
-    PSPECTRUM LightSpectrum;
-    PCREFLECTOR Reflector;
+    PSPECTRUM_REFERENCE LightSpectrum;
+    PCREFLECTOR_REFERENCE Reflector;
     FLOAT Attenuation;
-    PSPECTRUM Output;
-    PSPECTRUM Emissive;
+    PSPECTRUM_REFERENCE Output;
+    PSPECTRUM_REFERENCE Emissive;
     VECTOR3 ToLight;
     RAY RayToLight;
     ISTATUS Status;
@@ -119,10 +119,10 @@ ComputeDirectLighting(
             return ISTATUS_SUCCESS;
         }
 
-        Status = SpectrumCompositorAddReflection(SpectrumCompositor,
-                                                 LightSpectrum,
-                                                 Reflector,
-                                                 Spectrum);
+        Status = SpectrumCompositorReferenceAddReflection(SpectrumCompositor,
+                                                          LightSpectrum,
+                                                          Reflector,
+                                                          Spectrum);
 
         return Status;
     }
@@ -158,11 +158,11 @@ ComputeDirectLighting(
 
         Attenuation = Weight / LightPdf;
 
-        Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
-                                                           LightSpectrum,
-                                                           Reflector,
-                                                           Attenuation,
-                                                           &Output);
+        Status = SpectrumCompositorReferenceAttenuatedAddReflection(SpectrumCompositor,
+                                                                    LightSpectrum,
+                                                                    Reflector,
+                                                                    Attenuation,
+                                                                    &Output);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -248,21 +248,21 @@ ComputeDirectLighting(
         Attenuation = Weight / BrdfPdf;
     }
 
-    Status = SpectrumCompositorAttenuatedAddReflection(SpectrumCompositor,
-                                                       Emissive,
-                                                       Reflector,
-                                                       Attenuation,
-                                                       &Emissive);
+    Status = SpectrumCompositorReferenceAttenuatedAddReflection(SpectrumCompositor,
+                                                                Emissive,
+                                                                Reflector,
+                                                                Attenuation,
+                                                                &Emissive);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = SpectrumCompositorAddSpectrums(SpectrumCompositor,
-                                            Output,
-                                            Emissive,
-                                            &Output);
+    Status = SpectrumCompositorReferenceAddSpectrums(SpectrumCompositor,
+                                                     Output,
+                                                     Emissive,
+                                                     &Output);
                                             
     if (Status != ISTATUS_SUCCESS)
     {

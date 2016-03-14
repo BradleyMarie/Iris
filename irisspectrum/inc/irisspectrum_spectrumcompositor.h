@@ -32,11 +32,19 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
 ISTATUS
+SpectrumCompositorAllocate(
+    _Out_ PSPECTRUM_COMPOSITOR *Compositor
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSPECTRUMAPI
+ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum0,
-    _In_opt_ PCSPECTRUM Spectrum1,
-    _Out_ PCSPECTRUM *Sum
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _Out_ PCSPECTRUM_REFERENCE *Sum
     );
 
 _Check_return_
@@ -45,9 +53,9 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *AttenuatedSpectrum
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrum
     );
 
 _Check_return_
@@ -56,10 +64,10 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum0,
-    _In_opt_ PCSPECTRUM Spectrum1,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *AttenuatedSum
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
     );
 
 _Check_return_
@@ -68,9 +76,9 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
     );
     
 _Check_return_
@@ -79,10 +87,29 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
     );
 
+_Ret_
+IRISSPECTRUMAPI
+PSPECTRUM_COMPOSITOR_REFERENCE
+SpectrumCompositorGetSpectrumCompositorReference(
+    _In_ PSPECTRUM_COMPOSITOR Compositor
+    );
+
+IRISSPECTRUMAPI
+VOID
+SpectrumCompositorClear(
+    _Inout_opt_ PSPECTRUM_COMPOSITOR Compositor
+    );
+
+IRISSPECTRUMAPI
+VOID
+SpectrumCompositorFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_COMPOSITOR Compositor
+    );
+    
 #endif // _SPECTRUM_COMPOSITOR_IRIS_SPECTRUM_

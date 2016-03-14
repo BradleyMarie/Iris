@@ -67,15 +67,22 @@ SpectrumSample(
     _Out_ PFLOAT Intensity
     );
 
+_Ret_
+IRISSPECTRUMAPI
+PCSPECTRUM_REFERENCE
+SpectrumGetSpectrumReference(
+    _In_ PCSPECTRUM Spectrum
+    );
+
 IRISSPECTRUMAPI
 VOID
-SpectrumReference(
+SpectrumRetain(
     _In_opt_ PSPECTRUM Spectrum
     );
 
 IRISSPECTRUMAPI
 VOID
-SpectrumDereference(
+SpectrumRelease(
     _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
     );
 

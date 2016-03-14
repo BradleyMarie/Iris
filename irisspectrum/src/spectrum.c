@@ -15,6 +15,15 @@ Abstract:
 #include <irisspectrump.h>
 
 //
+// Types
+//
+
+struct _SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumReference;
+    SIZE_T ReferenceCount;
+};
+
+//
 // Functions
 //
 
@@ -78,9 +87,9 @@ SpectrumAllocate(
 
     AllocatedSpectrum = (PSPECTRUM) HeaderAllocation;
 
-    AllocatedSpectrum->VTable = SpectrumVTable;
-    AllocatedSpectrum->Data = DataAllocation;
-    AllocatedSpectrum->ReferenceCount = 1;
+    SpectrumReferenceInitialize(SpectrumVTable,
+                                DataAllocation,
+                                &AllocatedSpectrum->SpectrumReference);
 
     if (DataSizeInBytes != 0)
     {
@@ -120,15 +129,29 @@ SpectrumSample(
         return ISTATUS_SUCCESS;
     }
 
-    Status = Spectrum->VTable->SampleRoutine(Spectrum->Data,
-                                             Wavelength,
-                                             Intensity);
+    Status = SpectrumReferenceSample(&Spectrum->SpectrumReference,
+                                     Wavelength,
+                                     Intensity);
 
     return Status;
 }
 
+_Ret_
+PCSPECTRUM_REFERENCE
+SpectrumGetSpectrumReference(
+    _In_ PCSPECTRUM Spectrum
+    )
+{
+    if (Spectrum == NULL)
+    {
+        return NULL;
+    }
+
+    return &Spectrum->SpectrumReference;
+}
+
 VOID
-SpectrumReference(
+SpectrumRetain(
     _In_opt_ PSPECTRUM Spectrum
     )
 {
@@ -141,12 +164,10 @@ SpectrumReference(
 }
 
 VOID
-SpectrumDereference(
+SpectrumRelease(
     _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-
     if (Spectrum == NULL)
     {
         return;
@@ -156,13 +177,7 @@ SpectrumDereference(
 
     if (Spectrum->ReferenceCount == 0)
     {
-        FreeRoutine = Spectrum->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Spectrum->Data);
-        }
-
+        SpectrumReferenceDestroy(&Spectrum->SpectrumReference);
         IrisAlignedFree(Spectrum);
     }
 }

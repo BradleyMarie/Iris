@@ -38,12 +38,13 @@ SpectrumPointLightSample(
     _In_ POINT3 HitPoint,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _Out_ PCSPECTRUM *Spectrum,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
     _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
     )
 {
+    PCSPECTRUM_REFERENCE IntensityReference;
     PCSPECTRUM_POINT_LIGHT Light;
     FLOAT DistanceToLightSquared;
     VECTOR3 DirectionToLight;
@@ -90,12 +91,14 @@ SpectrumPointLightSample(
         return ISTATUS_SUCCESS;
     }
 
+    IntensityReference = SpectrumGetSpectrumReference(Light->Intensity);
+
     Attenuation = (FLOAT) 1.0f / DistanceToLightSquared;
 
-    Status = SpectrumCompositorAttenuateSpectrum(Compositor,
-                                                 Light->Intensity,
-                                                 Attenuation,
-                                                 Spectrum);
+    Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                          IntensityReference,
+                                                          Attenuation,
+                                                          Spectrum);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -116,7 +119,7 @@ SpectrumPointLightComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM *Spectrum
+    _Out_ PCSPECTRUM_REFERENCE *Spectrum
     )
 {
     ASSERT(Context != NULL);
@@ -137,7 +140,7 @@ SpectrumPointLightComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM *Spectrum,
+    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
     _Out_ PFLOAT Pdf
     )
 {
@@ -165,7 +168,7 @@ SpectrumPointLightFree(
 
     Light = (PCSPECTRUM_POINT_LIGHT) Context;
 
-    SpectrumDereference(Light->Intensity);
+    SpectrumRelease(Light->Intensity);
 }
 
 //
@@ -209,7 +212,7 @@ SpectrumPointLightAllocate(
         return Status;
     }
 
-    SpectrumReference(Intensity);
+    SpectrumRetain(Intensity);
 
     return ISTATUS_SUCCESS;
 }

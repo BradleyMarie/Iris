@@ -15,6 +15,15 @@ Abstract:
 #include <irisspectrump.h>
 
 //
+// Types
+//
+
+struct _REFLECTOR {
+    REFLECTOR_REFERENCE ReflectorReference;
+    SIZE_T ReferenceCount;
+};
+
+//
 // Functions
 //
 
@@ -78,8 +87,10 @@ ReflectorAllocate(
 
     AllocatedReflector = (PREFLECTOR) HeaderAllocation;
 
-    AllocatedReflector->VTable = ReflectorVTable;
-    AllocatedReflector->Data = DataAllocation;
+    ReflectorReferenceInitialize(ReflectorVTable,
+                                 DataAllocation,
+                                 &AllocatedReflector->ReflectorReference);
+
     AllocatedReflector->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
@@ -104,39 +115,35 @@ ReflectorReflect(
 {
     ISTATUS Status;
 
-    if (IsFiniteFloat(Wavelength) == FALSE ||
-        IsGreaterThanOrEqualToZeroFloat(Wavelength) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    if (IsFiniteFloat(IncomingIntensity) == FALSE ||
-        IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    if (OutgoingIntensity == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
+    //
+    // &Reflector->ReflectorReference should be safe to do
+    // even if Reflector == NULL
+    //
 
-    if (Reflector == NULL)
-    {
-        *OutgoingIntensity = (FLOAT) 0.0f;
-        return ISTATUS_SUCCESS;
-    }
-
-    Status = Reflector->VTable->ReflectRoutine(Reflector->Data,
-                                               Wavelength,
-                                               IncomingIntensity,
-                                               OutgoingIntensity);
+    Status = ReflectorReferenceReflect(&Reflector->ReflectorReference,
+                                       Wavelength,
+                                       IncomingIntensity,
+                                       OutgoingIntensity);
 
     return Status;
 }
 
+_Ret_
+PCREFLECTOR_REFERENCE
+ReflectorGetReflectorReference(
+    _In_ PCREFLECTOR Reflector
+    )
+{
+    if (Reflector == NULL)
+    {
+        return NULL;
+    }
+    
+    return &Reflector->ReflectorReference;
+}
+
 VOID
-ReflectorReference(
+ReflectorRetain(
     _In_opt_ PREFLECTOR Reflector
     )
 {
@@ -149,12 +156,10 @@ ReflectorReference(
 }
 
 VOID
-ReflectorDereference(
+ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR Reflector
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-
     if (Reflector == NULL)
     {
         return;
@@ -164,13 +169,7 @@ ReflectorDereference(
 
     if (Reflector->ReferenceCount == 0)
     {
-        FreeRoutine = Reflector->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(Reflector->Data);
-        }
-
+        ReflectorReferenceDestroy(&Reflector->ReflectorReference);
         IrisAlignedFree(Reflector);
     }
 }

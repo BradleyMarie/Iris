@@ -16,6 +16,64 @@ Abstract:
 #include <irisspectrump.h>
 
 //
+// Types
+//
+
+typedef struct _FMA_SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumHeader;
+    PCSPECTRUM_REFERENCE Spectrum0;
+    PCSPECTRUM_REFERENCE Spectrum1;
+    FLOAT Attenuation;
+} FMA_SPECTRUM, *PFMA_SPECTRUM;
+
+typedef CONST FMA_SPECTRUM *PCFMA_SPECTRUM;
+
+typedef struct _ATTENUATED_SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumHeader;
+    PCSPECTRUM_REFERENCE Spectrum;
+    FLOAT Attenuation;
+} ATTENUATED_SPECTRUM, *PATTENUATED_SPECTRUM;
+
+typedef CONST ATTENUATED_SPECTRUM *PCATTENUATED_SPECTRUM;
+
+typedef struct _SUM_SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumHeader;
+    PCSPECTRUM_REFERENCE Spectrum0;
+    PCSPECTRUM_REFERENCE Spectrum1;
+} SUM_SPECTRUM, *PSUM_SPECTRUM;
+
+typedef CONST SUM_SPECTRUM *PCSUM_SPECTRUM;
+
+typedef struct _REFLECTION_SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumHeader;
+    PCSPECTRUM_REFERENCE Spectrum;
+    PCREFLECTOR_REFERENCE Reflector;
+} REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
+
+typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
+
+typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
+    SPECTRUM_REFERENCE SpectrumHeader;
+    PCSPECTRUM_REFERENCE Spectrum;
+    PCREFLECTOR_REFERENCE Reflector;
+    FLOAT Attenuation;
+} ATTENUATED_REFLECTION_SPECTRUM, *PATTENUATED_REFLECTION_SPECTRUM;
+
+typedef CONST ATTENUATED_REFLECTION_SPECTRUM *PCATTENUATED_REFLECTION_SPECTRUM;
+
+struct _SPECTRUM_COMPOSITOR_REFERENCE {
+    STATIC_MEMORY_ALLOCATOR AttenuatedReflectionSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
+    STATIC_MEMORY_ALLOCATOR SumSpectrumAllocator;
+};
+
+struct _SPECTRUM_COMPOSITOR {
+    SPECTRUM_COMPOSITOR_REFERENCE CompositorReference;
+};
+
+//
 // Static Functions
 //
 
@@ -41,18 +99,18 @@ FmaSpectrumSample(
 
     FmaSpectrum = (PCFMA_SPECTRUM) Context;
 
-    Status = SpectrumSample(FmaSpectrum->Spectrum0,
-                            Wavelength,
-                            &SpectrumIntensity0);
+    Status = SpectrumReferenceSample(FmaSpectrum->Spectrum0,
+                                     Wavelength,
+                                     &SpectrumIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = SpectrumSample(FmaSpectrum->Spectrum1,
-                            Wavelength,
-                            &SpectrumIntensity1);
+    Status = SpectrumReferenceSample(FmaSpectrum->Spectrum1,
+                                     Wavelength,
+                                     &SpectrumIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -87,9 +145,9 @@ AttenuatedSpectrumSample(
 
     AttenuatedSpectrum = (PCATTENUATED_SPECTRUM) Context;
 
-    Status = SpectrumSample(AttenuatedSpectrum->Spectrum,
-                            Wavelength,
-                            &OutputIntensity);
+    Status = SpectrumReferenceSample(AttenuatedSpectrum->Spectrum,
+                                     Wavelength,
+                                     &OutputIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -122,18 +180,18 @@ SumSpectrumSample(
 
     SumSpectrum = (PCSUM_SPECTRUM) Context;
 
-    Status = SpectrumSample(SumSpectrum->Spectrum0,
-                            Wavelength,
-                            &SpectrumIntensity0);
+    Status = SpectrumReferenceSample(SumSpectrum->Spectrum0,
+                                     Wavelength,
+                                     &SpectrumIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = SpectrumSample(SumSpectrum->Spectrum1,
-                            Wavelength,
-                            &SpectrumIntensity1);
+    Status = SpectrumReferenceSample(SumSpectrum->Spectrum1,
+                                     Wavelength,
+                                     &SpectrumIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -165,19 +223,19 @@ ReflectionSpectrumSample(
 
     ReflectionSpectrum = (PCREFLECTION_SPECTRUM) Context;
 
-    Status = SpectrumSample(ReflectionSpectrum->Spectrum,
-                            Wavelength,
-                            &SpectrumIntensity);
+    Status = SpectrumReferenceSample(ReflectionSpectrum->Spectrum,
+                                     Wavelength,
+                                     &SpectrumIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReflect(ReflectionSpectrum->Reflector,
-                              Wavelength,
-                              SpectrumIntensity,
-                              Intensity);
+    Status = ReflectorReferenceReflect(ReflectionSpectrum->Reflector,
+                                       Wavelength,
+                                       SpectrumIntensity,
+                                       Intensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -209,19 +267,19 @@ AttenuatedReflectionSpectrumSample(
 
     AttenuatedReflectionSpectrum = (PCATTENUATED_REFLECTION_SPECTRUM) Context;
 
-    Status = SpectrumSample(AttenuatedReflectionSpectrum->Spectrum,
-                            Wavelength,
-                            &SpectrumIntensity);
+    Status = SpectrumReferenceSample(AttenuatedReflectionSpectrum->Spectrum,
+                                     Wavelength,
+                                     &SpectrumIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReflect(AttenuatedReflectionSpectrum->Reflector,
-                              Wavelength,
-                              SpectrumIntensity,
-                              &ReflectedIntensity);
+    Status = ReflectorReferenceReflect(AttenuatedReflectionSpectrum->Reflector,
+                                       Wavelength,
+                                       SpectrumIntensity,
+                                       &ReflectedIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -290,8 +348,8 @@ STATIC
 VOID
 FmaSpectrumInitialize(
     _Out_ PFMA_SPECTRUM FmaSpectrum,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1,
+    _In_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_ PCSPECTRUM_REFERENCE Spectrum1,
     _In_ FLOAT Attenuation
     )
 {
@@ -301,9 +359,10 @@ FmaSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    FmaSpectrum->SpectrumHeader.VTable = &FmaSpectrumVTable;
-    FmaSpectrum->SpectrumHeader.ReferenceCount = 0;
-    FmaSpectrum->SpectrumHeader.Data = FmaSpectrum;
+    SpectrumReferenceInitialize(&FmaSpectrumVTable,
+                                FmaSpectrum,
+                                &FmaSpectrum->SpectrumHeader);
+                                
     FmaSpectrum->Spectrum0 = Spectrum0;
     FmaSpectrum->Spectrum1 = Spectrum1;
     FmaSpectrum->Attenuation = Attenuation;
@@ -313,7 +372,7 @@ STATIC
 VOID
 AttenuatedSpectrumInitialize(
     _Out_ PATTENUATED_SPECTRUM AttenuatedSpectrum,
-    _In_ PCSPECTRUM Spectrum,
+    _In_ PCSPECTRUM_REFERENCE Spectrum,
     _In_ FLOAT Attenuation
     )
 {
@@ -322,9 +381,10 @@ AttenuatedSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    AttenuatedSpectrum->SpectrumHeader.VTable = &AttenuatedSpectrumVTable;
-    AttenuatedSpectrum->SpectrumHeader.ReferenceCount = 0;
-    AttenuatedSpectrum->SpectrumHeader.Data = AttenuatedSpectrum;
+    SpectrumReferenceInitialize(&AttenuatedSpectrumVTable,
+                                AttenuatedSpectrum,
+                                &AttenuatedSpectrum->SpectrumHeader);
+                                
     AttenuatedSpectrum->Spectrum = Spectrum;
     AttenuatedSpectrum->Attenuation = Attenuation;
 }
@@ -333,17 +393,18 @@ STATIC
 VOID
 SumSpectrumInitialize(
     _Out_ PSUM_SPECTRUM SumSpectrum,
-    _In_ PCSPECTRUM Spectrum0,
-    _In_ PCSPECTRUM Spectrum1
+    _In_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_ PCSPECTRUM_REFERENCE Spectrum1
     )
 {
     ASSERT(SumSpectrum != NULL);
     ASSERT(Spectrum0 != NULL);
     ASSERT(Spectrum1 != NULL);
 
-    SumSpectrum->SpectrumHeader.VTable = &SumSpectrumVTable;
-    SumSpectrum->SpectrumHeader.ReferenceCount = 0;
-    SumSpectrum->SpectrumHeader.Data = SumSpectrum;
+    SpectrumReferenceInitialize(&SumSpectrumVTable,
+                                SumSpectrum,
+                                &SumSpectrum->SpectrumHeader);
+                                
     SumSpectrum->Spectrum0 = Spectrum0;
     SumSpectrum->Spectrum1 = Spectrum1;
 }
@@ -352,17 +413,18 @@ STATIC
 VOID
 ReflectionSpectrumInitialize(
     _Out_ PREFLECTION_SPECTRUM ReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
-    _In_ PCREFLECTOR Reflector
+    _In_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_ PCREFLECTOR_REFERENCE Reflector
     )
 {
     ASSERT(ReflectionSpectrum != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
 
-    ReflectionSpectrum->SpectrumHeader.VTable = &ReflectionSpectrumVTable;
-    ReflectionSpectrum->SpectrumHeader.ReferenceCount = 0;
-    ReflectionSpectrum->SpectrumHeader.Data = ReflectionSpectrum;
+    SpectrumReferenceInitialize(&ReflectionSpectrumVTable,
+                                ReflectionSpectrum,
+                                &ReflectionSpectrum->SpectrumHeader);
+                                
     ReflectionSpectrum->Spectrum = Spectrum;
     ReflectionSpectrum->Reflector = Reflector;
 }
@@ -371,8 +433,8 @@ STATIC
 VOID
 AttenuatedReflectionSpectrumInitialize(
     _Out_ PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
-    _In_ PCREFLECTOR Reflector,
+    _In_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_ PCREFLECTOR_REFERENCE Reflector,
     _In_ FLOAT Attenuation
     )
 {
@@ -382,12 +444,112 @@ AttenuatedReflectionSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    AttenuatedReflectionSpectrum->SpectrumHeader.VTable = &ReflectionSpectrumVTable;
-    AttenuatedReflectionSpectrum->SpectrumHeader.ReferenceCount = 0;
-    AttenuatedReflectionSpectrum->SpectrumHeader.Data = AttenuatedReflectionSpectrum;
+    SpectrumReferenceInitialize(&ReflectionSpectrumVTable,
+                                AttenuatedReflectionSpectrum,
+                                &AttenuatedReflectionSpectrum->SpectrumHeader);
+                                
     AttenuatedReflectionSpectrum->Spectrum = Spectrum;
     AttenuatedReflectionSpectrum->Reflector = Reflector;
     AttenuatedReflectionSpectrum->Attenuation = Attenuation;
+}
+
+//
+// Static Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+SpectrumCompositorReferenceInitialize(
+    _Out_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(Compositor != NULL);
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->ReflectionSpectrumAllocator,
+                                             sizeof(REFLECTION_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedSpectrumAllocator,
+                                             sizeof(ATTENUATED_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        return Status;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->FmaSpectrumAllocator,
+                                             sizeof(FMA_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        return Status;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->SumSpectrumAllocator,
+                                             sizeof(SUM_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+        return Status;
+    }
+
+    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedReflectionSpectrumAllocator,
+                                             sizeof(ATTENUATED_REFLECTION_SPECTRUM));
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+        return Status;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+SFORCEINLINE
+VOID
+SpectrumCompositorReferenceClear(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor
+    )
+{
+    ASSERT(Compositor != NULL);
+
+    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectionSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorFreeAll(&Compositor->SumSpectrumAllocator);
+}
+
+SFORCEINLINE
+VOID
+SpectrumCompositorReferenceDestroy(
+    _In_ _Post_invalid_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor
+    )
+{
+    ASSERT(Compositor != NULL);
+
+    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
+    StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
 }
 
 //
@@ -397,16 +559,17 @@ AttenuatedReflectionSpectrumInitialize(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAddSpectrums(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum0,
-    _In_opt_ PCSPECTRUM Spectrum1,
-    _Out_ PCSPECTRUM *Sum
+SpectrumCompositorReferenceAddSpectrums(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _Out_ PCSPECTRUM_REFERENCE *Sum
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
     PSUM_SPECTRUM SumSpectrum;
     PVOID Allocation;
+    ISTATUS Status;
 
     if (Compositor == NULL)
     {
@@ -434,22 +597,25 @@ SpectrumCompositorAddSpectrums(
     {
         AttenuatedSpectrum = (PATTENUATED_SPECTRUM) Spectrum0;
 
-        return SpectrumCompositorAttenuatedAddSpectrums(Compositor,
-                                                        Spectrum1,
-                                                        AttenuatedSpectrum->Spectrum,
-                                                        AttenuatedSpectrum->Attenuation,
-                                                        Sum);
+        Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(Compositor,
+                                                                   Spectrum1,
+                                                                   AttenuatedSpectrum->Spectrum,
+                                                                   AttenuatedSpectrum->Attenuation,
+                                                                   Sum);
+        return Status;
     }
 
     if (Spectrum1->VTable == &AttenuatedSpectrumVTable)
     {
         AttenuatedSpectrum = (PATTENUATED_SPECTRUM) Spectrum1;
 
-        return SpectrumCompositorAttenuatedAddSpectrums(Compositor,
-                                                        Spectrum0,
-                                                        AttenuatedSpectrum->Spectrum,
-                                                        AttenuatedSpectrum->Attenuation,
-                                                        Sum);
+        Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(Compositor,
+                                                                   Spectrum0,
+                                                                   AttenuatedSpectrum->Spectrum,
+                                                                   AttenuatedSpectrum->Attenuation,
+                                                                   Sum);
+                                                                   
+        return Status;
     }
 
     Allocation = StaticMemoryAllocatorAllocate(&Compositor->SumSpectrumAllocator);
@@ -465,18 +631,18 @@ SpectrumCompositorAddSpectrums(
                           Spectrum0,
                           Spectrum1);
 
-    *Sum = (PCSPECTRUM) SumSpectrum;
+    *Sum = (PCSPECTRUM_REFERENCE) SumSpectrum;
     return ISTATUS_SUCCESS;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAttenuateSpectrum(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
+SpectrumCompositorReferenceAttenuateSpectrum(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *AttenuatedSpectrumOutput
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrumOutput
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
@@ -531,24 +697,25 @@ SpectrumCompositorAttenuateSpectrum(
                                  Spectrum,
                                  Attenuation);
 
-    *AttenuatedSpectrumOutput = (PCSPECTRUM) AttenuatedSpectrum;
+    *AttenuatedSpectrumOutput = (PCSPECTRUM_REFERENCE) AttenuatedSpectrum;
     return ISTATUS_SUCCESS;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAttenuatedAddSpectrums(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum0,
-    _In_opt_ PCSPECTRUM Spectrum1,
+SpectrumCompositorReferenceAttenuatedAddSpectrums(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *AttenuatedSum
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
     PFMA_SPECTRUM FmaSpectrum;
     PVOID Allocation;
+    ISTATUS Status;
 
     if (Compositor == NULL)
     {
@@ -567,10 +734,12 @@ SpectrumCompositorAttenuatedAddSpectrums(
 
     if (Spectrum0 == NULL)
     {
-        return SpectrumCompositorAttenuateSpectrum(Compositor,
-                                                   Spectrum1,
-                                                   Attenuation,
-                                                   AttenuatedSum);
+        Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                              Spectrum1,
+                                                              Attenuation,
+                                                              AttenuatedSum);
+                                                              
+        return Status;
     }
 
     if (Spectrum1 == NULL ||
@@ -582,10 +751,11 @@ SpectrumCompositorAttenuatedAddSpectrums(
 
     if (Attenuation == (FLOAT) 1.0)
     {
-        return SpectrumCompositorAddSpectrums(Compositor,
-                                              Spectrum0,
-                                              Spectrum1,
-                                              AttenuatedSum);   
+        Status = SpectrumCompositorReferenceAddSpectrums(Compositor,
+                                                         Spectrum0,
+                                                         Spectrum1,
+                                                         AttenuatedSum);   
+        return Status;
     }
 
     if (Spectrum1->VTable == &AttenuatedSpectrumVTable)
@@ -609,18 +779,18 @@ SpectrumCompositorAttenuatedAddSpectrums(
                           Spectrum1,
                           Attenuation);
 
-    *AttenuatedSum = (PCSPECTRUM) FmaSpectrum;
+    *AttenuatedSum = (PCSPECTRUM_REFERENCE) FmaSpectrum;
     return ISTATUS_SUCCESS;   
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAddReflection(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+SpectrumCompositorReferenceAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
     )
 {
     PREFLECTION_SPECTRUM ReflectionSpectrum;
@@ -651,19 +821,19 @@ SpectrumCompositorAddReflection(
                                  Spectrum,
                                  Reflector);
 
-    *ReflectedSpectrum = (PCSPECTRUM) ReflectionSpectrum;
+    *ReflectedSpectrum = (PCSPECTRUM_REFERENCE) ReflectionSpectrum;
     return ISTATUS_SUCCESS;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAttenuatedAddReflection(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
+SpectrumCompositorReferenceAttenuatedAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
     )
 {
     PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum;
@@ -690,10 +860,10 @@ SpectrumCompositorAttenuatedAddReflection(
 
     if (Attenuation == (FLOAT) 1.0f)
     {
-        Status = SpectrumCompositorAddReflection(Compositor,
-                                                 Spectrum,
-                                                 Reflector,
-                                                 ReflectedSpectrum);
+        Status = SpectrumCompositorReferenceAddReflection(Compositor,
+                                                          Spectrum,
+                                                          Reflector,
+                                                          ReflectedSpectrum);
 
         return Status;
     }
@@ -712,6 +882,208 @@ SpectrumCompositorAttenuatedAddReflection(
                                            Reflector,
                                            Attenuation);
 
-    *ReflectedSpectrum = (PCSPECTRUM) AttenuatedReflectionSpectrum;
+    *ReflectedSpectrum = (PCSPECTRUM_REFERENCE) AttenuatedReflectionSpectrum;
     return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAllocate(
+    _Out_ PSPECTRUM_COMPOSITOR *Result
+    )
+{
+    PSPECTRUM_COMPOSITOR Compositor;
+    ISTATUS Status;
+
+    if (Result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    Compositor = (PSPECTRUM_COMPOSITOR) malloc(sizeof(SPECTRUM_COMPOSITOR));
+
+    if (Compositor == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    Status = SpectrumCompositorReferenceInitialize(&Compositor->CompositorReference);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        free(Compositor);
+        return Status;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAddSpectrums(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _Out_ PCSPECTRUM_REFERENCE *Sum
+    )
+{
+    ISTATUS Status;
+    
+    //
+    // &Compositor->CompositorReference should be safe to do even if
+    // Compositor == NULL.
+    //
+    
+    Status = SpectrumCompositorReferenceAddSpectrums(&Compositor->CompositorReference,
+                                                     Spectrum0,
+                                                     Spectrum1,
+                                                     Sum);
+    
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAttenuateSpectrum(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrum
+    )
+{
+    ISTATUS Status;
+    
+    //
+    // &Compositor->CompositorReference should be safe to do even if
+    // Compositor == NULL.
+    //
+    
+    Status = SpectrumCompositorReferenceAttenuateSpectrum(&Compositor->CompositorReference,
+                                                          Spectrum,
+                                                          Attenuation,
+                                                          AttenuatedSpectrum);
+    
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAttenuatedAddSpectrums(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
+    )
+{
+    ISTATUS Status;
+    
+    //
+    // &Compositor->CompositorReference should be safe to do even if
+    // Compositor == NULL.
+    //
+    
+    Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(&Compositor->CompositorReference,
+                                                               Spectrum0,
+                                                               Spectrum1,
+                                                               Attenuation,
+                                                               AttenuatedSum);
+    
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    )
+{
+    ISTATUS Status;
+    
+    //
+    // &Compositor->CompositorReference should be safe to do even if
+    // Compositor == NULL.
+    //
+    
+    Status = SpectrumCompositorReferenceAddReflection(&Compositor->CompositorReference,
+                                                      Spectrum,
+                                                      Reflector,
+                                                      ReflectedSpectrum);
+    
+    return Status;
+}
+    
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SpectrumCompositorAttenuatedAddReflection(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
+    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_ FLOAT Attenuation,
+    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    )
+{
+    ISTATUS Status;
+    
+    //
+    // &Compositor->CompositorReference should be safe to do even if
+    // Compositor == NULL.
+    //
+    
+    Status = SpectrumCompositorReferenceAttenuatedAddReflection(&Compositor->CompositorReference,
+                                                                Spectrum,
+                                                                Reflector,
+                                                                Attenuation,
+                                                                ReflectedSpectrum);
+    
+    return Status;
+}
+
+_Ret_
+PSPECTRUM_COMPOSITOR_REFERENCE
+SpectrumCompositorGetSpectrumCompositorReference(
+    _In_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    if (Compositor == NULL)
+    {
+        return NULL;
+    }
+
+    return &Compositor->CompositorReference;
+}
+
+VOID
+SpectrumCompositorClear(
+    _Inout_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    if (Compositor == NULL)
+    {
+        return;
+    }
+
+    SpectrumCompositorReferenceClear(&Compositor->CompositorReference);
+}
+
+VOID
+SpectrumCompositorFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_COMPOSITOR Compositor
+    )
+{
+    if (Compositor == NULL)
+    {
+        return;
+    }
+
+    SpectrumCompositorReferenceDestroy(&Compositor->CompositorReference);
 }

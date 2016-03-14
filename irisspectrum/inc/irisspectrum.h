@@ -18,11 +18,13 @@ Abstract:
 #include <irisadvanced.h>
 
 #include "irisspectrum_api.h"
+#include "irisspectrum_spectrumreference.h"
+#include "irisspectrum_reflectorreference.h"
 #include "irisspectrum_spectrum.h"
 #include "irisspectrum_reflector.h"
+#include "irisspectrum_spectrumcompositorreference.h"
+#include "irisspectrum_reflectorcompositorreference.h"
 #include "irisspectrum_spectrumcompositor.h"
 #include "irisspectrum_reflectorcompositor.h"
-#include "irisspectrum_spectrumcompositorowner.h"
-#include "irisspectrum_reflectorcompositorowner.h"
 
 #endif // _IRIS_SPECTRUM_HEADER_

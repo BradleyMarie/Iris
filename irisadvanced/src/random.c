@@ -124,10 +124,10 @@ RandomGenerateFloat(
 {
     ISTATUS Status;
     
-    if (Rng == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
+    //
+    // &Rng->RandomReference should be safe to do even if
+    // Rng == NULL.
+    //
     
     Status = RandomReferenceGenerateFloat(&Rng->RandomReference,
                                           Minimum,
@@ -147,10 +147,10 @@ RandomGenerateIndex(
 {
     ISTATUS Status;
     
-    if (Rng == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
+    //
+    // &Rng->RandomReference should be safe to do even if
+    // Rng == NULL.
+    //
     
     Status = RandomReferenceGenerateIndex(&Rng->RandomReference,
                                           Minimum,
@@ -165,10 +165,10 @@ RandomFree(
     _In_ _Post_invalid_ PRANDOM Rng
     )
 {    
-    if (Rng == NULL)
-    {
-        return;
-    }
+    //
+    // &Rng->RandomReference should be safe to do even if
+    // Rng == NULL.
+    //
     
     RandomReferenceDestroy(&Rng->RandomReference);
     IrisAlignedFree(Rng);

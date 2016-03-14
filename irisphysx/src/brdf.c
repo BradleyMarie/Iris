@@ -25,8 +25,8 @@ BrdfSample(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -86,8 +86,8 @@ BrdfSampleWithLambertianFalloff(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -147,8 +147,8 @@ BrdfComputeReflectance(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector
     )
 {
     ISTATUS Status;
@@ -194,8 +194,8 @@ BrdfComputeReflectanceWithLambertianFalloff(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector
     )
 {
     ISTATUS Status;
@@ -241,8 +241,8 @@ BrdfComputeReflectanceWithPdf(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PFLOAT Pdf
     )
 {
@@ -295,8 +295,8 @@ BrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCBRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PFLOAT Pdf
     )
 {

@@ -26,6 +26,12 @@ namespace Iris {
 
 class ShapeReference final {
 public:
+    ShapeReference(
+        _In_ PCSHAPE_REFERENCE ShapeRef
+        )
+    : Data(ShapeRef)
+    { }
+    
     _Ret_
     PCSHAPE_REFERENCE
     AsPCSHAPE_REFERENCE(
@@ -37,14 +43,6 @@ public:
 
 private:
     PCSHAPE_REFERENCE Data;
-    
-    ShapeReference(
-        _In_ PCSHAPE_REFERENCE ShapeRef
-        )
-    : Data(ShapeRef)
-    { }
-    
-    friend class RayTracer;
 };
 
 } // namespace Iris

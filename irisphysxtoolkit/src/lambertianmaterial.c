@@ -43,6 +43,7 @@ SimpleLambertianMaterialSample(
     )
 {
     PCSIMPLE_LAMBERTIAN_MATERIAL Material;
+    PCREFLECTOR_REFERENCE ReflecanceReference;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
@@ -53,8 +54,10 @@ SimpleLambertianMaterialSample(
     
     Material = (PCSIMPLE_LAMBERTIAN_MATERIAL) Context;
     
+    ReflecanceReference = ReflectorGetReflectorReference(Material->Reflectance);
+
     Status = SpectrumLambertianBrdfAllocate(BrdfAllocator,
-                                            Material->Reflectance,
+                                            ReflecanceReference,
                                             SurfaceNormal,
                                             Brdf);
                                             
@@ -73,7 +76,7 @@ SimpleLambertianMaterialFree(
 
     Material = (PCSIMPLE_LAMBERTIAN_MATERIAL) Context;
 
-    ReflectorDereference(Material->Reflectance);
+    ReflectorRelease(Material->Reflectance);
 }
 
 //
@@ -124,7 +127,7 @@ LambertianMaterialAllocate(
         return Status;
     }
     
-    ReflectorReference(Reflectance);
+    ReflectorRetain(Reflectance);
     
     return ISTATUS_SUCCESS;
 }

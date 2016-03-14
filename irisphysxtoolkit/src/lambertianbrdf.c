@@ -19,7 +19,7 @@ Abstract:
 //
 
 typedef struct _SPECRUM_LAMBERTIAN_BRDF {
-    PCREFLECTOR Reflectance;
+    PCREFLECTOR_REFERENCE Reflectance;
     VECTOR3 SurfaceNormal;
 } SPECRUM_LAMBERTIAN_BRDF, *PSPECRUM_LAMBERTIAN_BRDF;
 
@@ -37,8 +37,8 @@ SpectrumLambertianBrdfSample(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -65,10 +65,10 @@ SpectrumLambertianBrdfSample(
         return Status;
     }
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    IRIS_INV_PI,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             IRIS_INV_PI,
+                                                             Reflector);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -88,8 +88,8 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -121,10 +121,10 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
     DotProduct = VectorDotProduct(Brdf->SurfaceNormal, *Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    Attenuation,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             Attenuation,
+                                                             Reflector);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -144,8 +144,8 @@ SpectrumLambertianBrdfComputeReflectance(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector
     )
 {
     PCSPECRUM_LAMBERTIAN_BRDF Brdf;
@@ -159,10 +159,10 @@ SpectrumLambertianBrdfComputeReflectance(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    IRIS_INV_PI,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             IRIS_INV_PI,
+                                                             Reflector);
 
     return Status;
 }
@@ -175,8 +175,8 @@ SpectrumLambertianBrdfComputeReflectanceWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector
     )
 {
     FLOAT Attenuation;
@@ -195,10 +195,10 @@ SpectrumLambertianBrdfComputeReflectanceWithLambertianFalloff(
     DotProduct = VectorDotProduct(Brdf->SurfaceNormal, Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    Attenuation,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             Attenuation,
+                                                             Reflector);
 
     return Status;
 }
@@ -211,8 +211,8 @@ SpectrumLambertianBrdfComputeReflectanceWithPdf(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PFLOAT Pdf
     )
 {
@@ -228,10 +228,10 @@ SpectrumLambertianBrdfComputeReflectanceWithPdf(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    IRIS_INV_PI,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             IRIS_INV_PI,
+                                                             Reflector);
 
     return Status;
 }
@@ -244,8 +244,8 @@ SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _Out_ PCREFLECTOR *Reflector,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR_REFERENCE *Reflector,
     _Out_ PFLOAT Pdf
     )
 {
@@ -266,10 +266,10 @@ SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
     DotProduct = VectorDotProduct(Brdf->SurfaceNormal, Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
-    Status = ReflectorCompositorAttenuateReflection(Compositor,
-                                                    Brdf->Reflectance,
-                                                    Attenuation,
-                                                    Reflector);
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             Attenuation,
+                                                             Reflector);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -303,7 +303,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumLambertianBrdfAllocate(
     _In_ PBRDF_ALLOCATOR Allocator,
-    _In_ PCREFLECTOR Reflectance,
+    _In_ PCREFLECTOR_REFERENCE Reflectance,
     _In_ VECTOR3 SurfaceNormal,
     _Out_ PCBRDF *Brdf
     )
