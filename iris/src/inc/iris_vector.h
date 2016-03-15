@@ -18,18 +18,6 @@ Abstract:
 #define _VECTOR_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
-#define VectorMatrixReferenceMultiply(Matrix, Vector) \
-        StaticVectorMatrixReferenceMultiply(Matrix, Vector)
-
-#define VectorMatrixReferenceTransposedMultiply(Matrix, Vector) \
-        StaticVectorMatrixReferenceTransposedMultiply(Matrix, Vector)
-
-#define VectorMatrixReferenceInverseMultiply(Matrix, Vector) \
-        StaticVectorMatrixReferenceInverseMultiply(Matrix, Vector)
-
-#define VectorMatrixReferenceInverseTransposedMultiply(Matrix, Vector) \
-        StaticVectorMatrixReferenceInverseTransposedMultiply(Matrix, Vector)
-
 #define VectorMatrixMultiply(Matrix, Vector) \
         StaticVectorMatrixMultiply(Matrix, Vector)
 
@@ -45,8 +33,8 @@ Abstract:
 
 SFORCEINLINE
 VECTOR3
-VectorMatrixReferenceMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
+VectorMatrixMultiply(
+    _In_opt_ PCMATRIX Matrix,
     _In_ VECTOR3 Vector
     )
 {
@@ -79,27 +67,8 @@ VectorMatrixReferenceMultiply(
 
 SFORCEINLINE
 VECTOR3
-VectorMatrixMultiply(
+VectorMatrixTransposedMultiply(
     _In_opt_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector
-    )
-{
-    VECTOR3 Product;
-
-    if (Matrix == NULL)
-    {
-        return Vector;
-    }
-
-    Product = VectorMatrixReferenceMultiply(&Matrix->MatrixReference, Vector);
-
-    return Product;
-}
-
-SFORCEINLINE
-VECTOR3
-VectorMatrixReferenceTransposedMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
     _In_ VECTOR3 Vector
     )
 {
@@ -132,44 +101,6 @@ VectorMatrixReferenceTransposedMultiply(
 
 SFORCEINLINE
 VECTOR3
-VectorMatrixTransposedMultiply(
-    _In_opt_ PCMATRIX Matrix,
-    _In_ VECTOR3 Vector
-    )
-{
-    VECTOR3 Product;
-
-    if (Matrix == NULL)
-    {
-        return Vector;
-    }
-
-    Product = VectorMatrixReferenceTransposedMultiply(&Matrix->MatrixReference, Vector);
-
-    return Product;
-}
-
-SFORCEINLINE
-VECTOR3
-VectorMatrixReferenceInverseMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
-    _In_ VECTOR3 Vector
-    )
-{
-    VECTOR3 Product;
-
-    if (Matrix == NULL)
-    {
-        return Vector;
-    }
-
-    Product = VectorMatrixReferenceMultiply(Matrix->Inverse, Vector);
-
-    return Product;
-}
-
-SFORCEINLINE
-VECTOR3
 VectorMatrixInverseMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ VECTOR3 Vector
@@ -182,26 +113,7 @@ VectorMatrixInverseMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixReferenceInverseMultiply(&Matrix->MatrixReference, Vector);
-
-    return Product;
-}
-
-SFORCEINLINE
-VECTOR3
-VectorMatrixReferenceInverseTransposedMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
-    _In_ VECTOR3 Vector
-    )
-{
-    VECTOR3 Product;
-
-    if (Matrix == NULL)
-    {
-        return Vector;
-    }
-
-    Product = VectorMatrixReferenceTransposedMultiply(Matrix->Inverse, Vector);
+    Product = VectorMatrixMultiply(Matrix->Inverse, Vector);
 
     return Product;
 }
@@ -220,16 +132,12 @@ VectorMatrixInverseTransposedMultiply(
         return Vector;
     }
 
-    Product = VectorMatrixReferenceInverseTransposedMultiply(&Matrix->MatrixReference, Vector);
+    Product = VectorMatrixTransposedMultiply(Matrix->Inverse, Vector);
 
     return Product;
 }
 
 #ifdef _IRIS_EXPORT_VECTOR_ROUTINES_
-#undef VectorMatrixReferenceMultiply
-#undef VectorMatrixReferenceTransposedMultiply
-#undef VectorMatrixReferenceInverseMultiply
-#undef VectorMatrixReferenceInverseTransposedMultiply
 #undef VectorMatrixMultiply
 #undef VectorMatrixTransposedMultiply
 #undef VectorMatrixInverseMultiply

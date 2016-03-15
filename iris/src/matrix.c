@@ -24,17 +24,15 @@ struct _INVERTIBLE_MATRIX {
     SIZE_T ReferenceCount;
 };
 
-typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
-
 //
 // Static Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-SFORCEINLINE
+STATIC
 ISTATUS
-MatrixPairInitialize(
+InvertibleMatrixInitialize(
     _In_ FLOAT M00,
     _In_ FLOAT M01,
     _In_ FLOAT M02,
@@ -51,9 +49,7 @@ MatrixPairInitialize(
     _In_ FLOAT M31,
     _In_ FLOAT M32,
     _In_ FLOAT M33,
-    _In_ PINVERTIBLE_MATRIX InvertibleMatrix,
-    _Out_ PMATRIX Matrix,
-    _Out_ PMATRIX Inverse
+    _Out_ PINVERTIBLE_MATRIX InvertibleMatrix
     )
 {
     ISTATUS Status;
@@ -74,43 +70,63 @@ MatrixPairInitialize(
     ASSERT(IsFiniteFloat(M31) != FALSE);
     ASSERT(IsFiniteFloat(M32) != FALSE);
     ASSERT(IsFiniteFloat(M33) != FALSE);
-    ASSERT(InvertibleMatrix != NULL);
-    ASSERT(Inverse != NULL);
     ASSERT(Matrix != NULL);
-    
-    Status = MatrixReferencePairInitialize(M00,
-                                           M01,
-                                           M02,
-                                           M03,
-                                           M10,
-                                           M11,
-                                           M12,
-                                           M13,
-                                           M20,
-                                           M21,
-                                           M22,
-                                           M23,
-                                           M30,
-                                           M31,
-                                           M32,
-                                           M33,
-                                           &Matrix->MatrixReference,
-                                           &Inverse->MatrixReference);
-    
+    ASSERT(Inverse != NULL);
+
+    Status = Float4x4InverseInitialize(M00,
+                                       M01,
+                                       M02,
+                                       M03,
+                                       M10,
+                                       M11,
+                                       M12,
+                                       M13,
+                                       M20,
+                                       M21,
+                                       M22,
+                                       M23,
+                                       M30,
+                                       M31,
+                                       M32,
+                                       M33,
+                                       InvertibleMatrix->Inverse.M);
+
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    Matrix->InvertibleMatrix = InvertibleMatrix;
-    Inverse->InvertibleMatrix = InvertibleMatrix;
-    
-    return Status;
+    InvertibleMatrix->Inverse.Inverse = &InvertibleMatrix->Matrix;
+    InvertibleMatrix->Inverse.InvertibleMatrix = InvertibleMatrix;
+
+    InvertibleMatrix->Matrix.M[0][0] = M00;
+    InvertibleMatrix->Matrix.M[0][1] = M01;
+    InvertibleMatrix->Matrix.M[0][2] = M02;
+    InvertibleMatrix->Matrix.M[0][3] = M03;
+    InvertibleMatrix->Matrix.M[1][0] = M10;
+    InvertibleMatrix->Matrix.M[1][1] = M11;
+    InvertibleMatrix->Matrix.M[1][2] = M12;
+    InvertibleMatrix->Matrix.M[1][3] = M13;
+    InvertibleMatrix->Matrix.M[2][0] = M20;
+    InvertibleMatrix->Matrix.M[2][1] = M21;
+    InvertibleMatrix->Matrix.M[2][2] = M22;
+    InvertibleMatrix->Matrix.M[2][3] = M23;
+    InvertibleMatrix->Matrix.M[3][0] = M30;
+    InvertibleMatrix->Matrix.M[3][1] = M31;
+    InvertibleMatrix->Matrix.M[3][2] = M32;
+    InvertibleMatrix->Matrix.M[3][3] = M33;
+
+    InvertibleMatrix->Matrix.Inverse = &InvertibleMatrix->Inverse;
+    InvertibleMatrix->Matrix.InvertibleMatrix = InvertibleMatrix;
+
+    InvertibleMatrix->ReferenceCount = 1;
+
+    return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
 VOID
-MatrixPairInitializeFromValues(
+InvertibleMatrixInitializeFromValues(
     _In_ FLOAT M00,
     _In_ FLOAT M01,
     _In_ FLOAT M02,
@@ -143,9 +159,7 @@ MatrixPairInitializeFromValues(
     _In_ FLOAT I31,
     _In_ FLOAT I32,
     _In_ FLOAT I33,
-    _In_ PINVERTIBLE_MATRIX InvertibleMatrix,
-    _Out_ PMATRIX Matrix,
-    _Out_ PMATRIX Inverse
+    _Out_ PINVERTIBLE_MATRIX InvertibleMatrix
     )
 {
     ASSERT(IsFiniteFloat(M00) != FALSE);
@@ -180,47 +194,50 @@ MatrixPairInitializeFromValues(
     ASSERT(IsFiniteFloat(I31) != FALSE);
     ASSERT(IsFiniteFloat(I32) != FALSE);
     ASSERT(IsFiniteFloat(I33) != FALSE);
-    ASSERT(InvertibleMatrix != NULL);
     ASSERT(Inverse != NULL);
     ASSERT(Matrix != NULL);
+
+    InvertibleMatrix->Matrix.M[0][0] = M00;
+    InvertibleMatrix->Matrix.M[0][1] = M01;
+    InvertibleMatrix->Matrix.M[0][2] = M02;
+    InvertibleMatrix->Matrix.M[0][3] = M03;
+    InvertibleMatrix->Matrix.M[1][0] = M10;
+    InvertibleMatrix->Matrix.M[1][1] = M11;
+    InvertibleMatrix->Matrix.M[1][2] = M12;
+    InvertibleMatrix->Matrix.M[1][3] = M13;
+    InvertibleMatrix->Matrix.M[2][0] = M20;
+    InvertibleMatrix->Matrix.M[2][1] = M21;
+    InvertibleMatrix->Matrix.M[2][2] = M22;
+    InvertibleMatrix->Matrix.M[2][3] = M23;
+    InvertibleMatrix->Matrix.M[3][0] = M30;
+    InvertibleMatrix->Matrix.M[3][1] = M31;
+    InvertibleMatrix->Matrix.M[3][2] = M32;
+    InvertibleMatrix->Matrix.M[3][3] = M33;
+
+    InvertibleMatrix->Matrix.Inverse = &InvertibleMatrix->Inverse;
+    InvertibleMatrix->Matrix.InvertibleMatrix = InvertibleMatrix;
     
-    MatrixReferencePairInitializeFromValues(M00,
-                                            M01,
-                                            M02,
-                                            M03,
-                                            M10,
-                                            M11,
-                                            M12,
-                                            M13,
-                                            M20,
-                                            M21,
-                                            M22,
-                                            M23,
-                                            M30,
-                                            M31,
-                                            M32,
-                                            M33,
-                                            I00,
-                                            I01,
-                                            I02,
-                                            I03,
-                                            I10,
-                                            I11,
-                                            I12,
-                                            I13,
-                                            I20,
-                                            I21,
-                                            I22,
-                                            I23,
-                                            I30,
-                                            I31,
-                                            I32,
-                                            I33,
-                                            &Matrix->MatrixReference,
-                                            &Inverse->MatrixReference);
-    
-    Matrix->InvertibleMatrix = InvertibleMatrix;
-    Inverse->InvertibleMatrix = InvertibleMatrix;
+    InvertibleMatrix->Inverse.M[0][0] = I00;
+    InvertibleMatrix->Inverse.M[0][1] = I01;
+    InvertibleMatrix->Inverse.M[0][2] = I02;
+    InvertibleMatrix->Inverse.M[0][3] = I03;
+    InvertibleMatrix->Inverse.M[1][0] = I10;
+    InvertibleMatrix->Inverse.M[1][1] = I11;
+    InvertibleMatrix->Inverse.M[1][2] = I12;
+    InvertibleMatrix->Inverse.M[1][3] = I13;
+    InvertibleMatrix->Inverse.M[2][0] = I20;
+    InvertibleMatrix->Inverse.M[2][1] = I21;
+    InvertibleMatrix->Inverse.M[2][2] = I22;
+    InvertibleMatrix->Inverse.M[2][3] = I23;
+    InvertibleMatrix->Inverse.M[3][0] = I30;
+    InvertibleMatrix->Inverse.M[3][1] = I31;
+    InvertibleMatrix->Inverse.M[3][2] = I32;
+    InvertibleMatrix->Inverse.M[3][3] = I33;
+
+    InvertibleMatrix->Inverse.Inverse = &InvertibleMatrix->Matrix;
+    InvertibleMatrix->Inverse.InvertibleMatrix = InvertibleMatrix;
+
+    InvertibleMatrix->ReferenceCount = 1;
 }
 
 _Check_return_
@@ -305,43 +322,39 @@ MatrixAllocateFromValues(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    MatrixPairInitializeFromValues(M00,
-                                   M01,
-                                   M02,
-                                   M03,
-                                   M10,
-                                   M11,
-                                   M12,
-                                   M13,
-                                   M20,
-                                   M21,
-                                   M22,
-                                   M23,
-                                   M30,
-                                   M31,
-                                   M32,
-                                   M33,
-                                   I00,
-                                   I01,
-                                   I02,
-                                   I03,
-                                   I10,
-                                   I11,
-                                   I12,
-                                   I13,
-                                   I20,
-                                   I21,
-                                   I22,
-                                   I23,
-                                   I30,
-                                   I31,
-                                   I32,
-                                   I33,
-                                   InvertibleMatrix,
-                                   &InvertibleMatrix->Matrix,
-                                   &InvertibleMatrix->Inverse);
-
-    InvertibleMatrix->ReferenceCount = 1;
+    InvertibleMatrixInitializeFromValues(M00,
+                                         M01,
+                                         M02,
+                                         M03,
+                                         M10,
+                                         M11,
+                                         M12,
+                                         M13,
+                                         M20,
+                                         M21,
+                                         M22,
+                                         M23,
+                                         M30,
+                                         M31,
+                                         M32,
+                                         M33,
+                                         I00,
+                                         I01,
+                                         I02,
+                                         I03,
+                                         I10,
+                                         I11,
+                                         I12,
+                                         I13,
+                                         I20,
+                                         I21,
+                                         I22,
+                                         I23,
+                                         I30,
+                                         I31,
+                                         I32,
+                                         I33,
+                                         InvertibleMatrix);
 
     *Matrix = &InvertibleMatrix->Matrix;
 
@@ -538,33 +551,29 @@ MatrixAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = MatrixPairInitialize(M00,
-                                  M01,
-                                  M02,
-                                  M03,
-                                  M10,
-                                  M11,
-                                  M12,
-                                  M13,
-                                  M20,
-                                  M21,
-                                  M22,
-                                  M23,
-                                  M30,
-                                  M31,
-                                  M32,
-                                  M33,
-                                  InvertibleMatrix,
-                                  &InvertibleMatrix->Matrix,
-                                  &InvertibleMatrix->Inverse);
+    Status = InvertibleMatrixInitialize(M00,
+                                        M01,
+                                        M02,
+                                        M03,
+                                        M10,
+                                        M11,
+                                        M12,
+                                        M13,
+                                        M20,
+                                        M21,
+                                        M22,
+                                        M23,
+                                        M30,
+                                        M31,
+                                        M32,
+                                        M33,
+                                        InvertibleMatrix);
 
     if (Status != ISTATUS_SUCCESS)
     {
         free(InvertibleMatrix);
         return Status;
     }
-
-    InvertibleMatrix->ReferenceCount = 1;
 
     *Matrix = &InvertibleMatrix->Matrix;
 
@@ -1008,85 +1017,85 @@ MatrixAllocateProduct(
         return ISTATUS_SUCCESS;
     }
 
-    M00 = Multiplicand0->MatrixReference.M[0][0] * Multiplicand1->MatrixReference.M[0][0] + 
-          Multiplicand0->MatrixReference.M[0][1] * Multiplicand1->MatrixReference.M[1][0] +
-          Multiplicand0->MatrixReference.M[0][2] * Multiplicand1->MatrixReference.M[2][0] +
-          Multiplicand0->MatrixReference.M[0][3] * Multiplicand1->MatrixReference.M[3][0];
+    M00 = Multiplicand0->M[0][0] * Multiplicand1->M[0][0] + 
+          Multiplicand0->M[0][1] * Multiplicand1->M[1][0] +
+          Multiplicand0->M[0][2] * Multiplicand1->M[2][0] +
+          Multiplicand0->M[0][3] * Multiplicand1->M[3][0];
 
-    M01 = Multiplicand0->MatrixReference.M[0][0] * Multiplicand1->MatrixReference.M[0][1] + 
-          Multiplicand0->MatrixReference.M[0][1] * Multiplicand1->MatrixReference.M[1][1] +
-          Multiplicand0->MatrixReference.M[0][2] * Multiplicand1->MatrixReference.M[2][1] +
-          Multiplicand0->MatrixReference.M[0][3] * Multiplicand1->MatrixReference.M[3][1];
+    M01 = Multiplicand0->M[0][0] * Multiplicand1->M[0][1] + 
+          Multiplicand0->M[0][1] * Multiplicand1->M[1][1] +
+          Multiplicand0->M[0][2] * Multiplicand1->M[2][1] +
+          Multiplicand0->M[0][3] * Multiplicand1->M[3][1];
 
-    M02 = Multiplicand0->MatrixReference.M[0][0] * Multiplicand1->MatrixReference.M[0][2] + 
-          Multiplicand0->MatrixReference.M[0][1] * Multiplicand1->MatrixReference.M[1][2] +
-          Multiplicand0->MatrixReference.M[0][2] * Multiplicand1->MatrixReference.M[2][2] +
-          Multiplicand0->MatrixReference.M[0][3] * Multiplicand1->MatrixReference.M[3][2];
+    M02 = Multiplicand0->M[0][0] * Multiplicand1->M[0][2] + 
+          Multiplicand0->M[0][1] * Multiplicand1->M[1][2] +
+          Multiplicand0->M[0][2] * Multiplicand1->M[2][2] +
+          Multiplicand0->M[0][3] * Multiplicand1->M[3][2];
 
-    M03 = Multiplicand0->MatrixReference.M[0][0] * Multiplicand1->MatrixReference.M[0][3] + 
-          Multiplicand0->MatrixReference.M[0][1] * Multiplicand1->MatrixReference.M[1][3] +
-          Multiplicand0->MatrixReference.M[0][2] * Multiplicand1->MatrixReference.M[2][3] +
-          Multiplicand0->MatrixReference.M[0][3] * Multiplicand1->MatrixReference.M[3][3];
+    M03 = Multiplicand0->M[0][0] * Multiplicand1->M[0][3] + 
+          Multiplicand0->M[0][1] * Multiplicand1->M[1][3] +
+          Multiplicand0->M[0][2] * Multiplicand1->M[2][3] +
+          Multiplicand0->M[0][3] * Multiplicand1->M[3][3];
 
-    M10 = Multiplicand0->MatrixReference.M[1][0] * Multiplicand1->MatrixReference.M[0][0] + 
-          Multiplicand0->MatrixReference.M[1][1] * Multiplicand1->MatrixReference.M[1][0] +
-          Multiplicand0->MatrixReference.M[1][2] * Multiplicand1->MatrixReference.M[2][0] +
-          Multiplicand0->MatrixReference.M[1][3] * Multiplicand1->MatrixReference.M[3][0];
+    M10 = Multiplicand0->M[1][0] * Multiplicand1->M[0][0] + 
+          Multiplicand0->M[1][1] * Multiplicand1->M[1][0] +
+          Multiplicand0->M[1][2] * Multiplicand1->M[2][0] +
+          Multiplicand0->M[1][3] * Multiplicand1->M[3][0];
 
-    M11 = Multiplicand0->MatrixReference.M[1][0] * Multiplicand1->MatrixReference.M[0][1] + 
-          Multiplicand0->MatrixReference.M[1][1] * Multiplicand1->MatrixReference.M[1][1] +
-          Multiplicand0->MatrixReference.M[1][2] * Multiplicand1->MatrixReference.M[2][1] +
-          Multiplicand0->MatrixReference.M[1][3] * Multiplicand1->MatrixReference.M[3][1];
+    M11 = Multiplicand0->M[1][0] * Multiplicand1->M[0][1] + 
+          Multiplicand0->M[1][1] * Multiplicand1->M[1][1] +
+          Multiplicand0->M[1][2] * Multiplicand1->M[2][1] +
+          Multiplicand0->M[1][3] * Multiplicand1->M[3][1];
 
-    M12 = Multiplicand0->MatrixReference.M[1][0] * Multiplicand1->MatrixReference.M[0][2] + 
-          Multiplicand0->MatrixReference.M[1][1] * Multiplicand1->MatrixReference.M[1][2] +
-          Multiplicand0->MatrixReference.M[1][2] * Multiplicand1->MatrixReference.M[2][2] +
-          Multiplicand0->MatrixReference.M[1][3] * Multiplicand1->MatrixReference.M[3][2];
+    M12 = Multiplicand0->M[1][0] * Multiplicand1->M[0][2] + 
+          Multiplicand0->M[1][1] * Multiplicand1->M[1][2] +
+          Multiplicand0->M[1][2] * Multiplicand1->M[2][2] +
+          Multiplicand0->M[1][3] * Multiplicand1->M[3][2];
 
-    M13 = Multiplicand0->MatrixReference.M[1][0] * Multiplicand1->MatrixReference.M[0][3] + 
-          Multiplicand0->MatrixReference.M[1][1] * Multiplicand1->MatrixReference.M[1][3] +
-          Multiplicand0->MatrixReference.M[1][2] * Multiplicand1->MatrixReference.M[2][3] +
-          Multiplicand0->MatrixReference.M[1][3] * Multiplicand1->MatrixReference.M[3][3];
+    M13 = Multiplicand0->M[1][0] * Multiplicand1->M[0][3] + 
+          Multiplicand0->M[1][1] * Multiplicand1->M[1][3] +
+          Multiplicand0->M[1][2] * Multiplicand1->M[2][3] +
+          Multiplicand0->M[1][3] * Multiplicand1->M[3][3];
 
-    M20 = Multiplicand0->MatrixReference.M[2][0] * Multiplicand1->MatrixReference.M[0][0] + 
-          Multiplicand0->MatrixReference.M[2][1] * Multiplicand1->MatrixReference.M[1][0] +
-          Multiplicand0->MatrixReference.M[2][2] * Multiplicand1->MatrixReference.M[2][0] +
-          Multiplicand0->MatrixReference.M[2][3] * Multiplicand1->MatrixReference.M[3][0];
+    M20 = Multiplicand0->M[2][0] * Multiplicand1->M[0][0] + 
+          Multiplicand0->M[2][1] * Multiplicand1->M[1][0] +
+          Multiplicand0->M[2][2] * Multiplicand1->M[2][0] +
+          Multiplicand0->M[2][3] * Multiplicand1->M[3][0];
 
-    M21 = Multiplicand0->MatrixReference.M[2][0] * Multiplicand1->MatrixReference.M[0][1] + 
-          Multiplicand0->MatrixReference.M[2][1] * Multiplicand1->MatrixReference.M[1][1] +
-          Multiplicand0->MatrixReference.M[2][2] * Multiplicand1->MatrixReference.M[2][1] +
-          Multiplicand0->MatrixReference.M[2][3] * Multiplicand1->MatrixReference.M[3][1];
+    M21 = Multiplicand0->M[2][0] * Multiplicand1->M[0][1] + 
+          Multiplicand0->M[2][1] * Multiplicand1->M[1][1] +
+          Multiplicand0->M[2][2] * Multiplicand1->M[2][1] +
+          Multiplicand0->M[2][3] * Multiplicand1->M[3][1];
 
-    M22 = Multiplicand0->MatrixReference.M[2][0] * Multiplicand1->MatrixReference.M[0][2] + 
-          Multiplicand0->MatrixReference.M[2][1] * Multiplicand1->MatrixReference.M[1][2] +
-          Multiplicand0->MatrixReference.M[2][2] * Multiplicand1->MatrixReference.M[2][2] +
-          Multiplicand0->MatrixReference.M[2][3] * Multiplicand1->MatrixReference.M[3][2];
+    M22 = Multiplicand0->M[2][0] * Multiplicand1->M[0][2] + 
+          Multiplicand0->M[2][1] * Multiplicand1->M[1][2] +
+          Multiplicand0->M[2][2] * Multiplicand1->M[2][2] +
+          Multiplicand0->M[2][3] * Multiplicand1->M[3][2];
 
-    M23 = Multiplicand0->MatrixReference.M[2][0] * Multiplicand1->MatrixReference.M[0][3] + 
-          Multiplicand0->MatrixReference.M[2][1] * Multiplicand1->MatrixReference.M[1][3] +
-          Multiplicand0->MatrixReference.M[2][2] * Multiplicand1->MatrixReference.M[2][3] +
-          Multiplicand0->MatrixReference.M[2][3] * Multiplicand1->MatrixReference.M[3][3];
+    M23 = Multiplicand0->M[2][0] * Multiplicand1->M[0][3] + 
+          Multiplicand0->M[2][1] * Multiplicand1->M[1][3] +
+          Multiplicand0->M[2][2] * Multiplicand1->M[2][3] +
+          Multiplicand0->M[2][3] * Multiplicand1->M[3][3];
 
-    M30 = Multiplicand0->MatrixReference.M[3][0] * Multiplicand1->MatrixReference.M[0][0] + 
-          Multiplicand0->MatrixReference.M[3][1] * Multiplicand1->MatrixReference.M[1][0] +
-          Multiplicand0->MatrixReference.M[3][2] * Multiplicand1->MatrixReference.M[2][0] +
-          Multiplicand0->MatrixReference.M[3][3] * Multiplicand1->MatrixReference.M[3][0];
+    M30 = Multiplicand0->M[3][0] * Multiplicand1->M[0][0] + 
+          Multiplicand0->M[3][1] * Multiplicand1->M[1][0] +
+          Multiplicand0->M[3][2] * Multiplicand1->M[2][0] +
+          Multiplicand0->M[3][3] * Multiplicand1->M[3][0];
 
-    M31 = Multiplicand0->MatrixReference.M[3][0] * Multiplicand1->MatrixReference.M[0][1] + 
-          Multiplicand0->MatrixReference.M[3][1] * Multiplicand1->MatrixReference.M[1][1] +
-          Multiplicand0->MatrixReference.M[3][2] * Multiplicand1->MatrixReference.M[2][1] +
-          Multiplicand0->MatrixReference.M[3][3] * Multiplicand1->MatrixReference.M[3][1];
+    M31 = Multiplicand0->M[3][0] * Multiplicand1->M[0][1] + 
+          Multiplicand0->M[3][1] * Multiplicand1->M[1][1] +
+          Multiplicand0->M[3][2] * Multiplicand1->M[2][1] +
+          Multiplicand0->M[3][3] * Multiplicand1->M[3][1];
 
-    M32 = Multiplicand0->MatrixReference.M[3][0] * Multiplicand1->MatrixReference.M[0][2] + 
-          Multiplicand0->MatrixReference.M[3][1] * Multiplicand1->MatrixReference.M[1][2] +
-          Multiplicand0->MatrixReference.M[3][2] * Multiplicand1->MatrixReference.M[2][2] +
-          Multiplicand0->MatrixReference.M[3][3] * Multiplicand1->MatrixReference.M[3][2];
+    M32 = Multiplicand0->M[3][0] * Multiplicand1->M[0][2] + 
+          Multiplicand0->M[3][1] * Multiplicand1->M[1][2] +
+          Multiplicand0->M[3][2] * Multiplicand1->M[2][2] +
+          Multiplicand0->M[3][3] * Multiplicand1->M[3][2];
 
-    M33 = Multiplicand0->MatrixReference.M[3][0] * Multiplicand1->MatrixReference.M[0][3] + 
-          Multiplicand0->MatrixReference.M[3][1] * Multiplicand1->MatrixReference.M[1][3] +
-          Multiplicand0->MatrixReference.M[3][2] * Multiplicand1->MatrixReference.M[2][3] +
-          Multiplicand0->MatrixReference.M[3][3] * Multiplicand1->MatrixReference.M[3][3];
+    M33 = Multiplicand0->M[3][0] * Multiplicand1->M[0][3] + 
+          Multiplicand0->M[3][1] * Multiplicand1->M[1][3] +
+          Multiplicand0->M[3][2] * Multiplicand1->M[2][3] +
+          Multiplicand0->M[3][3] * Multiplicand1->M[3][3];
 
     Status = MatrixAllocate(M00,
                             M01,
@@ -1116,7 +1125,6 @@ MatrixGetInverse(
     )
 {
     PINVERTIBLE_MATRIX InvertibleMatrix;
-    PMATRIX Output;
     
     if (Matrix == NULL)
     {
@@ -1124,19 +1132,24 @@ MatrixGetInverse(
     }
     
     InvertibleMatrix = Matrix->InvertibleMatrix;
-
     InvertibleMatrix->ReferenceCount += 1;
-    
-    if (Matrix == &InvertibleMatrix->Matrix)
-    {
-        Output = &InvertibleMatrix->Inverse;
-    }
-    else
-    {
-        Output = &InvertibleMatrix->Matrix;
-    }
 
-    return Output;
+    return Matrix->Inverse;
+}
+
+_Ret_opt_
+IRISAPI
+PCMATRIX
+MatrixGetConstantInverse(
+    _In_opt_ PCMATRIX Matrix
+    )
+{
+    if (Matrix == NULL)
+    {
+        return NULL;
+    }
+    
+    return Matrix->Inverse;
 }
 
 ISTATUS
@@ -1145,17 +1158,34 @@ MatrixReadContents(
     _Out_writes_(4) FLOAT Contents[4][4]
     )
 {
-    ISTATUS Status;
-    
     if (Matrix == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Status = MatrixReferenceReadContents(&Matrix->MatrixReference, 
-                                         Contents);
+    if (Contents == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
 
-    return Status;
+    Contents[0][0] = Matrix->M[0][0];
+    Contents[0][1] = Matrix->M[0][1];
+    Contents[0][2] = Matrix->M[0][2];
+    Contents[0][3] = Matrix->M[0][3];
+    Contents[1][0] = Matrix->M[1][0];
+    Contents[1][1] = Matrix->M[1][1];
+    Contents[1][2] = Matrix->M[1][2];
+    Contents[1][3] = Matrix->M[1][3];
+    Contents[2][0] = Matrix->M[2][0];
+    Contents[2][1] = Matrix->M[2][1];
+    Contents[2][2] = Matrix->M[2][2];
+    Contents[2][3] = Matrix->M[2][3];
+    Contents[3][0] = Matrix->M[3][0];
+    Contents[3][1] = Matrix->M[3][1];
+    Contents[3][2] = Matrix->M[3][2];
+    Contents[3][3] = Matrix->M[3][3];
+    
+    return ISTATUS_SUCCESS;
 }
 
 VOID

@@ -219,15 +219,15 @@ public:
         _In_ Vector Multiplicand1
         )
     {
-        PCMATRIX_REFERENCE IrisMultiplicand0;
+        PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
         VECTOR3 IrisResult;
 
-        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
         IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
 
-        IrisResult = VectorMatrixReferenceTransposedMultiply(IrisMultiplicand0,
-                                                             IrisMultiplicand1);
+        IrisResult = VectorMatrixTransposedMultiply(IrisMultiplicand0,
+                                                    IrisMultiplicand1);
 
         return Vector(IrisResult);
     }
@@ -259,15 +259,15 @@ public:
         _In_ Vector Multiplicand1
         )
     {
-        PCMATRIX_REFERENCE IrisMultiplicand0;
+        PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
         VECTOR3 IrisResult;
 
-        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
         IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
 
-        IrisResult = VectorMatrixReferenceInverseMultiply(IrisMultiplicand0,
-                                                          IrisMultiplicand1);
+        IrisResult = VectorMatrixInverseMultiply(IrisMultiplicand0,
+                                                 IrisMultiplicand1);
 
         return Vector(IrisResult);
     }
@@ -299,15 +299,15 @@ public:
         _In_ Vector Multiplicand1
         )
     {
-        PCMATRIX_REFERENCE IrisMultiplicand0;
+        PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
         VECTOR3 IrisResult;
 
-        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
         IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
 
-        IrisResult = VectorMatrixReferenceInverseTransposedMultiply(IrisMultiplicand0,
-                                                                    IrisMultiplicand1);
+        IrisResult = VectorMatrixInverseTransposedMultiply(IrisMultiplicand0,
+                                                           IrisMultiplicand1);
 
         return Vector(IrisResult);
     }
@@ -443,15 +443,15 @@ operator*(
     _In_ Vector Multiplicand1
     )
 {
-    PCMATRIX_REFERENCE IrisMultiplicand0;
+    PCMATRIX IrisMultiplicand0;
     VECTOR3 IrisMultiplicand1;
     VECTOR3 IrisResult;
 
-    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
     IrisMultiplicand1 = Multiplicand1.AsVECTOR3();
 
-    IrisResult = VectorMatrixReferenceMultiply(IrisMultiplicand0,
-                                               IrisMultiplicand1);
+    IrisResult = VectorMatrixMultiply(IrisMultiplicand0,
+                                      IrisMultiplicand1);
 
     return Vector(IrisResult);
 }

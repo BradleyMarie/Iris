@@ -18,12 +18,6 @@ Abstract:
 #define _POINT_IRIS_INTERNAL_
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
-#define PointMatrixReferenceMultiply(Matrix, Vector) \
-        StaticPointMatrixReferenceMultiply(Matrix, Vector)
-
-#define PointMatrixReferenceInverseMultiply(Matrix, Vector) \
-        StaticPointMatrixReferenceInverseMultiply(Matrix, Vector)
-
 #define PointMatrixMultiply(Matrix, Vector) \
         StaticPointMatrixMultiply(Matrix, Vector)
 
@@ -61,8 +55,8 @@ PointCreateScaled(
 
 SFORCEINLINE
 POINT3
-PointMatrixReferenceMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
+PointMatrixMultiply(
+    _In_opt_ PCMATRIX Matrix,
     _In_ POINT3 Point
     )
 {
@@ -104,44 +98,6 @@ PointMatrixReferenceMultiply(
 
 SFORCEINLINE
 POINT3
-PointMatrixMultiply(
-    _In_opt_ PCMATRIX Matrix,
-    _In_ POINT3 Point
-    )
-{
-    POINT3 Product;
-    
-    if (Matrix == NULL)
-    {
-        return Point;
-    }
-
-    Product = PointMatrixReferenceMultiply(&Matrix->MatrixReference, Point);
-    
-    return Product;
-}
-
-SFORCEINLINE
-POINT3
-PointMatrixReferenceInverseMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
-    _In_ POINT3 Point
-    )
-{
-    POINT3 Product;
-
-    if (Matrix == NULL)
-    {
-        return Point;
-    }
-
-    Product = PointMatrixReferenceMultiply(Matrix->Inverse, Point);
-
-    return Product;
-}
-
-SFORCEINLINE
-POINT3
 PointMatrixInverseMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ POINT3 Point
@@ -154,14 +110,12 @@ PointMatrixInverseMultiply(
         return Point;
     }
 
-    Product = PointMatrixReferenceInverseMultiply(Matrix->MatrixReference.Inverse, Point);
+    Product = PointMatrixMultiply(Matrix->Inverse, Point);
 
     return Product;
 }
 
 #ifdef _IRIS_EXPORT_POINT_ROUTINES_
-#undef PointMatrixReferenceMultiply
-#undef PointMatrixReferenceInverseMultiply
 #undef PointMatrixMultiply
 #undef PointMatrixInverseMultiply
 #endif

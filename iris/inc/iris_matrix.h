@@ -131,6 +131,13 @@ MatrixGetInverse(
     _In_opt_ PMATRIX Matrix
     );
 
+_Ret_opt_
+IRISAPI
+PCMATRIX
+MatrixGetConstantInverse(
+    _In_opt_ PCMATRIX Matrix
+    );
+
 IRISAPI
 ISTATUS
 MatrixReadContents(

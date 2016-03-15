@@ -16,24 +16,6 @@ Abstract:
 #include <irisp.h>
 
 RAY
-RayMatrixReferenceMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
-    _In_ RAY Point
-    )
-{
-    return StaticRayMatrixReferenceMultiply(Matrix, Point);
-}
-
-RAY
-RayMatrixReferenceInverseMultiply(
-    _In_opt_ PCMATRIX_REFERENCE Matrix,
-    _In_ RAY Point
-    )
-{
-    return StaticRayMatrixReferenceInverseMultiply(Matrix, Point);
-}
-
-RAY
 RayMatrixMultiply(
     _In_opt_ PCMATRIX Matrix,
     _In_ RAY Point

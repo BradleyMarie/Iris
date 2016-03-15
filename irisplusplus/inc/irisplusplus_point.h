@@ -111,15 +111,15 @@ public:
         _In_ Point Multiplicand1
         )
     {
-        PCMATRIX_REFERENCE IrisMultiplicand0;
+        PCMATRIX IrisMultiplicand0;
         POINT3 IrisMultiplicand1;
         POINT3 IrisResult;
 
-        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
         IrisMultiplicand1 = Multiplicand1.AsPOINT3();
 
-        IrisResult = PointMatrixReferenceInverseMultiply(IrisMultiplicand0,
-                                                         IrisMultiplicand1);
+        IrisResult = PointMatrixInverseMultiply(IrisMultiplicand0,
+                                                IrisMultiplicand1);
 
         return Point(IrisResult);
     }
@@ -274,15 +274,15 @@ operator*(
     _In_ Point Multiplicand1
     )
 {
-    PCMATRIX_REFERENCE IrisMultiplicand0;
+    PCMATRIX IrisMultiplicand0;
     POINT3 IrisMultiplicand1;
     POINT3 IrisResult;
 
-    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
     IrisMultiplicand1 = Multiplicand1.AsPOINT3();
 
-    IrisResult = PointMatrixReferenceMultiply(IrisMultiplicand0,
-                                              IrisMultiplicand1);
+    IrisResult = PointMatrixMultiply(IrisMultiplicand0,
+                                     IrisMultiplicand1);
 
     return Point(IrisResult);
 }

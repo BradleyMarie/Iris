@@ -49,8 +49,8 @@ SurfaceNormalGetWorldNormal(
 
     if (SurfaceNormal->ModelToWorld != NULL)
     {
-        *WorldNormal = VectorMatrixReferenceInverseTransposedMultiply(SurfaceNormal->ModelToWorld,
-                                                                      *WorldNormal);
+        *WorldNormal = VectorMatrixInverseTransposedMultiply(SurfaceNormal->ModelToWorld,
+                                                             *WorldNormal);
     }
     else if (SurfaceNormal->Prenormalized != FALSE)
     {

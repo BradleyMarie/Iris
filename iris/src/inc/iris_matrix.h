@@ -22,10 +22,12 @@ Abstract:
 //
 
 typedef struct _INVERTIBLE_MATRIX INVERTIBLE_MATRIX, *PINVERTIBLE_MATRIX;
+typedef CONST INVERTIBLE_MATRIX *PCINVERTIBLE_MATRIX;
 
 struct _MATRIX {
-    MATRIX_REFERENCE MatrixReference;
-    PINVERTIBLE_MATRIX InvertibleMatrix;    
+    FLOAT M[4][4];
+    PMATRIX Inverse;
+    PINVERTIBLE_MATRIX InvertibleMatrix;
 };
 
 #endif // _MATRIX_IRIS_INTERNAL_

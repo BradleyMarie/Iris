@@ -129,15 +129,15 @@ public:
         _In_ Ray Multiplicand1
         )
     {
-        PCMATRIX_REFERENCE IrisMultiplicand0;
+        PCMATRIX IrisMultiplicand0;
         RAY IrisMultiplicand1;
         RAY IrisResult;
 
-        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+        IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
         IrisMultiplicand1 = Multiplicand1.AsRAY();
 
-        IrisResult = RayMatrixReferenceInverseMultiply(IrisMultiplicand0,
-                                                       IrisMultiplicand1);
+        IrisResult = RayMatrixInverseMultiply(IrisMultiplicand0,
+                                              IrisMultiplicand1);
 
         return Ray(IrisResult);
     }
@@ -175,15 +175,15 @@ operator*(
     _In_ Ray Multiplicand1
     )
 {
-    PCMATRIX_REFERENCE IrisMultiplicand0;
+    PCMATRIX IrisMultiplicand0;
     RAY IrisMultiplicand1;
     RAY IrisResult;
 
-    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX_REFERENCE();
+    IrisMultiplicand0 = Multiplicand0.AsPCMATRIX();
     IrisMultiplicand1 = Multiplicand1.AsRAY();
 
-    IrisResult = RayMatrixReferenceMultiply(IrisMultiplicand0,
-                                            IrisMultiplicand1);
+    IrisResult = RayMatrixMultiply(IrisMultiplicand0,
+                                   IrisMultiplicand1);
 
     return Ray(IrisResult);
 }

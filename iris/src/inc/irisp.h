@@ -39,7 +39,6 @@ Abstract:
 #include <iriscommon_staticallocator.h>
 
 #include "iris_math.h"
-#include "iris_matrixreference.h"
 #include "iris_matrix.h"
 #include "iris_vector.h"
 #include "iris_point.h"

@@ -48,7 +48,7 @@ MatrixReference::ReadContents(
     }
     else
     {
-        MatrixReferenceReadContents(Data, Contents);
+        MatrixReadContents(Data, Contents);
     }
 }
 

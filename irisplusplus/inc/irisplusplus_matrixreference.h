@@ -27,13 +27,13 @@ namespace Iris {
 class MatrixReference final {
 public:
     MatrixReference(
-        _In_ PCMATRIX_REFERENCE MatrixRef
+        _In_ PCMATRIX MatrixRef
         )
     : Data(MatrixRef)
     { }
 
-    PCMATRIX_REFERENCE
-    AsPCMATRIX_REFERENCE(
+    PCMATRIX
+    AsPCMATRIX(
         void
         ) const
     {
@@ -45,9 +45,9 @@ public:
         void
         )
     {
-        PCMATRIX_REFERENCE Inverse;
+        PCMATRIX Inverse;
 
-        Inverse = MatrixReferenceGetInverse(Data);
+        Inverse = MatrixGetConstantInverse(Data);
 
         return MatrixReference(Inverse);
     }
@@ -59,7 +59,7 @@ public:
         ) const;
 
 private:
-    PCMATRIX_REFERENCE Data;
+    PCMATRIX Data;
 };
 
 } // namespace Iris

@@ -51,7 +51,7 @@ ISTATUS
 RayTracer::ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit,
-    _In_ PCMATRIX_REFERENCE ModelToWorldReference,
+    _In_ PCMATRIX ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint
@@ -64,7 +64,7 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
                                      Hit->AdditionalDataSizeInBytes,
-                                     MatrixReference(ModelToWorldReference),
+                                     MatrixReference(ModelToWorld),
                                      Vector(ModelViewer),
                                      Point(ModelHitPoint),
                                      Point(WorldHitPoint));
