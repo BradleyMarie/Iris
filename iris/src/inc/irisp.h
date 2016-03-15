@@ -27,8 +27,8 @@ Abstract:
 #define _DISABLE_IRIS_POINT_EXPORTS_
 #endif
 
-#ifndef _IRIS_EXPORT_SHAPE_REFERENCE_ROUTINES_
-#define _DISABLE_IRIS_SHAPE_REFERENCE_EXPORTS_
+#ifndef _IRIS_EXPORT_SHAPE_ROUTINES_
+#define _DISABLE_IRIS_SHAPE_EXPORTS_
 #endif
 
 #include <iris.h>
@@ -44,7 +44,6 @@ Abstract:
 #include "iris_point.h"
 #include "iris_ray.h"
 #include "iris_hitallocator.h"
-#include "iris_shapereference.h"
 #include "iris_shape.h"
 #include "iris_sharedhitdataallocator.h"
 #include "iris_scene.h"

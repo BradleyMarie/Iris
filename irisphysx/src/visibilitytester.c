@@ -59,7 +59,7 @@ SpectrumVisibilityTesterTestLightVisibilityProcessHit(
     PCLIGHT ClosestLight;
     
     TestContext = (PSPECTRUM_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
-    SpectrumShape = (PCSPECTRUM_SHAPE) Hit->ShapeReference;
+    SpectrumShape = (PCSPECTRUM_SHAPE) Hit->Shape;
 
     SpectrumShapeGetLight(SpectrumShape, Hit->FaceHit, &ClosestLight);
     

@@ -12,6 +12,7 @@ Abstract:
 
 --*/
 
+#define _IRIS_EXPORT_SHAPE_ROUTINES_
 #include <irisp.h>
 
 //
@@ -78,10 +79,8 @@ ShapeAllocate(
 
     AllocatedShape = (PSHAPE) HeaderAllocation;
 
-    ShapeReferenceInitialize(ShapeVTable,
-                             DataAllocation,
-                             &AllocatedShape->ShapeReference);
-                             
+    AllocatedShape->VTable = ShapeVTable;
+    AllocatedShape->Data = DataAllocation;             
     AllocatedShape->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
@@ -107,7 +106,7 @@ ShapeGetVTable(
         return NULL;
     }
 
-    Result = ShapeReferenceGetVTable(&Shape->ShapeReference);
+    Result = StaticShapeGetVTable(Shape);
 
     return Result;
 }
@@ -125,7 +124,7 @@ ShapeGetData(
         return NULL;
     }
 
-    Result = ShapeReferenceGetData(&Shape->ShapeReference);
+    Result = StaticShapeGetData(Shape);
 
     return Result;
 }
@@ -148,6 +147,8 @@ ShapeRelease(
     _In_opt_ _Post_invalid_ PSHAPE Shape
     )
 {
+    PFREE_ROUTINE FreeRoutine;
+    
     if (Shape == NULL)
     {
         return;
@@ -157,7 +158,13 @@ ShapeRelease(
 
     if (Shape->ReferenceCount == 0)
     {
-        ShapeReferenceDestroy(&Shape->ShapeReference);
+        FreeRoutine = Shape->VTable->FreeRoutine;
+
+        if (FreeRoutine != NULL)
+        {
+            FreeRoutine(Shape->Data);
+        }
+    
         IrisAlignedFree(Shape);
     }
 }

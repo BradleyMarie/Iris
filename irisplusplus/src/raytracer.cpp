@@ -31,7 +31,7 @@ RayTracer::ProcessHitsAdapter(
 {
     auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
     
-    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->ShapeReference),
+    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->Shape),
                                      Hit->Distance,
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
@@ -59,7 +59,7 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
 {
     auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
 
-    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->ShapeReference),
+    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->Shape),
                                      Hit->Distance,
                                      Hit->FaceHit,
                                      Hit->AdditionalData,

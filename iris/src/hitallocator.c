@@ -105,7 +105,7 @@ HitAllocatorAllocateInternal(
     InternalHit = &HitAllocatorAllocation->InternalHit;
     Hit = &InternalHit->Hit;
 
-    Hit->ShapeReference = Allocator->CurrentShapeReference;
+    Hit->Shape = Allocator->CurrentShape;
     Hit->Distance = Distance;
     Hit->FaceHit = FaceHit;
     Hit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;

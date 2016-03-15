@@ -27,14 +27,14 @@ namespace Iris {
 class ShapeReference final {
 public:
     ShapeReference(
-        _In_ PCSHAPE_REFERENCE ShapeRef
+        _In_ PCSHAPE ShapeRef
         )
     : Data(ShapeRef)
     { }
     
     _Ret_
-    PCSHAPE_REFERENCE
-    AsPCSHAPE_REFERENCE(
+    PCSHAPE
+    AsPCSHAPE(
         void
         ) const
     {
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    PCSHAPE_REFERENCE Data;
+    PCSHAPE Data;
 };
 
 } // namespace Iris

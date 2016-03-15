@@ -32,7 +32,7 @@ typedef CONST SHARED_HIT_DATA *PCSHARED_HIT_DATA;
 typedef struct _HIT_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR AdditionalDataAllocator;
     STATIC_MEMORY_ALLOCATOR HitAllocator;
-    PCSHAPE_REFERENCE CurrentShapeReference;
+    PCSHAPE CurrentShape;
 } HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 
 typedef struct _INTERNAL_HIT {
@@ -124,15 +124,15 @@ HitAllocatorFreeAll(
 
 SFORCEINLINE
 VOID
-HitAllocatorSetCurrentShapeReference(
+HitAllocatorSetCurrentShape(
     _Inout_ PHIT_ALLOCATOR Allocator,
-    _In_ PCSHAPE_REFERENCE ShapeReference
+    _In_ PCSHAPE Shape
     )
 {
     ASSERT(Allocator != NULL);
-    ASSERT(ShapeReference != NULL);
+    ASSERT(Shape != NULL);
 
-    Allocator->CurrentShapeReference = ShapeReference;
+    Allocator->CurrentShape = Shape;
 }
 
 SFORCEINLINE

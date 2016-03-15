@@ -21,14 +21,14 @@ Abstract:
 // Types
 //
 
-typedef struct _SHAPE_REFERENCE SHAPE_REFERENCE, *PSHAPE_REFERENCE;
-typedef CONST SHAPE_REFERENCE *PCSHAPE_REFERENCE;
+typedef struct _SHAPE SHAPE, *PSHAPE;
+typedef CONST SHAPE *PCSHAPE;
 
 typedef struct _HIT_ALLOCATOR HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 typedef CONST HIT_ALLOCATOR *PCHIT_ALLOCATOR;
 
 typedef struct _HIT {
-    PCSHAPE_REFERENCE ShapeReference;
+    PCSHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;

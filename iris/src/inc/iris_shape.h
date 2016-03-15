@@ -17,18 +17,57 @@ Abstract:
 
 #include <irisp.h>
 
+#ifdef _IRIS_EXPORT_SHAPE_ROUTINES_
+#define ShapeGetVTable(Shape) \
+        StaticShapeGetVTable(Shape)
+
+#define ShapeGetData(Shape) \
+        StaticShapeGetData(Shape)
+#endif
+
 //
 // Types
 //
 
 struct _SHAPE {
-    SHAPE_REFERENCE ShapeReference;
+    PCSHAPE_VTABLE VTable;
     SIZE_T ReferenceCount;
+    PVOID Data;
 };
 
 //
 // Functions
 //
+
+_Ret_
+SFORCEINLINE
+PCSHAPE_VTABLE
+ShapeGetVTable(
+    _In_ PCSHAPE Shape
+    )
+{
+    if (Shape == NULL)
+    {
+        return NULL;
+    }
+
+    return Shape->VTable;
+}
+
+_Ret_
+SFORCEINLINE
+PCVOID
+ShapeGetData(
+    _In_ PCSHAPE Shape
+    )
+{
+    if (Shape == NULL)
+    {
+        return NULL;
+    }
+
+    return Shape->Data;
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -47,12 +86,19 @@ ShapeTraceShape(
     ASSERT(HitAllocator != NULL);
     ASSERT(HitList != NULL);
 
-    Status = ShapeReferenceTrace(&Shape->ShapeReference,
-                                 Ray,
-                                 HitAllocator,
-                                 HitList);
-                                 
+    HitAllocatorSetCurrentShape(HitAllocator, Shape);
+
+    Status = Shape->VTable->TraceRoutine(Shape->Data, 
+                                         Ray,
+                                         HitAllocator,
+                                         HitList);
+
     return Status;
 }
+
+#ifdef _IRIS_EXPORT_SHAPE_ROUTINES_
+#undef ShapeGetVTable
+#undef ShapeGetData
+#endif
 
 #endif // _IRIS_SHAPE_INTERNAL_
