@@ -22,7 +22,7 @@ Abstract:
 //
 
 typedef struct _SPECTRUM_COMPOSITOR_REFERENCE SPECTRUM_COMPOSITOR_REFERENCE, *PSPECTRUM_COMPOSITOR_REFERENCE;
-typedef CONST SPECTRUM_COMPOSITOR_REFERENCE *PCSPECTRUM_REFERENCE_COMPOSITOR_REFERENCE;
+typedef CONST SPECTRUM_COMPOSITOR_REFERENCE *PCSPECTRUM_COMPOSITOR_REFERENCE;
 
 //
 // Functions
@@ -34,9 +34,9 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorReferenceAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
-    _Out_ PCSPECTRUM_REFERENCE *Sum
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
+    _Out_ PCSPECTRUM *Sum
     );
 
 _Check_return_
@@ -45,9 +45,9 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorReferenceAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrum
+    _Out_ PCSPECTRUM *AttenuatedSpectrum
     );
 
 _Check_return_
@@ -56,10 +56,10 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorReferenceAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
+    _Out_ PCSPECTRUM *AttenuatedSum
     );
 
 _Check_return_
@@ -68,9 +68,9 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorReferenceAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     );
     
 _Check_return_
@@ -79,10 +79,10 @@ IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorReferenceAttenuatedAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     );
 
 #endif // _SPECTRUM_COMPOSITOR_REFERENCE_IRIS_SPECTRUM_

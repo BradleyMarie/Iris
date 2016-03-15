@@ -12,16 +12,8 @@ Abstract:
 
 --*/
 
+#define _IRIS_SPECTRUM_EXPORT_SPECTRUM_ROUTINES_
 #include <irisspectrump.h>
-
-//
-// Types
-//
-
-struct _SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumReference;
-    SIZE_T ReferenceCount;
-};
 
 //
 // Functions
@@ -87,9 +79,9 @@ SpectrumAllocate(
 
     AllocatedSpectrum = (PSPECTRUM) HeaderAllocation;
 
-    SpectrumReferenceInitialize(SpectrumVTable,
-                                DataAllocation,
-                                &AllocatedSpectrum->SpectrumReference);
+    SpectrumInitialize(SpectrumVTable,
+                       DataAllocation,
+                       AllocatedSpectrum);
 
     if (DataSizeInBytes != 0)
     {
@@ -112,42 +104,11 @@ SpectrumSample(
 {
     ISTATUS Status;
 
-    if (IsFiniteFloat(Wavelength) == FALSE ||
-        IsGreaterThanZeroFloat(Wavelength) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    if (Intensity == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (Spectrum == NULL)
-    {
-        *Intensity = (FLOAT) 0.0f;
-        return ISTATUS_SUCCESS;
-    }
-
-    Status = SpectrumReferenceSample(&Spectrum->SpectrumReference,
-                                     Wavelength,
-                                     Intensity);
+    Status = StaticSpectrumSample(Spectrum,
+                                  Wavelength,
+                                  Intensity);
 
     return Status;
-}
-
-_Ret_
-PCSPECTRUM_REFERENCE
-SpectrumGetSpectrumReference(
-    _In_ PCSPECTRUM Spectrum
-    )
-{
-    if (Spectrum == NULL)
-    {
-        return NULL;
-    }
-
-    return &Spectrum->SpectrumReference;
 }
 
 VOID
@@ -168,6 +129,8 @@ SpectrumRelease(
     _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
     )
 {
+    PFREE_ROUTINE FreeRoutine;
+    
     if (Spectrum == NULL)
     {
         return;
@@ -177,7 +140,13 @@ SpectrumRelease(
 
     if (Spectrum->ReferenceCount == 0)
     {
-        SpectrumReferenceDestroy(&Spectrum->SpectrumReference);
+        FreeRoutine = Spectrum->VTable->FreeRoutine;
+
+        if (FreeRoutine != NULL)
+        {
+            FreeRoutine(Spectrum->Data);
+        }
+    
         IrisAlignedFree(Spectrum);
     }
 }

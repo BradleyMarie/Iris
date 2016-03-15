@@ -20,26 +20,26 @@ Abstract:
 //
 
 typedef struct _FMA_REFLECTOR {
-    REFLECTOR_REFERENCE ReflectorHeader;
-    PCREFLECTOR_REFERENCE Reflector0;
-    PCREFLECTOR_REFERENCE Reflector1;
+    REFLECTOR ReflectorHeader;
+    PCREFLECTOR Reflector0;
+    PCREFLECTOR Reflector1;
     FLOAT Attenuation;
 } FMA_REFLECTOR, *PFMA_REFLECTOR;
 
 typedef CONST FMA_REFLECTOR *PCFMA_REFLECTOR;
 
 typedef struct _ATTENUATED_REFLECTOR {
-    REFLECTOR_REFERENCE ReflectorHeader;
-    PCREFLECTOR_REFERENCE Reflector;
+    REFLECTOR ReflectorHeader;
+    PCREFLECTOR Reflector;
     FLOAT Attenuation;
 } ATTENUATED_REFLECTOR, *PATTENUATED_REFLECTOR;
 
 typedef CONST ATTENUATED_REFLECTOR *PCATTENUATED_REFLECTOR;
 
 typedef struct _SUM_REFLECTOR {
-    REFLECTOR_REFERENCE ReflectorHeader;
-    PCREFLECTOR_REFERENCE Reflector0;
-    PCREFLECTOR_REFERENCE Reflector1;
+    REFLECTOR ReflectorHeader;
+    PCREFLECTOR Reflector0;
+    PCREFLECTOR Reflector1;
 } SUM_REFLECTOR, *PSUM_REFLECTOR;
 
 typedef CONST SUM_REFLECTOR *PCSUM_REFLECTOR;
@@ -83,20 +83,20 @@ FmaReflectorReflect(
 
     FmaReflector = (PCFMA_REFLECTOR) Context;
 
-    Status = ReflectorReferenceReflect(FmaReflector->Reflector0,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       &ReflectorIntensity0);
+    Status = ReflectorReflect(FmaReflector->Reflector0,
+                              Wavelength,
+                              IncomingIntensity,
+                              &ReflectorIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReferenceReflect(FmaReflector->Reflector1,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       &ReflectorIntensity1);
+    Status = ReflectorReflect(FmaReflector->Reflector1,
+                              Wavelength,
+                              IncomingIntensity,
+                              &ReflectorIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -134,10 +134,10 @@ AttenuatedReflectorReflect(
 
     AttenuatedReflector = (PCATTENUATED_REFLECTOR) Context;
 
-    Status = ReflectorReferenceReflect(AttenuatedReflector->Reflector,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       &OutputIntensity);
+    Status = ReflectorReflect(AttenuatedReflector->Reflector,
+                              Wavelength,
+                              IncomingIntensity,
+                              &OutputIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -173,20 +173,20 @@ SumReflectorReflect(
 
     SumReflector = (PCSUM_REFLECTOR) Context;
 
-    Status = ReflectorReferenceReflect(SumReflector->Reflector0,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       &ReflectorIntensity0);
+    Status = ReflectorReflect(SumReflector->Reflector0,
+                              Wavelength,
+                              IncomingIntensity,
+                              &ReflectorIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReferenceReflect(SumReflector->Reflector1,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       &ReflectorIntensity1);
+    Status = ReflectorReflect(SumReflector->Reflector1,
+                              Wavelength,
+                              IncomingIntensity,
+                              &ReflectorIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -247,8 +247,8 @@ STATIC
 VOID
 FmaReflectorInitialize(
     _Out_ PFMA_REFLECTOR FmaReflector,
-    _In_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_ PCREFLECTOR_REFERENCE Reflector1,
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1,
     _In_ FLOAT Attenuation
     )
 {
@@ -258,9 +258,9 @@ FmaReflectorInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    ReflectorReferenceInitialize(&FmaReflectorVTable,
-                                 FmaReflector,
-                                 &FmaReflector->ReflectorHeader);
+    ReflectorInitialize(&FmaReflectorVTable,
+                        FmaReflector,
+                        &FmaReflector->ReflectorHeader);
     
     FmaReflector->Reflector0 = Reflector0;
     FmaReflector->Reflector1 = Reflector1;
@@ -271,7 +271,7 @@ STATIC
 VOID
 AttenuatedReflectorInitialize(
     _Out_ PATTENUATED_REFLECTOR AttenuatedReflector,
-    _In_ PCREFLECTOR_REFERENCE Reflector,
+    _In_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation
     )
 {
@@ -280,9 +280,9 @@ AttenuatedReflectorInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    ReflectorReferenceInitialize(&AttenuatedReflectorVTable,
-                                 AttenuatedReflector,
-                                 &AttenuatedReflector->ReflectorHeader);
+    ReflectorInitialize(&AttenuatedReflectorVTable,
+                        AttenuatedReflector,
+                        &AttenuatedReflector->ReflectorHeader);
 
     AttenuatedReflector->Reflector = Reflector;
     AttenuatedReflector->Attenuation = Attenuation;
@@ -292,17 +292,17 @@ STATIC
 VOID
 SumReflectorInitialize(
     _Out_ PSUM_REFLECTOR SumReflector,
-    _In_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_ PCREFLECTOR_REFERENCE Reflector1
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1
     )
 {
     ASSERT(SumReflector != NULL);
     ASSERT(Reflector0 != NULL);
     ASSERT(Reflector1 != NULL);
 
-    ReflectorReferenceInitialize(&SumReflectorVTable,
-                                 SumReflector,
-                                 &SumReflector->ReflectorHeader);
+    ReflectorInitialize(&SumReflectorVTable,
+                        SumReflector,
+                        &SumReflector->ReflectorHeader);
 
     SumReflector->Reflector0 = Reflector0;
     SumReflector->Reflector1 = Reflector1;
@@ -385,9 +385,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorReferenceAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
-    _Out_ PCREFLECTOR_REFERENCE *Sum
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
     )
 {
     PATTENUATED_REFLECTOR AttenuatedReflector;
@@ -455,7 +455,7 @@ ReflectorCompositorReferenceAddReflections(
                            Reflector0,
                            Reflector1);
 
-    *Sum = (PCREFLECTOR_REFERENCE) SumReflector;
+    *Sum = (PCREFLECTOR) SumReflector;
     return ISTATUS_SUCCESS;
 }
 
@@ -464,9 +464,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorReferenceAttenuateReflection(
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedReflectorOutput
+    _Out_ PCREFLECTOR *AttenuatedReflectorOutput
     )
 {
     PATTENUATED_REFLECTOR AttenuatedReflector;
@@ -521,7 +521,7 @@ ReflectorCompositorReferenceAttenuateReflection(
                                   Reflector,
                                   Attenuation);
 
-    *AttenuatedReflectorOutput = (PCREFLECTOR_REFERENCE) AttenuatedReflector;
+    *AttenuatedReflectorOutput = (PCREFLECTOR) AttenuatedReflector;
     return ISTATUS_SUCCESS;
 }
 
@@ -530,10 +530,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorReferenceAttenuatedAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedSum
+    _Out_ PCREFLECTOR *AttenuatedSum
     )
 {
     PATTENUATED_REFLECTOR AttenuatedReflector;
@@ -602,7 +602,7 @@ ReflectorCompositorReferenceAttenuatedAddReflections(
                            Reflector1,
                            Attenuation);
 
-    *AttenuatedSum = (PCREFLECTOR_REFERENCE) FmaReflector;
+    *AttenuatedSum = (PCREFLECTOR) FmaReflector;
     return ISTATUS_SUCCESS;   
 }
 
@@ -644,9 +644,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
-    _Out_ PCREFLECTOR_REFERENCE *Sum
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
     )
 {
     ISTATUS Status;
@@ -669,9 +669,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAttenuateReflection(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedReflectorOutput
+    _Out_ PCREFLECTOR *AttenuatedReflectorOutput
     )
 {
     ISTATUS Status;
@@ -694,10 +694,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 ReflectorCompositorAttenuatedAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedSum
+    _Out_ PCREFLECTOR *AttenuatedSum
     )
 {
     ISTATUS Status;

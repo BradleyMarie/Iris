@@ -30,7 +30,7 @@ ISTATUS
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     );
@@ -44,7 +44,7 @@ ISTATUS
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector
+    _Out_ PCREFLECTOR *Reflector
     );
 
 typedef
@@ -56,7 +56,7 @@ ISTATUS
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     );
 
@@ -87,7 +87,7 @@ BrdfSample(
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     );
@@ -101,7 +101,7 @@ BrdfSampleWithLambertianFalloff(
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     );
@@ -115,7 +115,7 @@ BrdfComputeReflectance(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector
+    _Out_ PCREFLECTOR *Reflector
     );
 
 _Check_return_
@@ -127,7 +127,7 @@ BrdfComputeReflectanceWithLambertianFalloff(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector
+    _Out_ PCREFLECTOR *Reflector
     );
 
 _Check_return_
@@ -139,7 +139,7 @@ BrdfComputeReflectanceWithPdf(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     );
     
@@ -152,7 +152,7 @@ BrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     );
 

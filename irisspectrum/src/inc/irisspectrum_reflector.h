@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisspectrum_reflectorreference.h
+    irisspectrum_reflector.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _REFLECTOR_REFERENCE_IRIS_SPECTRUM_INTERNAL_
-#define _REFLECTOR_REFERENCE_IRIS_SPECTRUM_INTERNAL_
+#ifndef _REFLECTOR_IRIS_SPECTRUM_INTERNAL_
+#define _REFLECTOR_IRIS_SPECTRUM_INTERNAL_
 
 #include <irisspectrump.h>
 
@@ -21,17 +21,18 @@ Abstract:
 // Macros
 //
 
-#ifdef _IRIS_SPECTRUM_EXPORT_REFLECTOR_REFERENCE_ROUTINES_
-#define ReflectorReferenceReflect(Reflector,Wavelength,IncomingIntensity,OutgoingIntensity) \
-        StaticReflectorReferenceReflect(Reflector,Wavelength,IncomingIntensity,OutgoingIntensity)
+#ifdef _IRIS_SPECTRUM_EXPORT_REFLECTOR_ROUTINES_
+#define ReflectorReflect(Reflector,Wavelength,IncomingIntensity,OutgoingIntensity) \
+        StaticReflectorReflect(Reflector,Wavelength,IncomingIntensity,OutgoingIntensity)
 #endif
 
 //
 // Types
 //
 
-struct _REFLECTOR_REFERENCE {
+struct _REFLECTOR {
     PCREFLECTOR_VTABLE VTable;
+    SIZE_T ReferenceCount;
     PVOID Data;
 };
 
@@ -41,16 +42,17 @@ struct _REFLECTOR_REFERENCE {
 
 SFORCEINLINE
 VOID
-ReflectorReferenceInitialize(
+ReflectorInitialize(
     _In_ PCREFLECTOR_VTABLE VTable,
     _In_opt_ PVOID Data,
-    _Out_ PREFLECTOR_REFERENCE Reflector
+    _Out_ PREFLECTOR Reflector
     )
 {
     ASSERT(VTable != NULL);
     ASSERT(Reflector != NULL);
     
     Reflector->VTable = VTable;
+    Reflector->ReferenceCount = 1;
     Reflector->Data = Data;
 }
 
@@ -58,8 +60,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-ReflectorReferenceReflect(
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+ReflectorReflect(
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Wavelength,
     _In_ FLOAT IncomingIntensity,
     _Out_ PFLOAT OutgoingIntensity
@@ -98,26 +100,8 @@ ReflectorReferenceReflect(
     return Status;
 }
 
-SFORCEINLINE
-VOID
-ReflectorReferenceDestroy(
-    _In_ _Post_invalid_ PREFLECTOR_REFERENCE Reflector
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-
-    ASSERT(Reflector != NULL);
-
-    FreeRoutine = Reflector->VTable->FreeRoutine;
-
-    if (FreeRoutine != NULL)
-    {
-        FreeRoutine(Reflector->Data);
-    }
-}
-
-#ifdef _IRIS_SPECTRUM_EXPORT_REFLECTOR_REFERENCE_ROUTINES_
-#undef ReflectorReferenceReflect
+#ifdef _IRIS_SPECTRUM_EXPORT_REFLECTOR_ROUTINES_
+#undef ReflectorReflect
 #endif
 
-#endif // _REFLECTOR_REFERENCE_IRIS_SPECTRUM_INTERNAL_
+#endif // _REFLECTOR_IRIS_SPECTRUM_INTERNAL_

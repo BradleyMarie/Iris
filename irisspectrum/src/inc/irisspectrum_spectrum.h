@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisspectrum_spectrumreference.h
+    irisspectrum_spectrum.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _SPECTRUM_REFERENCE_IRIS_SPECTRUM_INTERNAL_
-#define _SPECTRUM_REFERENCE_IRIS_SPECTRUM_INTERNAL_
+#ifndef _SPECTRUM_IRIS_SPECTRUM_INTERNAL_
+#define _SPECTRUM_IRIS_SPECTRUM_INTERNAL_
 
 #include <irisspectrump.h>
 
@@ -21,17 +21,18 @@ Abstract:
 // Macros
 //
 
-#ifdef _IRIS_SPECTRUM_EXPORT_SPECTRUM_REFERENCE_ROUTINES_
-#define SpectrumReferenceSample(Spectrum,Wavelength,Intensity) \
-        StaticSpectrumReferenceSample(Spectrum,Wavelength,Intensity)
+#ifdef _IRIS_SPECTRUM_EXPORT_SPECTRUM_ROUTINES_
+#define SpectrumSample(Spectrum,Wavelength,Intensity) \
+        StaticSpectrumSample(Spectrum,Wavelength,Intensity)
 #endif
 
 //
 // Types
 //
 
-struct _SPECTRUM_REFERENCE {
+struct _SPECTRUM {
     PCSPECTRUM_VTABLE VTable;
+    SIZE_T ReferenceCount;
     PVOID Data;
 };
 
@@ -41,16 +42,17 @@ struct _SPECTRUM_REFERENCE {
 
 SFORCEINLINE
 VOID
-SpectrumReferenceInitialize(
+SpectrumInitialize(
     _In_ PCSPECTRUM_VTABLE VTable,
     _In_opt_ PVOID Data,
-    _Out_ PSPECTRUM_REFERENCE Spectrum
+    _Out_ PSPECTRUM Spectrum
     )
 {
     ASSERT(VTable != NULL);
     ASSERT(Spectrum != NULL);
     
     Spectrum->VTable = VTable;
+    Spectrum->ReferenceCount = 1;
     Spectrum->Data = Data;
 }
 
@@ -58,8 +60,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-SpectrumReferenceSample(
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+SpectrumSample(
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Wavelength,
     _Out_ PFLOAT Intensity
     )
@@ -71,7 +73,7 @@ SpectrumReferenceSample(
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
-    
+
     if (Intensity == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
@@ -90,26 +92,8 @@ SpectrumReferenceSample(
     return Status;
 }
 
-SFORCEINLINE
-VOID
-SpectrumReferenceDestroy(
-    _In_ _Post_invalid_ PSPECTRUM_REFERENCE Spectrum
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-
-    ASSERT(Spectrum != NULL);
-
-    FreeRoutine = Spectrum->VTable->FreeRoutine;
-
-    if (FreeRoutine != NULL)
-    {
-        FreeRoutine(Spectrum->Data);
-    }
-}
-
-#ifdef _IRIS_SPECTRUM_EXPORT_SPECTRUM_REFERENCE_ROUTINES_
-#undef SpectrumReferenceSample
+#ifdef _IRIS_SPECTRUM_EXPORT_SPECTRUM_ROUTINES_
+#undef SpectrumSample
 #endif
 
-#endif // _SPECTRUM_REFERENCE_IRIS_SPECTRUM_INTERNAL_
+#endif // _SPECTRUM_IRIS_SPECTRUM_INTERNAL_

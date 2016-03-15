@@ -57,15 +57,15 @@ ComputeDirectLighting(
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum
+    _Out_ PCSPECTRUM *Spectrum
     )
 {
     BOOL IsGreaterThanZero;
-    PSPECTRUM_REFERENCE LightSpectrum;
-    PCREFLECTOR_REFERENCE Reflector;
+    PCSPECTRUM LightSpectrum;
+    PCREFLECTOR Reflector;
     FLOAT Attenuation;
-    PSPECTRUM_REFERENCE Output;
-    PSPECTRUM_REFERENCE Emissive;
+    PCSPECTRUM Output;
+    PCSPECTRUM Emissive;
     VECTOR3 ToLight;
     RAY RayToLight;
     ISTATUS Status;

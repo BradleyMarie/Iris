@@ -27,7 +27,7 @@ IRISPHYSXTOOLKITAPI
 ISTATUS
 SpectrumMirrorBrdfAllocate(
     _In_ PBRDF_ALLOCATOR Allocator,
-    _In_ PCREFLECTOR_REFERENCE Reflectance,
+    _In_ PCREFLECTOR Reflectance,
     _In_ VECTOR3 SurfaceNormal,
     _Out_ PCBRDF *Brdf
     );

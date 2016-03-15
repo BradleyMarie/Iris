@@ -3,9 +3,7 @@ include(GenerateExportHeader)
 include_directories(../iris/inc ../irisadvanced/inc ../iriscommon inc src/inc)
 
 add_library(irisspectrum SHARED
-    src/spectrumreference.c
     src/spectrum.c
-    src/reflectorreference.c
     src/reflector.c
     src/spectrumcompositor.c
     src/reflectorcompositor.c)

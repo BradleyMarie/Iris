@@ -39,12 +39,11 @@ SpectrumPointLightSample(
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
     )
 {
-    PCSPECTRUM_REFERENCE IntensityReference;
     PCSPECTRUM_POINT_LIGHT Light;
     FLOAT DistanceToLightSquared;
     VECTOR3 DirectionToLight;
@@ -91,12 +90,10 @@ SpectrumPointLightSample(
         return ISTATUS_SUCCESS;
     }
 
-    IntensityReference = SpectrumGetSpectrumReference(Light->Intensity);
-
     Attenuation = (FLOAT) 1.0f / DistanceToLightSquared;
 
     Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                          IntensityReference,
+                                                          Light->Intensity,
                                                           Attenuation,
                                                           Spectrum);
 
@@ -119,7 +116,7 @@ SpectrumPointLightComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum
+    _Out_ PCSPECTRUM *Spectrum
     )
 {
     ASSERT(Context != NULL);
@@ -140,7 +137,7 @@ SpectrumPointLightComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )
 {

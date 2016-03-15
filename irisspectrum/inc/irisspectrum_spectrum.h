@@ -57,6 +57,8 @@ SpectrumAllocate(
     _Out_ PSPECTRUM *Spectrum
     );
 
+#ifndef _DISABLE_IRIS_SPECTRUM_SPECTRUM_EXPORTS_
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
@@ -67,12 +69,7 @@ SpectrumSample(
     _Out_ PFLOAT Intensity
     );
 
-_Ret_
-IRISSPECTRUMAPI
-PCSPECTRUM_REFERENCE
-SpectrumGetSpectrumReference(
-    _In_ PCSPECTRUM Spectrum
-    );
+#endif // _DISABLE_IRIS_SPECTRUM_SPECTRUM_EXPORTS_
 
 IRISSPECTRUMAPI
 VOID

@@ -12,16 +12,8 @@ Abstract:
 
 --*/
 
+#define _IRIS_SPECTRUM_EXPORT_REFLECTOR_ROUTINES_
 #include <irisspectrump.h>
-
-//
-// Types
-//
-
-struct _REFLECTOR {
-    REFLECTOR_REFERENCE ReflectorReference;
-    SIZE_T ReferenceCount;
-};
 
 //
 // Functions
@@ -87,9 +79,9 @@ ReflectorAllocate(
 
     AllocatedReflector = (PREFLECTOR) HeaderAllocation;
 
-    ReflectorReferenceInitialize(ReflectorVTable,
-                                 DataAllocation,
-                                 &AllocatedReflector->ReflectorReference);
+    ReflectorInitialize(ReflectorVTable,
+                        DataAllocation,
+                        AllocatedReflector);
 
     AllocatedReflector->ReferenceCount = 1;
 
@@ -115,31 +107,12 @@ ReflectorReflect(
 {
     ISTATUS Status;
 
-    //
-    // &Reflector->ReflectorReference should be safe to do
-    // even if Reflector == NULL
-    //
-
-    Status = ReflectorReferenceReflect(&Reflector->ReflectorReference,
-                                       Wavelength,
-                                       IncomingIntensity,
-                                       OutgoingIntensity);
+    Status = StaticReflectorReflect(Reflector,
+                                    Wavelength,
+                                    IncomingIntensity,
+                                    OutgoingIntensity);
 
     return Status;
-}
-
-_Ret_
-PCREFLECTOR_REFERENCE
-ReflectorGetReflectorReference(
-    _In_ PCREFLECTOR Reflector
-    )
-{
-    if (Reflector == NULL)
-    {
-        return NULL;
-    }
-    
-    return &Reflector->ReflectorReference;
 }
 
 VOID
@@ -160,6 +133,8 @@ ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR Reflector
     )
 {
+    PFREE_ROUTINE FreeRoutine;
+    
     if (Reflector == NULL)
     {
         return;
@@ -169,7 +144,13 @@ ReflectorRelease(
 
     if (Reflector->ReferenceCount == 0)
     {
-        ReflectorReferenceDestroy(&Reflector->ReflectorReference);
+        FreeRoutine = Reflector->VTable->FreeRoutine;
+
+        if (FreeRoutine != NULL)
+        {
+            FreeRoutine(Reflector->Data);
+        }
+    
         IrisAlignedFree(Reflector);
     }
 }

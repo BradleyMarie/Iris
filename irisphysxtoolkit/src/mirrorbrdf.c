@@ -19,7 +19,7 @@ Abstract:
 //
 
 typedef struct _SPECTRUM_MIRROR_BRDF {
-    PCREFLECTOR_REFERENCE Reflectance;
+    PCREFLECTOR Reflectance;
     VECTOR3 SurfaceNormal;
 } SPECTRUM_MIRROR_BRDF, *PSPECTRUM_MIRROR_BRDF;
 
@@ -38,7 +38,7 @@ SpectrumMirrorBrdfSample(
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PVECTOR3 Outgoing,
     _Out_ PFLOAT Pdf
     )
@@ -71,7 +71,7 @@ SpectrumMirrorBrdfComputeReflectance(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector
+    _Out_ PCREFLECTOR *Reflector
     )
 {
     ASSERT(Context != NULL);
@@ -94,7 +94,7 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR_REFERENCE *Reflector,
+    _Out_ PCREFLECTOR *Reflector,
     _Out_ PFLOAT Pdf
     )
 {
@@ -133,7 +133,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumMirrorBrdfAllocate(
     _In_ PBRDF_ALLOCATOR Allocator,
-    _In_ PCREFLECTOR_REFERENCE Reflectance,
+    _In_ PCREFLECTOR Reflectance,
     _In_ VECTOR3 SurfaceNormal,
     _Out_ PCBRDF *Brdf
     )

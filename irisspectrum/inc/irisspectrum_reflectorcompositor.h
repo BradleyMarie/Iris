@@ -42,9 +42,9 @@ IRISSPECTRUMAPI
 ISTATUS
 ReflectorCompositorAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
-    _Out_ PCREFLECTOR_REFERENCE *Sum
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
     );
 
 _Check_return_
@@ -53,9 +53,9 @@ IRISSPECTRUMAPI
 ISTATUS
 ReflectorCompositorAttenuateReflection(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedReflector
+    _Out_ PCREFLECTOR *AttenuatedReflector
     );
 
 _Check_return_
@@ -64,10 +64,10 @@ IRISSPECTRUMAPI
 ISTATUS
 ReflectorCompositorAttenuatedAddReflections(
     _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector0,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector1,
+    _In_opt_ PCREFLECTOR Reflector0,
+    _In_opt_ PCREFLECTOR Reflector1,
     _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR_REFERENCE *AttenuatedReflector
+    _Out_ PCREFLECTOR *AttenuatedReflector
     );
 
 _Ret_

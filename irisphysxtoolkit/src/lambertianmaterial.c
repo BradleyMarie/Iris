@@ -43,7 +43,6 @@ SimpleLambertianMaterialSample(
     )
 {
     PCSIMPLE_LAMBERTIAN_MATERIAL Material;
-    PCREFLECTOR_REFERENCE ReflecanceReference;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
@@ -53,11 +52,9 @@ SimpleLambertianMaterialSample(
     ASSERT(Brdf != NULL);
     
     Material = (PCSIMPLE_LAMBERTIAN_MATERIAL) Context;
-    
-    ReflecanceReference = ReflectorGetReflectorReference(Material->Reflectance);
 
     Status = SpectrumLambertianBrdfAllocate(BrdfAllocator,
-                                            ReflecanceReference,
+                                            Material->Reflectance,
                                             SurfaceNormal,
                                             Brdf);
                                             

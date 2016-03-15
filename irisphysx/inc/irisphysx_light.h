@@ -34,7 +34,7 @@ ISTATUS
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
     );
@@ -47,7 +47,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum
+    _Out_ PCSPECTRUM *Spectrum
     );
 
 typedef
@@ -58,7 +58,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );
 
@@ -100,7 +100,7 @@ LightSample(
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
     );
@@ -113,7 +113,7 @@ LightComputeEmissive(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum
+    _Out_ PCSPECTRUM *Spectrum
     );
 
 _Check_return_
@@ -124,7 +124,7 @@ LightComputeEmissiveWithPdf(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
     _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
-    _Out_ PCSPECTRUM_REFERENCE *Spectrum,
+    _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );
 

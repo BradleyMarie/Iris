@@ -58,6 +58,8 @@ ReflectorAllocate(
     _Out_ PREFLECTOR *Reflector
     );
 
+#ifndef _DISABLE_IRIS_SPECTRUM_REFLECTOR_EXPORTS_
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
@@ -69,12 +71,7 @@ ReflectorReflect(
     _Out_ PFLOAT OutgoingIntensity
     );
 
-_Ret_
-IRISSPECTRUMAPI
-PCREFLECTOR_REFERENCE
-ReflectorGetReflectorReference(
-    _In_ PCREFLECTOR Reflector
-    );
+#endif // _DISABLE_IRIS_SPECTRUM_REFLECTOR_EXPORTS_
 
 IRISSPECTRUMAPI
 VOID

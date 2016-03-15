@@ -18,8 +18,6 @@ Abstract:
 #include <irisadvanced.h>
 
 #include "irisspectrum_api.h"
-#include "irisspectrum_spectrumreference.h"
-#include "irisspectrum_reflectorreference.h"
 #include "irisspectrum_spectrum.h"
 #include "irisspectrum_reflector.h"
 #include "irisspectrum_spectrumcompositorreference.h"

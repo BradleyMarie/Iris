@@ -20,42 +20,42 @@ Abstract:
 //
 
 typedef struct _FMA_SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumHeader;
-    PCSPECTRUM_REFERENCE Spectrum0;
-    PCSPECTRUM_REFERENCE Spectrum1;
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum0;
+    PCSPECTRUM Spectrum1;
     FLOAT Attenuation;
 } FMA_SPECTRUM, *PFMA_SPECTRUM;
 
 typedef CONST FMA_SPECTRUM *PCFMA_SPECTRUM;
 
 typedef struct _ATTENUATED_SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumHeader;
-    PCSPECTRUM_REFERENCE Spectrum;
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
     FLOAT Attenuation;
 } ATTENUATED_SPECTRUM, *PATTENUATED_SPECTRUM;
 
 typedef CONST ATTENUATED_SPECTRUM *PCATTENUATED_SPECTRUM;
 
 typedef struct _SUM_SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumHeader;
-    PCSPECTRUM_REFERENCE Spectrum0;
-    PCSPECTRUM_REFERENCE Spectrum1;
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum0;
+    PCSPECTRUM Spectrum1;
 } SUM_SPECTRUM, *PSUM_SPECTRUM;
 
 typedef CONST SUM_SPECTRUM *PCSUM_SPECTRUM;
 
 typedef struct _REFLECTION_SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumHeader;
-    PCSPECTRUM_REFERENCE Spectrum;
-    PCREFLECTOR_REFERENCE Reflector;
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
+    PCREFLECTOR Reflector;
 } REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
 
 typedef CONST REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
 
 typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
-    SPECTRUM_REFERENCE SpectrumHeader;
-    PCSPECTRUM_REFERENCE Spectrum;
-    PCREFLECTOR_REFERENCE Reflector;
+    SPECTRUM SpectrumHeader;
+    PCSPECTRUM Spectrum;
+    PCREFLECTOR Reflector;
     FLOAT Attenuation;
 } ATTENUATED_REFLECTION_SPECTRUM, *PATTENUATED_REFLECTION_SPECTRUM;
 
@@ -99,18 +99,18 @@ FmaSpectrumSample(
 
     FmaSpectrum = (PCFMA_SPECTRUM) Context;
 
-    Status = SpectrumReferenceSample(FmaSpectrum->Spectrum0,
-                                     Wavelength,
-                                     &SpectrumIntensity0);
+    Status = SpectrumSample(FmaSpectrum->Spectrum0,
+                            Wavelength,
+                            &SpectrumIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = SpectrumReferenceSample(FmaSpectrum->Spectrum1,
-                                     Wavelength,
-                                     &SpectrumIntensity1);
+    Status = SpectrumSample(FmaSpectrum->Spectrum1,
+                            Wavelength,
+                            &SpectrumIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -145,9 +145,9 @@ AttenuatedSpectrumSample(
 
     AttenuatedSpectrum = (PCATTENUATED_SPECTRUM) Context;
 
-    Status = SpectrumReferenceSample(AttenuatedSpectrum->Spectrum,
-                                     Wavelength,
-                                     &OutputIntensity);
+    Status = SpectrumSample(AttenuatedSpectrum->Spectrum,
+                            Wavelength,
+                            &OutputIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -180,18 +180,18 @@ SumSpectrumSample(
 
     SumSpectrum = (PCSUM_SPECTRUM) Context;
 
-    Status = SpectrumReferenceSample(SumSpectrum->Spectrum0,
-                                     Wavelength,
-                                     &SpectrumIntensity0);
+    Status = SpectrumSample(SumSpectrum->Spectrum0,
+                            Wavelength,
+                            &SpectrumIntensity0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = SpectrumReferenceSample(SumSpectrum->Spectrum1,
-                                     Wavelength,
-                                     &SpectrumIntensity1);
+    Status = SpectrumSample(SumSpectrum->Spectrum1,
+                            Wavelength,
+                            &SpectrumIntensity1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -223,19 +223,19 @@ ReflectionSpectrumSample(
 
     ReflectionSpectrum = (PCREFLECTION_SPECTRUM) Context;
 
-    Status = SpectrumReferenceSample(ReflectionSpectrum->Spectrum,
-                                     Wavelength,
-                                     &SpectrumIntensity);
+    Status = SpectrumSample(ReflectionSpectrum->Spectrum,
+                            Wavelength,
+                            &SpectrumIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReferenceReflect(ReflectionSpectrum->Reflector,
-                                       Wavelength,
-                                       SpectrumIntensity,
-                                       Intensity);
+    Status = ReflectorReflect(ReflectionSpectrum->Reflector,
+                              Wavelength,
+                              SpectrumIntensity,
+                              Intensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -267,19 +267,19 @@ AttenuatedReflectionSpectrumSample(
 
     AttenuatedReflectionSpectrum = (PCATTENUATED_REFLECTION_SPECTRUM) Context;
 
-    Status = SpectrumReferenceSample(AttenuatedReflectionSpectrum->Spectrum,
-                                     Wavelength,
-                                     &SpectrumIntensity);
+    Status = SpectrumSample(AttenuatedReflectionSpectrum->Spectrum,
+                            Wavelength,
+                            &SpectrumIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = ReflectorReferenceReflect(AttenuatedReflectionSpectrum->Reflector,
-                                       Wavelength,
-                                       SpectrumIntensity,
-                                       &ReflectedIntensity);
+    Status = ReflectorReflect(AttenuatedReflectionSpectrum->Reflector,
+                              Wavelength,
+                              SpectrumIntensity,
+                              &ReflectedIntensity);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -348,8 +348,8 @@ STATIC
 VOID
 FmaSpectrumInitialize(
     _Out_ PFMA_SPECTRUM FmaSpectrum,
-    _In_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_ PCSPECTRUM_REFERENCE Spectrum1,
+    _In_ PCSPECTRUM Spectrum0,
+    _In_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation
     )
 {
@@ -359,9 +359,9 @@ FmaSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    SpectrumReferenceInitialize(&FmaSpectrumVTable,
-                                FmaSpectrum,
-                                &FmaSpectrum->SpectrumHeader);
+    SpectrumInitialize(&FmaSpectrumVTable,
+                       FmaSpectrum,
+                       &FmaSpectrum->SpectrumHeader);
                                 
     FmaSpectrum->Spectrum0 = Spectrum0;
     FmaSpectrum->Spectrum1 = Spectrum1;
@@ -372,7 +372,7 @@ STATIC
 VOID
 AttenuatedSpectrumInitialize(
     _Out_ PATTENUATED_SPECTRUM AttenuatedSpectrum,
-    _In_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation
     )
 {
@@ -381,9 +381,9 @@ AttenuatedSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    SpectrumReferenceInitialize(&AttenuatedSpectrumVTable,
-                                AttenuatedSpectrum,
-                                &AttenuatedSpectrum->SpectrumHeader);
+    SpectrumInitialize(&AttenuatedSpectrumVTable,
+                       AttenuatedSpectrum,
+                       &AttenuatedSpectrum->SpectrumHeader);
                                 
     AttenuatedSpectrum->Spectrum = Spectrum;
     AttenuatedSpectrum->Attenuation = Attenuation;
@@ -393,17 +393,17 @@ STATIC
 VOID
 SumSpectrumInitialize(
     _Out_ PSUM_SPECTRUM SumSpectrum,
-    _In_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_ PCSPECTRUM_REFERENCE Spectrum1
+    _In_ PCSPECTRUM Spectrum0,
+    _In_ PCSPECTRUM Spectrum1
     )
 {
     ASSERT(SumSpectrum != NULL);
     ASSERT(Spectrum0 != NULL);
     ASSERT(Spectrum1 != NULL);
 
-    SpectrumReferenceInitialize(&SumSpectrumVTable,
-                                SumSpectrum,
-                                &SumSpectrum->SpectrumHeader);
+    SpectrumInitialize(&SumSpectrumVTable,
+                       SumSpectrum,
+                       &SumSpectrum->SpectrumHeader);
                                 
     SumSpectrum->Spectrum0 = Spectrum0;
     SumSpectrum->Spectrum1 = Spectrum1;
@@ -413,17 +413,17 @@ STATIC
 VOID
 ReflectionSpectrumInitialize(
     _Out_ PREFLECTION_SPECTRUM ReflectionSpectrum,
-    _In_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_ PCREFLECTOR_REFERENCE Reflector
+    _In_ PCSPECTRUM Spectrum,
+    _In_ PCREFLECTOR Reflector
     )
 {
     ASSERT(ReflectionSpectrum != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
 
-    SpectrumReferenceInitialize(&ReflectionSpectrumVTable,
-                                ReflectionSpectrum,
-                                &ReflectionSpectrum->SpectrumHeader);
+    SpectrumInitialize(&ReflectionSpectrumVTable,
+                       ReflectionSpectrum,
+                       &ReflectionSpectrum->SpectrumHeader);
                                 
     ReflectionSpectrum->Spectrum = Spectrum;
     ReflectionSpectrum->Reflector = Reflector;
@@ -433,8 +433,8 @@ STATIC
 VOID
 AttenuatedReflectionSpectrumInitialize(
     _Out_ PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum,
-    _In_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_ PCREFLECTOR_REFERENCE Reflector,
+    _In_ PCSPECTRUM Spectrum,
+    _In_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation
     )
 {
@@ -444,9 +444,9 @@ AttenuatedReflectionSpectrumInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    SpectrumReferenceInitialize(&ReflectionSpectrumVTable,
-                                AttenuatedReflectionSpectrum,
-                                &AttenuatedReflectionSpectrum->SpectrumHeader);
+    SpectrumInitialize(&ReflectionSpectrumVTable,
+                       AttenuatedReflectionSpectrum,
+                       &AttenuatedReflectionSpectrum->SpectrumHeader);
                                 
     AttenuatedReflectionSpectrum->Spectrum = Spectrum;
     AttenuatedReflectionSpectrum->Reflector = Reflector;
@@ -561,9 +561,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorReferenceAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
-    _Out_ PCSPECTRUM_REFERENCE *Sum
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
+    _Out_ PCSPECTRUM *Sum
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
@@ -631,7 +631,7 @@ SpectrumCompositorReferenceAddSpectrums(
                           Spectrum0,
                           Spectrum1);
 
-    *Sum = (PCSPECTRUM_REFERENCE) SumSpectrum;
+    *Sum = (PCSPECTRUM) SumSpectrum;
     return ISTATUS_SUCCESS;
 }
 
@@ -640,9 +640,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorReferenceAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrumOutput
+    _Out_ PCSPECTRUM *AttenuatedSpectrumOutput
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
@@ -697,7 +697,7 @@ SpectrumCompositorReferenceAttenuateSpectrum(
                                  Spectrum,
                                  Attenuation);
 
-    *AttenuatedSpectrumOutput = (PCSPECTRUM_REFERENCE) AttenuatedSpectrum;
+    *AttenuatedSpectrumOutput = (PCSPECTRUM) AttenuatedSpectrum;
     return ISTATUS_SUCCESS;
 }
 
@@ -706,10 +706,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorReferenceAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
+    _Out_ PCSPECTRUM *AttenuatedSum
     )
 {
     PATTENUATED_SPECTRUM AttenuatedSpectrum;
@@ -779,7 +779,7 @@ SpectrumCompositorReferenceAttenuatedAddSpectrums(
                           Spectrum1,
                           Attenuation);
 
-    *AttenuatedSum = (PCSPECTRUM_REFERENCE) FmaSpectrum;
+    *AttenuatedSum = (PCSPECTRUM) FmaSpectrum;
     return ISTATUS_SUCCESS;   
 }
 
@@ -788,9 +788,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorReferenceAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
     PREFLECTION_SPECTRUM ReflectionSpectrum;
@@ -821,7 +821,7 @@ SpectrumCompositorReferenceAddReflection(
                                  Spectrum,
                                  Reflector);
 
-    *ReflectedSpectrum = (PCSPECTRUM_REFERENCE) ReflectionSpectrum;
+    *ReflectedSpectrum = (PCSPECTRUM) ReflectionSpectrum;
     return ISTATUS_SUCCESS;
 }
 
@@ -830,10 +830,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorReferenceAttenuatedAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
     PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum;
@@ -882,7 +882,7 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
                                            Reflector,
                                            Attenuation);
 
-    *ReflectedSpectrum = (PCSPECTRUM_REFERENCE) AttenuatedReflectionSpectrum;
+    *ReflectedSpectrum = (PCSPECTRUM) AttenuatedReflectionSpectrum;
     return ISTATUS_SUCCESS;
 }
 
@@ -924,9 +924,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
-    _Out_ PCSPECTRUM_REFERENCE *Sum
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
+    _Out_ PCSPECTRUM *Sum
     )
 {
     ISTATUS Status;
@@ -949,9 +949,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSpectrum
+    _Out_ PCSPECTRUM *AttenuatedSpectrum
     )
 {
     ISTATUS Status;
@@ -974,10 +974,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAttenuatedAddSpectrums(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum0,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum1,
+    _In_opt_ PCSPECTRUM Spectrum0,
+    _In_opt_ PCSPECTRUM Spectrum1,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *AttenuatedSum
+    _Out_ PCSPECTRUM *AttenuatedSum
     )
 {
     ISTATUS Status;
@@ -1001,9 +1001,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
     ISTATUS Status;
@@ -1026,10 +1026,10 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumCompositorAttenuatedAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM_REFERENCE Spectrum,
-    _In_opt_ PCREFLECTOR_REFERENCE Reflector,
+    _In_opt_ PCSPECTRUM Spectrum,
+    _In_opt_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation,
-    _Out_ PCSPECTRUM_REFERENCE *ReflectedSpectrum
+    _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
     ISTATUS Status;
