@@ -122,7 +122,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxTriangleXTraceTriangle(
+PhysxTriangleXDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -139,10 +139,10 @@ PhysxTriangleXTraceTriangle(
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
-    Status = TriangleXDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleXDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -151,7 +151,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxTriangleYTraceTriangle(
+PhysxTriangleYDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -168,10 +168,10 @@ PhysxTriangleYTraceTriangle(
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
-    Status = TriangleYDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleYDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -180,7 +180,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxTriangleZTraceTriangle(
+PhysxTriangleZDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -197,10 +197,10 @@ PhysxTriangleZTraceTriangle(
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
-    Status = TriangleZDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleZDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -330,7 +330,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxLightTriangleXTraceTriangle(
+PhysxLightTriangleXDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -347,10 +347,10 @@ PhysxLightTriangleXTraceTriangle(
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
-    Status = TriangleXDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleXDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -359,7 +359,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxLightTriangleYTraceTriangle(
+PhysxLightTriangleYDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -376,10 +376,10 @@ PhysxLightTriangleYTraceTriangle(
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
-    Status = TriangleYDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleYDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -388,7 +388,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxLightTriangleZTraceTriangle(
+PhysxLightTriangleZDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -405,10 +405,10 @@ PhysxLightTriangleZTraceTriangle(
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
-    Status = TriangleZDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleZDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -436,7 +436,7 @@ PhysxLightTriangleFree(
 //
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE XTriangleHeader = {
-    PhysxTriangleXTraceTriangle, 
+    PhysxTriangleXDominantTestRay,
     PhysxTriangleFree,
     PhysxTriangleComputeNormal,
     PhysxTriangleGetBounds,
@@ -445,7 +445,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE XTriangleHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE YTriangleHeader = {
-    PhysxTriangleYTraceTriangle, 
+    PhysxTriangleYDominantTestRay,
     PhysxTriangleFree,
     PhysxTriangleComputeNormal,
     PhysxTriangleGetBounds,
@@ -454,7 +454,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE YTriangleHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE ZTriangleHeader = {
-    PhysxTriangleZTraceTriangle, 
+    PhysxTriangleZDominantTestRay,
     PhysxTriangleFree,
     PhysxTriangleComputeNormal,
     PhysxTriangleGetBounds,
@@ -463,7 +463,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE ZTriangleHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE XLightTriangleHeader = {
-    PhysxLightTriangleXTraceTriangle, 
+    PhysxLightTriangleXDominantTestRay,
     PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
     PhysxLightTriangleGetBounds,
@@ -472,7 +472,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE XLightTriangleHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE YLightTriangleHeader = {
-    PhysxLightTriangleYTraceTriangle, 
+    PhysxLightTriangleYDominantTestRay,
     PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
     PhysxLightTriangleGetBounds,
@@ -481,7 +481,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE YLightTriangleHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE ZLightTriangleHeader = {
-    PhysxLightTriangleZTraceTriangle, 
+    PhysxLightTriangleZDominantTestRay,
     PhysxLightTriangleFree,
     PhysxLightTriangleComputeNormal,
     PhysxLightTriangleGetBounds,

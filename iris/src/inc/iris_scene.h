@@ -37,15 +37,15 @@ SFORCEINLINE
 ISTATUS 
 SceneTrace(
     _In_ PCSCENE Scene,
-    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
+    _Inout_ PHIT_TESTER HitTester
     )
 {
     ISTATUS Status;
 
     ASSERT(Scene != NULL);
-    ASSERT(RayTracerReference != NULL);
+    ASSERT(HitTester != NULL);
 
-    Status = Scene->VTable->TraceRoutine(Scene->Data, RayTracerReference);
+    Status = Scene->VTable->TraceRoutine(Scene->Data, HitTester);
 
     return Status;
 }

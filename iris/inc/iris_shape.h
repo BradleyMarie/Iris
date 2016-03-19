@@ -25,7 +25,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PSHAPE_TRACE_ROUTINE)(
+(*PSHAPE_TEST_RAY_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -33,7 +33,7 @@ ISTATUS
     );
 
 typedef struct _SHAPE_VTABLE {
-    PSHAPE_TRACE_ROUTINE TraceRoutine;
+    PSHAPE_TEST_RAY_ROUTINE TestRayRoutine;
     PFREE_ROUTINE FreeRoutine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 

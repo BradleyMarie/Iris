@@ -87,7 +87,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-TriangleTraceXTriangle(
+TriangleXTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -103,10 +103,10 @@ TriangleTraceXTriangle(
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
-    Status = TriangleXDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleXDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -115,7 +115,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-TriangleTraceYTriangle(
+TriangleYTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -131,10 +131,10 @@ TriangleTraceYTriangle(
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
-    Status = TriangleYDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleYDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -143,7 +143,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-TriangleTraceZTriangle(
+TriangleZTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -159,10 +159,10 @@ TriangleTraceZTriangle(
 
     Triangle = (PCIRISTOOLKIT_TRIANGLE) Context;
 
-    Status = TriangleZDominantTraceTriangle(&Triangle->Data,
-                                            Ray,
-                                            HitAllocator,
-                                            HitList);
+    Status = TriangleZDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
 
     return Status;
 }
@@ -190,19 +190,19 @@ TriangleFree(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE XTriangleHeader = {
-    { TriangleTraceXTriangle, TriangleFree },
+    { TriangleZDominantTestRay, TriangleFree },
     TriangleGetTexture,
     TriangleGetNormal
 };
 
 CONST STATIC DRAWING_SHAPE_VTABLE YTriangleHeader = {
-    { TriangleTraceYTriangle, TriangleFree },
+    { TriangleYTestRay, TriangleFree },
     TriangleGetTexture,
     TriangleGetNormal
 };
 
 CONST STATIC DRAWING_SHAPE_VTABLE ZTriangleHeader = {
-    { TriangleTraceZTriangle, TriangleFree },
+    { TriangleZTestRay, TriangleFree },
     TriangleGetTexture,
     TriangleGetNormal
 };

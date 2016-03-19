@@ -46,7 +46,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-TriangleXDominantTraceTriangle(
+TriangleXDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -142,7 +142,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-TriangleYDominantTraceTriangle(
+TriangleYDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -237,7 +237,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-TriangleZDominantTraceTriangle(
+TriangleZDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,

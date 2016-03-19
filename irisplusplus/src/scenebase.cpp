@@ -26,16 +26,16 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 SceneBase::Trace(
     _In_ PCVOID Context, 
-    _Inout_ PRAYTRACER_REFERENCE RayTracerRef
+    _Inout_ PHIT_TESTER HitTesterPtr
     )
 {
     assert(Context != nullptr);
     assert(RayTracerRef != nullptr);
 
-    RayTracerReference Tracer(RayTracerRef);
+    HitTester Tester(HitTesterPtr);
 
     const SceneBase **SceneBasePtr = (const SceneBase**) Context;
-    (*SceneBasePtr)->Trace(Tracer);
+    (*SceneBasePtr)->Trace(Tester);
     return ISTATUS_SUCCESS;
 }
 

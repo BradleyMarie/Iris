@@ -29,7 +29,7 @@ protected:
     virtual
     void
     Trace(
-        _In_ RayTracerReference RayTracerRef
+        _In_ HitTester Tester
         ) const = 0;
 
     IRISPLUSPLUSAPI
@@ -53,7 +53,7 @@ private:
     ISTATUS 
     Trace(
         _In_ PCVOID Context, 
-        _Inout_ PRAYTRACER_REFERENCE RayTracerReference
+        _Inout_ PHIT_TESTER HitTesterPtr
         );
     
     static

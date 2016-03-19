@@ -110,7 +110,7 @@ ShapeBase::HitAllocator::Allocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-ShapeBase::Trace(
+ShapeBase::Test(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR IrisHitAllocator,
@@ -124,7 +124,7 @@ ShapeBase::Trace(
     HitAllocator Allocator(IrisHitAllocator);
 
     const ShapeBase **ShapeBasePointer = (const ShapeBase**) Context;
-    *HitList = (*ShapeBasePointer)->Trace(Ray, Allocator);
+    *HitList = (*ShapeBasePointer)->Test(Ray, Allocator);
     return ISTATUS_SUCCESS;
 }
 
@@ -171,7 +171,7 @@ ShapeBase::Create(
 //
 
 const SHAPE_VTABLE ShapeBase::InteropVTable = {
-    ShapeBase::Trace, ShapeBase::Free
+    ShapeBase::Test, ShapeBase::Free
 };
 
 } // namespace Iris

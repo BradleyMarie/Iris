@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSCENE_TRACE_ROUTINE)(
     _In_ PCVOID Context, 
-    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
+    _Inout_ PHIT_TESTER HitTester
     );
 
 typedef struct _SCENE_VTABLE {

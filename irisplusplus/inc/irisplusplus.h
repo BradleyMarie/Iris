@@ -46,7 +46,7 @@ extern "C" {
 #include "irisplusplus_shape.h"
 #include "irisplusplus_shapebase.h"
 #include "irisplusplus_shapecollection.h"
-#include "irisplusplus_raytracerreference.h"
+#include "irisplusplus_hittester.h"
 #include "irisplusplus_scene.h"
 #include "irisplusplus_scenebase.h"
 #include "irisplusplus_raytracer.h"

@@ -12,7 +12,7 @@ add_library(irisplusplus SHARED
     src/matrixreference.cpp
     src/scene.cpp
     src/scenebase.cpp
-    src/raytracerreference.cpp
+    src/hittester.cpp
     src/raytracer.cpp)
 
 target_link_libraries(irisplusplus 

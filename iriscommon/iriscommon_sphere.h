@@ -43,7 +43,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-SphereTrace(
+SphereTestRay(
     _In_opt_ PCSPHERE Sphere, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,

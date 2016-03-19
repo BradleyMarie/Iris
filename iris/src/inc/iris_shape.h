@@ -73,7 +73,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS 
-ShapeTraceShape(
+ShapeTestRay(
     _In_ PCSHAPE Shape, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -88,10 +88,10 @@ ShapeTraceShape(
 
     HitAllocatorSetCurrentShape(HitAllocator, Shape);
 
-    Status = Shape->VTable->TraceRoutine(Shape->Data, 
-                                         Ray,
-                                         HitAllocator,
-                                         HitList);
+    Status = Shape->VTable->TestRayRoutine(Shape->Data, 
+                                           Ray,
+                                           HitAllocator,
+                                           HitList);
 
     return Status;
 }

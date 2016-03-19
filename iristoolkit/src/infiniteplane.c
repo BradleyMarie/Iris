@@ -88,7 +88,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-InfinitePlaneTraceInfinitePlane(
+InfinitePlaneTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -166,7 +166,7 @@ InfinitePlaneFree(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE InfinitePlaneHeader = {
-    { InfinitePlaneTraceInfinitePlane, NULL },
+    { InfinitePlaneTestRay, NULL },
     InfinitePlaneGetTexture,
     InfinitePlaneGetNormal
 };

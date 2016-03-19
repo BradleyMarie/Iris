@@ -272,7 +272,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxLightSphereTrace(
+PhysxLightSphereTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -289,10 +289,10 @@ PhysxLightSphereTrace(
 
     Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
 
-    Status = SphereTrace(&Sphere->Data,
-                         Ray,
-                         HitAllocator,
-                         HitList);
+    Status = SphereTestRay(&Sphere->Data,
+                           Ray,
+                           HitAllocator,
+                           HitList);
 
     return Status;
 }
@@ -320,7 +320,7 @@ PhysxLightSphereFree(
 //
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE SphereHeader = {
-    PhysxSphereTrace, 
+    PhysxLightSphereTestRay,
     PhysxSphereFree,
     PhysxSphereComputeNormal,
     PhysxSphereGetBounds,
@@ -329,7 +329,7 @@ CONST STATIC SPECTRUM_SHAPE_VTABLE SphereHeader = {
 };
 
 CONST STATIC SPECTRUM_SHAPE_VTABLE LightSphereHeader = {
-    PhysxLightSphereTrace, 
+    PhysxLightSphereTestRay,
     PhysxLightSphereFree,
     PhysxLightSphereComputeNormal,
     PhysxLightSphereGetBounds,

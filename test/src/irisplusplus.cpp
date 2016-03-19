@@ -490,12 +490,12 @@ protected:
     virtual
     void
     Trace(
-        _In_ RayTracerReference RayTracerRef
+        _In_ HitTester Tester
         ) const
     {
         for (size_t Index = 0; Index < Shapes.size(); Index++)
         {
-            RayTracerRef.Trace(Shapes[Index], Matrices[Index], IsPremultiplied[Index]);
+            Tester.Test(Shapes[Index], Matrices[Index], IsPremultiplied[Index]);
         }
     }
 
@@ -577,15 +577,15 @@ public:
 };
 
 const SHAPE_VTABLE Triangle::XTriangleHeader = {
-    (PSHAPE_TRACE_ROUTINE) TriangleXDominantTraceTriangle, nullptr
+    (PSHAPE_TEST_RAY_ROUTINE) TriangleXDominantTestRay, nullptr
 };
 
 const SHAPE_VTABLE Triangle::YTriangleHeader = {
-    (PSHAPE_TRACE_ROUTINE) TriangleYDominantTraceTriangle, nullptr
+    (PSHAPE_TEST_RAY_ROUTINE) TriangleYDominantTestRay, nullptr
 };
 
 const SHAPE_VTABLE Triangle::ZTriangleHeader = {
-    (PSHAPE_TRACE_ROUTINE) TriangleZDominantTraceTriangle, nullptr
+    (PSHAPE_TEST_RAY_ROUTINE) TriangleZDominantTestRay, nullptr
 };
 
 TEST(RayTracePlusPlusTestIdentityTriangle)

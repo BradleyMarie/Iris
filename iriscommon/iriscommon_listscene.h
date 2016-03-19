@@ -172,7 +172,7 @@ SFORCEINLINE
 ISTATUS 
 ListSceneTrace(
     _Inout_ PCLIST_SCENE ListScene,
-    _Inout_ PRAYTRACER_REFERENCE RayTracerReference
+    _Inout_ PHIT_TESTER HitTester
     )
 {
     PLIST_SCENE_OBJECT Objects;
@@ -188,10 +188,10 @@ ListSceneTrace(
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = RayTracerReferenceTraceShapeWithTransform(RayTracerReference,
-                                                           Objects[Index].Shape,
-                                                           Objects[Index].ModelToWorld,
-                                                           Objects[Index].Premultiplied);
+        Status = HitTesterTestShapeWithTransform(HitTester,
+                                                 Objects[Index].Shape,
+                                                 Objects[Index].ModelToWorld,
+                                                 Objects[Index].Premultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {

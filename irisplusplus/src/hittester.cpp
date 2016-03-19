@@ -22,11 +22,11 @@ namespace Iris {
 //
 
 void
-RayTracerReference::Trace(
+HitTester::Test(
     _In_ const Shape & ShapeRef
     )
 {
-    ISTATUS Status = RayTracerReferenceTraceShape(Data, ShapeRef.AsPCSHAPE());
+    ISTATUS Status = HitTesterTestShape(Data, ShapeRef.AsPCSHAPE());
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -35,14 +35,14 @@ RayTracerReference::Trace(
 }
 
 void
-RayTracerReference::Trace(
+HitTester::Test(
     _In_ const Shape & ShapeRef,
     _In_ const Matrix & MatrixRef
     )
 {
-    ISTATUS Status = RayTracerReferenceTracePremultipliedShapeWithTransform(Data,
-                                                                            ShapeRef.AsPCSHAPE(),
-                                                                            MatrixRef.AsPCMATRIX());
+    ISTATUS Status = HitTesterTestPremultipliedShapeWithTransform(Data,
+                                                                  ShapeRef.AsPCSHAPE(),
+                                                                  MatrixRef.AsPCMATRIX());
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -51,16 +51,16 @@ RayTracerReference::Trace(
 }
 
 void
-RayTracerReference::Trace(
+HitTester::Test(
     _In_ const Shape & ShapeRef,
     _In_ const Matrix & MatrixRef,
     _In_ bool Premultiplied
     )
 {
-    ISTATUS Status = RayTracerReferenceTraceShapeWithTransform(Data, 
-                                                               ShapeRef.AsPCSHAPE(),
-                                                               MatrixRef.AsPCMATRIX(),
-                                                               Premultiplied ? TRUE : FALSE);
+    ISTATUS Status = HitTesterTestShapeWithTransform(Data, 
+                                                     ShapeRef.AsPCSHAPE(),
+                                                     MatrixRef.AsPCMATRIX(),
+                                                     Premultiplied ? TRUE : FALSE);
                                                       
     if (Status != ISTATUS_SUCCESS)
     {

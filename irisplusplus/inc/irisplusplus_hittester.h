@@ -1,10 +1,10 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisplusplus_raytracerreference.h
+    irisplusplus_hittester.h
 
 Abstract:
 
@@ -15,8 +15,8 @@ Abstract:
 
 #include <irisplusplus.h>
 
-#ifndef _RAYTRACER_REFERENCE_IRIS_PLUS_PLUS_
-#define _RAYTRACER_REFERENCE_IRIS_PLUS_PLUS_
+#ifndef _HIT_TESTER_IRIS_PLUS_PLUS_
+#define _HIT_TESTER_IRIS_PLUS_PLUS_
 
 namespace Iris {
 
@@ -24,17 +24,17 @@ namespace Iris {
 // Types
 //
 
-class RayTracerReference final {
+class HitTester final {
 public:
-    RayTracerReference(
-        _In_ PRAYTRACER_REFERENCE RayTracerRef
+    HitTester(
+        _In_ PHIT_TESTER HitTesterPtr
         )
-    : Data(RayTracerRef)
+    : Data(HitTesterPtr)
     { }
     
     _Ret_
-    PRAYTRACER_REFERENCE
-    AsPRAYTRACER_REFERENCE(
+    PHIT_TESTER
+    AsPHIT_TESTER(
         void
         )
     {
@@ -50,36 +50,36 @@ public:
     {
         RAY CurrentRay;
         
-        RayTracerReferenceGetRay(Data, &CurrentRay);
+        HitTesterGetRay(Data, &CurrentRay);
         
         return Ray(CurrentRay);
     }
 
     IRISPLUSPLUSAPI
     void
-    Trace(
+    Test(
         _In_ const Shape & ShapeRef
         );
 
     IRISPLUSPLUSAPI
     void
-    Trace(
+    Test(
         _In_ const Shape & ShapeRef,
         _In_ const Matrix & MatrixRef
         );
 
     IRISPLUSPLUSAPI
     void
-    Trace(
+    Test(
         _In_ const Shape & ShapeRef,
         _In_ const Matrix & MatrixRef,
         _In_ bool Premultiplied
         );
 
 private:
-    PRAYTRACER_REFERENCE Data;
+    PHIT_TESTER Data;
 };
 
 } // namespace Iris
 
-#endif // _RAYTRACER_REFERENCE_IRIS_PLUS_PLUS_
+#endif // _HIT_TESTER_IRIS_PLUS_PLUS_

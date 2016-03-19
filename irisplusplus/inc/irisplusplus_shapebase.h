@@ -161,7 +161,7 @@ protected:
     _Ret_
     virtual
     PHIT_LIST
-    Trace(
+    Test(
         _In_ Ray ModelRay,
         _Inout_ HitAllocator & Allocator
         ) const = 0;
@@ -185,7 +185,7 @@ private:
     _Success_(return == ISTATUS_SUCCESS)
     static
     ISTATUS 
-    Trace(
+    Test(
         _In_opt_ PCVOID Context, 
         _In_ RAY Ray,
         _Inout_ PHIT_ALLOCATOR IrisHitAllocator,
