@@ -58,6 +58,21 @@ public:
         _Out_writes_(4) FLOAT Contents[4][4]
         ) const;
 
+    MatrixReference(
+        _In_ const MatrixReference & ToCopy
+        )
+    : Data(ToCopy.Data)
+    { }
+
+    MatrixReference & 
+    operator=(
+        _In_ const MatrixReference & ToCopy
+        )
+    {
+        Data = ToCopy.Data;
+        return *this;
+    }
+
 private:
     PCMATRIX Data;
 };

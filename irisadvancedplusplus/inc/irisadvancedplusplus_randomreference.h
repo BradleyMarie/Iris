@@ -68,12 +68,18 @@ public:
 
     RandomReference(
         _In_ const RandomReference & ToCopy
-        ) = delete;
+        )
+    : Data(ToCopy.Data)
+    { }
 
     RandomReference & 
     operator=(
         _In_ const RandomReference & ToCopy
-        ) = delete;
+        )
+    {
+        Data = ToCopy.Data;
+        return *this;
+    }
 
 private:
     PRANDOM_REFERENCE Data;

@@ -83,7 +83,7 @@ public:
         
     RayTracer &
     operator=(
-        _In_ const RayTracer & RayTracerRef
+        _In_ const RayTracer & ToCopy
         ) = delete;
     
     ~RayTracer(

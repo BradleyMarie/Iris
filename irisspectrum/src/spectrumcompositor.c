@@ -559,7 +559,7 @@ SpectrumCompositorReferenceDestroy(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorReferenceAddSpectrums(
+SpectrumCompositorReferenceAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,
@@ -597,11 +597,11 @@ SpectrumCompositorReferenceAddSpectrums(
     {
         AttenuatedSpectrum = (PATTENUATED_SPECTRUM) Spectrum0;
 
-        Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(Compositor,
-                                                                   Spectrum1,
-                                                                   AttenuatedSpectrum->Spectrum,
-                                                                   AttenuatedSpectrum->Attenuation,
-                                                                   Sum);
+        Status = SpectrumCompositorReferenceAttenuatedAddSpectra(Compositor,
+                                                                 Spectrum1,
+                                                                 AttenuatedSpectrum->Spectrum,
+                                                                 AttenuatedSpectrum->Attenuation,
+                                                                 Sum);
         return Status;
     }
 
@@ -609,11 +609,11 @@ SpectrumCompositorReferenceAddSpectrums(
     {
         AttenuatedSpectrum = (PATTENUATED_SPECTRUM) Spectrum1;
 
-        Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(Compositor,
-                                                                   Spectrum0,
-                                                                   AttenuatedSpectrum->Spectrum,
-                                                                   AttenuatedSpectrum->Attenuation,
-                                                                   Sum);
+        Status = SpectrumCompositorReferenceAttenuatedAddSpectra(Compositor,
+                                                                 Spectrum0,
+                                                                 AttenuatedSpectrum->Spectrum,
+                                                                 AttenuatedSpectrum->Attenuation,
+                                                                 Sum);
                                                                    
         return Status;
     }
@@ -704,7 +704,7 @@ SpectrumCompositorReferenceAttenuateSpectrum(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorReferenceAttenuatedAddSpectrums(
+SpectrumCompositorReferenceAttenuatedAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,
@@ -751,10 +751,10 @@ SpectrumCompositorReferenceAttenuatedAddSpectrums(
 
     if (Attenuation == (FLOAT) 1.0)
     {
-        Status = SpectrumCompositorReferenceAddSpectrums(Compositor,
-                                                         Spectrum0,
-                                                         Spectrum1,
-                                                         AttenuatedSum);   
+        Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                       Spectrum0,
+                                                       Spectrum1,
+                                                       AttenuatedSum);   
         return Status;
     }
 
@@ -922,7 +922,7 @@ SpectrumCompositorAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAddSpectrums(
+SpectrumCompositorAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,
@@ -936,10 +936,10 @@ SpectrumCompositorAddSpectrums(
     // Compositor == NULL.
     //
     
-    Status = SpectrumCompositorReferenceAddSpectrums(&Compositor->CompositorReference,
-                                                     Spectrum0,
-                                                     Spectrum1,
-                                                     Sum);
+    Status = SpectrumCompositorReferenceAddSpectra(&Compositor->CompositorReference,
+                                                   Spectrum0,
+                                                   Spectrum1,
+                                                   Sum);
     
     return Status;
 }
@@ -972,7 +972,7 @@ SpectrumCompositorAttenuateSpectrum(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SpectrumCompositorAttenuatedAddSpectrums(
+SpectrumCompositorAttenuatedAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,
@@ -987,11 +987,11 @@ SpectrumCompositorAttenuatedAddSpectrums(
     // Compositor == NULL.
     //
     
-    Status = SpectrumCompositorReferenceAttenuatedAddSpectrums(&Compositor->CompositorReference,
-                                                               Spectrum0,
-                                                               Spectrum1,
-                                                               Attenuation,
-                                                               AttenuatedSum);
+    Status = SpectrumCompositorReferenceAttenuatedAddSpectra(&Compositor->CompositorReference,
+                                                             Spectrum0,
+                                                             Spectrum1,
+                                                             Attenuation,
+                                                             AttenuatedSum);
     
     return Status;
 }

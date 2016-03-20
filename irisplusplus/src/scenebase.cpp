@@ -46,7 +46,7 @@ SceneBase::Free(
 {
     assert(Context != nullptr);
 
-    const SceneBase **SceneBasePtr = (const SceneBase**) Context;
+    SceneBase **SceneBasePtr = (SceneBase**) Context;
     delete *SceneBasePtr;
 }
 

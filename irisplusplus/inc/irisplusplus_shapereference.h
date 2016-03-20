@@ -41,6 +41,21 @@ public:
         return Data;
     }
 
+    ShapeReference(
+        _In_ const ShapeReference & ToCopy
+        )
+    : Data(ToCopy.Data)
+    { }
+
+    ShapeReference & 
+    operator=(
+        _In_ const ShapeReference & ToCopy
+        )
+    {
+        Data = ToCopy.Data;
+        return *this;
+    }
+
 private:
     PCSHAPE Data;
 };

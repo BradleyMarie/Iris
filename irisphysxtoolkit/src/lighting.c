@@ -259,10 +259,10 @@ ComputeDirectLighting(
         return Status;
     }
 
-    Status = SpectrumCompositorReferenceAddSpectrums(SpectrumCompositor,
-                                                     Output,
-                                                     Emissive,
-                                                     &Output);
+    Status = SpectrumCompositorReferenceAddSpectra(SpectrumCompositor,
+                                                   Output,
+                                                   Emissive,
+                                                   &Output);
                                             
     if (Status != ISTATUS_SUCCESS)
     {

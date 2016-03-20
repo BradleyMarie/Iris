@@ -32,7 +32,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
 ISTATUS
-SpectrumCompositorReferenceAddSpectrums(
+SpectrumCompositorReferenceAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,
@@ -54,7 +54,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISSPECTRUMAPI
 ISTATUS
-SpectrumCompositorReferenceAttenuatedAddSpectrums(
+SpectrumCompositorReferenceAttenuatedAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _In_opt_ PCSPECTRUM Spectrum0,
     _In_opt_ PCSPECTRUM Spectrum1,

@@ -135,7 +135,7 @@ ShapeBase::Free(
 {
     assert(Context != nullptr);
 
-    const ShapeBase **ShapeBasePointer = (const ShapeBase**) Context;
+    ShapeBase **ShapeBasePointer = (ShapeBase**) Context;
     delete *ShapeBasePointer;
 }
 

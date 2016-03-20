@@ -65,15 +65,6 @@ public:
         return Data;
     }
 
-    _Ret_
-    PCRANDOM
-    AsPCRANDOM(
-        void
-        ) const
-    {
-        return Data;
-    }
-
     Random(
         _In_ Random & ToCopy
         ) = delete;

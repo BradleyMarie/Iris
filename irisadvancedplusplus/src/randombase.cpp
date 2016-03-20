@@ -66,7 +66,7 @@ RandomBase::Free(
 {
     assert(Context != nullptr);
 
-    const RandomBase **RandomBasePtr = (const RandomBase**) Context;
+    RandomBase **RandomBasePtr = (RandomBase**) Context;
     delete *RandomBasePtr;
 }
 

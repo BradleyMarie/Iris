@@ -139,10 +139,10 @@ PhysxSphereTrace(
 
     Sphere = (PCPHYSX_SPHERE) Context;
 
-    Status = SphereTrace(&Sphere->Data,
-                         Ray,
-                         HitAllocator,
-                         HitList);
+    Status = SphereTestRay(&Sphere->Data,
+                           Ray,
+                           HitAllocator,
+                           HitList);
 
     return Status;
 }

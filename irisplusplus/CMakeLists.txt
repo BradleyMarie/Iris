@@ -24,11 +24,5 @@ generate_export_header(irisplusplus
     EXPORT_FILE_NAME inc/irisplusplus_api.h
     STATIC_DEFINE IRISPLUSPLUS_BUILT_AS_STATIC)
 
-option(ENABLE_CSG "Enable constructive solid geometry" OFF)
-
-if (ENABLE_CSG)
-    add_definitions(-DENABLE_CSG_SUPPORT)
-endif()
-
 set_property(TARGET irisplusplus PROPERTY CXX_STANDARD 11)
 set_property(TARGET irisplusplus PROPERTY CXX_STANDARD_REQUIRED ON)

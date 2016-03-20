@@ -68,6 +68,7 @@ irisshadingmodel/inc/irisshadingmodel_api.h
 irisplusplus/inc/irisplusplus_api.h
 irisphysxapi/inc/irisphysxtoolkit_api.h
 irisadvancedplusplus/inc/irisadvancedplusplus_api.h
+irisspectrumplusplus/inc/irisspectrumplusplus_api.h
 
 #Analysis files
 iris.dir/
