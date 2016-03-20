@@ -37,7 +37,7 @@ SpectrumCompositor::SpectrumCompositor(
 
 _Ret_
 SpectrumReference
-SpectrumCompositor::AddSpectra(
+SpectrumCompositor::Add(
     _In_ PCSPECTRUM Spectrum0Ptr,
     _In_ PCSPECTRUM Spectrum1Ptr
     )
@@ -65,7 +65,7 @@ SpectrumCompositor::AddSpectra(
 
 _Ret_
 SpectrumReference
-SpectrumCompositor::AttenuateSpectrum(
+SpectrumCompositor::Attenuate(
     _In_ PCSPECTRUM SpectrumPtr,
     _In_ FLOAT Attenuation
     )
@@ -96,7 +96,7 @@ SpectrumCompositor::AttenuateSpectrum(
 
 _Ret_
 SpectrumReference
-SpectrumCompositor::AttenuatedAddSpectra(
+SpectrumCompositor::AttenuatedAdd(
     _In_ PCSPECTRUM Spectrum0Ptr,
     _In_ PCSPECTRUM Spectrum1Ptr,
     _In_ FLOAT Attenuation
@@ -129,7 +129,7 @@ SpectrumCompositor::AttenuatedAddSpectra(
 
 _Ret_
 SpectrumReference
-SpectrumCompositor::AddReflection(
+SpectrumCompositor::Reflect(
     _In_ PCSPECTRUM SpectrumPtr,
     _In_ PCREFLECTOR ReflectorPtr
     )
@@ -157,7 +157,7 @@ SpectrumCompositor::AddReflection(
 
 _Ret_
 SpectrumReference
-SpectrumCompositor::AttenuatedAddReflection(
+SpectrumCompositor::AttenuatedReflect(
     _In_ PCSPECTRUM SpectrumPtr,
     _In_ PCREFLECTOR ReflectorPtr,
     _In_ FLOAT Attenuation

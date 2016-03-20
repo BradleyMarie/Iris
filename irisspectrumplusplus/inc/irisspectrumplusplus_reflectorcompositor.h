@@ -54,138 +54,138 @@ public:
     
     _Ret_
     ReflectorReference
-    AddReflections(
+    Add(
         _In_ const Reflector & Reflector0Ref,
         _In_ const Reflector & Reflector1Ref
         )
     {
-        ReflectorReference Result = AddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                   Reflector1Ref.AsPCREFLECTOR());
+        ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
+                                        Reflector1Ref.AsPCREFLECTOR());
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AddReflections(
+    Add(
         _In_ const Reflector & Reflector0Ref,
         _In_ ReflectorReference Reflector1Ref
         )
     {
-        ReflectorReference Result = AddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                   Reflector1Ref.AsPCREFLECTOR());
+        ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
+                                        Reflector1Ref.AsPCREFLECTOR());
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AddReflections(
+    Add(
         _In_ ReflectorReference Reflector0Ref,
         _In_ const Reflector & Reflector1Ref
         )
     {
-        ReflectorReference Result = AddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                   Reflector1Ref.AsPCREFLECTOR());
+        ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
+                                        Reflector1Ref.AsPCREFLECTOR());
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AddReflections(
+    Add(
         _In_ ReflectorReference Reflector0Ref,
         _In_ ReflectorReference Reflector1Ref
         )
     {
-        ReflectorReference Result = AddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                   Reflector1Ref.AsPCREFLECTOR());
+        ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
+                                        Reflector1Ref.AsPCREFLECTOR());
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuateReflection(
+    Attenuate(
         _In_ const Reflector & ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuateReflection(ReflectorRef.AsPCREFLECTOR(),
-                                                        Attenuation);
+        ReflectorReference Result = Attenuate(ReflectorRef.AsPCREFLECTOR(),
+                                              Attenuation);
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuateReflection(
+    Attenuate(
         _In_ ReflectorReference ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuateReflection(ReflectorRef.AsPCREFLECTOR(),
-                                                        Attenuation);
+        ReflectorReference Result = Attenuate(ReflectorRef.AsPCREFLECTOR(),
+                                              Attenuation);
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuatedAddReflections(
+    AttenuatedAdd(
         _In_ const Reflector & Reflector0Ref,
         _In_ const Reflector & Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuatedAddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                             Reflector1Ref.AsPCREFLECTOR(),
-                                                             Attenuation);
+        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
+                                                  Reflector1Ref.AsPCREFLECTOR(),
+                                                  Attenuation);
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuatedAddReflections(
+    AttenuatedAdd(
         _In_ const Reflector & Reflector0Ref,
         _In_ ReflectorReference Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuatedAddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                             Reflector1Ref.AsPCREFLECTOR(),
-                                                             Attenuation);
+        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
+                                                  Reflector1Ref.AsPCREFLECTOR(),
+                                                  Attenuation);
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuatedAddReflections(
+    AttenuatedAdd(
         _In_ ReflectorReference Reflector0Ref,
         _In_ const Reflector & Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuatedAddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                             Reflector1Ref.AsPCREFLECTOR(),
-                                                             Attenuation);
+        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
+                                                  Reflector1Ref.AsPCREFLECTOR(),
+                                                  Attenuation);
         
         return Result;
     }
     
     _Ret_
     ReflectorReference
-    AttenuatedAddReflections(
+    AttenuatedAdd(
         _In_ ReflectorReference Reflector0Ref,
         _In_ ReflectorReference Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {
-        ReflectorReference Result = AttenuatedAddReflections(Reflector0Ref.AsPCREFLECTOR(),
-                                                             Reflector1Ref.AsPCREFLECTOR(),
-                                                             Attenuation);
+        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
+                                                  Reflector1Ref.AsPCREFLECTOR(),
+                                                  Attenuation);
         
         return Result;
     }
@@ -219,21 +219,21 @@ private:
 
     _Ret_
     ReflectorReference
-    AddReflections(
+    Add(
         _In_ PCREFLECTOR Reflector0Ptr,
         _In_ PCREFLECTOR Reflector1Ptr
         );
 
     _Ret_
     ReflectorReference
-    AttenuateReflection(
+    Attenuate(
         _In_ PCREFLECTOR ReflectorPtr,
         _In_ FLOAT Attenuation
         );
 
     _Ret_
     ReflectorReference
-    AttenuatedAddReflections(
+    AttenuatedAdd(
         _In_ PCREFLECTOR Reflector0Ptr,
         _In_ PCREFLECTOR Reflector1Ptr,
         _In_ FLOAT Attenuation

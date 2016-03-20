@@ -19,7 +19,7 @@ namespace IrisSpectrum {
 
 _Ret_
 ReflectorReference
-ReflectorCompositorReference::AddReflections(
+ReflectorCompositorReference::Add(
     _In_ PCREFLECTOR Reflector0Ptr,
     _In_ PCREFLECTOR Reflector1Ptr
     )
@@ -47,7 +47,7 @@ ReflectorCompositorReference::AddReflections(
 
 _Ret_
 ReflectorReference
-ReflectorCompositorReference::AttenuateReflection(
+ReflectorCompositorReference::Attenuate(
     _In_ PCREFLECTOR ReflectorPtr,
     _In_ FLOAT Attenuation
     )
@@ -78,7 +78,7 @@ ReflectorCompositorReference::AttenuateReflection(
 
 _Ret_
 ReflectorReference
-ReflectorCompositorReference::AttenuatedAddReflections(
+ReflectorCompositorReference::AttenuatedAdd(
     _In_ PCREFLECTOR Reflector0Ptr,
     _In_ PCREFLECTOR Reflector1Ptr,
     _In_ FLOAT Attenuation

@@ -37,7 +37,7 @@ ReflectorCompositor::ReflectorCompositor(
 
 _Ret_
 ReflectorReference
-ReflectorCompositor::AddReflections(
+ReflectorCompositor::Add(
     _In_ PCREFLECTOR Reflector0Ptr,
     _In_ PCREFLECTOR Reflector1Ptr
     )
@@ -65,7 +65,7 @@ ReflectorCompositor::AddReflections(
 
 _Ret_
 ReflectorReference
-ReflectorCompositor::AttenuateReflection(
+ReflectorCompositor::Attenuate(
     _In_ PCREFLECTOR ReflectorPtr,
     _In_ FLOAT Attenuation
     )
@@ -96,7 +96,7 @@ ReflectorCompositor::AttenuateReflection(
 
 _Ret_
 ReflectorReference
-ReflectorCompositor::AttenuatedAddReflections(
+ReflectorCompositor::AttenuatedAdd(
     _In_ PCREFLECTOR Reflector0Ptr,
     _In_ PCREFLECTOR Reflector1Ptr,
     _In_ FLOAT Attenuation
