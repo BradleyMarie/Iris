@@ -22,7 +22,7 @@ struct _RAYSHADER {
     PCOLOR3 PathThroughputPointer;
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
-    PRANDOM Rng;
+    PRANDOM_REFERENCE Rng;
     PSCENE Scene;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
@@ -50,7 +50,7 @@ RayShaderAllocateInternal(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_opt_ PCOLOR3 PathThroughputPointer,
     _In_ FLOAT MinimumContinueProbability,
@@ -135,7 +135,6 @@ RayShaderAllocateInternal(
         MaximumContinueProbability = (FLOAT) 1.0;
     }
 
-    RandomReference(Rng);
     SceneRetain(Scene);
 
     RayShader->PathThroughputPointer = PathThroughputPointer;
@@ -340,7 +339,7 @@ RayShaderAllocate(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
@@ -419,10 +418,10 @@ RayShaderTraceRayMontecarlo(
 
     if (ContinueProbability < (FLOAT) 1.0)
     {
-        Status = RandomGenerateFloat(RayShader->Rng,
-                                     (FLOAT) 0.0,
-                                     (FLOAT) 1.0,
-                                     &NextRandom);
+        Status = RandomReferenceGenerateFloat(RayShader->Rng,
+                                              (FLOAT) 0.0,
+                                              (FLOAT) 1.0,
+                                              &NextRandom);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -489,7 +488,6 @@ RayShaderFree(
     }
 
     RayTracerFree(RayShader->RayTracer);
-    RandomDereference(RayShader->Rng);
     SceneRelease(RayShader->Scene);
     free(RayShader);
 }

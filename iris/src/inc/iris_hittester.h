@@ -176,7 +176,7 @@ HitTesterComputeHitData(
 
     ASSERT(HitTester != NULL);
     ASSERT(Hit != NULL);
-    ASSERT(ModelToWorldReference != NULL);
+    ASSERT(ModelToWorld != NULL);
     ASSERT(ModelViewer != NULL);
     ASSERT(ModelHit != NULL);
     ASSERT(WorldHit != NULL);

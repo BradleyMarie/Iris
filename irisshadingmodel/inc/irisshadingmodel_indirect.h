@@ -33,7 +33,7 @@ ISTATUS
     _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_opt_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect
@@ -73,7 +73,7 @@ IndirectShaderShade(
     _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_opt_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect

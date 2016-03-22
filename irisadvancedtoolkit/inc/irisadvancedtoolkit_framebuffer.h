@@ -1,10 +1,10 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    iristoolkit_framebuffer.h
+    irisadvancedtoolkit_framebuffer.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _FRAMEBUFFER_IRIS_TOOLKIT_
-#define _FRAMEBUFFER_IRIS_TOOLKIT_
+#ifndef _FRAMEBUFFER_IRIS_ADVANCED_TOOLKIT_
+#define _FRAMEBUFFER_IRIS_ADVANCED_TOOLKIT_
 
-#include <iristoolkit.h>
+#include <irisadvancedtoolkit.h>
 
 //
 // Types
@@ -29,17 +29,18 @@ typedef CONST FRAMEBUFFER *PCFRAMEBUFFER;
 //
 
 _Check_return_
-_Ret_maybenull_
-IRISTOOLKITAPI
-PFRAMEBUFFER
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDTOOLKITAPI
+ISTATUS
 FramebufferAllocate(
     _In_ COLOR3 InitialColor,
     _In_ SIZE_T Rows,
-    _In_ SIZE_T Columns
+    _In_ SIZE_T Columns,
+    _Out_ PFRAMEBUFFER *FrameBuffer
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 FramebufferSetPixel(
     _Inout_ PFRAMEBUFFER Framebuffer,
@@ -49,7 +50,7 @@ FramebufferSetPixel(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 FramebufferGetPixel(
     _In_ PCFRAMEBUFFER Framebuffer,
@@ -58,7 +59,7 @@ FramebufferGetPixel(
     _Out_ PCOLOR3 Color
     );
 
-IRISTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 FramebufferGetDimensions(
     _In_ PCFRAMEBUFFER Framebuffer,
@@ -66,10 +67,18 @@ FramebufferGetDimensions(
     _Out_ PSIZE_T Columns
     );
 
-IRISTOOLKITAPI
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDTOOLKITAPI
+ISTATUS
+FramebufferSaveAsPFM(
+    _In_ PCFRAMEBUFFER Framebuffer,
+    _In_ PCSTR Path
+    );
+
+IRISADVANCEDTOOLKITAPI
 VOID
 FramebufferFree(
     _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     );
 
-#endif // _FRAMEBUFFER_IRIS_TOOLKIT_
+#endif // _FRAMEBUFFER_IRIS_ADVANCED_TOOLKIT_

@@ -120,7 +120,7 @@ InterpolatedTriangleDirectShaderShade(
     _In_ VECTOR3 ModelViewer,
     _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 Direct
     )
@@ -189,7 +189,7 @@ InterpolatedTriangleIndirectShaderShade(
     _In_ VECTOR3 ModelViewer,
     _In_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Inout_opt_ PRAYSHADER RayTracer,
     _Out_ PCOLOR3 Indirect

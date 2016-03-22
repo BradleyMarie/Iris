@@ -30,7 +30,7 @@ SceneBase::Trace(
     )
 {
     assert(Context != nullptr);
-    assert(RayTracerRef != nullptr);
+    assert(HitTesterPtr != nullptr);
 
     HitTester Tester(HitTesterPtr);
 

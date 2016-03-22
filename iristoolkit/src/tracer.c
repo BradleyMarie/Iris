@@ -21,7 +21,7 @@ Abstract:
 typedef struct _COMMON_TRACER {
     TRACER TracerHeader;
     PVISIBILITY_TESTER VisibilityTester;
-    PRANDOM Rng;
+    PRANDOM_REFERENCE Rng;
 } COMMON_TRACER, *PCOMMON_TRACER;
 
 typedef CONST COMMON_TRACER *PCCOMMON_TRACER;
@@ -58,7 +58,7 @@ PathTracerShadeHit(
     COLOR3 ComponentColor;
     PCOMMON_TRACER Tracer;
     ISTATUS Status;
-    PRANDOM Rng;
+    PRANDOM_REFERENCE Rng;
     FLOAT Alpha;
 
     ASSERT(Context != NULL);
@@ -169,7 +169,7 @@ RecursiveRayTracerShadeHit(
     COLOR3 ComponentColor;
     PCOMMON_TRACER Tracer;
     ISTATUS Status;
-    PRANDOM Rng;
+    PRANDOM_REFERENCE Rng;
     FLOAT Alpha;
 
     ASSERT(Context != NULL);
@@ -292,7 +292,6 @@ CommonTracerFree(
 
     RayShaderFree(Tracer->TracerHeader.RayShader);
     VisibilityTesterFree(Tracer->VisibilityTester);
-    RandomDereference(Tracer->Rng);
     free(Tracer);
 }
 
@@ -302,7 +301,7 @@ STATIC
 PTRACER
 CommonTracerAllocateInternal(
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
@@ -355,8 +354,6 @@ CommonTracerAllocateInternal(
         return NULL;
     }
 
-    RandomReference(Rng);
-
     Tracer->TracerHeader.FreeRoutine = CommonTracerFree;
     Tracer->TracerHeader.RayShader = RayShader;
     Tracer->VisibilityTester = VisibilityTester;
@@ -374,7 +371,7 @@ _Ret_maybenull_
 PTRACER
 PathTracerAllocate(
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,
@@ -406,7 +403,7 @@ _Ret_maybenull_
 PTRACER
 RecursiveRayTracerAllocate(
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,

@@ -88,7 +88,7 @@ DirectShaderShade(
     _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 Direct
     )

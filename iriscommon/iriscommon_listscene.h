@@ -181,7 +181,7 @@ ListSceneTrace(
     SIZE_T Index;
 
     ASSERT(ListScene != NULL);
-    ASSERT(RayTracerReference != NULL);
+    ASSERT(HitTester != NULL);
 
     ListSize = ListScene->ObjectsSize;
     Objects = ListScene->Objects;

@@ -1,10 +1,12 @@
-include_directories(../iris/inc 
-    ../irisshadingmodel/inc 
+include_directories(src/inc
+    ../iris/inc 
+    ../irisadvanced/inc 
+    ../irisadvancedtoolkit/inc 
     ../iristoolkit/inc
+    ../irisshadingmodel/inc 
     ../irisplusplus/inc
     ../iriscommon
-    unittest++
-    src/inc)
+    unittest++)
 
 set(unittest-common-sources
     unittest++/AssertException.cpp
@@ -38,7 +40,6 @@ add_executable(iris-test
     ${unittest-platform-sources}
     src/main.cpp
     src/utility.cpp
-    src/pfm.cpp
     src/trianglecreator.cpp
     src/checkerboard.cpp
     src/vector.cpp

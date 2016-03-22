@@ -81,7 +81,7 @@ RayShaderAllocate(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
     _In_ PSCENE Scene,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
     _In_ FLOAT MaximumContinueProbability,

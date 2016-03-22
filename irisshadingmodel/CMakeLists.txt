@@ -1,6 +1,9 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc inc src/inc ../iriscommon)
+include_directories(inc src/inc
+    ../iris/inc 
+    ../irisadvanced/inc 
+    ../iriscommon)
 
 add_library(irisshadingmodel SHARED
     src/surfacenormal.c
@@ -12,14 +15,14 @@ add_library(irisshadingmodel SHARED
     src/texture.c
     src/translucentshader.c
     src/drawingshape.c
-    src/random.c
     src/normal.c
     src/emissive.c
     src/indirect.c
     src/direct.c)
 
 target_link_libraries(irisshadingmodel 
-    iris)
+    iris
+    irisadvanced)
 
 generate_export_header(irisshadingmodel
     BASE_NAME irisshadingmodel

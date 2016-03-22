@@ -30,7 +30,7 @@ StaticPinholeCameraRender(
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,
     _In_ BOOL Jitter,
-    _Inout_opt_ PRANDOM Rng,
+    _Inout_opt_ PRANDOM_REFERENCE Rng,
     _Inout_ PTRACER RayTracer,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
@@ -125,20 +125,20 @@ StaticPinholeCameraRender(
 
                     if (Jitter != FALSE)
                     {
-                        Status = RandomGenerateFloat(Rng,
-                                                     (FLOAT) 0.0,
-                                                     (FLOAT) 1.0,
-                                                     &RandomNumber0);
+                        Status = RandomReferenceGenerateFloat(Rng,
+                                                              (FLOAT) 0.0,
+                                                              (FLOAT) 1.0,
+                                                              &RandomNumber0);
 
                         if (Status != ISTATUS_SUCCESS)
                         {
                             return Status;
                         }
 
-                        Status = RandomGenerateFloat(Rng,
-                                                     (FLOAT) 0.0,
-                                                     (FLOAT) 1.0,
-                                                     &RandomNumber1);
+                        Status = RandomReferenceGenerateFloat(Rng,
+                                                              (FLOAT) 0.0,
+                                                              (FLOAT) 1.0,
+                                                              &RandomNumber1);
 
                         if (Status != ISTATUS_SUCCESS)
                         {
@@ -221,7 +221,7 @@ PinholeCameraRender(
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,
     _In_ BOOL Jitter,
-    _Inout_opt_ PRANDOM Rng,
+    _Inout_opt_ PRANDOM_REFERENCE Rng,
     _Inout_ PTRACER RayTracer,
     _Inout_ PFRAMEBUFFER Framebuffer
     )

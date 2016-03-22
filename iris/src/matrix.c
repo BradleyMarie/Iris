@@ -70,8 +70,7 @@ InvertibleMatrixInitialize(
     ASSERT(IsFiniteFloat(M31) != FALSE);
     ASSERT(IsFiniteFloat(M32) != FALSE);
     ASSERT(IsFiniteFloat(M33) != FALSE);
-    ASSERT(Matrix != NULL);
-    ASSERT(Inverse != NULL);
+    ASSERT(InvertibleMatrix != NULL);
 
     Status = Float4x4InverseInitialize(M00,
                                        M01,
@@ -194,8 +193,7 @@ InvertibleMatrixInitializeFromValues(
     ASSERT(IsFiniteFloat(I31) != FALSE);
     ASSERT(IsFiniteFloat(I32) != FALSE);
     ASSERT(IsFiniteFloat(I33) != FALSE);
-    ASSERT(Inverse != NULL);
-    ASSERT(Matrix != NULL);
+    ASSERT(InvertibleMatrix != NULL);
 
     InvertibleMatrix->Matrix.M[0][0] = M00;
     InvertibleMatrix->Matrix.M[0][1] = M01;

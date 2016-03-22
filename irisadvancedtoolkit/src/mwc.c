@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <iristoolkitp.h>
+#include <irisadvancedtoolkitp.h>
 #include <time.h>
 #include <math.h>
 
@@ -76,8 +76,8 @@ MultiplyWithCarryRngGenerateFloat(
     FLOAT RandomFloat;
 
     ASSERT(Rng != NULL);
-    ASSERT(IsNormalFloat(Minimum));
-    ASSERT(IsNormalFloat(Maximum));
+    ASSERT(IsFiniteFloat(Minimum));
+    ASSERT(IsFiniteFloat(Maximum));
     ASSERT(Minimum < Maximum);
     ASSERT(RandomValue != NULL);
 
@@ -147,26 +147,25 @@ CONST STATIC RANDOM_VTABLE MwcVTable = {
 
 _Check_return_
 _Ret_maybenull_
-IRISTOOLKITAPI
-PRANDOM
+ISTATUS
 MultiplyWithCarryRngAllocate(
-    VOID
+    _Out_ PRANDOM *Random
     )
 {
-    PRANDOM Random;
-    PUINT32 RngState;
-    MWC_RNG Rng;
     SIZE_T Index;
+    MWC_RNG Rng;
+    PUINT32 RngState;
+    double Seconds;
     UINT32 Seed;
+    ISTATUS Status;
     time_t Timer;
     struct tm YearTwoThousand;
-    double Seconds;
 
     RngState = (PUINT32) malloc(sizeof(UINT32) * RANDOM_STATE_SIZE);
 
     if (RngState == NULL)
     {
-        return NULL;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     YearTwoThousand.tm_hour = 0;
@@ -197,15 +196,16 @@ MultiplyWithCarryRngAllocate(
     Rng.C = INITIAL_C_VALUE;
     Rng.I = INITIAL_I_VALUE;
 
-    Random = RandomAllocate(&MwcVTable,
+    Status = RandomAllocate(&MwcVTable,
                             &Rng,
                             sizeof(MWC_RNG),
-                            sizeof(PVOID));
+                            sizeof(PVOID),
+                            Random);
 
-    if (Random == NULL)
+    if (Status != ISTATUS_SUCCESS)
     {
         MultiplyWithCarryRngFree(&Rng);
     }
 
-    return Random;
+    return Status;
 }

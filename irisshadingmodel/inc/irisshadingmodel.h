@@ -16,11 +16,10 @@ Abstract:
 #define _IRIS_SHADING_MODEL_HEADER_
 
 #include <iris.h>
+#include <irisadvanced.h>
 
 #include "irisshadingmodel_api.h"
 #include "irisshadingmodel_types.h"
-#include "irisshadingmodel_rng.h"
-#include "irisshadingmodel_color3.h"
 #include "irisshadingmodel_color4.h"
 #include "irisshadingmodel_normal.h"
 #include "irisshadingmodel_surfacenormal.h"

@@ -1,13 +1,17 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisshadingmodel/inc ../iriscommon inc src/inc)
+include_directories(inc src/inc
+    ../iris/inc 
+    ../irisadvanced/inc 
+    ../irisadvancedtoolkit/inc 
+    ../irisshadingmodel/inc 
+    ../iriscommon)
 
 add_library(iristoolkit SHARED
     src/triangle.c
     src/sphere.c
     src/listscene.c
     src/tracer.c
-    src/framebuffer.c
     src/constantnormal.c
     src/constantemissiveshader.c
     src/camera.c
@@ -18,11 +22,12 @@ add_library(iristoolkit SHARED
     src/perfectspecular.c
     src/constanttexture.c
     src/infiniteplane.c
-    src/mwc.c
     src/lambertianindirect.c)
 
 target_link_libraries(iristoolkit 
     iris 
+    irisadvanced
+    irisadvancedtoolkit
     irisshadingmodel)
 
 generate_export_header(iristoolkit

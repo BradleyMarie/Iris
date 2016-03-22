@@ -17,6 +17,7 @@ Abstract:
 TEST(RenderConstantRedWorldSphere)
 {
     PEMISSIVE_SHADER ConstantShader;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
@@ -27,7 +28,6 @@ TEST(RenderConstantRedWorldSphere)
     PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -52,12 +52,13 @@ TEST(RenderConstantRedWorldSphere)
 
     Status = ColorSceneAddWorldObject(Scene, Sphere);
     
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
+    FramebufferAllocate(SphereColor, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -82,12 +83,13 @@ TEST(RenderConstantRedWorldSphere)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderConstantRedWorldSphere.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderConstantRedWorldSphere.pfm");
 }
 
 TEST(RenderConstantRedModelSphere)
 {
     PEMISSIVE_SHADER ConstantShader;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
@@ -98,7 +100,6 @@ TEST(RenderConstantRedModelSphere)
     PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -123,12 +124,13 @@ TEST(RenderConstantRedModelSphere)
 
     Status = ColorSceneAddObject(Scene, Sphere, NULL, FALSE);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
+    FramebufferAllocate(SphereColor, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -153,12 +155,13 @@ TEST(RenderConstantRedModelSphere)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderConstantRedModelSphere.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderConstantRedModelSphere.pfm");
 }
 
 TEST(RenderConstantRedPremultipliedSphere)
 {
     PEMISSIVE_SHADER ConstantShader;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
@@ -169,7 +172,6 @@ TEST(RenderConstantRedPremultipliedSphere)
     PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -194,12 +196,13 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     Status = ColorSceneAddObject(Scene, Sphere, NULL, TRUE);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
+    FramebufferAllocate(SphereColor, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -224,12 +227,13 @@ TEST(RenderConstantRedPremultipliedSphere)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderConstantRedPremultipliedSphere.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderConstantRedPremultipliedSphere.pfm");
 }
 
 TEST(RenderConstantRedWorldTriangle)
 {
     PEMISSIVE_SHADER ConstantShader;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
@@ -242,7 +246,6 @@ TEST(RenderConstantRedWorldTriangle)
     PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -270,12 +273,13 @@ TEST(RenderConstantRedWorldTriangle)
 
     Status = ColorSceneAddWorldObject(Scene, Triangle);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(TriangleColor, 500, 500);
+    FramebufferAllocate(TriangleColor, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -300,7 +304,7 @@ TEST(RenderConstantRedWorldTriangle)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderConstantRedWorldTriangle.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderConstantRedWorldTriangle.pfm");
 }
 
 TEST(RenderInterpolatedRedWorldTriangle)
@@ -309,6 +313,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
     PEMISSIVE_SHADER ConstantShader0;
     PEMISSIVE_SHADER ConstantShader1;
     PEMISSIVE_SHADER ConstantShader2;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
@@ -323,7 +328,6 @@ TEST(RenderInterpolatedRedWorldTriangle)
     COLOR3 Blue;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -368,12 +372,13 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     Status = ColorSceneAddWorldObject(Scene, Triangle);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(Red, 500, 500);
+    FramebufferAllocate(Red, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -398,11 +403,12 @@ TEST(RenderInterpolatedRedWorldTriangle)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderInterpolatedRedWorldTriangle.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderInterpolatedRedWorldTriangle.pfm");
 }
 
 TEST(RenderPhongWorldSphere)
 {
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PDIRECT_SHADER PhongShader;
     COLOR3 AmbientShaderColor;
@@ -420,7 +426,6 @@ TEST(RenderPhongWorldSphere)
     ISTATUS Status;
     PSCENE Scene;
     COLOR3 Black;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -471,12 +476,13 @@ TEST(RenderPhongWorldSphere)
 
     Status = ColorSceneAddWorldObject(Scene, Sphere);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(Black, 500, 500);
+    FramebufferAllocate(Black, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                0);
 
@@ -501,13 +507,14 @@ TEST(RenderPhongWorldSphere)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderPhongWorldSphere.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderPhongWorldSphere.pfm");
 }
 
 TEST(RenderPerfectSpecularWorldSphere)
 {
     PINDIRECT_SHADER PerfectSpecularShader;
     PEMISSIVE_SHADER ConstantShader;
+    PRANDOM_REFERENCE RngReference;
     PTRACER RecursiveRayTracer;
     PNORMAL SphereFrontNormal;
     PFRAMEBUFFER Framebuffer;
@@ -521,7 +528,6 @@ TEST(RenderPerfectSpecularWorldSphere)
     PTEXTURE Texture;
     ISTATUS Status;
     PSCENE Scene;
-    bool Success;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -565,12 +571,13 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     Status = ColorSceneAddWorldObject(Scene, Sphere);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(SphereColor, 500, 500);
+    FramebufferAllocate(SphereColor, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                1);
 
@@ -595,7 +602,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
 
-    Success = WritePfm(Framebuffer, "RenderPerfectSpecularWorldSphere.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderPerfectSpecularWorldSphere.pfm");
 }
 
 TEST(RenderMirrorPhongCheckerboardSpheres)
@@ -641,6 +648,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     VECTOR3 Up;
     PTRACER RecursiveRayTracer;
     ISTATUS Status;
+    PRANDOM_REFERENCE RngReference;
     PRANDOM Rng;
 
     InfinitePlaneLocation = PointCreate((FLOAT) 0.0,
@@ -815,12 +823,13 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Status = ColorSceneAddWorldObject(Scene, InfinitePlane);
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
-    Framebuffer = FramebufferAllocate(Black, 500, 500);
+    FramebufferAllocate(Black, 500, 500, &Framebuffer);
 
     RecursiveRayTracer = RecursiveNonRouletteRayTracerAllocate(Scene,
-                                                               Rng,
+                                                               RngReference,
                                                                (FLOAT) 0.0005,
                                                                5);
 
@@ -844,13 +853,14 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
                                  RecursiveRayTracer,
                                  Framebuffer);
 
-    WritePfm(Framebuffer, "RenderMirrorPhongCheckerboardSpheres.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderMirrorPhongCheckerboardSpheres.pfm");
 }
 
 TEST(RenderCornellBox)
 {
     COLOR3 ShaderColor;
     PFRAMEBUFFER Framebuffer;
+    PRANDOM_REFERENCE RngReference;
     PRANDOM Rng;
     PEMISSIVE_SHADER EmissiveShader;
     PINDIRECT_SHADER IndirectShader;
@@ -1096,14 +1106,15 @@ TEST(RenderCornellBox)
     // Render
     //
 
-    Rng = MultiplyWithCarryRngAllocate();
+    MultiplyWithCarryRngAllocate(&Rng);
+    RngReference = RandomGetRandomReference(Rng);
 
     ShaderColor = Color3InitializeBlack();
 
-    Framebuffer = FramebufferAllocate(ShaderColor, 500, 500);
+    FramebufferAllocate(ShaderColor, 500, 500, &Framebuffer);
 
     PathTracer = PathTracerAllocate(Scene,
-                                    Rng,
+                                    RngReference,
                                     0.0005f,
                                     0.0f,
                                     0.5f,
@@ -1129,5 +1140,5 @@ TEST(RenderCornellBox)
                                  PathTracer,
                                  Framebuffer);
 
-    WritePfm(Framebuffer, "RenderCornellBox.pfm");
+    FramebufferSaveAsPFM(Framebuffer, "RenderCornellBox.pfm");
 }

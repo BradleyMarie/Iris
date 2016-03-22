@@ -114,7 +114,7 @@ PhongDirectShaderShadeLight(
     _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 Direct
     )
@@ -160,7 +160,7 @@ PhongDirectShaderShade(
     _In_ VECTOR3 ModelViewer,
     _In_opt_ PCVOID AdditionalData,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 Direct
     )
@@ -206,7 +206,7 @@ DirectionalPhongLightShade(
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 LightColor
     )
@@ -313,7 +313,7 @@ PointPhongLightShade(
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 LightColor
     )
@@ -430,7 +430,7 @@ AttenuatedPointPhongLightShade(
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 LightColor
     )
@@ -556,7 +556,7 @@ PointPhongSpotLightShade(
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 LightColor
     )
@@ -704,7 +704,7 @@ AttenuatedPointPhongSpotLightShade(
     _In_ POINT3 WorldHitPoint,
     _In_ VECTOR3 WorldViewer,
     _Inout_ PSURFACE_NORMAL SurfaceNormal,
-    _Inout_ PRANDOM Rng,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PVISIBILITY_TESTER VisibilityTester,
     _Out_ PCOLOR3 LightColor
     )
