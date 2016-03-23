@@ -311,8 +311,8 @@ PhysxLightSphereFree(
 
     MaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
     MaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
-    LightDereference(Sphere->Lights[SPHERE_FRONT_FACE]);
-    LightDereference(Sphere->Lights[SPHERE_BACK_FACE]);
+    LightRelease(Sphere->Lights[SPHERE_FRONT_FACE]);
+    LightRelease(Sphere->Lights[SPHERE_BACK_FACE]);
 }
 
 //
@@ -431,8 +431,8 @@ PhysxSphereAllocate(
 
     MaterialRetain(FrontMaterial);
     MaterialRetain(BackMaterial);
-    LightReference(FrontLight);
-    LightReference(BackLight);
+    LightRetain(FrontLight);
+    LightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

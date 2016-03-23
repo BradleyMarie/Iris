@@ -259,7 +259,7 @@ LightComputeEmissiveWithPdf(
 }
 
 VOID
-LightReference(
+LightRetain(
     _In_opt_ PLIGHT Light
     )
 {
@@ -272,7 +272,7 @@ LightReference(
 }
 
 VOID
-LightDereference(
+LightRelease(
     _In_opt_ _Post_invalid_ PLIGHT Light
     )
 {

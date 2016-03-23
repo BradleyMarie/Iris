@@ -427,8 +427,8 @@ PhysxLightTriangleFree(
 
     MaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
     MaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
-    LightDereference(Triangle->Lights[TRIANGLE_FRONT_FACE]);
-    LightDereference(Triangle->Lights[TRIANGLE_BACK_FACE]);
+    LightRelease(Triangle->Lights[TRIANGLE_FRONT_FACE]);
+    LightRelease(Triangle->Lights[TRIANGLE_BACK_FACE]);
 }
 
 //
@@ -619,8 +619,8 @@ PhysxTriangleAllocate(
 
     MaterialRetain(FrontMaterial);
     MaterialRetain(BackMaterial);
-    LightReference(FrontLight);
-    LightReference(BackLight);
+    LightRetain(FrontLight);
+    LightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

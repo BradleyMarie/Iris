@@ -134,7 +134,7 @@ SpectrumSceneAddLight(
         return Status;
     }
 
-    LightReference(Light);
+    LightRetain(Light);
 
     return ISTATUS_SUCCESS;   
 }
@@ -176,7 +176,7 @@ SpectrumSceneDereference(
         {
             Light = (PLIGHT) PointerListRetrieveAtIndex(&SpectrumScene->Lights,
                                                         Index);
-            LightDereference(Light);
+            LightRelease(Light);
         }
         
         PointerListDestroy(&SpectrumScene->Lights);
