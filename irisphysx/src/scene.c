@@ -72,7 +72,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 SpectrumSceneAddObject(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
-    _In_ PSPECTRUM_SHAPE SpectrumShape,
+    _In_ PPBR_SHAPE SpectrumShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )

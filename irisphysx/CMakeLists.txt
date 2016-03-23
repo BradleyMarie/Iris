@@ -3,7 +3,6 @@ include(GenerateExportHeader)
 include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../iriscommon inc src/inc)
 
 add_library(irisphysx SHARED
-    src/shape.c
     src/scene.c
     src/brdf.c
     src/light.c

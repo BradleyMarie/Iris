@@ -35,7 +35,7 @@ STATIC
 ISTATUS 
 PhysxListSceneAddObject(
     _Inout_ PVOID Context,
-    _In_ PSPECTRUM_SHAPE SpectrumShape,
+    _In_ PPBR_SHAPE SpectrumShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )

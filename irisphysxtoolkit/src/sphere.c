@@ -122,7 +122,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxSphereTrace(
+PhysxSphereTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -319,20 +319,20 @@ PhysxLightSphereFree(
 // Static Variables
 //
 
-CONST STATIC SPECTRUM_SHAPE_VTABLE SphereHeader = {
-    PhysxLightSphereTestRay,
-    PhysxSphereFree,
-    PhysxSphereComputeNormal,
-    PhysxSphereGetBounds,
+CONST STATIC PBR_SHAPE_VTABLE SphereHeader = {
+    { { PhysxSphereTestRay,
+        PhysxSphereFree },
+      PhysxSphereComputeNormal,
+      PhysxSphereGetBounds },
     PhysxSphereGetMaterial,
     NULL
 };
 
-CONST STATIC SPECTRUM_SHAPE_VTABLE LightSphereHeader = {
-    PhysxLightSphereTestRay,
-    PhysxLightSphereFree,
-    PhysxLightSphereComputeNormal,
-    PhysxLightSphereGetBounds,
+CONST STATIC PBR_SHAPE_VTABLE LightSphereHeader = {
+    { { PhysxLightSphereTestRay,
+        PhysxLightSphereFree },
+      PhysxLightSphereComputeNormal,
+      PhysxLightSphereGetBounds },
     PhysxLightSphereGetMaterial,
     PhysxLightSphereGetLight
 };
@@ -351,10 +351,10 @@ PhysxSphereAllocate(
     _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
-    _Out_ PSPECTRUM_SHAPE *Shape
+    _Out_ PPBR_SHAPE *Shape
     )
 {
-    PCSPECTRUM_SHAPE_VTABLE ShapeVTable;
+    PCPBR_SHAPE_VTABLE ShapeVTable;
     PHYSX_LIGHT_SPHERE LightSphere;
     PHYSX_SPHERE Sphere;
     SIZE_T DataAlignment;
@@ -418,11 +418,11 @@ PhysxSphereAllocate(
         ShapeVTable = &SphereHeader;
     }
     
-    Status = SpectrumShapeAllocate(ShapeVTable,
-                                   Data,
-                                   DataSize,
-                                   DataAlignment,
-                                   Shape);
+    Status = PBRShapeAllocate(ShapeVTable,
+                              Data,
+                              DataSize,
+                              DataAlignment,
+                              Shape);
 
     if (Status != ISTATUS_SUCCESS)
     {

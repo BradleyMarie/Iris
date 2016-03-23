@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PSPECTRUM_SCENE_ADD_OBJECT_ROUTINE)(
     _Inout_ PVOID Context,
-    _In_ PSPECTRUM_SHAPE SpectrumShape,
+    _In_ PPBR_SHAPE SpectrumShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
@@ -64,7 +64,7 @@ IRISPHYSXAPI
 ISTATUS 
 SpectrumSceneAddObject(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
-    _In_ PSPECTRUM_SHAPE SpectrumShape,
+    _In_ PPBR_SHAPE SpectrumShape,
     _In_opt_ PMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
@@ -75,7 +75,7 @@ SFORCEINLINE
 ISTATUS 
 SpectrumSceneAddWorldObject(
     _Inout_ PSPECTRUM_SCENE SpectrumScene,
-    _In_ PSPECTRUM_SHAPE SpectrumShape
+    _In_ PPBR_SHAPE SpectrumShape
     )
 {
     ISTATUS Status;

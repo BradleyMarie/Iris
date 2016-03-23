@@ -22,12 +22,12 @@ Abstract:
 //
 
 typedef struct _SPECTRUM_SHAPE_HIT {
-    PCSPECTRUM_SHAPE Shape;
+    PCPBR_SHAPE Shape;
     FLOAT Distance;
     INT32 FaceHit;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;
     SIZE_T AdditionalDataSizeInBytes;
-} SPECTRUM_SHAPE_HIT, *PSPECTRUM_SHAPE_HIT;
+} SPECTRUM_SHAPE_HIT, *PPBR_SHAPE_VTABLE_HIT;
 
 typedef CONST SPECTRUM_SHAPE_HIT *PCSPECTRUM_SHAPE_HIT;
 

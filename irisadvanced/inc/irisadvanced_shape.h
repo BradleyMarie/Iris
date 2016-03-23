@@ -227,6 +227,32 @@ AdvancedShapeAsShape(
 }
 
 SFORCEINLINE
+PCADVANCED_SHAPE
+AdvancedShapeFromConstantShape(
+    _In_ PCSHAPE Shape
+    )
+{
+    PCADVANCED_SHAPE AdvancedShape;
+
+    AdvancedShape = (PCADVANCED_SHAPE) Shape;
+
+    return AdvancedShape;
+}
+
+SFORCEINLINE
+PADVANCED_SHAPE
+AdvancedShapeFromShape(
+    _In_ PSHAPE Shape
+    )
+{
+    PADVANCED_SHAPE AdvancedShape;
+
+    AdvancedShape = (PADVANCED_SHAPE) Shape;
+
+    return AdvancedShape;
+}
+
+SFORCEINLINE
 VOID
 AdvancedShapeRetain(
     _In_opt_ PADVANCED_SHAPE AdvancedShape
