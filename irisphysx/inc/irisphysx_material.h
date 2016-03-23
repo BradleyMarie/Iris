@@ -77,13 +77,13 @@ MaterialSample(
 
 IRISPHYSXAPI
 VOID
-MaterialReference(
+MaterialRetain(
     _In_opt_ PMATERIAL Material
     );
 
 IRISPHYSXAPI
 VOID
-MaterialDereference(
+MaterialRelease(
     _In_opt_ _Post_invalid_ PMATERIAL Material
     );
 

@@ -159,8 +159,8 @@ PhysxSphereFree(
 
     Sphere = (PCPHYSX_SPHERE) Context;
 
-    MaterialDereference(Sphere->Materials[SPHERE_FRONT_FACE]);
-    MaterialDereference(Sphere->Materials[SPHERE_BACK_FACE]);
+    MaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    MaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
 }
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -309,8 +309,8 @@ PhysxLightSphereFree(
 
     Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
 
-    MaterialDereference(Sphere->Materials[SPHERE_FRONT_FACE]);
-    MaterialDereference(Sphere->Materials[SPHERE_BACK_FACE]);
+    MaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    MaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
     LightDereference(Sphere->Lights[SPHERE_FRONT_FACE]);
     LightDereference(Sphere->Lights[SPHERE_BACK_FACE]);
 }
@@ -429,8 +429,8 @@ PhysxSphereAllocate(
         return Status;
     }
 
-    MaterialReference(FrontMaterial);
-    MaterialReference(BackMaterial);
+    MaterialRetain(FrontMaterial);
+    MaterialRetain(BackMaterial);
     LightReference(FrontLight);
     LightReference(BackLight);
 

@@ -155,7 +155,7 @@ MaterialSample(
 }
 
 VOID
-MaterialReference(
+MaterialRetain(
     _In_opt_ PMATERIAL Material
     )
 {
@@ -168,7 +168,7 @@ MaterialReference(
 }
 
 VOID
-MaterialDereference(
+MaterialRelease(
     _In_opt_ _Post_invalid_ PMATERIAL Material
     )
 {

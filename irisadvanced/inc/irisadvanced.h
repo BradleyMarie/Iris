@@ -23,5 +23,6 @@ Abstract:
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_color3.h"
 #include "irisadvanced_math.h"
+#include "irisadvanced_shape.h"
 
 #endif // _IRIS_ADVANCED_HEADER_
