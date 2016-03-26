@@ -136,6 +136,21 @@ HitAllocatorSetCurrentShape(
 }
 
 SFORCEINLINE
+PCSHAPE
+HitAllocatorGetCurrentShape(
+    _Inout_ PHIT_ALLOCATOR Allocator
+    )
+{
+    PCSHAPE Result;
+    
+    ASSERT(Allocator != NULL);
+
+    Result = Allocator->CurrentShape;
+    
+    return Result;
+}
+
+SFORCEINLINE
 COMPARISON_RESULT
 InternalHitCompare(
     _In_ PCINTERNAL_HIT Hit0,

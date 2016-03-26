@@ -55,7 +55,16 @@ ShapeAllocate(
     _Out_ PSHAPE *Shape
     );
 
-#ifndef _DISABLE_IRIS_SHAPE_EXPORTS_
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
+ShapeTestRay(
+    _In_ PCSHAPE Shape,
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    );
 
 _Ret_
 IRISAPI
@@ -70,8 +79,6 @@ PCVOID
 ShapeGetData(
     _In_ PCSHAPE Shape
     );
-
-#endif // _DISABLE_IRIS_SHAPE_EXPORTS_
 
 IRISAPI
 VOID

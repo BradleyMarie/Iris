@@ -12,7 +12,6 @@ Abstract:
 
 --*/
 
-#define _IRIS_EXPORT_SHAPE_ROUTINES_
 #include <irisp.h>
 
 //
@@ -93,20 +92,66 @@ ShapeAllocate(
     return ISTATUS_SUCCESS;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+ShapeTestRay(
+    _In_ PCSHAPE Shape,
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCSHAPE CurrentShape;
+    ISTATUS Status;
+    
+    if (Shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (HitAllocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (HitList == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    CurrentShape = HitAllocatorGetCurrentShape(HitAllocator);
+    HitAllocatorSetCurrentShape(HitAllocator, Shape);
+
+    Status = Shape->VTable->TestRayRoutine(Shape->Data, 
+                                           Ray,
+                                           HitAllocator,
+                                           HitList);
+                                           
+    HitAllocatorSetCurrentShape(HitAllocator, CurrentShape);
+    
+    return Status;
+}
+
 _Ret_
 PCSHAPE_VTABLE
 ShapeGetVTable(
     _In_ PCSHAPE Shape
     )
 {
-    PCSHAPE_VTABLE Result;
+    PCVOID Result;
     
     if (Shape == NULL)
     {
         return NULL;
     }
-
-    Result = StaticShapeGetVTable(Shape);
+    
+    Result = Shape->VTable;
 
     return Result;
 }
@@ -124,7 +169,7 @@ ShapeGetData(
         return NULL;
     }
 
-    Result = StaticShapeGetData(Shape);
+    Result = Shape->Data;
 
     return Result;
 }

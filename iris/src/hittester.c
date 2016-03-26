@@ -84,10 +84,10 @@ HitTesterTestShape(
     SharedHitData->Premultiplied = TRUE;
     SharedHitData->ModelRay = HitTester->CurrentRay;
 
-    Status = ShapeTestRay(Shape,
-                          HitTester->CurrentRay,
-                          HitAllocator,
-                          &HitList);
+    Status = ShapeTestRayInternal(Shape,
+                                  HitTester->CurrentRay,
+                                  HitAllocator,
+                                  &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -178,10 +178,10 @@ HitTesterTestShapeWithTransform(
         TraceRay = SharedHitData->ModelRay;
     }
 
-    Status = ShapeTestRay(Shape,
-                          TraceRay,
-                          HitAllocator,
-                          &HitList);
+    Status = ShapeTestRayInternal(Shape,
+                                  TraceRay,
+                                  HitAllocator,
+                                  &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -256,10 +256,10 @@ HitTesterTestPremultipliedShapeWithTransform(
     SharedHitData->ModelToWorld = ModelToWorld;
     SharedHitData->Premultiplied = TRUE;
 
-    Status = ShapeTestRay(Shape,
-                          HitTester->CurrentRay,
-                          HitAllocator,
-                          &HitList);
+    Status = ShapeTestRayInternal(Shape,
+                                  HitTester->CurrentRay,
+                                  HitAllocator,
+                                  &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
