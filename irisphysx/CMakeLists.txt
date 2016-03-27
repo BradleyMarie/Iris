@@ -3,13 +3,10 @@ include(GenerateExportHeader)
 include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../iriscommon inc src/inc)
 
 add_library(irisphysx SHARED
-    src/scene.c
     src/brdf.c
     src/light.c
     src/material.c
-    src/brdfallocator.c
-    src/raytracer.c
-    src/visibilitytester.c)
+    src/brdfallocator.c)
 
 target_link_libraries(irisphysx 
     iris

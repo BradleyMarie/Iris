@@ -168,8 +168,8 @@ ListSceneFree(
 //
 
 STATIC COLOR_SCENE_VTABLE ListSceneVTable = {
-    { ListSceneTrace,
-      ListSceneFree },
+    ListSceneTrace,
+    ListSceneFree,
     ListSceneAddObject
 };
 
@@ -186,7 +186,7 @@ ListSceneAllocate(
 {
     PSCENE_OBJECT *Objects;
     LIST_SCENE ListScene;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
 
     Objects = (PSCENE_OBJECT*) malloc(sizeof(PSCENE_OBJECT) * LIST_SCENE_INTIAL_SIZE);
 

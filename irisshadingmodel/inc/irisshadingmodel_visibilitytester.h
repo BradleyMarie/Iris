@@ -21,6 +21,9 @@ Abstract:
 // Types
 //
 
+typedef struct _COLOR_SCENE COLOR_SCENE, *PCOLOR_SCENE;
+typedef CONST COLOR_SCENE *PCCOLOR_SCENE;
+
 typedef struct _VISIBILITY_TESTER VISIBILITY_TESTER, *PVISIBILITY_TESTER;
 typedef CONST VISIBILITY_TESTER *PCVISIBILITY_TESTER;
 
@@ -33,7 +36,7 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISSHADINGMODELAPI
 ISTATUS
 VisibilityTesterAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ FLOAT Epsilon,
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     );

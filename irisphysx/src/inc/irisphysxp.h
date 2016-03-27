@@ -23,10 +23,5 @@ Abstract:
 
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
-#include "irisphysx_scene.h"
-#include "irisphysx_raytracer.h"
-#include "irisphysx_raytracerowner.h"
-#include "irisphysx_visibilitytester.h"
-#include "irisphysx_visibilitytesterowner.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_

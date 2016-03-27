@@ -24,6 +24,21 @@ namespace Iris {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
+RayTracer::TestShapesAdapter(
+    _In_opt_ PCVOID Context, 
+    _Inout_ PHIT_TESTER HitTesterPtr
+    )
+{
+    auto TestShapesRoutine = static_cast<const std::function<void(HitTester)> *>(Context);
+    
+    (*TestShapesRoutine)(HitTester(HitTesterPtr));
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
 RayTracer::ProcessHitsAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit
@@ -101,14 +116,15 @@ RayTracer::RayTracer(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ const Scene & Scene,
+    _In_ std::function<void(HitTester)> TestShapesRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
     _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHit(Data,
-                                                          Scene.AsPCSCENE(),
+                                                          TestShapesAdapter,
+                                                          &TestShapesRoutine,
                                                           WorldRay.AsRAY(),
                                                           MinimumDistance,
                                                           ProcessHitsAdapter,
@@ -135,14 +151,15 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ const Scene & Scene,
+    _In_ std::function<void(HitTester)> TestShapesRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
     _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(Data,
-                                                                         Scene.AsPCSCENE(),
+                                                                         TestShapesAdapter,
+                                                                         &TestShapesRoutine,
                                                                          WorldRay.AsRAY(),
                                                                          MinimumDistance,
                                                                          ProcessHitsWithCoordinatesAdapter,
@@ -169,13 +186,14 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceAllHitsOutOfOrder(
-    _In_ const Scene & Scene,
+    _In_ std::function<void(HitTester)> TestShapesRoutine,
     _In_ const Ray & WorldRay,
     _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(Data,
-                                                                 Scene.AsPCSCENE(),
+                                                                 TestShapesAdapter,
+                                                                 &TestShapesRoutine,
                                                                  WorldRay.AsRAY(),
                                                                  ProcessHitsAdapter,
                                                                  &ProcessHitRoutine);
@@ -198,13 +216,14 @@ RayTracer::TraceAllHitsOutOfOrder(
 
 void
 RayTracer::TraceAllHitsInOrder(
-    _In_ const Scene & Scene,
+    _In_ std::function<void(HitTester)> TestShapesRoutine,
     _In_ const Ray & WorldRay,
     _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,
-                                                                             Scene.AsPCSCENE(),
+                                                                             TestShapesAdapter,
+                                                                             &TestShapesRoutine,
                                                                              WorldRay.AsRAY(),
                                                                              ProcessHitsWithCoordinatesAdapter,
                                                                              &ProcessHitRoutine);

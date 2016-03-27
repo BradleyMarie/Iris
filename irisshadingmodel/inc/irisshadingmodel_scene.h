@@ -25,20 +25,18 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PSCENE_ADD_OBJECT_ROUTINE)(
+(*PCOLOR_SCENE_ADD_OBJECT_ROUTINE)(
     _Inout_ PVOID Context,
     _In_ PSCENE_OBJECT SceneObject
     );
 
 typedef struct _COLOR_SCENE_VTABLE {
-    SCENE_VTABLE SceneVTable;
-    PSCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
+    PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine;
+    PFREE_ROUTINE FreeRoutine;
+    PCOLOR_SCENE_ADD_OBJECT_ROUTINE AddObjectRoutine;
 } COLOR_SCENE_VTABLE, *PCOLOR_SCENE_VTABLE;
 
 typedef CONST COLOR_SCENE_VTABLE *PCCOLOR_SCENE_VTABLE;
-
-typedef struct _SCENE COLOR_SCENE, *PCOLOR_SCENE;
-typedef CONST COLOR_SCENE *PCCOLOR_SCENE;
 
 //
 // Functions
@@ -83,13 +81,7 @@ ColorSceneAddWorldObject(
 
 IRISSHADINGMODELAPI
 VOID
-ColorSceneReference(
-    _In_opt_ PCOLOR_SCENE Scene
-    );
-
-IRISSHADINGMODELAPI
-VOID
-ColorSceneDereference(
+ColorSceneFree(
     _In_opt_ _Post_invalid_ PCOLOR_SCENE Scene
     );
 

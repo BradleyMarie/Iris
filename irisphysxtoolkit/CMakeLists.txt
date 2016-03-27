@@ -3,13 +3,10 @@ include(GenerateExportHeader)
 include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisphysx/inc ../iriscommon/ inc src/inc)
 
 add_library(irisphysxtoolkit SHARED
-    src/lighting.c
-    src/pointlight.c
     src/mirrorbrdf.c
     src/lambertianbrdf.c
     src/lambertianmaterial.c
     src/triangle.c
-    src/listscene.c
     src/sphere.c)
 
 target_link_libraries(irisphysxtoolkit 

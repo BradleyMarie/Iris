@@ -18,14 +18,14 @@ Abstract:
 struct _VISIBILITY_TESTER {
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
 };
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 VisibilityTesterAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ FLOAT Epsilon,
     _Out_ PVISIBILITY_TESTER *VisibilityTester
     )
@@ -65,8 +65,6 @@ VisibilityTesterAllocate(
         free(Tester);
         return ISTATUS_ALLOCATION_FAILED;
     }
-
-    SceneRetain(Scene);
 
     Tester->Scene = Scene;
     Tester->RayTracer = RayTracer;
@@ -115,7 +113,8 @@ VisibilityTesterTestVisibility(
     WorldRay = RayNormalize(WorldRay);
 
     Status = RayTracerTestVisibility(Tester->RayTracer,
-                                     Tester->Scene,
+                                     Tester->Scene->VTable->TestShapesRoutine,
+                                     Tester->Scene->Data,
                                      WorldRay,
                                      DistanceToObject,
                                      Tester->Epsilon,
@@ -159,7 +158,8 @@ VisibilityTesterTestVisibilityAnyDistance(
     WorldRay = RayNormalize(WorldRay);
 
     Status = RayTracerTestVisibilityAnyDistance(Tester->RayTracer,
-                                                Tester->Scene,
+                                                Tester->Scene->VTable->TestShapesRoutine,
+                                                Tester->Scene->Data,
                                                 WorldRay,
                                                 Tester->Epsilon,
                                                 Visible);
@@ -178,6 +178,5 @@ VisibilityTesterFree(
     }
 
     RayTracerFree(Tester->RayTracer);
-    SceneRelease(Tester->Scene);
     free(Tester);
 }

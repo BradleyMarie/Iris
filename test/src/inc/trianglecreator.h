@@ -20,7 +20,7 @@ Abstract:
 
 bool
 CreateFlatQuad(
-    PSCENE Scene,
+    PCOLOR_SCENE Scene,
     PMATRIX ModelToWorld,
     BOOL Premultiplied,
     float X0,

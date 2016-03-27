@@ -24,7 +24,7 @@ Abstract:
 _Check_return_
 _Ret_maybenull_
 IRISTOOLKITAPI
-PSCENE
+PCOLOR_SCENE
 ListSceneAllocate(
     VOID
     );

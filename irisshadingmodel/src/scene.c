@@ -28,21 +28,60 @@ ColorSceneAllocate(
     _In_ SIZE_T DataAlignment
     )
 {
-    ISTATUS Status;
-    PSCENE Scene;
+    BOOL AllocationSuccessful;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
+    PCOLOR_SCENE AllocatedScene;
 
-    Status = SceneAllocate(&SceneVTable->SceneVTable,
-                           Data,
-                           DataSizeInBytes,
-                           DataAlignment,
-                           &Scene);
-
-    if (Status != ISTATUS_SUCCESS)
+    if (SceneVTable == NULL)
     {
         return NULL;
     }
 
-    return (PCOLOR_SCENE) Scene;
+    if (DataSizeInBytes != 0)
+    {
+        if (Data == NULL)
+        {
+            return NULL;
+        }
+
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return NULL;
+        }
+
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return NULL;
+        }
+    }
+
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(COLOR_SCENE),
+                                                      _Alignof(COLOR_SCENE),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
+
+    if (AllocationSuccessful == FALSE)
+    {
+        return NULL;
+    }
+
+    AllocatedScene = (PCOLOR_SCENE)HeaderAllocation;
+
+    AllocatedScene->VTable = SceneVTable;
+    AllocatedScene->ReferenceCount = 1;
+    AllocatedScene->Data = DataAllocation;
+
+    if (DataSizeInBytes != 0)
+    {
+        memcpy(DataAllocation, Data, DataSizeInBytes);
+    }
+
+    return AllocatedScene;
 }
 
 _Check_return_
@@ -55,10 +94,8 @@ ColorSceneAddObject(
     _In_ BOOL Premultiplied
     )
 {
-    PCCOLOR_SCENE_VTABLE SceneVTable;
     PSCENE_OBJECT SceneObject;
     ISTATUS Status;
-    PVOID Data;
 
     if (Scene == NULL ||
         DrawingShape == NULL)
@@ -75,29 +112,29 @@ ColorSceneAddObject(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    SceneVTable = (PCCOLOR_SCENE_VTABLE) SceneGetVTable(Scene);
-
-    Data = SceneGetData(Scene);
-
-    Status = SceneVTable->AddObjectRoutine(Data, SceneObject);
+    Status = Scene->VTable->AddObjectRoutine(Scene->Data, SceneObject);
 
     return Status;
 }
 
 VOID
-ColorSceneReference(
-    _In_opt_ PCOLOR_SCENE ColorScene
-    )
-{
-    PSCENE Scene = (PSCENE) ColorScene;
-    SceneRetain(Scene);
-}
-
-VOID
-ColorSceneDereference(
+ColorSceneFree(
     _In_opt_ _Post_invalid_ PCOLOR_SCENE ColorScene
     )
 {
-    PSCENE Scene = (PSCENE) ColorScene;
-    SceneRelease(Scene);
+    PFREE_ROUTINE FreeRoutine;
+
+    if (ColorScene == NULL)
+    {
+        return;
+    }
+
+    FreeRoutine = ColorScene->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(ColorScene->Data);
+    }
+
+    IrisAlignedFree(ColorScene);
 }

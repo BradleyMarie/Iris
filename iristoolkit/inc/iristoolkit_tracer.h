@@ -37,7 +37,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PTRACER
 PathTracerAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -51,7 +51,7 @@ _Ret_maybenull_
 SFORCEINLINE
 PTRACER
 NonRoulettePathTracerAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ UINT8 MaximumRecursionDepth
@@ -80,7 +80,7 @@ _Ret_maybenull_
 IRISTOOLKITAPI
 PTRACER
 RecursiveRayTracerAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -94,7 +94,7 @@ _Ret_maybenull_
 SFORCEINLINE
 PTRACER
 RecursiveNonRouletteRayTracerAllocate(
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ UINT8 MaximumRecursionDepth

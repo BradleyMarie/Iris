@@ -475,19 +475,29 @@ TEST(RayPlusPlusMatrixMultiply)
 // Test Ray Tracing
 // 
 
-class ListScene final : public SceneBase {
+class ListScene final {
 public:
     static
-    Scene
+    ListScene
     Create(
-        _In_ const ShapeCollection & Shapes
+        void
         )
     {
-        return SceneBase::Create(std::unique_ptr<ListScene>(new ListScene(Shapes)));
+        return ListScene();
     }
 
-protected:
-    virtual
+    void
+    Add(
+        _In_ Shape ShapeRef,
+        _In_ Matrix MatrixRef,
+        _In_ bool Premultiplied
+        )
+    {
+        Shapes.push_back(ShapeRef);
+        Matrices.push_back(MatrixRef);
+        IsPremultiplied.push_back(Premultiplied);
+    }
+
     void
     Trace(
         _In_ HitTester Tester
@@ -500,18 +510,6 @@ protected:
     }
 
 private:
-    ListScene(
-        _In_ const ShapeCollection & Collection
-        )
-    {
-        for (auto & S : Collection)
-        {
-            Shapes.push_back(std::get<0>(S));
-            Matrices.push_back(std::get<1>(S));
-            IsPremultiplied.push_back(std::get<2>(S));
-        }
-    }
-
     std::vector<Shape> Shapes;
     std::vector<Matrix> Matrices;
     std::vector<bool> IsPremultiplied;
@@ -590,20 +588,23 @@ const SHAPE_VTABLE Triangle::ZTriangleHeader = {
 
 TEST(RayTracePlusPlusTestIdentityTriangle)
 {
-    ShapeCollection Shapes = ShapeCollection::Create();
+    ListScene Scene = ListScene::Create();
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
                                          Point(-1.0f, -1.0f, -1.0f));
 
-    Shapes.Add(TrianglePtr, Matrix::Identity(), false);
-
-    Scene ScenePtr = ListScene::Create(Shapes);
+    Scene.Add(TrianglePtr, Matrix::Identity(), false);
     RayTracer Tracer = RayTracer::Create();
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
+
+    std::function<void(HitTester)> TraceFunction = [&](HitTester Tester) -> void
+    {
+        Scene.Trace(Tester);
+    };
 
     EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
@@ -615,7 +616,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
         return true;
     };
 
-    Tracer.TraceClosestHit(ScenePtr,
+    Tracer.TraceClosestHit(TraceFunction,
                            Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
                            0.0f,
                            EvaluateFirstHit);
@@ -625,20 +626,24 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
 
 TEST(RayTracePlusPlusTestTranslatedTriangle)
 {
-    ShapeCollection Shapes = ShapeCollection::Create();
+    ListScene Scene = ListScene::Create();
 
     Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
                                          Point(1.0f, 1.0f, -1.0f),
                                          Point(-1.0f, -1.0f, -1.0f));
 
-    Shapes.Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
+    Scene.Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
 
-    Scene ScenePtr = ListScene::Create(Shapes);
     RayTracer Tracer = RayTracer::Create();
 
     std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
+
+    std::function<void(HitTester)> TraceFunction = [&](HitTester Tester) -> void
+    {
+        Scene.Trace(Tester);
+    };
 
     EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
@@ -650,7 +655,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
         return true;
     };
 
-    Tracer.TraceClosestHit(ScenePtr,
+    Tracer.TraceClosestHit(TraceFunction,
                            Ray(Point(-0.5f, 0.5f, 0.0f), Vector(0.0f, 0.0f, -1.0f)),
                            0.0f,
                            EvaluateFirstHit);

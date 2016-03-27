@@ -66,7 +66,8 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHit(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
@@ -84,32 +85,32 @@ RayTracerTraceSceneProcessClosestHit(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    if (Scene == NULL)
+    
+    if (TestShapesRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (RayValidate(Ray) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
     
     if (IsLessThanZeroFloat(MinimumDistance) != FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
     
     if (ProcessHitRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
     
     HitTester = &RayTracer->HitTester;
 
     HitTesterSetRay(HitTester, Ray);
 
-    Status = SceneTrace(Scene, HitTester);
+    Status = TestShapesRoutine(TestShapesContext, HitTester);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -163,7 +164,8 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHitWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
@@ -185,32 +187,32 @@ RayTracerTraceSceneProcessClosestHitWithCoordinates(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    if (Scene == NULL)
+    
+    if (TestShapesRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (RayValidate(Ray) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
     
     if (IsLessThanZeroFloat(MinimumDistance) != FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
     
     if (ProcessHitRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     HitTester = &RayTracer->HitTester;
     
     HitTesterSetRay(HitTester, Ray);
 
-    Status = SceneTrace(Scene, HitTester);
+    Status = TestShapesRoutine(TestShapesContext, HitTester);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -274,7 +276,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerTraceSceneProcessAllHitsOutOfOrder(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
@@ -288,27 +291,27 @@ RayTracerTraceSceneProcessAllHitsOutOfOrder(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    if (Scene == NULL)
+    
+    if (TestShapesRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (RayValidate(Ray) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
     
     if (ProcessHitRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     HitTester = &RayTracer->HitTester;
     
     HitTesterSetRay(HitTester, Ray);
 
-    Status = SceneTrace(Scene, HitTester);
+    Status = TestShapesRoutine(TestShapesContext, HitTester);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -345,7 +348,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
@@ -363,27 +367,27 @@ RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-
-    if (Scene == NULL)
+    
+    if (TestShapesRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (RayValidate(Ray) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
     
     if (ProcessHitRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
-
+    
     HitTester = &RayTracer->HitTester;
     
     HitTesterSetRay(HitTester, Ray);
 
-    Status = SceneTrace(Scene, HitTester);
+    Status = TestShapesRoutine(TestShapesContext, HitTester);
     
     if (Status != ISTATUS_SUCCESS)
     {

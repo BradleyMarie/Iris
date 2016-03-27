@@ -27,7 +27,7 @@ TEST(RenderConstantRedWorldSphere)
     COLOR3 SphereColor;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -99,7 +99,7 @@ TEST(RenderConstantRedModelSphere)
     COLOR3 SphereColor;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -171,7 +171,7 @@ TEST(RenderConstantRedPremultipliedSphere)
     COLOR3 SphereColor;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -245,7 +245,7 @@ TEST(RenderConstantRedWorldTriangle)
     COLOR3 TriangleColor;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -327,7 +327,7 @@ TEST(RenderInterpolatedRedWorldTriangle)
     COLOR3 Green;
     COLOR3 Blue;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -424,7 +424,7 @@ TEST(RenderPhongWorldSphere)
     POINT3 SphereCenter;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     COLOR3 Black;
     PRANDOM Rng;
     VECTOR3 Up;
@@ -527,7 +527,7 @@ TEST(RenderPerfectSpecularWorldSphere)
     COLOR3 Reflectance;
     PTEXTURE Texture;
     ISTATUS Status;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRANDOM Rng;
     VECTOR3 Up;
 
@@ -640,7 +640,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
     PDRAWING_SHAPE InfinitePlane;
     PTEXTURE SphereTexture;
     PTEXTURE InfinitePlaneTexture;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PFRAMEBUFFER Framebuffer;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
@@ -865,7 +865,7 @@ TEST(RenderCornellBox)
     PEMISSIVE_SHADER EmissiveShader;
     PINDIRECT_SHADER IndirectShader;
     PTEXTURE Texture;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     VECTOR3 CameraDirection;
     POINT3 PinholeLocation;
     VECTOR3 Up;

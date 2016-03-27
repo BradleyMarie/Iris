@@ -46,7 +46,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ const Scene & Scene,
+        _In_ std::function<void(HitTester)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
@@ -55,7 +55,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ const Scene & Scene,
+        _In_ std::function<void(HitTester)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
@@ -64,7 +64,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceAllHitsOutOfOrder(
-        _In_ const Scene & Scene,
+        _In_ std::function<void(HitTester)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
@@ -72,7 +72,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(
-        _In_ const Scene & Scene,
+        _In_ std::function<void(HitTester)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
@@ -99,6 +99,15 @@ private:
     IRISPLUSPLUSAPI
     RayTracer(
         void
+        );
+
+    _Check_return_
+    _Success_(return == ISTATUS_SUCCESS)
+    static
+    ISTATUS 
+    TestShapesAdapter(
+        _In_opt_ PCVOID Context, 
+        _Inout_ PHIT_TESTER HitTester
         );
 
     _Check_return_

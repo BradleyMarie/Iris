@@ -23,7 +23,7 @@ struct _RAYSHADER {
     FLOAT MinimumContinueProbability;
     FLOAT MaximumContinueProbability;
     PRANDOM_REFERENCE Rng;
-    PSCENE Scene;
+    PCOLOR_SCENE Scene;
     PRAYTRACER RayTracer;
     FLOAT Epsilon;
     UINT8 CurrentDepth;
@@ -49,7 +49,7 @@ PRAYSHADER
 RayShaderAllocateInternal(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_opt_ PCOLOR3 PathThroughputPointer,
@@ -134,8 +134,6 @@ RayShaderAllocateInternal(
         MinimumContinueProbability = (FLOAT) 1.0;
         MaximumContinueProbability = (FLOAT) 1.0;
     }
-
-    SceneRetain(Scene);
 
     RayShader->PathThroughputPointer = PathThroughputPointer;
     RayShader->MinimumContinueProbability = MinimumContinueProbability;
@@ -338,7 +336,7 @@ PRAYSHADER
 RayShaderAllocate(
     _In_opt_ PCVOID Context,
     _In_ PSHADE_RAY_ROUTINE ShadeRayRoutine,
-    _In_ PSCENE Scene,
+    _In_ PCOLOR_SCENE Scene,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon,
     _In_ FLOAT MinimumContinueProbability,
@@ -443,7 +441,8 @@ RayShaderTraceRayMontecarlo(
     ProcessHitContext.RayShader = RayShader;
 
     Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(RayShader->RayTracer,
-                                                                     RayShader->Scene,
+                                                                     RayShader->Scene->VTable->TestShapesRoutine,
+                                                                     RayShader->Scene->Data,
                                                                      WorldRay,
                                                                      RayShaderProcessHit,
                                                                      &ProcessHitContext);
@@ -488,6 +487,5 @@ RayShaderFree(
     }
 
     RayTracerFree(RayShader->RayTracer);
-    SceneRelease(RayShader->Scene);
     free(RayShader);
 }

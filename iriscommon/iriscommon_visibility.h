@@ -87,7 +87,8 @@ SFORCEINLINE
 ISTATUS
 RayTracerTestVisibility(
     _In_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
     _In_ FLOAT Epsilon,
@@ -97,21 +98,26 @@ RayTracerTestVisibility(
     RAYTRACER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
 
+    if (TestShapesRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
     if (IsFiniteFloat(DistanceToObject) == FALSE ||
         IsGreaterThanOrEqualToZeroFloat(DistanceToObject) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (IsFiniteFloat(Epsilon) == FALSE ||
         IsGreaterThanOrEqualToZeroFloat(Epsilon) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (Visible == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     if (Epsilon < DistanceToObject &&
@@ -125,7 +131,8 @@ RayTracerTestVisibility(
                                                              TRUE);
 
     Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(RayTracer,
-                                                         Scene,
+                                                         TestShapesRoutine,
+                                                         TestShapesContext,
                                                          WorldRay,
                                                          RayTracerTestVisibilityProcessHit,
                                                          &Context);
@@ -190,7 +197,8 @@ SFORCEINLINE
 ISTATUS
 RayTracerTestVisibilityAnyDistance(
     _In_ PRAYTRACER RayTracer,
-    _In_ PCSCENE Scene,
+    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY WorldRay,
     _In_ FLOAT MinimumDistance,
     _Out_ PBOOL Visible
@@ -199,21 +207,27 @@ RayTracerTestVisibilityAnyDistance(
     RAYTRACER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
 
+    if (TestShapesRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
     if (IsFiniteFloat(MinimumDistance) == FALSE ||
         IsGreaterThanOrEqualToZeroFloat(MinimumDistance) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (Visible == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     Context = RayTracerTestVisibilityAnyDistanceProcessHitCreateContext(MinimumDistance, TRUE);
 
     Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(RayTracer,
-                                                         Scene,
+                                                         TestShapesRoutine,
+                                                         TestShapesContext,
                                                          WorldRay,
                                                          RayTracerTestVisibilityAnyDistanceProcessHit,
                                                          &Context);

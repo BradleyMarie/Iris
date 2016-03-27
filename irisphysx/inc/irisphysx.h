@@ -24,8 +24,5 @@ Abstract:
 #include "irisphysx_light.h"
 #include "irisphysx_material.h"
 #include "irisphysx_shape.h"
-#include "irisphysx_visibilitytester.h"
-#include "irisphysx_scene.h"
-#include "irisphysx_raytracer.h"
 
 #endif // _IRIS_PHYSX_HEADER_
