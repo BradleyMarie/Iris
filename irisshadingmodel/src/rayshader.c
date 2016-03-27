@@ -257,7 +257,7 @@ RayShaderProcessHit(
         return ISTATUS_SUCCESS;
     }
 
-    DrawingShape = (PCDRAWING_SHAPE) Hit->Shape;
+    DrawingShape = (PCDRAWING_SHAPE) Hit->Data;
 
     Texture = DrawingShapeGetTexture(DrawingShape,
                                      Hit->FaceHit);

@@ -46,35 +46,35 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsOutOfOrder(
-        _In_ std::function<void(HitTester)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(
-        _In_ std::function<void(HitTester)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
         
     RayTracer(
@@ -105,9 +105,10 @@ private:
     _Success_(return == ISTATUS_SUCCESS)
     static
     ISTATUS 
-    TestShapesAdapter(
-        _In_opt_ PCVOID Context, 
-        _Inout_ PHIT_TESTER HitTester
+    TestGeometryAdapter(
+        _In_opt_ PCVOID Context,
+        _Inout_ PHIT_TESTER HitTesterPtr,
+        _In_ RAY WorldRay
         );
 
     _Check_return_

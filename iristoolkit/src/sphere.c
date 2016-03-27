@@ -89,6 +89,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 SphereTestRay(
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -189,6 +190,7 @@ SphereTestRay(
 
     Status = HitAllocatorAllocate(HitAllocator,
                                   NULL,
+                                  DrawingShape,
                                   Distance0,
                                   Face0,
                                   NULL,
@@ -243,7 +245,8 @@ SphereFree(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE SphereHeader = {
-    { SphereTestRay, SphereFree },
+    SphereTestRay, 
+    SphereFree,
     SphereGetTexture,
     SphereGetNormal
 };

@@ -23,8 +23,9 @@ namespace Iris {
 
 _Ret_
 PHIT_LIST
-ShapeBase::HitAllocator::Allocate(
+HitAllocator::Allocate(
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID DataPtr,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,    
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -37,6 +38,7 @@ ShapeBase::HitAllocator::Allocate(
 
     Status = HitAllocatorAllocate(Data,
                                   NextHit,
+                                  DataPtr,
                                   Distance,
                                   FaceHit,
                                   AdditionalData,
@@ -52,6 +54,9 @@ ShapeBase::HitAllocator::Allocate(
             throw std::bad_alloc();
             break;
         case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("DataPtr");
+            break;
+        case ISTATUS_INVALID_ARGUMENT_03:
             throw std::invalid_argument("Distance");
             break;
         default:
@@ -63,8 +68,9 @@ ShapeBase::HitAllocator::Allocate(
 
 _Ret_
 PHIT_LIST
-ShapeBase::HitAllocator::Allocate(
+HitAllocator::Allocate(
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID DataPtr,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_ const POINT3 & HitPoint,
@@ -78,6 +84,7 @@ ShapeBase::HitAllocator::Allocate(
 
     Status = HitAllocatorAllocateWithHitPoint(Data,
                                               NextHit,
+                                              DataPtr,
                                               Distance,
                                               FaceHit,
                                               AdditionalData,
@@ -94,6 +101,9 @@ ShapeBase::HitAllocator::Allocate(
             throw std::bad_alloc();
             break;
         case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("DataPtr");
+            break;
+        case ISTATUS_INVALID_ARGUMENT_03:
             throw std::invalid_argument("Distance");
             break;
         default:

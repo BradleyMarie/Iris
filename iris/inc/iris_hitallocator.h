@@ -21,14 +21,11 @@ Abstract:
 // Types
 //
 
-typedef struct _SHAPE SHAPE, *PSHAPE;
-typedef CONST SHAPE *PCSHAPE;
-
 typedef struct _HIT_ALLOCATOR HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 typedef CONST HIT_ALLOCATOR *PCHIT_ALLOCATOR;
 
 typedef struct _HIT {
-    PCSHAPE Shape;
+    PCVOID Data;
     FLOAT Distance;
     INT32 FaceHit;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;
@@ -55,6 +52,7 @@ ISTATUS
 HitAllocatorAllocate(
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -70,6 +68,7 @@ ISTATUS
 HitAllocatorAllocateWithHitPoint(
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,

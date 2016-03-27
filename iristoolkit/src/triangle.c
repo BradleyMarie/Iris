@@ -88,7 +88,8 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 TriangleXTestRay(
-    _In_opt_ PCVOID Context, 
+    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_opt_ PCVOID Context,
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
@@ -105,6 +106,7 @@ TriangleXTestRay(
 
     Status = TriangleXDominantTestRay(&Triangle->Data,
                                       Ray,
+                                      DrawingShape,
                                       HitAllocator,
                                       HitList);
 
@@ -116,7 +118,8 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 TriangleYTestRay(
-    _In_opt_ PCVOID Context, 
+    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_opt_ PCVOID Context,
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
@@ -133,6 +136,7 @@ TriangleYTestRay(
 
     Status = TriangleYDominantTestRay(&Triangle->Data,
                                       Ray,
+                                      DrawingShape,
                                       HitAllocator,
                                       HitList);
 
@@ -144,7 +148,8 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 TriangleZTestRay(
-    _In_opt_ PCVOID Context, 
+    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_opt_ PCVOID Context,
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
@@ -161,6 +166,7 @@ TriangleZTestRay(
 
     Status = TriangleZDominantTestRay(&Triangle->Data,
                                       Ray,
+                                      DrawingShape,
                                       HitAllocator,
                                       HitList);
 
@@ -190,19 +196,22 @@ TriangleFree(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE XTriangleHeader = {
-    { TriangleZDominantTestRay, TriangleFree },
+    TriangleXTestRay,
+    TriangleFree,
     TriangleGetTexture,
     TriangleGetNormal
 };
 
 CONST STATIC DRAWING_SHAPE_VTABLE YTriangleHeader = {
-    { TriangleYTestRay, TriangleFree },
+    TriangleYTestRay, 
+    TriangleFree,
     TriangleGetTexture,
     TriangleGetNormal
 };
 
 CONST STATIC DRAWING_SHAPE_VTABLE ZTriangleHeader = {
-    { TriangleZTestRay, TriangleFree },
+    TriangleZTestRay, 
+    TriangleFree,
     TriangleGetTexture,
     TriangleGetNormal
 };

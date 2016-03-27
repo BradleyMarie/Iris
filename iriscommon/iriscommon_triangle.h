@@ -49,6 +49,7 @@ ISTATUS
 TriangleXDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
+    _In_ PCVOID Data,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
@@ -127,6 +128,7 @@ TriangleXDominantTestRay(
 
     Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
                                               NULL,
+                                              Data,
                                               Distance,
                                               Face,
                                               &BarycentricCoordinates,
@@ -145,6 +147,7 @@ ISTATUS
 TriangleYDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
+    _In_ PCVOID Data,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
@@ -222,6 +225,7 @@ TriangleYDominantTestRay(
 
     Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
                                               NULL,
+                                              Data,
                                               Distance,
                                               Face,
                                               &BarycentricCoordinates,
@@ -240,6 +244,7 @@ ISTATUS
 TriangleZDominantTestRay(
     _In_ PCTRIANGLE Triangle, 
     _In_ RAY Ray,
+    _In_ PCVOID Data,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
@@ -318,6 +323,7 @@ TriangleZDominantTestRay(
 
     Status = HitAllocatorAllocateWithHitPoint(HitAllocator,
                                               NULL,
+                                              Data,
                                               Distance,
                                               Face,
                                               &BarycentricCoordinates,

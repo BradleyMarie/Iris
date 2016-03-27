@@ -25,6 +25,17 @@ Abstract:
 typedef struct _HIT_TESTER HIT_TESTER, *PHIT_TESTER;
 typedef CONST HIT_TESTER *PCHIT_TESTER;
 
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+(*PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    );
+
 //
 // Functions
 //
@@ -33,18 +44,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-HitTesterTestShape(
+HitTesterTestGeometry(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-HitTesterTestShapeWithTransform(
+HitTesterTestGeometryWithTransform(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
@@ -53,19 +66,11 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
-HitTesterTestPremultipliedShapeWithTransform(
+HitTesterTestPremultipliedGeometryWithTransform(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data,
     _In_opt_ PCMATRIX ModelToWorld
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISAPI
-ISTATUS
-HitTesterGetRay(
-    _In_ PHIT_TESTER HitTester,
-    _Out_ PRAY Ray
     );
 
 #endif // _HIT_TESTER_IRIS_

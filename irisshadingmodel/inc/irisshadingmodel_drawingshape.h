@@ -23,6 +23,18 @@ Abstract:
 
 typedef
 _Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PDRAWING_SHAPE_TEST_GEOMETRY_ROUTINE)(
+    _In_ PCDRAWING_SHAPE DrawingShape,
+    _In_opt_ PCVOID Context,
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    );
+
+typedef
+_Check_return_
 _Ret_opt_
 PCTEXTURE
 (*PDRAWING_SHAPE_GET_TEXTURE_ROUTINE)(
@@ -40,7 +52,8 @@ PCNORMAL
     );
 
 typedef struct _DRAWING_SHAPE_VTABLE {
-    SHAPE_VTABLE ShapeVTable;
+    PDRAWING_SHAPE_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PFREE_ROUTINE FreeRoutine;
     PDRAWING_SHAPE_GET_TEXTURE_ROUTINE GetTextureRoutine;
     PDRAWING_SHAPE_GET_NORMAL_ROUTINE GetNormalRoutine;
 } DRAWING_SHAPE_VTABLE, *PDRAWING_SHAPE_VTABLE;
@@ -60,6 +73,17 @@ DrawingShapeAllocate(
     _In_reads_bytes_opt_(DataSizeInBytes) PCVOID Data,
     _In_ _When_(Data == NULL, _Reserved_) SIZE_T DataSizeInBytes,
     _In_ SIZE_T DataAlignment
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISSHADINGMODELAPI
+ISTATUS
+DrawingShapeTrace(
+    _In_opt_ PCDRAWING_SHAPE Context, 
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
     );
 
 _Ret_opt_

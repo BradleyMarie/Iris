@@ -19,16 +19,12 @@ SceneObjectFree(
     _In_opt_ _Post_invalid_ PSCENE_OBJECT SceneObject
     )
 {
-    PSHAPE Shape;
-
     if (SceneObject == NULL)
     {
         return;
     }
 
-    Shape = (PSHAPE) SceneObject->Shape;
-
     MatrixRelease(SceneObject->ModelToWorld);
-    ShapeRelease(Shape);
+    DrawingShapeDereference(SceneObject->Shape);
     free(SceneObject);
 }

@@ -21,6 +21,7 @@ ISTATUS
 HitAllocatorAllocateInternal(
     _Inout_ PHIT_ALLOCATOR Allocator,
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -45,9 +46,14 @@ HitAllocatorAllocateInternal(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (IsFiniteFloat(Distance) == FALSE)
+    if (Data == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (IsFiniteFloat(Distance) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (AdditionalDataSizeInBytes != 0)
@@ -105,7 +111,7 @@ HitAllocatorAllocateInternal(
     InternalHit = &HitAllocatorAllocation->InternalHit;
     Hit = &InternalHit->Hit;
 
-    Hit->Shape = Allocator->CurrentShape;
+    Hit->Data = Data;
     Hit->Distance = Distance;
     Hit->FaceHit = FaceHit;
     Hit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
@@ -134,7 +140,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 HitAllocatorAllocate(
     _Inout_ PHIT_ALLOCATOR HitAllocator,
-    _In_opt_ PHIT_LIST NextHit,
+    _In_ PHIT_LIST NextHit,
+    _In_opt_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -147,11 +154,12 @@ HitAllocatorAllocate(
 
     if (HitList == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_08;
     }
 
     Status = HitAllocatorAllocateInternal(HitAllocator,
                                           NextHit,
+                                          Data,
                                           Distance,
                                           FaceHit,
                                           AdditionalData,
@@ -169,6 +177,7 @@ ISTATUS
 HitAllocatorAllocateWithHitPoint(
     _Inout_ PHIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
+    _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
@@ -182,16 +191,17 @@ HitAllocatorAllocateWithHitPoint(
 
     if (PointValidate(HitPoint) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_08;
     }
 
     if (HitList == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_07;
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     Status = HitAllocatorAllocateInternal(HitAllocator,
                                           NextHit,
+                                          Data,
                                           Distance,
                                           FaceHit,
                                           AdditionalData,

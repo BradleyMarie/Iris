@@ -87,7 +87,7 @@ SFORCEINLINE
 ISTATUS
 RayTracerTestVisibility(
     _In_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestShapesRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
@@ -197,7 +197,7 @@ SFORCEINLINE
 ISTATUS
 RayTracerTestVisibilityAnyDistance(
     _In_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestShapesRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY WorldRay,
     _In_ FLOAT MinimumDistance,

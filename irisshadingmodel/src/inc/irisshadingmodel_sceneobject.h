@@ -32,7 +32,6 @@ SceneObjectAllocate(
     )
 {
     PSCENE_OBJECT SceneObject;
-    PSHAPE Shape;
 
     ASSERT(DrawingShape != NULL);
 
@@ -43,14 +42,12 @@ SceneObjectAllocate(
         return NULL;
     }
 
-    Shape = (PSHAPE) DrawingShape;
-
     SceneObject->Shape = DrawingShape;
     SceneObject->ModelToWorld = ModelToWorld;
     SceneObject->Premultiplied = Premultiplied;
 
     MatrixRetain(ModelToWorld);
-    ShapeRetain(Shape);
+    DrawingShapeReference(DrawingShape);
 
     return SceneObject;
 }

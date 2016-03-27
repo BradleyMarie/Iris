@@ -46,9 +46,10 @@ HitTesterInternalHitPointerCompare(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-HitTesterTestShape(
+HitTesterTestGeometry(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data
     )
 {
     PSHARED_HIT_DATA_ALLOCATOR SharedHitDataAllocator;
@@ -64,7 +65,7 @@ HitTesterTestShape(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Shape == NULL)
+    if (TestGeometryRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -84,10 +85,10 @@ HitTesterTestShape(
     SharedHitData->Premultiplied = TRUE;
     SharedHitData->ModelRay = HitTester->CurrentRay;
 
-    Status = ShapeTestRayInternal(Shape,
-                                  HitTester->CurrentRay,
-                                  HitAllocator,
-                                  &HitList);
+    Status = TestGeometryRoutine(Data,
+                                 HitTester->CurrentRay,
+                                 HitAllocator,
+                                 &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -124,9 +125,10 @@ HitTesterTestShape(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-HitTesterTestShapeWithTransform(
+HitTesterTestGeometryWithTransform(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
@@ -145,7 +147,7 @@ HitTesterTestShapeWithTransform(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Shape == NULL)
+    if (TestGeometryRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -178,10 +180,10 @@ HitTesterTestShapeWithTransform(
         TraceRay = SharedHitData->ModelRay;
     }
 
-    Status = ShapeTestRayInternal(Shape,
-                                  TraceRay,
-                                  HitAllocator,
-                                  &HitList);
+    Status = TestGeometryRoutine(Data,
+                                 TraceRay,
+                                 HitAllocator,
+                                 &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -218,9 +220,10 @@ HitTesterTestShapeWithTransform(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-HitTesterTestPremultipliedShapeWithTransform(
+HitTesterTestPremultipliedGeometryWithTransform(
     _Inout_ PHIT_TESTER HitTester,
-    _In_ PCSHAPE Shape,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID Data,
     _In_opt_ PCMATRIX ModelToWorld
     )
 {
@@ -237,7 +240,7 @@ HitTesterTestPremultipliedShapeWithTransform(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Shape == NULL)
+    if (TestGeometryRoutine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -256,10 +259,10 @@ HitTesterTestPremultipliedShapeWithTransform(
     SharedHitData->ModelToWorld = ModelToWorld;
     SharedHitData->Premultiplied = TRUE;
 
-    Status = ShapeTestRayInternal(Shape,
-                                  HitTester->CurrentRay,
-                                  HitAllocator,
-                                  &HitList);
+    Status = TestGeometryRoutine(Data,
+                                 HitTester->CurrentRay,
+                                 HitAllocator,
+                                 &HitList);
 
     if (Status != ISTATUS_SUCCESS)
     {

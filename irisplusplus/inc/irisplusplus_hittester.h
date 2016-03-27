@@ -41,43 +41,38 @@ public:
         return Data;
     }
 
-    _Ret_
-    IRISPLUSPLUSAPI
-    Ray
-    GetRay(
-        void
-        ) const
-    {
-        RAY CurrentRay;
-        
-        HitTesterGetRay(Data, &CurrentRay);
-        
-        return Ray(CurrentRay);
-    }
-
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const Shape & ShapeRef
+        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine
         );
 
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const Shape & ShapeRef,
+        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
         _In_ const Matrix & MatrixRef
         );
 
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const Shape & ShapeRef,
+        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
         _In_ const Matrix & MatrixRef,
         _In_ bool Premultiplied
         );
 
 private:
     PHIT_TESTER Data;
+
+    static
+    ISTATUS
+    TestGeometryAdapter(
+        _In_opt_ PCVOID Context,
+        _In_ RAY Ray,
+        _Inout_ PHIT_ALLOCATOR HitAllocator,
+        _Outptr_result_maybenull_ PHIT_LIST *HitList
+        );
 };
 
 } // namespace Iris

@@ -6,11 +6,10 @@ include_directories(../iris/inc
 
 add_library(irisplusplus SHARED
     src/utility.cpp
-    src/shape.cpp
-    src/shapebase.cpp
     src/matrix.cpp
     src/matrixreference.cpp
     src/hittester.cpp
+    src/hitallocator.cpp
     src/raytracer.cpp)
 
 target_link_libraries(irisplusplus 

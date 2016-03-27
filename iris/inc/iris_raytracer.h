@@ -25,9 +25,10 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PRAYTRACER_TEST_SHAPES_ROUTINE)(
+(*PRAYTRACER_TEST_GEOMETRY_ROUTINE)(
     _In_opt_ PCVOID Context, 
-    _Inout_ PHIT_TESTER HitTester
+    _Inout_ PHIT_TESTER HitTester,
+    _In_ RAY Ray
     );
 
 typedef
@@ -73,7 +74,7 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHit(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
@@ -87,7 +88,7 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHitWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
@@ -101,7 +102,7 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessAllHitsOutOfOrder(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
@@ -114,7 +115,7 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_SHAPES_ROUTINE TestShapesRoutine,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,

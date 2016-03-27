@@ -488,12 +488,12 @@ public:
 
     void
     Add(
-        _In_ Shape ShapeRef,
+        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> ShapeFunc,
         _In_ Matrix MatrixRef,
         _In_ bool Premultiplied
         )
     {
-        Shapes.push_back(ShapeRef);
+        Shapes.push_back(ShapeFunc);
         Matrices.push_back(MatrixRef);
         IsPremultiplied.push_back(Premultiplied);
     }
@@ -510,28 +510,21 @@ public:
     }
 
 private:
-    std::vector<Shape> Shapes;
+    std::vector<std::function<PHIT_LIST(Ray, HitAllocator)>> Shapes;
     std::vector<Matrix> Matrices;
     std::vector<bool> IsPremultiplied;
 };
 
 class Triangle final {
-private:
-    const static SHAPE_VTABLE XTriangleHeader;
-    const static SHAPE_VTABLE YTriangleHeader;
-    const static SHAPE_VTABLE ZTriangleHeader;
-    
 public:
     static
-    Shape
+    std::function<PHIT_LIST(Ray, HitAllocator)>
     Create(
         _In_ Point Vertex0,
         _In_ Point Vertex1,
         _In_ Point Vertex2
         )
     {
-        PSHAPE ShapePointer;
-        PCSHAPE_VTABLE VTable;
         VECTOR_AXIS Axis;
         TRIANGLE Data;
         
@@ -546,67 +539,91 @@ public:
             throw std::runtime_error(ISTATUSToCString(Status));
         }
         
+        std::function<PHIT_LIST(Ray, HitAllocator)> Result;
+
         switch (Axis)
         {
             case VECTOR_X_AXIS:
-                VTable = &XTriangleHeader;
+                Result = [=](Ray WorldRay, HitAllocator Allocator) -> PHIT_LIST {
+                    PHIT_LIST Result;
+
+                    ISTATUS Status = TriangleXDominantTestRay(&Data,
+                                                              WorldRay.AsRAY(),
+                                                              &Data,
+                                                              Allocator.AsPHIT_ALLOCATOR(),
+                                                              &Result);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        throw std::runtime_error("error");
+                    }
+
+                    return Result;
+                };
                 break;       
             case VECTOR_Y_AXIS:
-                VTable = &YTriangleHeader;
+                Result = [=](Ray WorldRay, HitAllocator Allocator) -> PHIT_LIST {
+                    PHIT_LIST Result;
+
+                    ISTATUS Status = TriangleYDominantTestRay(&Data,
+                                                              WorldRay.AsRAY(),
+                                                              &Data,
+                                                              Allocator.AsPHIT_ALLOCATOR(),
+                                                              &Result);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        throw std::runtime_error("error");
+                    }
+
+                    return Result;
+                };
                 break;                
             default: // VECTOR_Z_AXIS
-                VTable = &ZTriangleHeader;
+                Result = [=](Ray WorldRay, HitAllocator Allocator) -> PHIT_LIST {
+                    PHIT_LIST Result;
+
+                    ISTATUS Status = TriangleZDominantTestRay(&Data,
+                                                              WorldRay.AsRAY(),
+                                                              &Data,
+                                                              Allocator.AsPHIT_ALLOCATOR(),
+                                                              &Result);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        throw std::runtime_error("error");
+                    }
+
+                    return Result;
+                };
                 break;
         }
         
-        Status = ShapeAllocate(VTable,
-                               &Data,
-                               sizeof(TRIANGLE),
-                               alignof(TRIANGLE),
-                               &ShapePointer);
-                               
-        if (Status != ISTATUS_SUCCESS)
-        {
-            throw std::runtime_error(ISTATUSToCString(Status));
-        }
-        
-        return Shape(ShapePointer, false);
+        return Result;
     }
-};
-
-const SHAPE_VTABLE Triangle::XTriangleHeader = {
-    (PSHAPE_TEST_RAY_ROUTINE) TriangleXDominantTestRay, nullptr
-};
-
-const SHAPE_VTABLE Triangle::YTriangleHeader = {
-    (PSHAPE_TEST_RAY_ROUTINE) TriangleYDominantTestRay, nullptr
-};
-
-const SHAPE_VTABLE Triangle::ZTriangleHeader = {
-    (PSHAPE_TEST_RAY_ROUTINE) TriangleZDominantTestRay, nullptr
 };
 
 TEST(RayTracePlusPlusTestIdentityTriangle)
 {
     ListScene Scene = ListScene::Create();
 
-    Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
-                                         Point(1.0f, 1.0f, -1.0f),
-                                         Point(-1.0f, -1.0f, -1.0f));
+    auto TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
+                                        Point(1.0f, 1.0f, -1.0f),
+                                        Point(-1.0f, -1.0f, -1.0f));
 
     Scene.Add(TrianglePtr, Matrix::Identity(), false);
     RayTracer Tracer = RayTracer::Create();
 
-    std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+    std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
 
-    std::function<void(HitTester)> TraceFunction = [&](HitTester Tester) -> void
+    std::function<void(HitTester, Ray)> TraceFunction = [&](HitTester Tester, Ray WorldRay) -> void
     {
         Scene.Trace(Tester);
     };
 
-    EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
         CHECK_EQUAL((FLOAT) 1.0, Distance);
         CHECK_EQUAL(0, FaceHit);
@@ -628,24 +645,24 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
 {
     ListScene Scene = ListScene::Create();
 
-    Shape TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
-                                         Point(1.0f, 1.0f, -1.0f),
-                                         Point(-1.0f, -1.0f, -1.0f));
+    auto TrianglePtr = Triangle::Create(Point(-1.0f, 1.0f, -1.0f),
+                                        Point(1.0f, 1.0f, -1.0f),
+                                        Point(-1.0f, -1.0f, -1.0f));
 
     Scene.Add(TrianglePtr, Matrix::Translation(0.0f, 0.0f, -1.0f), false);
 
     RayTracer Tracer = RayTracer::Create();
 
-    std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+    std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
 
-    std::function<void(HitTester)> TraceFunction = [&](HitTester Tester) -> void
+    std::function<void(HitTester, Ray)> TraceFunction = [&](HitTester Tester, Ray WorldRay) -> void
     {
         Scene.Trace(Tester);
     };
 
-    EvaluateFirstHit = [&](ShapeReference ShapeRef, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
         CHECK_EQUAL((FLOAT) 2.0, Distance);
         CHECK_EQUAL(0, FaceHit);

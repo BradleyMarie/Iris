@@ -42,9 +42,7 @@ extern "C" {
 #include "irisplusplus_vector.h"
 #include "irisplusplus_point.h"
 #include "irisplusplus_ray.h"
-#include "irisplusplus_shapereference.h"
-#include "irisplusplus_shape.h"
-#include "irisplusplus_shapebase.h"
+#include "irisplusplus_hitallocator.h"
 #include "irisplusplus_hittester.h"
 #include "irisplusplus_raytracer.h"
 

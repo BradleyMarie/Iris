@@ -24,14 +24,15 @@ namespace Iris {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-RayTracer::TestShapesAdapter(
+RayTracer::TestGeometryAdapter(
     _In_opt_ PCVOID Context, 
-    _Inout_ PHIT_TESTER HitTesterPtr
+    _Inout_ PHIT_TESTER HitTesterPtr,
+    _In_ RAY WorldRay
     )
 {
-    auto TestShapesRoutine = static_cast<const std::function<void(HitTester)> *>(Context);
+    auto TestGeometryRoutine = static_cast<const std::function<void(HitTester, Ray)> *>(Context);
     
-    (*TestShapesRoutine)(HitTester(HitTesterPtr));
+    (*TestGeometryRoutine)(HitTester(HitTesterPtr), Ray(WorldRay));
 
     return ISTATUS_SUCCESS;
 }
@@ -44,9 +45,9 @@ RayTracer::ProcessHitsAdapter(
     _In_ PCHIT Hit
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> *>(Context);
     
-    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->Shape),
+    bool Stop = (*ProcessHitRoutine)(Hit->Data,
                                      Hit->Distance,
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
@@ -72,9 +73,9 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
     _In_ POINT3 WorldHitPoint
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
 
-    bool Stop = (*ProcessHitRoutine)(ShapeReference(Hit->Shape),
+    bool Stop = (*ProcessHitRoutine)(Hit->Data,
                                      Hit->Distance,
                                      Hit->FaceHit,
                                      Hit->AdditionalData,
@@ -116,15 +117,15 @@ RayTracer::RayTracer(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ std::function<void(HitTester)> TestShapesRoutine,
+    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHit(Data,
-                                                          TestShapesAdapter,
-                                                          &TestShapesRoutine,
+                                                          TestGeometryAdapter,
+                                                          &TestGeometryRoutine,
                                                           WorldRay.AsRAY(),
                                                           MinimumDistance,
                                                           ProcessHitsAdapter,
@@ -151,15 +152,15 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ std::function<void(HitTester)> TestShapesRoutine,
+    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(Data,
-                                                                         TestShapesAdapter,
-                                                                         &TestShapesRoutine,
+                                                                         TestGeometryAdapter,
+                                                                         &TestGeometryRoutine,
                                                                          WorldRay.AsRAY(),
                                                                          MinimumDistance,
                                                                          ProcessHitsWithCoordinatesAdapter,
@@ -186,14 +187,14 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceAllHitsOutOfOrder(
-    _In_ std::function<void(HitTester)> TestShapesRoutine,
+    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(Data,
-                                                                 TestShapesAdapter,
-                                                                 &TestShapesRoutine,
+                                                                 TestGeometryAdapter,
+                                                                 &TestGeometryRoutine,
                                                                  WorldRay.AsRAY(),
                                                                  ProcessHitsAdapter,
                                                                  &ProcessHitRoutine);
@@ -216,14 +217,14 @@ RayTracer::TraceAllHitsOutOfOrder(
 
 void
 RayTracer::TraceAllHitsInOrder(
-    _In_ std::function<void(HitTester)> TestShapesRoutine,
+    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(ShapeReference, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,
-                                                                             TestShapesAdapter,
-                                                                             &TestShapesRoutine,
+                                                                             TestGeometryAdapter,
+                                                                             &TestGeometryRoutine,
                                                                              WorldRay.AsRAY(),
                                                                              ProcessHitsWithCoordinatesAdapter,
                                                                              &ProcessHitRoutine);

@@ -89,6 +89,7 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
 InfinitePlaneTestRay(
+    _In_ PCDRAWING_SHAPE DrawingShape,
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PHIT_ALLOCATOR HitAllocator,
@@ -122,6 +123,7 @@ InfinitePlaneTestRay(
     {
         Status = HitAllocatorAllocate(HitAllocator,
                                       NULL,
+                                      DrawingShape,
                                       Distance,
                                       INFINITE_PLANE_FRONT_FACE,
                                       NULL,
@@ -133,6 +135,7 @@ InfinitePlaneTestRay(
     {
         Status = HitAllocatorAllocate(HitAllocator,
                                       NULL,
+                                      DrawingShape,
                                       Distance,
                                       INFINITE_PLANE_BACK_FACE,
                                       NULL,
@@ -166,7 +169,8 @@ InfinitePlaneFree(
 //
 
 CONST STATIC DRAWING_SHAPE_VTABLE InfinitePlaneHeader = {
-    { InfinitePlaneTestRay, NULL },
+    InfinitePlaneTestRay, 
+    NULL,
     InfinitePlaneGetTexture,
     InfinitePlaneGetNormal
 };

@@ -9,8 +9,7 @@ add_library(iris SHARED
     src/hitallocator.c
     src/point.c
     src/vector.c
-    src/ray.c
-    src/shape.c)
+    src/ray.c)
 
 generate_export_header(iris
     BASE_NAME iris

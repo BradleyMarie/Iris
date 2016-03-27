@@ -101,10 +101,28 @@ ListSceneAddObject(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
+ISTATUS
+ListSceneTraceShapeAdapter(
+    _In_opt_ PCVOID Context,
+    _In_ RAY Ray,
+    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    return DrawingShapeTrace((PCDRAWING_SHAPE)Context,
+                             Ray,
+                             HitAllocator,
+                             HitList);
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS 
 ListSceneTrace(
-    _In_ PCVOID Context,
-    _Inout_ PHIT_TESTER HitTester
+    _In_opt_ PCVOID Context,
+    _Inout_ PHIT_TESTER HitTester,
+    _In_ RAY Ray
     )
 {
     PSCENE_OBJECT *Objects;
@@ -123,10 +141,11 @@ ListSceneTrace(
 
     for (Index = 0; Index < ListSize; Index++)
     {
-        Status = HitTesterTestShapeWithTransform(HitTester,
-                                                 (PSHAPE) Objects[Index]->Shape,
-                                                 Objects[Index]->ModelToWorld,
-                                                 Objects[Index]->Premultiplied);
+        Status = HitTesterTestGeometryWithTransform(HitTester,
+                                                    ListSceneTraceShapeAdapter,
+                                                    Objects[Index]->Shape,
+                                                    Objects[Index]->ModelToWorld,
+                                                    Objects[Index]->Premultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {
