@@ -15,6 +15,16 @@ Abstract:
 #include <irisphysxp.h>
 
 //
+// Types
+//
+
+struct _PBR_GEOMETRY {
+    PCPBR_GEOMETRY_VTABLE VTable;
+    SIZE_T ReferenceCount;
+    PVOID Data;
+};
+
+//
 // Internal Functions
 //
 
@@ -140,6 +150,7 @@ PBRGeometryTestNestedGeometry(
     _Out_ PHIT_LIST *HitList
     )
 {
+    PCPBR_GEOMETRY OldGeometry;
     ISTATUS Status;
     RAY Ray;
     
@@ -160,10 +171,15 @@ PBRGeometryTestNestedGeometry(
     
     Ray = PBRHitAllocatorGetRay(PBRHitAllocator);
     
+    OldGeometry = PBRHitAllocatorGetGeometry(PBRHitAllocator);
+    PBRHitAllocatorSetGeometry(PBRHitAllocator, PBRGeometry);
+    
     Status = PBRGeometry->VTable->TestRayRoutine(PBRGeometry->Data,
                                                  Ray,
                                                  PBRHitAllocator,
                                                  HitList);
+
+    PBRHitAllocatorSetGeometry(PBRHitAllocator, OldGeometry);
 
     return Status;
 }

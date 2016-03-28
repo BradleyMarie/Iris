@@ -8,7 +8,8 @@ add_library(irisphysx SHARED
     src/material.c
     src/brdfallocator.c
     src/hitallocator.c
-    src/geometry.c)
+    src/geometry.c
+    src/hittester.c)
 
 target_link_libraries(irisphysx 
     iris

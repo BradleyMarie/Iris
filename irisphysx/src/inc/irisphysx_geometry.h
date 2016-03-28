@@ -18,16 +18,6 @@ Abstract:
 #include <irisphysxp.h>
 
 //
-// Types
-//
-
-struct _PBR_GEOMETRY {
-    PCPBR_GEOMETRY_VTABLE VTable;
-    SIZE_T ReferenceCount;
-    PVOID Data;
-};
-
-//
 // Prototypes
 //
 

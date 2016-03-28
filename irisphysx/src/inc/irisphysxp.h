@@ -25,5 +25,6 @@ Abstract:
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_hitallocator.h"
 #include "irisphysx_geometry.h"
+#include "irisphysx_hittester.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_
