@@ -23,6 +23,7 @@ Abstract:
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_light.h"
 #include "irisphysx_material.h"
-#include "irisphysx_shape.h"
+#include "irisphysx_hitallocator.h"
+#include "irisphysx_geometry.h"
 
 #endif // _IRIS_PHYSX_HEADER_

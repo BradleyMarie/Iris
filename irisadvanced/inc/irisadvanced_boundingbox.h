@@ -48,6 +48,25 @@ BoundingBoxCreate(
 
 SFORCEINLINE
 BOOL
+BoundingBoxValidate(
+    _In_ BOUNDING_BOX BoundingBox
+    )
+{
+    if (PointValidate(BoundingBox.Corners[0]) != TRUE)
+    {
+        return FALSE;
+    }
+    
+    if (PointValidate(BoundingBox.Corners[1]) != TRUE)
+    {
+        return FALSE;
+    }
+    
+    return TRUE;
+}
+
+SFORCEINLINE
+BOOL
 BoundingBoxContainsPoint(
     _In_ BOUNDING_BOX BoundingBox,
     _In_ POINT3 Point
