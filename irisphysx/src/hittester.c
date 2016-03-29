@@ -50,7 +50,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PBRHitTesterTestGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+    _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     )
@@ -81,7 +81,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PBRHitTesterTestPremultipliedGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+    _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_opt_ PCMATRIX ModelToWorld
     )
 {

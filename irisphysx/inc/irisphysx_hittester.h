@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_HIT_ALLOCATOR_
-#define _IRIS_PHYSX_HIT_ALLOCATOR_
+#ifndef _IRIS_PHYSX_HIT_TESTER_
+#define _IRIS_PHYSX_HIT_TESTER_
 
 #include <iris.h>
 
@@ -39,23 +39,23 @@ PBRHitTesterTestGeometry(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSPHYSXAPI
+IRISPHYSXAPI
 ISTATUS
 PBRHitTesterTestGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+    _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISSPHYSXAPI
+IRISPHYSXAPI
 ISTATUS
 PBRHitTesterTestPremultipliedGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+    _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_opt_ PCMATRIX ModelToWorld
     );
 
-#endif // _IRIS_PHYSX_HIT_ALLOCATOR_
+#endif // _IRIS_PHYSX_HIT_TESTER_

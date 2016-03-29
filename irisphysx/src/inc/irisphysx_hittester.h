@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _PBR_HIT_ALLOCATOR_IRIS_PHYSX_INTERNAL_
-#define _PBR_HIT_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#ifndef _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
+#define _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -25,21 +25,4 @@ struct _PBR_HIT_TESTER {
     PHIT_TESTER Tester;
 };
 
-//
-// Functions
-//
-
-SFORCEINLINE
-VOID
-PBRHitTesterInitialize(
-    _Out_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PHIT_TESTER Tester
-    )
-{
-    ASSERT(PBRHitTester != NULL);
-    ASSERT(Tester != NULL);
-    
-    PBRHitTester->Tester = Tester;
-}
-
-#endif // _PBR_HIT_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#endif // _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
