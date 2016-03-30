@@ -10,7 +10,8 @@ add_library(irisphysx SHARED
     src/hitallocator.c
     src/geometry.c
     src/hittester.c
-    src/raytraceradapter.c)
+    src/raytraceradapter.c
+    src/visibilitytester.c)
 
 target_link_libraries(irisphysx 
     iris

@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-typedef struct _SPECTRUM_VISIBILITY_TESTER SPECTRUM_VISIBILITY_TESTER, *PSPECTRUM_VISIBILITY_TESTER;
-typedef CONST SPECTRUM_VISIBILITY_TESTER *PCSPECTRUM_VISIBILITY_TESTER;
+typedef struct _PBR_VISIBILITY_TESTER PBR_VISIBILITY_TESTER, *PPBR_VISIBILITY_TESTER;
+typedef CONST PBR_VISIBILITY_TESTER *PCPBR_VISIBILITY_TESTER;
 
 typedef
 _Check_return_
@@ -31,7 +31,7 @@ ISTATUS
 (*PLIGHT_SAMPLE)(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -46,7 +46,7 @@ ISTATUS
 (*PLIGHT_COMPUTE_EMISSIVE)(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Out_ PCSPECTRUM *Spectrum
     );
 
@@ -57,7 +57,7 @@ ISTATUS
 (*PLIGHT_COMPUTE_EMISSIVE_WITH_PDF)(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );
@@ -97,7 +97,7 @@ ISTATUS
 LightSample(
     _In_ PCLIGHT Light,
     _In_ POINT3 HitPoint,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -112,7 +112,7 @@ ISTATUS
 LightComputeEmissive(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Out_ PCSPECTRUM *Spectrum
     );
 
@@ -123,7 +123,7 @@ ISTATUS
 LightComputeEmissiveWithPdf(
     _In_ PCLIGHT Light,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );

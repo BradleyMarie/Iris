@@ -27,5 +27,6 @@ Abstract:
 #include "irisphysx_geometry.h"
 #include "irisphysx_hittester.h"
 #include "irisphysx_raytraceradapter.h"
+#include "irisphysx_visibilitytester.h"
 
 #endif // _IRIS_PHYSX_INTERNAL_HEADER_
