@@ -33,7 +33,7 @@ PhysxTriangleAllocate(
     _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
-    _Out_ PPBR_SHAPE *Shape
+    _Out_ PPBR_GEOMETRY *Geometry
     );
 
 #endif // _TRIANGLE_IRIS_PHYSX_TOOLKIT_

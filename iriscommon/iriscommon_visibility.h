@@ -131,9 +131,9 @@ RayTracerTestVisibility(
                                                              TRUE);
 
     Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(RayTracer,
+                                                         WorldRay,
                                                          TestShapesRoutine,
                                                          TestShapesContext,
-                                                         WorldRay,
                                                          RayTracerTestVisibilityProcessHit,
                                                          &Context);
 
@@ -226,9 +226,9 @@ RayTracerTestVisibilityAnyDistance(
     Context = RayTracerTestVisibilityAnyDistanceProcessHitCreateContext(MinimumDistance, TRUE);
 
     Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(RayTracer,
+                                                         WorldRay,
                                                          TestShapesRoutine,
                                                          TestShapesContext,
-                                                         WorldRay,
                                                          RayTracerTestVisibilityAnyDistanceProcessHit,
                                                          &Context);
 

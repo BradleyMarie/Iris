@@ -5,9 +5,7 @@ include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisp
 add_library(irisphysxtoolkit SHARED
     src/mirrorbrdf.c
     src/lambertianbrdf.c
-    src/lambertianmaterial.c
-    src/triangle.c
-    src/sphere.c)
+    src/lambertianmaterial.c)
 
 target_link_libraries(irisphysxtoolkit 
     iris 

@@ -435,56 +435,56 @@ PhysxLightTriangleFree(
 // Static Variables
 //
 
-CONST STATIC PBR_SHAPE_VTABLE XTriangleHeader = {
-    { { PhysxTriangleXDominantTestRay,
-        PhysxTriangleFree },
-      PhysxTriangleComputeNormal,
-      PhysxTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE XTriangleHeader = {
+    PhysxTriangleXDominantTestRay,
+    PhysxTriangleFree,
+    PhysxTriangleComputeNormal,
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
-CONST STATIC PBR_SHAPE_VTABLE YTriangleHeader = {
-    { { PhysxTriangleYDominantTestRay,
-        PhysxTriangleFree },
-      PhysxTriangleComputeNormal,
-      PhysxTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE YTriangleHeader = {
+    PhysxTriangleYDominantTestRay,
+    PhysxTriangleFree,
+    PhysxTriangleComputeNormal,
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
-CONST STATIC PBR_SHAPE_VTABLE ZTriangleHeader = {
-    { { PhysxTriangleZDominantTestRay,
-        PhysxTriangleFree },
-      PhysxTriangleComputeNormal,
-      PhysxTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE ZTriangleHeader = {
+    PhysxTriangleZDominantTestRay,
+    PhysxTriangleFree,
+    PhysxTriangleComputeNormal,
+    PhysxTriangleGetBounds,
     PhysxTriangleGetMaterial,
     NULL
 };
 
-CONST STATIC PBR_SHAPE_VTABLE XLightTriangleHeader = {
-    { { PhysxLightTriangleXDominantTestRay,
-        PhysxLightTriangleFree },
-      PhysxLightTriangleComputeNormal,
-      PhysxLightTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE XLightTriangleHeader = {
+    PhysxLightTriangleXDominantTestRay,
+    PhysxLightTriangleFree,
+    PhysxLightTriangleComputeNormal,
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
 
-CONST STATIC PBR_SHAPE_VTABLE YLightTriangleHeader = {
-    { { PhysxLightTriangleYDominantTestRay,
-        PhysxLightTriangleFree },
-      PhysxLightTriangleComputeNormal,
-      PhysxLightTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE YLightTriangleHeader = {
+    PhysxLightTriangleYDominantTestRay,
+    PhysxLightTriangleFree,
+    PhysxLightTriangleComputeNormal,
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
 
-CONST STATIC PBR_SHAPE_VTABLE ZLightTriangleHeader = {
-    { { PhysxLightTriangleXDominantTestRay,
-        PhysxLightTriangleFree },
-      PhysxLightTriangleComputeNormal,
-      PhysxLightTriangleGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE ZLightTriangleHeader = {
+    PhysxLightTriangleXDominantTestRay,
+    PhysxLightTriangleFree,
+    PhysxLightTriangleComputeNormal,
+    PhysxLightTriangleGetBounds,
     PhysxLightTriangleGetMaterial,
     PhysxLightTriangleGetLight
 };
@@ -504,10 +504,10 @@ PhysxTriangleAllocate(
     _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
-    _Out_ PPBR_SHAPE *Shape
+    _Out_ PPBR_GEOMETRY *Shape
     )
 {
-    PCPBR_SHAPE_VTABLE ShapeVTable;
+    PCPBR_GEOMETRY_VTABLE ShapeVTable;
     PHYSX_LIGHT_TRIANGLE LightTriangle;
     VECTOR_AXIS DominantAxis;
     PHYSX_TRIANGLE Triangle;

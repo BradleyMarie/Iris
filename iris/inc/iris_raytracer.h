@@ -74,10 +74,10 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHit(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
-    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     );
@@ -88,10 +88,10 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessClosestHitWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
-    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
-    _In_opt_ PCVOID TestShapesContext,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestShapesContext,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     );
@@ -102,9 +102,9 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessAllHitsOutOfOrder(
     _Inout_ PRAYTRACER RayTracer,
+    _In_ RAY Ray,
     _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
-    _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     );
@@ -115,9 +115,9 @@ IRISAPI
 ISTATUS
 RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
+    _In_ RAY Ray,
     _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestShapesContext,
-    _In_ RAY Ray,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     );

@@ -212,9 +212,9 @@ PBRVisibilityTesterTestVisibility(
 
 
     Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(PBRVisibilityTester->RayTracer,
+                                                                WorldRay,
                                                                 PBRVisibilityTester->TestGeometryRoutine,
                                                                 PBRVisibilityTester->TestGeometryRoutineContext,
-                                                                WorldRay,
                                                                 PBRVisibilityTesterTestVisibilityProcessHit,
                                                                 &Context);
 
@@ -257,9 +257,9 @@ PBRVisibilityTesterTestVisibilityAnyDistance(
     Context = PBRVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(PBRVisibilityTester->Epsilon, TRUE);
 
     Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(PBRVisibilityTester->RayTracer,
+                                                                WorldRay,
                                                                 PBRVisibilityTester->TestGeometryRoutine,
                                                                 PBRVisibilityTester->TestGeometryRoutineContext,
-                                                                WorldRay,
                                                                 RayTracerTestVisibilityAnyDistanceProcessHit,
                                                                 &Context);
 
@@ -308,10 +308,10 @@ PBRVisibilityTesterTestLightVisibility(
     ProcessHitContext = PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(Light, FALSE);
 
     Status = RayTracerAdapterTraceSceneProcessClosestHit(PBRVisibilityTester->RayTracer,
-                                                         PBRVisibilityTester->TestGeometryRoutine,
-                                                         PBRVisibilityTester->TestGeometryRoutineContext,
                                                          WorldRay,
                                                          PBRVisibilityTester->Epsilon,
+                                                         PBRVisibilityTester->TestGeometryRoutine,
+                                                         PBRVisibilityTester->TestGeometryRoutineContext,
                                                          PBRVisibilityTesterTestLightVisibilityProcessHit,
                                                          &ProcessHitContext);
     

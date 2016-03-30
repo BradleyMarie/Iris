@@ -441,9 +441,9 @@ RayShaderTraceRayMontecarlo(
     ProcessHitContext.RayShader = RayShader;
 
     Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(RayShader->RayTracer,
+                                                                     WorldRay,
                                                                      RayShader->Scene->VTable->TestShapesRoutine,
                                                                      RayShader->Scene->Data,
-                                                                     WorldRay,
                                                                      RayShaderProcessHit,
                                                                      &ProcessHitContext);
 

@@ -39,7 +39,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PPBR_INTEGRATOR_INTEGRATE_ROUTINE)(
-    _In_opt_ PCVOID Context, 
+    _Inout_opt_ PVOID Context, 
     _Inout_ PPBR_RAYTRACER PBRRayTracer,
     _In_ RAY Ray
     );
@@ -63,9 +63,9 @@ ISTATUS
 PBRIntegratorIntegrate(
     _In_ PPBR_INTEGRATOR PBRIntegrator,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
-    _In_ PCVOID TestGeometryRoutineContext,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_ PPBR_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
-    _Inout_ PVOID IntegrateRoutineContext,
+    _Inout_opt_ PVOID IntegrateRoutineContext,
     _In_reads_(NumberOfLights) PCLIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ FLOAT VisibilityEpsilon,

@@ -124,10 +124,10 @@ RayTracer::TraceClosestHit(
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHit(Data,
-                                                          TestGeometryAdapter,
-                                                          &TestGeometryRoutine,
                                                           WorldRay.AsRAY(),
                                                           MinimumDistance,
+                                                          TestGeometryAdapter,
+                                                          &TestGeometryRoutine,
                                                           ProcessHitsAdapter,
                                                           &ProcessHitRoutine);
     
@@ -135,10 +135,10 @@ RayTracer::TraceClosestHit(
     {
         case ISTATUS_SUCCESS:
             break;
-        case ISTATUS_INVALID_ARGUMENT_02:
+        case ISTATUS_INVALID_ARGUMENT_01:
             throw std::invalid_argument("WorldRay");
             break;
-        case ISTATUS_INVALID_ARGUMENT_03:
+        case ISTATUS_INVALID_ARGUMENT_02:
             throw std::invalid_argument("MinimumDistance");
             break;
         case ISTATUS_ALLOCATION_FAILED:
@@ -159,10 +159,10 @@ RayTracer::TraceClosestHit(
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(Data,
-                                                                         TestGeometryAdapter,
-                                                                         &TestGeometryRoutine,
                                                                          WorldRay.AsRAY(),
                                                                          MinimumDistance,
+                                                                         TestGeometryAdapter,
+                                                                         &TestGeometryRoutine,
                                                                          ProcessHitsWithCoordinatesAdapter,
                                                                          &ProcessHitRoutine);
 
@@ -170,10 +170,10 @@ RayTracer::TraceClosestHit(
     {
         case ISTATUS_SUCCESS:
             break;
-        case ISTATUS_INVALID_ARGUMENT_02:
+        case ISTATUS_INVALID_ARGUMENT_01:
             throw std::invalid_argument("WorldRay");
             break;
-        case ISTATUS_INVALID_ARGUMENT_03:
+        case ISTATUS_INVALID_ARGUMENT_02:
             throw std::invalid_argument("MinimumDistance");
             break;
         case ISTATUS_ALLOCATION_FAILED:
@@ -193,9 +193,9 @@ RayTracer::TraceAllHitsOutOfOrder(
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(Data,
+                                                                 WorldRay.AsRAY(),
                                                                  TestGeometryAdapter,
                                                                  &TestGeometryRoutine,
-                                                                 WorldRay.AsRAY(),
                                                                  ProcessHitsAdapter,
                                                                  &ProcessHitRoutine);
 
@@ -203,7 +203,7 @@ RayTracer::TraceAllHitsOutOfOrder(
     {
         case ISTATUS_SUCCESS:
             break;
-        case ISTATUS_INVALID_ARGUMENT_02:
+        case ISTATUS_INVALID_ARGUMENT_01:
             throw std::invalid_argument("WorldRay");
             break;
         case ISTATUS_ALLOCATION_FAILED:
@@ -223,9 +223,9 @@ RayTracer::TraceAllHitsInOrder(
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,
+                                                                             WorldRay.AsRAY(),
                                                                              TestGeometryAdapter,
                                                                              &TestGeometryRoutine,
-                                                                             WorldRay.AsRAY(),
                                                                              ProcessHitsWithCoordinatesAdapter,
                                                                              &ProcessHitRoutine);
 
@@ -233,7 +233,7 @@ RayTracer::TraceAllHitsInOrder(
     {
         case ISTATUS_SUCCESS:
             break;
-        case ISTATUS_INVALID_ARGUMENT_02:
+        case ISTATUS_INVALID_ARGUMENT_01:
             throw std::invalid_argument("WorldRay");
             break;
         case ISTATUS_ALLOCATION_FAILED:

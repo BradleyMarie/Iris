@@ -319,20 +319,20 @@ PhysxLightSphereFree(
 // Static Variables
 //
 
-CONST STATIC PBR_SHAPE_VTABLE SphereHeader = {
-    { { PhysxSphereTestRay,
-        PhysxSphereFree },
-      PhysxSphereComputeNormal,
-      PhysxSphereGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE SphereHeader = {
+    PhysxSphereTestRay,
+    PhysxSphereFree,
+    PhysxSphereComputeNormal,
+    PhysxSphereGetBounds,
     PhysxSphereGetMaterial,
     NULL
 };
 
-CONST STATIC PBR_SHAPE_VTABLE LightSphereHeader = {
-    { { PhysxLightSphereTestRay,
-        PhysxLightSphereFree },
-      PhysxLightSphereComputeNormal,
-      PhysxLightSphereGetBounds },
+CONST STATIC PBR_GEOMETRY_VTABLE LightSphereHeader = {
+    PhysxLightSphereTestRay,
+    PhysxLightSphereFree,
+    PhysxLightSphereComputeNormal,
+    PhysxLightSphereGetBounds,
     PhysxLightSphereGetMaterial,
     PhysxLightSphereGetLight
 };
@@ -351,10 +351,10 @@ PhysxSphereAllocate(
     _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
-    _Out_ PPBR_SHAPE *Shape
+    _Out_ PPBR_GEOMETRY *Shape
     )
 {
-    PCPBR_SHAPE_VTABLE ShapeVTable;
+    PCPBR_GEOMETRY_VTABLE ShapeVTable;
     PHYSX_LIGHT_SPHERE LightSphere;
     PHYSX_SPHERE Sphere;
     SIZE_T DataAlignment;
