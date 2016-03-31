@@ -20,7 +20,7 @@ Abstract:
 
 typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     PPBR_RAYTRACER NextPRBRayTracer;
-    PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
+    PPBR_SHARED_CONTEXT SharedContext;
     PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
@@ -36,7 +36,7 @@ VOID
 PBRRayTracerProcessHitAdapterContextInitialize(
     _Out_ PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext,
     _In_ PPBR_RAYTRACER NextPRBRayTracer,
-    _In_ PPBR_RAYTRACER_SHARED_CONTEXT SharedContext,
+    _In_ PPBR_SHARED_CONTEXT SharedContext,
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
     _In_ RAY WorldRay,
@@ -70,7 +70,7 @@ PBRRayTracerProcessHitAdapter(
     )
 {
     PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
+    PPBR_SHARED_CONTEXT SharedContext;
     PCPBR_GEOMETRY PBRGeometry;
     ISTATUS Status;
     
@@ -92,8 +92,8 @@ PBRRayTracerProcessHitAdapter(
                                                SharedContext->Lights,
                                                SharedContext->NumberOfLights,
                                                AdapterContext->NextPRBRayTracer,
-                                               SharedContext->PBRVisibilityTester,
-                                               SharedContext->BrdfAllocator,
+                                               &SharedContext->PBRVisibilityTester,
+                                               &SharedContext->BrdfAllocator,
                                                SharedContext->SpectrumCompositor,
                                                SharedContext->ReflectorCompositor,
                                                SharedContext->Rng,
@@ -118,7 +118,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
+    PPBR_SHARED_CONTEXT SharedContext;
     ISTATUS Status;
     
     if (PBRRayTracer == NULL)
@@ -169,7 +169,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
+    PPBR_SHARED_CONTEXT SharedContext;
     ISTATUS Status;
     
     if (PBRRayTracer == NULL)
