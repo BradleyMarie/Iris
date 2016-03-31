@@ -36,7 +36,7 @@ ISTATUS
 SpectrumPointLightSample(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -72,10 +72,10 @@ SpectrumPointLightSample(
 
     RayToLight = RayCreate(HitPoint, DirectionToLight);
 
-    Status = SpectrumVisibilityTesterTestVisibility(Tester,
-                                                    RayToLight,
-                                                    DistanceToLight,
-                                                    &Visible);
+    Status = PBRVisibilityTesterTestVisibility(Tester,
+                                               RayToLight,
+                                               DistanceToLight,
+                                               &Visible);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -115,7 +115,7 @@ ISTATUS
 SpectrumPointLightComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
@@ -136,7 +136,7 @@ ISTATUS
 SpectrumPointLightComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PSPECTRUM_VISIBILITY_TESTER Tester,
+    _Inout_ PPBR_VISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )

@@ -13,7 +13,231 @@ Abstract:
 --*/
 
 #include <irisphysxtoolkitp.h>
-#include <iriscommon_advancedsphere.h>
+
+//
+// Constants
+//
+
+#define SPHERE_FRONT_FACE 0
+#define SPHERE_BACK_FACE  1
+
+//
+// Types
+//
+
+typedef struct _SPHERE {
+    POINT3 Center;
+    FLOAT RadiusSquared;
+} SPHERE, *PSPHERE;
+
+typedef CONST SPHERE *PCSPHERE;
+
+//
+// Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+SphereTestRay(
+    _In_opt_ PCSPHERE Sphere,
+    _In_ RAY Ray,
+    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    VECTOR3 CenterToRayOrigin;
+    FLOAT Discriminant;
+    FLOAT Distance0;
+    UINT32 Face0;
+    FLOAT LengthOfRaySquared;
+    FLOAT LengthSquaredCenterToOrigin;
+    FLOAT NegatedScalarProjectionOriginToCenterOntoRay;
+    FLOAT ScalarProjectionOriginToCenterOntoRay;
+    ISTATUS Status;
+
+#if defined(ENABLE_CSG_SUPPORT)
+
+    UINT32 Face1;
+    FLOAT Distance1;
+
+#endif // defined(ENABLE_CSG_SUPPORT)
+
+    ASSERT(Sphere != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    CenterToRayOrigin = PointSubtract(Ray.Origin, Sphere->Center);
+
+    ScalarProjectionOriginToCenterOntoRay = VectorDotProduct(Ray.Direction,
+                                                             CenterToRayOrigin);
+
+    LengthOfRaySquared = VectorDotProduct(Ray.Direction, Ray.Direction);
+
+    LengthSquaredCenterToOrigin = VectorDotProduct(CenterToRayOrigin,
+                                                   CenterToRayOrigin);
+
+    Discriminant = ScalarProjectionOriginToCenterOntoRay *
+        ScalarProjectionOriginToCenterOntoRay -
+        LengthOfRaySquared *
+        (LengthSquaredCenterToOrigin - Sphere->RadiusSquared);
+
+    if (Discriminant < (FLOAT) 0.0)
+    {
+        //
+        // Misses sphere completely
+        //
+
+        *HitList = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (IsZeroFloat(Discriminant) != FALSE)
+    {
+        //
+        // Hits One Point
+        //
+
+        *HitList = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    //
+    // Hits two points
+    //
+
+    NegatedScalarProjectionOriginToCenterOntoRay = -ScalarProjectionOriginToCenterOntoRay;
+
+    Discriminant = SqrtFloat(Discriminant);
+
+    Distance0 = (NegatedScalarProjectionOriginToCenterOntoRay - Discriminant) /
+        LengthOfRaySquared;
+
+    if (LengthSquaredCenterToOrigin < Sphere->RadiusSquared)
+    {
+        Face0 = SPHERE_BACK_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
+        Face1 = SPHERE_BACK_FACE;
+#endif // defined(ENABLE_CSG_SUPPORT)
+    }
+    else if (Distance0 >(FLOAT) 0.0)
+    {
+        Face0 = SPHERE_FRONT_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
+        Face1 = SPHERE_BACK_FACE;
+#endif // defined(ENABLE_CSG_SUPPORT)
+    }
+    else
+    {
+        Face0 = SPHERE_BACK_FACE;
+#if defined(ENABLE_CSG_SUPPORT)
+        Face1 = SPHERE_FRONT_FACE;
+#endif // defined(ENABLE_CSG_SUPPORT)
+    }
+
+    Status = PBRHitAllocatorAllocate(HitAllocator,
+                                     NULL,
+                                     Distance0,
+                                     Face0,
+                                     NULL,
+                                     0,
+                                     0,
+                                     HitList);
+
+#if defined(ENABLE_CSG_SUPPORT)
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
+                LengthOfRaySquared;
+
+    Status = PBRHitAllocatorAllocate(HitAllocator,
+                                     *HitList,
+                                     Distance1,
+                                     Face1,
+                                     NULL,
+                                     0,
+                                     0,
+                                     HitList);
+
+#endif // defined(ENABLE_CSG_SUPPORT)
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+SphereComputeNormal(
+    _In_ PCSPHERE Sphere,
+    _In_ POINT3 ModelHitPoint,
+    _In_ UINT32 FaceHit,
+    _Out_ PVECTOR3 SurfaceNormal
+    )
+{
+    VECTOR3 CenterToHitPoint;
+
+    ASSERT(Sphere != NULL);
+    ASSERT(PointValidate(ModelHitPoint) != FALSE);
+    ASSERT(SurfaceNormal != NULL);
+
+    CenterToHitPoint = PointSubtract(ModelHitPoint, Sphere->Center);
+    CenterToHitPoint = VectorNormalize(CenterToHitPoint, NULL, NULL);
+
+    if (FaceHit == SPHERE_FRONT_FACE)
+    {
+        *SurfaceNormal = CenterToHitPoint;
+    }
+    else if (FaceHit == SPHERE_BACK_FACE)
+    {
+        *SurfaceNormal = VectorNegate(CenterToHitPoint);
+    }
+    else
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+SphereCheckBounds(
+    _In_ PCSPHERE Sphere,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    )
+{
+    ASSERT(IsInsideBox != NULL);
+
+    *IsInsideBox = TRUE;
+
+    return ISTATUS_SUCCESS;
+}
+
+VOID
+SphereInitialize(
+    _Out_ PSPHERE Sphere,
+    _In_ POINT3 Center,
+    _In_ FLOAT RadiusSquared
+    )
+{
+    ASSERT(PointValidate(Center) != FALSE);
+    ASSERT(IsFiniteFloat(RadiusSquared) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(RadiusSquared) != FALSE);
+
+    Sphere->Center = Center;
+    Sphere->RadiusSquared = RadiusSquared;
+}
 
 //
 // Types
@@ -125,7 +349,7 @@ ISTATUS
 PhysxSphereTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -245,7 +469,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxLightSphereGetBounds(
+PhysxSphereTestBounds(
     _In_ PCVOID Context,
     _In_ PCMATRIX ModelToWorld,
     _In_ BOUNDING_BOX WorldAlignedBoundingBox,
@@ -275,7 +499,7 @@ ISTATUS
 PhysxLightSphereTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PHIT_ALLOCATOR HitAllocator,
+    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -321,20 +545,20 @@ PhysxLightSphereFree(
 
 CONST STATIC PBR_GEOMETRY_VTABLE SphereHeader = {
     PhysxSphereTestRay,
-    PhysxSphereFree,
     PhysxSphereComputeNormal,
-    PhysxSphereGetBounds,
+    PhysxSphereTestBounds,
     PhysxSphereGetMaterial,
-    NULL
+    NULL,
+    PhysxSphereFree
 };
 
 CONST STATIC PBR_GEOMETRY_VTABLE LightSphereHeader = {
     PhysxLightSphereTestRay,
-    PhysxLightSphereFree,
     PhysxLightSphereComputeNormal,
-    PhysxLightSphereGetBounds,
+    PhysxSphereTestBounds,
     PhysxLightSphereGetMaterial,
-    PhysxLightSphereGetLight
+    PhysxLightSphereGetLight,
+    PhysxLightSphereFree
 };
 
 //
@@ -351,10 +575,10 @@ PhysxSphereAllocate(
     _In_opt_ PMATERIAL BackMaterial,
     _In_opt_ PLIGHT FrontLight,
     _In_opt_ PLIGHT BackLight,
-    _Out_ PPBR_GEOMETRY *Shape
+    _Out_ PPBR_GEOMETRY *Geometry
     )
 {
-    PCPBR_GEOMETRY_VTABLE ShapeVTable;
+    PCPBR_GEOMETRY_VTABLE GeometryVTable;
     PHYSX_LIGHT_SPHERE LightSphere;
     PHYSX_SPHERE Sphere;
     SIZE_T DataAlignment;
@@ -381,7 +605,7 @@ PhysxSphereAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    if (Shape == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -401,7 +625,7 @@ PhysxSphereAllocate(
         Data = &LightSphere;
         DataSize = sizeof(PHYSX_LIGHT_SPHERE);
         DataAlignment = _Alignof(PHYSX_LIGHT_SPHERE);
-        ShapeVTable = &LightSphereHeader;
+        GeometryVTable = &LightSphereHeader;
     }
     else
     {
@@ -415,14 +639,14 @@ PhysxSphereAllocate(
         Data = &Sphere;
         DataSize = sizeof(PHYSX_SPHERE);
         DataAlignment = _Alignof(PHYSX_SPHERE);
-        ShapeVTable = &SphereHeader;
+        GeometryVTable = &SphereHeader;
     }
     
-    Status = PBRShapeAllocate(ShapeVTable,
-                              Data,
-                              DataSize,
-                              DataAlignment,
-                              Shape);
+    Status = PBRGeometryAllocate(GeometryVTable,
+                                 Data,
+                                 DataSize,
+                                 DataAlignment,
+                                 Geometry);
 
     if (Status != ISTATUS_SUCCESS)
     {
