@@ -68,7 +68,7 @@ PBRIntegratorIntegrate(
     _Inout_opt_ PVOID IntegrateRoutineContext,
     _In_reads_(NumberOfLights) PCLIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
-    _In_ FLOAT VisibilityEpsilon,
+    _In_ FLOAT Epsilon,
     _In_ RAY WorldRay,
     _Inout_ PRANDOM Rng
     );
