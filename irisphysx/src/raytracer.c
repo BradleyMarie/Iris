@@ -18,19 +18,6 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_RAYTRACER_SHARED_CONTEXT {
-    PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
-    PCVOID TestGeometryRoutineContext;
-    _Field_size_opt_(NumberOfLights) PCLIGHT *Lights;
-    SIZE_T NumberOfLights;
-    PPBR_VISIBILITY_TESTER PBRVisibilityTester;
-    PBRDF_ALLOCATOR BrdfAllocator;
-    PSPECTRUM_COMPOSITOR SpectrumCompositor;
-    PREFLECTOR_COMPOSITOR ReflectorCompositor;
-    PRANDOM Rng;
-    FLOAT Epsilon;
-} PBR_RAYTRACER_SHARED_CONTEXT, *PPBR_RAYTRACER_SHARED_CONTEXT;
-
 typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     PPBR_RAYTRACER NextPRBRayTracer;
     PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
@@ -39,12 +26,6 @@ typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     RAY WorldRay;
     PSPECTRUM *Output;
 } RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT, *PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT;
-
-struct _PBR_RAYTRACER {
-    PPBR_RAYTRACER NextPRBRayTracer;
-    PPBR_RAYTRACER_SHARED_CONTEXT SharedContext;
-    PRAYTRACER RayTracer;
-};
 
 //
 // Static Functions
