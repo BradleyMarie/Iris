@@ -60,7 +60,7 @@ ISTATUS
 (*PPBR_GEOMETRY_GET_MATERIAL_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCMATERIAL *Material
+    _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
     );
 
 typedef
@@ -69,7 +69,7 @@ ISTATUS
 (*PPBR_GEOMETRY_GET_LIGHT_ROUTINE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCLIGHT *Light
+    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     );
 
 typedef struct _PBR_GEOMETRY_VTABLE {
@@ -137,7 +137,7 @@ ISTATUS
 PBRGeometryGetMaterial(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCMATERIAL *Material
+    _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
     );
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -146,7 +146,7 @@ ISTATUS
 PBRGeometryGetLight(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCLIGHT *Light
+    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     );
 
 IRISPHYSXAPI

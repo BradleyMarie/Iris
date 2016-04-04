@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-struct _BRDF {
-    PCBRDF_VTABLE VTable;
+struct _PBR_BRDF {
+    PCPBR_BRDF_VTABLE VTable;
     SIZE_T ReferenceCount;
     PVOID Data;
 };

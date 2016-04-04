@@ -25,6 +25,7 @@ target_link_libraries(irisspectrumplusplus
     irisplusplus
     irisadvanced
     irisadvancedplusplus
+    irisspectrum
     irisspectrum)
 
 generate_export_header(irisspectrumplusplus

@@ -17,6 +17,17 @@ Abstract:
 
 namespace IrisAdvanced {
 
+RandomReference::RandomReference(
+    _In_ PRANDOM_REFERENCE RandomReferencePtr
+    )
+: Data(RandomReferencePtr)
+{ 
+    if (RandomReferencePtr == NULL)
+    {
+        throw std::invalid_argument("RandomReferencePtr");
+    }
+}
+
 _Ret_range_(Minimum, Maximum)
 FLOAT
 RandomReference::GenerateFloat(

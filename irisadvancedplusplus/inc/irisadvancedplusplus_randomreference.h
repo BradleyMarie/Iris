@@ -26,11 +26,10 @@ namespace IrisAdvanced {
 
 class RandomReference final {
 public:
+    IRISADVANCEDPLUSPLUSAPI
     RandomReference(
         _In_ PRANDOM_REFERENCE RandomReferencePtr
-        )
-    : Data(RandomReferencePtr)
-    { }
+        );
     
     _Ret_range_(Minimum, Maximum)
     IRISADVANCEDPLUSPLUSAPI

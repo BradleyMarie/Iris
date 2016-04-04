@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the BRDF_ALLOCATOR type.
+    This file contains the definitions for the PBR_BRDF_ALLOCATOR type.
 
 --*/
 
-#ifndef _BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
-#define _BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#ifndef _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#define _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -21,7 +21,7 @@ Abstract:
 // Types
 //
 
-struct _BRDF_ALLOCATOR {
+struct _PBR_BRDF_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR Allocator;
 };
 
@@ -33,35 +33,35 @@ _Check_return_
 _Ret_maybenull_
 SFORCEINLINE
 VOID
-BrdfAllocatorInitialize(
-    _Out_ PBRDF_ALLOCATOR BrdfAllocator
+PbrBrdfAllocatorInitialize(
+    _Out_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
     )
 {
-    ASSERT(BrdfAllocator != NULL);
+    ASSERT(PbrBrdfAllocator != NULL);
     
-    DynamicMemoryAllocatorInitialize(&BrdfAllocator->Allocator);
+    DynamicMemoryAllocatorInitialize(&PbrBrdfAllocator->Allocator);
 }
 
 SFORCEINLINE
 VOID
-BrdfAllocatorFreeAll(
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator
+PbrBrdfAllocatorFreeAll(
+    _Inout_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
     )
 {
-    ASSERT(BrdfAllocator != NULL);
+    ASSERT(PbrBrdfAllocator != NULL);
     
-    DynamicMemoryAllocatorFreeAll(&BrdfAllocator->Allocator);
+    DynamicMemoryAllocatorFreeAll(&PbrBrdfAllocator->Allocator);
 }
 
 SFORCEINLINE
 VOID
-BrdfAllocatorDestroy(
-    _In_ _Post_invalid_ PBRDF_ALLOCATOR BrdfAllocator
+PbrBrdfAllocatorDestroy(
+    _In_ _Post_invalid_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
     )
 {
-    ASSERT(BrdfAllocator != NULL);
+    ASSERT(PbrBrdfAllocator != NULL);
     
-    DynamicMemoryAllocatorDestroy(&BrdfAllocator->Allocator);
+    DynamicMemoryAllocatorDestroy(&PbrBrdfAllocator->Allocator);
 }
 
-#endif // _BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#endif // _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_

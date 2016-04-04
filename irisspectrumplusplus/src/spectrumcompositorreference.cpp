@@ -17,6 +17,17 @@ Abstract:
 
 namespace IrisSpectrum {
 
+SpectrumCompositorReference::SpectrumCompositorReference(
+    _In_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr
+    )
+: Data(SpectrumCompositorReferencePtr)
+{ 
+    if (SpectrumCompositorReferencePtr == nullptr)
+    {
+        throw std::invalid_argument("SpectrumCompositorReferencePtr");
+    }
+}
+
 _Ret_
 SpectrumReference
 SpectrumCompositorReference::Add(

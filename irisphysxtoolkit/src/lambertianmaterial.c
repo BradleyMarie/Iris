@@ -38,8 +38,8 @@ SimpleLambertianMaterialSample(
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PBRDF *Brdf
+    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PPBR_BRDF *PbrBrdf
     )
 {
     PCSIMPLE_LAMBERTIAN_MATERIAL Material;
@@ -49,14 +49,14 @@ SimpleLambertianMaterialSample(
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
     ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(BrdfAllocator != NULL);
-    ASSERT(Brdf != NULL);
+    ASSERT(PbrBrdf != NULL);
     
     Material = (PCSIMPLE_LAMBERTIAN_MATERIAL) Context;
 
     Status = SpectrumLambertianBrdfAllocate(BrdfAllocator,
                                             Material->Reflectance,
                                             SurfaceNormal,
-                                            Brdf);
+                                            PbrBrdf);
                                             
     return Status;
 }
@@ -80,7 +80,7 @@ SimpleLambertianMaterialFree(
 // Static Variables
 //
 
-CONST STATIC MATERIAL_VTABLE SimpleLambertianMaterialVTable = {
+CONST STATIC PBR_MATERIAL_VTABLE SimpleLambertianMaterialVTable = {
     SimpleLambertianMaterialSample,
     SimpleLambertianMaterialFree
 };
@@ -95,7 +95,7 @@ IRISPHYSXTOOLKITAPI
 ISTATUS
 LambertianMaterialAllocate(
     _In_ PREFLECTOR Reflectance,
-    _Out_ PMATERIAL *Material
+    _Out_ PPBR_MATERIAL *Material
     )
 {
     SIMPLE_LAMBERTIAN_MATERIAL SimpleMaterial;
@@ -113,11 +113,11 @@ LambertianMaterialAllocate(
     
     SimpleMaterial.Reflectance = Reflectance;
     
-    Status = MaterialAllocate(&SimpleLambertianMaterialVTable,
-                              &SimpleMaterial,
-                              sizeof(SIMPLE_LAMBERTIAN_MATERIAL),
-                              _Alignof(SIMPLE_LAMBERTIAN_MATERIAL),
-                              Material);
+    Status = PbrMaterialAllocate(&SimpleLambertianMaterialVTable,
+                                 &SimpleMaterial,
+                                 sizeof(SIMPLE_LAMBERTIAN_MATERIAL),
+                                 _Alignof(SIMPLE_LAMBERTIAN_MATERIAL),
+                                 Material);
                             
     if (Status != ISTATUS_SUCCESS)
     {

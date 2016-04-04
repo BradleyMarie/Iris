@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the MATERIAL type.
+    This file contains the definitions for the PBR_MATERIAL type.
 
 --*/
 
-#ifndef _MATERIAL_IRIS_PHYSX_
-#define _MATERIAL_IRIS_PHYSX_
+#ifndef _PBR_MATERIAL_IRIS_PHYSX_
+#define _PBR_MATERIAL_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -25,25 +25,25 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PMATERIAL_SAMPLE_ROUTINE)(
+(*PPBR_MATERIAL_SAMPLE_ROUTINE)(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PBRDF *Brdf
+    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PPBR_BRDF *PbrBrdf
     );
 
-typedef struct _MATERIAL_VTABLE {
-    PMATERIAL_SAMPLE_ROUTINE SampleRoutine;
+typedef struct _PBR_MATERIAL_VTABLE {
+    PPBR_MATERIAL_SAMPLE_ROUTINE SampleRoutine;
     PFREE_ROUTINE FreeRoutine;
-} MATERIAL_VTABLE, *PMATERIAL_VTABLE;
+} PBR_MATERIAL_VTABLE, *PPBR_MATERIAL_VTABLE;
 
-typedef CONST MATERIAL_VTABLE *PCMATERIAL_VTABLE;
+typedef CONST PBR_MATERIAL_VTABLE *PCPBR_MATERIAL_VTABLE;
 
-typedef struct _MATERIAL MATERIAL, *PMATERIAL;
-typedef CONST MATERIAL *PCMATERIAL;
+typedef struct _PBR_MATERIAL PBR_MATERIAL, *PPBR_MATERIAL;
+typedef CONST PBR_MATERIAL *PCPBR_MATERIAL;
 
 //
 // Functions
@@ -53,38 +53,38 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-MaterialAllocate(
-    _In_ PCMATERIAL_VTABLE MaterialVTable,
+PbrMaterialAllocate(
+    _In_ PCPBR_MATERIAL_VTABLE PbrMaterialVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PMATERIAL *Material
+    _Out_ PPBR_MATERIAL *PbrMaterial
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-MaterialSample(
-    _In_ PCMATERIAL Material,
+PbrMaterialSample(
+    _In_ PCPBR_MATERIAL Material,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PBRDF *Brdf
+    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PPBR_BRDF *Brdf
     );
 
 IRISPHYSXAPI
 VOID
-MaterialRetain(
-    _In_opt_ PMATERIAL Material
+PbrMaterialRetain(
+    _In_opt_ PPBR_MATERIAL PbrMaterial
     );
 
 IRISPHYSXAPI
 VOID
-MaterialRelease(
-    _In_opt_ _Post_invalid_ PMATERIAL Material
+PbrMaterialRelease(
+    _In_opt_ _Post_invalid_ PPBR_MATERIAL PbrMaterial
     );
 
-#endif // _MATERIAL_IRIS_PHYSX_
+#endif // _PBR_MATERIAL_IRIS_PHYSX_

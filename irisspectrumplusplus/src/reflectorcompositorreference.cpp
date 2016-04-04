@@ -17,6 +17,17 @@ Abstract:
 
 namespace IrisSpectrum {
 
+ReflectorCompositorReference::ReflectorCompositorReference(
+    _In_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr
+    )
+: Data(ReflectorCompositorReferencePtr)
+{ 
+    if (ReflectorCompositorReferencePtr == nullptr)
+    {
+        throw std::invalid_argument("ReflectorCompositorReferencePtr");
+    }
+}
+
 _Ret_
 ReflectorReference
 ReflectorCompositorReference::Add(

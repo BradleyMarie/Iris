@@ -21,16 +21,16 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfAllocatorAllocate(
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _In_ PCBRDF_VTABLE BrdfVTable,
+PbrBrdfAllocatorAllocate(
+    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _In_ PCPBR_BRDF_VTABLE PbrBrdfVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PCBRDF *Brdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
-    PBRDF AllocatedBrdf;
+    PPBR_BRDF AllocatedBrdf;
     PVOID DataDestination;
     PVOID Header;
     
@@ -39,7 +39,7 @@ BrdfAllocatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    if (BrdfVTable == NULL)
+    if (PbrBrdfVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -63,14 +63,14 @@ BrdfAllocatorAllocate(
         }
     }
     
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     Header = DynamicMemoryAllocatorAllocateWithHeader(&BrdfAllocator->Allocator,
-                                                      sizeof(BRDF),
-                                                      _Alignof(BRDF),
+                                                      sizeof(PBR_BRDF),
+                                                      _Alignof(PBR_BRDF),
                                                       DataSizeInBytes,
                                                       DataAlignment,
                                                       &DataDestination);
@@ -80,15 +80,15 @@ BrdfAllocatorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    AllocatedBrdf = (PBRDF) Header;
+    AllocatedBrdf = (PPBR_BRDF) Header;
     
-    AllocatedBrdf->VTable = BrdfVTable;
+    AllocatedBrdf->VTable = PbrBrdfVTable;
     AllocatedBrdf->ReferenceCount = 0;
     AllocatedBrdf->Data = DataDestination;
     
     memcpy(DataDestination, Data, DataSizeInBytes);
     
-    *Brdf = AllocatedBrdf;
+    *PbrBrdf = AllocatedBrdf;
 
     return ISTATUS_SUCCESS;
 }

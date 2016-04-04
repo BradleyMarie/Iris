@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the LIGHT type.
+    This file contains the definitions for the PBR_LIGHT type.
 
 --*/
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-struct _LIGHT {
-    PCLIGHT_VTABLE VTable;
+struct _PBR_LIGHT {
+    PCPBR_LIGHT_VTABLE VTable;
     SIZE_T ReferenceCount;
     PVOID Data;
 };
@@ -31,20 +31,20 @@ struct _LIGHT {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-LightAllocate(
-    _In_ PCLIGHT_VTABLE LightVTable,
+PbrLightAllocate(
+    _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PLIGHT *Light
+    _Out_ PPBR_LIGHT *PbrLight
     )
 {
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PLIGHT AllocatedLight;
+    PPBR_LIGHT AllocatedPbrLight;
 
-    if (LightVTable == NULL)
+    if (PbrLightVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -68,13 +68,13 @@ LightAllocate(
         }
     }
 
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(LIGHT),
-                                                      _Alignof(LIGHT),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_LIGHT),
+                                                      _Alignof(PBR_LIGHT),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -86,18 +86,18 @@ LightAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedLight = (PLIGHT) HeaderAllocation;
+    AllocatedPbrLight = (PPBR_LIGHT) HeaderAllocation;
 
-    AllocatedLight->VTable = LightVTable;
-    AllocatedLight->Data = DataAllocation;
-    AllocatedLight->ReferenceCount = 1;
+    AllocatedPbrLight->VTable = PbrLightVTable;
+    AllocatedPbrLight->Data = DataAllocation;
+    AllocatedPbrLight->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    *Light = AllocatedLight;
+    *PbrLight = AllocatedPbrLight;
 
     return ISTATUS_SUCCESS;
 }
@@ -105,20 +105,20 @@ LightAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-LightSample(
-    _In_ PCLIGHT Light,
+PbrLightSample(
+    _In_ PCPBR_LIGHT PbrLight,
     _In_ POINT3 HitPoint,
     _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
-    _Out_ PVECTOR3 ToLight,
+    _Out_ PVECTOR3 ToPbrLight,
     _Out_ PFLOAT Pdf
     )
 {
     ISTATUS Status;
 
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -148,7 +148,7 @@ LightSample(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (ToLight == NULL)
+    if (ToPbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -158,14 +158,14 @@ LightSample(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    Status = Light->VTable->SampleRoutine(Light->Data,
-                                          HitPoint,
-                                          VisibilityTester,
-                                          Rng,
-                                          Compositor, 
-                                          Spectrum,
-                                          ToLight,
-                                          Pdf);
+    Status = PbrLight->VTable->SampleRoutine(PbrLight->Data,
+                                             HitPoint,
+                                             VisibilityTester,
+                                             Rng,
+                                             Compositor, 
+                                             Spectrum,
+                                             ToPbrLight,
+                                             Pdf);
 
     return Status;
 }
@@ -173,21 +173,21 @@ LightSample(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-LightComputeEmissive(
-    _In_ PCLIGHT Light,
-    _In_ RAY ToLight,
+PbrLightComputeEmissive(
+    _In_ PCPBR_LIGHT PbrLight,
+    _In_ RAY ToPbrLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
     ISTATUS Status;
 
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (RayValidate(ToLight) == FALSE)
+    if (RayValidate(ToPbrLight) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -202,10 +202,10 @@ LightComputeEmissive(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = Light->VTable->ComputeEmissiveRoutine(Light->Data,
-                                                   ToLight,
-                                                   Tester,
-                                                   Spectrum);
+    Status = PbrLight->VTable->ComputeEmissiveRoutine(PbrLight->Data,
+                                                      ToPbrLight,
+                                                      Tester,
+                                                      Spectrum);
 
     return Status;
 }
@@ -214,9 +214,9 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-LightComputeEmissiveWithPdf(
-    _In_ PCLIGHT Light,
-    _In_ RAY ToLight,
+PbrLightComputeEmissiveWithPdf(
+    _In_ PCPBR_LIGHT PbrLight,
+    _In_ RAY ToPbrLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
@@ -224,12 +224,12 @@ LightComputeEmissiveWithPdf(
 {
     ISTATUS Status;
 
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (RayValidate(ToLight) == FALSE)
+    if (RayValidate(ToPbrLight) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -249,51 +249,51 @@ LightComputeEmissiveWithPdf(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Status = Light->VTable->ComputeEmissiveWithPdfRoutine(Light->Data,
-                                                          ToLight,
-                                                          Tester,
-                                                          Spectrum,
-                                                          Pdf);
+    Status = PbrLight->VTable->ComputeEmissiveWithPdfRoutine(PbrLight->Data,
+                                                             ToPbrLight,
+                                                             Tester,
+                                                             Spectrum,
+                                                             Pdf);
 
     return Status;
 }
 
 VOID
-LightRetain(
-    _In_opt_ PLIGHT Light
+PbrLightRetain(
+    _In_opt_ PPBR_LIGHT PbrLight
     )
 {
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return;
     }
 
-    Light->ReferenceCount += 1;
+    PbrLight->ReferenceCount += 1;
 }
 
 VOID
-LightRelease(
-    _In_opt_ _Post_invalid_ PLIGHT Light
+PbrLightRelease(
+    _In_opt_ _Post_invalid_ PPBR_LIGHT PbrLight
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return;
     }
 
-    Light->ReferenceCount -= 1;
+    PbrLight->ReferenceCount -= 1;
 
-    if (Light->ReferenceCount == 0)
+    if (PbrLight->ReferenceCount == 0)
     {
-        FreeRoutine = Light->VTable->FreeRoutine;
+        FreeRoutine = PbrLight->VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {
-            FreeRoutine(Light->Data);
+            FreeRoutine(PbrLight->Data);
         }
 
-        IrisAlignedFree(Light);
+        IrisAlignedFree(PbrLight);
     }
 }

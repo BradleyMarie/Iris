@@ -17,6 +17,17 @@ Abstract:
 
 namespace IrisSpectrum {
 
+ReflectorReference::ReflectorReference(
+    _In_ PCREFLECTOR ReflectorPtr
+    )
+: Data(ReflectorPtr)
+{ 
+    if (ReflectorPtr == nullptr)
+    {
+        throw std::invalid_argument("ReflectorPtr");
+    }
+}
+
 _Ret_
 FLOAT
 ReflectorReference::Reflect(

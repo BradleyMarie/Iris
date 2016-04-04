@@ -244,15 +244,15 @@ SphereInitialize(
 //
 
 typedef struct _PHYSX_SPHERE {
-    PMATERIAL Materials[2];
+    PPBR_MATERIAL Materials[2];
     SPHERE Data;
 } PHYSX_SPHERE, *PPHYSX_SPHERE;
 
 typedef CONST PHYSX_SPHERE *PCPHYSX_SPHERE;
 
 typedef struct _PHYSX_LIGHT_SPHERE {
-    PMATERIAL Materials[2];
-    PLIGHT Lights[2];
+    PPBR_MATERIAL Materials[2];
+    PPBR_LIGHT Lights[2];
     SPHERE Data;
 } PHYSX_LIGHT_SPHERE, *PPHYSX_LIGHT_SPHERE;
 
@@ -268,7 +268,7 @@ ISTATUS
 PhysxSphereGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCMATERIAL *Material
+    _Out_opt_ PCPBR_MATERIAL *Material
     )
 {
     PCPHYSX_SPHERE Sphere;
@@ -383,8 +383,8 @@ PhysxSphereFree(
 
     Sphere = (PCPHYSX_SPHERE) Context;
 
-    MaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
-    MaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
+    PbrMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    PbrMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
 }
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -393,7 +393,7 @@ ISTATUS
 PhysxLightSphereGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCMATERIAL *Material
+    _Out_opt_ PCPBR_MATERIAL *Material
     )
 {
     PCPHYSX_LIGHT_SPHERE Sphere;
@@ -418,7 +418,7 @@ ISTATUS
 PhysxLightSphereGetLight(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_ PCLIGHT *Light
+    _Out_ PCPBR_LIGHT *Light
     )
 {
     PCPHYSX_LIGHT_SPHERE Sphere;
@@ -533,10 +533,10 @@ PhysxLightSphereFree(
 
     Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
 
-    MaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
-    MaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
-    LightRelease(Sphere->Lights[SPHERE_FRONT_FACE]);
-    LightRelease(Sphere->Lights[SPHERE_BACK_FACE]);
+    PbrMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    PbrMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
+    PbrLightRelease(Sphere->Lights[SPHERE_FRONT_FACE]);
+    PbrLightRelease(Sphere->Lights[SPHERE_BACK_FACE]);
 }
 
 //
@@ -571,10 +571,10 @@ ISTATUS
 PhysxSphereAllocate(
     _In_ POINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PMATERIAL FrontMaterial,
-    _In_opt_ PMATERIAL BackMaterial,
-    _In_opt_ PLIGHT FrontLight,
-    _In_opt_ PLIGHT BackLight,
+    _In_opt_ PPBR_MATERIAL FrontMaterial,
+    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPBR_LIGHT FrontLight,
+    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     )
 {
@@ -653,10 +653,10 @@ PhysxSphereAllocate(
         return Status;
     }
 
-    MaterialRetain(FrontMaterial);
-    MaterialRetain(BackMaterial);
-    LightRetain(FrontLight);
-    LightRetain(BackLight);
+    PbrMaterialRetain(FrontMaterial);
+    PbrMaterialRetain(BackMaterial);
+    PbrLightRetain(FrontLight);
+    PbrLightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

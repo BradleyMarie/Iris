@@ -453,15 +453,15 @@ TriangleCheckBounds(
 //
 
 typedef struct _PHYSX_TRIANGLE {
-    PMATERIAL Materials[2];
+    PPBR_MATERIAL Materials[2];
     TRIANGLE Data;
 } PHYSX_TRIANGLE, *PPHYSX_TRIANGLE;
 
 typedef CONST PHYSX_TRIANGLE *PCPHYSX_TRIANGLE;
 
 typedef struct _PHYSX_LIGHT_TRIANGLE {
-    PMATERIAL Materials[2];
-    PLIGHT Lights[2];
+    PPBR_MATERIAL Materials[2];
+    PPBR_LIGHT Lights[2];
     TRIANGLE Data;
 } PHYSX_LIGHT_TRIANGLE, *PPHYSX_LIGHT_TRIANGLE;
 
@@ -477,7 +477,7 @@ ISTATUS
 PhysxTriangleGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCMATERIAL *Material
+    _Out_opt_ PCPBR_MATERIAL *Material
     )
 {
     PCPHYSX_TRIANGLE Triangle;
@@ -650,8 +650,8 @@ PhysxTriangleFree(
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
-    MaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
-    MaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
+    PbrMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
+    PbrMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
 }
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -660,7 +660,7 @@ ISTATUS
 PhysxLightTriangleGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCMATERIAL *Material
+    _Out_opt_ PCPBR_MATERIAL *Material
     )
 {
     PCPHYSX_LIGHT_TRIANGLE Triangle;
@@ -685,7 +685,7 @@ ISTATUS
 PhysxLightTriangleGetLight(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_ PCLIGHT *Light
+    _Out_ PCPBR_LIGHT *Light
     )
 {
     PCPHYSX_LIGHT_TRIANGLE Triangle;
@@ -858,10 +858,10 @@ PhysxLightTriangleFree(
 
     Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
 
-    MaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
-    MaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
-    LightRelease(Triangle->Lights[TRIANGLE_FRONT_FACE]);
-    LightRelease(Triangle->Lights[TRIANGLE_BACK_FACE]);
+    PbrMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
+    PbrMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
+    PbrLightRelease(Triangle->Lights[TRIANGLE_FRONT_FACE]);
+    PbrLightRelease(Triangle->Lights[TRIANGLE_BACK_FACE]);
 }
 
 //
@@ -933,10 +933,10 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
-    _In_opt_ PMATERIAL FrontMaterial,
-    _In_opt_ PMATERIAL BackMaterial,
-    _In_opt_ PLIGHT FrontLight,
-    _In_opt_ PLIGHT BackLight,
+    _In_opt_ PPBR_MATERIAL FrontMaterial,
+    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPBR_LIGHT FrontLight,
+    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     )
 {
@@ -1050,10 +1050,10 @@ PhysxTriangleAllocate(
         return Status;
     }
 
-    MaterialRetain(FrontMaterial);
-    MaterialRetain(BackMaterial);
-    LightRetain(FrontLight);
-    LightRetain(BackLight);
+    PbrMaterialRetain(FrontMaterial);
+    PbrMaterialRetain(BackMaterial);
+    PbrLightRetain(FrontLight);
+    PbrLightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

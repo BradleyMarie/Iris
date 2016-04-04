@@ -26,11 +26,10 @@ namespace IrisSpectrum {
 
 class ReflectorReference final {
 public:
+    IRISSPECTRUMPLUSPLUSAPI
     ReflectorReference(
         _In_ PCREFLECTOR ReflectorPtr
-        )
-    : Data(ReflectorPtr)
-    { }
+        );
         
     _Ret_
     PCREFLECTOR

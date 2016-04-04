@@ -29,10 +29,10 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
-    _In_opt_ PMATERIAL FrontMaterial,
-    _In_opt_ PMATERIAL BackMaterial,
-    _In_opt_ PLIGHT FrontLight,
-    _In_opt_ PLIGHT BackLight,
+    _In_opt_ PPBR_MATERIAL FrontMaterial,
+    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPBR_LIGHT FrontLight,
+    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     );
 

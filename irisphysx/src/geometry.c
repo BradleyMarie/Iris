@@ -259,7 +259,7 @@ ISTATUS
 PBRGeometryGetMaterial(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCMATERIAL *Material
+    _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
     )
 {
     ISTATUS Status;
@@ -286,7 +286,7 @@ ISTATUS
 PBRGeometryGetLight(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCLIGHT *Light
+    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     )
 {
     ISTATUS Status;

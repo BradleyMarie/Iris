@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the MATERIAL type.
+    This file contains the definitions for the PBR_MATERIAL type.
 
 --*/
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-struct _MATERIAL {
-    PCMATERIAL_VTABLE VTable;
+struct _PBR_MATERIAL {
+    PCPBR_MATERIAL_VTABLE VTable;
     SIZE_T ReferenceCount;
     PVOID Data;
 };
@@ -31,20 +31,20 @@ struct _MATERIAL {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-MaterialAllocate(
-    _In_ PCMATERIAL_VTABLE MaterialVTable,
+PbrMaterialAllocate(
+    _In_ PCPBR_MATERIAL_VTABLE PbrMaterialVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PMATERIAL *Material
+    _Out_ PPBR_MATERIAL *PbrMaterial
     )
 {
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PMATERIAL AllocatedMaterial;
+    PPBR_MATERIAL AllocatedPbrMaterial;
 
-    if (MaterialVTable == NULL)
+    if (PbrMaterialVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -68,13 +68,13 @@ MaterialAllocate(
         }
     }
 
-    if (Material == NULL)
+    if (PbrMaterial == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(MATERIAL),
-                                                      _Alignof(MATERIAL),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_MATERIAL),
+                                                      _Alignof(PBR_MATERIAL),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -86,18 +86,18 @@ MaterialAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedMaterial = (PMATERIAL) HeaderAllocation;
+    AllocatedPbrMaterial = (PPBR_MATERIAL) HeaderAllocation;
 
-    AllocatedMaterial->VTable = MaterialVTable;
-    AllocatedMaterial->Data = DataAllocation;
-    AllocatedMaterial->ReferenceCount = 1;
+    AllocatedPbrMaterial->VTable = PbrMaterialVTable;
+    AllocatedPbrMaterial->Data = DataAllocation;
+    AllocatedPbrMaterial->ReferenceCount = 1;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    *Material = AllocatedMaterial;
+    *PbrMaterial = AllocatedPbrMaterial;
 
     return ISTATUS_SUCCESS;
 }
@@ -106,19 +106,19 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-MaterialSample(
-    _In_ PCMATERIAL Material,
+PbrMaterialSample(
+    _In_ PCPBR_MATERIAL PbrMaterial,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PBRDF *Brdf
+    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PPBR_BRDF *PbrBrdf
     )
 {
     ISTATUS Status;
     
-    if (Material == NULL)
+    if (PbrMaterial == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -138,58 +138,58 @@ MaterialSample(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
     
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
     
-    Status = Material->VTable->SampleRoutine(Material->Data,
-                                             ModelHitPoint,
-                                             AdditionalData,
-                                             SurfaceNormal,
-                                             ModelToWorld,
-                                             BrdfAllocator,
-                                             Brdf);
+    Status = PbrMaterial->VTable->SampleRoutine(PbrMaterial->Data,
+                                                ModelHitPoint,
+                                                AdditionalData,
+                                                SurfaceNormal,
+                                                ModelToWorld,
+                                                BrdfAllocator,
+                                                PbrBrdf);
     
     return ISTATUS_SUCCESS;
 }
 
 VOID
-MaterialRetain(
-    _In_opt_ PMATERIAL Material
+PbrMaterialRetain(
+    _In_opt_ PPBR_MATERIAL PbrMaterial
     )
 {
-    if (Material == NULL)
+    if (PbrMaterial == NULL)
     {
         return;
     }
 
-    Material->ReferenceCount += 1;
+    PbrMaterial->ReferenceCount += 1;
 }
 
 VOID
-MaterialRelease(
-    _In_opt_ _Post_invalid_ PMATERIAL Material
+PbrMaterialRelease(
+    _In_opt_ _Post_invalid_ PPBR_MATERIAL PbrMaterial
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    if (Material == NULL)
+    if (PbrMaterial == NULL)
     {
         return;
     }
 
-    Material->ReferenceCount -= 1;
+    PbrMaterial->ReferenceCount -= 1;
 
-    if (Material->ReferenceCount == 0)
+    if (PbrMaterial->ReferenceCount == 0)
     {
-        FreeRoutine = Material->VTable->FreeRoutine;
+        FreeRoutine = PbrMaterial->VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {
-            FreeRoutine(Material->Data);
+            FreeRoutine(PbrMaterial->Data);
         }
 
-        IrisAlignedFree(Material);
+        IrisAlignedFree(PbrMaterial);
     }
 }

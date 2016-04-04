@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the BRDF_ALLOCATOR type.
+    This file contains the definitions for the PBR_BRDF_ALLOCATOR type.
 
 --*/
 
-#ifndef _BRDF_ALLOCATOR_IRIS_PHYSX_
-#define _BRDF_ALLOCATOR_IRIS_PHYSX_
+#ifndef _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_
+#define _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-typedef struct _BRDF_ALLOCATOR BRDF_ALLOCATOR, *PBRDF_ALLOCATOR;
-typedef CONST BRDF_ALLOCATOR *PCBRDF_ALLOCATOR;
+typedef struct _PBR_BRDF_ALLOCATOR PBR_BRDF_ALLOCATOR, *PPBR_BRDF_ALLOCATOR;
+typedef CONST PBR_BRDF_ALLOCATOR *PCPBR_BRDF_ALLOCATOR;
 
 //
 // Functions
@@ -32,13 +32,13 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfAllocatorAllocate(
-    _Inout_ PBRDF_ALLOCATOR BrdfAllocator,
-    _In_ PCBRDF_VTABLE BrdfVTable,
+PbrBrdfAllocatorAllocate(
+    _Inout_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator,
+    _In_ PCPBR_BRDF_VTABLE PbrBrdfVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PCBRDF *Brdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     );
 
-#endif // _BRDF_ALLOCATOR_IRIS_PHYSX_
+#endif // _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_

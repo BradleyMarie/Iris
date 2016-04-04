@@ -172,7 +172,7 @@ SpectrumPointLightFree(
 // Static Variables
 //
 
-CONST STATIC LIGHT_VTABLE PointLightVTable = {
+CONST STATIC PBR_LIGHT_VTABLE PointLightVTable = {
     SpectrumPointLightSample,
     SpectrumPointLightComputeEmissive,
     SpectrumPointLightComputeEmissiveWithPdf,
@@ -189,7 +189,7 @@ ISTATUS
 SpectrumPointLightAllocate(
     _In_ PSPECTRUM Intensity,
     _In_ POINT3 WorldLocation,
-    _Out_ PLIGHT *Light
+    _Out_ PPBR_LIGHT *Light
     )
 {
     SPECTRUM_POINT_LIGHT LightData;
@@ -198,11 +198,11 @@ SpectrumPointLightAllocate(
     LightData.Location = WorldLocation;
     LightData.Intensity = Intensity;
 
-    Status = LightAllocate(&PointLightVTable,
-                           &LightData,
-                           sizeof(SPECTRUM_POINT_LIGHT),
-                           _Alignof(SPECTRUM_POINT_LIGHT),
-                           Light);
+    Status = PbrLightAllocate(&PointLightVTable,
+                              &LightData,
+                              sizeof(SPECTRUM_POINT_LIGHT),
+                              _Alignof(SPECTRUM_POINT_LIGHT),
+                              Light);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -115,7 +115,7 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
 // Static Variables
 //
 
-CONST STATIC BRDF_VTABLE SpectrumMirrorBrdfVTable = {
+CONST STATIC PBR_BRDF_VTABLE SpectrumMirrorBrdfVTable = {
     SpectrumMirrorBrdfSample,
     SpectrumMirrorBrdfSample,
     SpectrumMirrorBrdfComputeReflectance,
@@ -132,10 +132,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumMirrorBrdfAllocate(
-    _In_ PBRDF_ALLOCATOR Allocator,
+    _In_ PPBR_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
     _In_ VECTOR3 SurfaceNormal,
-    _Out_ PCBRDF *Brdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
     SPECTRUM_MIRROR_BRDF BrdfData;
@@ -156,7 +156,7 @@ SpectrumMirrorBrdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -164,12 +164,12 @@ SpectrumMirrorBrdfAllocate(
     BrdfData.Reflectance = Reflectance;
     BrdfData.SurfaceNormal = SurfaceNormal;
 
-    Status = BrdfAllocatorAllocate(Allocator,
-                                   &SpectrumMirrorBrdfVTable,
-                                   &BrdfData,
-                                   sizeof(SPECTRUM_MIRROR_BRDF),
-                                   _Alignof(SPECTRUM_MIRROR_BRDF),
-                                   Brdf);
+    Status = PbrBrdfAllocatorAllocate(Allocator,
+                                      &SpectrumMirrorBrdfVTable,
+                                      &BrdfData,
+                                      sizeof(SPECTRUM_MIRROR_BRDF),
+                                      _Alignof(SPECTRUM_MIRROR_BRDF),
+                                      PbrBrdf);
 
     if (Status != ISTATUS_SUCCESS)
     {

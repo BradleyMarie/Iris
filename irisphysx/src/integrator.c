@@ -18,10 +18,10 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_INTEGRATOR {
+struct _PBR_INTEGRATOR {
     PBR_SHARED_CONTEXT PBRSharedContext;
     PPBR_RAYTRACER NextPBRRayTracer;
-} PBR_INTEGRATOR, *PPBR_INTEGRATOR;
+};
 
 //
 // Functions
@@ -93,7 +93,7 @@ PBRIntegratorIntegrate(
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_ PPBR_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
     _Inout_opt_ PVOID IntegrateRoutineContext,
-    _In_reads_(NumberOfLights) PCLIGHT *Lights,
+    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ FLOAT Epsilon,
     _In_ RAY WorldRay,

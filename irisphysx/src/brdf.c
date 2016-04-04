@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the BRDF type.
+    This file contains the definitions for the PBR_BRDF type.
 
 --*/
 
@@ -21,8 +21,8 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfSample(
-    _In_ PCBRDF Brdf,
+PbrBrdfSample(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -33,7 +33,7 @@ BrdfSample(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -68,13 +68,13 @@ BrdfSample(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    Status = Brdf->VTable->SampleRoutine(Brdf->Data,
-                                         Incoming,
-                                         Rng, 
-                                         Compositor,
-                                         Reflector,
-                                         Outgoing,
-                                         Pdf);
+    Status = PbrBrdf->VTable->SampleRoutine(PbrBrdf->Data,
+                                            Incoming,
+                                            Rng, 
+                                            Compositor,
+                                            Reflector,
+                                            Outgoing,
+                                            Pdf);
 
     return Status;
 }
@@ -82,8 +82,8 @@ BrdfSample(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfSampleWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfSampleWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -94,7 +94,7 @@ BrdfSampleWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -129,13 +129,13 @@ BrdfSampleWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    Status = Brdf->VTable->SampleRoutineWithLambertianFalloff(Brdf->Data,
-                                                              Incoming,
-                                                              Rng, 
-                                                              Compositor,
-                                                              Reflector,
-                                                              Outgoing,
-                                                              Pdf);
+    Status = PbrBrdf->VTable->SampleRoutineWithLambertianFalloff(PbrBrdf->Data,
+                                                                 Incoming,
+                                                                 Rng, 
+                                                                 Compositor,
+                                                                 Reflector,
+                                                                 Outgoing,
+                                                                 Pdf);
 
     return Status;
 }
@@ -143,8 +143,8 @@ BrdfSampleWithLambertianFalloff(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfComputeReflectance(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectance(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -153,7 +153,7 @@ BrdfComputeReflectance(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -178,11 +178,11 @@ BrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Status = Brdf->VTable->ComputeReflectanceRoutine(Brdf->Data,
-                                                     Incoming,
-                                                     Outgoing,
-                                                     Compositor,
-                                                     Reflector);
+    Status = PbrBrdf->VTable->ComputeReflectanceRoutine(PbrBrdf->Data,
+                                                        Incoming,
+                                                        Outgoing,
+                                                        Compositor,
+                                                        Reflector);
 
     return Status;
 }
@@ -190,8 +190,8 @@ BrdfComputeReflectance(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfComputeReflectanceWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -200,7 +200,7 @@ BrdfComputeReflectanceWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -225,11 +225,11 @@ BrdfComputeReflectanceWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Status = Brdf->VTable->ComputeReflectanceRoutineWithLambertianFalloff(Brdf->Data,
-                                                                          Incoming,
-                                                                          Outgoing,
-                                                                          Compositor,
-                                                                          Reflector);
+    Status = PbrBrdf->VTable->ComputeReflectanceRoutineWithLambertianFalloff(PbrBrdf->Data,
+                                                                             Incoming,
+                                                                             Outgoing,
+                                                                             Compositor,
+                                                                             Reflector);
 
     return Status;
 }
@@ -237,8 +237,8 @@ BrdfComputeReflectanceWithLambertianFalloff(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfComputeReflectanceWithPdf(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithPdf(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -248,7 +248,7 @@ BrdfComputeReflectanceWithPdf(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -278,12 +278,12 @@ BrdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Status = Brdf->VTable->ComputeReflectanceWithPdfRoutine(Brdf->Data,
-                                                            Incoming,
-                                                            Outgoing,
-                                                            Compositor,
-                                                            Reflector,
-                                                            Pdf);
+    Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutine(PbrBrdf->Data,
+                                                               Incoming,
+                                                               Outgoing,
+                                                               Compositor,
+                                                               Reflector,
+                                                               Pdf);
 
     return Status;
 }
@@ -291,8 +291,8 @@ BrdfComputeReflectanceWithPdf(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-BrdfComputeReflectanceWithPdfWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -302,7 +302,7 @@ BrdfComputeReflectanceWithPdfWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -332,12 +332,12 @@ BrdfComputeReflectanceWithPdfWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Status = Brdf->VTable->ComputeReflectanceWithPdfRoutineWithLambertianFalloff(Brdf->Data,
-                                                                                 Incoming,
-                                                                                 Outgoing,
-                                                                                 Compositor,
-                                                                                 Reflector,
-                                                                                 Pdf);
+    Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutineWithLambertianFalloff(PbrBrdf->Data,
+                                                                                    Incoming,
+                                                                                    Outgoing,
+                                                                                    Compositor,
+                                                                                    Reflector,
+                                                                                    Pdf);
 
     return Status;
 }

@@ -285,7 +285,7 @@ SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
 // Static Variables
 //
 
-CONST STATIC BRDF_VTABLE SpectrumLambertianBrdfVTable = {
+CONST STATIC PBR_BRDF_VTABLE SpectrumLambertianBrdfVTable = {
     SpectrumLambertianBrdfSample,
     SpectrumLambertianBrdfSampleWithLambertianFalloff,
     SpectrumLambertianBrdfComputeReflectance,
@@ -302,10 +302,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SpectrumLambertianBrdfAllocate(
-    _In_ PBRDF_ALLOCATOR Allocator,
+    _In_ PPBR_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
     _In_ VECTOR3 SurfaceNormal,
-    _Out_ PCBRDF *Brdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
     SPECRUM_LAMBERTIAN_BRDF BrdfData;
@@ -326,7 +326,7 @@ SpectrumLambertianBrdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Brdf == NULL)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -334,12 +334,12 @@ SpectrumLambertianBrdfAllocate(
     BrdfData.Reflectance = Reflectance;
     BrdfData.SurfaceNormal = SurfaceNormal;
 
-    Status = BrdfAllocatorAllocate(Allocator,
-                                   &SpectrumLambertianBrdfVTable,
-                                   &BrdfData,
-                                   sizeof(SPECRUM_LAMBERTIAN_BRDF),
-                                   _Alignof(SPECRUM_LAMBERTIAN_BRDF),
-                                   Brdf);
+    Status = PbrBrdfAllocatorAllocate(Allocator,
+                                      &SpectrumLambertianBrdfVTable,
+                                      &BrdfData,
+                                      sizeof(SPECRUM_LAMBERTIAN_BRDF),
+                                      _Alignof(SPECRUM_LAMBERTIAN_BRDF),
+                                      PbrBrdf);
 
     if (Status != ISTATUS_SUCCESS)
     {

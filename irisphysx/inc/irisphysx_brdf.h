@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the BRDF type.
+    This file contains the definitions for the PBR_BRDF type.
 
 --*/
 
-#ifndef _BRDF_IRIS_PHYSX_
-#define _BRDF_IRIS_PHYSX_
+#ifndef _PBR_BRDF_IRIS_PHYSX_
+#define _PBR_BRDF_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -25,7 +25,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PBRDF_SAMPLE)(
+(*PPBR_BRDF_SAMPLE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -39,7 +39,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PBRDF_COMPUTE_REFLECTANCE)(
+(*PPBR_BRDF_COMPUTE_REFLECTANCE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
@@ -51,7 +51,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PBRDF_COMPUTE_REFLECTANCE_WITH_PDF)(
+(*PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
@@ -60,19 +60,19 @@ ISTATUS
     _Out_ PFLOAT Pdf
     );
 
-typedef struct _BRDF_VTABLE {
-    PBRDF_SAMPLE SampleRoutine;
-    PBRDF_SAMPLE SampleRoutineWithLambertianFalloff;
-    PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
-    PBRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutineWithLambertianFalloff;
-    PBRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutine;
-    PBRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutineWithLambertianFalloff;
-} BRDF_VTABLE, *PBRDF_VTABLE;
+typedef struct _PBR_BRDF_VTABLE {
+    PPBR_BRDF_SAMPLE SampleRoutine;
+    PPBR_BRDF_SAMPLE SampleRoutineWithLambertianFalloff;
+    PPBR_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
+    PPBR_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutineWithLambertianFalloff;
+    PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutine;
+    PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutineWithLambertianFalloff;
+} PBR_BRDF_VTABLE, *PPBR_BRDF_VTABLE;
 
-typedef CONST BRDF_VTABLE *PCBRDF_VTABLE;
+typedef CONST PBR_BRDF_VTABLE *PCPBR_BRDF_VTABLE;
 
-typedef struct _BRDF BRDF, *PBRDF;
-typedef CONST BRDF *PCBRDF;
+typedef struct _PBR_BRDF PBR_BRDF, *PPBR_BRDF;
+typedef CONST PBR_BRDF *PCPBR_BRDF;
 
 //
 // Functions
@@ -82,8 +82,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfSample(
-    _In_ PCBRDF Brdf,
+PbrBrdfSample(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -96,8 +96,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfSampleWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfSampleWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -110,8 +110,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfComputeReflectance(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectance(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -122,8 +122,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfComputeReflectanceWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -134,8 +134,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfComputeReflectanceWithPdf(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithPdf(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -147,8 +147,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-BrdfComputeReflectanceWithPdfWithLambertianFalloff(
-    _In_ PCBRDF Brdf,
+PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
+    _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
@@ -156,4 +156,4 @@ BrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _Out_ PFLOAT Pdf
     );
 
-#endif // _BRDF_IRIS_PHYSX_
+#endif // _PBR_BRDF_IRIS_PHYSX_

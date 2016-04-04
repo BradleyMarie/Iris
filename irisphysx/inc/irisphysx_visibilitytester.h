@@ -49,7 +49,7 @@ ISTATUS
 PBRVisibilityTesterTestLightVisibility(
     _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PCLIGHT Light,
+    _In_ PCPBR_LIGHT Light,
     _Out_ PBOOL Visible
     );
 

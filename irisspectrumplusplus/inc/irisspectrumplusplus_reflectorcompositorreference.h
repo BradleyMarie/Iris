@@ -26,11 +26,10 @@ namespace IrisSpectrum {
 
 class ReflectorCompositorReference final {
 public:
+    IRISSPECTRUMPLUSPLUSAPI
     ReflectorCompositorReference(
         _In_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr
-        )
-    : Data(ReflectorCompositorReferencePtr)
-    { }
+        );
     
     _Ret_
     PREFLECTOR_COMPOSITOR_REFERENCE

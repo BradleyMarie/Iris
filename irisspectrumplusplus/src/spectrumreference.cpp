@@ -17,6 +17,17 @@ Abstract:
 
 namespace IrisSpectrum {
 
+SpectrumReference::SpectrumReference(
+    _In_ PCSPECTRUM SpectrumPtr
+    )
+: Data(SpectrumPtr)
+{ 
+    if (SpectrumPtr == nullptr)
+    {
+        throw std::invalid_argument("SpectrumPtr");
+    }
+}
+
 _Ret_
 FLOAT
 SpectrumReference::Sample(

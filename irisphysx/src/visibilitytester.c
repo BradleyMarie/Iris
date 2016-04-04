@@ -29,10 +29,10 @@ typedef struct _PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT {
     BOOL Visible;
 } PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT;
 
-typedef struct _PBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT {
-    PCLIGHT TargetLight;
+typedef struct _PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT {
+    PCPBR_LIGHT TargetPbrLight;
     BOOL Visible;
-} PBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT;
+} PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT;
 
 //
 // Static Functions
@@ -79,17 +79,17 @@ PBRVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(
 }
 
 SFORCEINLINE
-PBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT
+PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT
 PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(
-    _In_ PCLIGHT TargetLight,
+    _In_ PCPBR_LIGHT TargetPbrLight,
     _In_ BOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT Context;
+    PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT Context;
 
-    ASSERT(TargetLight != NULL);
+    ASSERT(TargetPbrLight != NULL);
 
-    Context.TargetLight = TargetLight;
+    Context.TargetPbrLight = TargetPbrLight;
     Context.Visible = Visible;
 
     return Context;
@@ -106,14 +106,14 @@ PBRVisibilityTesterTestLightVisibilityProcessHit(
 {
     PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
     PCPBR_GEOMETRY PBRGeometry;
-    PCLIGHT ClosestLight;
+    PCPBR_LIGHT ClosestPbrLight;
     
     TestContext = (PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
     PBRGeometry = (PCPBR_GEOMETRY) Hit->Data;
 
-    PBRGeometryGetLight(PBRGeometry, Hit->FaceHit, &ClosestLight);
+    PBRGeometryGetLight(PBRGeometry, Hit->FaceHit, &ClosestPbrLight);
     
-    if (ClosestLight == TestContext->TargetLight)
+    if (ClosestPbrLight == TestContext->TargetPbrLight)
     {
         TestContext->Visible = TRUE;
     }
@@ -278,11 +278,11 @@ ISTATUS
 PBRVisibilityTesterTestLightVisibility(
     _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PCLIGHT Light,
+    _In_ PCPBR_LIGHT PbrLight,
     _Out_ PBOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
+    PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
     ISTATUS Status;
     
     if (PBRVisibilityTester == NULL)
@@ -295,7 +295,7 @@ PBRVisibilityTesterTestLightVisibility(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    if (Light == NULL)
+    if (PbrLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -305,7 +305,7 @@ PBRVisibilityTesterTestLightVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    ProcessHitContext = PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(Light, FALSE);
+    ProcessHitContext = PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(PbrLight, FALSE);
 
     Status = RayTracerAdapterTraceSceneProcessClosestHit(PBRVisibilityTester->RayTracer,
                                                          WorldRay,
