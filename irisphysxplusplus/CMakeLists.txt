@@ -10,7 +10,8 @@ include_directories(inc src/inc
     ../irisspectrumplusplus/inc)
 
 add_library(irisphysxplusplus SHARED
-    src/brdf.cpp)
+    src/brdf.cpp
+    src/brdfallocator.cpp)
 
 target_link_libraries(irisphysxplusplus 
     iris

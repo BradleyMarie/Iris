@@ -27,6 +27,7 @@ extern "C" {
 // Include C++ standard library headers
 //
 
+#include <type_traits>
 #include <functional>
 #include <memory>
 #include <tuple>
@@ -45,5 +46,6 @@ extern "C" {
 
 #include "irisphysxplusplus_api.h"
 #include "irisphysxplusplus_brdf.h"
+#include "irisphysxplusplus_brdfallocator.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_

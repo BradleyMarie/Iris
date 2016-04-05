@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisphysxplusplus_raytrace.h
+    irisphysxplusplus_brdf.h
 
 Abstract:
 
