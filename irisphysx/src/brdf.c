@@ -21,6 +21,80 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
+PbrBrdfAllocate(
+    _In_ PCPBR_BRDF_VTABLE PbrBrdfVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PPBR_BRDF *PbrBrdf
+    )
+{
+    BOOL AllocationSuccessful;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
+    PPBR_BRDF AllocatedBrdf;
+
+    if (PbrBrdfVTable == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (DataSizeInBytes != 0)
+    {
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
+    }
+
+    if (PbrBrdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_BRDF),
+                                                      _Alignof(PBR_BRDF),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
+
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedBrdf = (PPBR_BRDF) HeaderAllocation;
+
+    AllocatedBrdf->VTable = PbrBrdfVTable;
+    AllocatedBrdf->Data = DataAllocation;
+    AllocatedBrdf->ReferenceCount = 1;
+
+    if (DataSizeInBytes != 0)
+    {
+        memcpy(DataAllocation, Data, DataSizeInBytes);
+    }
+
+    *PbrBrdf = AllocatedBrdf;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 PbrBrdfSample(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
@@ -340,4 +414,44 @@ PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
                                                                                     Pdf);
 
     return Status;
+}
+
+VOID
+PbrBrdfRetain(
+    _In_opt_ PPBR_BRDF PbrBrdf
+    )
+{
+    if (PbrBrdf == NULL)
+    {
+        return;
+    }
+
+    PbrBrdf->ReferenceCount += 1;
+}
+
+VOID
+PbrBrdfRelease(
+    _In_opt_ _Post_invalid_ PPBR_BRDF PbrBrdf
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+
+    if (PbrBrdf == NULL)
+    {
+        return;
+    }
+
+    PbrBrdf->ReferenceCount -= 1;
+
+    if (PbrBrdf->ReferenceCount == 0)
+    {
+        FreeRoutine = PbrBrdf->VTable->FreeRoutine;
+
+        if (FreeRoutine != NULL)
+        {
+            FreeRoutine(PbrBrdf->Data);
+        }
+
+        IrisAlignedFree(PbrBrdf);
+    }
 }

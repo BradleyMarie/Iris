@@ -4,21 +4,20 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    brdf.cpp
+    brdfreference.cpp
 
 Abstract:
 
     This file contains the definitions for the 
-    IrisPysx++ BRDF type.
+    IrisPysx++ BRDFReference type.
 
 --*/
 
 #include <irisphysxplusplusp.h>
 namespace IrisPhysx {
 
-BRDF::BRDF(
-    _In_ PPBR_BRDF PbrBrdf,
-    _In_ bool Retain
+BRDFReference::BRDFReference(
+    _In_ PCPBR_BRDF PbrBrdf
     )
 : Data(PbrBrdf)
 { 
@@ -26,16 +25,11 @@ BRDF::BRDF(
     {
         throw std::invalid_argument("PbrBrdf");
     }
-    
-    if (Retain)
-    {
-        PbrBrdfRetain(Data);
-    }
 }
 
 _Ret_
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
-BRDF::Sample(
+BRDFReference::Sample(
     _In_ const Iris::Vector & Incoming,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
@@ -73,7 +67,7 @@ BRDF::Sample(
 
 _Ret_
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
-BRDF::SampleWithLambertianFalloff(
+BRDFReference::SampleWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
@@ -111,7 +105,7 @@ BRDF::SampleWithLambertianFalloff(
 
 _Ret_
 IrisSpectrum::ReflectorReference
-BRDF::ComputeReflectance(
+BRDFReference::ComputeReflectance(
     _In_ const Iris::Vector & Incoming,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
@@ -148,7 +142,7 @@ BRDF::ComputeReflectance(
 
 _Ret_
 IrisSpectrum::ReflectorReference
-BRDF::ComputeReflectanceWithLambertianFalloff(
+BRDFReference::ComputeReflectanceWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
@@ -185,7 +179,7 @@ BRDF::ComputeReflectanceWithLambertianFalloff(
 
 _Ret_
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
-BRDF::ComputeReflectanceWithPdf(
+BRDFReference::ComputeReflectanceWithPdf(
     _In_ const Iris::Vector & Incoming,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
@@ -224,7 +218,7 @@ BRDF::ComputeReflectanceWithPdf(
 
 _Ret_
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
-BRDF::ComputeReflectanceWithPdfWithLambertianFalloff(
+BRDFReference::ComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor

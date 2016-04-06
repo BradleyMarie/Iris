@@ -4,19 +4,19 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisphysxplusplus_brdf.h
+    irisphysxplusplus_brdfreference.h
 
 Abstract:
 
     This file contains the declarations for the 
-    IrisPysx++ BRDF type.
+    IrisPysx++ BRDFReference type.
 
 --*/
 
 #include <irisphysxplusplus.h>
 
-#ifndef _BRDF_IRIS_PHYSX_PLUS_PLUS_
-#define _BRDF_IRIS_PHYSX_PLUS_PLUS_
+#ifndef _BRDF_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
+#define _BRDF_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
 
 namespace IrisPhysx {
 
@@ -24,12 +24,11 @@ namespace IrisPhysx {
 // Types
 //
 
-class BRDF final {
+class BRDFReference final {
 public:
     IRISPHYSXPLUSPLUSAPI
-    BRDF(
-        _In_ PPBR_BRDF PbrBrdf,
-        _In_ bool Retain
+    BRDFReference(
+        _In_ PCPBR_BRDF PbrBrdf
         );
         
     _Ret_
@@ -80,17 +79,10 @@ public:
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
     
-    ~BRDF(
-        void
-        )
-    {
-        PbrBrdfRelease(Data);    
-    }
-    
 private:
-    PPBR_BRDF Data;
+    PCPBR_BRDF Data;
 };
 
 } // namespace Iris
 
-#endif // _BRDF_IRIS_PHYSX_PLUS_PLUS_
+#endif // _BRDF_REFERENCE_IRIS_PHYSX_PLUS_PLUS_

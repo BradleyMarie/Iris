@@ -248,7 +248,7 @@ public:
 
     _Ret_
     template<typename T>
-    BRDF
+    BRDFReference
     Allocate(
         _In_ const T & BRDFData
         )
@@ -285,7 +285,7 @@ public:
                 assert(false);
         }
         
-        return BRDF(AllocatedBrdf);
+        return BRDFReference(AllocatedBrdf);
     }
     
 private:

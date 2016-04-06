@@ -46,6 +46,7 @@ extern "C" {
 
 #include "irisphysxplusplus_api.h"
 #include "irisphysxplusplus_brdf.h"
+#include "irisphysxplusplus_brdfreference.h"
 #include "irisphysxplusplus_brdfallocator.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_
