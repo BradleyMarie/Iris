@@ -262,7 +262,8 @@ public:
             BRDFComputeReflectanceAdapter<T>,
             BRDFComputeReflectanceWithLambertianFalloffAdapter<T>,
             BRDFComputeReflectanceWithPdfAdapter<T>,
-            BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter<T>
+            BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter<T>,
+            nullptr
         };
         
         PCPBR_BRDF AllocatedBrdf;

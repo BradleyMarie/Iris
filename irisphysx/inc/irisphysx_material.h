@@ -32,7 +32,7 @@ ISTATUS
     _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PPBR_BRDF *PbrBrdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     );
 
 typedef struct _PBR_MATERIAL_VTABLE {
@@ -72,7 +72,7 @@ PbrMaterialSample(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PPBR_BRDF *Brdf
+    _Out_ PCPBR_BRDF *Brdf
     );
 
 IRISPHYSXAPI

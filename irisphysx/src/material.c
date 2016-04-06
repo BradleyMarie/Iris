@@ -113,7 +113,7 @@ PbrMaterialSample(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PPBR_BRDF *PbrBrdf
+    _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
     ISTATUS Status;

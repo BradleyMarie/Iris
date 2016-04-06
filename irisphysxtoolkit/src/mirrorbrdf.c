@@ -121,7 +121,8 @@ CONST STATIC PBR_BRDF_VTABLE SpectrumMirrorBrdfVTable = {
     SpectrumMirrorBrdfComputeReflectance,
     SpectrumMirrorBrdfComputeReflectance,
     SpectrumMirrorBrdfComputeReflectanceWithPdf,
-    SpectrumMirrorBrdfComputeReflectanceWithPdf
+    SpectrumMirrorBrdfComputeReflectanceWithPdf,
+    NULL
 };
 
 //

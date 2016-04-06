@@ -12,7 +12,9 @@ include_directories(inc src/inc
 add_library(irisphysxplusplus SHARED
     src/brdf.cpp
     src/brdfreference.cpp
-    src/brdfallocator.cpp)
+    src/brdfallocator.cpp
+    src/material.cpp
+    src/materialreference.cpp)
 
 target_link_libraries(irisphysxplusplus 
     iris

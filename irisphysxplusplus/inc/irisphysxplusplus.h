@@ -48,5 +48,7 @@ extern "C" {
 #include "irisphysxplusplus_brdf.h"
 #include "irisphysxplusplus_brdfreference.h"
 #include "irisphysxplusplus_brdfallocator.h"
+#include "irisphysxplusplus_material.h"
+#include "irisphysxplusplus_materialreference.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_

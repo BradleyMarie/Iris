@@ -291,7 +291,8 @@ CONST STATIC PBR_BRDF_VTABLE SpectrumLambertianBrdfVTable = {
     SpectrumLambertianBrdfComputeReflectance,
     SpectrumLambertianBrdfComputeReflectanceWithLambertianFalloff,
     SpectrumLambertianBrdfComputeReflectanceWithPdf,
-    SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff
+    SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff,
+    NULL
 };
 
 //
