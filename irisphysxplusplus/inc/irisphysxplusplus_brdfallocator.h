@@ -254,7 +254,7 @@ public:
         )
     {
         static_assert(std::is_trivially_copyable<T>::value,
-                      "T must be trivially copyable");
+                      "BRDFData must be trivially copyable");
     
         static const PBR_BRDF_VTABLE VTable {
             BRDFSampleAdapter<T>,

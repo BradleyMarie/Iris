@@ -14,7 +14,8 @@ add_library(irisphysxplusplus SHARED
     src/brdfreference.cpp
     src/brdfallocator.cpp
     src/material.cpp
-    src/materialreference.cpp)
+    src/materialreference.cpp
+    src/hitallocator.cpp)
 
 target_link_libraries(irisphysxplusplus 
     iris

@@ -50,5 +50,6 @@ extern "C" {
 #include "irisphysxplusplus_brdfallocator.h"
 #include "irisphysxplusplus_material.h"
 #include "irisphysxplusplus_materialreference.h"
+#include "irisphysxplusplus_hitallocator.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_
