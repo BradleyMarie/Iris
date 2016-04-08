@@ -99,7 +99,45 @@ public:
                                     FaceHit,
                                     &AdditionalData,
                                     sizeof(T),
-                                    alignof(T)
+                                    alignof(T),
+                                    HitPoint);
+    
+        return Result;        
+    }
+    
+    _Ret_
+    PHIT_LIST
+    Allocate(
+        _In_opt_ PHIT_LIST NextHit,
+        _In_ FLOAT Distance,
+        _In_ INT32 FaceHit
+        )
+    {
+        PHIT_LIST Result = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    nullptr,
+                                    0,
+                                    0);
+    
+        return Result;
+    }
+    
+    _Ret_
+    PHIT_LIST
+    Allocate(
+        _In_opt_ PHIT_LIST NextHit,
+        _In_ FLOAT Distance,
+        _In_ INT32 FaceHit,
+        _In_ const Iris::Point & HitPoint
+        )
+    {
+        PHIT_LIST Result = Allocate(NextHit,
+                                    Distance,
+                                    FaceHit,
+                                    nullptr,
+                                    0,
+                                    0,
                                     HitPoint);
     
         return Result;        

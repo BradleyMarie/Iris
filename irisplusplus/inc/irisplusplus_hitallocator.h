@@ -58,7 +58,7 @@ public:
                                     Distance,
                                     FaceHit,
                                     IrisHitPoint,
-                                    NULL,
+                                    nullptr,
                                     0,
                                     0);
 
@@ -77,6 +77,9 @@ public:
         _In_ const T & AdditionalData
         )
     {
+        static_assert(std::is_trivially_copyable<T>::value,
+                      "AdditionalData must be trivially copyable");
+                      
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
         PHIT_LIST Output = Allocate(NextHit,
@@ -104,7 +107,7 @@ public:
                                     DataPtr,
                                     Distance,
                                     FaceHit,
-                                    NULL,
+                                    nullptr,
                                     0,
                                     0);
 
@@ -122,6 +125,9 @@ public:
         _In_ const T & AdditionalData
         )
     {
+        static_assert(std::is_trivially_copyable<T>::value,
+                      "AdditionalData must be trivially copyable");
+                      
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,

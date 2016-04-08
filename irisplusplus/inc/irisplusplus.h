@@ -27,6 +27,7 @@ extern "C" {
 // Include C++ standard library headers
 //
 
+#include <type_traits>
 #include <functional>
 #include <memory>
 #include <tuple>
