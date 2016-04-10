@@ -27,6 +27,12 @@ extern "C" {
 // Include C++ standard library headers
 //
 
+#ifdef _MSC_VER
+#include "optional.hpp"
+#else
+#include <optional>
+#endif
+
 #include <type_traits>
 #include <functional>
 #include <memory>
@@ -51,5 +57,6 @@ extern "C" {
 #include "irisphysxplusplus_material.h"
 #include "irisphysxplusplus_materialreference.h"
 #include "irisphysxplusplus_hitallocator.h"
+#include "irisphysxplusplus_geometry.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_
