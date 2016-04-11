@@ -18,7 +18,7 @@ Abstract:
 namespace Iris {
 
 //
-// Functions
+// Static Functions
 //
 
 static
@@ -42,6 +42,10 @@ TestGeometryAdapter(
     *HitList = Result;
     return ISTATUS_SUCCESS;
 }
+
+//
+// Functions
+//
 
 void
 HitTester::Test(

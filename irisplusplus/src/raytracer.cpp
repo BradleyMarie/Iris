@@ -18,11 +18,12 @@ Abstract:
 namespace Iris {
 
 //
-// Functions
+// Static Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS 
 TestGeometryAdapter(
     _In_opt_ PCVOID Context, 
@@ -39,6 +40,7 @@ TestGeometryAdapter(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS 
 ProcessHitsAdapter(
     _Inout_opt_ PVOID Context, 
@@ -63,6 +65,7 @@ ProcessHitsAdapter(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS 
 ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
@@ -92,6 +95,10 @@ ProcessHitsWithCoordinatesAdapter(
 
     return ISTATUS_SUCCESS;
 }
+
+//
+// Functions
+//
 
 void
 RayTracer::TraceClosestHit(
