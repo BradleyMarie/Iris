@@ -46,35 +46,35 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> & ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsOutOfOrder(
-        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(
-        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
         );
         
     RayTracer(
@@ -108,38 +108,6 @@ private:
             throw std::bad_alloc();;
         }
     }
-
-    _Check_return_
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS 
-    TestGeometryAdapter(
-        _In_opt_ PCVOID Context,
-        _Inout_ PHIT_TESTER HitTesterPtr,
-        _In_ RAY WorldRay
-        );
-
-    _Check_return_
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS 
-    ProcessHitsAdapter(
-        _Inout_opt_ PVOID Context, 
-        _In_ PCHIT Hit
-        );
-        
-    _Check_return_
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS 
-    ProcessHitsWithCoordinatesAdapter(
-        _Inout_opt_ PVOID Context, 
-        _In_ PCHIT Hit,
-        _In_ PCMATRIX ModelToWorldReference,
-        _In_ VECTOR3 ModelViewer,
-        _In_ POINT3 ModelHitPoint,
-        _In_ POINT3 WorldHitPoint
-        );
 };
 
 } // namespace Iris

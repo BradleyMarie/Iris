@@ -34,7 +34,7 @@ public:
     { }
 
     Ray(
-        _In_ RAY IrisRay
+        _In_ const RAY & IrisRay
         )
     : Data(IrisRay)
     { }
@@ -78,7 +78,7 @@ public:
     static
     Point 
     Endpoint(
-        _In_ Ray R,
+        _In_ const Ray & R,
         _In_ FLOAT Distance
         )
     {
@@ -92,7 +92,7 @@ public:
     static 
     Ray 
     Normalize(
-        _In_ Ray ToNormalize
+        _In_ const Ray & ToNormalize
         )
     {
         RAY IrisResult;
@@ -106,7 +106,7 @@ public:
     Ray
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ Ray Multiplicand1
+        _In_ const Ray & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -125,8 +125,8 @@ public:
     static
     Ray
     InverseMultiply(
-        _In_ MatrixReference Multiplicand0,
-        _In_ Ray Multiplicand1
+        _In_ const MatrixReference & Multiplicand0,
+        _In_ const Ray & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -151,7 +151,7 @@ inline
 Ray
 operator*(
     _In_ const Matrix & Multiplicand0,
-    _In_ Ray Multiplicand1
+    _In_ const Ray & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;
@@ -171,8 +171,8 @@ static
 inline
 Ray
 operator*(
-    _In_ MatrixReference Multiplicand0,
-    _In_ Ray Multiplicand1
+    _In_ const MatrixReference & Multiplicand0,
+    _In_ const Ray & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;

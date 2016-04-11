@@ -618,7 +618,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
 
     bool FirstHitFound = false;
 
-    std::function<void(HitTester, Ray)> TraceFunction = [&](HitTester Tester, Ray WorldRay) -> void
+    std::function<void(HitTester, const Ray &)> TraceFunction = [&](HitTester Tester, const Ray & WorldRay) -> void
     {
         Scene.Trace(Tester);
     };
@@ -657,7 +657,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
 
     bool FirstHitFound = false;
 
-    std::function<void(HitTester, Ray)> TraceFunction = [&](HitTester Tester, Ray WorldRay) -> void
+    std::function<void(HitTester, const Ray &)> TraceFunction = [&](HitTester Tester, const Ray & WorldRay) -> void
     {
         Scene.Trace(Tester);
     };

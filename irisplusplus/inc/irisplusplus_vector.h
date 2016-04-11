@@ -100,7 +100,7 @@ public:
     static 
     Vector 
     Normalize(
-        _In_ Vector ToNormalize
+        _In_ const Vector & ToNormalize
         )
     {
         VECTOR3 Normalized;
@@ -113,7 +113,7 @@ public:
     static 
     std::tuple<Vector, FLOAT, FLOAT> 
     NormalizeWithLength(
-        _In_ Vector ToNormalize
+        _In_ const Vector & ToNormalize
         )
     {
         VECTOR3 Normalized;
@@ -128,8 +128,8 @@ public:
     static 
     FLOAT 
     DotProduct(
-        _In_ Vector Operand0, 
-        _In_ Vector Operand1
+        _In_ const Vector & Operand0, 
+        _In_ const Vector & Operand1
         )
     {
         return VectorDotProduct(Operand0.Data, Operand1.Data);
@@ -138,8 +138,8 @@ public:
     static 
     Vector 
     CrossProduct(
-        _In_ Vector Operand0, 
-        _In_ Vector Operand1
+        _In_ const Vector & Operand0, 
+        _In_ const Vector & Operand1
         )
     {
         VECTOR3 Product;
@@ -152,8 +152,8 @@ public:
     static 
     Vector 
     Fma(
-        _In_ Vector Addend0, 
-        _In_ Vector Addend1, 
+        _In_ const Vector & Addend0, 
+        _In_ const Vector & Addend1, 
         _In_ FLOAT Scalar
         )
     {
@@ -167,8 +167,8 @@ public:
     static 
     Vector 
     Reflect(
-        _In_ Vector Vec, 
-        _In_ Vector Normal
+        _In_ const Vector & Vec, 
+        _In_ const Vector & Normal
         )
     {
         VECTOR3 Reflected;
@@ -181,8 +181,8 @@ public:
     static 
     Vector 
     HalfAngle(
-        _In_ Vector Vector0, 
-        _In_ Vector Vector1
+        _In_ const Vector & Vector0, 
+        _In_ const Vector & Vector1
         )
     {
         VECTOR3 HalfAngle;
@@ -196,7 +196,7 @@ public:
     Vector
     TransposedMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -215,8 +215,8 @@ public:
     static
     Vector
     TransposedMultiply(
-        _In_ MatrixReference Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const MatrixReference & Multiplicand0,
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -236,7 +236,7 @@ public:
     Vector
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -255,8 +255,8 @@ public:
     static
     Vector
     InverseMultiply(
-        _In_ MatrixReference Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const MatrixReference & Multiplicand0,
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -276,7 +276,7 @@ public:
     Vector
     InverseTransposedMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -295,8 +295,8 @@ public:
     static
     Vector
     InverseTransposedMultiply(
-        _In_ MatrixReference Multiplicand0,
-        _In_ Vector Multiplicand1
+        _In_ const MatrixReference & Multiplicand0,
+        _In_ const Vector & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -360,8 +360,8 @@ static
 inline 
 Vector 
 operator+(
-    _In_ Vector Addend0, 
-    _In_ Vector Addend1
+    _In_ const Vector & Addend0, 
+    _In_ const Vector & Addend1
     )
 {
     VECTOR3 IrisAddend0;
@@ -380,8 +380,8 @@ static
 inline 
 Vector 
 operator-(
-    _In_ Vector Minuend, 
-    _In_ Vector Subtrahend
+    _In_ const Vector & Minuend, 
+    _In_ const Vector & Subtrahend
     )
 {
     VECTOR3 IrisDifference;
@@ -400,7 +400,7 @@ static
 inline 
 Vector 
 operator*(
-    _In_ Vector ToScale, 
+    _In_ const Vector & ToScale, 
     _In_ FLOAT Scalar
     )
 {
@@ -419,7 +419,7 @@ inline
 Vector
 operator*(
     _In_ const Matrix & Multiplicand0,
-    _In_ Vector Multiplicand1
+    _In_ const Vector & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;
@@ -439,8 +439,8 @@ static
 inline
 Vector
 operator*(
-    _In_ MatrixReference Multiplicand0,
-    _In_ Vector Multiplicand1
+    _In_ const MatrixReference & Multiplicand0,
+    _In_ const Vector & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;

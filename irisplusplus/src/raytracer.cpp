@@ -24,13 +24,13 @@ namespace Iris {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-RayTracer::TestGeometryAdapter(
+TestGeometryAdapter(
     _In_opt_ PCVOID Context, 
     _Inout_ PHIT_TESTER HitTesterPtr,
     _In_ RAY WorldRay
     )
 {
-    auto TestGeometryRoutine = static_cast<const std::function<void(HitTester, Ray)> *>(Context);
+    auto TestGeometryRoutine = static_cast<const std::function<void(HitTester, const Ray &)> *>(Context);
     
     (*TestGeometryRoutine)(HitTester(HitTesterPtr), Ray(WorldRay));
 
@@ -40,7 +40,7 @@ RayTracer::TestGeometryAdapter(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-RayTracer::ProcessHitsAdapter(
+ProcessHitsAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit
     )
@@ -64,7 +64,7 @@ RayTracer::ProcessHitsAdapter(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-RayTracer::ProcessHitsWithCoordinatesAdapter(
+ProcessHitsWithCoordinatesAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit,
     _In_ PCMATRIX ModelToWorld,
@@ -73,7 +73,7 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
     _In_ POINT3 WorldHitPoint
     )
 {
-    auto ProcessHitRoutine = static_cast<std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> *>(Context);
+    auto ProcessHitRoutine = static_cast<std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> *>(Context);
 
     bool Stop = (*ProcessHitRoutine)(Hit->Data,
                                      Hit->Distance,
@@ -95,10 +95,10 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+    _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> & ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHit(Data,
@@ -125,10 +125,10 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceClosestHit(
-    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+    _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
     _In_ const Ray & WorldRay,
     _In_ FLOAT MinimumDistance,
-    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(Data,
@@ -155,9 +155,9 @@ RayTracer::TraceClosestHit(
 
 void
 RayTracer::TraceAllHitsOutOfOrder(
-    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+    _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(Data,
@@ -183,9 +183,9 @@ RayTracer::TraceAllHitsOutOfOrder(
 
 void
 RayTracer::TraceAllHitsInOrder(
-    _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
+    _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
     _In_ const Ray & WorldRay,
-    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
+    _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
     )
 {
     ISTATUS Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(Data,

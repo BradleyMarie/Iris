@@ -9,7 +9,6 @@ add_library(irisplusplus SHARED
     src/matrix.cpp
     src/matrixreference.cpp
     src/hittester.cpp
-    src/hitallocator.cpp
     src/raytracer.cpp)
 
 target_link_libraries(irisplusplus 

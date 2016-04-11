@@ -143,7 +143,6 @@ private:
     PHIT_ALLOCATOR Data;
 
     _Ret_
-    IRISPLUSPLUSAPI
     PHIT_LIST
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
@@ -153,10 +152,36 @@ private:
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
         _In_ SIZE_T AdditionalDataAlignment
-        );
+        )
+    {
+        PHIT_LIST Result;
+        ISTATUS Status;
+
+        Status = HitAllocatorAllocate(Data,
+                                      NextHit,
+                                      DataPtr,
+                                      Distance,
+                                      FaceHit,
+                                      AdditionalData,
+                                      AdditionalDataSizeInBytes,
+                                      AdditionalDataAlignment,
+                                      &Result);
+
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return Result;
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(ISTATUSToCString(Status));
+        }
+    }
 
     _Ret_
-    IRISPLUSPLUSAPI
     PHIT_LIST
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
@@ -167,7 +192,35 @@ private:
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
         _In_ SIZE_T AdditionalDataAlignment
-        );
+        )
+    {
+        PHIT_LIST Result;
+        ISTATUS Status;
+
+        Status = HitAllocatorAllocateWithHitPoint(Data,
+                                                  NextHit,
+                                                  DataPtr,
+                                                  Distance,
+                                                  FaceHit,
+                                                  AdditionalData,
+                                                  AdditionalDataSizeInBytes,
+                                                  AdditionalDataAlignment,
+                                                  HitPoint,
+                                                  &Result);
+
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return Result;
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(ISTATUSToCString(Status));
+        }
+    }
 };
 
 } // namespace Iris

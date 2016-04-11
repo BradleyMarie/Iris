@@ -43,8 +43,8 @@ public:
     static
     Point
     AddScaled(
-        _In_ Point Addend0, 
-        _In_ Vector Addend1, 
+        _In_ const Point & Addend0, 
+        _In_ const Vector & Addend1, 
         _In_ FLOAT Scalar
         )
     {
@@ -65,8 +65,8 @@ public:
     static
     Point
     SubtractScaled(
-        _In_ Point Minuend, 
-        _In_ Vector Subtrahend, 
+        _In_ const Point & Minuend, 
+        _In_ const Vector & Subtrahend, 
         _In_ FLOAT Scalar
         )
     {
@@ -88,7 +88,7 @@ public:
     Point
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
-        _In_ Point Multiplicand1
+        _In_ const Point & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -107,8 +107,8 @@ public:
     static
     Point
     InverseMultiply(
-        _In_ MatrixReference Multiplicand0,
-        _In_ Point Multiplicand1
+        _In_ const MatrixReference & Multiplicand0,
+        _In_ const Point & Multiplicand1
         )
     {
         PCMATRIX IrisMultiplicand0;
@@ -189,8 +189,8 @@ static
 inline 
 Point 
 operator+(
-    _In_ Point Addend0, 
-    _In_ Vector Addend1
+    _In_ const Point & Addend0, 
+    _In_ const Vector & Addend1
     )
 {
     POINT3 IrisAddend0;
@@ -209,8 +209,8 @@ static
 inline
 Vector 
 operator-(
-    _In_ Point Minuend, 
-    _In_ Point Subtrahend
+    _In_ const Point & Minuend, 
+    _In_ const Point & Subtrahend
     )
 {
     POINT3 IrisMinuend;
@@ -229,8 +229,8 @@ static
 inline
 Point 
 operator-(
-    _In_ Point Minuend, 
-    _In_ Vector Subtrahend
+    _In_ const Point & Minuend, 
+    _In_ const Vector & Subtrahend
     )
 {
     POINT3 IrisMinuend;
@@ -250,7 +250,7 @@ inline
 Point
 operator*(
     _In_ const Matrix & Multiplicand0,
-    _In_ Point Multiplicand1
+    _In_ const Point & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;
@@ -270,8 +270,8 @@ static
 inline
 Point
 operator*(
-    _In_ MatrixReference Multiplicand0,
-    _In_ Point Multiplicand1
+    _In_ const MatrixReference & Multiplicand0,
+    _In_ const Point & Multiplicand1
     )
 {
     PCMATRIX IrisMultiplicand0;

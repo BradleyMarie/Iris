@@ -46,69 +46,29 @@ public:
         return Data;
     }
 
+    IRISPLUSPLUSAPI
     void
     Test(
-        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine
-        )
-    {
-        ISTATUS Status = HitTesterTestGeometry(Data, 
-                                               TestGeometryAdapter,
-                                               &TestGeometryRoutine);
-        
-        if (Status != ISTATUS_SUCCESS)
-        {
-            throw std::runtime_error(ISTATUSToCString(Status));
-        }
-    }
+        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine
+        );
 
+    IRISPLUSPLUSAPI
     void
     Test(
-        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
+        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
         _In_ const Matrix & MatrixRef
-        )
-    {
-        ISTATUS Status = HitTesterTestPremultipliedGeometryWithTransform(Data, 
-                                                                         TestGeometryAdapter,
-                                                                         &TestGeometryRoutine,
-                                                                         MatrixRef.AsPCMATRIX());
-        
-        if (Status != ISTATUS_SUCCESS)
-        {
-            throw std::runtime_error(ISTATUSToCString(Status));
-        }
-    }
+        );
 
+    IRISPLUSPLUSAPI
     void
     Test(
-        _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
+        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
         _In_ const Matrix & MatrixRef,
         _In_ bool Premultiplied
-        )
-    {
-        ISTATUS Status = HitTesterTestGeometryWithTransform(Data, 
-                                                            TestGeometryAdapter,
-                                                            &TestGeometryRoutine,
-                                                            MatrixRef.AsPCMATRIX(),
-                                                            Premultiplied ? TRUE : FALSE);
-                                                          
-        if (Status != ISTATUS_SUCCESS)
-        {
-            throw std::runtime_error(ISTATUSToCString(Status));
-        }
-    }
+        );
 
 private:
     PHIT_TESTER Data;
-
-    IRISPLUSPLUSAPI
-    static
-    ISTATUS
-    TestGeometryAdapter(
-        _In_opt_ PCVOID Context,
-        _In_ RAY Ray,
-        _Inout_ PHIT_ALLOCATOR HitAllocator,
-        _Outptr_result_maybenull_ PHIT_LIST *HitList
-        );
 };
 
 } // namespace Iris
