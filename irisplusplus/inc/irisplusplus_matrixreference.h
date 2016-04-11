@@ -52,11 +52,18 @@ public:
         return MatrixReference(Inverse);
     }
 
-    IRISPLUSPLUSAPI
     void
     ReadContents(
         _Out_writes_(4) FLOAT Contents[4][4]
-        ) const;
+        ) const
+    {
+        if (Contents == nullptr)
+        {
+            throw std::invalid_argument("Contents");
+        }
+
+        MatrixReadContents(Data, Contents);
+    } 
 
     MatrixReference(
         _In_ const MatrixReference & ToCopy

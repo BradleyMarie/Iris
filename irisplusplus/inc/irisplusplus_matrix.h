@@ -135,11 +135,18 @@ public:
         return Matrix(IrisMatrix);
     }
 
-    IRISPLUSPLUSAPI
     void
     ReadContents(
         _Out_writes_(4) FLOAT Contents[4][4]
-        ) const;
+        ) const
+    {
+        if (Contents == nullptr)
+        {
+            throw std::invalid_argument("Contents");
+        }
+
+        MatrixReadContents(Data, Contents);
+    } 
 
     Matrix(
         _In_ const Matrix & ToCopy
@@ -157,11 +164,20 @@ public:
         ToMove.Data = nullptr;
     }
 
-    IRISPLUSPLUSAPI
     Matrix & 
     operator=(
         _In_ const Matrix & ToCopy
-        );
+        )
+    {
+        if (this != &ToCopy)
+        {
+            MatrixRelease(Data);
+            Data = ToCopy.Data;
+            MatrixRetain(Data);
+        }
+
+        return *this;
+    }
 
     ~Matrix(
         void
@@ -171,7 +187,8 @@ public:
     }
 
     friend
-    IRISPLUSPLUSAPI
+    static
+    inline
     Matrix
     operator*(
         _In_ const Matrix & Multiplicand0,
@@ -188,12 +205,35 @@ private:
     { }
 };
 
-IRISPLUSPLUSAPI
+static
+inline
 Matrix
 operator*(
     _In_ const Matrix & Multiplicand0,
     _In_ const Matrix & Multiplicand1
-    );
+    )
+{
+    PMATRIX IrisMatrix;
+    ISTATUS Status;
+
+    Status = MatrixAllocateProduct(Multiplicand0.Data,
+                                   Multiplicand1.Data,
+                                   &IrisMatrix);
+
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return Matrix(IrisMatrix);
+    }
+
+    switch (Status)
+    {
+        case ISTATUS_ARITHMETIC_ERROR:
+            throw std::invalid_argument("Product Not Invertible");
+        default:
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();
+    }
+}
 
 } // namespace Iris
 

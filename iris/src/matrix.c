@@ -1152,36 +1152,53 @@ MatrixGetConstantInverse(
 
 ISTATUS
 MatrixReadContents(
-    _In_ PCMATRIX Matrix,
+    _In_opt_ PCMATRIX Matrix,
     _Out_writes_(4) FLOAT Contents[4][4]
     )
 {
-    if (Matrix == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (Contents == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    Contents[0][0] = Matrix->M[0][0];
-    Contents[0][1] = Matrix->M[0][1];
-    Contents[0][2] = Matrix->M[0][2];
-    Contents[0][3] = Matrix->M[0][3];
-    Contents[1][0] = Matrix->M[1][0];
-    Contents[1][1] = Matrix->M[1][1];
-    Contents[1][2] = Matrix->M[1][2];
-    Contents[1][3] = Matrix->M[1][3];
-    Contents[2][0] = Matrix->M[2][0];
-    Contents[2][1] = Matrix->M[2][1];
-    Contents[2][2] = Matrix->M[2][2];
-    Contents[2][3] = Matrix->M[2][3];
-    Contents[3][0] = Matrix->M[3][0];
-    Contents[3][1] = Matrix->M[3][1];
-    Contents[3][2] = Matrix->M[3][2];
-    Contents[3][3] = Matrix->M[3][3];
+    if (Matrix == NULL)
+    {
+        Contents[0][0] = (FLOAT) 1.0;
+        Contents[0][1] = (FLOAT) 0.0;
+        Contents[0][2] = (FLOAT) 0.0;
+        Contents[0][3] = (FLOAT) 0.0;
+        Contents[1][0] = (FLOAT) 0.0;
+        Contents[1][1] = (FLOAT) 1.0;
+        Contents[1][2] = (FLOAT) 0.0;
+        Contents[1][3] = (FLOAT) 0.0;
+        Contents[2][0] = (FLOAT) 0.0;
+        Contents[2][1] = (FLOAT) 0.0;
+        Contents[2][2] = (FLOAT) 1.0;
+        Contents[2][3] = (FLOAT) 0.0;
+        Contents[3][0] = (FLOAT) 0.0;
+        Contents[3][1] = (FLOAT) 0.0;
+        Contents[3][2] = (FLOAT) 0.0;
+        Contents[3][3] = (FLOAT) 1.0;
+    }
+    else
+    {
+        Contents[0][0] = Matrix->M[0][0];
+        Contents[0][1] = Matrix->M[0][1];
+        Contents[0][2] = Matrix->M[0][2];
+        Contents[0][3] = Matrix->M[0][3];
+        Contents[1][0] = Matrix->M[1][0];
+        Contents[1][1] = Matrix->M[1][1];
+        Contents[1][2] = Matrix->M[1][2];
+        Contents[1][3] = Matrix->M[1][3];
+        Contents[2][0] = Matrix->M[2][0];
+        Contents[2][1] = Matrix->M[2][1];
+        Contents[2][2] = Matrix->M[2][2];
+        Contents[2][3] = Matrix->M[2][3];
+        Contents[3][0] = Matrix->M[3][0];
+        Contents[3][1] = Matrix->M[3][1];
+        Contents[3][2] = Matrix->M[3][2];
+        Contents[3][3] = Matrix->M[3][3];
+    }
     
     return ISTATUS_SUCCESS;
 }

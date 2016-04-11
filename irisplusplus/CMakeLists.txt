@@ -7,7 +7,6 @@ include_directories(../iris/inc
 add_library(irisplusplus SHARED
     src/utility.cpp
     src/matrix.cpp
-    src/matrixreference.cpp
     src/hittester.cpp
     src/raytracer.cpp)
 
