@@ -140,12 +140,13 @@ public:
         _Out_writes_(4) FLOAT Contents[4][4]
         ) const
     {
-        if (Contents == nullptr)
+		ISTATUS Status = MatrixReadContents(Data, Contents);
+
+        if (Status != ISTATUS_SUCCESS)
         {
+			assert(Status == ISTATUS_INVALID_ARGUMENT_01);
             throw std::invalid_argument("Contents");
         }
-
-        MatrixReadContents(Data, Contents);
     } 
 
     Matrix(

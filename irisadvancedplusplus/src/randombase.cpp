@@ -18,12 +18,13 @@ Abstract:
 namespace IrisAdvanced {
 
 //
-// Static Functions
+// Adapter Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
-RandomBase::GenerateFloat(
+GenerateFloat(
     _In_ PVOID Context,
     _In_ FLOAT Minimum,
     _In_ FLOAT Maximum,
@@ -42,8 +43,9 @@ RandomBase::GenerateFloat(
 }
 
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
-RandomBase::GenerateIndex(
+GenerateIndex(
     _In_ PVOID Context,
     _In_ SIZE_T Minimum,
     _In_ SIZE_T Maximum,
@@ -59,8 +61,9 @@ RandomBase::GenerateIndex(
     return ISTATUS_SUCCESS;
 }
 
+static
 VOID 
-RandomBase::Free(
+Free(
     _In_ _Post_invalid_ PVOID Context
     )
 {
@@ -69,6 +72,20 @@ RandomBase::Free(
     RandomBase **RandomBasePtr = (RandomBase**) Context;
     delete *RandomBasePtr;
 }
+
+//
+// Static Variables
+//
+
+const static RANDOM_VTABLE InteropVTable = {
+    GenerateFloat, 
+    GenerateIndex, 
+    Free
+};
+
+//
+// Functions
+//
 
 Random
 RandomBase::Create(
@@ -96,15 +113,5 @@ RandomBase::Create(
     
     return Random(RandomPtr);
 }
-
-//
-// Static Variables
-//
-
-const RANDOM_VTABLE RandomBase::InteropVTable = {
-    RandomBase::GenerateFloat, 
-    RandomBase::GenerateIndex, 
-    RandomBase::Free
-};
 
 } // namespace IrisAdvanced

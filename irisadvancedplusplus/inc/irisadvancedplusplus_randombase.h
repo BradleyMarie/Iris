@@ -55,35 +55,6 @@ public:
         void
         )
     { }
-    
-private:
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS
-    GenerateFloat(
-        _In_ PVOID Context,
-        _In_ FLOAT Minimum,
-        _In_ FLOAT Maximum,
-        _Out_range_(Minimum, Maximum) PFLOAT RandomValue
-        );
-
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS
-    GenerateIndex(
-        _In_ PVOID Context,
-        _In_ SIZE_T Minimum,
-        _In_ SIZE_T Maximum,
-        _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
-        );
-    
-    static
-    VOID 
-    Free(
-        _In_ _Post_invalid_ PVOID Context
-        );
-    
-    const static RANDOM_VTABLE InteropVTable;
 };
 
 } // namespace IrisAdvanced
