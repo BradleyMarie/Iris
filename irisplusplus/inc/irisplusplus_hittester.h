@@ -30,7 +30,12 @@ public:
         _In_ PHIT_TESTER HitTesterPtr
         )
     : Data(HitTesterPtr)
-    { }
+    { 
+        if (HitTesterPtr == nullptr)
+        {
+            throw std::invalid_argument("HitTesterPtr");
+        }
+    }
     
     _Ret_
     PHIT_TESTER
@@ -41,30 +46,61 @@ public:
         return Data;
     }
 
-    IRISPLUSPLUSAPI
     void
     Test(
         _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine
-        );
+        )
+    {
+        ISTATUS Status = HitTesterTestGeometry(Data, 
+                                               TestGeometryAdapter,
+                                               &TestGeometryRoutine);
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(ISTATUSToCString(Status));
+        }
+    }
 
-    IRISPLUSPLUSAPI
     void
     Test(
         _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
         _In_ const Matrix & MatrixRef
-        );
+        )
+    {
+        ISTATUS Status = HitTesterTestPremultipliedGeometryWithTransform(Data, 
+                                                                         TestGeometryAdapter,
+                                                                         &TestGeometryRoutine,
+                                                                         MatrixRef.AsPCMATRIX());
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(ISTATUSToCString(Status));
+        }
+    }
 
-    IRISPLUSPLUSAPI
     void
     Test(
         _In_ std::function<PHIT_LIST(Ray, HitAllocator)> TestGeometryRoutine,
         _In_ const Matrix & MatrixRef,
         _In_ bool Premultiplied
-        );
+        )
+    {
+        ISTATUS Status = HitTesterTestGeometryWithTransform(Data, 
+                                                            TestGeometryAdapter,
+                                                            &TestGeometryRoutine,
+                                                            MatrixRef.AsPCMATRIX(),
+                                                            Premultiplied ? TRUE : FALSE);
+                                                          
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(ISTATUSToCString(Status));
+        }
+    }
 
 private:
     PHIT_TESTER Data;
 
+    IRISPLUSPLUSAPI
     static
     ISTATUS
     TestGeometryAdapter(

@@ -9,16 +9,8 @@ include_directories(../iris/inc
     src/inc)
 
 add_library(irisspectrumplusplus SHARED
-    src/reflector.cpp
     src/reflectorbase.cpp
-    src/reflectorreference.cpp
-    src/spectrum.cpp
-    src/spectrumbase.cpp
-    src/spectrumreference.cpp
-    src/reflectorcompositor.cpp
-    src/reflectorcompositorreference.cpp
-    src/spectrumcompositor.cpp
-    src/spectrumcompositorreference.cpp)
+    src/spectrumbase.cpp)
 
 target_link_libraries(irisspectrumplusplus 
     iris

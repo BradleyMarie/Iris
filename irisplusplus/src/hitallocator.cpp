@@ -46,24 +46,18 @@ HitAllocator::Allocate(
                                   AdditionalDataAlignment,
                                   &Result);
 
-    switch (Status)
+    if (Status == ISTATUS_SUCCESS)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_ALLOCATION_FAILED:
-            throw std::bad_alloc();
-            break;
-        case ISTATUS_INVALID_ARGUMENT_02:
-            throw std::invalid_argument("DataPtr");
-            break;
-        case ISTATUS_INVALID_ARGUMENT_03:
-            throw std::invalid_argument("Distance");
-            break;
-        default:
-            ASSERT(FALSE);
+        return Result;
     }
 
-    return Result;
+    switch (Status)
+    {
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+    }
 }
 
 _Ret_
@@ -93,24 +87,18 @@ HitAllocator::Allocate(
                                               HitPoint,
                                               &Result);
 
-    switch (Status)
+    if (Status == ISTATUS_SUCCESS)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_ALLOCATION_FAILED:
-            throw std::bad_alloc();
-            break;
-        case ISTATUS_INVALID_ARGUMENT_02:
-            throw std::invalid_argument("DataPtr");
-            break;
-        case ISTATUS_INVALID_ARGUMENT_03:
-            throw std::invalid_argument("Distance");
-            break;
-        default:
-            ASSERT(FALSE);
+        return Result;
     }
 
-    return Result;
+    switch (Status)
+    {
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+    }
 }
 
 } // namespace Iris

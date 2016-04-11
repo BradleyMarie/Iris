@@ -26,12 +26,12 @@ namespace IrisSpectrum {
 
 class SpectrumReference final {
 public:
-    IRISSPECTRUMPLUSPLUSAPI
     SpectrumReference(
-        _In_ PCSPECTRUM SpectrumPtr
-        );
+        _In_opt_ PCSPECTRUM SpectrumPtr
+        )
+    { }
         
-    _Ret_
+    _Ret_opt_
     PCSPECTRUM
     AsPCSPECTRUM(
         void
@@ -41,11 +41,24 @@ public:
     }
     
     _Ret_
-    IRISSPECTRUMPLUSPLUSAPI
     FLOAT
     Sample(
         _In_ FLOAT Wavelength
-        ) const;
+        ) const
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = SpectrumSample(Data,
+                                        Wavelength,
+                                        &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;
+    }
 
     SpectrumReference(
         _In_ const SpectrumReference & ToCopy

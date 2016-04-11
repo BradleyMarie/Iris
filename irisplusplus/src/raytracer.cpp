@@ -18,7 +18,7 @@ Abstract:
 namespace Iris {
 
 //
-// Static Functions
+// Functions
 //
 
 _Check_return_
@@ -93,28 +93,6 @@ RayTracer::ProcessHitsWithCoordinatesAdapter(
     return ISTATUS_SUCCESS;
 }
 
-//
-// Functions
-//
-
-RayTracer::RayTracer(
-    void
-    )
-{
-    ISTATUS Status = RayTracerAllocate(&Data);
-    
-    switch (Status)
-    {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_ALLOCATION_FAILED:
-            throw std::bad_alloc();
-            break;
-        default:
-            ASSERT(false);
-    }
-}
-
 void
 RayTracer::TraceClosestHit(
     _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
@@ -131,22 +109,17 @@ RayTracer::TraceClosestHit(
                                                           ProcessHitsAdapter,
                                                           &ProcessHitRoutine);
     
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return;
+    }
+
     switch (Status)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            throw std::invalid_argument("WorldRay");
-            break;
-        case ISTATUS_INVALID_ARGUMENT_02:
-            throw std::invalid_argument("MinimumDistance");
-            break;
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
-            break;
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
-            break;
     }
 }
 
@@ -166,22 +139,17 @@ RayTracer::TraceClosestHit(
                                                                          ProcessHitsWithCoordinatesAdapter,
                                                                          &ProcessHitRoutine);
 
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return;
+    }
+
     switch (Status)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            throw std::invalid_argument("WorldRay");
-            break;
-        case ISTATUS_INVALID_ARGUMENT_02:
-            throw std::invalid_argument("MinimumDistance");
-            break;
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
-            break;
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
-            break;
     }
 }
 
@@ -199,19 +167,17 @@ RayTracer::TraceAllHitsOutOfOrder(
                                                                  ProcessHitsAdapter,
                                                                  &ProcessHitRoutine);
 
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return;
+    }
+
     switch (Status)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            throw std::invalid_argument("WorldRay");
-            break;
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
-            break;
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
-            break;
     }
 }
 
@@ -229,19 +195,17 @@ RayTracer::TraceAllHitsInOrder(
                                                                              ProcessHitsWithCoordinatesAdapter,
                                                                              &ProcessHitRoutine);
 
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return;
+    }
+
     switch (Status)
     {
-        case ISTATUS_SUCCESS:
-            break;
-        case ISTATUS_INVALID_ARGUMENT_01:
-            throw std::invalid_argument("WorldRay");
-            break;
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
-            break;
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
-            break;
     }
 }
 

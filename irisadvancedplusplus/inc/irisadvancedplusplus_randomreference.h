@@ -26,41 +26,66 @@ namespace IrisAdvanced {
 
 class RandomReference final {
 public:
-    IRISADVANCEDPLUSPLUSAPI
     RandomReference(
         _In_ PRANDOM_REFERENCE RandomReferencePtr
-        );
+        )
+    : Data(RandomReferencePtr)
+    { 
+        if (RandomReferencePtr == NULL)
+        {
+            throw std::invalid_argument("RandomReferencePtr");
+        }
+    }
     
     _Ret_range_(Minimum, Maximum)
-    IRISADVANCEDPLUSPLUSAPI
     FLOAT
     GenerateFloat(
         _In_ FLOAT Minimum,
         _In_ FLOAT Maximum
-        );
+        )
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = RandomReferenceGenerateFloat(Data,
+                                                      Minimum,
+                                                      Maximum,
+                                                      &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+
+        return Result;
+    }
 
     _Ret_range_(Minimum, Maximum)
-    IRISADVANCEDPLUSPLUSAPI
     SIZE_T
     GenerateIndex(
         _In_ SIZE_T Minimum,
         _In_ SIZE_T Maximum
-        );
+        )
+    {
+        SIZE_T Result;
+        
+        ISTATUS Status = RandomReferenceGenerateIndex(Data,
+                                                      Minimum,
+                                                      Maximum,
+                                                      &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+
+        return Result;  
+    }
         
     _Ret_
     PRANDOM_REFERENCE
     AsPRANDOM_REFERENCE(
         void
         )
-    {
-        return Data;
-    }
-
-    _Ret_
-    PCRANDOM_REFERENCE
-    AsPCRANDOM_REFERENCE(
-        void
-        ) const
     {
         return Data;
     }

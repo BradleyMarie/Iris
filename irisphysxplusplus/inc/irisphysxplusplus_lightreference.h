@@ -4,19 +4,19 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisphysxplusplus_light.h
+    irisphysxplusplus_lightreference.h
 
 Abstract:
 
     This file contains the declarations for the 
-    IrisPysx++ Light type.
+    IrisPysx++ LightReference type.
 
 --*/
 
 #include <irisphysxplusplus.h>
 
-#ifndef _LIGHT_IRIS_PHYSX_PLUS_PLUS_
-#define _LIGHT_IRIS_PHYSX_PLUS_PLUS_
+#ifndef _LIGHT_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
+#define _LIGHT_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
 
 namespace IrisPhysx {
 
@@ -24,13 +24,14 @@ namespace IrisPhysx {
 // Types
 //
 
-class Light final {
+class LightReference final {
 public:
     IRISPHYSXPLUSPLUSAPI
-    Light(
-        _In_ PPBR_LIGHT LightPtr,
-        _In_ bool Retain
-        );
+    LightReference(
+        _In_ PCPBR_LIGHT LightPtr
+        )
+    : Data(LightPtr)
+    { }
     
     _Ret_
     IRISPHYSXPLUSPLUSAPI
@@ -58,17 +59,10 @@ public:
         _In_ VisibilityTester Tester
         ) const;
     
-    ~Light(
-        void
-        )
-    {
-        PbrLightRelease(Data);    
-    }
-    
 private:
-    PPBR_LIGHT Data;
+    PCPBR_LIGHT Data;
 };
 
 } // namespace Iris
 
-#endif // _LIGHT_IRIS_PHYSX_PLUS_PLUS_
+#endif // _LIGHT_REFERENCE_IRIS_PHYSX_PLUS_PLUS_

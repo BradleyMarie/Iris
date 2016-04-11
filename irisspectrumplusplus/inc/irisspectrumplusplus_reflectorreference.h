@@ -26,12 +26,13 @@ namespace IrisSpectrum {
 
 class ReflectorReference final {
 public:
-    IRISSPECTRUMPLUSPLUSAPI
     ReflectorReference(
-        _In_ PCREFLECTOR ReflectorPtr
-        );
+        _In_opt_ PCREFLECTOR ReflectorPtr
+        )
+    : Data(ReflectorPtr)
+    { }
         
-    _Ret_
+    _Ret_opt_
     PCREFLECTOR
     AsPCREFLECTOR(
         void
@@ -40,13 +41,28 @@ public:
         return Data;
     }
     
-    _Ret_
+    _Ret_opt_
     IRISSPECTRUMPLUSPLUSAPI
     FLOAT
     Reflect(
         _In_ FLOAT Wavelength,
         _In_ FLOAT IncomingIntensity
-        ) const;
+        ) const
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = ReflectorReflect(Data,
+                                          Wavelength,
+                                          IncomingIntensity,
+                                          &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;
+    }
 
     ReflectorReference(
         _In_ const ReflectorReference & ToCopy

@@ -57,6 +57,9 @@ extern "C" {
 #include "irisphysxplusplus_material.h"
 #include "irisphysxplusplus_materialreference.h"
 #include "irisphysxplusplus_hitallocator.h"
+#include "irisphysxplusplus_visibilitytester.h"
+#include "irisphysxplusplus_light.h"
+#include "irisphysxplusplus_lightreference.h"
 #include "irisphysxplusplus_geometry.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_

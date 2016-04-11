@@ -30,7 +30,12 @@ public:
         _In_ PRANDOM RandomPtr
         )
     : Data(RandomPtr)
-    { }
+    { 
+        if (RandomPtr == NULL)
+        {
+            throw std::invalid_argument("RandomPtr");
+        }
+    }
 
     Random(
         _In_ Random && ToMove
@@ -41,20 +46,48 @@ public:
     }
     
     _Ret_range_(Minimum, Maximum)
-    IRISADVANCEDPLUSPLUSAPI
     FLOAT
     GenerateFloat(
         _In_ FLOAT Minimum,
         _In_ FLOAT Maximum
-        );
+        )
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = RandomGenerateFloat(Data,
+                                             Minimum,
+                                             Maximum,
+                                             &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;
+    }
 
     _Ret_range_(Minimum, Maximum)
-    IRISADVANCEDPLUSPLUSAPI
     SIZE_T
     GenerateIndex(
         _In_ SIZE_T Minimum,
         _In_ SIZE_T Maximum
-        );
+        )
+    {
+        SIZE_T Result;
+        
+        ISTATUS Status = RandomGenerateIndex(Data,
+                                             Minimum,
+                                             Maximum,
+                                             &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;    
+    }
         
     _Ret_
     PRANDOM

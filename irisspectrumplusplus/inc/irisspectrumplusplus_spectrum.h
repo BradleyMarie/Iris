@@ -27,7 +27,7 @@ namespace IrisSpectrum {
 class Spectrum final {
 public:
     Spectrum(
-        _In_ PSPECTRUM SpectrumPtr,
+        _In_opt_ PSPECTRUM SpectrumPtr,
         _In_ bool Retain
         )
     : Data(SpectrumPtr)
@@ -38,7 +38,7 @@ public:
         }
     }
         
-    _Ret_
+    _Ret_opt_
     PSPECTRUM
     AsPSPECTRUM(
         void
@@ -47,7 +47,7 @@ public:
         return Data;
     }
         
-    _Ret_
+    _Ret_opt_
     PCSPECTRUM
     AsPCSPECTRUM(
         void
@@ -57,11 +57,24 @@ public:
     }
     
     _Ret_
-    IRISSPECTRUMPLUSPLUSAPI
     FLOAT
     Sample(
         _In_ FLOAT Wavelength
-        ) const;
+        ) const
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = SpectrumSample(Data,
+                                        Wavelength,
+                                        &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;
+    }
 
     Spectrum(
         _In_ const Spectrum & ToCopy
@@ -79,11 +92,20 @@ public:
         ToMove.Data = nullptr;
     }
 
-    IRISSPECTRUMPLUSPLUSAPI
     Spectrum & 
     operator=(
         _In_ const Spectrum & ToCopy
-        );
+        )
+    {
+        if (this != &ToCopy)
+        {
+            SpectrumRelease(Data);
+            Data = ToCopy.Data;
+            SpectrumRetain(Data);
+        }
+
+        return *this;
+    }
 
     ~Spectrum(
         void

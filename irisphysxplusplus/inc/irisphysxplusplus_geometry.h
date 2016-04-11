@@ -49,7 +49,7 @@ public:
     
 	_Ret_
     IRISPHYSXPLUSPLUSAPI
-    std::experimental::optional<Iris::Vector>
+    std::optional<Iris::Vector>
     ComputeNormal(
         _In_ const Iris::Point & HitPoint,
         _In_ const UINT32 FaceHit
@@ -57,14 +57,14 @@ public:
     
 	_Ret_
     IRISPHYSXPLUSPLUSAPI
-	std::experimental::optional<MaterialReference>
+	std::optional<MaterialReference>
     GetMaterial(
         _In_ const UINT32 FaceHit
         ) const;
     
 	_Ret_
     IRISPHYSXPLUSPLUSAPI
-    PCPBR_LIGHT
+    std::optional<LightReference>
     GetLight(
         _In_ const UINT32 FaceHit
         ) const;

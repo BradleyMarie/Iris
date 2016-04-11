@@ -29,6 +29,7 @@ extern "C" {
 
 #include <type_traits>
 #include <functional>
+#include <stdexcept>
 #include <memory>
 #include <tuple>
 

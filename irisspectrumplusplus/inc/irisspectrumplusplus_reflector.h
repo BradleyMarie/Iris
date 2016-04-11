@@ -27,7 +27,7 @@ namespace IrisSpectrum {
 class Reflector final {
 public:
     Reflector(
-        _In_ PREFLECTOR ReflectorPtr,
+        _In_opt_ PREFLECTOR ReflectorPtr,
         _In_ bool Retain
         )
     : Data(ReflectorPtr)
@@ -38,7 +38,7 @@ public:
         }
     }
         
-    _Ret_
+    _Ret_opt_
     PREFLECTOR
     AsPREFLECTOR(
         void
@@ -47,7 +47,7 @@ public:
         return Data;
     }
         
-    _Ret_
+    _Ret_opt_
     PCREFLECTOR
     AsPCREFLECTOR(
         void
@@ -57,12 +57,26 @@ public:
     }
     
     _Ret_
-    IRISSPECTRUMPLUSPLUSAPI
     FLOAT
     Reflect(
         _In_ FLOAT Wavelength,
         _In_ FLOAT IncomingIntensity
-        ) const;
+        ) const
+    {
+        FLOAT Result;
+        
+        ISTATUS Status = ReflectorReflect(Data,
+                                          Wavelength,
+                                          IncomingIntensity,
+                                          &Result);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return Result;
+    }
 
     Reflector(
         _In_ const Reflector & ToCopy
@@ -80,11 +94,20 @@ public:
         ToMove.Data = nullptr;
     }
 
-    IRISSPECTRUMPLUSPLUSAPI
     Reflector & 
     operator=(
         _In_ const Reflector & ToCopy
-        );
+        )
+    {
+        if (this != &ToCopy)
+        {
+            ReflectorRelease(Data);
+            Data = ToCopy.Data;
+            ReflectorRetain(Data);
+        }
+
+        return *this;
+    }
 
     ~Reflector(
         void

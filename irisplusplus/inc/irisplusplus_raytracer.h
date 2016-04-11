@@ -4,7 +4,7 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisplusplus_raytrace.h
+    irisplusplus_raytracer.h
 
 Abstract:
 
@@ -46,7 +46,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
         _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
@@ -55,7 +55,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
         _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
@@ -64,7 +64,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceAllHitsOutOfOrder(
-        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
@@ -72,7 +72,7 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(
-        _In_ std::function<void(HitTester, Ray)> TestShapesRoutine,
+        _In_ std::function<void(HitTester, Ray)> TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, Vector, Point, Point)> ProcessHitRoutine
         );
@@ -96,10 +96,18 @@ public:
 private:
     PRAYTRACER Data;
 
-    IRISPLUSPLUSAPI
     RayTracer(
         void
-        );
+        )
+    {
+        ISTATUS Status = RayTracerAllocate(&Data);
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();;
+        }
+    }
 
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)

@@ -27,10 +27,17 @@ extern "C" {
 // Include C++ standard library headers
 //
 
+#include <stdexcept>
 #include <memory>
 
 //
 // Include Iris++ Headers
+//
+
+#include <irisplusplus.h>
+
+//
+// Include IrisAdvanced++ Headers
 //
 
 #include "irisadvancedplusplus_api.h"

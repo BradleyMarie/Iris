@@ -7,8 +7,6 @@ include_directories(../iris/inc
     src/inc)
 
 add_library(irisadvancedplusplus SHARED
-    src/randomreference.cpp
-    src/random.cpp
     src/randombase.cpp)
 
 target_link_libraries(irisadvancedplusplus 

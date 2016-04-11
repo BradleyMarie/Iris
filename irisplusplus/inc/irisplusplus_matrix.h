@@ -25,13 +25,6 @@ namespace Iris {
 //
 
 class Matrix final {
-private: 
-    Matrix(
-        _In_ PMATRIX IrisMatrix
-        )
-    : Data(IrisMatrix)
-    { }
-
 public:
     IRISPLUSPLUSAPI
     Matrix(
@@ -188,6 +181,12 @@ public:
 
 private:
     PMATRIX Data;
+
+    Matrix(
+        _In_ PMATRIX IrisMatrix
+        )
+    : Data(IrisMatrix)
+    { }
 };
 
 IRISPLUSPLUSAPI

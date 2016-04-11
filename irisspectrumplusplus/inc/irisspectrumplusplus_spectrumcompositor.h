@@ -332,44 +332,159 @@ private:
     _Ret_
     SpectrumReference
     Add(
-        _In_ PCSPECTRUM Spectrum0Ptr,
-        _In_ PCSPECTRUM Spectrum1Ptr
-        );
+        _In_opt_ PCSPECTRUM Spectrum0Ptr,
+        _In_opt_ PCSPECTRUM Spectrum1Ptr
+        )
+    {
+        PCSPECTRUM Result;
+        
+        ISTATUS Status = SpectrumCompositorAddSpectra(Data,
+                                                      Spectrum0Ptr,
+                                                      Spectrum1Ptr,
+                                                      &Result);
+                                                           
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return SpectrumReference(Result);
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    }
 
     _Ret_
     SpectrumReference
     Attenuate(
-        _In_ PCSPECTRUM SpectrumPtr,
+        _In_opt_ PCSPECTRUM SpectrumPtr,
         _In_ FLOAT Attenuation
-        );
+        )
+    {
+        PCSPECTRUM Result;
+        
+        ISTATUS Status = SpectrumCompositorAttenuateSpectrum(Data,
+                                                             SpectrumPtr,
+                                                             Attenuation,
+                                                             &Result);
+                                                           
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return SpectrumReference(Result);
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    }
 
     _Ret_
     SpectrumReference
     AttenuatedAdd(
-        _In_ PCSPECTRUM Spectrum0Ptr,
-        _In_ PCSPECTRUM Spectrum1Ptr,
+        _In_opt_ PCSPECTRUM Spectrum0Ptr,
+        _In_opt_ PCSPECTRUM Spectrum1Ptr,
         _In_ FLOAT Attenuation
-        );
+        )
+    {
+        PCSPECTRUM Result;
+        
+        ISTATUS Status = SpectrumCompositorAttenuatedAddSpectra(Data,
+                                                                Spectrum0Ptr,
+                                                                Spectrum1Ptr,
+                                                                Attenuation,
+                                                                &Result);
+                                                           
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return SpectrumReference(Result);
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    }
 
     _Ret_
     SpectrumReference
     Reflect(
-        _In_ PCSPECTRUM SpectrumPtr,
-        _In_ PCREFLECTOR ReflectorPtr
-        );
+        _In_opt_ PCSPECTRUM SpectrumPtr,
+        _In_opt_ PCREFLECTOR ReflectorPtr
+        )
+    {
+        PCSPECTRUM Result;
+        
+        ISTATUS Status = SpectrumCompositorAddReflection(Data,
+                                                         SpectrumPtr,
+                                                         ReflectorPtr,
+                                                         &Result);
+                                                           
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return SpectrumReference(Result);
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    }
 
     _Ret_
     SpectrumReference
     AttenuatedReflect(
-        _In_ PCSPECTRUM SpectrumPtr,
-        _In_ PCREFLECTOR ReflectorPtr,
+        _In_opt_ PCSPECTRUM SpectrumPtr,
+        _In_opt_ PCREFLECTOR ReflectorPtr,
         _In_ FLOAT Attenuation
-        );
+        )
+    {
+        PCSPECTRUM Result;
+        
+        ISTATUS Status = SpectrumCompositorAttenuatedAddReflection(Data,
+                                                                   SpectrumPtr,
+                                                                   ReflectorPtr,
+                                                                   Attenuation,
+                                                                   &Result);
 
-    IRISSPECTRUMPLUSPLUSAPI
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return SpectrumReference(Result);
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    }
+
     SpectrumCompositor(
         void
-        );
+        )
+    {
+        ISTATUS Status = SpectrumCompositorAllocate(&Data);
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();
+        }
+    }
 };
 
 } // namespace IrisSpectrum
