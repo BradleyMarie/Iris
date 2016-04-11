@@ -159,17 +159,15 @@ private:
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
-        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+        _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
-        _In_ SIZE_T AdditionalDataAlignment
+        _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment
         )
     {
         PHIT_LIST Result;
         ISTATUS Status;
 
-        assert((AdditionalData == nullptr && 
-                AdditionalDataSizeInBytes == 0 &&
-                AdditionalDataSizeInBytes == 0) ||
+        assert(AdditionalDataSizeInBytes == 0 ||
                (AdditionalData != nullptr &&
                 AdditionalDataSizeInBytes != 0 &&
                 AdditionalDataAlignment != 0 &&
@@ -209,17 +207,15 @@ private:
         _In_ FLOAT Distance,
         _In_ INT32 FaceHit,
         _In_ const POINT3 & HitPoint,
-        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+        _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
-        _In_ SIZE_T AdditionalDataAlignment
+        _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment
         )
     {
         PHIT_LIST Result;
         ISTATUS Status;
 
-        assert((AdditionalData == nullptr && 
-                AdditionalDataSizeInBytes == 0 &&
-                AdditionalDataSizeInBytes == 0) ||
+        assert(AdditionalDataSizeInBytes == 0 ||
                (AdditionalData != nullptr &&
                 AdditionalDataSizeInBytes != 0 &&
                 AdditionalDataAlignment != 0 &&

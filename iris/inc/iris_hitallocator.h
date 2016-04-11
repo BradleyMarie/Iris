@@ -55,9 +55,9 @@ HitAllocatorAllocate(
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
-    _In_ SIZE_T AdditionalDataAlignment,
+    _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
     _Out_ PHIT_LIST *HitList
     );
 
@@ -71,9 +71,9 @@ HitAllocatorAllocateWithHitPoint(
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
     _In_ INT32 FaceHit,
-    _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+    _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
-    _In_ SIZE_T AdditionalDataAlignment,
+    _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
     _In_ POINT3 HitPoint,
     _Out_ PHIT_LIST *HitList
     );
