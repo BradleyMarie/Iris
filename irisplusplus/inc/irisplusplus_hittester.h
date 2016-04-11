@@ -49,20 +49,20 @@ public:
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine
+        _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine
         );
 
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
+        _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine,
         _In_ const Matrix & MatrixRef
         );
 
     IRISPLUSPLUSAPI
     void
     Test(
-        _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
+        _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine,
         _In_ const Matrix & MatrixRef,
         _In_ bool Premultiplied
         );

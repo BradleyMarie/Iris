@@ -46,35 +46,35 @@ public:
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+        _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> & ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
-        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+        _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsOutOfOrder(
-        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+        _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(
-        _In_ std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+        _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, const MatrixReference &, const Vector &, const Point &, const Point &)> & ProcessHitRoutine
+        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
         );
         
     RayTracer(

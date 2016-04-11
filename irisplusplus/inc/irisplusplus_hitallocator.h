@@ -79,7 +79,12 @@ public:
     {
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
-                      
+
+        static_assert(sizeof(T) != 0);
+        static_assert(alignof(T) != 0);
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
+        static_assert(sizeof(T) % alignof(T) == 0);
+
         POINT3 IrisHitPoint = HitPoint.AsPOINT3();
 
         PHIT_LIST Output = Allocate(NextHit,
@@ -89,7 +94,7 @@ public:
                                     IrisHitPoint,
                                     static_cast<PCVOID>(AdditionalData),
                                     sizeof(T),
-                                    sizeof(PVOID));
+                                    alignof(T));
 
         return Output;
     }
@@ -127,14 +132,19 @@ public:
     {
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
-                      
+        
+        static_assert(sizeof(T) != 0);
+        static_assert(alignof(T) != 0);
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
+        static_assert(sizeof(T) % alignof(T) == 0);
+
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,
                                     FaceHit,
                                     static_cast<PCVOID>(AdditionalData),
                                     sizeof(T),
-                                    sizeof(PVOID));
+                                    alignof(T));
 
         return Output;
     }
@@ -157,6 +167,15 @@ private:
         PHIT_LIST Result;
         ISTATUS Status;
 
+        assert((AdditionalData == nullptr && 
+                AdditionalDataSizeInBytes == 0 &&
+                AdditionalDataSizeInBytes == 0) ||
+               (AdditionalData != nullptr &&
+                AdditionalDataSizeInBytes != 0 &&
+                AdditionalDataAlignment != 0 &&
+                (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
+                AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
+
         Status = HitAllocatorAllocate(Data,
                                       NextHit,
                                       DataPtr,
@@ -174,10 +193,11 @@ private:
 
         switch (Status)
         {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Distance");
             default:
-                throw std::runtime_error(ISTATUSToCString(Status));
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
         }
     }
 
@@ -197,6 +217,15 @@ private:
         PHIT_LIST Result;
         ISTATUS Status;
 
+        assert((AdditionalData == nullptr && 
+                AdditionalDataSizeInBytes == 0 &&
+                AdditionalDataSizeInBytes == 0) ||
+               (AdditionalData != nullptr &&
+                AdditionalDataSizeInBytes != 0 &&
+                AdditionalDataAlignment != 0 &&
+                (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
+                AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
+
         Status = HitAllocatorAllocateWithHitPoint(Data,
                                                   NextHit,
                                                   DataPtr,
@@ -215,10 +244,13 @@ private:
 
         switch (Status)
         {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Distance");
+            case ISTATUS_INVALID_ARGUMENT_08:
+                throw std::invalid_argument("HitPoint");
             default:
-                throw std::runtime_error(ISTATUSToCString(Status));
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
         }
     }
 };

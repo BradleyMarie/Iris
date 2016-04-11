@@ -35,7 +35,7 @@ TestGeometryAdapter(
     assert(Allocator != nullptr);
     assert(HitList != nullptr);
     
-    auto TestGeometryRoutine = static_cast<const std::function<PHIT_LIST(Ray, HitAllocator)> *>(Context);
+    auto TestGeometryRoutine = static_cast<const std::function<PHIT_LIST(const Ray &, HitAllocator)> *>(Context);
 
     PHIT_LIST Result = (*TestGeometryRoutine)(Ray(WorldRay), HitAllocator(Allocator));
 
@@ -49,7 +49,7 @@ TestGeometryAdapter(
 
 void
 HitTester::Test(
-    _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine
+    _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine
     )
 {
     ISTATUS Status = HitTesterTestGeometry(Data, 
@@ -64,7 +64,7 @@ HitTester::Test(
 
 void
 HitTester::Test(
-    _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
+    _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine,
     _In_ const Matrix & MatrixRef
     )
 {
@@ -81,7 +81,7 @@ HitTester::Test(
 
 void
 HitTester::Test(
-    _In_ const std::function<PHIT_LIST(Ray, HitAllocator)> & TestGeometryRoutine,
+    _In_ const std::function<PHIT_LIST(const Ray &, HitAllocator)> & TestGeometryRoutine,
     _In_ const Matrix & MatrixRef,
     _In_ bool Premultiplied
     )
