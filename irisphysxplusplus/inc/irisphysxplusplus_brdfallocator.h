@@ -24,8 +24,69 @@ namespace IrisPhysx {
 // Types
 //
 
-class BRDFAllocator final {
+class BRDFAllocator final {    
+public:
+    BRDFAllocator(
+        _In_ PPBR_BRDF_ALLOCATOR BrdfAllocator
+        )
+    : Data(BrdfAllocator)
+    { 
+        if (BrdfAllocator == nullptr)
+        {
+            throw std::invalid_argument("BrdfAllocator");
+        }
+    }
+    
+    _Ret_
+    PPBR_BRDF_ALLOCATOR
+    AsPPBR_BRDF_ALLOCATOR(
+        void
+        )
+    {
+        return Data;
+    }
+
+    _Ret_
+    template<typename T>
+    BRDFReference
+    Allocate(
+        _In_ const T & BRDFData
+        )
+    {
+        static_assert(std::is_trivially_copyable<T>::value,
+                      "BRDFData must be trivially copyable");
+    
+        static const PBR_BRDF_VTABLE VTable {
+            BRDFSampleAdapter<T>,
+            BRDFSampleWithLambertianFalloffAdapter<T>,
+            BRDFComputeReflectanceAdapter<T>,
+            BRDFComputeReflectanceWithLambertianFalloffAdapter<T>,
+            BRDFComputeReflectanceWithPdfAdapter<T>,
+            BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter<T>,
+            nullptr
+        };
+        
+        PCPBR_BRDF AllocatedBrdf;
+        
+        ISTATUS Status = PbrBrdfAllocatorAllocate(Data,
+                                                  &VTable,
+                                                  &BRDFData,
+                                                  sizeof(T),
+                                                  alignof(T),
+                                                  &AllocatedBrdf);
+    
+        if (Status != ISTATUS_SUCCESS)
+        {
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bac_alloc();
+        }
+        
+        return BRDFReference(AllocatedBrdf);
+    }
+    
 private:
+    PPBR_BRDF_ALLOCATOR Data;
+
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
     template<typename T>
@@ -230,67 +291,6 @@ private:
         
         return ISTATUS_SUCCESS;
     }
-    
-public:
-    IRISPHYSXPLUSPLUSAPI
-    BRDFAllocator(
-        _In_ PPBR_BRDF_ALLOCATOR BrdfAllocator
-        );
-    
-    _Ret_
-    PPBR_BRDF_ALLOCATOR
-    AsPPBR_BRDF_ALLOCATOR(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
-    template<typename T>
-    BRDFReference
-    Allocate(
-        _In_ const T & BRDFData
-        )
-    {
-        static_assert(std::is_trivially_copyable<T>::value,
-                      "BRDFData must be trivially copyable");
-    
-        static const PBR_BRDF_VTABLE VTable {
-            BRDFSampleAdapter<T>,
-            BRDFSampleWithLambertianFalloffAdapter<T>,
-            BRDFComputeReflectanceAdapter<T>,
-            BRDFComputeReflectanceWithLambertianFalloffAdapter<T>,
-            BRDFComputeReflectanceWithPdfAdapter<T>,
-            BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter<T>,
-            nullptr
-        };
-        
-        PCPBR_BRDF AllocatedBrdf;
-        
-        ISTATUS Status = PbrBrdfAllocatorAllocate(Data,
-                                                  &VTable,
-                                                  &BRDFData,
-                                                  sizeof(T),
-                                                  alignof(T),
-                                                  &AllocatedBrdf);
-    
-        switch (Status)
-        {
-            case ISTATUS_SUCCESS:
-                break;
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bac_alloc();
-                break;
-            default:
-                assert(false);
-        }
-        
-        return BRDFReference(AllocatedBrdf);
-    }
-    
-private:
-    PPBR_BRDF_ALLOCATOR Data;
 };
 
 } // namespace Iris

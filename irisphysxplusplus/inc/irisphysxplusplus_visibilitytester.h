@@ -33,8 +33,7 @@ class Light;
 
 class VisibilityTester final {
 private:
-    _Ret_    
-    IRISPHYSXPLUSPLUSAPI
+    _Ret_
     bool
     Test(
         _In_ const Iris::Ray & WorldRay,
@@ -49,14 +48,12 @@ public:
     { }
     
     _Ret_
-    IRISPHYSXPLUSPLUSAPI
     bool
     Test(
         _In_ const Iris::Ray & WorldRay
         );
 
-    _Ret_    
-    IRISPHYSXPLUSPLUSAPI
+    _Ret_
     bool
     Test(
         _In_ const Iris::Ray & WorldRay,

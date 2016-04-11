@@ -26,21 +26,18 @@ namespace IrisPhysx {
 
 class Geometry final {
 public:
-    IRISPHYSXPLUSPLUSAPI
     Geometry(
         _In_ PPBR_GEOMETRY GeometryPtr,
         _In_ bool Retain
         );
     
     _Ret_opt_
-    IRISPHYSXPLUSPLUSAPI
     PHIT_LIST
     TestNestedGeometry(
         _In_ HitAllocator Allocator
         ) const;
     
     _Ret_
-    IRISPHYSXPLUSPLUSAPI
     bool
     CheckBounds(
         _In_ BOUNDING_BOX WorldAlignedBoundingBox,
@@ -48,7 +45,6 @@ public:
         ) const;
     
 	_Ret_
-    IRISPHYSXPLUSPLUSAPI
     std::optional<Iris::Vector>
     ComputeNormal(
         _In_ const Iris::Point & HitPoint,
@@ -56,14 +52,12 @@ public:
         ) const;
     
 	_Ret_
-    IRISPHYSXPLUSPLUSAPI
 	std::optional<MaterialReference>
     GetMaterial(
         _In_ const UINT32 FaceHit
         ) const;
     
 	_Ret_
-    IRISPHYSXPLUSPLUSAPI
     std::optional<LightReference>
     GetLight(
         _In_ const UINT32 FaceHit

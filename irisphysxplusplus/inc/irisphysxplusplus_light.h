@@ -26,14 +26,12 @@ namespace IrisPhysx {
 
 class Light final {
 public:
-    IRISPHYSXPLUSPLUSAPI
     Light(
         _In_ PPBR_LIGHT LightPtr,
         _In_ bool Retain
         );
     
     _Ret_
-    IRISPHYSXPLUSPLUSAPI
     std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Point & HitPoint,
@@ -43,7 +41,6 @@ public:
         ) const;
 
     _Ret_
-    IRISPHYSXPLUSPLUSAPI
     FLOAT
     ComputeEmissive(
         _In_ const Iris::Ray & ToLight,
@@ -51,7 +48,6 @@ public:
         ) const;
     
     _Ret_
-    IRISPHYSXPLUSPLUSAPI
     std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
     ComputeEmissiveWithPdf(
         _In_ const Iris::Ray & ToLight,

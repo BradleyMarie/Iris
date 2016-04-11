@@ -25,37 +25,17 @@ namespace IrisPhysx {
 //
 
 class HitAllocator final {
-private:
-    _Ret_
-    IRISPHYSXPLUSPLUSAPI
-    PHIT_LIST
-    Allocate(
-        _In_opt_ PHIT_LIST NextHit,
-        _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
-        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-        _In_ SIZE_T AdditionalDataSizeInBytes,
-        _In_ SIZE_T AdditionalDataAlignment
-        );
-    
-    _Ret_
-    IRISPHYSXPLUSPLUSAPI
-    PHIT_LIST
-    Allocate(
-        _In_opt_ PHIT_LIST NextHit,
-        _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
-        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
-        _In_ SIZE_T AdditionalDataSizeInBytes,
-        _In_ SIZE_T AdditionalDataAlignment,
-        _In_ const Iris::Point & HitPoint
-        );
-        
 public:
-    IRISPHYSXPLUSPLUSAPI
     HitAllocator(
         _In_ PPBR_HIT_ALLOCATOR HitAllocatorPtr
-        );
+        )
+    : Data(HitAllocatorPtr)
+    { 
+        if (HitAllocatorPtr == nullptr)
+        {
+            throw std::invalid_argument("HitAllocatorPtr");
+        }
+    }
     
     _Ret_
     template<typename T>
@@ -145,6 +125,87 @@ public:
     
 private:
     PPBR_HIT_ALLOCATOR Data;
+
+    _Ret_
+    PHIT_LIST
+    Allocate(
+        _In_opt_ PHIT_LIST NextHit,
+        _In_ FLOAT Distance,
+        _In_ INT32 FaceHit,
+        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+        _In_ SIZE_T AdditionalDataSizeInBytes,
+        _In_ SIZE_T AdditionalDataAlignment
+        )
+    {
+        PHIT_LIST Result;
+        
+        ISTATUS Status = PBRHitAllocatorAllocate(Data,
+                                                 NextHit,
+                                                 Distance,
+                                                 FaceHit,
+                                                 AdditionalData,
+                                                 AdditionalDataSizeInBytes,
+                                                 AdditionalDataAlignment,
+                                                 &Result);
+
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return Result;
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Distance");
+                break;
+            default:
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
+        }
+    }
+    
+    _Ret_
+    PHIT_LIST
+    Allocate(
+        _In_opt_ PHIT_LIST NextHit,
+        _In_ FLOAT Distance,
+        _In_ INT32 FaceHit,
+        _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
+        _In_ SIZE_T AdditionalDataSizeInBytes,
+        _In_ SIZE_T AdditionalDataAlignment,
+        _In_ const Iris::Point & HitPoint
+        )
+    {
+        PHIT_LIST Result;
+        
+        ISTATUS Status = PBRHitAllocatorAllocateWithHitPoint(Data,
+                                                             NextHit,
+                                                             Distance,
+                                                             FaceHit,
+                                                             AdditionalData,
+                                                             AdditionalDataSizeInBytes,
+                                                             AdditionalDataAlignment,
+                                                             HitPoint.AsPOINT3(),
+                                                             &Result);
+
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return Result;
+        }
+
+        switch (Status)
+        {
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Distance");
+                break;
+            case ISTATUS_INVALID_ARGUMENT_07:
+                throw std::invalid_argument("HitPoint");
+                break;
+            default:
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
+        }
+    }
 };
 
 } // namespace Iris

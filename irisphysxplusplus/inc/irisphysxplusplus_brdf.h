@@ -26,11 +26,22 @@ namespace IrisPhysx {
 
 class BRDF final {
 public:
-    IRISPHYSXPLUSPLUSAPI
     BRDF(
         _In_ PPBR_BRDF PbrBrdf,
         _In_ bool Retain
-        );
+        )
+    : Data(PbrBrdf)
+    { 
+        if (PbrBrdf == nullptr)
+        {
+            throw std::invalid_argument("PbrBrdf");
+        }
+        
+        if (Retain)
+        {
+            PbrBrdfRetain(Data);
+        }
+    }
         
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
@@ -38,7 +49,28 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        VECTOR3 Outgoing;
+        FLOAT Pdf;
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfSample(Data,
+                               Incoming.AsVECTOR3(),
+                               Rng.AsPRANDOM_REFERENCE(),
+                               Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                               &Reflector,
+                               &Outgoing,
+                               &Pdf);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return std::make_tuple(IrisSpectrum::ReflectorReference(Reflector), Iris::Vector(Outgoing), Pdf);
+    }
         
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
@@ -46,7 +78,28 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        VECTOR3 Outgoing;
+        FLOAT Pdf;
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfSampleWithLambertianFalloff(Data,
+                                                    Incoming.AsVECTOR3(),
+                                                    Rng.AsPRANDOM_REFERENCE(),
+                                                    Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                    &Reflector,
+                                                    &Outgoing,
+                                                    &Pdf);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return std::make_tuple(IrisSpectrum::ReflectorReference(Reflector), Iris::Vector(Outgoing), Pdf);
+    }
     
     _Ret_
     IrisSpectrum::ReflectorReference
@@ -54,7 +107,24 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfComputeReflectance(Data,
+                                           Incoming.AsVECTOR3(),
+                                           Outgoing.AsVECTOR3(),
+                                           Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                           &Reflector);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return IrisSpectrum::ReflectorReference(Reflector);
+    }
     
     _Ret_
     IrisSpectrum::ReflectorReference
@@ -62,7 +132,24 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfComputeReflectanceWithLambertianFalloff(Data,
+                                                                Incoming.AsVECTOR3(),
+                                                                Outgoing.AsVECTOR3(),
+                                                                Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                                &Reflector);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return IrisSpectrum::ReflectorReference(Reflector);
+    }
     
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
@@ -70,7 +157,26 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        FLOAT Pdf;
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfComputeReflectanceWithPdf(Data,
+                                                  Incoming.AsVECTOR3(),
+                                                  Outgoing.AsVECTOR3(),
+                                                  Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                  &Reflector,
+                                                  &Pdf);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return std::make_tuple(IrisSpectrum::ReflectorReference(Reflector), Pdf);
+    }
     
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
@@ -78,7 +184,26 @@ public:
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
-        ) const;
+        ) const
+    {
+        FLOAT Pdf;
+        PCREFLECTOR Reflector;
+        ISTATUS Status;
+        
+        Status = PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(Data,
+                                                                       Incoming.AsVECTOR3(),
+                                                                       Outgoing.AsVECTOR3(),
+                                                                       Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                                       &Reflector,
+                                                                       &Pdf);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+        
+        return std::make_tuple(IrisSpectrum::ReflectorReference(Reflector), Pdf);
+    }
     
     ~BRDF(
         void
