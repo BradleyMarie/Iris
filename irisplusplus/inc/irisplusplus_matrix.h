@@ -98,7 +98,6 @@ public:
         _In_ FLOAT Far
         );
 
-    IRISPLUSPLUSAPI
     static 
     Matrix
     Identity(
