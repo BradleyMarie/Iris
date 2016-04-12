@@ -92,7 +92,7 @@ public:
 
         ISTATUS Status = PBRGeometryCheckBounds(Data,
                                                 ModelToWorld.AsPCMATRIX(),
-												WorldAlignedBoundingBox,
+                                                WorldAlignedBoundingBox,
                                                 &Result);
 
         if (Status != ISTATUS_SUCCESS)
@@ -103,7 +103,7 @@ public:
         return Result != FALSE;
     }
     
-	_Ret_
+    _Ret_
     Iris::Vector
     ComputeNormal(
         _In_ const Iris::Point & HitPoint,
@@ -113,9 +113,9 @@ public:
         VECTOR3 Result;
 
         ISTATUS Status = PBRGeometryComputeNormal(Data,
-						                          HitPoint.AsPOINT3(),
-								                  FaceHit,
-										          &Result);
+                                                  HitPoint.AsPOINT3(),
+                                                  FaceHit,
+                                                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -125,8 +125,8 @@ public:
         return Iris::Vector(Result);
     }
     
-	_Ret_
-	std::optional<MaterialReference>
+    _Ret_
+    std::optional<MaterialReference>
     GetMaterial(
         _In_ const UINT32 FaceHit
         ) const
@@ -134,8 +134,8 @@ public:
         PCPBR_MATERIAL Result;
 
         ISTATUS Status = PBRGeometryGetMaterial(Data,
-						                        FaceHit,
-								                &Result);
+                                                FaceHit,
+                                                &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -150,7 +150,7 @@ public:
         return std::make_optional(MaterialReference(Result));
     }
     
-	_Ret_
+    _Ret_
     std::optional<LightReference>
     GetLight(
         _In_ const UINT32 FaceHit
@@ -159,8 +159,8 @@ public:
         PCPBR_LIGHT Result;
 
         ISTATUS Status = PBRGeometryGetLight(Data,
-						                     FaceHit,
-								             &Result);
+                                             FaceHit,
+                                             &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {

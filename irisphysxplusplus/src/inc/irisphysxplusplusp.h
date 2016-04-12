@@ -21,10 +21,4 @@ Abstract:
 
 #include <irisphysxplusplus.h>
 
-//
-// Include C++ standard library headers
-//
-
-#include <stdexcept>
-
 #endif // _IRIS_PHYSX_PLUS_PLUS_INTERNAL_HEADER_

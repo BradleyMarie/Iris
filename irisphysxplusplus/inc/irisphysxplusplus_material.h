@@ -44,6 +44,24 @@ public:
     }
     
     _Ret_
+    PPBR_MATERIAL
+    AsPPBR_MATERIAL(
+        void
+        )
+    {
+        return Data;
+    }
+    
+    _Ret_
+    PCPBR_MATERIAL
+    AsPCPBR_MATERIAL(
+        void
+        )
+    {
+        return Data;
+    }
+    
+    _Ret_
     BRDFReference
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
