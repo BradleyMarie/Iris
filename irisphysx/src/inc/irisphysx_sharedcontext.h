@@ -31,7 +31,7 @@ typedef struct _PBR_SHARED_CONTEXT {
     PCVOID TestGeometryRoutineContext;
     _Field_size_opt_(NumberOfLights) PCPBR_LIGHT *Lights;
     SIZE_T NumberOfLights;
-    PRANDOM Rng;
+    PRANDOM_REFERENCE Rng;
     FLOAT Epsilon;
 } PBR_SHARED_CONTEXT, *PPBR_SHARED_CONTEXT;
 
@@ -97,7 +97,7 @@ PBRSharedContextSet(
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
-    _In_ PRANDOM Rng,
+    _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon
     )
 {    

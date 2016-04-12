@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisphysxplusplus_geometry.h
+    irisphysxplusplus_geometryreference.h
 
 Abstract:
 
@@ -15,8 +15,8 @@ Abstract:
 
 #include <irisphysxplusplus.h>
 
-#ifndef _GEOMETRY_IRIS_PHYSX_PLUS_PLUS_
-#define _GEOMETRY_IRIS_PHYSX_PLUS_PLUS_
+#ifndef _GEOMETRY_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
+#define _GEOMETRY_REFERENCE_IRIS_PHYSX_PLUS_PLUS_
 
 namespace IrisPhysx {
 
@@ -24,11 +24,10 @@ namespace IrisPhysx {
 // Types
 //
 
-class Geometry final {
+class GeometryReference final {
 public:
-    Geometry(
-        _In_ PPBR_GEOMETRY GeometryPtr,
-        _In_ bool Retain
+    GeometryReference(
+        _In_ PCPBR_GEOMETRY GeometryPtr
         )
     : Data(GeometryPtr)
     {
@@ -36,20 +35,6 @@ public:
         {
             throw std::invalid_argument("GeometryPtr");
         }
-
-        if (Retain)
-        {
-            PBRGeometryRetain(GeometryPtr);
-        }
-    }
-    
-    _Ret_
-    PPBR_GEOMETRY
-    AsPPBR_GEOMETRY(
-        void
-        )
-    {
-        return Data;
     }
 
     _Ret_
@@ -175,17 +160,10 @@ public:
         return std::make_optional(LightReference(Result));
     }
     
-    ~Geometry(
-        void
-        )
-    {
-        PBRGeometryRelease(Data);    
-    }
-    
 private:
-    PPBR_GEOMETRY Data;
+    PCPBR_GEOMETRY Data;
 };
 
 } // namespace Iris
 
-#endif // _GEOMETRY_IRIS_PHYSX_PLUS_PLUS_
+#endif // _GEOMETRY_REFERENCE_IRIS_PHYSX_PLUS_PLUS_

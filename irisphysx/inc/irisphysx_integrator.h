@@ -70,7 +70,7 @@ PBRIntegratorIntegrate(
     _In_ SIZE_T NumberOfLights,
     _In_ FLOAT Epsilon,
     _In_ RAY WorldRay,
-    _Inout_ PRANDOM Rng
+    _Inout_ PRANDOM_REFERENCE Rng
     );
 
 IRISPHYSXAPI

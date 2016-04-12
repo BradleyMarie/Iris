@@ -24,7 +24,7 @@ typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
-    PSPECTRUM *Output;
+    PCSPECTRUM *Output;
 } RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT, *PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT;
 
 //
@@ -40,7 +40,7 @@ PBRRayTracerProcessHitAdapterContextInitialize(
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
     _In_ RAY WorldRay,
-    _In_ PSPECTRUM *Output
+    _In_ PCSPECTRUM *Output
     )
 {
     ASSERT(AdapterContext != NULL);
@@ -69,6 +69,8 @@ PBRRayTracerProcessHitAdapter(
     _In_ POINT3 WorldHitPoint
     )
 {
+    PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReference;
+    PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReference;
     PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
     PPBR_SHARED_CONTEXT SharedContext;
     PCPBR_GEOMETRY PBRGeometry;
@@ -80,8 +82,11 @@ PBRRayTracerProcessHitAdapter(
     AdapterContext = (PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT) Context;
     
     SharedContext = AdapterContext->SharedContext;
+
     PBRGeometry = (PCPBR_GEOMETRY) Hit->Data;
-    
+    SpectrumCompositorReference = SpectrumCompositorGetSpectrumCompositorReference(SharedContext->SpectrumCompositor);
+    ReflectorCompositorReference = ReflectorCompositorGetReflectorCompositorReference(SharedContext->ReflectorCompositor);
+
     Status = AdapterContext->ProcessHitRoutine(AdapterContext->ProcessHitContext,
                                                PBRGeometry,
                                                ModelToWorld,
@@ -94,8 +99,8 @@ PBRRayTracerProcessHitAdapter(
                                                AdapterContext->NextPRBRayTracer,
                                                &SharedContext->PBRVisibilityTester,
                                                &SharedContext->BrdfAllocator,
-                                               SharedContext->SpectrumCompositor,
-                                               SharedContext->ReflectorCompositor,
+                                               SpectrumCompositorReference,
+                                               ReflectorCompositorReference,
                                                SharedContext->Rng,
                                                AdapterContext->Output);
     
@@ -114,7 +119,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
     _In_ RAY Ray,
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
-    _Out_ PSPECTRUM *Spectrum
+    _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
@@ -165,7 +170,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
     _In_ RAY Ray,
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
-    _Out_ PSPECTRUM *Spectrum
+    _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;

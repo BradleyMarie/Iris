@@ -41,10 +41,10 @@ ISTATUS
     _Inout_opt_ PPBR_RAYTRACER PBRRayTracer,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Inout_ PSPECTRUM_COMPOSITOR SpectrumCompositor,
-    _Inout_ PREFLECTOR_COMPOSITOR ReflectorCompositor,
-    _Inout_ PRANDOM Rng,
-    _Out_ PSPECTRUM *Spectrum
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     );
 
 //
@@ -60,7 +60,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
     _In_ RAY Ray,
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
-    _Out_ PSPECTRUM *Spectrum
+    _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     );
 
 _Check_return_
@@ -72,7 +72,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
     _In_ RAY Ray,
     _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
-    _Out_ PSPECTRUM *Spectrum
+    _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     );
 
 #endif // _PBR_RAYTRACER_IRIS_PHYSX_
