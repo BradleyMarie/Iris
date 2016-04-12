@@ -38,6 +38,15 @@ public:
     }
     
     _Ret_
+    PPBR_HIT_ALLOCATOR
+    AsPPBR_HIT_ALLOCATOR(
+        void
+        )
+    {
+        return Data;
+    }
+
+    _Ret_
     template<typename T>
     PHIT_LIST
     Allocate(
