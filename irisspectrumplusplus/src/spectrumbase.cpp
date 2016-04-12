@@ -18,12 +18,13 @@ Abstract:
 namespace IrisSpectrum {
 
 //
-// Static Functions
+// Adapter Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
-SpectrumBase::Sample(
+SpectrumSampleAdapter(
     _In_ PCVOID Context,
     _In_ FLOAT Wavelength,
     _Out_ PFLOAT OutgoingIntensity
@@ -39,8 +40,9 @@ SpectrumBase::Sample(
     return ISTATUS_SUCCESS;
 }
 
+static
 VOID 
-SpectrumBase::Free(
+SpectrumFreeAdapter(
     _In_ _Post_invalid_ PVOID Context
     )
 {
@@ -49,6 +51,19 @@ SpectrumBase::Free(
     SpectrumBase **SpectrumBasePtr = (SpectrumBase**) Context;
     delete *SpectrumBasePtr;
 }
+
+//
+// Static Variables
+//
+
+const static SPECTRUM_VTABLE InteropVTable = {
+    SpectrumSampleAdapter, 
+    SpectrumFreeAdapter
+};
+
+//
+// Static Functions
+//
 
 Spectrum
 SpectrumBase::Create(
@@ -76,14 +91,5 @@ SpectrumBase::Create(
     
     return Spectrum(SpectrumPtr, false);
 }
-
-//
-// Static Variables
-//
-
-const SPECTRUM_VTABLE SpectrumBase::InteropVTable = {
-    SpectrumBase::Sample, 
-    SpectrumBase::Free
-};
 
 } // namespace IrisSpectrum

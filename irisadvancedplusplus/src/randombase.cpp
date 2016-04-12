@@ -24,7 +24,7 @@ namespace IrisAdvanced {
 _Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
-GenerateFloat(
+RandomGenerateFloatAdapter(
     _In_ PVOID Context,
     _In_ FLOAT Minimum,
     _In_ FLOAT Maximum,
@@ -45,7 +45,7 @@ GenerateFloat(
 _Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
-GenerateIndex(
+RandomGenerateIndexAdapter(
     _In_ PVOID Context,
     _In_ SIZE_T Minimum,
     _In_ SIZE_T Maximum,
@@ -63,7 +63,7 @@ GenerateIndex(
 
 static
 VOID 
-Free(
+RandomFreeAdapter(
     _In_ _Post_invalid_ PVOID Context
     )
 {
@@ -78,9 +78,9 @@ Free(
 //
 
 const static RANDOM_VTABLE InteropVTable = {
-    GenerateFloat, 
-    GenerateIndex, 
-    Free
+    RandomGenerateFloatAdapter, 
+    RandomGenerateIndexAdapter, 
+    RandomFreeAdapter
 };
 
 //

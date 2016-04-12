@@ -62,7 +62,7 @@ public:
     SpectrumReference
     Add(
         _In_ const Spectrum & Spectrum0Ref,
-        _In_ SpectrumReference Spectrum1Ref
+        _In_ const SpectrumReference & Spectrum1Ref
         )
     {
         SpectrumReference Result = Add(Spectrum0Ref.AsPCSPECTRUM(),
@@ -74,7 +74,7 @@ public:
     _Ret_
     SpectrumReference
     Add(
-        _In_ SpectrumReference Spectrum0Ref,
+        _In_ const SpectrumReference & Spectrum0Ref,
         _In_ const Spectrum & Spectrum1Ref
         )
     {
@@ -87,8 +87,8 @@ public:
     _Ret_
     SpectrumReference
     Add(
-        _In_ SpectrumReference Spectrum0Ref,
-        _In_ SpectrumReference Spectrum1Ref
+        _In_ const SpectrumReference & Spectrum0Ref,
+        _In_ const SpectrumReference & Spectrum1Ref
         )
     {
         SpectrumReference Result = Add(Spectrum0Ref.AsPCSPECTRUM(),
@@ -113,7 +113,7 @@ public:
     _Ret_
     SpectrumReference
     Attenuate(
-        _In_ SpectrumReference SpectrumRef,
+        _In_ const SpectrumReference & SpectrumRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -142,7 +142,7 @@ public:
     SpectrumReference
     AttenuatedAdd(
         _In_ const Spectrum & Spectrum0Ref,
-        _In_ SpectrumReference Spectrum1Ref,
+        _In_ const SpectrumReference & Spectrum1Ref,
         _In_ FLOAT Attenuation
         )
     {
@@ -156,7 +156,7 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedAdd(
-        _In_ SpectrumReference Spectrum0Ref,
+        _In_ const SpectrumReference & Spectrum0Ref,
         _In_ const Spectrum & Spectrum1Ref,
         _In_ FLOAT Attenuation
         )
@@ -171,8 +171,8 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedAdd(
-        _In_ SpectrumReference Spectrum0Ref,
-        _In_ SpectrumReference Spectrum1Ref,
+        _In_ const SpectrumReference & Spectrum0Ref,
+        _In_ const SpectrumReference & Spectrum1Ref,
         _In_ FLOAT Attenuation
         )
     {
@@ -199,7 +199,7 @@ public:
     _Ret_
     SpectrumReference
     Reflect(
-        _In_ SpectrumReference SpectrumRef,
+        _In_ const SpectrumReference & SpectrumRef,
         _In_ const Reflector & ReflectorRef
         )
     {
@@ -213,7 +213,7 @@ public:
     SpectrumReference
     Reflect(
         _In_ const Spectrum & SpectrumRef,
-        _In_ ReflectorReference ReflectorRef
+        _In_ const ReflectorReference & ReflectorRef
         )
     {
         SpectrumReference Result = Reflect(SpectrumRef.AsPCSPECTRUM(),
@@ -225,8 +225,8 @@ public:
     _Ret_
     SpectrumReference
     Reflect(
-        _In_ SpectrumReference SpectrumRef,
-        _In_ ReflectorReference ReflectorRef
+        _In_ const SpectrumReference & SpectrumRef,
+        _In_ const ReflectorReference & ReflectorRef
         )
     {
         SpectrumReference Result = Reflect(SpectrumRef.AsPCSPECTRUM(),
@@ -253,7 +253,7 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedReflect(
-        _In_ SpectrumReference SpectrumRef,
+        _In_ const SpectrumReference & SpectrumRef,
         _In_ const Reflector & ReflectorRef,
         _In_ FLOAT Attenuation
         )
@@ -269,7 +269,7 @@ public:
     SpectrumReference
     AttenuatedReflect(
         _In_ const Spectrum & SpectrumRef,
-        _In_ ReflectorReference ReflectorRef,
+        _In_ const ReflectorReference & ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -283,8 +283,8 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedReflect(
-        _In_ SpectrumReference SpectrumRef,
-        _In_ ReflectorReference ReflectorRef,
+        _In_ const SpectrumReference & SpectrumRef,
+        _In_ const ReflectorReference & ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -326,18 +326,13 @@ private:
                                                                Spectrum1Ptr,
                                                                &Result);
         
-        if (Status == ISTATUS_SUCCESS)
+        if (Status != ISTATUS_SUCCESS)
         {
-            return SpectrumReference(Result);
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();
         }
 
-        switch (Status)
-        {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
-            default:
-                throw std::runtime_error(Iris::ISTATUSToCString(Status));
-        }
+        return SpectrumReference(Result);
     }
 
     _Ret_
@@ -361,10 +356,11 @@ private:
 
         switch (Status)
         {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_02:
+                throw std::invalid_argument("Attenuation");
             default:
-                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
         }
     }
 
@@ -391,10 +387,11 @@ private:
 
         switch (Status)
         {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Attenuation");
             default:
-                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
         }
     }
 
@@ -412,18 +409,13 @@ private:
                                                                   ReflectorPtr,
                                                                   &Result);
                                                            
-        if (Status == ISTATUS_SUCCESS)
+        if (Status != ISTATUS_SUCCESS)
         {
-            return SpectrumReference(Result);
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();
         }
 
-        switch (Status)
-        {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
-            default:
-                throw std::runtime_error(Iris::ISTATUSToCString(Status));
-        }
+        return SpectrumReference(Result);
     }
 
     _Ret_
@@ -449,10 +441,11 @@ private:
 
         switch (Status)
         {
-            case ISTATUS_ALLOCATION_FAILED:
-                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_03:
+                throw std::invalid_argument("Attenuation");
             default:
-                throw std::runtime_error(Iris::ISTATUSToCString(Status));
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
+                throw std::bad_alloc();
         }
     }
 };

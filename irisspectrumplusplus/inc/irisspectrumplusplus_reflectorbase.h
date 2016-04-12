@@ -47,25 +47,6 @@ public:
         void
         )
     { }
-    
-private:
-    _Success_(return == ISTATUS_SUCCESS)
-    static
-    ISTATUS
-    Reflect(
-        _In_ PCVOID Context,
-        _In_ FLOAT Wavelength,
-        _In_ FLOAT IncomingIntensity,
-        _Out_ PFLOAT OutgoingIntensity
-        );
-    
-    static
-    VOID 
-    Free(
-        _In_ _Post_invalid_ PVOID Context
-        );
-    
-    const static REFLECTOR_VTABLE InteropVTable;
 };
 
 } // namespace IrisSpectrum

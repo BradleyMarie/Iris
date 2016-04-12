@@ -18,12 +18,13 @@ Abstract:
 namespace IrisSpectrum {
 
 //
-// Static Functions
+// Adapter Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
-ReflectorBase::Reflect(
+ReflectorReflectAdapter(
     _In_ PCVOID Context,
     _In_ FLOAT Wavelength,
     _In_ FLOAT IncomingIntensity,
@@ -42,8 +43,9 @@ ReflectorBase::Reflect(
     return ISTATUS_SUCCESS;
 }
 
+static
 VOID 
-ReflectorBase::Free(
+ReflectorFreeAdapter(
     _In_ _Post_invalid_ PVOID Context
     )
 {
@@ -52,6 +54,19 @@ ReflectorBase::Free(
     ReflectorBase **ReflectorBasePtr = (ReflectorBase**) Context;
     delete *ReflectorBasePtr;
 }
+
+//
+// Static Variables
+//
+
+const REFLECTOR_VTABLE InteropVTable = {
+    ReflectorReflectAdapter, 
+    ReflectorFreeAdapter
+};
+
+//
+// Static Functions
+//
 
 Reflector
 ReflectorBase::Create(
@@ -79,14 +94,5 @@ ReflectorBase::Create(
     
     return Reflector(ReflectorPtr, false);
 }
-
-//
-// Static Variables
-//
-
-const REFLECTOR_VTABLE ReflectorBase::InteropVTable = {
-    ReflectorBase::Reflect, 
-    ReflectorBase::Free
-};
 
 } // namespace IrisSpectrum

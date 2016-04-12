@@ -63,7 +63,7 @@ public:
     ReflectorReference
     Add(
         _In_ const Reflector & Reflector0Ref,
-        _In_ ReflectorReference Reflector1Ref
+        _In_ const ReflectorReference & Reflector1Ref
         )
     {
         ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
@@ -75,7 +75,7 @@ public:
     _Ret_
     ReflectorReference
     Add(
-        _In_ ReflectorReference Reflector0Ref,
+        _In_ const ReflectorReference & Reflector0Ref,
         _In_ const Reflector & Reflector1Ref
         )
     {
@@ -88,8 +88,8 @@ public:
     _Ret_
     ReflectorReference
     Add(
-        _In_ ReflectorReference Reflector0Ref,
-        _In_ ReflectorReference Reflector1Ref
+        _In_ const ReflectorReference & Reflector0Ref,
+        _In_ const ReflectorReference & Reflector1Ref
         )
     {
         ReflectorReference Result = Add(Reflector0Ref.AsPCREFLECTOR(),
@@ -114,7 +114,7 @@ public:
     _Ret_
     ReflectorReference
     Attenuate(
-        _In_ ReflectorReference ReflectorRef,
+        _In_ const ReflectorReference & ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -143,7 +143,7 @@ public:
     ReflectorReference
     AttenuatedAdd(
         _In_ const Reflector & Reflector0Ref,
-        _In_ ReflectorReference Reflector1Ref,
+        _In_ const ReflectorReference & Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {
@@ -157,7 +157,7 @@ public:
     _Ret_
     ReflectorReference
     AttenuatedAdd(
-        _In_ ReflectorReference Reflector0Ref,
+        _In_ const ReflectorReference & Reflector0Ref,
         _In_ const Reflector & Reflector1Ref,
         _In_ FLOAT Attenuation
         )
@@ -172,8 +172,8 @@ public:
     _Ret_
     ReflectorReference
     AttenuatedAdd(
-        _In_ ReflectorReference Reflector0Ref,
-        _In_ ReflectorReference Reflector1Ref,
+        _In_ const ReflectorReference & Reflector0Ref,
+        _In_ const ReflectorReference & Reflector1Ref,
         _In_ FLOAT Attenuation
         )
     {

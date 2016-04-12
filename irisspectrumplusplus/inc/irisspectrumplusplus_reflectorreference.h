@@ -41,8 +41,7 @@ public:
         return Data;
     }
     
-    _Ret_opt_
-    IRISSPECTRUMPLUSPLUSAPI
+    _Ret_
     FLOAT
     Reflect(
         _In_ FLOAT Wavelength,
