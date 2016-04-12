@@ -50,6 +50,11 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
         
+        static_assert(sizeof(T) != 0);
+        static_assert(alignof(T) != 0);
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
+        static_assert(sizeof(T) % alignof(T) == 0);
+
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
                                     FaceHit,
@@ -74,6 +79,11 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
         
+        static_assert(sizeof(T) != 0);
+        static_assert(alignof(T) != 0);
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
+        static_assert(sizeof(T) % alignof(T) == 0);
+
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
                                     FaceHit,
@@ -139,6 +149,13 @@ private:
     {
         PHIT_LIST Result;
         
+        assert(AdditionalDataSizeInBytes == 0 ||
+               (AdditionalData != nullptr &&
+                AdditionalDataSizeInBytes != 0 &&
+                AdditionalDataAlignment != 0 &&
+                (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
+                AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
+
         ISTATUS Status = PBRHitAllocatorAllocate(Data,
                                                  NextHit,
                                                  Distance,
@@ -178,6 +195,13 @@ private:
     {
         PHIT_LIST Result;
         
+        assert(AdditionalDataSizeInBytes == 0 ||
+               (AdditionalData != nullptr &&
+                AdditionalDataSizeInBytes != 0 &&
+                AdditionalDataAlignment != 0 &&
+                (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
+                AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
+
         ISTATUS Status = PBRHitAllocatorAllocateWithHitPoint(Data,
                                                              NextHit,
                                                              Distance,

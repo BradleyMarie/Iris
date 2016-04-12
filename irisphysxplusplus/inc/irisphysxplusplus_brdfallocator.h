@@ -56,6 +56,11 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "BRDFData must be trivially copyable");
     
+        static_assert(sizeof(T) != 0);
+        static_assert(alignof(T) != 0);
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
+        static_assert(sizeof(T) % alignof(T) == 0);
+    
         static const PBR_BRDF_VTABLE VTable {
             BRDFSampleAdapter<T>,
             BRDFSampleWithLambertianFalloffAdapter<T>,
