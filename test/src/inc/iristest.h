@@ -26,6 +26,9 @@ extern "C" {
 }
 
 #include <irisplusplus.h>
+#include <irisadvancedplusplus.h>
+#include <irisspectrumplusplus.h>
+#include <irisphysxplusplus.h>
 
 #include "utility.h"
 #include "checkerboard.h"

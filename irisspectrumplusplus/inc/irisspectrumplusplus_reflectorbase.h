@@ -40,7 +40,7 @@ public:
     Reflect(
         _In_ FLOAT Wavelength,
         _In_ FLOAT IncomingIntensity
-        ) const;
+        ) const = 0;
 
     virtual
     ~ReflectorBase(

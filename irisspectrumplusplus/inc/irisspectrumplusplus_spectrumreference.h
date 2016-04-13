@@ -29,6 +29,7 @@ public:
     SpectrumReference(
         _In_opt_ PCSPECTRUM SpectrumPtr
         )
+    : Data(SpectrumPtr)
     { }
         
     _Ret_opt_

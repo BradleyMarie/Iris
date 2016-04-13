@@ -37,7 +37,7 @@ LightSampleAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(PointValidate(HitPoint) != FALSE);
-    ASSERT(Tester != NULL);
+    ASSERT(PBRVisibilityTester != NULL);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
@@ -71,7 +71,7 @@ LightComputeEmissiveAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(Tester != NULL);
+    ASSERT(PBRVisibilityTester != NULL);
     ASSERT(Spectrum != NULL);
 
     const LightBase **LightBasePtr = (const LightBase**) Context;
@@ -97,7 +97,7 @@ LightComputeEmissiveWithPdfAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(Tester != NULL);
+    ASSERT(PBRVisibilityTester != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Pdf != NULL);
 

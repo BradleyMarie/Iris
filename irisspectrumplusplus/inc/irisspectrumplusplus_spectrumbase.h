@@ -39,7 +39,7 @@ public:
     FLOAT
     Sample(
         _In_ FLOAT Wavelength
-        ) const;
+        ) const = 0;
 
     virtual
     ~SpectrumBase(

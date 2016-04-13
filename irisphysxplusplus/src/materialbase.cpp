@@ -36,7 +36,7 @@ MaterialSampleAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
-    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
+    ASSERT(VectorValidate(ShapeSurfaceNormal) != FALSE);
     ASSERT(Allocator != NULL);
     ASSERT(PbrBrdf != NULL);
 

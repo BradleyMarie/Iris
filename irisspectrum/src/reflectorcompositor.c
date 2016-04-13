@@ -636,6 +636,8 @@ ReflectorCompositorAllocate(
         return Status;
     }
 
+    *Result = Compositor;
+
     return ISTATUS_SUCCESS;
 }
 

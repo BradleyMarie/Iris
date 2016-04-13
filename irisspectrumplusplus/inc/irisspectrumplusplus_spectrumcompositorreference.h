@@ -29,6 +29,7 @@ public:
     SpectrumCompositorReference(
         _In_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr
         )
+    : Data(SpectrumCompositorReferencePtr)
     {
         if (SpectrumCompositorReferencePtr == nullptr)
         {

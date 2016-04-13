@@ -51,7 +51,7 @@ ProcessHitAdapter(
     assert(RayValidate(WorldRay) != FALSE);
     assert(LightsPtr != nullptr || NumberOfLights == 0);
     assert(VisibilityTesterPtr != nullptr);
-    assert(BrdfAllocatorPtrPtr != nullptr);
+    assert(BrdfAllocatorPtr != nullptr);
     assert(SpectrumCompositorReferencePtr != nullptr);
     assert(ReflectorCompositorReferencePtr != nullptr);
     assert(Rng != nullptr);

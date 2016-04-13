@@ -2,9 +2,15 @@ include_directories(src/inc
     ../iris/inc 
     ../irisadvanced/inc 
     ../irisadvancedtoolkit/inc 
+    ../irisspectrum/inc 
+    ../irisphysx/inc 
+    ../irisphysxtoolkit/inc 
     ../iristoolkit/inc
     ../irisshadingmodel/inc 
     ../irisplusplus/inc
+    ../irisadvancedplusplus/inc
+    ../irisspectrumplusplus/inc
+    ../irisphysxplusplus/inc
     ../iriscommon
     unittest++)
 
@@ -47,13 +53,20 @@ add_executable(iris-test
     src/point.cpp
     src/ray.cpp
     src/render.cpp
-    src/irisplusplus.cpp)
+    src/irisplusplus.cpp
+    src/spectrum.cpp)
 
 target_link_libraries(iris-test 
     iris 
     irisshadingmodel
+    irisadvanced
+    irisspectrum
+    irisphysx
     iristoolkit
-    irisplusplus)
+    irisplusplus
+    irisadvancedplusplus
+    irisspectrumplusplus
+    irisphysxplusplus)
 
 set_property(TARGET iris-test PROPERTY CXX_STANDARD 11)
 
