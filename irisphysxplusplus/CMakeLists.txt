@@ -12,7 +12,10 @@ include_directories(inc src/inc
 add_library(irisphysxplusplus SHARED
     src/raytracer.cpp
     src/integrator.cpp
-    src/geometrybase.cpp)
+    src/geometrybase.cpp
+    src/materialbase.cpp
+    src/lightbase.cpp
+    src/brdfbase.cpp)
 
 target_link_libraries(irisphysxplusplus 
     iris

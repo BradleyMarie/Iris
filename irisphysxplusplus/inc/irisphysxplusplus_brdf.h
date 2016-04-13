@@ -42,7 +42,25 @@ public:
             PbrBrdfRetain(Data);
         }
     }
-        
+     
+    _Ret_
+    PPBR_BRDF
+    AsPPBR_BRDF(
+        void
+        )
+    {
+        return Data;
+    }
+     
+    _Ret_
+    PCPBR_BRDF
+    AsPCPBR_BRDF(
+        void
+        ) const
+    {
+        return Data;
+    }
+
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(
