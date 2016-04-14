@@ -7,6 +7,12 @@
 //
 
 //
+// IrisSpectrum
+//
+
+1) Consider adding Reflect/Attenuated reflect classes for NULL spectrum
+
+//
 // IrisPhysx
 //
 
@@ -20,10 +26,10 @@
 // IrisAdvancedPlusPlus
 //
 
-1) Pass by const reference to inlined functions
+//
+// IrisSpectrumPlusPlus
+//
 
 //
 // IrisPhysxPlusPlus
 //
-
-1) Pass by const reference to inlined functions

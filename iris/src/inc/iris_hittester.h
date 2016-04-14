@@ -159,8 +159,6 @@ HitTesterGetNextHit(
     return ISTATUS_SUCCESS;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 VOID
 HitTesterComputeHitData(

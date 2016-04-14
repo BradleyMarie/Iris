@@ -165,10 +165,10 @@ RandomFree(
     _In_ _Post_invalid_ PRANDOM Rng
     )
 {    
-    //
-    // &Rng->RandomReference should be safe to do even if
-    // Rng == NULL.
-    //
+    if (Rng == NULL)
+    {
+        return;
+    }
     
     RandomReferenceDestroy(&Rng->RandomReference);
     IrisAlignedFree(Rng);

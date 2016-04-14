@@ -33,7 +33,7 @@ ReflectorReflectAdapter(
 {
     assert(Context != nullptr);
     assert(IsFiniteFloat(Wavelength) != FALSE);
-    assert(IsGreaterThanOrEqualToZeroFloat(Wavelength) != FALSE);
+    assert(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     assert(IsFiniteFloat(IncomingIntensity) != FALSE);
     assert(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
     assert(OutgoingIntensity != nullptr);

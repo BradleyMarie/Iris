@@ -78,7 +78,7 @@ FmaReflectorReflect(
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     FmaReflector = (PCFMA_REFLECTOR) Context;
@@ -129,7 +129,7 @@ AttenuatedReflectorReflect(
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     AttenuatedReflector = (PCATTENUATED_REFLECTOR) Context;
@@ -168,7 +168,7 @@ SumReflectorReflect(
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     SumReflector = (PCSUM_REFLECTOR) Context;
@@ -212,7 +212,7 @@ ZeroReflectorReflect(
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(IncomingIntensity) != FALSE);
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
     ASSERT(OutgoingIntensity != NULL);
 
     *OutgoingIntensity = (FLOAT) 0.0;
@@ -478,7 +478,7 @@ ReflectorCompositorReferenceAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsFiniteFloat(Attenuation) == FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -546,7 +546,7 @@ ReflectorCompositorReferenceAttenuatedAddReflections(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsFiniteFloat(Attenuation) == FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -621,7 +621,7 @@ ReflectorCompositorAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    Compositor = (PREFLECTOR_COMPOSITOR) malloc(sizeof(PREFLECTOR_COMPOSITOR));
+    Compositor = (PREFLECTOR_COMPOSITOR) malloc(sizeof(REFLECTOR_COMPOSITOR));
 
     if (Compositor == NULL)
     {

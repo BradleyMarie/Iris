@@ -70,7 +70,7 @@ ReflectorReflect(
     ISTATUS Status;
 
     if (IsFiniteFloat(Wavelength) == FALSE ||
-        IsGreaterThanOrEqualToZeroFloat(Wavelength) == FALSE)
+        IsGreaterThanZeroFloat(Wavelength) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }

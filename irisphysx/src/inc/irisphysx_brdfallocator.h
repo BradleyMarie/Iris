@@ -29,8 +29,6 @@ struct _PBR_BRDF_ALLOCATOR {
 // Functions
 //
 
-_Check_return_
-_Ret_maybenull_
 SFORCEINLINE
 VOID
 PbrBrdfAllocatorInitialize(

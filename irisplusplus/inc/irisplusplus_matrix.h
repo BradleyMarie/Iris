@@ -200,7 +200,7 @@ private:
     PMATRIX Data;
 
     Matrix(
-        _In_ PMATRIX IrisMatrix
+        _In_opt_ PMATRIX IrisMatrix
         )
     : Data(IrisMatrix)
     { }

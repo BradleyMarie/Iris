@@ -44,6 +44,7 @@ Abstract:
 #define ModFloat(number, modulo) fmodf(number, modulo)
 #define IsNaNFloat(number) isnan(number)
 #define IsInfiniteFloat(number) isinf(number)
+#define IsFiniteFloat(number) ((IsInfiniteFloat(number) == FALSE) ? TRUE : FALSE)
 #define IsZeroFloat(number) (number == (FLOAT) 0.0)
 #define IsNotZeroFloat(number) (number != (FLOAT) 0.0)
 #define IsGreaterThanZeroFloat(number) (number > (FLOAT) 0.0)
@@ -56,23 +57,12 @@ Abstract:
 #define MaxFloat(number0, number1) fmaxf(number0, number1)
 #define MinFloat(number0, number1) fminf(number0, number1)
 #define FmaFloat(m0, m1, a0) fmaf(m0, m1, a0)
-#define IsFiniteFloat(number) isfinite(number)
 
 #else
 
 #define MaxFloat(number0, number1) ((number0 < number1) ? number1 : number0)
 #define MinFloat(number0, number1) ((number0 < number1) ? number0 : number1)
 #define FmaFloat(m0, m1, a0) ((m0 * m1) + a0)
-
-#if _MSC_VER
-
-#define IsFiniteFloat(number) (_finite(number) != 0)
-
-#else
-
-#define IsFiniteFloat(number) (IsInfiniteFloat(number) == FALSE)
-
-#endif
 
 #endif
 

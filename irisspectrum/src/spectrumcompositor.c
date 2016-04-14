@@ -413,12 +413,11 @@ STATIC
 VOID
 ReflectionSpectrumInitialize(
     _Out_ PREFLECTION_SPECTRUM ReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ PCREFLECTOR Reflector
     )
 {
     ASSERT(ReflectionSpectrum != NULL);
-    ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
 
     SpectrumInitialize(&ReflectionSpectrumVTable,
@@ -433,18 +432,17 @@ STATIC
 VOID
 AttenuatedReflectionSpectrumInitialize(
     _Out_ PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation
     )
 {
     ASSERT(AttenuatedReflectionSpectrum != NULL);
-    ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    SpectrumInitialize(&ReflectionSpectrumVTable,
+    SpectrumInitialize(&AttenuatedReflectionSpectrumVTable,
                        AttenuatedReflectionSpectrum,
                        &AttenuatedReflectionSpectrum->SpectrumHeader);
                                 
@@ -654,7 +652,7 @@ SpectrumCompositorReferenceAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsFiniteFloat(Attenuation) == FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -722,7 +720,7 @@ SpectrumCompositorReferenceAttenuatedAddSpectra(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsFiniteFloat(Attenuation) == FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -801,8 +799,7 @@ SpectrumCompositorReferenceAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (Spectrum == NULL ||
-        Reflector == NULL)
+    if (Reflector == NULL)
     {
         *ReflectedSpectrum = NULL;
         return ISTATUS_SUCCESS;
@@ -845,13 +842,12 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(IsFiniteFloat(Attenuation) == FALSE);
+    if(IsFiniteFloat(Attenuation) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Spectrum == NULL ||
-        Reflector == NULL ||
+    if (Reflector == NULL ||
         IsNotZeroFloat(Attenuation) == FALSE)
     {
         *ReflectedSpectrum = NULL;

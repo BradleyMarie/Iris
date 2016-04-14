@@ -46,7 +46,6 @@ public:
         return Data;
     }
 
-    _Ret_
     template<typename T>
     BRDFReference
     Allocate(
