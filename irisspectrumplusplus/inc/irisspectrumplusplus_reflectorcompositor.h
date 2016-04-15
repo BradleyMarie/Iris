@@ -130,66 +130,6 @@ public:
         return Result;
     }
     
-    _Ret_
-    ReflectorReference
-    AttenuatedAdd(
-        _In_ const Reflector & Reflector0Ref,
-        _In_ const Reflector & Reflector1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
-                                                  Reflector1Ref.AsPCREFLECTOR(),
-                                                  Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    ReflectorReference
-    AttenuatedAdd(
-        _In_ const Reflector & Reflector0Ref,
-        _In_ const ReflectorReference & Reflector1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
-                                                  Reflector1Ref.AsPCREFLECTOR(),
-                                                  Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    ReflectorReference
-    AttenuatedAdd(
-        _In_ const ReflectorReference & Reflector0Ref,
-        _In_ const Reflector & Reflector1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
-                                                  Reflector1Ref.AsPCREFLECTOR(),
-                                                  Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    ReflectorReference
-    AttenuatedAdd(
-        _In_ const ReflectorReference & Reflector0Ref,
-        _In_ const ReflectorReference & Reflector1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        ReflectorReference Result = AttenuatedAdd(Reflector0Ref.AsPCREFLECTOR(),
-                                                  Reflector1Ref.AsPCREFLECTOR(),
-                                                  Attenuation);
-        
-        return Result;
-    }
-    
     void
     Clear(
         void
@@ -262,37 +202,6 @@ private:
         switch (Status)
         {
             case ISTATUS_INVALID_ARGUMENT_02:
-                throw std::invalid_argument("Attenuation");
-            default:
-                assert(Status == ISTATUS_ALLOCATION_FAILED);
-                throw std::bad_alloc();
-        }
-    }
-
-    _Ret_
-    ReflectorReference
-    AttenuatedAdd(
-        _In_opt_ PCREFLECTOR Reflector0Ptr,
-        _In_opt_ PCREFLECTOR Reflector1Ptr,
-        _In_ FLOAT Attenuation
-        )
-    {
-        PCREFLECTOR Result;
-        
-        ISTATUS Status = ReflectorCompositorAttenuatedAddReflections(Data,
-                                                                     Reflector0Ptr,
-                                                                     Reflector1Ptr,
-                                                                     Attenuation,
-                                                                     &Result);
-                                                           
-        if (Status == ISTATUS_SUCCESS)
-        {
-            return ReflectorReference(Result);
-        }
-
-        switch (Status)
-        {
-            case ISTATUS_INVALID_ARGUMENT_03:
                 throw std::invalid_argument("Attenuation");
             default:
                 assert(Status == ISTATUS_ALLOCATION_FAILED);

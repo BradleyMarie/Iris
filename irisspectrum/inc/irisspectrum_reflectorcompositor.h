@@ -58,18 +58,6 @@ ReflectorCompositorAttenuateReflection(
     _Out_ PCREFLECTOR *AttenuatedReflector
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISSPECTRUMAPI
-ISTATUS
-ReflectorCompositorAttenuatedAddReflections(
-    _Inout_ PREFLECTOR_COMPOSITOR Compositor,
-    _In_opt_ PCREFLECTOR Reflector0,
-    _In_opt_ PCREFLECTOR Reflector1,
-    _In_ FLOAT Attenuation,
-    _Out_ PCREFLECTOR *AttenuatedReflector
-    );
-
 _Ret_
 IRISSPECTRUMAPI
 PREFLECTOR_COMPOSITOR_REFERENCE

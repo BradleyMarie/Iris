@@ -126,66 +126,6 @@ public:
     
     _Ret_
     SpectrumReference
-    AttenuatedAdd(
-        _In_ const Spectrum & Spectrum0Ref,
-        _In_ const Spectrum & Spectrum1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        SpectrumReference Result = AttenuatedAdd(Spectrum0Ref.AsPCSPECTRUM(),
-                                                 Spectrum1Ref.AsPCSPECTRUM(),
-                                                 Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    SpectrumReference
-    AttenuatedAdd(
-        _In_ const Spectrum & Spectrum0Ref,
-        _In_ const SpectrumReference & Spectrum1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        SpectrumReference Result = AttenuatedAdd(Spectrum0Ref.AsPCSPECTRUM(),
-                                                 Spectrum1Ref.AsPCSPECTRUM(),
-                                                 Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    SpectrumReference
-    AttenuatedAdd(
-        _In_ const SpectrumReference & Spectrum0Ref,
-        _In_ const Spectrum & Spectrum1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        SpectrumReference Result = AttenuatedAdd(Spectrum0Ref.AsPCSPECTRUM(),
-                                                 Spectrum1Ref.AsPCSPECTRUM(),
-                                                 Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    SpectrumReference
-    AttenuatedAdd(
-        _In_ const SpectrumReference & Spectrum0Ref,
-        _In_ const SpectrumReference & Spectrum1Ref,
-        _In_ FLOAT Attenuation
-        )
-    {
-        SpectrumReference Result = AttenuatedAdd(Spectrum0Ref.AsPCSPECTRUM(),
-                                                 Spectrum1Ref.AsPCSPECTRUM(),
-                                                 Attenuation);
-        
-        return Result;
-    }
-    
-    _Ret_
-    SpectrumReference
     Reflect(
         _In_ const Spectrum & SpectrumRef,
         _In_ const Reflector & ReflectorRef
@@ -358,37 +298,6 @@ private:
         switch (Status)
         {
             case ISTATUS_INVALID_ARGUMENT_02:
-                throw std::invalid_argument("Attenuation");
-            default:
-                assert(Status == ISTATUS_ALLOCATION_FAILED);
-                throw std::bad_alloc();
-        }
-    }
-
-    _Ret_
-    SpectrumReference
-    AttenuatedAdd(
-        _In_opt_ PCSPECTRUM Spectrum0Ptr,
-        _In_opt_ PCSPECTRUM Spectrum1Ptr,
-        _In_ FLOAT Attenuation
-        )
-    {
-        PCSPECTRUM Result;
-        
-        ISTATUS Status = SpectrumCompositorReferenceAttenuatedAddSpectra(Data,
-                                                                         Spectrum0Ptr,
-                                                                         Spectrum1Ptr,
-                                                                         Attenuation,
-                                                                         &Result);
-                                                           
-        if (Status == ISTATUS_SUCCESS)
-        {
-            return SpectrumReference(Result);
-        }
-
-        switch (Status)
-        {
-            case ISTATUS_INVALID_ARGUMENT_03:
                 throw std::invalid_argument("Attenuation");
             default:
                 assert(Status == ISTATUS_ALLOCATION_FAILED);
