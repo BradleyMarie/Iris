@@ -19,14 +19,6 @@ Abstract:
 // Types
 //
 
-typedef struct _ATTENUATED_REFLECTOR {
-    REFLECTOR ReflectorHeader;
-    PCREFLECTOR Reflector;
-    FLOAT Attenuation;
-} ATTENUATED_REFLECTOR, *PATTENUATED_REFLECTOR;
-
-typedef CONST ATTENUATED_REFLECTOR *PCATTENUATED_REFLECTOR;
-
 typedef struct _SUM_REFLECTOR {
     REFLECTOR ReflectorHeader;
     PCREFLECTOR Reflector0;
@@ -160,10 +152,10 @@ ZeroReflectorReflect(
 }
 
 //
-// Static Variables
+// Variables
 //
 
-CONST STATIC REFLECTOR_VTABLE AttenuatedReflectorVTable = {
+CONST REFLECTOR_VTABLE AttenuatedReflectorVTable = {
     AttenuatedReflectorReflect,
     NULL
 };
@@ -235,6 +227,7 @@ ReflectorCompositorReferenceInitialize(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -243,6 +236,7 @@ ReflectorCompositorReferenceInitialize(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectorAllocator);
         return Status;
     }
@@ -288,8 +282,12 @@ ReflectorCompositorReferenceAddReflections(
     _Out_ PCREFLECTOR *Sum
     )
 {
+    PCATTENUATED_REFLECTOR AttenuatedReflector0;
+    PCATTENUATED_REFLECTOR AttenuatedReflector1;
+    PCREFLECTOR IntermediateReflector;
     PSUM_REFLECTOR SumReflector;
     PVOID Allocation;
+    ISTATUS Status;
 
     if (Compositor == NULL)
     {
@@ -311,6 +309,35 @@ ReflectorCompositorReferenceAddReflections(
     {
         *Sum = Reflector0;
         return ISTATUS_SUCCESS;
+    }
+
+    if (Reflector0->VTable == &AttenuatedReflectorVTable &&
+        Reflector1->VTable == &AttenuatedReflectorVTable)
+    {
+        AttenuatedReflector0 = (PCATTENUATED_REFLECTOR) Reflector0;
+        AttenuatedReflector1 = (PCATTENUATED_REFLECTOR) Reflector1;
+
+        if (AttenuatedReflector0->Attenuation == AttenuatedReflector1->Attenuation)
+        {
+            Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                                AttenuatedReflector0->Reflector,
+                                                                AttenuatedReflector1->Reflector,
+                                                                &IntermediateReflector);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
+
+            Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                     IntermediateReflector,
+                                                                     AttenuatedReflector0->Attenuation,
+                                                                     Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
     }
 
     Allocation = StaticMemoryAllocatorAllocate(&Compositor->SumReflectorAllocator);
@@ -343,6 +370,7 @@ ReflectorCompositorReferenceAttenuateReflection(
     PATTENUATED_REFLECTOR AttenuatedReflector;
     PATTENUATED_REFLECTOR ReflectorAsAttenuatedReflector;
     PVOID Allocation;
+    ISTATUS Status;
 
     if (Compositor == NULL)
     {
@@ -375,8 +403,14 @@ ReflectorCompositorReferenceAttenuateReflection(
     if (Reflector->VTable == &AttenuatedReflectorVTable)
     {
         ReflectorAsAttenuatedReflector = (PATTENUATED_REFLECTOR) Reflector;
-        Reflector = ReflectorAsAttenuatedReflector->Reflector;
-        Attenuation *= ReflectorAsAttenuatedReflector->Attenuation;
+
+        Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                 ReflectorAsAttenuatedReflector->Reflector,
+                                                                 Attenuation * ReflectorAsAttenuatedReflector->Attenuation,
+                                                                 AttenuatedReflectorOutput);
+        
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
     }
 
     Allocation = StaticMemoryAllocatorAllocate(&Compositor->AttenuatedReflectorAllocator);
@@ -422,6 +456,7 @@ ReflectorCompositorAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         free(Compositor);
         return Status;
     }
