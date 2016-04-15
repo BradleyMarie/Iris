@@ -10,6 +10,8 @@
 // IrisSpectrum
 //
 
+1) Consider adding Reflect/Attenuated reflect classes for NULL spectrum
+
 //
 // IrisPhysx
 //

@@ -61,25 +61,8 @@ typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
 
 typedef CONST ATTENUATED_REFLECTION_SPECTRUM *PCATTENUATED_REFLECTION_SPECTRUM;
 
-typedef struct _REFLECTION_NO_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCREFLECTOR Reflector;
-} REFLECTION_NO_SPECTRUM, *PREFLECTION_NO_SPECTRUM;
-
-typedef CONST REFLECTION_NO_SPECTRUM *PCREFLECTION_NO_SPECTRUM;
-
-typedef struct _ATTENUATED_REFLECTION_NO_SPECTRUM {
-    SPECTRUM SpectrumHeader;
-    PCREFLECTOR Reflector;
-    FLOAT Attenuation;
-} ATTENUATED_REFLECTION_NO_SPECTRUM, *PATTENUATED_REFLECTION_NO_SPECTRUM;
-
-typedef CONST ATTENUATED_REFLECTION_NO_SPECTRUM *PCATTENUATED_REFLECTION_NO_SPECTRUM;
-
 struct _SPECTRUM_COMPOSITOR_REFERENCE {
-    STATIC_MEMORY_ALLOCATOR AttenuatedReflectionNoSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR AttenuatedReflectionSpectrumAllocator;
-    STATIC_MEMORY_ALLOCATOR ReflectionNoSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR ReflectionSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR AttenuatedSpectrumAllocator;
     STATIC_MEMORY_ALLOCATOR FmaSpectrumAllocator;
@@ -312,67 +295,18 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-ReflectionNoSpectrumSample(
+ZeroSpectrumSample(
     _In_ PCVOID Context,
     _In_ FLOAT Wavelength,
     _Out_ PFLOAT Intensity
     )
 {
-    PCREFLECTION_NO_SPECTRUM ReflectionNoSpectrum;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
+    ASSERT(Context == NULL);
     ASSERT(IsFiniteFloat(Wavelength) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
     ASSERT(Intensity != NULL);
 
-    ReflectionNoSpectrum = (PCREFLECTION_NO_SPECTRUM) Context;
-
-    Status = ReflectorReflect(ReflectionNoSpectrum->Reflector,
-                              Wavelength,
-                              (FLOAT) 0.0f,
-                              Intensity);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    return ISTATUS_SUCCESS; 
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-AttenuatedReflectionNoSpectrumSample(
-    _In_ PCVOID Context,
-    _In_ FLOAT Wavelength,
-    _Out_ PFLOAT Intensity
-    )
-{
-    PCATTENUATED_REFLECTION_NO_SPECTRUM AttenuatedReflectionNoSpectrum;
-    FLOAT ReflectedIntensity;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
-    ASSERT(Intensity != NULL);
-
-    AttenuatedReflectionNoSpectrum = (PCATTENUATED_REFLECTION_NO_SPECTRUM) Context;
-
-    Status = ReflectorReflect(AttenuatedReflectionNoSpectrum->Reflector,
-                              Wavelength,
-                              (FLOAT) 1.0f,
-                              &ReflectedIntensity);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    *Intensity = ReflectedIntensity * AttenuatedReflectionNoSpectrum->Attenuation;
+    *Intensity = (FLOAT) 0.0;
 
     return ISTATUS_SUCCESS; 
 }
@@ -403,16 +337,6 @@ CONST STATIC SPECTRUM_VTABLE ReflectionSpectrumVTable = {
 
 CONST STATIC SPECTRUM_VTABLE AttenuatedReflectionSpectrumVTable = {
     AttenuatedReflectionSpectrumSample,
-    NULL
-};
-
-CONST STATIC SPECTRUM_VTABLE ReflectionNoSpectrumVTable = {
-    ReflectionNoSpectrumSample,
-    NULL
-};
-
-CONST STATIC SPECTRUM_VTABLE AttenuatedReflectionNoSpectrumVTable = {
-    AttenuatedReflectionNoSpectrumSample,
     NULL
 };
 
@@ -489,12 +413,11 @@ STATIC
 VOID
 ReflectionSpectrumInitialize(
     _Out_ PREFLECTION_SPECTRUM ReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ PCREFLECTOR Reflector
     )
 {
     ASSERT(ReflectionSpectrum != NULL);
-    ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
 
     SpectrumInitialize(&ReflectionSpectrumVTable,
@@ -509,13 +432,12 @@ STATIC
 VOID
 AttenuatedReflectionSpectrumInitialize(
     _Out_ PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _In_ PCREFLECTOR Reflector,
     _In_ FLOAT Attenuation
     )
 {
     ASSERT(AttenuatedReflectionSpectrum != NULL);
-    ASSERT(Spectrum != NULL);
     ASSERT(Reflector != NULL);
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
@@ -527,44 +449,6 @@ AttenuatedReflectionSpectrumInitialize(
     AttenuatedReflectionSpectrum->Spectrum = Spectrum;
     AttenuatedReflectionSpectrum->Reflector = Reflector;
     AttenuatedReflectionSpectrum->Attenuation = Attenuation;
-}
-
-STATIC
-VOID
-ReflectionNoSpectrumInitialize(
-    _Out_ PREFLECTION_NO_SPECTRUM ReflectionNoSpectrum,
-    _In_ PCREFLECTOR Reflector
-    )
-{
-    ASSERT(ReflectionNoSpectrum != NULL);
-    ASSERT(Reflector != NULL);
-
-    SpectrumInitialize(&ReflectionNoSpectrumVTable,
-                       ReflectionNoSpectrum,
-                       &ReflectionNoSpectrum->SpectrumHeader);
-
-    ReflectionNoSpectrum->Reflector = Reflector;
-}
-
-STATIC
-VOID
-AttenuatedReflectionNoSpectrumInitialize(
-    _Out_ PATTENUATED_REFLECTION_NO_SPECTRUM AttenuatedReflectionNoSpectrum,
-    _In_ PCREFLECTOR Reflector,
-    _In_ FLOAT Attenuation
-    )
-{
-    ASSERT(AttenuatedReflectionNoSpectrum != NULL);
-    ASSERT(Reflector != NULL);
-    ASSERT(IsFiniteFloat(Attenuation) != FALSE);
-    ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
-
-    SpectrumInitialize(&AttenuatedReflectionNoSpectrumVTable,
-                       AttenuatedReflectionNoSpectrum,
-                       &AttenuatedReflectionNoSpectrum->SpectrumHeader);
-
-    AttenuatedReflectionNoSpectrum->Reflector = Reflector;
-    AttenuatedReflectionNoSpectrum->Attenuation = Attenuation;
 }
 
 //
@@ -633,33 +517,6 @@ SpectrumCompositorReferenceInitialize(
         return Status;
     }
 
-    Status = StaticMemoryAllocatorInitialize(&Compositor->AttenuatedReflectionNoSpectrumAllocator,
-                                             sizeof(ATTENUATED_REFLECTION_NO_SPECTRUM));
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
-        return Status;
-    }
-
-    Status = StaticMemoryAllocatorInitialize(&Compositor->ReflectionNoSpectrumAllocator,
-                                             sizeof(REFLECTION_NO_SPECTRUM));
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectionNoSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
-        StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
-        return Status;
-    }
-
     return ISTATUS_SUCCESS;
 }
 
@@ -671,9 +528,7 @@ SpectrumCompositorReferenceClear(
 {
     ASSERT(Compositor != NULL);
 
-    StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectionNoSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedReflectionSpectrumAllocator);
-    StaticMemoryAllocatorFreeAll(&Compositor->ReflectionNoSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->ReflectionSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->AttenuatedSpectrumAllocator);
     StaticMemoryAllocatorFreeAll(&Compositor->FmaSpectrumAllocator);
@@ -688,9 +543,7 @@ SpectrumCompositorReferenceDestroy(
 {
     ASSERT(Compositor != NULL);
 
-    StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionNoSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectionSpectrumAllocator);
-    StaticMemoryAllocatorDestroy(&Compositor->ReflectionNoSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
     StaticMemoryAllocatorDestroy(&Compositor->FmaSpectrumAllocator);
@@ -938,7 +791,6 @@ SpectrumCompositorReferenceAddReflection(
     _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
-    PREFLECTION_NO_SPECTRUM ReflectionNoSpectrum;
     PREFLECTION_SPECTRUM ReflectionSpectrum;
     PVOID Allocation;
 
@@ -950,24 +802,6 @@ SpectrumCompositorReferenceAddReflection(
     if (Reflector == NULL)
     {
         *ReflectedSpectrum = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    if (Spectrum == NULL)
-    {
-        Allocation = StaticMemoryAllocatorAllocate(&Compositor->ReflectionNoSpectrumAllocator);
-
-        if (Allocation == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        ReflectionNoSpectrum = (PREFLECTION_NO_SPECTRUM) Allocation;
-
-        ReflectionNoSpectrumInitialize(ReflectionNoSpectrum,
-                                       Reflector);
-
-        *ReflectedSpectrum = (PCSPECTRUM) ReflectionNoSpectrum;
         return ISTATUS_SUCCESS;
     }
 
@@ -999,7 +833,6 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
     _Out_ PCSPECTRUM *ReflectedSpectrum
     )
 {
-    PATTENUATED_REFLECTION_NO_SPECTRUM AttenuatedReflectionNoSpectrum;
     PATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum;
     PVOID Allocation;
     ISTATUS Status;
@@ -1029,25 +862,6 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
                                                           ReflectedSpectrum);
 
         return Status;
-    }
-
-    if (Spectrum == NULL)
-    {
-        Allocation = StaticMemoryAllocatorAllocate(&Compositor->AttenuatedReflectionNoSpectrumAllocator);
-
-        if (Allocation == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        AttenuatedReflectionNoSpectrum = (PATTENUATED_REFLECTION_NO_SPECTRUM) Allocation;
-
-        AttenuatedReflectionNoSpectrumInitialize(AttenuatedReflectionNoSpectrum,
-                                                 Reflector,
-                                                 Attenuation);
-
-        *ReflectedSpectrum = (PCSPECTRUM) AttenuatedReflectionNoSpectrum;
-        return ISTATUS_SUCCESS;
     }
 
     Allocation = StaticMemoryAllocatorAllocate(&Compositor->AttenuatedReflectionSpectrumAllocator);
