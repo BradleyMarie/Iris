@@ -236,8 +236,8 @@ ReflectorCompositorReferenceInitialize(
 
     if (Status != ISTATUS_SUCCESS)
     {
-        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         StaticMemoryAllocatorDestroy(&Compositor->AttenuatedReflectorAllocator);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 

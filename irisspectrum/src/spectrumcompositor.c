@@ -234,26 +234,6 @@ AttenuatedReflectionSpectrumSample(
     return ISTATUS_SUCCESS; 
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-ZeroSpectrumSample(
-    _In_ PCVOID Context,
-    _In_ FLOAT Wavelength,
-    _Out_ PFLOAT Intensity
-    )
-{
-    ASSERT(Context == NULL);
-    ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
-    ASSERT(Intensity != NULL);
-
-    *Intensity = (FLOAT) 0.0;
-
-    return ISTATUS_SUCCESS; 
-}
-
 //
 // Static Variables
 //
@@ -386,6 +366,7 @@ SpectrumCompositorReferenceInitialize(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -395,6 +376,7 @@ SpectrumCompositorReferenceInitialize(
     if (Status != ISTATUS_SUCCESS)
     {
         StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -405,6 +387,7 @@ SpectrumCompositorReferenceInitialize(
     {
         StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
         StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -416,6 +399,7 @@ SpectrumCompositorReferenceInitialize(
         StaticMemoryAllocatorDestroy(&Compositor->SumSpectrumAllocator);
         StaticMemoryAllocatorDestroy(&Compositor->ReflectionSpectrumAllocator);
         StaticMemoryAllocatorDestroy(&Compositor->AttenuatedSpectrumAllocator);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -858,6 +842,7 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
                                                           Reflector,
                                                           ReflectedSpectrum);
 
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
         return Status;
     }
 
@@ -919,6 +904,7 @@ SpectrumCompositorAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         free(Compositor);
         return Status;
     }
