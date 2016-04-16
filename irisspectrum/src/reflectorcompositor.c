@@ -368,7 +368,7 @@ ReflectorCompositorReferenceAddReflections(
     {
         ConstSumReflector0 = (PCSUM_REFLECTOR) Reflector0;
 
-        if (Reflector0->VTable == &SumReflectorVTable)
+        if (Reflector1->VTable == &SumReflectorVTable)
         {
             ConstSumReflector1 = (PCSUM_REFLECTOR) Reflector1;
 
