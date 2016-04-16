@@ -452,8 +452,12 @@ SpectrumCompositorReferenceAddSpectra(
     PCATTENUATED_REFLECTION_SPECTRUM AttenuatedReflectionSpectrum1;
     PCATTENUATED_SPECTRUM AttenuatedSpectrum0;
     PCATTENUATED_SPECTRUM AttenuatedSpectrum1;
+    PCREFLECTION_SPECTRUM ReflectionSpectrum0;
+    PCREFLECTION_SPECTRUM ReflectionSpectrum1;
     PCSPECTRUM IntermediateSpectrum0;
     PCSPECTRUM IntermediateSpectrum1;
+    PCSUM_SPECTRUM ConstSumSpectrum0;
+    PCSUM_SPECTRUM ConstSumSpectrum1;
     PSUM_SPECTRUM SumSpectrum;
     PVOID Allocation;
     ISTATUS Status;
@@ -480,6 +484,17 @@ SpectrumCompositorReferenceAddSpectra(
         return ISTATUS_SUCCESS;
     }
 
+    if (Spectrum0 == Spectrum1)
+    {
+        Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                              Spectrum0,
+                                                              (FLOAT) 2.0, 
+                                                              Sum);
+
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
     if (Spectrum0->VTable == &AttenuatedSpectrumVTable)
     {
         AttenuatedSpectrum0 = (PCATTENUATED_SPECTRUM) Spectrum0;
@@ -487,6 +502,17 @@ SpectrumCompositorReferenceAddSpectra(
         if (Spectrum1->VTable == &AttenuatedSpectrumVTable)
         {
             AttenuatedSpectrum1 = (PCATTENUATED_SPECTRUM) Spectrum1;
+
+            if (AttenuatedSpectrum0->Spectrum == AttenuatedSpectrum1->Spectrum)
+            {
+                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                      AttenuatedSpectrum0->Spectrum,
+                                                                      AttenuatedSpectrum0->Attenuation + AttenuatedSpectrum1->Attenuation,
+                                                                      Sum);
+
+                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
 
             if (AttenuatedSpectrum0->Attenuation == AttenuatedSpectrum1->Attenuation)
             {
@@ -556,6 +582,19 @@ SpectrumCompositorReferenceAddSpectra(
         if (Spectrum1->VTable == &AttenuatedReflectionSpectrumVTable)
         {
             AttenuatedReflectionSpectrum1 = (PCATTENUATED_REFLECTION_SPECTRUM) Spectrum1;
+
+            if (AttenuatedReflectionSpectrum0->Spectrum == AttenuatedReflectionSpectrum1->Spectrum &&
+                AttenuatedReflectionSpectrum0->Reflector == AttenuatedReflectionSpectrum1->Reflector)
+            {
+                Status = SpectrumCompositorReferenceAttenuatedAddReflection(Compositor,
+                                                                            AttenuatedReflectionSpectrum0->Spectrum,
+                                                                            AttenuatedReflectionSpectrum0->Reflector,
+                                                                            AttenuatedReflectionSpectrum0->Attenuation + AttenuatedReflectionSpectrum1->Attenuation,
+                                                                            Sum);
+
+                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
 
             if (AttenuatedReflectionSpectrum0->Attenuation == AttenuatedReflectionSpectrum1->Attenuation)
             {
@@ -637,6 +676,46 @@ SpectrumCompositorReferenceAddSpectra(
                 ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
                 return Status;
             }
+        }
+    }
+
+    if (Spectrum0->VTable == &ReflectionSpectrumVTable &&
+        Spectrum1->VTable == &ReflectionSpectrumVTable)
+    {
+        ReflectionSpectrum0 = (PCREFLECTION_SPECTRUM) Spectrum0;
+        ReflectionSpectrum1 = (PCREFLECTION_SPECTRUM) Spectrum1;
+
+        if (ReflectionSpectrum0->Spectrum == ReflectionSpectrum1->Spectrum &&
+            ReflectionSpectrum0->Reflector == ReflectionSpectrum1->Reflector)
+        {
+            Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                  Spectrum0,
+                                                                  (FLOAT) 2.0, 
+                                                                  Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+    }
+
+    if (Spectrum0->VTable == &SumSpectrumVTable &&
+        Spectrum1->VTable == &SumSpectrumVTable)
+    {
+        ConstSumSpectrum0 = (PCSUM_SPECTRUM) Spectrum0;
+        ConstSumSpectrum1 = (PCSUM_SPECTRUM) Spectrum1;
+
+        if ((ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum0 &&
+             ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum1) ||
+            (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum0 &&
+             ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum1))
+        {
+            Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                  Spectrum0,
+                                                                  (FLOAT) 2.0, 
+                                                                  Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
         }
     }
 

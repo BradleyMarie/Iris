@@ -13,7 +13,7 @@ Abstract:
 --*/
 
 #include <iristest.h>
-
+/*
 TEST(RenderConstantRedWorldSphere)
 {
     PEMISSIVE_SHADER ConstantShader;
@@ -1142,3 +1142,4 @@ TEST(RenderCornellBox)
 
     FramebufferSaveAsPFM(Framebuffer, "RenderCornellBox.pfm");
 }
+*/

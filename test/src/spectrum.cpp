@@ -157,11 +157,29 @@ TEST(AddSpectra)
     CHECK_EQUAL(2.0f, Spectra1.Sample(2.0f));
     CHECK_EQUAL(0.0f, Spectra1.Sample(4.0f));
 
-    SpectrumReference Sum = Compositor.Add(Spectra0, Spectra1);
+    SpectrumReference Sum0 = Compositor.Add(Spectra0, Spectra1);
 
-    CHECK_EQUAL(3.0f, Sum.Sample(1.0f));
-    CHECK_EQUAL(2.0f, Sum.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Sum.Sample(4.0f));
+    CHECK_EQUAL(3.0f, Sum0.Sample(1.0f));
+    CHECK_EQUAL(2.0f, Sum0.Sample(2.0f));
+    CHECK_EQUAL(0.0f, Sum0.Sample(4.0f));
+
+    SpectrumReference Sum1 = Compositor.Add(Spectra0, Spectra0);
+
+    CHECK_EQUAL(2.0f, Sum1.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum1.Sample(2.0f));
+    CHECK_EQUAL(0.0f, Sum1.Sample(4.0f));
+
+    SpectrumReference Sum2 = Compositor.Add(Sum1, Sum1);
+
+    CHECK_EQUAL(4.0f, Sum2.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum2.Sample(2.0f));
+    CHECK_EQUAL(0.0f, Sum2.Sample(4.0f));
+
+    SpectrumReference Sum3 = Compositor.Add(Sum2, Sum0);
+
+    CHECK_EQUAL(7.0f, Sum3.Sample(1.0f));
+    CHECK_EQUAL(2.0f, Sum3.Sample(2.0f));
+    CHECK_EQUAL(0.0f, Sum3.Sample(4.0f));
 }
 
 TEST(AttenuateSpectra)
@@ -173,10 +191,20 @@ TEST(AttenuateSpectra)
     CHECK_EQUAL(1.0f, Spectra0.Sample(1.0f));
     CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
 
-    SpectrumReference Attenuated = Compositor.Attenuate(Spectra0, 0.5);
+    SpectrumReference Attenuated0 = Compositor.Attenuate(Spectra0, 0.5);
 
-    CHECK_EQUAL(0.5f, Attenuated.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Attenuated.Sample(2.0f));
+    CHECK_EQUAL(0.5f, Attenuated0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Attenuated0.Sample(2.0f));
+
+    SpectrumReference Attenuated1 = Compositor.Attenuate(Attenuated0, 0.5);
+
+    CHECK_EQUAL(0.25f, Attenuated1.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Attenuated1.Sample(2.0f));
+
+    SpectrumReference Sum0 = Compositor.Add(Attenuated0, Attenuated1);
+
+    CHECK_EQUAL(0.75f, Sum0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
 }
 
 TEST(Reflect)
@@ -189,10 +217,17 @@ TEST(Reflect)
     CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
 
     Reflector Reflector0 = ConstantReflector::Create(0.5, 1.0f);
-    SpectrumReference Reflected = Compositor.Reflect(Spectra0, Reflector0);
+    SpectrumReference Reflected0 = Compositor.Reflect(Spectra0, Reflector0);
 
-    CHECK_EQUAL(0.5f, Reflected.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected.Sample(2.0f));
+    CHECK_EQUAL(0.5f, Reflected0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Reflected0.Sample(2.0f));
+
+    SpectrumReference Reflected1 = Compositor.Reflect(Spectra0, Reflector0);
+
+    SpectrumReference Sum0 = Compositor.Add(Reflected0, Reflected1);
+
+    CHECK_EQUAL(1.0f, Sum0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
 }
 
 TEST(AttenuatedReflect)
@@ -205,10 +240,25 @@ TEST(AttenuatedReflect)
     CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
 
     Reflector Reflector0 = ConstantReflector::Create(0.5, 1.0f);
-    SpectrumReference Reflected = Compositor.AttenuatedReflect(Spectra0, Reflector0, 0.5f);
+    SpectrumReference Reflected0 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 0.5f);
 
-    CHECK_EQUAL(0.25f, Reflected.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected.Sample(2.0f));
+    CHECK_EQUAL(0.25f, Reflected0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Reflected0.Sample(2.0f));
+
+    SpectrumReference Reflected1 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 2.0f);
+
+    SpectrumReference Sum0 = Compositor.Add(Reflected0, Reflected1);
+
+    CHECK_EQUAL(1.25f, Sum0.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
+
+    Reflector Reflector1 = ConstantReflector::Create(0.5, 1.0f);
+    SpectrumReference Reflected2 = Compositor.AttenuatedReflect(Spectra0, Reflector1, 0.5f);
+
+    SpectrumReference Sum1 = Compositor.Add(Reflected0, Reflected2);
+
+    CHECK_EQUAL(0.5f, Sum1.Sample(1.0f));
+    CHECK_EQUAL(0.0f, Sum1.Sample(2.0f));
 }
 
 TEST(NullReflect)
@@ -281,4 +331,57 @@ TEST(AttenuateReflectors)
 
     CHECK_EQUAL(0.5f, Reflector1.Reflect(0.25f, 1.0f));
     CHECK_EQUAL(0.0f, Reflector1.Reflect(2.0f, 1.0f));
+}
+
+TEST(AddSameReflector)
+{
+    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
+
+    Reflector Reflector0 = ConstantReflector::Create(2.0, 1.0f);
+
+    ReflectorReference SumReflector = RefCompositor.Add(Reflector0, Reflector0);
+
+    CHECK_EQUAL(4.0f, SumReflector.Reflect(0.25f, 1.0f));
+    CHECK_EQUAL(4.0f, SumReflector.Reflect(0.75f, 1.0f));
+    CHECK_EQUAL(0.0f, SumReflector.Reflect(2.0f, 1.0f));
+}
+
+TEST(AttenuateSameReflector)
+{
+    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
+
+    Reflector Reflector0 = ConstantReflector::Create(1.0, 1.0f);
+    ReflectorReference Reflector1 = RefCompositor.Attenuate(Reflector0, 2.0);
+    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector1, 2.0);
+
+    CHECK_EQUAL(4.0f, Reflector2.Reflect(0.25f, 1.0f));
+    CHECK_EQUAL(0.0f, Reflector2.Reflect(2.0f, 1.0f));
+
+    ReflectorReference Reflector3 = RefCompositor.Attenuate(Reflector0, 0.5);
+    ReflectorReference Reflector4 = RefCompositor.Attenuate(Reflector3, 2.0);
+
+    CHECK_EQUAL(1.0f, Reflector4.Reflect(0.25f, 1.0f));
+    CHECK_EQUAL(0.0f, Reflector4.Reflect(2.0f, 1.0f));
+}
+
+TEST(AddAttenuatedReflectors)
+{
+    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
+
+    Reflector Reflector0 = ConstantReflector::Create(2.0, 1.0f);
+    Reflector Reflector1 = ConstantReflector::Create(1.0, 1.0f);
+
+    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector0, 0.5);
+    ReflectorReference Reflector3 = RefCompositor.Attenuate(Reflector1, 0.5);
+    ReflectorReference SumReflector0 = RefCompositor.Add(Reflector2, Reflector3);
+
+    ReflectorReference Reflector4 = RefCompositor.Attenuate(Reflector0, 0.5);
+    ReflectorReference Reflector5 = RefCompositor.Attenuate(Reflector0, 1.5);
+    ReflectorReference SumReflector1 = RefCompositor.Add(Reflector4, Reflector5);
+
+    ReflectorReference SumReflector3 = RefCompositor.Add(SumReflector0, SumReflector1);
+
+    CHECK_EQUAL(5.5f, SumReflector3.Reflect(0.25f, 1.0f));
+    CHECK_EQUAL(5.5f, SumReflector3.Reflect(0.75f, 1.0f));
+    CHECK_EQUAL(0.0f, SumReflector3.Reflect(2.0f, 1.0f));
 }
