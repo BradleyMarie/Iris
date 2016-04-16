@@ -10,6 +10,8 @@
 // IrisSpectrum
 //
 
+Reimplement Add routines using an extended VTable identified when ReferenceCount == 0
+
 //
 // IrisPhysx
 //
