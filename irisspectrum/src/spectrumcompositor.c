@@ -574,8 +574,7 @@ SpectrumCompositorReferenceAddSpectra(
             }
         }
     }
-
-    if (Spectrum0->VTable == &AttenuatedReflectionSpectrumVTable)
+    else if (Spectrum0->VTable == &AttenuatedReflectionSpectrumVTable)
     {
         AttenuatedReflectionSpectrum0 = (PCATTENUATED_REFLECTION_SPECTRUM) Spectrum0;
 
@@ -678,90 +677,126 @@ SpectrumCompositorReferenceAddSpectra(
             }
         }
     }
-
-    if (Spectrum0->VTable == &ReflectionSpectrumVTable &&
-        Spectrum1->VTable == &ReflectionSpectrumVTable)
+    else if (Spectrum0->VTable == &ReflectionSpectrumVTable)
     {
         ReflectionSpectrum0 = (PCREFLECTION_SPECTRUM) Spectrum0;
-        ReflectionSpectrum1 = (PCREFLECTION_SPECTRUM) Spectrum1;
 
-        if (ReflectionSpectrum0->Spectrum == ReflectionSpectrum1->Spectrum &&
-            ReflectionSpectrum0->Reflector == ReflectionSpectrum1->Reflector)
+        if (Spectrum1->VTable == &ReflectionSpectrumVTable)
         {
-            Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                  Spectrum0,
-                                                                  (FLOAT) 2.0, 
-                                                                  Sum);
+            ReflectionSpectrum1 = (PCREFLECTION_SPECTRUM) Spectrum1;
 
-            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-            return Status;
+            if (ReflectionSpectrum0->Spectrum == ReflectionSpectrum1->Spectrum &&
+                ReflectionSpectrum0->Reflector == ReflectionSpectrum1->Reflector)
+            {
+                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                      Spectrum0,
+                                                                      (FLOAT) 2.0,
+                                                                      Sum);
+
+                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
         }
     }
-
-    if (Spectrum0->VTable == &SumSpectrumVTable &&
-        Spectrum1->VTable == &SumSpectrumVTable)
+    else if (Spectrum0->VTable == &SumSpectrumVTable)
     {
         ConstSumSpectrum0 = (PCSUM_SPECTRUM) Spectrum0;
-        ConstSumSpectrum1 = (PCSUM_SPECTRUM) Spectrum1;
 
-        if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum0)
+        if (Spectrum1->VTable == &SumSpectrumVTable)
         {
-            if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum1)
-            {
-                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                      Spectrum0,
-                                                                      (FLOAT) 2.0,
-                                                                      Sum);
+            ConstSumSpectrum1 = (PCSUM_SPECTRUM) Spectrum1;
 
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-            else
+            if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum0)
             {
-                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                      ConstSumSpectrum0->Spectrum0,
-                                                                      (FLOAT) 2.0,
-                                                                      &IntermediateSpectrum0);
-
-                if (Status != ISTATUS_SUCCESS)
+                if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum1)
                 {
-                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                    Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                          Spectrum0,
+                                                                          (FLOAT) 2.0,
+                                                                          Sum);
+
+                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
                     return Status;
                 }
-                
-                Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                               ConstSumSpectrum0->Spectrum1,
-                                                               ConstSumSpectrum1->Spectrum1,
-                                                               &IntermediateSpectrum1);
-
-                if (Status != ISTATUS_SUCCESS)
+                else
                 {
-                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                    Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                          ConstSumSpectrum0->Spectrum0,
+                                                                          (FLOAT) 2.0,
+                                                                          &IntermediateSpectrum0);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                        return Status;
+                    }
+
+                    Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                                   ConstSumSpectrum0->Spectrum1,
+                                                                   ConstSumSpectrum1->Spectrum1,
+                                                                   &IntermediateSpectrum1);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                        return Status;
+                    }
+
+                    Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                                   IntermediateSpectrum0,
+                                                                   IntermediateSpectrum1,
+                                                                   Sum);
+
+                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
                     return Status;
                 }
-
-                Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                               IntermediateSpectrum0,
-                                                               IntermediateSpectrum1,
-                                                               Sum);
-
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
             }
-        }
-        else if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum0)
-        {
-            if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum1)
+            else if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum0)
             {
-                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                      Spectrum0,
-                                                                      (FLOAT) 2.0,
-                                                                      Sum);
+                if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum1)
+                {
+                    Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                          Spectrum0,
+                                                                          (FLOAT) 2.0,
+                                                                          Sum);
 
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
+                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+                    return Status;
+                }
+                else
+                {
+                    Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                          ConstSumSpectrum0->Spectrum1,
+                                                                          (FLOAT) 2.0,
+                                                                          &IntermediateSpectrum0);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                        return Status;
+                    }
+
+                    Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                                   ConstSumSpectrum0->Spectrum0,
+                                                                   ConstSumSpectrum1->Spectrum1,
+                                                                   &IntermediateSpectrum1);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                        return Status;
+                    }
+
+                    Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                                   IntermediateSpectrum0,
+                                                                   IntermediateSpectrum1,
+                                                                   Sum);
+
+                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+                    return Status;
+                }
             }
-            else
+            else if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum1)
             {
                 Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
                                                                       ConstSumSpectrum0->Spectrum1,
@@ -776,7 +811,7 @@ SpectrumCompositorReferenceAddSpectra(
 
                 Status = SpectrumCompositorReferenceAddSpectra(Compositor,
                                                                ConstSumSpectrum0->Spectrum0,
-                                                               ConstSumSpectrum1->Spectrum1,
+                                                               ConstSumSpectrum1->Spectrum0,
                                                                &IntermediateSpectrum1);
 
                 if (Status != ISTATUS_SUCCESS)
@@ -793,70 +828,38 @@ SpectrumCompositorReferenceAddSpectra(
                 ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
                 return Status;
             }
-        }
-        else if (ConstSumSpectrum0->Spectrum1 == ConstSumSpectrum1->Spectrum1)
-        {
-            Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                  ConstSumSpectrum0->Spectrum1,
-                                                                  (FLOAT) 2.0,
-                                                                  &IntermediateSpectrum0);
-
-            if (Status != ISTATUS_SUCCESS)
+            else if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum1)
             {
-                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
+                                                                      ConstSumSpectrum0->Spectrum0,
+                                                                      (FLOAT) 2.0,
+                                                                      &IntermediateSpectrum0);
+
+                if (Status != ISTATUS_SUCCESS)
+                {
+                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                    return Status;
+                }
+
+                Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                               ConstSumSpectrum0->Spectrum1,
+                                                               ConstSumSpectrum1->Spectrum0,
+                                                               &IntermediateSpectrum1);
+
+                if (Status != ISTATUS_SUCCESS)
+                {
+                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                    return Status;
+                }
+
+                Status = SpectrumCompositorReferenceAddSpectra(Compositor,
+                                                               IntermediateSpectrum0,
+                                                               IntermediateSpectrum1,
+                                                               Sum);
+
+                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
                 return Status;
             }
-
-            Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                           ConstSumSpectrum0->Spectrum0,
-                                                           ConstSumSpectrum1->Spectrum0,
-                                                           &IntermediateSpectrum1);
-
-            if (Status != ISTATUS_SUCCESS)
-            {
-                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-
-            Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                           IntermediateSpectrum0,
-                                                           IntermediateSpectrum1,
-                                                           Sum);
-
-            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-            return Status;
-        }
-        else if (ConstSumSpectrum0->Spectrum0 == ConstSumSpectrum1->Spectrum1)
-        {
-            Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-                                                                  ConstSumSpectrum0->Spectrum0,
-                                                                  (FLOAT) 2.0,
-                                                                  &IntermediateSpectrum0);
-
-            if (Status != ISTATUS_SUCCESS)
-            {
-                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-
-            Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                           ConstSumSpectrum0->Spectrum1,
-                                                           ConstSumSpectrum1->Spectrum0,
-                                                           &IntermediateSpectrum1);
-
-            if (Status != ISTATUS_SUCCESS)
-            {
-                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-
-            Status = SpectrumCompositorReferenceAddSpectra(Compositor,
-                                                           IntermediateSpectrum0,
-                                                           IntermediateSpectrum1,
-                                                           Sum);
-
-            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-            return Status;
         }
     }
 
