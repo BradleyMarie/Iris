@@ -29,13 +29,23 @@ typedef CONST SUM_REFLECTOR *PCSUM_REFLECTOR;
 
 struct _REFLECTOR_COMPOSITOR_REFERENCE {
     STATIC_MEMORY_ALLOCATOR AttenuatedReflectorAllocator;
-    STATIC_MEMORY_ALLOCATOR FmaReflectorAllocator;
     STATIC_MEMORY_ALLOCATOR SumReflectorAllocator;
 };
 
 struct _REFLECTOR_COMPOSITOR {
     REFLECTOR_COMPOSITOR_REFERENCE CompositorReference;
 };
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PREFLECTOR_ADD_REFLECTIONS)(
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
+    );
 
 //
 // Static Functions
@@ -128,46 +138,14 @@ SumReflectorReflect(
     return ISTATUS_SUCCESS; 
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-ZeroReflectorReflect(
-    _In_ PCVOID Context,
-    _In_ FLOAT Wavelength,
-    _In_ FLOAT IncomingIntensity,
-    _Out_ PFLOAT OutgoingIntensity
-    )
-{
-    ASSERT(Context == NULL);
-    ASSERT(IsFiniteFloat(Wavelength) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(Wavelength) != FALSE);
-    ASSERT(IsFiniteFloat(IncomingIntensity) != FALSE);
-    ASSERT(IsGreaterThanOrEqualToZeroFloat(IncomingIntensity) != FALSE);
-    ASSERT(OutgoingIntensity != NULL);
-
-    *OutgoingIntensity = (FLOAT) 0.0;
-
-    return ISTATUS_SUCCESS; 
-}
-
 //
-// Variables
+// VTables
 //
 
-CONST REFLECTOR_VTABLE AttenuatedReflectorVTable = {
-    AttenuatedReflectorReflect,
-    NULL
+CONST REFLECTOR_VTABLE ReflectorVTables[] = {
+	{ AttenuatedReflectorReflect, NULL },
+	{ SumReflectorReflect, NULL }
 };
-
-CONST STATIC REFLECTOR_VTABLE SumReflectorVTable = {
-    SumReflectorReflect,
-    NULL
-};
-
-//
-// Initialization Functions
-//
 
 STATIC
 VOID
@@ -182,7 +160,7 @@ AttenuatedReflectorInitialize(
     ASSERT(IsFiniteFloat(Attenuation) != FALSE);
     ASSERT(IsNotZeroFloat(Attenuation) != FALSE);
 
-    ReflectorInitialize(&AttenuatedReflectorVTable,
+    ReflectorInitialize(&ReflectorVTables[REFLECTOR_TYPE_ATTENUATED],
                         AttenuatedReflector,
                         &AttenuatedReflector->ReflectorHeader);
 
@@ -202,13 +180,322 @@ SumReflectorInitialize(
     ASSERT(Reflector0 != NULL);
     ASSERT(Reflector1 != NULL);
 
-    ReflectorInitialize(&SumReflectorVTable,
+    ReflectorInitialize(&ReflectorVTables[REFLECTOR_TYPE_SUM],
                         SumReflector,
                         &SumReflector->ReflectorHeader);
 
     SumReflector->Reflector0 = Reflector0;
     SumReflector->Reflector1 = Reflector1;
 }
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+ReflectorCompositorReferenceAddTwoReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
+    )
+{
+    PSUM_REFLECTOR SumReflector;
+    PVOID Allocation;
+
+    ASSERT(Compositor != NULL);
+    ASSERT(Reflector0 != NULL);
+    ASSERT(Reflector1 != NULL);
+    ASSERT(Reflector0 != Reflector1);
+    ASSERT(Sum != NULL);
+
+    Allocation = StaticMemoryAllocatorAllocate(&Compositor->SumReflectorAllocator);
+
+    if (Allocation == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SumReflector = (PSUM_REFLECTOR) Allocation;
+
+    SumReflectorInitialize(SumReflector,
+                           Reflector0,
+                           Reflector1);
+
+    *Sum = (PCREFLECTOR) SumReflector;
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+ReflectorCompositorReferenceAddTwoSumReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
+    )
+{
+    PCREFLECTOR IntermediateReflector0;
+    PCREFLECTOR IntermediateReflector1;
+    PCSUM_REFLECTOR SumReflector0;
+    PCSUM_REFLECTOR SumReflector1;
+	ISTATUS Status;
+
+    ASSERT(Compositor != NULL);
+    ASSERT(Reflector0 != NULL);
+    ASSERT(Reflector0->VTable == &ReflectorVTables[REFLECTOR_TYPE_SUM]);
+    ASSERT(Reflector1 != NULL);
+    ASSERT(Reflector1->VTable == &ReflectorVTables[REFLECTOR_TYPE_SUM]);
+    ASSERT(Reflector0 != Reflector1);
+    ASSERT(Sum != NULL);
+
+    SumReflector0 = (PCSUM_REFLECTOR) Reflector0;
+    SumReflector1 = (PCSUM_REFLECTOR) Reflector1;
+
+    if (SumReflector0->Reflector0 == SumReflector1->Reflector0)
+    {
+        if (SumReflector0->Reflector1 == SumReflector1->Reflector1)
+        {
+            Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                     Reflector0,
+                                                                     (FLOAT) 2.0,
+                                                                     Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+        else
+        {
+            Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                     SumReflector0->Reflector0,
+                                                                     (FLOAT) 2.0,
+                                                                     &IntermediateReflector0);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_SUCCESS);
+                return Status;
+            }
+
+            Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                                SumReflector0->Reflector1,
+                                                                SumReflector1->Reflector1,
+                                                                &IntermediateReflector1);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
+
+            Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                                IntermediateReflector0,
+                                                                IntermediateReflector1,
+                                                                Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+    }
+    else if (SumReflector0->Reflector0 == SumReflector1->Reflector1)
+    {
+        if (SumReflector0->Reflector1 == SumReflector1->Reflector0)
+        {
+            Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                     Reflector0,
+                                                                     (FLOAT) 2.0,
+                                                                     Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+        else
+        {
+            Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                     SumReflector0->Reflector0,
+                                                                     (FLOAT) 2.0,
+                                                                     &IntermediateReflector0);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_SUCCESS);
+                return Status;
+            }
+
+            Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                                SumReflector0->Reflector1,
+                                                                SumReflector1->Reflector0,
+                                                                &IntermediateReflector1);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                return Status;
+            }
+
+            Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                                IntermediateReflector0,
+                                                                IntermediateReflector1,
+                                                                Sum);
+
+            ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+    }
+    else if (SumReflector0->Reflector1 == SumReflector1->Reflector1)
+    {
+        Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                 SumReflector0->Reflector1,
+                                                                 (FLOAT) 2.0,
+                                                                 &IntermediateReflector0);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            ASSERT(Status == ISTATUS_SUCCESS);
+            return Status;
+        }
+
+        Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                            SumReflector0->Reflector0,
+                                                            SumReflector1->Reflector0,
+                                                            &IntermediateReflector1);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+
+        Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                            IntermediateReflector0,
+                                                            IntermediateReflector1,
+                                                            Sum);
+
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+    else if (SumReflector0->Reflector1 == SumReflector1->Reflector0)
+    {
+        Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                                 SumReflector0->Reflector1,
+                                                                 (FLOAT) 2.0,
+                                                                 &IntermediateReflector0);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            ASSERT(Status == ISTATUS_SUCCESS);
+            return Status;
+        }
+
+        Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                            SumReflector0->Reflector0,
+                                                            SumReflector1->Reflector1,
+                                                            &IntermediateReflector1);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+
+        Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                            IntermediateReflector0,
+                                                            IntermediateReflector1,
+                                                            Sum);
+
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    Status = ReflectorCompositorReferenceAddTwoReflectors(Compositor,
+                                                          Reflector0,
+                                                          Reflector1,
+                                                          Sum);
+
+    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+ReflectorCompositorReferenceAddTwoAttenuatedReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _In_ PCREFLECTOR Reflector0,
+    _In_ PCREFLECTOR Reflector1,
+    _Out_ PCREFLECTOR *Sum
+    )
+{
+
+    PCATTENUATED_REFLECTOR AttenuatedReflector0;
+    PCATTENUATED_REFLECTOR AttenuatedReflector1;
+	PCREFLECTOR IntermediateReflector;
+	ISTATUS Status;
+
+    ASSERT(Compositor != NULL);
+    ASSERT(Reflector0 != NULL);
+    ASSERT(Reflector0->VTable == &ReflectorVTables[REFLECTOR_TYPE_ATTENUATED]);
+    ASSERT(Reflector1 != NULL);
+    ASSERT(Reflector1->VTable == &ReflectorVTables[REFLECTOR_TYPE_ATTENUATED]);
+    ASSERT(Reflector0 != Reflector1);
+    ASSERT(Sum != NULL);
+
+    AttenuatedReflector0 = (PCATTENUATED_REFLECTOR) Reflector0;
+    AttenuatedReflector1 = (PCATTENUATED_REFLECTOR) Reflector1;
+
+    if (AttenuatedReflector0->Reflector == AttenuatedReflector1->Reflector)
+    {
+        Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+																 AttenuatedReflector0->Reflector,
+                                                                 AttenuatedReflector0->Attenuation + AttenuatedReflector1->Attenuation,
+                                                                 Sum);
+
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    if (AttenuatedReflector0->Attenuation == AttenuatedReflector1->Attenuation)
+    {
+        Status = ReflectorCompositorReferenceAddReflections(Compositor,
+                                                            AttenuatedReflector0->Reflector,
+                                                            AttenuatedReflector1->Reflector,
+                                                            &IntermediateReflector);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+            return Status;
+        }
+
+        Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+																 IntermediateReflector,
+                                                                 AttenuatedReflector0->Attenuation,
+                                                                 Sum);
+
+        ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    Status = ReflectorCompositorReferenceAddTwoReflectors(Compositor,
+                                                          Reflector0,
+                                                          Reflector1,
+                                                          Sum);
+
+    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+    return Status;
+}
+
+CONST STATIC PREFLECTOR_ADD_REFLECTIONS AddReflectionsRoutines[3][3] = {
+    { ReflectorCompositorReferenceAddTwoAttenuatedReflectors, ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoReflectors },
+    { ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoSumReflectors, ReflectorCompositorReferenceAddTwoReflectors },
+    { ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoReflectors },
+};
+
+//
+// Initialization Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -282,14 +569,8 @@ ReflectorCompositorReferenceAddReflections(
     _Out_ PCREFLECTOR *Sum
     )
 {
-    PCATTENUATED_REFLECTOR AttenuatedReflector0;
-    PCATTENUATED_REFLECTOR AttenuatedReflector1;
-    PCSUM_REFLECTOR ConstSumReflector0;
-    PCSUM_REFLECTOR ConstSumReflector1;
-    PCREFLECTOR IntermediateReflector0;
-    PCREFLECTOR IntermediateReflector1;
-    PSUM_REFLECTOR SumReflector;
-    PVOID Allocation;
+    SIZE_T Reflector0Type;
+    SIZE_T Reflector1Type;
     ISTATUS Status;
 
     if (Compositor == NULL)
@@ -325,225 +606,33 @@ ReflectorCompositorReferenceAddReflections(
         return Status;
     }
 
-    if (Reflector0->VTable == &AttenuatedReflectorVTable)
+    if (&ReflectorVTables[0] <= Reflector0->VTable &&
+        Reflector0->VTable < &ReflectorVTables[REFLECTOR_TYPE_EXTERNAL])
     {
-        AttenuatedReflector0 = (PCATTENUATED_REFLECTOR) Reflector0;
-
-        if (Reflector1->VTable == &AttenuatedReflectorVTable)
-        {
-            AttenuatedReflector1 = (PCATTENUATED_REFLECTOR) Reflector1;
-
-            if (AttenuatedReflector0->Reflector == AttenuatedReflector1->Reflector)
-            {
-                Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                         Reflector0,
-                                                                         AttenuatedReflector0->Attenuation + AttenuatedReflector1->Attenuation,
-                                                                         Sum);
-            }
-
-            if (AttenuatedReflector0->Attenuation == AttenuatedReflector1->Attenuation)
-            {
-                Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                    AttenuatedReflector0->Reflector,
-                                                                    AttenuatedReflector1->Reflector,
-                                                                    &IntermediateReflector0);
-
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-
-                Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                         IntermediateReflector0,
-                                                                         AttenuatedReflector0->Attenuation,
-                                                                         Sum);
-
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-        }
+        Reflector0Type = Reflector0->VTable - &ReflectorVTables[0];
     }
-    else if (Reflector0->VTable == &SumReflectorVTable)
+    else
     {
-        ConstSumReflector0 = (PCSUM_REFLECTOR) Reflector0;
+        Reflector0Type = REFLECTOR_TYPE_EXTERNAL;
+    }
 
-        if (Reflector1->VTable == &SumReflectorVTable)
-        {
-            ConstSumReflector1 = (PCSUM_REFLECTOR) Reflector1;
+    if (&ReflectorVTables[0] <= Reflector1->VTable &&
+        Reflector1->VTable < &ReflectorVTables[REFLECTOR_TYPE_EXTERNAL])
+    {
+        Reflector1Type = Reflector1->VTable - &ReflectorVTables[0];
+    }
+    else
+    {
+        Reflector1Type = REFLECTOR_TYPE_EXTERNAL;
+    }
 
-            if (ConstSumReflector0->Reflector0 == ConstSumReflector1->Reflector0)
-            {
-                if (ConstSumReflector0->Reflector1 == ConstSumReflector1->Reflector1)
-                {
-                    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                             Reflector0,
-                                                                             (FLOAT) 2.0,
-                                                                             Sum);
-
-                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-                else
-                {
-                    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                             ConstSumReflector0->Reflector0,
-                                                                             (FLOAT) 2.0,
-                                                                             &IntermediateReflector0);
-
-                    if (Status != ISTATUS_SUCCESS)
-                    {
-                        ASSERT(Status == ISTATUS_SUCCESS);
-                        return Status;
-                    }
-
-                    Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                        ConstSumReflector0->Reflector1,
-                                                                        ConstSumReflector1->Reflector1,
-                                                                        &IntermediateReflector1);
-
-                    if (Status != ISTATUS_SUCCESS)
-                    {
-                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                        return Status;
-                    }
-
-                    Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                        IntermediateReflector0,
-                                                                        IntermediateReflector1,
-                                                                        Sum);
-
-                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-            }
-            else if (ConstSumReflector0->Reflector0 == ConstSumReflector1->Reflector1)
-            {
-                if (ConstSumReflector0->Reflector1 == ConstSumReflector1->Reflector0)
-                {
-                    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                             Reflector0,
-                                                                             (FLOAT) 2.0,
-                                                                             Sum);
-
-                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-                else
-                {
-                    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                             ConstSumReflector0->Reflector0,
-                                                                             (FLOAT) 2.0,
-                                                                             &IntermediateReflector0);
-
-                    if (Status != ISTATUS_SUCCESS)
-                    {
-                        ASSERT(Status == ISTATUS_SUCCESS);
-                        return Status;
-                    }
-
-                    Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                        ConstSumReflector0->Reflector1,
-                                                                        ConstSumReflector1->Reflector0,
-                                                                        &IntermediateReflector1);
-
-                    if (Status != ISTATUS_SUCCESS)
-                    {
-                        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                        return Status;
-                    }
-
-                    Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                        IntermediateReflector0,
-                                                                        IntermediateReflector1,
-                                                                        Sum);
-
-                    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-            }
-            else if (ConstSumReflector0->Reflector1 == ConstSumReflector1->Reflector1)
-            {
-                Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                         ConstSumReflector0->Reflector1,
-                                                                         (FLOAT) 2.0,
-                                                                         &IntermediateReflector0);
-
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    ASSERT(Status == ISTATUS_SUCCESS);
-                    return Status;
-                }
-
-                Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                    ConstSumReflector0->Reflector0,
-                                                                    ConstSumReflector1->Reflector0,
-                                                                    &IntermediateReflector1);
-
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-
-                Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                    IntermediateReflector0,
-                                                                    IntermediateReflector1,
+    Status = AddReflectionsRoutines[Reflector0Type][Reflector1Type](Compositor,
+                                                                    Reflector0,
+                                                                    Reflector1,
                                                                     Sum);
 
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-            else if (ConstSumReflector0->Reflector1 == ConstSumReflector1->Reflector0)
-            {
-                Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                                         ConstSumReflector0->Reflector1,
-                                                                         (FLOAT) 2.0,
-                                                                         &IntermediateReflector0);
-
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    ASSERT(Status == ISTATUS_SUCCESS);
-                    return Status;
-                }
-
-                Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                    ConstSumReflector0->Reflector0,
-                                                                    ConstSumReflector1->Reflector1,
-                                                                    &IntermediateReflector1);
-
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-                    return Status;
-                }
-
-                Status = ReflectorCompositorReferenceAddReflections(Compositor,
-                                                                    IntermediateReflector0,
-                                                                    IntermediateReflector1,
-                                                                    Sum);
-
-                ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
-                return Status;
-            }
-        }
-    }
-
-    Allocation = StaticMemoryAllocatorAllocate(&Compositor->SumReflectorAllocator);
-
-    if (Allocation == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    SumReflector = (PSUM_REFLECTOR) Allocation;
-
-    SumReflectorInitialize(SumReflector,
-                           Reflector0,
-                           Reflector1);
-
-    *Sum = (PCREFLECTOR) SumReflector;
-    return ISTATUS_SUCCESS;
+    ASSERT(Status == ISTATUS_SUCCESS || Status == ISTATUS_ALLOCATION_FAILED);
+    return Status;
 }
 
 _Check_return_
@@ -589,7 +678,7 @@ ReflectorCompositorReferenceAttenuateReflection(
         return ISTATUS_SUCCESS;
     }
 
-    if (Reflector->VTable == &AttenuatedReflectorVTable)
+    if (Reflector->VTable == &ReflectorVTables[REFLECTOR_TYPE_ATTENUATED])
     {
         ReflectorAsAttenuatedReflector = (PATTENUATED_REFLECTOR) Reflector;
 

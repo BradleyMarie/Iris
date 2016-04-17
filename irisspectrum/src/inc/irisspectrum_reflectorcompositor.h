@@ -18,6 +18,14 @@ Abstract:
 #include <irisspectrump.h>
 
 //
+// Macros
+//
+
+#define REFLECTOR_TYPE_ATTENUATED 0
+#define REFLECTOR_TYPE_SUM        1
+#define REFLECTOR_TYPE_EXTERNAL   2
+
+//
 // Types
 //
 
@@ -33,6 +41,6 @@ typedef CONST ATTENUATED_REFLECTOR *PCATTENUATED_REFLECTOR;
 // Variables
 //
 
-extern CONST REFLECTOR_VTABLE AttenuatedReflectorVTable;
+extern CONST REFLECTOR_VTABLE ReflectorVTables[];
 
 #endif // _REFLECTOR_COMPOSITOR_IRIS_SPECTRUM_INTERNAL_

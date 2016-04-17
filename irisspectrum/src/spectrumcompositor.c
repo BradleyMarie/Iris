@@ -994,7 +994,7 @@ SpectrumCompositorReferenceAddReflection(
         return ISTATUS_SUCCESS;
     }
 
-    if (Reflector->VTable == &AttenuatedReflectorVTable)
+    if (Reflector->VTable == &ReflectorVTables[REFLECTOR_TYPE_ATTENUATED])
     {
         AttenuatedReflector = (PCATTENUATED_REFLECTOR) Reflector;
 
@@ -1069,7 +1069,7 @@ SpectrumCompositorReferenceAttenuatedAddReflection(
         return Status;
     }
 
-    if (Reflector->VTable == &AttenuatedReflectorVTable)
+    if (Reflector->VTable == &ReflectorVTables[REFLECTOR_TYPE_ATTENUATED])
     {
         AttenuatedReflector = (PCATTENUATED_REFLECTOR) Reflector;
 
