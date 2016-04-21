@@ -487,6 +487,10 @@ ReflectorCompositorReferenceAddTwoAttenuatedReflectors(
     return Status;
 }
 
+//
+// Static Variables
+//
+
 CONST STATIC PREFLECTOR_ADD_REFLECTIONS AddReflectionsRoutines[3][3] = {
     { ReflectorCompositorReferenceAddTwoAttenuatedReflectors, ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoReflectors },
     { ReflectorCompositorReferenceAddTwoReflectors, ReflectorCompositorReferenceAddTwoSumReflectors, ReflectorCompositorReferenceAddTwoReflectors },
