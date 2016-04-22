@@ -400,137 +400,7 @@ TEST(SimpleReflect)
     CHECK_EQUAL(0.0f, Reflector0.Reflect(2.0f, 1.0f));
 }
 
-TEST(AddReflectors)
-{
-    ReflectorCompositor Compositor = ReflectorCompositor::Create();
-
-    Reflector Reflector0 = ConstantReflector::Create(0.25, 1.0f);
-    Reflector Reflector1 = ConstantReflector::Create(0.25, 0.5f);
-
-    ReflectorReference SumReflector = Compositor.Add(Reflector0, Reflector1);
-
-    CHECK_EQUAL(0.5f, SumReflector.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.25f, SumReflector.Reflect(0.75f, 1.0f));
-    CHECK_EQUAL(0.0f, SumReflector.Reflect(2.0f, 1.0f));
-
-    Reflector Reflector2 = ConstantReflector::Create(1.0f, 1.0f);
-    Reflector Reflector3 = ConstantReflector::Create(2.0f, 1.0f);
-    Reflector Reflector4 = ConstantReflector::Create(3.0f, 1.0f);
-    Reflector Reflector5 = ConstantReflector::Create(4.0f, 1.0f);
-
-    ReflectorReference Sum4 = Compositor.Add(Compositor.Add(Reflector2, Reflector3),
-                                             Compositor.Add(Reflector2, Reflector3));
-
-    CHECK_EQUAL(6.0f, Sum4.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum4.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Sum5 = Compositor.Add(Compositor.Add(Reflector3, Reflector2),
-                                             Compositor.Add(Reflector2, Reflector3));
-
-    CHECK_EQUAL(6.0f, Sum5.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum5.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Sum6 = Compositor.Add(Compositor.Add(Reflector2, Reflector4),
-                                             Compositor.Add(Reflector2, Reflector3));
-
-    CHECK_EQUAL(7.0f, Sum6.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum6.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Sum7 = Compositor.Add(Compositor.Add(Reflector4, Reflector2),
-                                             Compositor.Add(Reflector2, Reflector3));
-
-    CHECK_EQUAL(7.0f, Sum7.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum7.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Sum8 = Compositor.Add(Compositor.Add(Reflector4, Reflector2),
-                                             Compositor.Add(Reflector3, Reflector2));
-
-    CHECK_EQUAL(7.0f, Sum8.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum8.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Sum9 = Compositor.Add(Compositor.Add(Reflector2, Reflector4),
-                                             Compositor.Add(Reflector3, Reflector2));
-
-    CHECK_EQUAL(7.0f, Sum9.Reflect(0.5f, 1.0f));
-    CHECK_EQUAL(0.0f, Sum9.Reflect(2.0f, 1.0f));
-}
-
-TEST(AttenuateReflectors)
-{
-    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
-
-    Reflector Reflector0 = ConstantReflector::Create(0.25, 1.0f);
-    ReflectorReference Reflector1 = RefCompositor.Attenuate(Reflector0, 2.0);
-
-    CHECK_EQUAL(0.5f, Reflector1.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.0f, Reflector1.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector1, 0.0);
-
-    CHECK_EQUAL(0.0f, Reflector2.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.0f, Reflector2.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Reflector3(nullptr);
-    ReflectorReference Reflector4 = RefCompositor.Attenuate(Reflector3, 0.0);
-
-    CHECK_EQUAL(0.0f, Reflector4.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.0f, Reflector4.Reflect(2.0f, 1.0f));
-}
-
-TEST(AddSameReflector)
-{
-    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
-
-    Reflector Reflector0 = ConstantReflector::Create(2.0, 1.0f);
-
-    ReflectorReference SumReflector = RefCompositor.Add(Reflector0, Reflector0);
-
-    CHECK_EQUAL(4.0f, SumReflector.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(4.0f, SumReflector.Reflect(0.75f, 1.0f));
-    CHECK_EQUAL(0.0f, SumReflector.Reflect(2.0f, 1.0f));
-}
-
-TEST(AttenuateSameReflector)
-{
-    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
-
-    Reflector Reflector0 = ConstantReflector::Create(1.0, 1.0f);
-    ReflectorReference Reflector1 = RefCompositor.Attenuate(Reflector0, 2.0);
-    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector1, 2.0);
-
-    CHECK_EQUAL(4.0f, Reflector2.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.0f, Reflector2.Reflect(2.0f, 1.0f));
-
-    ReflectorReference Reflector3 = RefCompositor.Attenuate(Reflector0, 0.5);
-    ReflectorReference Reflector4 = RefCompositor.Attenuate(Reflector3, 2.0);
-
-    CHECK_EQUAL(1.0f, Reflector4.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(0.0f, Reflector4.Reflect(2.0f, 1.0f));
-}
-
-TEST(AddAttenuatedReflectors)
-{
-    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
-
-    Reflector Reflector0 = ConstantReflector::Create(2.0, 1.0f);
-    Reflector Reflector1 = ConstantReflector::Create(1.0, 1.0f);
-
-    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector0, 0.5);
-    ReflectorReference Reflector3 = RefCompositor.Attenuate(Reflector1, 0.5);
-    ReflectorReference SumReflector0 = RefCompositor.Add(Reflector2, Reflector3);
-
-    ReflectorReference Reflector4 = RefCompositor.Attenuate(Reflector0, 0.5);
-    ReflectorReference Reflector5 = RefCompositor.Attenuate(Reflector0, 1.5);
-    ReflectorReference SumReflector1 = RefCompositor.Add(Reflector4, Reflector5);
-
-    ReflectorReference SumReflector3 = RefCompositor.Add(SumReflector0, SumReflector1);
-
-    CHECK_EQUAL(5.5f, SumReflector3.Reflect(0.25f, 1.0f));
-    CHECK_EQUAL(5.5f, SumReflector3.Reflect(0.75f, 1.0f));
-    CHECK_EQUAL(0.0f, SumReflector3.Reflect(2.0f, 1.0f));
-}
-
-TEST(AddLotsOfReflectors)
+TEST(TestReflectorCompositor)
 {
     ReflectorCompositor Compositor = ReflectorCompositor::Create();
 
@@ -539,7 +409,8 @@ TEST(AddLotsOfReflectors)
                                               EmissiveReflector::Create(4.0f),
                                               EmissiveReflector::Create(8.0f) };
 
-    std::vector<ReflectorReference> References = { Compositor.Attenuate(BaseReflectors[0], 0.5),
+    std::vector<ReflectorReference> References = { ReflectorReference(nullptr),
+                                                   Compositor.Attenuate(BaseReflectors[0], 0.5),
                                                    Compositor.Attenuate(BaseReflectors[0], 1.0),
                                                    Compositor.Attenuate(BaseReflectors[0], 2.0),
                                                    Compositor.Attenuate(BaseReflectors[1], 0.5),
@@ -552,12 +423,16 @@ TEST(AddLotsOfReflectors)
                                                    Compositor.Attenuate(BaseReflectors[3], 1.0),
                                                    Compositor.Attenuate(BaseReflectors[3], 2.0) };
 
-    std::vector<FLOAT> Answers = { 0.5f, 1.0f, 2.0f, 1.0f, 2.0f, 4.0f, 2.0f, 4.0f, 8.0f, 4.0f, 8.0f, 16.0f };
+    std::vector<FLOAT> Answers = { 0.0f, 0.5f, 1.0f, 2.0f, 1.0f, 2.0f, 4.0f, 2.0f, 4.0f, 8.0f, 4.0f, 8.0f, 16.0f };
 
     for (size_t i = 0; i < References.size(); i++)
     {
         CHECK_EQUAL(Answers[i], References[i].Reflect(1.0f, 1.0f));
     }
+
+    //
+    // Test Add Reflector Routines
+    //
 
     size_t StopSize = References.size();
 
@@ -581,6 +456,48 @@ TEST(AddLotsOfReflectors)
         }
     }
 
+    //
+    // Test Attenuate Reflector Routines
+    //
+
+    StopSize = References.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        References.push_back(Compositor.Attenuate(References[i], 0.0f));
+        Answers.push_back(Answers[i] * 0.0f);
+
+        References.push_back(Compositor.Attenuate(References[i], 0.5f));
+        Answers.push_back(Answers[i] * 0.5f);
+
+        References.push_back(Compositor.Attenuate(References[i], 1.0f));
+        Answers.push_back(Answers[i] * 1.0f);
+
+        References.push_back(Compositor.Attenuate(References[i], 2.0f));
+        Answers.push_back(Answers[i] * 2.0f);
+    }
+
+    StopSize = References.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        References.push_back(Compositor.Attenuate(References[i], 0.0f));
+        Answers.push_back(Answers[i] * 0.0f);
+
+        References.push_back(Compositor.Attenuate(References[i], 0.5f));
+        Answers.push_back(Answers[i] * 0.5f);
+
+        References.push_back(Compositor.Attenuate(References[i], 1.0f));
+        Answers.push_back(Answers[i] * 1.0f);
+
+        References.push_back(Compositor.Attenuate(References[i], 2.0f));
+        Answers.push_back(Answers[i] * 2.0f);
+    }
+
+    //
+    // Validate Answers
+    //
+    
     for (size_t i = 0; i < References.size(); i++)
     {
         CHECK_EQUAL(Answers[i], References[i].Reflect(1.0f, 1.0f));
