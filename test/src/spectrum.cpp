@@ -404,24 +404,24 @@ TEST(TestReflectorCompositor)
 {
     ReflectorCompositor Compositor = ReflectorCompositor::Create();
 
-    std::vector<Reflector> BaseReflectors = { EmissiveReflector::Create(1.0f),
-                                              EmissiveReflector::Create(2.0f),
-                                              EmissiveReflector::Create(4.0f),
-                                              EmissiveReflector::Create(8.0f) };
+    Reflector Reflector0 = EmissiveReflector::Create(1.0f);
+    Reflector Reflector1 = EmissiveReflector::Create(2.0f);
+    Reflector Reflector2 = EmissiveReflector::Create(4.0f);
+    Reflector Reflector3 = EmissiveReflector::Create(8.0f);
 
     std::vector<ReflectorReference> References = { ReflectorReference(nullptr),
-                                                   Compositor.Attenuate(BaseReflectors[0], 0.5),
-                                                   Compositor.Attenuate(BaseReflectors[0], 1.0),
-                                                   Compositor.Attenuate(BaseReflectors[0], 2.0),
-                                                   Compositor.Attenuate(BaseReflectors[1], 0.5),
-                                                   Compositor.Attenuate(BaseReflectors[1], 1.0),
-                                                   Compositor.Attenuate(BaseReflectors[1], 2.0),
-                                                   Compositor.Attenuate(BaseReflectors[2], 0.5),
-                                                   Compositor.Attenuate(BaseReflectors[2], 1.0),
-                                                   Compositor.Attenuate(BaseReflectors[2], 2.0),
-                                                   Compositor.Attenuate(BaseReflectors[3], 0.5),
-                                                   Compositor.Attenuate(BaseReflectors[3], 1.0),
-                                                   Compositor.Attenuate(BaseReflectors[3], 2.0) };
+                                                   Compositor.Attenuate(Reflector0, 0.5),
+                                                   ReflectorReference(Reflector0.AsPCREFLECTOR()),
+                                                   Compositor.Attenuate(Reflector0, 2.0),
+                                                   Compositor.Attenuate(Reflector1, 0.5),
+                                                   ReflectorReference(Reflector1.AsPCREFLECTOR()),
+                                                   Compositor.Attenuate(Reflector1, 2.0),
+                                                   Compositor.Attenuate(Reflector2, 0.5),
+                                                   ReflectorReference(Reflector2.AsPCREFLECTOR()),
+                                                   Compositor.Attenuate(Reflector2, 2.0),
+                                                   Compositor.Attenuate(Reflector3, 0.5),
+                                                   ReflectorReference(Reflector3.AsPCREFLECTOR()),
+                                                   Compositor.Attenuate(Reflector3, 2.0) };
 
     std::vector<FLOAT> Answers = { 0.0f, 0.5f, 1.0f, 2.0f, 1.0f, 2.0f, 4.0f, 2.0f, 4.0f, 8.0f, 4.0f, 8.0f, 16.0f };
 
@@ -435,6 +435,19 @@ TEST(TestReflectorCompositor)
     //
 
     size_t StopSize = References.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        for (size_t j = 0; j < StopSize; j++)
+        {
+            References.push_back(Compositor.Add(References[i], References[j]));
+            Answers.push_back(Answers[i] + Answers[j]);
+        }
+    }
+
+    //
+    // Do initial sums twice
+    //
 
     for (size_t i = 0; i < StopSize; i++)
     {
