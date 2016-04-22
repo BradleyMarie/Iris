@@ -947,7 +947,7 @@ CONST STATIC PREFLECTOR_ADD_REFLECTIONS AddReflectionsRoutines[3][3] = {
     { ReflectorCompositorReferenceAddSumAndAttenuatedReflectors, 
       ReflectorCompositorReferenceAddTwoSumReflectors, 
       ReflectorCompositorReferenceAddSumAndExternalReflectors },
-    { ReflectorCompositorReferenceAddAttenuatedAndExternalReflectors, 
+    { ReflectorCompositorReferenceAddExternalAndAttenuatedReflectors, 
       ReflectorCompositorReferenceAddExternalAndSumReflectors, 
       ReflectorCompositorReferenceAddTwoReflectors },
 };

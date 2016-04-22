@@ -20,6 +20,7 @@ Abstract:
 #include <cstdio>
 #include <cmath>
 #include <atomic>
+#include <vector>
 
 extern "C" {
 #include <iristoolkit.h>

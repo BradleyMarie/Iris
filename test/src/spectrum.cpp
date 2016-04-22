@@ -529,3 +529,60 @@ TEST(AddAttenuatedReflectors)
     CHECK_EQUAL(5.5f, SumReflector3.Reflect(0.75f, 1.0f));
     CHECK_EQUAL(0.0f, SumReflector3.Reflect(2.0f, 1.0f));
 }
+
+TEST(AddLotsOfReflectors)
+{
+    ReflectorCompositor Compositor = ReflectorCompositor::Create();
+
+    std::vector<Reflector> BaseReflectors = { EmissiveReflector::Create(1.0f),
+                                              EmissiveReflector::Create(2.0f),
+                                              EmissiveReflector::Create(4.0f),
+                                              EmissiveReflector::Create(8.0f) };
+
+    std::vector<ReflectorReference> References = { Compositor.Attenuate(BaseReflectors[0], 0.5),
+                                                   Compositor.Attenuate(BaseReflectors[0], 1.0),
+                                                   Compositor.Attenuate(BaseReflectors[0], 2.0),
+                                                   Compositor.Attenuate(BaseReflectors[1], 0.5),
+                                                   Compositor.Attenuate(BaseReflectors[1], 1.0),
+                                                   Compositor.Attenuate(BaseReflectors[1], 2.0),
+                                                   Compositor.Attenuate(BaseReflectors[2], 0.5),
+                                                   Compositor.Attenuate(BaseReflectors[2], 1.0),
+                                                   Compositor.Attenuate(BaseReflectors[2], 2.0),
+                                                   Compositor.Attenuate(BaseReflectors[3], 0.5),
+                                                   Compositor.Attenuate(BaseReflectors[3], 1.0),
+                                                   Compositor.Attenuate(BaseReflectors[3], 2.0) };
+
+    std::vector<FLOAT> Answers = { 0.5f, 1.0f, 2.0f, 1.0f, 2.0f, 4.0f, 2.0f, 4.0f, 8.0f, 4.0f, 8.0f, 16.0f };
+
+    for (size_t i = 0; i < References.size(); i++)
+    {
+        CHECK_EQUAL(Answers[i], References[i].Reflect(1.0f, 1.0f));
+    }
+
+    size_t StopSize = References.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        for (size_t j = 0; j < StopSize; j++)
+        {
+            References.push_back(Compositor.Add(References[i], References[j]));
+            Answers.push_back(Answers[i] + Answers[j]);
+        }
+    }
+
+    StopSize = References.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        for (size_t j = 0; j < StopSize; j++)
+        {
+            References.push_back(Compositor.Add(References[i], References[j]));
+            Answers.push_back(Answers[i] + Answers[j]);
+        }
+    }
+
+    for (size_t i = 0; i < References.size(); i++)
+    {
+        CHECK_EQUAL(Answers[i], References[i].Reflect(1.0f, 1.0f));
+    }
+}
