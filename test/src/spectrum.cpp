@@ -144,245 +144,111 @@ TEST(ConstantValue)
     CHECK_EQUAL(0.0f, Spectr.Sample(2.0f));
 }
 
-TEST(AddSpectra)
+TEST(SpectrumCompositor)
 {
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0 = ConstantSpectrum::Create(1.0f, 1.0f);
-    Spectrum Spectra1 = ConstantSpectrum::Create(2.0f, 3.0f);
-
-    CHECK_EQUAL(1.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-    CHECK_EQUAL(2.0f, Spectra1.Sample(1.0f));
-    CHECK_EQUAL(2.0f, Spectra1.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Spectra1.Sample(4.0f));
-
-    SpectrumReference Sum0 = Compositor.Add(Spectra0, Spectra1);
-
-    CHECK_EQUAL(3.0f, Sum0.Sample(1.0f));
-    CHECK_EQUAL(2.0f, Sum0.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Sum0.Sample(4.0f));
-
-    SpectrumReference Sum1 = Compositor.Add(Spectra0, Spectra0);
-
-    CHECK_EQUAL(2.0f, Sum1.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum1.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Sum1.Sample(4.0f));
-
-    SpectrumReference Sum2 = Compositor.Add(Sum1, Sum1);
-
-    CHECK_EQUAL(4.0f, Sum2.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum2.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Sum2.Sample(4.0f));
-
-    SpectrumReference Sum3 = Compositor.Add(Sum2, Sum0);
-
-    CHECK_EQUAL(7.0f, Sum3.Sample(1.0f));
-    CHECK_EQUAL(2.0f, Sum3.Sample(2.0f));
-    CHECK_EQUAL(0.0f, Sum3.Sample(4.0f));
-
-    Spectrum Spectra2 = ConstantSpectrum::Create(1.0f, 1.0f);
-    Spectrum Spectra3 = ConstantSpectrum::Create(2.0f, 1.0f);
-    Spectrum Spectra4 = ConstantSpectrum::Create(3.0f, 1.0f);
-    Spectrum Spectra5 = ConstantSpectrum::Create(4.0f, 1.0f);
-
-    SpectrumReference Sum4 = Compositor.Add(Compositor.Add(Spectra2, Spectra3),
-                                            Compositor.Add(Spectra2, Spectra3));
-
-    CHECK_EQUAL(6.0f, Sum4.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum4.Sample(2.0f));
-
-    SpectrumReference Sum5 = Compositor.Add(Compositor.Add(Spectra3, Spectra2),
-                                            Compositor.Add(Spectra2, Spectra3));
-
-    CHECK_EQUAL(6.0f, Sum5.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum5.Sample(2.0f));
-
-    SpectrumReference Sum6 = Compositor.Add(Compositor.Add(Spectra2, Spectra4),
-                                            Compositor.Add(Spectra2, Spectra3));
-
-    CHECK_EQUAL(7.0f, Sum6.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum6.Sample(2.0f));
-
-    SpectrumReference Sum7 = Compositor.Add(Compositor.Add(Spectra4, Spectra2),
-                                            Compositor.Add(Spectra2, Spectra3));
-
-    CHECK_EQUAL(7.0f, Sum7.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum7.Sample(2.0f));
-
-    SpectrumReference Sum8 = Compositor.Add(Compositor.Add(Spectra4, Spectra2),
-                                            Compositor.Add(Spectra3, Spectra2));
-
-    CHECK_EQUAL(7.0f, Sum8.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum8.Sample(2.0f));
-
-    SpectrumReference Sum9 = Compositor.Add(Compositor.Add(Spectra2, Spectra4),
-                                            Compositor.Add(Spectra3, Spectra2));
-
-    CHECK_EQUAL(7.0f, Sum9.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum9.Sample(2.0f));
-}
-
-TEST(AttenuateSpectra)
-{
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0 = ConstantSpectrum::Create(1.0f, 1.0f);
-    Spectrum Spectra1 = ConstantSpectrum::Create(1.0f, 1.0f);
-
-    CHECK_EQUAL(1.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-
-    SpectrumReference Attenuated0 = Compositor.Attenuate(Spectra0, 0.5);
-
-    CHECK_EQUAL(0.5f, Attenuated0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Attenuated0.Sample(2.0f));
-
-    SpectrumReference Attenuated1 = Compositor.Attenuate(Attenuated0, 0.5);
-
-    CHECK_EQUAL(0.25f, Attenuated1.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Attenuated1.Sample(2.0f));
-
-    SpectrumReference Sum0 = Compositor.Add(Attenuated0, Attenuated1);
-
-    CHECK_EQUAL(0.75f, Sum0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
-
-    SpectrumReference Attenuated2 = Compositor.Attenuate(Spectra1, 0.5);
-    SpectrumReference Sum2 = Compositor.Add(Attenuated0, Attenuated2);
-
-    CHECK_EQUAL(1.0f, Sum2.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum2.Sample(2.0f));
-}
-
-TEST(Reflect)
-{
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0 = ConstantSpectrum::Create(1.0f, 1.0f);
-
-    CHECK_EQUAL(1.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-
-    Reflector Reflector0 = ConstantReflector::Create(0.5, 1.0f);
-    SpectrumReference Reflected0 = Compositor.Reflect(Spectra0, Reflector0);
-
-    CHECK_EQUAL(0.5f, Reflected0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected0.Sample(2.0f));
-
-    SpectrumReference Reflected1 = Compositor.Reflect(Spectra0, Reflector0);
-
-    SpectrumReference Sum0 = Compositor.Add(Reflected0, Reflected1);
-
-    CHECK_EQUAL(1.0f, Sum0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
-}
-
-TEST(AttenuatedReflect)
-{
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0 = ConstantSpectrum::Create(1.0f, 1.0f);
-    Spectrum Spectra1 = ConstantSpectrum::Create(1.0f, 1.0f);
-
-    CHECK_EQUAL(1.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-
-    Reflector Reflector0 = ConstantReflector::Create(0.5, 1.0f);
-    SpectrumReference Reflected0 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 0.5f);
-
-    CHECK_EQUAL(0.25f, Reflected0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected0.Sample(2.0f));
-
-    SpectrumReference Reflected1 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 2.0f);
-
-    SpectrumReference Sum0 = Compositor.Add(Reflected0, Reflected1);
-
-    CHECK_EQUAL(1.25f, Sum0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum0.Sample(2.0f));
-
-    Reflector Reflector1 = ConstantReflector::Create(0.5, 1.0f);
-    SpectrumReference Reflected2 = Compositor.AttenuatedReflect(Spectra0, Reflector1, 0.5f);
-
-    SpectrumReference Sum1 = Compositor.Add(Reflected0, Reflected2);
-
-    CHECK_EQUAL(0.5f, Sum1.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum1.Sample(2.0f));
-
-    SpectrumReference Attenuated0 = Compositor.Attenuate(Spectra1, 0.5f);
-    SpectrumReference Sum2 = Compositor.Add(Reflected0, Attenuated0);
-
-    CHECK_EQUAL(0.75f, Sum2.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum2.Sample(2.0f));
-
-    SpectrumReference Sum3 = Compositor.Add(Attenuated0, Reflected0);
-
-    CHECK_EQUAL(0.75f, Sum3.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Sum3.Sample(2.0f));
-
-    SpectrumReference Reflected3 = Compositor.AttenuatedReflect(Spectra0, Reflector1, 1.0f);
-    CHECK_EQUAL(0.5f, Reflected3.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected3.Sample(2.0f));
-
-    ReflectorCompositor RefCompositor = ReflectorCompositor::Create();
-    ReflectorReference Reflector2 = RefCompositor.Attenuate(Reflector1, 0.5f);
-    SpectrumReference Reflected4 = Compositor.AttenuatedReflect(Spectra0, Reflector2, 1.0f);
-
-    CHECK_EQUAL(0.25f, Reflected4.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected4.Sample(2.0f));
-
-    SpectrumReference Reflected5 = Compositor.AttenuatedReflect(Spectra0, Reflector2, 4.0f);
-
-    CHECK_EQUAL(1.0f, Reflected5.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected5.Sample(2.0f));
-
-    SpectrumReference Reflected6 = Compositor.Attenuate(Reflected5, 4.0f);
-
-    CHECK_EQUAL(4.0f, Reflected6.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected6.Sample(2.0f));
-}
-
-TEST(NullReflect)
-{
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0(nullptr, false);
-
-    CHECK_EQUAL(0.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-
-    Reflector Reflector0 = EmissiveReflector::Create(5.0f);
-    SpectrumReference Reflected = Compositor.Reflect(Spectra0, Reflector0);
-
-    CHECK_EQUAL(5.0f, Reflected.Sample(1.0f));
-    CHECK_EQUAL(5.0f, Reflected.Sample(2.0f));
-}
-
-TEST(NullAttenuatedReflect)
-{
-    SpectrumCompositor Compositor = SpectrumCompositor::Create();
-
-    Spectrum Spectra0(nullptr, false);
-
-    CHECK_EQUAL(0.0f, Spectra0.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Spectra0.Sample(2.0f));
-
-    Reflector Reflector0 = EmissiveReflector::Create(5.0f);
-    SpectrumReference Reflected0 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 0.5f);
-
-    CHECK_EQUAL(2.5f, Reflected0.Sample(1.0f));
-    CHECK_EQUAL(2.5f, Reflected0.Sample(2.0f));
-
-    SpectrumReference Reflected1 = Compositor.AttenuatedReflect(Spectra0, Reflector0, 0.0);
-
-    CHECK_EQUAL(0.0f, Reflected1.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected1.Sample(2.0f));
-
-    ReflectorReference Reflector1(nullptr);
-    SpectrumReference Reflected2 = Compositor.AttenuatedReflect(Spectra0, Reflector1, 100.0);
-
-    CHECK_EQUAL(0.0f, Reflected2.Sample(1.0f));
-    CHECK_EQUAL(0.0f, Reflected2.Sample(2.0f));
+    SpectrumCompositor SpecCompositor0 = SpectrumCompositor::Create();
+    ReflectorCompositor RefCompositor0 = ReflectorCompositor::Create();
+
+    Reflector Reflector0 = EmissiveReflector::Create(1.0f);
+    Reflector Reflector1 = EmissiveReflector::Create(2.0f);
+    ReflectorReference Reflector2 = RefCompositor0.Attenuate(Reflector0, 0.0f);
+    ReflectorReference Reflector3 = RefCompositor0.Attenuate(Reflector0, 1.0f);
+    ReflectorReference Reflector4 = RefCompositor0.Attenuate(Reflector0, 2.0f);
+
+    std::vector<ReflectorReference> Reflectors = { ReflectorReference(Reflector0.AsPCREFLECTOR()),
+                                                   ReflectorReference(Reflector1.AsPCREFLECTOR()),
+                                                   Reflector2,
+                                                   Reflector3, 
+                                                   Reflector4,
+                                                   ReflectorReference(nullptr) };
+
+    std::vector<FLOAT> ReflectorAnswers = { 1.0f, 2.0f, 0.0f, 1.0f, 2.0f, 0.0f };
+
+    Spectrum Spectrum0 = ConstantSpectrum::Create(1.0f, 1.5f);
+    Spectrum Spectrum1 = ConstantSpectrum::Create(2.0f, 1.5f);
+    Spectrum Spectrum2 = ConstantSpectrum::Create(4.0f, 1.5f);
+    Spectrum Spectrum3 = ConstantSpectrum::Create(8.0f, 1.5f);
+
+    std::vector<SpectrumReference> Spectra = { SpectrumReference(nullptr),
+                                               SpectrumReference(Spectrum0.AsPCSPECTRUM()),
+                                               SpectrumReference(Spectrum1.AsPCSPECTRUM()),
+                                               SpectrumReference(Spectrum2.AsPCSPECTRUM()),
+                                               SpectrumReference(Spectrum3.AsPCSPECTRUM()) };
+
+    std::vector<FLOAT> AnswersWavelengthOne = { 0.0f, 1.0f, 2.0f, 4.0f, 8.0f };
+    std::vector<FLOAT> AnswersWavelengthTwo = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
+    for (size_t i = 0; i < Reflectors.size(); i++)
+    {
+        Spectra.push_back(SpecCompositor0.Reflect(SpectrumReference(nullptr), Reflectors[i]));
+        AnswersWavelengthOne.push_back(ReflectorAnswers[i]);
+        AnswersWavelengthTwo.push_back(ReflectorAnswers[i]);
+    }
+
+    for (size_t i = 0; i < Reflectors.size(); i++)
+    {
+        Spectra.push_back(SpecCompositor0.AttenuatedReflect(SpectrumReference(nullptr), Reflectors[i], 0.0f));
+        Spectra.push_back(SpecCompositor0.AttenuatedReflect(SpectrumReference(nullptr), Reflectors[i], 0.5f));
+        Spectra.push_back(SpecCompositor0.AttenuatedReflect(SpectrumReference(nullptr), Reflectors[i], 1.0f));
+        Spectra.push_back(SpecCompositor0.AttenuatedReflect(SpectrumReference(nullptr), Reflectors[i], 2.0f));
+        AnswersWavelengthOne.push_back(ReflectorAnswers[i] * 0.0f);
+        AnswersWavelengthOne.push_back(ReflectorAnswers[i] * 0.5f);
+        AnswersWavelengthOne.push_back(ReflectorAnswers[i] * 1.0f);
+        AnswersWavelengthOne.push_back(ReflectorAnswers[i] * 2.0f);
+        AnswersWavelengthTwo.push_back(ReflectorAnswers[i] * 0.0f);
+        AnswersWavelengthTwo.push_back(ReflectorAnswers[i] * 0.5f);
+        AnswersWavelengthTwo.push_back(ReflectorAnswers[i] * 1.0f);
+        AnswersWavelengthTwo.push_back(ReflectorAnswers[i] * 2.0f);
+    }
+
+    size_t StopSize = Spectra.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        Spectra.push_back(SpecCompositor0.Attenuate(Spectra[i], 0.0f));
+        Spectra.push_back(SpecCompositor0.Attenuate(Spectra[i], 0.5f));
+        Spectra.push_back(SpecCompositor0.Attenuate(Spectra[i], 1.0f));
+        Spectra.push_back(SpecCompositor0.Attenuate(Spectra[i], 2.0f));
+        AnswersWavelengthOne.push_back(AnswersWavelengthOne[i] * 0.0f);
+        AnswersWavelengthOne.push_back(AnswersWavelengthOne[i] * 0.5f);
+        AnswersWavelengthOne.push_back(AnswersWavelengthOne[i] * 1.0f);
+        AnswersWavelengthOne.push_back(AnswersWavelengthOne[i] * 2.0f);
+        AnswersWavelengthTwo.push_back(AnswersWavelengthTwo[i] * 0.0f);
+        AnswersWavelengthTwo.push_back(AnswersWavelengthTwo[i] * 0.5f);
+        AnswersWavelengthTwo.push_back(AnswersWavelengthTwo[i] * 1.0f);
+        AnswersWavelengthTwo.push_back(AnswersWavelengthTwo[i] * 2.0f);
+    }
+
+    StopSize = Spectra.size();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        for (size_t j = 0; j < StopSize; j++)
+        {
+            Spectra.push_back(SpecCompositor0.Add(Spectra[i], Spectra[j]));
+            AnswersWavelengthOne.push_back(AnswersWavelengthOne[i] + AnswersWavelengthOne[j]);
+            AnswersWavelengthTwo.push_back(AnswersWavelengthTwo[i] + AnswersWavelengthTwo[j]);
+        }
+    }
+
+    for (size_t i = 0; i < Spectra.size(); i++)
+    {
+        CHECK_EQUAL(AnswersWavelengthOne[i], Spectra[i].Sample(1.0f));
+        CHECK_EQUAL(AnswersWavelengthTwo[i], Spectra[i].Sample(2.0f));
+    }
+
+    SpectrumCompositor SpecCompositor1 = SpectrumCompositor::Create();
+
+    for (size_t i = 0; i < StopSize; i++)
+    {
+        for (size_t j = 0; j < StopSize; j++)
+        {
+            SpectrumReference TempSpectrum = SpecCompositor1.Add(Spectra[i], Spectra[j]);
+            CHECK_EQUAL(AnswersWavelengthOne[i] + AnswersWavelengthOne[j], TempSpectrum.Sample(1.0f));
+            CHECK_EQUAL(AnswersWavelengthTwo[i] + AnswersWavelengthTwo[j], TempSpectrum.Sample(2.0f));
+            SpecCompositor1.Clear();
+        }
+    } 
 }
 
 TEST(NullReflector)
@@ -402,7 +268,7 @@ TEST(SimpleReflect)
 
 TEST(TestReflectorCompositor)
 {
-    ReflectorCompositor Compositor = ReflectorCompositor::Create();
+    ReflectorCompositor RefCompositor0 = ReflectorCompositor::Create();
 
     Reflector Reflector0 = EmissiveReflector::Create(1.0f);
     Reflector Reflector1 = EmissiveReflector::Create(2.0f);
@@ -410,18 +276,18 @@ TEST(TestReflectorCompositor)
     Reflector Reflector3 = EmissiveReflector::Create(8.0f);
 
     std::vector<ReflectorReference> References = { ReflectorReference(nullptr),
-                                                   Compositor.Attenuate(Reflector0, 0.5),
+                                                   RefCompositor0.Attenuate(Reflector0, 0.5),
                                                    ReflectorReference(Reflector0.AsPCREFLECTOR()),
-                                                   Compositor.Attenuate(Reflector0, 2.0),
-                                                   Compositor.Attenuate(Reflector1, 0.5),
+                                                   RefCompositor0.Attenuate(Reflector0, 2.0),
+                                                   RefCompositor0.Attenuate(Reflector1, 0.5),
                                                    ReflectorReference(Reflector1.AsPCREFLECTOR()),
-                                                   Compositor.Attenuate(Reflector1, 2.0),
-                                                   Compositor.Attenuate(Reflector2, 0.5),
+                                                   RefCompositor0.Attenuate(Reflector1, 2.0),
+                                                   RefCompositor0.Attenuate(Reflector2, 0.5),
                                                    ReflectorReference(Reflector2.AsPCREFLECTOR()),
-                                                   Compositor.Attenuate(Reflector2, 2.0),
-                                                   Compositor.Attenuate(Reflector3, 0.5),
+                                                   RefCompositor0.Attenuate(Reflector2, 2.0),
+                                                   RefCompositor0.Attenuate(Reflector3, 0.5),
                                                    ReflectorReference(Reflector3.AsPCREFLECTOR()),
-                                                   Compositor.Attenuate(Reflector3, 2.0) };
+                                                   RefCompositor0.Attenuate(Reflector3, 2.0) };
 
     std::vector<FLOAT> Answers = { 0.0f, 0.5f, 1.0f, 2.0f, 1.0f, 2.0f, 4.0f, 2.0f, 4.0f, 8.0f, 4.0f, 8.0f, 16.0f };
 
@@ -440,7 +306,7 @@ TEST(TestReflectorCompositor)
     {
         for (size_t j = 0; j < StopSize; j++)
         {
-            References.push_back(Compositor.Add(References[i], References[j]));
+            References.push_back(RefCompositor0.Add(References[i], References[j]));
             Answers.push_back(Answers[i] + Answers[j]);
         }
     }
@@ -453,7 +319,7 @@ TEST(TestReflectorCompositor)
     {
         for (size_t j = 0; j < StopSize; j++)
         {
-            References.push_back(Compositor.Add(References[i], References[j]));
+            References.push_back(RefCompositor0.Add(References[i], References[j]));
             Answers.push_back(Answers[i] + Answers[j]);
         }
     }
@@ -464,7 +330,7 @@ TEST(TestReflectorCompositor)
     {
         for (size_t j = 0; j < StopSize; j++)
         {
-            References.push_back(Compositor.Add(References[i], References[j]));
+            References.push_back(RefCompositor0.Add(References[i], References[j]));
             Answers.push_back(Answers[i] + Answers[j]);
         }
     }
@@ -477,42 +343,40 @@ TEST(TestReflectorCompositor)
 
     for (size_t i = 0; i < StopSize; i++)
     {
-        References.push_back(Compositor.Attenuate(References[i], 0.0f));
+        References.push_back(RefCompositor0.Attenuate(References[i], 0.0f));
         Answers.push_back(Answers[i] * 0.0f);
 
-        References.push_back(Compositor.Attenuate(References[i], 0.5f));
+        References.push_back(RefCompositor0.Attenuate(References[i], 0.5f));
         Answers.push_back(Answers[i] * 0.5f);
 
-        References.push_back(Compositor.Attenuate(References[i], 1.0f));
+        References.push_back(RefCompositor0.Attenuate(References[i], 1.0f));
         Answers.push_back(Answers[i] * 1.0f);
 
-        References.push_back(Compositor.Attenuate(References[i], 2.0f));
-        Answers.push_back(Answers[i] * 2.0f);
-    }
-
-    StopSize = References.size();
-
-    for (size_t i = 0; i < StopSize; i++)
-    {
-        References.push_back(Compositor.Attenuate(References[i], 0.0f));
-        Answers.push_back(Answers[i] * 0.0f);
-
-        References.push_back(Compositor.Attenuate(References[i], 0.5f));
-        Answers.push_back(Answers[i] * 0.5f);
-
-        References.push_back(Compositor.Attenuate(References[i], 1.0f));
-        Answers.push_back(Answers[i] * 1.0f);
-
-        References.push_back(Compositor.Attenuate(References[i], 2.0f));
+        References.push_back(RefCompositor0.Attenuate(References[i], 2.0f));
         Answers.push_back(Answers[i] * 2.0f);
     }
 
     //
     // Validate Answers
     //
-    
+
     for (size_t i = 0; i < References.size(); i++)
     {
         CHECK_EQUAL(Answers[i], References[i].Reflect(1.0f, 1.0f));
+    }
+
+    //
+    // Compute Sums Again
+    //
+
+    ReflectorCompositor RefCompositor1 = ReflectorCompositor::Create();
+
+    for (size_t i = 0; i < References.size(); i++)
+    {
+        CHECK_EQUAL(Answers[i] * 0.0f, RefCompositor1.Attenuate(References[i], 0.0f).Reflect(1.0f, 1.0f));
+        CHECK_EQUAL(Answers[i] * 0.5f, RefCompositor1.Attenuate(References[i], 0.5f).Reflect(1.0f, 1.0f));
+        CHECK_EQUAL(Answers[i] * 1.0f, RefCompositor1.Attenuate(References[i], 1.0f).Reflect(1.0f, 1.0f));
+        CHECK_EQUAL(Answers[i] * 2.0f, RefCompositor1.Attenuate(References[i], 2.0f).Reflect(1.0f, 1.0f));
+        RefCompositor1.Clear();
     }
 }
