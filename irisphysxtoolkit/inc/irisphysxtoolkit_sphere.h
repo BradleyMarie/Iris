@@ -4,16 +4,16 @@ Copyright (c) 2014 Brad Weinberger
 
 Module Name:
 
-    irisphysxtoolkit_triangle.h
+    irisphysxtoolkit_sphere.h
 
 Abstract:
 
-    This file contains the allocation functions for a triangle.
+    This file contains the allocation functions for a sphere.
 
 --*/
 
-#ifndef _TRIANGLE_IRIS_PHYSX_TOOLKIT_
-#define _TRIANGLE_IRIS_PHYSX_TOOLKIT_
+#ifndef _SPHERE_IRIS_PHYSX_TOOLKIT_
+#define _SPHERE_IRIS_PHYSX_TOOLKIT_
 
 #include <irisphysxtoolkit.h>
 
@@ -28,11 +28,11 @@ ISTATUS
 PhysxSphereAllocate(
     _In_ POINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PMATERIAL FrontMaterial,
-    _In_opt_ PMATERIAL BackMaterial,
-    _In_opt_ PLIGHT FrontLight,
-    _In_opt_ PLIGHT BackLight,
-    _Out_ PSPECTRUM_SHAPE *Shape
+    _In_opt_ PPBR_MATERIAL FrontMaterial,
+    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPBR_LIGHT FrontLight,
+    _In_opt_ PPBR_LIGHT BackLight,
+    _Out_ PPBR_GEOMETRY *Geometry
     );
 
-#endif // _TRIANGLE_IRIS_PHYSX_TOOLKIT_
+#endif // _SPHERE_IRIS_PHYSX_TOOLKIT_

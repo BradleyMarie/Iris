@@ -61,6 +61,14 @@ public:
         return Data;
     }
 
+    BRDFReference
+    AsBRDFReference(
+        void
+        ) const
+    {
+        return BRDFReference(Data);
+    }
+
     _Ret_
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(

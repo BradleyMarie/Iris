@@ -54,7 +54,8 @@ add_executable(iris-test
     src/ray.cpp
     src/render.cpp
     src/irisplusplus.cpp
-    src/spectrum.cpp)
+    src/spectrum.cpp
+    src/simplephysxrender.cpp)
 
 target_link_libraries(iris-test 
     iris 
@@ -62,6 +63,7 @@ target_link_libraries(iris-test
     irisadvanced
     irisspectrum
     irisphysx
+    irisphysxtoolkit
     iristoolkit
     irisplusplus
     irisadvancedplusplus

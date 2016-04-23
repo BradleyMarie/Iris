@@ -24,6 +24,8 @@ Abstract:
 
 extern "C" {
 #include <iristoolkit.h>
+#include <irisadvancedtoolkit.h>
+#include <irisphysxtoolkit.h>
 }
 
 #include <irisplusplus.h>

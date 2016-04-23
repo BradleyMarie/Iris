@@ -56,6 +56,14 @@ public:
         return Data;
     }
     
+    ReflectorReference
+    AsReflectorReference(
+        void
+        ) const
+    {
+        return ReflectorReference(Data);
+    }
+
     _Ret_
     FLOAT
     Reflect(

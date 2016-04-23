@@ -61,6 +61,14 @@ public:
         return Data;
     }
     
+    MaterialReference
+    AsMaterialReference(
+        void
+        ) const
+    {
+        return MaterialReference(Data);
+    }
+
     _Ret_
     BRDFReference
     Sample(

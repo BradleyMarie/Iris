@@ -56,6 +56,14 @@ public:
         return Data;
     }
     
+    SpectrumReference
+    AsSpectrumReference(
+        void
+        ) const
+    {
+        return SpectrumReference(Data);
+    }
+
     _Ret_
     FLOAT
     Sample(
