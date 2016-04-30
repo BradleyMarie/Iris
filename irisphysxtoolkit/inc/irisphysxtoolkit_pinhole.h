@@ -45,6 +45,17 @@ ISTATUS
     _In_ SIZE_T NumberOfThreads
     );
 
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS 
+(*PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE)(
+    _In_opt_ PVOID Context,
+    _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
+    _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,
+    _In_ SIZE_T NumberOfThreads
+    );
+
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXTOOLKITAPI
@@ -58,8 +69,8 @@ PinholeRender(
     _In_ VECTOR3 Up,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,
-    _In_ SIZE_T MaxDepth,
     _In_ FLOAT Epsilon,
+    _In_ SIZE_T MaxDepth,
     _In_ BOOL Jitter,
     _In_ BOOL Parallelize,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
@@ -67,7 +78,8 @@ PinholeRender(
     _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
-    _Inout_ PVOID CreateStateContext,
+    _In_opt_ PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
+    _Inout_opt_ PVOID CreateStateContext,
     _Inout_ PFRAMEBUFFER Framebuffer
     );
 

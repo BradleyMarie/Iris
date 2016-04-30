@@ -42,8 +42,8 @@ PinholeIntegrateRoutine(
     )
 {
     PPINHOLE_INTEGRATE_CONTEXT IntegrateContext;
-    PCSPECTRUM ResultSpectrum;
     COLOR3 ResultColor;
+    PCSPECTRUM ResultSpectrum;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
@@ -103,23 +103,23 @@ StaticPinholeCameraRender(
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
+    VECTOR3 Direction;
     SIZE_T FramebufferColumnSubpixelIndex;
-    SIZE_T FramebufferRowSubpixelIndex;
     SIZE_T FramebufferColumns;
+    SIZE_T FramebufferRowSubpixelIndex;
     SIZE_T FramebufferRows;
-    POINT3 SubpixelRowStart;
-    POINT3 SubpixelOrigin;
+    POINT3 Origin;
+    COLOR3 PixelColor;
     FLOAT RandomNumber0;
     FLOAT RandomNumber1;
-    FLOAT SubpixelWeight;
-    VECTOR3 SubpixelXDimensions;
-    VECTOR3 SubpixelYDimensions;
-    VECTOR3 Direction;
-    COLOR3 PixelColor;
     POINT3 RayOrigin;
     POINT3 RowStart;
     ISTATUS Status;
-    POINT3 Origin;
+    POINT3 SubpixelOrigin;
+    POINT3 SubpixelRowStart;
+    FLOAT SubpixelWeight;
+    VECTOR3 SubpixelXDimensions;
+    VECTOR3 SubpixelYDimensions;
     RAY WorldRay;
 
     ASSERT(PointValidate(PinholeLocation) != FALSE);
@@ -280,8 +280,8 @@ PinholeRender(
     _In_ VECTOR3 Up,
     _In_ SIZE_T AdditionalXSamplesPerPixel,
     _In_ SIZE_T AdditionalYSamplesPerPixel,
-    _In_ SIZE_T MaxDepth,
     _In_ FLOAT Epsilon,
+    _In_ SIZE_T MaxDepth,
     _In_ BOOL Jitter,
     _In_ BOOL Parallelize,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
@@ -289,29 +289,30 @@ PinholeRender(
     _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
-    _Inout_ PVOID CreateStateContext,
+    _In_opt_ PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
+    _Inout_opt_ PVOID CreateStateContext,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
-    PPBR_INTEGRATOR *Integrators;
-    PRANDOM *Rngs;
-    PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
-    PVOID *ProcessHitContexts;
-    PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines;
-    PVOID *ToneMappingContexts;
-    PINHOLE_INTEGRATE_CONTEXT IntegrateContext;
-    VECTOR3 NormalizedCameraDirection;
-    VECTOR3 NormalizedUpVector;
-    VECTOR3 ImagePlaneHeightVector;
-    VECTOR3 ImagePlaneWidthVector;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
-    SIZE_T NumberOfThreads;
-    SIZE_T NumberOfPixels;
-    SIZE_T ThreadIndex;
-    SIZE_T PixelIndex;
     POINT3 ImagePlaneCorner;
+    VECTOR3 ImagePlaneHeightVector;
+    VECTOR3 ImagePlaneWidthVector;
+    PINHOLE_INTEGRATE_CONTEXT IntegrateContext;
+    PPBR_INTEGRATOR *Integrators;
+    VECTOR3 NormalizedCameraDirection;
+    VECTOR3 NormalizedUpVector;
+    SIZE_T NumberOfPixels;
+    SIZE_T NumberOfThreads;
+    SIZE_T PixelIndex;
+    PVOID *ProcessHitContexts;
+    PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
+    PRANDOM *Rngs;
     ISTATUS Status;
+    SIZE_T ThreadIndex;
+    PVOID *ToneMappingContexts;
+    PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines;
 
     if (PointValidate(PinholeLocation) == FALSE)
     {
@@ -346,14 +347,34 @@ PinholeRender(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
+    if (IsFiniteFloat(Epsilon) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (TestGeometryRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_12;
+    }
+
+    if (Lights == NULL && NumberOfLights != 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+    
+    if (Lights != NULL && NumberOfLights == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+    }
+
     if (CreateStateRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_10;
+        return ISTATUS_INVALID_ARGUMENT_16;
     }
 
     if (Framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_12;
+        return ISTATUS_INVALID_ARGUMENT_19;
     }
 
     FramebufferGetDimensions(Framebuffer, 
@@ -511,12 +532,12 @@ PinholeRender(
         }
     }
 
+    FreeCameraStateRoutine(CreateStateContext, ProcessHitContexts, ToneMappingContexts, NumberOfThreads);
+
     for (ThreadIndex = 0;
          ThreadIndex < NumberOfThreads;
          ThreadIndex++)
     {
-        free(ToneMappingContexts[ThreadIndex]);
-        free(ProcessHitContexts[ThreadIndex]);
         RandomFree(Rngs[ThreadIndex]);
         PBRIntegratorFree(Integrators[ThreadIndex]);
     }
