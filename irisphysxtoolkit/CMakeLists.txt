@@ -1,6 +1,12 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisphysx/inc ../iriscommon/ inc src/inc)
+include_directories(inc src/inc
+    ../iris/inc 
+    ../irisadvanced/inc 
+    ../irisadvancedtoolkit/inc 
+    ../irisspectrum/inc 
+    ../irisphysx/inc 
+    ../iriscommon)
 
 add_library(irisphysxtoolkit SHARED
     src/mirrorbrdf.c
@@ -8,11 +14,13 @@ add_library(irisphysxtoolkit SHARED
     src/lambertianmaterial.c
     src/pointlight.c
     src/triangle.c
-    src/sphere.c)
+    src/sphere.c
+    src/pinhole.c)
 
 target_link_libraries(irisphysxtoolkit 
     iris 
     irisadvanced
+    irisadvancedtoolkit
     irisspectrum
     irisphysx)
 

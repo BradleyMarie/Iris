@@ -17,6 +17,7 @@ Abstract:
 
 #include <iris.h>
 #include <irisadvanced.h>
+#include <irisadvancedtoolkit.h>
 #include <irisspectrum.h>
 #include <irisphysx.h>
 
@@ -28,5 +29,6 @@ Abstract:
 #include "irisphysxtoolkit_pointlight.h"
 #include "irisphysxtoolkit_triangle.h"
 #include "irisphysxtoolkit_sphere.h"
+#include "irisphysxtoolkit_pinhole.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_
