@@ -79,6 +79,8 @@ PBRIntegratorAllocate(
         }
     }
     
+    PBRIntegrator->NextPBRRayTracer = PBRRayTracer;
+
     *Result = PBRIntegrator;
     
     return ISTATUS_SUCCESS;
