@@ -275,19 +275,4 @@ Color3InitializeBlack(
     return Color;
 }
 
-SFORCEINLINE
-COLOR3
-Color3InitializeWhite(
-    VOID
-    )
-{
-    COLOR3 Color;
-
-    Color = Color3InitializeFromComponents((FLOAT) 1.0,
-                                           (FLOAT) 1.0,
-                                           (FLOAT) 1.0);
-
-    return Color;
-}
-
 #endif // _IRIS_ADVANCED_COLOR3_

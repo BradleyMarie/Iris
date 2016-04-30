@@ -119,7 +119,7 @@ RayShaderTraceRay(
     COLOR3 AmountReflected;
     ISTATUS Status;
 
-    AmountReflected = Color3InitializeWhite();
+    AmountReflected = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     Status = RayShaderTraceRayMontecarlo(RayShader,
                                          WorldRay,

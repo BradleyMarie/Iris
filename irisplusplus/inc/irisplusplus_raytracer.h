@@ -29,7 +29,7 @@ public:
     RayTracer(
         _In_ RayTracer && ToMove
         )
-        : Data(ToMove.Data)
+    : Data(ToMove.Data)
     {
         ToMove.Data = nullptr;
     }

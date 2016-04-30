@@ -554,7 +554,7 @@ TEST(RenderPerfectSpecularWorldSphere)
 
     SphereCenter2 = PointCreate((FLOAT)-1.0, (FLOAT) 0.0, (FLOAT)-1.0);
 
-    Reflectance = Color3InitializeWhite();
+    Reflectance = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     PerfectSpecularShader = PerfectSpecularIndirectShaderAllocate(Reflectance);
 
@@ -717,7 +717,7 @@ TEST(RenderMirrorPhongCheckerboardSpheres)
 
     Black = Color3InitializeBlack();
 
-    White = Color3InitializeWhite();
+    White = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     Lights[0] = PointPhongLightAllocate(Light0Location,
                                         Black,

@@ -134,7 +134,7 @@ TracerTraceRay(
     ASSERT(Tracer != NULL);
     ASSERT(Color != NULL);
 
-    AmountReflected = Color3InitializeWhite();
+    AmountReflected = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     Status = RayShaderTraceRayMontecarlo(Tracer->RayShader,
                                          WorldRay,

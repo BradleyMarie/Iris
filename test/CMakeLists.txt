@@ -9,6 +9,7 @@ include_directories(src/inc
     ../irisshadingmodel/inc 
     ../irisplusplus/inc
     ../irisadvancedplusplus/inc
+    ../irisadvancedtoolkitplusplus/inc
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
     ../iriscommon

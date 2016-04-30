@@ -147,7 +147,7 @@ RayShaderAllocateInternal(
     RayShader->NextRayShader = NextRayShader;
     RayShader->ShadeRayRoutine = ShadeRayRoutine;
 
-    RayShader->OldPathThroughput = Color3InitializeWhite();
+    RayShader->OldPathThroughput = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
 
     return RayShader;
 }
@@ -162,7 +162,7 @@ RayShaderPopPathThroughput(
 
     if (RayShader->CurrentDepth == 0)
     {
-        *RayShader->PathThroughputPointer = Color3InitializeWhite();
+        *RayShader->PathThroughputPointer = Color3InitializeFromComponents((FLOAT) 1.0, (FLOAT) 1.0, (FLOAT) 1.0);
     }
     else
     {
