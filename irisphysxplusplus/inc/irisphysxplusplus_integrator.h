@@ -26,6 +26,7 @@ namespace IrisPhysx {
 
 class Integrator final {
 public:
+
     Integrator(
         _In_ Integrator && ToMove
         )
@@ -52,11 +53,14 @@ public:
         return Data;
     }
 
+    typedef std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine;
+    typedef std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine;
+
     IRISPHYSXPLUSPLUSAPI
     void
     Integrate(
-        _In_ const std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine,
-        _In_ std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine,
+        _In_ const TestGeometryRoutine TestGeometryFunction,
+        _In_ IntegrateRoutine IntegrateFunction,
         _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
         _In_ SIZE_T NumberOfLights,
         _In_ FLOAT Epsilon,

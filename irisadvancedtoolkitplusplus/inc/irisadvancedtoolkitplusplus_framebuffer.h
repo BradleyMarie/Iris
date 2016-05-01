@@ -43,6 +43,15 @@ public:
         return Framebuffer(InitialColor, Rows, Columns);
     }
 
+    _Ret_
+    PFRAMEBUFFER
+    AsPFRAMEBUFFER(
+        void
+        )
+    {
+        return Data;
+    }
+
     void
     SetPixel(
         _In_ const IrisAdvanced::Color3 & Color,

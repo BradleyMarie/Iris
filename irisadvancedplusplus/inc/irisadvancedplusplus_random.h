@@ -97,6 +97,23 @@ public:
     {
         return Data;
     }
+        
+    _Ret_
+    PRANDOM_REFERENCE
+    AsPRANDOM_REFERENCE(
+        void
+        )
+    {
+        return RandomGetRandomReference(Data);
+    }
+
+    RandomReference
+    AsRandomReference(
+        void
+        )
+    {
+        return RandomReference(AsPRANDOM_REFERENCE());
+    }
 
     Random(
         _In_ Random & ToCopy

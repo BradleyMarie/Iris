@@ -27,7 +27,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PPBR_TONE_MAPPING_ROUTINE)(
     _In_opt_ PCVOID Context,
-    _In_ PCSPECTRUM Spectrum,
+    _In_opt_ PCSPECTRUM Spectrum,
     _Out_ PCOLOR3 Color
     );
 
@@ -37,7 +37,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE)(
     _In_opt_ PVOID Context, 
-    _Out_writes_(NumberOfThreads) PRANDOM *Rngs,
+    _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
     _Out_writes_(NumberOfThreads) PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
     _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
@@ -51,8 +51,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE)(
     _In_opt_ PVOID Context,
-    _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
-    _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,
+    _In_reads_(NumberOfThreads) PVOID *ProcessHitContexts,
+    _In_reads_(NumberOfThreads) PVOID *ToneMappingContexts,
     _In_ SIZE_T NumberOfThreads
     );
 

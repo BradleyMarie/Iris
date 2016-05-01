@@ -70,6 +70,8 @@ irisplusplus/inc/irisplusplus_api.h
 irisadvancedtoolkit/inc/irisadvancedtoolkit_api.h
 irisadvancedplusplus/inc/irisadvancedplusplus_api.h
 irisspectrumplusplus/inc/irisspectrumplusplus_api.h
+irisphysxplusplus/inc/irisphysxplusplus_api.h
+irisphysxtoolkitplusplus/inc/irisphysxtoolkitplusplus_api.h
 
 #Analysis files
 iris.dir/
