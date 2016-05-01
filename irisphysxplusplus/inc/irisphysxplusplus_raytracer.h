@@ -21,8 +21,29 @@ Abstract:
 namespace IrisPhysx {
 
 //
+// Forward Declarations
+//
+
+class RayTracer;
+
+//
 // Types
 //
+
+typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
+                                                      Iris::MatrixReference,
+                                                      const Iris::Vector &,
+                                                      const Iris::Point &,
+                                                      const Iris::Point &,
+                                                      const Iris::Ray &,
+                                                      PCPBR_LIGHT *PbrLights,
+                                                      SIZE_T,
+                                                      RayTracer *,
+                                                      VisibilityTester,
+                                                      BRDFAllocator,
+                                                      IrisSpectrum::SpectrumCompositorReference,
+                                                      IrisSpectrum::ReflectorCompositorReference,
+                                                      IrisAdvanced::RandomReference)> ProcessHitRoutine;
 
 class RayTracer final {
 public:
@@ -46,33 +67,18 @@ public:
         return Data;
     }
 
-    typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
-                                                          Iris::MatrixReference,
-                                                          const Iris::Vector &,
-                                                          const Iris::Point &,
-                                                          const Iris::Point &,
-                                                          const Iris::Ray &,
-                                                          PCPBR_LIGHT *PbrLights,
-                                                          SIZE_T,
-                                                          RayTracer *,
-                                                          VisibilityTester,
-                                                          BRDFAllocator,
-                                                          IrisSpectrum::SpectrumCompositorReference,
-                                                          IrisSpectrum::ReflectorCompositorReference,
-                                                          IrisAdvanced::RandomReference)> ProcessHitRoutineType;
-
     IRISPHYSXPLUSPLUSAPI
     IrisSpectrum::SpectrumReference
     TraceClosestHit(
         _In_ const Iris::Ray & WorldRay,
-        _In_ ProcessHitRoutineType ProcessHitRoutine
+        _In_ ProcessHitRoutine ProcessHitFunction
         );
 
     IRISPHYSXPLUSPLUSAPI
     IrisSpectrum::SpectrumReference
     TraceAllHitsInOrder(
         _In_ const Iris::Ray & WorldRay,
-        _In_ ProcessHitRoutineType ProcessHitRoutine
+        _In_ ProcessHitRoutine ProcessHitFunction
         );
 
 private:

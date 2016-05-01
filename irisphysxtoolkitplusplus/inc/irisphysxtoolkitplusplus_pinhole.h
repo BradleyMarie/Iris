@@ -21,18 +21,6 @@ namespace IrisPhysxToolkit {
 namespace PinholeCamera {
 
 //
-// Types
-//
-
-typedef std::function<IrisAdvanced::Color3(IrisSpectrum::SpectrumReference)> ToneMappingRoutine;
-
-typedef 
-std::function<void(std::vector<IrisAdvanced::Random> &,
-                   std::vector<IrisPhysx::RayTracer::ProcessHitRoutineType> &,
-                   std::vector<ToneMappingRoutine> &,
-                   SIZE_T NumberOfThreads)> CreateStateRoutine;
-
-//
 // Functions
 //
 
@@ -51,7 +39,7 @@ Render(
     _In_ SIZE_T MaxDepth,
     _In_ bool Jitter,
     _In_ bool Parallelize,
-    _In_ const IrisPhysx::Integrator::TestGeometryRoutine TestGeometryFunction,
+    _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_reads_(NumberOfLights) const std::vector<IrisPhysx::Light> Lights,
     _In_ CreateStateRoutine CreateStateFunction,
     _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer

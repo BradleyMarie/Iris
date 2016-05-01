@@ -57,7 +57,7 @@ ProcessHitAdapter(
     assert(Rng != nullptr);
     assert(SpectrumPtr != nullptr);
 
-    RayTracer::ProcessHitRoutineType * HitRoutine = static_cast<RayTracer::ProcessHitRoutineType *>(Context);
+    ProcessHitRoutine * HitRoutine = static_cast<ProcessHitRoutine *>(Context);
 
     if (RayTracerPtr == nullptr)
     {
@@ -110,7 +110,7 @@ ProcessHitAdapter(
 IrisSpectrum::SpectrumReference
 RayTracer::TraceClosestHit(
     _In_ const Iris::Ray & WorldRay,
-    _In_ ProcessHitRoutineType ProcessHitRoutine
+    _In_ ProcessHitRoutine ProcessHitFunction
     )
 {
     PCSPECTRUM Result;
@@ -118,7 +118,7 @@ RayTracer::TraceClosestHit(
     ISTATUS Status = PBRRayTracerTraceSceneProcessClosestHit(Data,
                                                              WorldRay.AsRAY(),
                                                              ProcessHitAdapter,
-                                                             &ProcessHitRoutine,
+                                                             &ProcessHitFunction,
                                                              &Result);
 
     if (Status != ISTATUS_SUCCESS)
@@ -132,7 +132,7 @@ RayTracer::TraceClosestHit(
 IrisSpectrum::SpectrumReference
 RayTracer::TraceAllHitsInOrder(
     _In_ const Iris::Ray & WorldRay,
-    _In_ ProcessHitRoutineType ProcessHitRoutine
+    _In_ ProcessHitRoutine ProcessHitFunction
     )
 {
     PCSPECTRUM Result;
@@ -140,7 +140,7 @@ RayTracer::TraceAllHitsInOrder(
     ISTATUS Status = PBRRayTracerTraceSceneProcessAllHitsInOrder(Data,
                                                                  WorldRay.AsRAY(),
                                                                  ProcessHitAdapter,
-                                                                 &ProcessHitRoutine,
+                                                                 &ProcessHitFunction,
                                                                  &Result);
 
     if (Status != ISTATUS_SUCCESS)

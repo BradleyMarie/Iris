@@ -24,6 +24,9 @@ namespace IrisPhysx {
 // Types
 //
 
+typedef std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine;
+typedef std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine;
+
 class Integrator final {
 public:
 
@@ -53,8 +56,7 @@ public:
         return Data;
     }
 
-    typedef std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine;
-    typedef std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine;
+
 
     IRISPHYSXPLUSPLUSAPI
     void

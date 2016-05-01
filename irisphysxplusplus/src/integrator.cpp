@@ -35,9 +35,9 @@ TestGeometryRoutineAdapter(
     assert(PBRHitTester != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
-    auto TestGeometryRoutine = static_cast<const std::function<void(const Iris::Ray &, HitTester)> *>(Context);
+    auto TestGeometryFunction = static_cast<const TestGeometryRoutine *>(Context);
 
-    (*TestGeometryRoutine)(Iris::Ray(WorldRay), HitTester(PBRHitTester));
+    (*TestGeometryFunction)(Iris::Ray(WorldRay), HitTester(PBRHitTester));
 
     return ISTATUS_SUCCESS;
 }
@@ -56,9 +56,9 @@ IntegrateRoutineAdapter(
     assert(PBRRayTracer != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
-    auto IntegrateRoutine = static_cast<std::function<void(const Iris::Ray &, RayTracer)> *>(Context);
+    auto IntegrateFunction = static_cast<IntegrateRoutine *>(Context);
 
-    (*IntegrateRoutine)(Iris::Ray(WorldRay), RayTracer(PBRRayTracer));
+    (*IntegrateFunction)(Iris::Ray(WorldRay), RayTracer(PBRRayTracer));
 
     return ISTATUS_SUCCESS;
 }
@@ -69,8 +69,8 @@ IntegrateRoutineAdapter(
 
 void
 Integrator::Integrate(
-    _In_ const std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine,
-    _In_ std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine,
+    _In_ const TestGeometryRoutine TestGeometryFunction,
+    _In_ IntegrateRoutine IntegrateFunction,
     _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
     _In_ SIZE_T NumberOfLights,
     _In_ FLOAT Epsilon,
@@ -80,9 +80,9 @@ Integrator::Integrate(
 {
     ISTATUS Status = PBRIntegratorIntegrate(Data,
                                             TestGeometryRoutineAdapter,
-                                            &TestGeometryRoutine,
+                                            &TestGeometryFunction,
                                             IntegrateRoutineAdapter,
-                                            &IntegrateRoutine,
+                                            &IntegrateFunction,
                                             Lights,
                                             NumberOfLights,
                                             Epsilon,

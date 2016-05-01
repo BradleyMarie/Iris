@@ -24,15 +24,15 @@ namespace PinholeCamera {
 
 struct CreateStateContext {
     CreateStateContext(
-        _In_ PinholeCamera::CreateStateRoutine Func
+        _In_ IrisPhysxToolkit::CreateStateRoutine Func
         )
     : CreateStateFunction(Func)
     { }
 
     std::vector<IrisAdvanced::Random> Rngs;
-    std::vector<IrisPhysx::RayTracer::ProcessHitRoutineType> ProcessHitRoutines;
-    std::vector<PinholeCamera::ToneMappingRoutine> ToneMappingRoutines;
-    PinholeCamera::CreateStateRoutine CreateStateFunction;
+    std::vector<IrisPhysx::ProcessHitRoutine> ProcessHitRoutines;
+    std::vector<IrisPhysxToolkit::ToneMappingRoutine> ToneMappingRoutines;
+    IrisPhysxToolkit::CreateStateRoutine CreateStateFunction;
 };
 
 //
@@ -76,7 +76,7 @@ ProcessHitAdapter(
     assert(Rng != nullptr);
     assert(SpectrumPtr != nullptr);
 
-    IrisPhysx::RayTracer::ProcessHitRoutineType * HitRoutine = static_cast<IrisPhysx::RayTracer::ProcessHitRoutineType *>(Context);
+    IrisPhysx::ProcessHitRoutine * HitRoutine = static_cast<IrisPhysx::ProcessHitRoutine *>(Context);
 
     if (RayTracerPtr == nullptr)
     {
@@ -136,7 +136,7 @@ TestGeometryAdapter(
     assert(PBRHitTester != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
-    auto TestGeometryFunction = static_cast<const IrisPhysx::Integrator::TestGeometryRoutine *>(Context);
+    auto TestGeometryFunction = static_cast<const IrisPhysx::TestGeometryRoutine *>(Context);
 
     (*TestGeometryFunction)(Iris::Ray(WorldRay), IrisPhysx::HitTester(PBRHitTester));
 
@@ -156,7 +156,7 @@ ToneMappingAdapter(
     assert(Context != nullptr);
     assert(Result != nullptr);
 
-    PinholeCamera::ToneMappingRoutine * ToneMappingFunction = (PinholeCamera::ToneMappingRoutine *) Context;
+    IrisPhysxToolkit::ToneMappingRoutine * ToneMappingFunction = (IrisPhysxToolkit::ToneMappingRoutine *) Context;
 
     IrisAdvanced::Color3 Color = (*ToneMappingFunction)(IrisSpectrum::SpectrumReference(Spectrum));
 
@@ -223,7 +223,7 @@ Render(
     _In_ SIZE_T MaxDepth,
     _In_ bool Jitter,
     _In_ bool Parallelize,
-    _In_ const IrisPhysx::Integrator::TestGeometryRoutine TestGeometryFunction,
+    _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_reads_(NumberOfLights) const std::vector<IrisPhysx::Light> Lights,
     _In_ CreateStateRoutine CreateStateFunction,
     _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
