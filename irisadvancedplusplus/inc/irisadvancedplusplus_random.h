@@ -27,13 +27,19 @@ namespace IrisAdvanced {
 class Random final {
 public:
     Random(
-        _In_ PRANDOM RandomPtr
+        _In_ PRANDOM RandomPtr,
+        _In_ bool Retain
         )
     : Data(RandomPtr)
     { 
         if (RandomPtr == NULL)
         {
             throw std::invalid_argument("RandomPtr");
+        }
+
+        if (Retain)
+        {
+            RandomRetain(Data);
         }
     }
 
@@ -116,19 +122,33 @@ public:
     }
 
     Random(
-        _In_ Random & ToCopy
-        ) = delete;
+        _In_ const Random & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        RandomRetain(Data);
+    }
 
     Random & 
     operator=(
         _In_ const Random & ToCopy
-        ) = delete;
+        )
+    {
+        if (this != &ToCopy)
+        {
+            RandomRetain(Data);
+            Data = ToCopy.Data;
+            RandomRelease(Data);
+        }
+
+        return *this;
+    }
 
     ~Random(
         void
         )
     { 
-        RandomFree(Data);
+        RandomRelease(Data);
     }
 
 private:
