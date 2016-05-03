@@ -105,15 +105,12 @@ StaticPinholeCameraRender(
 {
     VECTOR3 Direction;
     SIZE_T FramebufferColumnSubpixelIndex;
-    SIZE_T FramebufferColumns;
     SIZE_T FramebufferRowSubpixelIndex;
-    SIZE_T FramebufferRows;
     POINT3 Origin;
     COLOR3 PixelColor;
     FLOAT RandomNumber0;
     FLOAT RandomNumber1;
     POINT3 RayOrigin;
-    POINT3 RowStart;
     ISTATUS Status;
     POINT3 SubpixelOrigin;
     POINT3 SubpixelRowStart;
@@ -130,13 +127,6 @@ StaticPinholeCameraRender(
     ASSERT(Rng != NULL);
     ASSERT(IntegrateContext != NULL);
     ASSERT(Framebuffer != NULL);
-
-    FramebufferGetDimensions(Framebuffer, 
-                             &FramebufferRows,
-                             &FramebufferColumns);
-
-    ASSERT(PixelColumn < FramebufferColumns);
-    ASSERT(PixelRow < FramebufferRows);
 
     if (AdditionalXSamplesPerPixel != 0)
     {
@@ -159,14 +149,13 @@ StaticPinholeCameraRender(
     }
 
     SubpixelWeight = (FLOAT) 1.0 /
-                      (((FLOAT) 1.0 + (FLOAT)AdditionalXSamplesPerPixel) *
-                      ((FLOAT)AdditionalYSamplesPerPixel + (FLOAT) 1.0));
+                      (((FLOAT) 1.0 + (FLOAT) AdditionalXSamplesPerPixel) *
+                      ((FLOAT) AdditionalYSamplesPerPixel + (FLOAT) 1.0));
 
     IntegrateContext->ColorSum = Color3InitializeBlack();
 
-    RowStart = ImagePlaneStartingLocation;
-
-    Origin = RowStart;
+    Origin = PointVectorAddScaled(ImagePlaneStartingLocation, PixelXDimensions, (FLOAT) PixelColumn);
+    Origin = PointVectorAddScaled(Origin, PixelYDimensions, (FLOAT) PixelRow);
 
     SubpixelRowStart = Origin;
 
@@ -486,60 +475,81 @@ PinholeRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = CreateStateRoutine(CreateStateContext,
-                                Rngs,
-                                ProcessHitRoutines,
-                                ProcessHitContexts,
-                                ToneMappingRoutines,
-                                ToneMappingContexts,
-                                NumberOfThreads);
-
-    if (Status == ISTATUS_SUCCESS)
+    for (ThreadIndex = 0;
+         ThreadIndex < NumberOfThreads;
+         ThreadIndex++)
     {
-        NumberOfPixels = FramebufferRows * FramebufferColumns;
+        Status = PBRIntegratorAllocate(MaxDepth, Integrators + ThreadIndex);
 
-        #pragma omp parallel default(shared) private(IntegrateContext, ThreadIndex) reduction(max, Status)
+        if (Status != ISTATUS_SUCCESS)
         {
-            ThreadIndex = (SIZE_T) omp_get_thread_num();
-
-            IntegrateContext.ToneMappingRoutine = ToneMappingRoutines[ThreadIndex];
-            IntegrateContext.ProcessHitRoutine = ProcessHitRoutines[ThreadIndex];
-            IntegrateContext.ProcessHitContext = ProcessHitContexts[ThreadIndex];
-            IntegrateContext.ToneMappingContext = ToneMappingContexts[ThreadIndex];
-
-            #pragma omp for schedule(dynamic, 16)
-            for (PixelIndex = 0; PixelIndex < NumberOfPixels && Status == ISTATUS_SUCCESS; PixelIndex++)
-            {
-                Status = StaticPinholeCameraRender(PinholeLocation,
-                                                   ImagePlaneCorner,
-                                                   ImagePlaneWidthVector,
-                                                   ImagePlaneHeightVector,
-                                                   PixelIndex % FramebufferColumns,
-                                                   PixelIndex / FramebufferColumns,
-                                                   AdditionalXSamplesPerPixel,
-                                                   AdditionalYSamplesPerPixel,
-                                                   Epsilon,
-                                                   Jitter,
-                                                   RandomGetRandomReference(Rngs[ThreadIndex]),
-                                                   Integrators[ThreadIndex],
-                                                   TestGeometryRoutine,
-                                                   TestGeometryRoutineContext,
-                                                   Lights,
-                                                   NumberOfLights,
-                                                   &IntegrateContext,
-                                                   Framebuffer);
-            }
+            break;
         }
     }
 
-    FreeCameraStateRoutine(CreateStateContext, ProcessHitContexts, ToneMappingContexts, NumberOfThreads);
+    if (Status == ISTATUS_SUCCESS)
+    {
+        Status = CreateStateRoutine(CreateStateContext,
+                                    Rngs,
+                                    ProcessHitRoutines,
+                                    ProcessHitContexts,
+                                    ToneMappingRoutines,
+                                    ToneMappingContexts,
+                                    NumberOfThreads);
+
+        if (Status == ISTATUS_SUCCESS)
+        {
+            NumberOfPixels = FramebufferRows * FramebufferColumns;
+
+            #pragma omp parallel default(shared) private(IntegrateContext, ThreadIndex) reduction(max, Status)
+            {
+                ThreadIndex = (SIZE_T)omp_get_thread_num();
+
+                IntegrateContext.ToneMappingRoutine = ToneMappingRoutines[ThreadIndex];
+                IntegrateContext.ProcessHitRoutine = ProcessHitRoutines[ThreadIndex];
+                IntegrateContext.ProcessHitContext = ProcessHitContexts[ThreadIndex];
+                IntegrateContext.ToneMappingContext = ToneMappingContexts[ThreadIndex];
+
+                #pragma omp for schedule(dynamic, 16)
+                for (PixelIndex = 0; PixelIndex < NumberOfPixels && Status == ISTATUS_SUCCESS; PixelIndex++)
+                {
+                    Status = StaticPinholeCameraRender(PinholeLocation,
+                                                       ImagePlaneCorner,
+                                                       ImagePlaneWidthVector,
+                                                       ImagePlaneHeightVector,
+                                                       PixelIndex % FramebufferColumns,
+                                                       PixelIndex / FramebufferColumns,
+                                                       AdditionalXSamplesPerPixel,
+                                                       AdditionalYSamplesPerPixel,
+                                                       Epsilon,
+                                                       Jitter,
+                                                       RandomGetRandomReference(Rngs[ThreadIndex]),
+                                                       Integrators[ThreadIndex],
+                                                       TestGeometryRoutine,
+                                                       TestGeometryRoutineContext,
+                                                       Lights,
+                                                       NumberOfLights,
+                                                       &IntegrateContext,
+                                                       Framebuffer);
+                }
+            }
+        }
+
+        if (FreeCameraStateRoutine != NULL)
+        {
+            FreeCameraStateRoutine(CreateStateContext,
+                                   ProcessHitContexts,
+                                   ToneMappingContexts,
+                                   NumberOfThreads);
+        }
+    }
 
     for (ThreadIndex = 0;
          ThreadIndex < NumberOfThreads;
          ThreadIndex++)
     {
-        RandomRelease(Rngs[ThreadIndex]);
         PBRIntegratorFree(Integrators[ThreadIndex]);
+        RandomRelease(Rngs[ThreadIndex]);
     }
 
     free(Integrators);

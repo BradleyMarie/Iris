@@ -27,6 +27,14 @@ namespace IrisAdvanced {
 class Color3 final {
 public:
     Color3(
+        _In_ FLOAT R,
+        _In_ FLOAT G,
+        _In_ FLOAT B
+        )
+    : Data(Color3InitializeFromComponents(R, G, B))
+    { }
+
+    Color3(
         _In_ const Color3 & Color
         )
     : Data(Color.AsCOLOR3())
@@ -96,6 +104,30 @@ public:
                                         Scalar);
 
         return Color3(Result);
+    }
+
+    FLOAT 
+    Red(
+        void
+        ) const
+    {
+        return Data.Red;
+    }
+
+    FLOAT 
+    Green(
+        void
+        ) const
+    {
+        return Data.Green;
+    }
+
+    FLOAT 
+    Blue(
+        void
+        ) const
+    {
+        return Data.Blue;
     }
 
 private:

@@ -89,6 +89,7 @@ PBRRayTracerProcessHitAdapter(
 
     Status = AdapterContext->ProcessHitRoutine(AdapterContext->ProcessHitContext,
                                                PBRGeometry,
+                                               Hit->FaceHit,
                                                ModelToWorld,
                                                ModelViewer,
                                                ModelHitPoint,
@@ -124,6 +125,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
     PPBR_SHARED_CONTEXT SharedContext;
+    PCSPECTRUM Result;
     ISTATUS Status;
     
     if (PBRRayTracer == NULL)
@@ -142,6 +144,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
     }
     
     SharedContext = PBRRayTracer->SharedContext;
+    Result = NULL;
 
     PBRRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
                                                    PBRRayTracer->NextPRBRayTracer,
@@ -149,7 +152,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
                                                    ProcessHitRoutine,
                                                    ProcessHitContext,
                                                    Ray,
-                                                   Spectrum);
+                                                   &Result);
 
     Status = RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(PBRRayTracer->RayTracer,
                                                                         Ray,
@@ -159,7 +162,14 @@ PBRRayTracerTraceSceneProcessClosestHit(
                                                                         PBRRayTracerProcessHitAdapter,
                                                                         &AdapterContext);
 
-    return Status;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Spectrum = Result;
+
+    return ISTATUS_SUCCESS;
 }
 
 _Check_return_
@@ -175,6 +185,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
     PPBR_SHARED_CONTEXT SharedContext;
+    PCSPECTRUM Result;
     ISTATUS Status;
     
     if (PBRRayTracer == NULL)
@@ -200,7 +211,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
                                                    ProcessHitRoutine,
                                                    ProcessHitContext,
                                                    Ray,
-                                                   Spectrum);
+                                                   &Result);
 
     Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(PBRRayTracer->RayTracer,
                                                                             Ray,
@@ -209,5 +220,12 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
                                                                             PBRRayTracerProcessHitAdapter,
                                                                             &AdapterContext);
 
-    return Status;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Spectrum = Result;
+
+    return ISTATUS_SUCCESS;
 }

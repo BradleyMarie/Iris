@@ -31,6 +31,7 @@ ISTATUS
 (*PPBR_RAYTRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ PVOID Context, 
     _In_ PCPBR_GEOMETRY PBRGeometry,
+    _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,

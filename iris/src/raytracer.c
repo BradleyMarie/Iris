@@ -259,7 +259,7 @@ RayTracerTraceSceneProcessClosestHitWithCoordinates(
                             &WorldHit);
     
     Status = ProcessHitRoutine(ProcessHitContext,
-                               &CurrentHit->Hit,
+                               &ClosestHit->Hit,
                                ModelToWorld,
                                ModelViewer,
                                ModelHit,

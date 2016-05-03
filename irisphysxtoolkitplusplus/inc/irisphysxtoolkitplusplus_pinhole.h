@@ -40,7 +40,7 @@ Render(
     _In_ bool Jitter,
     _In_ bool Parallelize,
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
-    _In_reads_(NumberOfLights) const std::vector<IrisPhysx::Light> Lights,
+    _In_ std::optional<const std::vector<IrisPhysx::Light> &> Lights,
     _In_ CreateStateRoutine CreateStateFunction,
     _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
     );

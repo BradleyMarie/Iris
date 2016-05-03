@@ -17,6 +17,8 @@ using namespace Iris;
 using namespace IrisAdvanced;
 using namespace IrisPhysx;
 using namespace IrisSpectrum;
+using namespace IrisAdvancedToolkit;
+using namespace IrisPhysxToolkit;
 
 class ConstantRGBReflector final : public ReflectorBase
 {
@@ -49,12 +51,12 @@ public:
         _In_ FLOAT IncomingIntensity
         ) const
     {
-        if (Wavelength == 0)
+        if (Wavelength <= 1)
         {
             return R;
         }
 
-        if (Wavelength == 1)
+        if (Wavelength <= 2)
         {
             return G;
         }
@@ -233,11 +235,7 @@ private:
 
 TEST(PhysxRenderConstantRedWorldSphere)
 {
-    PRANDOM Mwc;
-    CHECK_EQUAL(ISTATUS_SUCCESS, MultiplyWithCarryRngAllocate(&Mwc));
-    RandomReference Rng(RandomGetRandomReference(Mwc));
-
-    Material ConstantMaterial = ConstantRGBMaterial::Create(1.0f, 0.0f, 1.0f);
+    Material ConstantMaterial = ConstantRGBMaterial::Create(1.0f, 0.0f, 0.0f);
 
     PPBR_GEOMETRY Sphere;
     ISTATUS Status = PhysxSphereAllocate(Point(0.0f, 0.0f, 0.0f).AsPOINT3(),
@@ -253,5 +251,64 @@ TEST(PhysxRenderConstantRedWorldSphere)
     TestListScene Scene;
     Scene.AddGeometry(Geometry(Sphere, false));
 
-    Integrator Integrate = Integrator::Create(0);
+    ProcessHitRoutine ProcessHitFunc = [](GeometryReference Geom,
+                                          UINT32 FaceHit,
+                                          Iris::MatrixReference ModelToWorld,
+                                          const Iris::Vector & ModelViewer,
+                                          const Iris::Point & ModelHitPoint,
+                                          const Iris::Point & WorldHitPoint,
+                                          const Iris::Ray & WorldRay,
+                                          PCPBR_LIGHT *PbrLights,
+                                          SIZE_T NumberOfLights,
+                                          IrisPhysx::RayTracer * RayTracerPtr,
+                                          VisibilityTester Tester,
+                                          BRDFAllocator Allocator,
+                                          IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
+                                          IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
+                                          IrisAdvanced::RandomReference Rng) -> SpectrumReference
+    {
+        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
+        BRDFReference Brdf = Mat.Sample(ModelHitPoint, nullptr, SurfaceNormal, ModelToWorld, Allocator);
+        auto Ref = Brdf.Sample(ModelViewer, Rng, ReflectorCompositor);
+        return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
+    };
+
+    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectrum) -> Color3
+    {
+        return Color3(Spectrum.Sample(1.0f), Spectrum.Sample(2.0f), Spectrum.Sample(3.0f));
+    };
+
+    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+                                         std::vector<ProcessHitRoutine> & ProcessHits,
+                                         std::vector<ToneMappingRoutine> & ToneMap,
+                                         SIZE_T NumberOfThreads)
+    {
+        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
+        {
+            Rngs.push_back(MultiplyWithCarry::Create());
+            ProcessHits.push_back(ProcessHitFunc);
+            ToneMap.push_back(ToneMappingFunc);
+        }
+    };
+
+    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
+    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
+                          1.0f,
+                          1.0f,
+                          1.0f,
+                          Vector(0.0f, 0.0f, -1.0f),
+                          Vector(0.0f, 1.0f, 0.0f),
+                          0,
+                          0,
+                          0.0001f,
+                          0,
+                          false,
+                          false,
+                          Scene.GetTestRoutine(),
+                          nullopt,
+                          CreateState,
+                          Fb);
+
+    Fb.SaveAsPFM("RenderConstantRedWorldSpherePlusPlus.pfm");
 }

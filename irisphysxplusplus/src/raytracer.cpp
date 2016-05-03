@@ -27,6 +27,7 @@ ISTATUS
 ProcessHitAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCPBR_GEOMETRY GeometryPtr,
+    _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
@@ -62,6 +63,7 @@ ProcessHitAdapter(
     if (RayTracerPtr == nullptr)
     {
         IrisSpectrum::SpectrumReference Result = (*HitRoutine)(GeometryReference(GeometryPtr),
+                                                               FaceHit,
                                                                Iris::MatrixReference(ModelToWorld),
                                                                Iris::Vector(ModelViewer),
                                                                Iris::Point(ModelHitPoint),
@@ -83,6 +85,7 @@ ProcessHitAdapter(
         RayTracer Rt(RayTracerPtr);
 
         IrisSpectrum::SpectrumReference Result = (*HitRoutine)(GeometryReference(GeometryPtr),
+                                                               FaceHit,
                                                                Iris::MatrixReference(ModelToWorld),
                                                                Iris::Vector(ModelViewer),
                                                                Iris::Point(ModelHitPoint),

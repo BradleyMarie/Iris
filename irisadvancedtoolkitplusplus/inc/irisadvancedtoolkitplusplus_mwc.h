@@ -32,7 +32,7 @@ Create(
 
     ISTATUS Status = MultiplyWithCarryRngAllocate(&Rng);
 
-    if (Status != ISTATUS_ALLOCATION_FAILED)
+    if (Status != ISTATUS_SUCCESS)
     {
         assert(Status == ISTATUS_ALLOCATION_FAILED);
         throw std::bad_alloc();

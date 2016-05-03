@@ -12,6 +12,7 @@ include_directories(src/inc
     ../irisadvancedtoolkitplusplus/inc
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
+    ../irisphysxtoolkitplusplus/inc
     ../iriscommon
     unittest++)
 
@@ -69,7 +70,8 @@ target_link_libraries(iris-test
     irisplusplus
     irisadvancedplusplus
     irisspectrumplusplus
-    irisphysxplusplus)
+    irisphysxplusplus
+    irisphysxtoolkitplusplus)
 
 set_property(TARGET iris-test PROPERTY CXX_STANDARD 11)
 

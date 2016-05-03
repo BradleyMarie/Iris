@@ -174,7 +174,38 @@ public:
 
         return std::make_optional(LightReference(Result));
     }
+
+    Geometry(
+        _In_ const Geometry & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        PBRGeometryRetain(Data);
+    }
     
+    Geometry(
+        _In_ Geometry && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
+
+    Geometry &
+    operator=(
+        _In_ const Geometry & ToCopy
+        )
+    {
+        if (this != &ToCopy)
+        {
+            PBRGeometryRelease(Data);
+            Data = ToCopy.Data;
+            PBRGeometryRetain(Data);
+        }
+
+        return *this;
+    }
+
     ~Geometry(
         void
         )

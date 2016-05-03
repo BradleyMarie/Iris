@@ -45,6 +45,7 @@ ISTATUS
 ProcessHitAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCPBR_GEOMETRY GeometryPtr,
+    _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
@@ -80,6 +81,7 @@ ProcessHitAdapter(
     if (RayTracerPtr == nullptr)
     {
         IrisSpectrum::SpectrumReference Result = (*HitRoutine)(IrisPhysx::GeometryReference(GeometryPtr),
+                                                               FaceHit,
                                                                Iris::MatrixReference(ModelToWorld),
                                                                Iris::Vector(ModelViewer),
                                                                Iris::Point(ModelHitPoint),
@@ -101,6 +103,7 @@ ProcessHitAdapter(
         IrisPhysx::RayTracer Rt(RayTracerPtr);
 
         IrisSpectrum::SpectrumReference Result = (*HitRoutine)(IrisPhysx::GeometryReference(GeometryPtr),
+                                                               FaceHit,
                                                                Iris::MatrixReference(ModelToWorld),
                                                                Iris::Vector(ModelViewer),
                                                                Iris::Point(ModelHitPoint),
@@ -226,16 +229,19 @@ Render(
     _In_ bool Jitter,
     _In_ bool Parallelize,
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
-    _In_reads_(NumberOfLights) const std::vector<IrisPhysx::Light> Lights,
+    _In_ std::optional<const std::vector<IrisPhysx::Light> &> Lights,
     _In_ CreateStateRoutine CreateStateFunction,
     _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
-    )
+)
 {
     std::vector<PCPBR_LIGHT> IrisLights;
 
-    for (auto & it : Lights)
+    if (Lights)
     {
-        IrisLights.push_back(it.AsPCPBR_LIGHT());
+        for (auto & it : *Lights)
+        {
+            IrisLights.push_back(it.AsPCPBR_LIGHT());
+        }
     }
 
     CreateStateContext CreateStateCtxt(CreateStateFunction);

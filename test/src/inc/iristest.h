@@ -33,6 +33,7 @@ extern "C" {
 #include <irisadvancedtoolkitplusplus.h>
 #include <irisspectrumplusplus.h>
 #include <irisphysxplusplus.h>
+#include <irisphysxtoolkitplusplus.h>
 
 #include "utility.h"
 #include "checkerboard.h"

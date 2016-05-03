@@ -40,7 +40,7 @@ PBRHitTesterTestGeometry(
     
     Status = HitTesterTestGeometry(PBRHitTester->Tester,
                                    PBRGeometryTestRayAdapter,
-                                   PBRHitTester);
+                                   PBRGeometry);
 
     return Status;
 }
@@ -69,7 +69,7 @@ PBRHitTesterTestGeometryWithTransform(
     
     Status = HitTesterTestGeometryWithTransform(PBRHitTester->Tester,
                                                 PBRGeometryTestRayAdapter,
-                                                PBRHitTester,
+                                                PBRGeometry,
                                                 ModelToWorld,
                                                 Premultiplied);
 
@@ -99,7 +99,7 @@ PBRHitTesterTestPremultipliedGeometryWithTransform(
     
     Status = HitTesterTestPremultipliedGeometryWithTransform(PBRHitTester->Tester,
                                                              PBRGeometryTestRayAdapter,
-                                                             PBRHitTester,
+                                                             PBRGeometry,
                                                              ModelToWorld);
 
     return Status;
