@@ -237,19 +237,15 @@ TEST(PhysxRenderConstantRedWorldSphere)
 {
     Material ConstantMaterial = ConstantRGBMaterial::Create(1.0f, 0.0f, 0.0f);
 
-    PPBR_GEOMETRY Sphere;
-    ISTATUS Status = PhysxSphereAllocate(Point(0.0f, 0.0f, 0.0f).AsPOINT3(),
-                                         1.0f,
-                                         ConstantMaterial.AsPPBR_MATERIAL(),
-                                         ConstantMaterial.AsPPBR_MATERIAL(),
-                                         nullptr,
-                                         nullptr,
-                                         &Sphere);
-
-    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
+    Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
+                                              1.0f,
+                                              ConstantMaterial,
+                                              ConstantMaterial,
+                                              nullopt,
+                                              nullopt);
 
     TestListScene Scene;
-    Scene.AddGeometry(Geometry(Sphere, false));
+    Scene.AddGeometry(SphereRadiusOne);
 
     ProcessHitRoutine ProcessHitFunc = [](GeometryReference Geom,
                                           UINT32 FaceHit,

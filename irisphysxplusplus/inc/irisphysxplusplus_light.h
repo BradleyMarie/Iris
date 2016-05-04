@@ -44,7 +44,7 @@ public:
     }
     
     _Ret_
-    PCPBR_LIGHT
+    PPBR_LIGHT
     AsPPBR_LIGHT(
         void
         )

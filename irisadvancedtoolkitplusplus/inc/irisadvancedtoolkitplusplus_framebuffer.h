@@ -69,7 +69,7 @@ public:
             case ISTATUS_SUCCESS:
                 return;
             case ISTATUS_INVALID_ARGUMENT_01:
-                throw std::invalid_argument("Color is not valid");;
+                throw std::invalid_argument("Color");;
             case ISTATUS_INVALID_ARGUMENT_02:
                 throw std::out_of_range("Row");
             case ISTATUS_INVALID_ARGUMENT_03:
@@ -132,7 +132,7 @@ public:
             case ISTATUS_SUCCESS:
                 return;
             case ISTATUS_IO_ERROR:
-                throw std::runtime_error("Could not write to " + Path);
+                throw std::runtime_error("ISTATUS_IO_ERROR");
         }
 
         assert(false);
@@ -173,11 +173,11 @@ private:
             case ISTATUS_SUCCESS:
                 return;
             case ISTATUS_INVALID_ARGUMENT_00:
-                throw std::invalid_argument("InitialColor is not valid");;
+                throw std::invalid_argument("InitialColor");;
             case ISTATUS_INVALID_ARGUMENT_01:
-                throw std::invalid_argument("Rows == 0");
+                throw std::invalid_argument("Rows");
             case ISTATUS_INVALID_ARGUMENT_02:
-                throw std::invalid_argument("Columns == 0");
+                throw std::invalid_argument("Columns");
             case ISTATUS_ALLOCATION_FAILED:
                 throw std::bad_alloc();
         }

@@ -51,5 +51,6 @@ extern "C" {
 #include "irisphysxtoolkitplusplus_api.h"
 #include "irisphysxtoolkitplusplus_typedefs.h"
 #include "irisphysxtoolkitplusplus_pinhole.h"
+#include "irisphysxtoolkitplusplus_sphere.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_PLUS_PLUS_HEADER_
