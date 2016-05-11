@@ -84,7 +84,7 @@ public:
     VectorAxis 
     DominantAxis(
         void
-        )
+        ) const
     {
         return VectorAxis(VectorDominantAxis(Data));
     }
@@ -92,7 +92,7 @@ public:
     VectorAxis 
     DiminishedAxis(
         void
-        )
+        ) const
     {
         return VectorAxis(VectorDiminishedAxis(Data));
     }
@@ -349,7 +349,7 @@ public:
     }
 
 private:
-    const VECTOR3 Data;
+    VECTOR3 Data;
 };
 
 //

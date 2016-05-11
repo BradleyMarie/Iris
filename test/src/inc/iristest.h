@@ -35,6 +35,7 @@ extern "C" {
 #include <irisphysxplusplus.h>
 #include <irisphysxtoolkitplusplus.h>
 
+#include "phong.h"
 #include "utility.h"
 #include "checkerboard.h"
 #include "trianglecreator.h"

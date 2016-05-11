@@ -64,21 +64,6 @@ public:
             assert(Status == ISTATUS_INVALID_ARGUMENT_01);
             throw std::invalid_argument("Contents");
         }
-    } 
-
-    MatrixReference(
-        _In_ const MatrixReference & ToCopy
-        )
-    : Data(ToCopy.Data)
-    { }
-
-    MatrixReference & 
-    operator=(
-        _In_ const MatrixReference & ToCopy
-        )
-    {
-        Data = ToCopy.Data;
-        return *this;
     }
 
 private:

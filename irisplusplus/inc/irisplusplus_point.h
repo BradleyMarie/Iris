@@ -178,7 +178,7 @@ public:
     }
 
 private:
-    const POINT3 Data;
+    POINT3 Data;
 };
 
 //

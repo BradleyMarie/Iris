@@ -143,7 +143,7 @@ public:
     }
 
 private:
-    const RAY Data;
+    RAY Data;
 };
 
 static

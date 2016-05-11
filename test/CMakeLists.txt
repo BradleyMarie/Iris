@@ -57,6 +57,7 @@ add_executable(iris-test
     src/render.cpp
     src/irisplusplus.cpp
     src/spectrum.cpp
+    src/phong.cpp
     src/simplephysxrender.cpp)
 
 target_link_libraries(iris-test 

@@ -63,21 +63,6 @@ public:
         return Result;
     }
 
-    ReflectorReference(
-        _In_ const ReflectorReference & ToCopy
-        )
-    : Data(ToCopy.Data)
-    { }
-
-    ReflectorReference & 
-    operator=(
-        _In_ const ReflectorReference & ToCopy
-        )
-    {
-        Data = ToCopy.Data;
-        return *this;
-    }
-
 private:
     PCREFLECTOR Data;
 };

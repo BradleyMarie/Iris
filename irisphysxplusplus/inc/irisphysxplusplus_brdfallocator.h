@@ -55,10 +55,10 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "BRDFData must be trivially copyable");
     
-        static_assert(sizeof(T) != 0);
-        static_assert(alignof(T) != 0);
-        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
-        static_assert(sizeof(T) % alignof(T) == 0);
+        static_assert(sizeof(T) != 0, "Size of type must not be 0");
+        static_assert(alignof(T) != 0, "Alignment of type must not be 0");
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0, "Alignment of type must not be a power of two");
+        static_assert(sizeof(T) % alignof(T) == 0, "Size of type must be evenly divisible by the alignment");
     
         static const PBR_BRDF_VTABLE VTable {
             BRDFSampleAdapter<T>,
@@ -82,7 +82,7 @@ public:
         if (Status != ISTATUS_SUCCESS)
         {
             assert(Status == ISTATUS_ALLOCATION_FAILED);
-            throw std::bac_alloc();
+            throw std::bad_alloc();
         }
         
         return BRDFReference(AllocatedBrdf);
@@ -119,7 +119,7 @@ private:
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->Sample(Iris::Vector(Incoming),
                          IrisAdvanced::RandomReference(Rng),
-                         IrisSpecrum::ReflectorCompositorReference(Compositor));
+                         IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = std::get<0>(Result).AsPCREFLECTOR();
         *Outgoing = std::get<1>(Result).AsVECTOR3();
@@ -156,7 +156,7 @@ private:
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->SampleWithLambertianFalloff(Iris::Vector(Incoming),
                                               IrisAdvanced::RandomReference(Rng),
-                                              IrisSpecrum::ReflectorCompositorReference(Compositor));
+                                              IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = std::get<0>(Result).AsPCREFLECTOR();
         *Outgoing = std::get<1>(Result).AsVECTOR3();
@@ -189,7 +189,7 @@ private:
         IrisSpectrum::ReflectorReference Result =
             Brdf->ComputeReflectance(Iris::Vector(Incoming),
                                      Iris::Vector(Outgoing),
-                                     IrisSpecrum::ReflectorCompositorReference(Compositor));
+                                     IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = Result.AsPCREFLECTOR();
         
@@ -220,7 +220,7 @@ private:
         IrisSpectrum::ReflectorReference Result =
             Brdf->ComputeReflectanceWithLambertianFalloff(Iris::Vector(Incoming),
                                                           Iris::Vector(Outgoing),
-                                                          IrisSpecrum::ReflectorCompositorReference(Compositor));
+                                                          IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = Result.AsPCREFLECTOR();
         
@@ -250,13 +250,12 @@ private:
         
         const T * Brdf = static_cast<const T*>(Context);
         
-        
         std::tuple<IrisSpectrum::ReflectorReference, FLOAT> Result =
             Brdf->ComputeReflectanceWithPdf(Iris::Vector(Incoming),
                                             Iris::Vector(Outgoing),
-                                            IrisSpecrum::ReflectorCompositorReference(Compositor));
+                                            IrisSpectrum::ReflectorCompositorReference(Compositor));
     
-        *Reflector = Result.AsPCREFLECTOR();
+        *Reflector = std::get<0>(Result).AsPCREFLECTOR();
         *Pdf = std::get<1>(Result);
         
         return ISTATUS_SUCCESS;
@@ -288,7 +287,7 @@ private:
         std::tuple<IrisSpectrum::ReflectorReference, FLOAT> Result =
             Brdf->ComputeReflectanceWithPdfWithLambertianFalloff(Iris::Vector(Incoming),
                                                                  Iris::Vector(Outgoing),
-                                                                 IrisSpecrum::ReflectorCompositorReference(Compositor));
+                                                                 IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = std::get<0>(Result).AsPCREFLECTOR();
         *Pdf = std::get<1>(Result);
