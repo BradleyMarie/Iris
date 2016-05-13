@@ -94,6 +94,30 @@ private:
     IrisAdvanced::Color3 s;
 };
 
+class PhongReflectiveReflector final : public IrisSpectrum::ReflectorBase {
+private:
+    PhongReflectiveReflector(
+        _In_ const IrisAdvanced::Color3 & Reflective
+        );
+
+public:
+    static
+    IrisSpectrum::Reflector
+    Create(
+        _In_ const IrisAdvanced::Color3 & Reflective
+        );
+
+    virtual
+    FLOAT
+    Reflect(
+        _In_ FLOAT Wavelength,
+        _In_ FLOAT IncomingIntensity
+        ) const;
+
+private:
+    IrisAdvanced::Color3 r;
+};
+
 class PhongBRDF final {
 public:
     PhongBRDF(
@@ -101,6 +125,7 @@ public:
         _In_ IrisSpectrum::ReflectorReference Diffuse,
         _In_ IrisSpectrum::ReflectorReference Specular,
         _In_ const FLOAT S,
+        _In_ IrisSpectrum::ReflectorReference Reflective,
         _In_ const Iris::Vector & N
         );
 
@@ -152,25 +177,28 @@ private:
     IrisSpectrum::ReflectorReference DiffuseReflector;
     IrisSpectrum::ReflectorReference SpecularReflector;
     FLOAT Shininess;
+    IrisSpectrum::ReflectorReference ReflectiveReflector;
 };
 
 class PhongMaterial final : public IrisPhysx::MaterialBase {
 private:
     PhongMaterial(
-        _In_ IrisAdvanced::Color3 Emissive,
-        _In_ IrisAdvanced::Color3 Diffuse,
-        _In_ IrisAdvanced::Color3 Specular,
-        _In_ const FLOAT S
+        _In_ const IrisAdvanced::Color3 & Emissive,
+        _In_ const IrisAdvanced::Color3 & Diffuse,
+        _In_ const IrisAdvanced::Color3 & Specular,
+        _In_ FLOAT S,
+        _In_ const IrisAdvanced::Color3 & Reflective
         );
 
 public:
     static
     IrisPhysx::Material
     Create(
-        _In_ IrisAdvanced::Color3 Emissive,
-        _In_ IrisAdvanced::Color3 Diffuse,
-        _In_ IrisAdvanced::Color3 Specular,
-        _In_ const FLOAT S
+        _In_ const IrisAdvanced::Color3 & Emissive,
+        _In_ const IrisAdvanced::Color3 & Diffuse,
+        _In_ const IrisAdvanced::Color3 & Specular,
+        _In_ FLOAT S,
+        _In_ const IrisAdvanced::Color3 & Reflective
         );
 
     virtual
@@ -188,6 +216,7 @@ private:
     IrisSpectrum::Reflector DiffuseReflector;
     IrisSpectrum::Reflector SpecularReflector;
     FLOAT Shininess;
+    IrisSpectrum::Reflector ReflectiveReflector;
 };
 
 #endif // _IRIS_TEST_PHONG_HEADER_

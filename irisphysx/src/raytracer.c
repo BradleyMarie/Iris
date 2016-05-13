@@ -53,6 +53,7 @@ PBRRayTracerProcessHitAdapterContextInitialize(
     AdapterContext->SharedContext = SharedContext;
     AdapterContext->ProcessHitRoutine = ProcessHitRoutine;
     AdapterContext->ProcessHitContext = ProcessHitContext;
+    AdapterContext->WorldRay = WorldRay;
     AdapterContext->Output = Output;
 }
 

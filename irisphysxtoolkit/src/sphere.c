@@ -115,6 +115,18 @@ SphereTestRay(
     Distance0 = (NegatedScalarProjectionOriginToCenterOntoRay - Discriminant) /
         LengthOfRaySquared;
 
+#ifndef ENABLE_CSG_SUPPORT
+    if (Distance0 < (FLOAT) 0.0)
+    {
+        //
+        // Intersection is behind ray origin
+        //
+
+        *HitList = NULL;
+        return ISTATUS_SUCCESS;
+    }
+#endif // ENABLE_CSG_SUPPORT
+
     if (LengthSquaredCenterToOrigin < Sphere->RadiusSquared)
     {
         Face0 = SPHERE_BACK_FACE;
