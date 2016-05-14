@@ -42,6 +42,14 @@ public:
             PbrBrdfRetain(Data);
         }
     }
+    
+    BRDF(
+        _In_ BRDF && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
      
     _Ret_
     PPBR_BRDF
@@ -229,6 +237,29 @@ public:
         }
         
         return std::make_tuple(IrisSpectrum::ReflectorReference(Reflector), Pdf);
+    }
+
+    BRDF(
+        _In_ const BRDF & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        PbrBrdfRetain(Data);
+    }
+
+    BRDF & 
+    operator=(
+        _In_ const BRDF & ToCopy
+        )
+    {
+        if (this != &ToCopy)
+        {
+            PbrBrdfRetain(Data);
+            Data = ToCopy.Data;
+            PbrBrdfRelease(Data);
+        }
+
+        return *this;
     }
     
     ~BRDF(

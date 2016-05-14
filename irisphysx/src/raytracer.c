@@ -92,6 +92,7 @@ PBRRayTracerProcessHitAdapter(
                                                PBRGeometry,
                                                Hit->FaceHit,
                                                ModelToWorld,
+                                               Hit->AdditionalData,
                                                ModelViewer,
                                                ModelHitPoint,
                                                WorldHitPoint,

@@ -437,3 +437,240 @@ PhongMaterial::Sample(
 
     return Allocator.Allocate(Brdf);
 }
+
+TriangleInterpolatedPhongBRDF::TriangleInterpolatedPhongBRDF(
+    _In_ IrisSpectrum::ReflectorReference Emissive0,
+    _In_ IrisSpectrum::ReflectorReference Diffuse0,
+    _In_ IrisSpectrum::ReflectorReference Specular0,
+    _In_ FLOAT S0,
+    _In_ IrisSpectrum::ReflectorReference Reflective0,
+    _In_ FLOAT Scale0,
+    _In_ IrisSpectrum::ReflectorReference Emissive1,
+    _In_ IrisSpectrum::ReflectorReference Diffuse1,
+    _In_ IrisSpectrum::ReflectorReference Specular1,
+    _In_ FLOAT S1,
+    _In_ IrisSpectrum::ReflectorReference Reflective1,
+    _In_ FLOAT Scale1,
+    _In_ IrisSpectrum::ReflectorReference Emissive2,
+    _In_ IrisSpectrum::ReflectorReference Diffuse2,
+    _In_ IrisSpectrum::ReflectorReference Specular2,
+    _In_ FLOAT S2,
+    _In_ IrisSpectrum::ReflectorReference Reflective2,
+    _In_ FLOAT Scale2,
+    _In_ const Iris::Vector & N
+    )
+: EmissiveReflector0(Emissive0),
+  DiffuseReflector0(Diffuse0),
+  SpecularReflector0(Specular0),
+  Shininess0(S0),
+  ReflectiveReflector0(Reflective0),
+  Scalar0(Scale0),
+  EmissiveReflector1(Emissive1),
+  DiffuseReflector1(Diffuse1),
+  SpecularReflector1(Specular1),
+  Shininess1(S1),
+  ReflectiveReflector1(Reflective1),
+  Scalar1(Scale1),
+  EmissiveReflector2(Emissive2),
+  DiffuseReflector2(Diffuse2),
+  SpecularReflector2(Specular2),
+  Shininess2(S2),
+  ReflectiveReflector2(Reflective2),
+  Scalar2(Scale2),
+  SurfaceNormal(N)
+{ }
+
+std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
+TriangleInterpolatedPhongBRDF::Sample(
+    _In_ const Iris::Vector & Incoming,
+    _In_ IrisAdvanced::RandomReference Rng,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    IrisSpectrum::ReflectorReference Result = Compositor.Attenuate(EmissiveReflector0, Scalar0);
+    Result = Compositor.Add(Result, Compositor.Attenuate(EmissiveReflector1, Scalar1));
+    Result = Compositor.Add(Result, Compositor.Attenuate(EmissiveReflector2, Scalar2));
+
+    if (ReflectiveReflector0.AsPCREFLECTOR() != nullptr ||
+        ReflectiveReflector1.AsPCREFLECTOR() != nullptr ||
+        ReflectiveReflector2.AsPCREFLECTOR() != nullptr)
+    {
+        Iris::Vector Reflected = Iris::Vector::Reflect(Incoming, SurfaceNormal);
+        Result = Compositor.Add(Result, Compositor.Attenuate(ReflectiveReflector0, Scalar0));
+        Result = Compositor.Add(Result, Compositor.Attenuate(ReflectiveReflector1, Scalar1));
+        Result = Compositor.Add(Result, Compositor.Attenuate(ReflectiveReflector2, Scalar2));
+        return make_tuple(Result, Reflected, 1.0f);
+    }
+
+    return make_tuple(Result, -Incoming, 0.0f);
+}
+
+std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
+TriangleInterpolatedPhongBRDF::SampleWithLambertianFalloff(
+    _In_ const Iris::Vector & Incoming,
+    _In_ IrisAdvanced::RandomReference Rng,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    return Sample(Incoming, Rng, Compositor);
+}
+
+IrisSpectrum::ReflectorReference
+TriangleInterpolatedPhongBRDF::ComputeReflectance(
+    _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & Outgoing,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    IrisSpectrum::ReflectorReference Result = Compositor.Attenuate(EmissiveReflector0, Scalar0);
+    Result = Compositor.Add(Result, Compositor.Attenuate(EmissiveReflector1, Scalar1));
+    Result = Compositor.Add(Result, Compositor.Attenuate(EmissiveReflector2, Scalar2));
+    
+    FLOAT LambertianAttenuation = Iris::Vector::DotProduct(Incoming, Outgoing);
+    Result = Compositor.Add(Result, Compositor.Attenuate(DiffuseReflector0, Scalar0 * LambertianAttenuation));
+    Result = Compositor.Add(Result, Compositor.Attenuate(DiffuseReflector1, Scalar1 * LambertianAttenuation));
+    Result = Compositor.Add(Result, Compositor.Attenuate(DiffuseReflector2, Scalar2 * LambertianAttenuation));
+    
+    Iris::Vector HalfAngle = Iris::Vector::HalfAngle(-Incoming, Outgoing);
+    FLOAT SpecularPower = Iris::Vector::DotProduct(HalfAngle, SurfaceNormal);
+    
+    if (SpecularPower > (FLOAT) 0.0)
+    {
+        SpecularPower = Scalar0 * PowFloat(SpecularPower, Shininess0) +
+                        Scalar1 * PowFloat(SpecularPower, Shininess1) +
+                        Scalar2 * PowFloat(SpecularPower, Shininess2);
+
+        Result = Compositor.Add(Result, Compositor.Attenuate(SpecularReflector0, Scalar0 * SpecularPower));
+        Result = Compositor.Add(Result, Compositor.Attenuate(SpecularReflector1, Scalar1 * SpecularPower));
+        Result = Compositor.Add(Result, Compositor.Attenuate(SpecularReflector2, Scalar2 * SpecularPower));
+    }
+    
+    return Result;
+}
+
+IrisSpectrum::ReflectorReference
+TriangleInterpolatedPhongBRDF::ComputeReflectanceWithLambertianFalloff(
+    _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & Outgoing,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    return ComputeReflectance(Incoming, Outgoing, Compositor);
+}
+
+std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
+TriangleInterpolatedPhongBRDF::ComputeReflectanceWithPdf(
+    _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & Outgoing,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 0.0f);
+}
+
+std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
+TriangleInterpolatedPhongBRDF::ComputeReflectanceWithPdfWithLambertianFalloff(
+    _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & Outgoing,
+    _In_ IrisSpectrum::ReflectorCompositorReference Compositor
+    ) const
+{
+    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 0.0f);
+}
+
+TriangleInterpolatedPhongMaterial::TriangleInterpolatedPhongMaterial(
+    _In_ const IrisAdvanced::Color3 & Emissive0,
+    _In_ const IrisAdvanced::Color3 & Diffuse0,
+    _In_ const IrisAdvanced::Color3 & Specular0,
+    _In_ FLOAT S0,
+    _In_ const IrisAdvanced::Color3 & Reflective0,
+    _In_ const IrisAdvanced::Color3 & Emissive1,
+    _In_ const IrisAdvanced::Color3 & Diffuse1,
+    _In_ const IrisAdvanced::Color3 & Specular1,
+    _In_ FLOAT S1,
+    _In_ const IrisAdvanced::Color3 & Reflective1,
+    _In_ const IrisAdvanced::Color3 & Emissive2,
+    _In_ const IrisAdvanced::Color3 & Diffuse2,
+    _In_ const IrisAdvanced::Color3 & Specular2,
+    _In_ FLOAT S2,
+    _In_ const IrisAdvanced::Color3 & Reflective2
+    )
+: EmissiveReflector0(PhongEmissiveReflector::Create(Emissive0)),
+  DiffuseReflector0(PhongDiffuseReflector::Create(Diffuse0)),
+  SpecularReflector0(PhongSpecularReflector::Create(Diffuse0)),
+  Shininess0(S0),
+  ReflectiveReflector0(PhongReflectiveReflector::Create(Reflective0)),
+  EmissiveReflector1(PhongEmissiveReflector::Create(Emissive1)),
+  DiffuseReflector1(PhongDiffuseReflector::Create(Diffuse1)),
+  SpecularReflector1(PhongSpecularReflector::Create(Diffuse1)),
+  Shininess1(S1),
+  ReflectiveReflector1(PhongReflectiveReflector::Create(Reflective1)),
+  EmissiveReflector2(PhongEmissiveReflector::Create(Emissive2)),
+  DiffuseReflector2(PhongDiffuseReflector::Create(Diffuse2)),
+  SpecularReflector2(PhongSpecularReflector::Create(Diffuse2)),
+  Shininess2(S2),
+  ReflectiveReflector2(PhongReflectiveReflector::Create(Reflective2))
+{ }
+
+IrisPhysx::Material
+TriangleInterpolatedPhongMaterial::Create(
+    _In_ const IrisAdvanced::Color3 & Emissive0,
+    _In_ const IrisAdvanced::Color3 & Diffuse0,
+    _In_ const IrisAdvanced::Color3 & Specular0,
+    _In_ FLOAT S0,
+    _In_ const IrisAdvanced::Color3 & Reflective0,
+    _In_ const IrisAdvanced::Color3 & Emissive1,
+    _In_ const IrisAdvanced::Color3 & Diffuse1,
+    _In_ const IrisAdvanced::Color3 & Specular1,
+    _In_ FLOAT S1,
+    _In_ const IrisAdvanced::Color3 & Reflective1,
+    _In_ const IrisAdvanced::Color3 & Emissive2,
+    _In_ const IrisAdvanced::Color3 & Diffuse2,
+    _In_ const IrisAdvanced::Color3 & Specular2,
+    _In_ FLOAT S2,
+    _In_ const IrisAdvanced::Color3 & Reflective2
+    )
+{
+    IrisPhysx::Material Result = MaterialBase::Create(
+            std::unique_ptr<TriangleInterpolatedPhongMaterial>(
+                new TriangleInterpolatedPhongMaterial(
+                    Emissive0, Diffuse0, Specular0, S0, Reflective0,
+                    Emissive1, Diffuse1, Specular1, S1, Reflective1,
+                    Emissive2, Diffuse2, Specular2, S2, Reflective2)));
+
+    return Result;
+}
+
+IrisPhysx::BRDFReference
+TriangleInterpolatedPhongMaterial::Sample(
+    _In_ const Iris::Point & ModelHitPoint,
+    _In_ PCVOID AdditionalData,
+    _In_ const Iris::Vector & SurfaceNormal,
+    _In_ const Iris::MatrixReference & ModelToWorld,
+    _In_ IrisPhysx::BRDFAllocator Allocator
+    ) const
+{
+    const FLOAT *BarycentricCoordinates = (const FLOAT *) AdditionalData;
+
+    TriangleInterpolatedPhongBRDF Brdf(EmissiveReflector0.AsReflectorReference(),
+                                       DiffuseReflector0.AsReflectorReference(),
+                                       SpecularReflector0.AsReflectorReference(),
+                                       Shininess0,
+                                       ReflectiveReflector0.AsReflectorReference(),
+                                       BarycentricCoordinates[0],
+                                       EmissiveReflector1.AsReflectorReference(),
+                                       DiffuseReflector1.AsReflectorReference(),
+                                       SpecularReflector1.AsReflectorReference(),
+                                       Shininess1,
+                                       ReflectiveReflector1.AsReflectorReference(),
+                                       BarycentricCoordinates[1],
+                                       EmissiveReflector2.AsReflectorReference(),
+                                       DiffuseReflector2.AsReflectorReference(),
+                                       SpecularReflector2.AsReflectorReference(),
+                                       Shininess2,
+                                       ReflectiveReflector2.AsReflectorReference(),
+                                       BarycentricCoordinates[2],
+                                       SurfaceNormal);
+
+    return Allocator.Allocate(Brdf);
+}

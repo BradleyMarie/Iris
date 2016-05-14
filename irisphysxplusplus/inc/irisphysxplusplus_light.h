@@ -42,6 +42,14 @@ public:
             PbrLightRetain(LightPtr);
         }
     }
+
+    Light(
+        _In_ Light && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
     
     _Ret_
     PPBR_LIGHT
@@ -135,6 +143,29 @@ public:
         }
 
         return std::make_tuple(IrisSpectrum::SpectrumReference(ResultSpectrum), ResultPdf);
+    }
+
+    Light(
+        _In_ const Light & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        PbrLightRetain(Data);
+    }
+
+    Light & 
+    operator=(
+        _In_ const Light & ToCopy
+        )
+    {
+        if (this != &ToCopy)
+        {
+            PbrLightRetain(Data);
+            Data = ToCopy.Data;
+            PbrLightRelease(Data);
+        }
+
+        return *this;
     }
     
     ~Light(

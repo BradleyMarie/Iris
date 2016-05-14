@@ -33,6 +33,7 @@ class RayTracer;
 typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
                                                       UINT32,
                                                       Iris::MatrixReference,
+                                                      PCVOID,
                                                       const Iris::Vector &,
                                                       const Iris::Point &,
                                                       const Iris::Point &,

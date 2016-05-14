@@ -42,6 +42,14 @@ public:
             PbrMaterialRetain(MaterialPtr);
         }
     }
+
+    Material(
+        _In_ Material && ToMove
+        )
+    : Data(ToMove.Data)
+    {
+        ToMove.Data = nullptr;
+    }
     
     _Ret_
     PPBR_MATERIAL
@@ -95,6 +103,29 @@ public:
         }
         
         return BRDFReference(Result);
+    }
+
+    Material(
+        _In_ const Material & ToCopy
+        )
+    : Data(ToCopy.Data)
+    {
+        PbrMaterialRetain(Data);
+    }
+
+    Material & 
+    operator=(
+        _In_ const Material & ToCopy
+        )
+    {
+        if (this != &ToCopy)
+        {
+            PbrMaterialRetain(Data);
+            Data = ToCopy.Data;
+            PbrMaterialRelease(Data);
+        }
+
+        return *this;
     }
     
     ~Material(

@@ -33,6 +33,7 @@ ISTATUS
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
+    _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ModelViewer,
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint,
