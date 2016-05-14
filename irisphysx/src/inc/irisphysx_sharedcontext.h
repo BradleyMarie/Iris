@@ -107,13 +107,17 @@ PBRSharedContextSet(
     ASSERT(Rng != NULL);
     ASSERT(IsFiniteFloat(Epsilon));
     ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
-    
+
+    ReflectorCompositorClear(PBRSharedContext->ReflectorCompositor);
+    SpectrumCompositorClear(PBRSharedContext->SpectrumCompositor);
+    PbrBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
+
     PBRSharedContext->TestGeometryRoutine = TestGeometryRoutine;
     PBRSharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
     PBRSharedContext->Lights = Lights;
     PBRSharedContext->NumberOfLights = NumberOfLights;
     PBRSharedContext->Rng = Rng;
-    PBRSharedContext->Epsilon = Epsilon;   
+    PBRSharedContext->Epsilon = Epsilon;
 }
 
 SFORCEINLINE
