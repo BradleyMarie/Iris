@@ -102,14 +102,17 @@ TEST(PhysxRenderConstantRedWorldSphere)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }
@@ -183,14 +186,17 @@ TEST(PhysxRenderConstantRedModelSphere)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }
@@ -264,14 +270,17 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }
@@ -369,14 +378,17 @@ TEST(PhysxRenderPerfectSpecularSphere)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }
@@ -460,14 +472,17 @@ TEST(PhysxRenderConstantRedWorldTriangle)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }
@@ -561,14 +576,17 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
         return PhongToRGB(Spectra);
     };
 
-    CreateStateRoutine CreateState = [&](std::vector<Random> & Rngs,
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
                                          std::vector<ProcessHitRoutine> & ProcessHits,
                                          std::vector<ToneMappingRoutine> & ToneMap,
                                          SIZE_T NumberOfThreads)
     {
         for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
         {
-            Rngs.push_back(MultiplyWithCarry::Create());
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
             ProcessHits.push_back(ProcessHitFunc);
             ToneMap.push_back(ToneMappingFunc);
         }

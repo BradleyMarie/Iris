@@ -297,7 +297,7 @@ PinholeRender(
     SIZE_T PixelIndex;
     PVOID *ProcessHitContexts;
     PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
-    PRANDOM *Rngs;
+    PRANDOM_REFERENCE *Rngs;
     ISTATUS Status;
     SIZE_T ThreadIndex;
     PVOID *ToneMappingContexts;
@@ -418,7 +418,7 @@ PinholeRender(
         NumberOfThreads = 1;
     }
 
-    Rngs = calloc(NumberOfThreads, sizeof(PRANDOM));
+    Rngs = calloc(NumberOfThreads, sizeof(PRANDOM_REFERENCE));
 
     if (Rngs == NULL)
     {
@@ -523,7 +523,7 @@ PinholeRender(
                                                        AdditionalYSamplesPerPixel,
                                                        Epsilon,
                                                        Jitter,
-                                                       RandomGetRandomReference(Rngs[ThreadIndex]),
+                                                       Rngs[ThreadIndex],
                                                        Integrators[ThreadIndex],
                                                        TestGeometryRoutine,
                                                        TestGeometryRoutineContext,
@@ -549,7 +549,6 @@ PinholeRender(
          ThreadIndex++)
     {
         PBRIntegratorFree(Integrators[ThreadIndex]);
-        RandomRelease(Rngs[ThreadIndex]);
     }
 
     free(Integrators);

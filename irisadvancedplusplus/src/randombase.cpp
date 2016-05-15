@@ -111,7 +111,7 @@ RandomBase::Create(
         throw std::bad_alloc();
     }
     
-    return Random(RandomPtr, false);
+    return Random(RandomPtr);
 }
 
 } // namespace IrisAdvanced

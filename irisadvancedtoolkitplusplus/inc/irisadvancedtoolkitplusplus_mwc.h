@@ -38,7 +38,7 @@ Create(
         throw std::bad_alloc();
     }
 
-    return IrisAdvanced::Random(Rng, false);
+    return IrisAdvanced::Random(Rng);
 }
 
 } // namespace MultiplyWithCarry

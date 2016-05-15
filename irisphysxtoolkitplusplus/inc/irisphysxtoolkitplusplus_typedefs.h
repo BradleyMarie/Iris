@@ -25,7 +25,7 @@ namespace IrisPhysxToolkit {
 
 typedef std::function<IrisAdvanced::Color3(IrisSpectrum::SpectrumReference)> ToneMappingRoutine;
 
-typedef std::function<void(std::vector<IrisAdvanced::Random> &,
+typedef std::function<void(std::vector<IrisAdvanced::RandomReference> &,
                            std::vector<IrisPhysx::ProcessHitRoutine> &,
                            std::vector<ToneMappingRoutine> &,
                            SIZE_T NumberOfThreads)> CreateStateRoutine;

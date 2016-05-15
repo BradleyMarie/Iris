@@ -97,13 +97,7 @@ RandomGenerateIndex(
 
 IRISADVANCEDAPI
 VOID
-RandomRetain(
-    _In_opt_ PRANDOM Rng
-    );
-
-IRISADVANCEDAPI
-VOID
-RandomRelease(
+RandomFree(
     _In_opt_ _Post_invalid_ PRANDOM Rng
     );
 

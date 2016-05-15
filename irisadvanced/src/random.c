@@ -20,7 +20,6 @@ Abstract:
 
 struct _RANDOM {
     RANDOM_REFERENCE RandomReference;
-    SIZE_T ReferenceCount;
 };
 
 //
@@ -96,8 +95,6 @@ RandomAllocate(
                               DataAllocation,
                               &AllocatedRng->RandomReference);
 
-    AllocatedRng->ReferenceCount = 1;
-
     *Rng = AllocatedRng;
 
     return ISTATUS_SUCCESS;
@@ -164,20 +161,7 @@ RandomGenerateIndex(
 }
 
 VOID
-RandomRetain(
-    _In_opt_ PRANDOM Rng
-    )
-{
-    if (Rng == NULL)
-    {
-        return;
-    }
-
-    Rng->ReferenceCount += 1;
-}
-
-VOID
-RandomRelease(
+RandomFree(
     _In_opt_ _Post_invalid_ PRANDOM Rng
     )
 {
@@ -186,11 +170,6 @@ RandomRelease(
         return;
     }
 
-    Rng->ReferenceCount -= 1;
-
-    if (Rng->ReferenceCount == 0)
-    {
-        RandomReferenceDestroy(&Rng->RandomReference);
-        IrisAlignedFree(Rng);
-    }
+    RandomReferenceDestroy(&Rng->RandomReference);
+    IrisAlignedFree(Rng);
 }

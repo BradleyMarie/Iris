@@ -176,7 +176,7 @@ static
 ISTATUS 
 CreateStateAdapter(
     _In_opt_ PVOID Context,
-    _Out_writes_(NumberOfThreads) PRANDOM *Rngs,
+    _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
     _Out_writes_(NumberOfThreads) PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
     _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
@@ -192,18 +192,16 @@ CreateStateAdapter(
     assert(NumberOfThreads != 0);
 
     CreateStateContext * StateContext = (CreateStateContext *) Context;
-    std::vector<IrisAdvanced::Random> IrisAdvancedRngs;
+    std::vector<IrisAdvanced::RandomReference> RngReferences;
 
-    StateContext->CreateStateFunction(IrisAdvancedRngs,
+    StateContext->CreateStateFunction(RngReferences,
                                       StateContext->ProcessHitRoutines,
                                       StateContext->ToneMappingRoutines,
                                       NumberOfThreads);
 
     for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
     {
-        Rngs[Index] = IrisAdvancedRngs.at(Index).AsPRANDOM();
-        RandomRetain(Rngs[Index]);
-        
+        Rngs[Index] = RngReferences.at(Index).AsPRANDOM_REFERENCE();
         ProcessHitRoutine[Index] = ProcessHitAdapter;
         ProcessHitContexts[Index] = &StateContext->ProcessHitRoutines.at(Index);
         ToneMappingRoutines[Index] = ToneMappingAdapter;

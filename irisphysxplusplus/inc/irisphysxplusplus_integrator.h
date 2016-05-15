@@ -29,7 +29,6 @@ typedef std::function<void(const Iris::Ray &, RayTracer)> IntegrateRoutine;
 
 class Integrator final {
 public:
-
     Integrator(
         _In_ Integrator && ToMove
         )
@@ -55,8 +54,6 @@ public:
     {
         return Data;
     }
-
-
 
     IRISPHYSXPLUSPLUSAPI
     void
