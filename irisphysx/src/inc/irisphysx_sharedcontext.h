@@ -112,6 +112,11 @@ PBRSharedContextSet(
     SpectrumCompositorClear(PBRSharedContext->SpectrumCompositor);
     PbrBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
 
+    PBRVisibilityTesterSetSceneAndEpsilon(&PBRSharedContext->PBRVisibilityTester,
+                                          TestGeometryRoutine,
+                                          TestGeometryRoutineContext,
+                                          Epsilon);
+
     PBRSharedContext->TestGeometryRoutine = TestGeometryRoutine;
     PBRSharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
     PBRSharedContext->Lights = Lights;

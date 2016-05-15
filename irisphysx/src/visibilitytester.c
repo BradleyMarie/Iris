@@ -209,8 +209,6 @@ PBRVisibilityTesterTestVisibility(
                                                                        PBRVisibilityTester->Epsilon,
                                                                        TRUE);
     
-
-
     Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(PBRVisibilityTester->RayTracer,
                                                                 WorldRay,
                                                                 PBRVisibilityTester->TestGeometryRoutine,

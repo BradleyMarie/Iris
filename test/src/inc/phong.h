@@ -376,4 +376,96 @@ private:
     IrisSpectrum::Reflector ReflectiveReflector2;
 };
 
+class PhongDiffuseSpectrum final : public IrisSpectrum::SpectrumBase {
+private:
+    PhongDiffuseSpectrum(
+        _In_ const IrisAdvanced::Color3 & Diffuse
+        );
+
+public:
+    static
+    IrisSpectrum::Spectrum
+    Create(
+        _In_ const IrisAdvanced::Color3 & Diffuse
+        );
+
+    virtual
+    FLOAT
+    Sample(
+        _In_ FLOAT Wavelength
+        ) const;
+
+private:
+    IrisAdvanced::Color3 d;
+};
+
+class PhongSpecularSpectrum final : public IrisSpectrum::SpectrumBase {
+private:
+    PhongSpecularSpectrum(
+        _In_ const IrisAdvanced::Color3 & Specular
+        );
+
+public:
+    static
+    IrisSpectrum::Spectrum
+    Create(
+        _In_ const IrisAdvanced::Color3 & Specular
+        );
+
+    virtual
+    FLOAT
+    Sample(
+        _In_ FLOAT Wavelength
+        ) const;
+
+private:
+    IrisAdvanced::Color3 s;
+};
+
+class PhongPointLight final : public IrisPhysx::LightBase {
+private:
+    PhongPointLight(
+        _In_ const IrisAdvanced::Color3 & Diffuse,
+        _In_ const IrisAdvanced::Color3 & Specular,
+        _In_ const Iris::Point & Loc
+        );
+
+public:
+    static
+    IrisPhysx::Light
+    Create(
+        _In_ const IrisAdvanced::Color3 & Diffuse,
+        _In_ const IrisAdvanced::Color3 & Specular,
+        _In_ const Iris::Point & Loc
+        );
+
+    virtual
+    std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
+    Sample(
+        _In_ const Iris::Point & HitPoint,
+        _In_ IrisPhysx::VisibilityTester Tester,
+        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
+        ) const;
+
+    virtual
+    IrisSpectrum::SpectrumReference
+    ComputeEmissive(
+        _In_ const Iris::Ray & ToLight,
+        _In_ IrisPhysx::VisibilityTester Tester
+        ) const;
+    
+    virtual
+    std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
+    ComputeEmissiveWithPdf(
+        _In_ const Iris::Ray & ToLight,
+        _In_ IrisPhysx::VisibilityTester Tester
+        ) const;
+
+private:
+    IrisSpectrum::Spectrum DiffuseSpectrum;
+    IrisSpectrum::Spectrum SpecularSpectrum;
+    Iris::Point Location;
+};
+
 #endif // _IRIS_TEST_PHONG_HEADER_

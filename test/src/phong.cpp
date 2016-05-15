@@ -82,7 +82,7 @@ PhongEmissiveReflector::Reflect(
         return e.Green();
     }
     
-    if (Wavelength <= PHONG_EMISSIVE_B)
+    if (Wavelength == PHONG_EMISSIVE_B)
     {
         return e.Blue();
     }
@@ -110,17 +110,17 @@ PhongDiffuseReflector::Reflect(
     _In_ FLOAT IncomingIntensity
     ) const
 {
-    if (Wavelength <= PHONG_DIFFUSE_R)
+    if (Wavelength == PHONG_DIFFUSE_R)
     {
         return IncomingIntensity * d.Red();
     }
     
-    if (Wavelength <= PHONG_DIFFUSE_G)
+    if (Wavelength == PHONG_DIFFUSE_G)
     {
         return IncomingIntensity * d.Green();
     }
     
-    if (Wavelength <= PHONG_DIFFUSE_B)
+    if (Wavelength == PHONG_DIFFUSE_B)
     {
         return IncomingIntensity * d.Blue();
     }
@@ -148,47 +148,17 @@ PhongSpecularReflector::Reflect(
     _In_ FLOAT IncomingIntensity
     ) const
 {
-    if (Wavelength <= PHONG_EMISSIVE_R)
-    {
-        return IncomingIntensity * s.Red();
-    }
-
-    if (Wavelength <= PHONG_EMISSIVE_G)
-    {
-        return IncomingIntensity * s.Green();
-    }
-
-    if (Wavelength <= PHONG_EMISSIVE_B)
-    {
-        return IncomingIntensity * s.Blue();
-    }
-
-    if (Wavelength <= PHONG_DIFFUSE_R)
-    {
-        return IncomingIntensity * s.Red();
-    }
-
-    if (Wavelength <= PHONG_DIFFUSE_G)
-    {
-        return IncomingIntensity * s.Green();
-    }
-
-    if (Wavelength <= PHONG_DIFFUSE_R)
-    {
-        return IncomingIntensity * s.Blue();
-    }
-
-    if (Wavelength <= PHONG_SPECULAR_B)
+    if (Wavelength == PHONG_SPECULAR_R)
     {
         return IncomingIntensity * s.Red();
     }
     
-    if (Wavelength <= PHONG_SPECULAR_G)
+    if (Wavelength == PHONG_SPECULAR_G)
     {
         return IncomingIntensity * s.Green();
     }
     
-    if (Wavelength <= PHONG_SPECULAR_B)
+    if (Wavelength == PHONG_SPECULAR_B)
     {
         return IncomingIntensity * s.Blue();
     }
@@ -221,17 +191,47 @@ PhongReflectiveReflector::Reflect(
     _In_ FLOAT IncomingIntensity
     ) const
 {
-    if (Wavelength <= PHONG_SPECULAR_R)
+    if (Wavelength == PHONG_EMISSIVE_R)
     {
         return IncomingIntensity * r.Red();
     }
 
-    if (Wavelength <= PHONG_SPECULAR_G)
+    if (Wavelength == PHONG_EMISSIVE_G)
     {
         return IncomingIntensity * r.Green();
     }
 
-    if (Wavelength <= PHONG_SPECULAR_B)
+    if (Wavelength == PHONG_EMISSIVE_B)
+    {
+        return IncomingIntensity * r.Blue();
+    }
+
+    if (Wavelength == PHONG_DIFFUSE_R)
+    {
+        return IncomingIntensity * r.Red();
+    }
+
+    if (Wavelength == PHONG_DIFFUSE_G)
+    {
+        return IncomingIntensity * r.Green();
+    }
+
+    if (Wavelength == PHONG_DIFFUSE_R)
+    {
+        return IncomingIntensity * r.Blue();
+    }
+
+    if (Wavelength == PHONG_SPECULAR_R)
+    {
+        return IncomingIntensity * r.Red();
+    }
+
+    if (Wavelength == PHONG_SPECULAR_G)
+    {
+        return IncomingIntensity * r.Green();
+    }
+
+    if (Wavelength == PHONG_SPECULAR_B)
     {
         return IncomingIntensity * r.Blue();
     }
@@ -247,12 +247,12 @@ PhongBRDF::PhongBRDF(
     _In_ IrisSpectrum::ReflectorReference Reflective,
     _In_ const Iris::Vector & N
     )
-    : EmissiveReflector(Emissive),
-      DiffuseReflector(Diffuse),
-      SpecularReflector(Specular),
-      Shininess(S),
-      ReflectiveReflector(Reflective),
-      SurfaceNormal(N)
+: EmissiveReflector(Emissive),
+  DiffuseReflector(Diffuse),
+  SpecularReflector(Specular),
+  Shininess(S),
+  ReflectiveReflector(Reflective),
+  SurfaceNormal(N)
 { }
 
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
@@ -279,14 +279,7 @@ PhongBRDF::SampleWithLambertianFalloff(
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    if (ReflectiveReflector.AsPCREFLECTOR() != nullptr)
-    {
-        Iris::Vector Reflected = Iris::Vector::Reflect(Incoming, SurfaceNormal);
-        IrisSpectrum::ReflectorReference Result = Compositor.Add(ReflectiveReflector, EmissiveReflector);
-        return make_tuple(Result, Reflected, 1.0f);
-    }
-
-    return make_tuple(EmissiveReflector, -Incoming, 0.0f);
+    return Sample(Incoming, Rng, Compositor);
 }
 
 IrisSpectrum::ReflectorReference
@@ -295,12 +288,9 @@ PhongBRDF::ComputeReflectance(
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
-{
-    IrisSpectrum::ReflectorReference Result = EmissiveReflector;
-    
-    FLOAT LambertianAttenuation = Iris::Vector::DotProduct(Incoming, Outgoing);
-    Result = Compositor.Add(Compositor.Attenuate(DiffuseReflector, LambertianAttenuation),
-                            Result);
+{    
+    FLOAT LambertianAttenuation = MaxFloat(0.0f, Iris::Vector::DotProduct(SurfaceNormal, Outgoing));
+    IrisSpectrum::ReflectorReference Result = Compositor.Attenuate(DiffuseReflector, LambertianAttenuation);
     
     Iris::Vector HalfAngle = Iris::Vector::HalfAngle(-Incoming, Outgoing);
     FLOAT SpecularPower = Iris::Vector::DotProduct(HalfAngle, SurfaceNormal);
@@ -322,23 +312,7 @@ PhongBRDF::ComputeReflectanceWithLambertianFalloff(
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    IrisSpectrum::ReflectorReference Result = EmissiveReflector;
-
-    FLOAT LambertianAttenuation = Iris::Vector::DotProduct(Incoming, Outgoing);
-    Result = Compositor.Add(Compositor.Attenuate(DiffuseReflector, LambertianAttenuation),
-                            Result);
-
-    Iris::Vector HalfAngle = Iris::Vector::HalfAngle(-Incoming, Outgoing);
-    FLOAT SpecularPower = Iris::Vector::DotProduct(HalfAngle, SurfaceNormal);
-
-    if (SpecularPower > (FLOAT) 0.0)
-    {
-        SpecularPower = PowFloat(SpecularPower, Shininess);
-        Result = Compositor.Add(Compositor.Attenuate(SpecularReflector, SpecularPower),
-                                Result);
-    }
-    
-    return Result;
+    return ComputeReflectance(Incoming, Outgoing, Compositor);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
@@ -348,23 +322,7 @@ PhongBRDF::ComputeReflectanceWithPdf(
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    IrisSpectrum::ReflectorReference Result = EmissiveReflector;
-
-    FLOAT LambertianAttenuation = Iris::Vector::DotProduct(Incoming, Outgoing);
-    Result = Compositor.Add(Compositor.Attenuate(DiffuseReflector, LambertianAttenuation),
-                            Result);
-
-    Iris::Vector HalfAngle = Iris::Vector::HalfAngle(-Incoming, Outgoing);
-    FLOAT SpecularPower = Iris::Vector::DotProduct(HalfAngle, SurfaceNormal);
-
-    if (SpecularPower > (FLOAT) 0.0)
-    {
-        SpecularPower = PowFloat(SpecularPower, Shininess);
-        Result = Compositor.Add(Compositor.Attenuate(SpecularReflector, SpecularPower),
-                                Result);
-    }
-    
-    return make_tuple(Result, 1.0f);
+    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 1.0f);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
@@ -374,23 +332,7 @@ PhongBRDF::ComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    IrisSpectrum::ReflectorReference Result = EmissiveReflector;
-
-    FLOAT LambertianAttenuation = Iris::Vector::DotProduct(Incoming, Outgoing);
-    Result = Compositor.Add(Compositor.Attenuate(DiffuseReflector, LambertianAttenuation),
-                            Result);
-
-    Iris::Vector HalfAngle = Iris::Vector::HalfAngle(-Incoming, Outgoing);
-    FLOAT SpecularPower = Iris::Vector::DotProduct(HalfAngle, SurfaceNormal);
-
-    if (SpecularPower > (FLOAT) 0.0)
-    {
-        SpecularPower = PowFloat(SpecularPower, Shininess);
-        Result = Compositor.Add(Compositor.Attenuate(SpecularReflector, SpecularPower),
-                                Result);
-    }
-    
-    return make_tuple(Result, 1.0f);
+    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 1.0f);
 }
 
 PhongMaterial::PhongMaterial(
@@ -673,4 +615,136 @@ TriangleInterpolatedPhongMaterial::Sample(
                                        SurfaceNormal);
 
     return Allocator.Allocate(Brdf);
+}
+
+PhongDiffuseSpectrum::PhongDiffuseSpectrum(
+    _In_ const IrisAdvanced::Color3 & Diffuse
+    )
+: d(Diffuse)
+{ }
+
+IrisSpectrum::Spectrum
+PhongDiffuseSpectrum::Create(
+    _In_ const IrisAdvanced::Color3 & Diffuse
+    )
+{
+    return SpectrumBase::Create(std::unique_ptr<PhongDiffuseSpectrum>(new PhongDiffuseSpectrum(Diffuse)));
+}
+
+FLOAT
+PhongDiffuseSpectrum::Sample(
+    _In_ FLOAT Wavelength
+    ) const
+{
+    if (Wavelength == PHONG_DIFFUSE_R)
+    {
+        return d.Red();
+    }
+
+    if (Wavelength == PHONG_DIFFUSE_G)
+    {
+        return d.Green();
+    }
+
+    if (Wavelength == PHONG_DIFFUSE_B)
+    {
+        return d.Blue();
+    }
+
+    return 0.0f;
+}
+
+PhongSpecularSpectrum::PhongSpecularSpectrum(
+    _In_ const IrisAdvanced::Color3 & Specular
+    )
+: s(Specular)
+{ }
+
+IrisSpectrum::Spectrum
+PhongSpecularSpectrum::Create(
+    _In_ const IrisAdvanced::Color3 & Specular
+    )
+{
+    return SpectrumBase::Create(std::unique_ptr<PhongSpecularSpectrum>(new PhongSpecularSpectrum(Specular)));
+}
+
+FLOAT
+PhongSpecularSpectrum::Sample(
+    _In_ FLOAT Wavelength
+    ) const
+{
+    if (Wavelength == PHONG_SPECULAR_R)
+    {
+        return s.Red();
+    }
+
+    if (Wavelength == PHONG_SPECULAR_G)
+    {
+        return s.Green();
+    }
+
+    if (Wavelength == PHONG_SPECULAR_B)
+    {
+        return s.Blue();
+    }
+
+    return 0.0f;
+}
+
+PhongPointLight::PhongPointLight(
+    _In_ const IrisAdvanced::Color3 & Diffuse,
+    _In_ const IrisAdvanced::Color3 & Specular,
+    _In_ const Iris::Point & Loc
+    )
+: DiffuseSpectrum(PhongDiffuseSpectrum::Create(Diffuse)),
+  SpecularSpectrum(PhongSpecularSpectrum::Create(Specular)),
+  Location(Loc)
+{ }
+
+IrisPhysx::Light
+PhongPointLight::Create(
+    _In_ const IrisAdvanced::Color3 & Diffuse,
+    _In_ const IrisAdvanced::Color3 & Specular,
+    _In_ const Iris::Point & Loc
+    )
+{
+    return LightBase::Create( std::unique_ptr<PhongPointLight>(new PhongPointLight(Diffuse, Specular, Loc)));
+}
+
+std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
+PhongPointLight::Sample(
+    _In_ const Iris::Point & HitPoint,
+    _In_ IrisPhysx::VisibilityTester Tester,
+    _In_ IrisAdvanced::RandomReference Rng,
+    _In_ IrisSpectrum::SpectrumCompositorReference Compositor
+    ) const
+{
+    Iris::Vector ToLight = Location - HitPoint;
+    FLOAT Distance = ToLight.Length();
+    ToLight = Iris::Vector::Normalize(ToLight);
+
+    if (Tester.Test(Iris::Ray(HitPoint, ToLight), Distance))
+    {
+        return make_tuple(Compositor.Add(DiffuseSpectrum, SpecularSpectrum), ToLight, INFINITY);
+    }
+
+    return make_tuple(IrisSpectrum::SpectrumReference(nullptr), ToLight, 0.0f);
+}
+
+IrisSpectrum::SpectrumReference
+PhongPointLight::ComputeEmissive(
+    _In_ const Iris::Ray & ToLight,
+    _In_ IrisPhysx::VisibilityTester Tester
+    ) const
+{
+    return IrisSpectrum::SpectrumReference(nullptr);
+}
+
+std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
+PhongPointLight::ComputeEmissiveWithPdf(
+    _In_ const Iris::Ray & ToLight,
+    _In_ IrisPhysx::VisibilityTester Tester
+    ) const
+{
+    return make_tuple(IrisSpectrum::SpectrumReference(nullptr), 0.0f);
 }

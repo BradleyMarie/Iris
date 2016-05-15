@@ -370,7 +370,16 @@ TEST(PhysxRenderPerfectSpecularSphere)
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        return SpectrumCompositor.Reflect(ReflectedLight, std::get<0>(Ref));
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+        }
+        else
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+        }
+
+        return ReflectedLight;
     };
 
     ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
@@ -464,7 +473,16 @@ TEST(PhysxRenderConstantRedWorldTriangle)
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        return SpectrumCompositor.Reflect(ReflectedLight, std::get<0>(Ref));
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+        }
+        else
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+        }
+
+        return ReflectedLight;
     };
 
     ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
@@ -568,7 +586,16 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        return SpectrumCompositor.Reflect(ReflectedLight, std::get<0>(Ref));
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+        }
+        else
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+        }
+
+        return ReflectedLight;
     };
 
     ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
@@ -611,4 +638,129 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                           Fb);
 
     Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");    
+}
+
+TEST(PhysxRenderPhongWorldSphere)
+{
+    Material ConstantMaterial = PhongMaterial::Create(Color3::CreateBlack(),
+                                                      Color3(0.8f, 0.8f, 0.8f),
+                                                      Color3::CreateBlack(),
+                                                      1.0f,
+                                                      Color3::CreateBlack());
+
+    Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
+                                              1.0f,
+                                              ConstantMaterial,
+                                              ConstantMaterial,
+                                              nullopt,
+                                              nullopt);
+
+    TestListScene Scene;
+    Scene.AddGeometry(SphereRadiusOne);
+
+    std::vector<IrisPhysx::Light> Lights;
+    Lights.push_back(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
+                                             Color3::CreateBlack(),
+                                             Point(0.0f, 0.0f, 1000.0f)));
+
+    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
+                                           UINT32 FaceHit,
+                                           Iris::MatrixReference ModelToWorld,
+                                           PCVOID AdditionalData,
+                                           const Iris::Vector & ModelViewer,
+                                           const Iris::Point & ModelHitPoint,
+                                           const Iris::Point & WorldHitPoint,
+                                           const Iris::Ray & WorldRay,
+                                           PCPBR_LIGHT *PbrLights,
+                                           SIZE_T NumberOfLights,
+                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           VisibilityTester Tester,
+                                           BRDFAllocator Allocator,
+                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
+                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
+                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
+    {
+        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
+        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, SurfaceNormal, ModelToWorld, Allocator);
+
+        SpectrumReference ReflectedLight(nullptr);
+
+        for (SIZE_T Index = 0; Index < NumberOfLights; Index++)
+        {
+            PCSPECTRUM LightSpectrum;
+            FLOAT LightPdf;
+            VECTOR3 ToLight;
+
+            ISTATUS Status = PbrLightSample(PbrLights[Index],
+                                            WorldHitPoint.AsPOINT3(), 
+                                            Tester.AsPPBR_VISIBILITY_TESTER(), 
+                                            Rng.AsPRANDOM_REFERENCE(), 
+                                            SpectrumCompositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(), 
+                                            &LightSpectrum, 
+                                            &ToLight, 
+                                            &LightPdf);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                throw std::runtime_error(ISTATUSToCString(Status));
+            }
+
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(ModelViewer, Vector::Normalize(ModelToWorld.Inverse() * ToLight), ReflectorCompositor)));
+        }
+
+        auto Ref = Brdf.Sample(ModelViewer, Rng, ReflectorCompositor);
+
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+        }
+        else
+        {
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+        }
+
+        return ReflectedLight;
+    };
+
+    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
+    {
+        return PhongToRGB(Spectra);
+    };
+
+    std::vector<Random> StrongRngReferences;
+
+    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
+                                         std::vector<ProcessHitRoutine> & ProcessHits,
+                                         std::vector<ToneMappingRoutine> & ToneMap,
+                                         SIZE_T NumberOfThreads)
+    {
+        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
+        {
+            StrongRngReferences.push_back(MultiplyWithCarry::Create());
+            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
+            ProcessHits.push_back(ProcessHitFunc);
+            ToneMap.push_back(ToneMappingFunc);
+        }
+    };
+
+    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
+    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
+                          1.0f,
+                          1.0f,
+                          1.0f,
+                          Vector(0.0f, 0.0f, -1.0f),
+                          Vector(0.0f, 1.0f, 0.0f),
+                          0,
+                          0,
+                          0.0001f,
+                          0,
+                          false,
+                          false,
+                          Scene.GetTestRoutine(),
+                          Lights,
+                          CreateState,
+                          Fb);
+
+    Fb.SaveAsPFM("RenderPhongWorldSpherePlusPlus.pfm");
 }
