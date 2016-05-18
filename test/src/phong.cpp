@@ -216,7 +216,7 @@ PhongReflectiveReflector::Reflect(
         return IncomingIntensity * r.Green();
     }
 
-    if (Wavelength == PHONG_DIFFUSE_R)
+    if (Wavelength == PHONG_DIFFUSE_B)
     {
         return IncomingIntensity * r.Blue();
     }
@@ -344,7 +344,7 @@ PhongMaterial::PhongMaterial(
     )
 : EmissiveReflector(PhongEmissiveReflector::Create(Emissive)),
   DiffuseReflector(PhongDiffuseReflector::Create(Diffuse)),
-  SpecularReflector(PhongSpecularReflector::Create(Diffuse)),
+  SpecularReflector(PhongSpecularReflector::Create(Specular)),
   Shininess(S),
   ReflectiveReflector(PhongReflectiveReflector::Create(Reflective))
 { }
@@ -708,7 +708,7 @@ PhongPointLight::Create(
     _In_ const Iris::Point & Loc
     )
 {
-    return LightBase::Create( std::unique_ptr<PhongPointLight>(new PhongPointLight(Diffuse, Specular, Loc)));
+    return LightBase::Create(std::unique_ptr<PhongPointLight>(new PhongPointLight(Diffuse, Specular, Loc)));
 }
 
 std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>

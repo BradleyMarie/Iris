@@ -80,6 +80,7 @@ RayTracerTraceSceneProcessClosestHit(
     FLOAT CurrentDistance;
     PHIT_TESTER HitTester;
     ISTATUS Status;
+    BOOL FoundHit;
 
     if (RayTracer == NULL)
     {
@@ -119,13 +120,26 @@ RayTracerTraceSceneProcessClosestHit(
         return Status;
     }
     
+    FoundHit = FALSE;
+
     Status = HitTesterGetNextHit(HitTester, &ClosestHit);
+
+    while (Status != ISTATUS_NO_MORE_DATA)
+    {
+        if (ClosestHit->Hit.Distance > MinimumDistance)
+        {
+            FoundHit = TRUE;
+            break;
+        }
+
+        Status = HitTesterGetNextHit(HitTester, &ClosestHit);
+    }
     
-    if (Status == ISTATUS_NO_MORE_DATA)
+    if (FoundHit == FALSE)
     {
         return ISTATUS_SUCCESS;
     }
-    
+
     ClosestDistance = ClosestHit->Hit.Distance;
     
     while (TRUE)
@@ -183,6 +197,7 @@ RayTracerTraceSceneProcessClosestHitWithCoordinates(
     POINT3 ModelHit;
     POINT3 WorldHit;
     ISTATUS Status;
+    BOOL FoundHit;
 
     if (RayTracer == NULL)
     {
@@ -221,14 +236,27 @@ RayTracerTraceSceneProcessClosestHitWithCoordinates(
     {
         return Status;
     }
+
+    FoundHit = FALSE;
+
+    Status = HitTesterGetNextHit(HitTester, &ClosestHit);
+
+    while (Status != ISTATUS_NO_MORE_DATA)
+    {
+        if (ClosestHit->Hit.Distance > MinimumDistance)
+        {
+            FoundHit = TRUE;
+            break;
+        }
+
+        Status = HitTesterGetNextHit(HitTester, &ClosestHit);
+    }
     
-    Status = HitTesterGetNextHit(HitTester,&ClosestHit);
-    
-    if (Status == ISTATUS_NO_MORE_DATA)
+    if (FoundHit == FALSE)
     {
         return ISTATUS_SUCCESS;
     }
-    
+
     ClosestDistance = ClosestHit->Hit.Distance;
     
     while (TRUE)

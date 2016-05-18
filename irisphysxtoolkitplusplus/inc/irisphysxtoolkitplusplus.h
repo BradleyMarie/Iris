@@ -53,5 +53,6 @@ extern "C" {
 #include "irisphysxtoolkitplusplus_pinhole.h"
 #include "irisphysxtoolkitplusplus_sphere.h"
 #include "irisphysxtoolkitplusplus_triangle.h"
+#include "irisphysxtoolkitplusplus_infiniteplane.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_PLUS_PLUS_HEADER_

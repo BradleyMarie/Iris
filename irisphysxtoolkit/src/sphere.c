@@ -627,7 +627,7 @@ PhysxSphereAllocate(
     {
         SphereInitialize(&LightSphere.Data,
                          Center,
-                         Radius);
+                         RadiusSquared);
         
         LightSphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
         LightSphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
@@ -643,7 +643,7 @@ PhysxSphereAllocate(
     {
         SphereInitialize(&Sphere.Data,
                          Center,
-                         Radius);
+                         RadiusSquared);
         
         Sphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
         Sphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
