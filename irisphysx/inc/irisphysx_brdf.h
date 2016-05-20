@@ -28,6 +28,7 @@ ISTATUS
 (*PPBR_BRDF_SAMPLE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -42,6 +43,7 @@ ISTATUS
 (*PPBR_BRDF_COMPUTE_REFLECTANCE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -54,6 +56,7 @@ ISTATUS
 (*PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -98,6 +101,7 @@ ISTATUS
 PbrBrdfSample(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -112,6 +116,7 @@ ISTATUS
 PbrBrdfSampleWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -126,6 +131,7 @@ ISTATUS
 PbrBrdfComputeReflectance(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -138,6 +144,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -150,6 +157,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithPdf(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -163,6 +171,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,

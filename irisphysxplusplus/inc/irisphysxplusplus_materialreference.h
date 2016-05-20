@@ -51,7 +51,6 @@ public:
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
         _In_ PCVOID AdditionalData,
-        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ BRDFAllocator Allocator
         ) const
@@ -61,7 +60,6 @@ public:
         ISTATUS Status = PbrMaterialSample(Data,
                                            ModelHitPoint.AsPOINT3(),
                                            AdditionalData,
-                                           SurfaceNormal.AsVECTOR3(),
                                            ModelToWorld.AsPCMATRIX(),
                                            Allocator.AsPPBR_BRDF_ALLOCATOR(),
                                            &Result);

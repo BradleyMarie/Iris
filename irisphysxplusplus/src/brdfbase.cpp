@@ -27,6 +27,7 @@ ISTATUS
 BRDFSampleAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
@@ -36,6 +37,7 @@ BRDFSampleAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);
@@ -62,6 +64,7 @@ ISTATUS
 BRDFSampleWithLambertianFalloffAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
@@ -71,6 +74,7 @@ BRDFSampleWithLambertianFalloffAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);
@@ -97,6 +101,7 @@ ISTATUS
 BRFFComputeReflectanceAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr
@@ -104,6 +109,7 @@ BRFFComputeReflectanceAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);
@@ -125,6 +131,7 @@ ISTATUS
 BRFFComputeReflectanceWithLambertianFalloffAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr
@@ -132,6 +139,7 @@ BRFFComputeReflectanceWithLambertianFalloffAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);
@@ -153,6 +161,7 @@ ISTATUS
 BRDFComputeReflectanceWithPdfAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
@@ -161,6 +170,7 @@ BRDFComputeReflectanceWithPdfAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);
@@ -185,6 +195,7 @@ ISTATUS
 BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
@@ -193,6 +204,7 @@ BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(ReflectorPtr != NULL);

@@ -98,6 +98,7 @@ ISTATUS
 PbrBrdfSample(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -117,33 +118,39 @@ PbrBrdfSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (Rng == NULL)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Compositor == NULL)
+    if (Rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Outgoing == NULL)
+    if (Reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (Pdf == NULL)
+    if (Outgoing == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     Status = PbrBrdf->VTable->SampleRoutine(PbrBrdf->Data,
                                             Incoming,
+                                            SurfaceNormal,
                                             Rng, 
                                             Compositor,
                                             Reflector,
@@ -159,6 +166,7 @@ ISTATUS
 PbrBrdfSampleWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -178,33 +186,39 @@ PbrBrdfSampleWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (Rng == NULL)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Compositor == NULL)
+    if (Rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Outgoing == NULL)
+    if (Reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (Pdf == NULL)
+    if (Outgoing == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     Status = PbrBrdf->VTable->SampleRoutineWithLambertianFalloff(PbrBrdf->Data,
                                                                  Incoming,
+                                                                 SurfaceNormal,
                                                                  Rng, 
                                                                  Compositor,
                                                                  Reflector,
@@ -220,6 +234,7 @@ ISTATUS
 PbrBrdfComputeReflectance(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -237,23 +252,29 @@ PbrBrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(Outgoing) == FALSE)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Compositor == NULL)
+    if (VectorValidate(Outgoing) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    if (Reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     Status = PbrBrdf->VTable->ComputeReflectanceRoutine(PbrBrdf->Data,
                                                         Incoming,
+                                                        SurfaceNormal,
                                                         Outgoing,
                                                         Compositor,
                                                         Reflector);
@@ -267,6 +288,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -284,23 +306,29 @@ PbrBrdfComputeReflectanceWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(Outgoing) == FALSE)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Compositor == NULL)
+    if (VectorValidate(Outgoing) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    if (Reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     Status = PbrBrdf->VTable->ComputeReflectanceRoutineWithLambertianFalloff(PbrBrdf->Data,
                                                                              Incoming,
+                                                                             SurfaceNormal,
                                                                              Outgoing,
                                                                              Compositor,
                                                                              Reflector);
@@ -314,6 +342,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithPdf(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -332,28 +361,34 @@ PbrBrdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(Outgoing) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (Compositor == NULL)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (VectorValidate(Outgoing) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Pdf == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
+    if (Reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutine(PbrBrdf->Data,
                                                                Incoming,
+                                                               SurfaceNormal,
                                                                Outgoing,
                                                                Compositor,
                                                                Reflector,
@@ -368,6 +403,7 @@ ISTATUS
 PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCPBR_BRDF PbrBrdf,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -386,28 +422,34 @@ PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(Outgoing) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (Compositor == NULL)
+    if (VectorValidate(SurfaceNormal) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Reflector == NULL)
+    if (VectorValidate(Outgoing) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (Pdf == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
+    if (Reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutineWithLambertianFalloff(PbrBrdf->Data,
                                                                                     Incoming,
+                                                                                    SurfaceNormal,
                                                                                     Outgoing,
                                                                                     Compositor,
                                                                                     Reflector,

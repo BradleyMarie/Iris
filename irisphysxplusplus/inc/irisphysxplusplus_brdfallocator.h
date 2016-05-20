@@ -99,6 +99,7 @@ private:
     BRDFSampleAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _Inout_ PRANDOM_REFERENCE Rng,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
@@ -108,6 +109,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(Rng != nullptr);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -118,6 +120,7 @@ private:
         
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->Sample(Iris::Vector(Incoming),
+                         Iris::Vector(SurfaceNormal),
                          IrisAdvanced::RandomReference(Rng),
                          IrisSpectrum::ReflectorCompositorReference(Compositor));
     
@@ -136,6 +139,7 @@ private:
     BRDFSampleWithLambertianFalloffAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _Inout_ PRANDOM_REFERENCE Rng,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
@@ -145,6 +149,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(Rng != nullptr);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -155,6 +160,7 @@ private:
         
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->SampleWithLambertianFalloff(Iris::Vector(Incoming),
+                                              Iris::Vector(SurfaceNormal),
                                               IrisAdvanced::RandomReference(Rng),
                                               IrisSpectrum::ReflectorCompositorReference(Compositor));
     
@@ -173,6 +179,7 @@ private:
     BRDFComputeReflectanceAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _In_ VECTOR3 Outgoing,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector
@@ -180,6 +187,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(VectorValidate(Outgoing) != FALSE);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -188,6 +196,7 @@ private:
         
         IrisSpectrum::ReflectorReference Result =
             Brdf->ComputeReflectance(Iris::Vector(Incoming),
+                                     Iris::Vector(SurfaceNormal),
                                      Iris::Vector(Outgoing),
                                      IrisSpectrum::ReflectorCompositorReference(Compositor));
     
@@ -204,6 +213,7 @@ private:
     BRDFComputeReflectanceWithLambertianFalloffAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _In_ VECTOR3 Outgoing,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector
@@ -211,6 +221,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(VectorValidate(Outgoing) != FALSE);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -219,6 +230,7 @@ private:
         
         IrisSpectrum::ReflectorReference Result =
             Brdf->ComputeReflectanceWithLambertianFalloff(Iris::Vector(Incoming),
+                                                          Iris::Vector(SurfaceNormal),
                                                           Iris::Vector(Outgoing),
                                                           IrisSpectrum::ReflectorCompositorReference(Compositor));
     
@@ -235,6 +247,7 @@ private:
     BRDFComputeReflectanceWithPdfAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _In_ VECTOR3 Outgoing,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
@@ -243,6 +256,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(VectorValidate(Outgoing) != FALSE);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -252,6 +266,7 @@ private:
         
         std::tuple<IrisSpectrum::ReflectorReference, FLOAT> Result =
             Brdf->ComputeReflectanceWithPdf(Iris::Vector(Incoming),
+                                            Iris::Vector(SurfaceNormal),
                                             Iris::Vector(Outgoing),
                                             IrisSpectrum::ReflectorCompositorReference(Compositor));
     
@@ -269,6 +284,7 @@ private:
     BRDFComputeReflectanceWithPdfWithLambertianFalloffAdapter(
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
+        _In_ VECTOR3 SurfaceNormal,
         _In_ VECTOR3 Outgoing,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
@@ -277,6 +293,7 @@ private:
     {
         assert(Context != nullptr);
         assert(VectorValidate(Incoming) != FALSE);
+        assert(VectorValidate(SurfaceNormal) != FALSE);
         assert(VectorValidate(Outgoing) != FALSE);
         assert(Compositor != nullptr);
         assert(Reflector != nullptr);
@@ -286,6 +303,7 @@ private:
         
         std::tuple<IrisSpectrum::ReflectorReference, FLOAT> Result =
             Brdf->ComputeReflectanceWithPdfWithLambertianFalloff(Iris::Vector(Incoming),
+                                                                 Iris::Vector(SurfaceNormal),
                                                                  Iris::Vector(Outgoing),
                                                                  IrisSpectrum::ReflectorCompositorReference(Compositor));
     

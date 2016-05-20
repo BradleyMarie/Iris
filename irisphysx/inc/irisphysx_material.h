@@ -29,7 +29,6 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
     _Out_ PCPBR_BRDF *PbrBrdf
@@ -69,7 +68,6 @@ PbrMaterialSample(
     _In_ PCPBR_MATERIAL Material,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
     _Out_ PCPBR_BRDF *Brdf

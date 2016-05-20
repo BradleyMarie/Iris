@@ -20,7 +20,6 @@ Abstract:
 
 typedef struct _SPECTRUM_MIRROR_BRDF {
     PCREFLECTOR Reflectance;
-    VECTOR3 SurfaceNormal;
 } SPECTRUM_MIRROR_BRDF, *PSPECTRUM_MIRROR_BRDF;
 
 typedef CONST SPECTRUM_MIRROR_BRDF *PCSPECTRUM_MIRROR_BRDF;
@@ -36,6 +35,7 @@ ISTATUS
 SpectrumMirrorBrdfSample(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -47,6 +47,7 @@ SpectrumMirrorBrdfSample(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -56,7 +57,7 @@ SpectrumMirrorBrdfSample(
     Brdf = (PCSPECTRUM_MIRROR_BRDF) Context;
 
     *Reflector = Brdf->Reflectance;
-    *Outgoing = VectorReflect(Incoming, Brdf->SurfaceNormal);
+    *Outgoing = VectorReflect(Incoming, SurfaceNormal);
     *Pdf = (FLOAT) INFINITY;
 
     return ISTATUS_SUCCESS;
@@ -69,6 +70,7 @@ ISTATUS
 SpectrumMirrorBrdfComputeReflectance(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -76,6 +78,7 @@ SpectrumMirrorBrdfComputeReflectance(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -92,6 +95,7 @@ ISTATUS
 SpectrumMirrorBrdfComputeReflectanceWithPdf(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -100,6 +104,7 @@ SpectrumMirrorBrdfComputeReflectanceWithPdf(
 {
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -135,7 +140,6 @@ ISTATUS
 SpectrumMirrorBrdfAllocate(
     _In_ PPBR_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
-    _In_ VECTOR3 SurfaceNormal,
     _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
@@ -152,18 +156,12 @@ SpectrumMirrorBrdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(SurfaceNormal) == FALSE)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (PbrBrdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
     BrdfData.Reflectance = Reflectance;
-    BrdfData.SurfaceNormal = SurfaceNormal;
 
     Status = PbrBrdfAllocatorAllocate(Allocator,
                                       &SpectrumMirrorBrdfVTable,

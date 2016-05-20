@@ -125,13 +125,13 @@ public:
         _In_ IrisSpectrum::ReflectorReference Diffuse,
         _In_ IrisSpectrum::ReflectorReference Specular,
         _In_ const FLOAT S,
-        _In_ IrisSpectrum::ReflectorReference Reflective,
-        _In_ const Iris::Vector & N
+        _In_ IrisSpectrum::ReflectorReference Reflective
         );
 
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -139,6 +139,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -146,6 +147,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectance(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -153,6 +155,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectanceWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -160,6 +163,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdf(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -167,12 +171,12 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdfWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
 
 private:
-    Iris::Vector SurfaceNormal;
     IrisSpectrum::ReflectorReference EmissiveReflector;
     IrisSpectrum::ReflectorReference DiffuseReflector;
     IrisSpectrum::ReflectorReference SpecularReflector;
@@ -206,7 +210,6 @@ public:
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
         _In_ PCVOID AdditionalData,
-        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ IrisPhysx::BRDFAllocator Allocator
         ) const;
@@ -239,13 +242,13 @@ public:
         _In_ IrisSpectrum::ReflectorReference Specular2,
         _In_ FLOAT S2,
         _In_ IrisSpectrum::ReflectorReference Reflective2,
-        _In_ FLOAT Scale2,
-        _In_ const Iris::Vector & N
+        _In_ FLOAT Scale2
         );
 
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -253,6 +256,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -260,6 +264,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectance(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -267,6 +272,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectanceWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -274,6 +280,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdf(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
@@ -281,12 +288,12 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdfWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
 
 private:
-    Iris::Vector SurfaceNormal;
     IrisSpectrum::ReflectorReference EmissiveReflector0;
     IrisSpectrum::ReflectorReference DiffuseReflector0;
     IrisSpectrum::ReflectorReference SpecularReflector0;
@@ -353,7 +360,6 @@ public:
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
         _In_ PCVOID AdditionalData,
-        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ IrisPhysx::BRDFAllocator Allocator
         ) const;

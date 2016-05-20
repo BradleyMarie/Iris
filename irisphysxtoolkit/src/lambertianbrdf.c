@@ -20,7 +20,6 @@ Abstract:
 
 typedef struct _SPECRUM_LAMBERTIAN_BRDF {
     PCREFLECTOR Reflectance;
-    VECTOR3 SurfaceNormal;
 } SPECRUM_LAMBERTIAN_BRDF, *PSPECRUM_LAMBERTIAN_BRDF;
 
 typedef CONST SPECRUM_LAMBERTIAN_BRDF *PCSPECRUM_LAMBERTIAN_BRDF;
@@ -36,6 +35,7 @@ ISTATUS
 SpectrumLambertianBrdfSample(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -48,6 +48,7 @@ SpectrumLambertianBrdfSample(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -56,7 +57,7 @@ SpectrumLambertianBrdfSample(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    Status = IrisAdvancedCosineSampleHemisphere(Brdf->SurfaceNormal,
+    Status = IrisAdvancedCosineSampleHemisphere(SurfaceNormal,
                                                 Rng,
                                                 Outgoing);
 
@@ -75,7 +76,7 @@ SpectrumLambertianBrdfSample(
         return Status;
     }
 
-    *Pdf = IRIS_INV_PI * VectorDotProduct(Brdf->SurfaceNormal, *Outgoing);
+    *Pdf = IRIS_INV_PI * VectorDotProduct(SurfaceNormal, *Outgoing);
 
     return ISTATUS_SUCCESS;
 }
@@ -87,6 +88,7 @@ ISTATUS
 SpectrumLambertianBrdfSampleWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -101,6 +103,7 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -109,7 +112,7 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF)Context;
 
-    Status = IrisAdvancedCosineSampleHemisphere(Brdf->SurfaceNormal,
+    Status = IrisAdvancedCosineSampleHemisphere(SurfaceNormal,
                                                 Rng,
                                                 Outgoing);
 
@@ -118,7 +121,7 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
         return Status;
     }
 
-    DotProduct = VectorDotProduct(Brdf->SurfaceNormal, *Outgoing);
+    DotProduct = VectorDotProduct(SurfaceNormal, *Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
     Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
@@ -143,6 +146,7 @@ ISTATUS
 SpectrumLambertianBrdfComputeReflectance(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -153,6 +157,7 @@ SpectrumLambertianBrdfComputeReflectance(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -174,6 +179,7 @@ ISTATUS
 SpectrumLambertianBrdfComputeReflectanceWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector
@@ -186,13 +192,14 @@ SpectrumLambertianBrdfComputeReflectanceWithLambertianFalloff(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
     
-    DotProduct = VectorDotProduct(Brdf->SurfaceNormal, Outgoing);
+    DotProduct = VectorDotProduct(SurfaceNormal, Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
     Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
@@ -210,6 +217,7 @@ ISTATUS
 SpectrumLambertianBrdfComputeReflectanceWithPdf(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -221,6 +229,7 @@ SpectrumLambertianBrdfComputeReflectanceWithPdf(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -243,6 +252,7 @@ ISTATUS
 SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *Reflector,
@@ -256,6 +266,7 @@ SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
 
     ASSERT(Context != NULL);
     ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(VectorValidate(Outgoing) != FALSE);
     ASSERT(Compositor != NULL);
     ASSERT(Reflector != NULL);
@@ -263,7 +274,7 @@ SpectrumLambertianBrdfComputeReflectanceWithPdfWithLambertianFalloff(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    DotProduct = VectorDotProduct(Brdf->SurfaceNormal, Outgoing);
+    DotProduct = VectorDotProduct(SurfaceNormal, Outgoing);
     Attenuation = DotProduct * IRIS_INV_PI;
 
     Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
@@ -305,7 +316,6 @@ ISTATUS
 SpectrumLambertianBrdfAllocate(
     _In_ PPBR_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
-    _In_ VECTOR3 SurfaceNormal,
     _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
@@ -322,18 +332,12 @@ SpectrumLambertianBrdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (VectorValidate(SurfaceNormal) == FALSE)
+    if (PbrBrdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (PbrBrdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
     BrdfData.Reflectance = Reflectance;
-    BrdfData.SurfaceNormal = SurfaceNormal;
 
     Status = PbrBrdfAllocatorAllocate(Allocator,
                                       &SpectrumLambertianBrdfVTable,

@@ -244,20 +244,19 @@ PhongBRDF::PhongBRDF(
     _In_ IrisSpectrum::ReflectorReference Diffuse,
     _In_ IrisSpectrum::ReflectorReference Specular,
     _In_ const FLOAT S,
-    _In_ IrisSpectrum::ReflectorReference Reflective,
-    _In_ const Iris::Vector & N
+    _In_ IrisSpectrum::ReflectorReference Reflective
     )
 : EmissiveReflector(Emissive),
   DiffuseReflector(Diffuse),
   SpecularReflector(Specular),
   Shininess(S),
-  ReflectiveReflector(Reflective),
-  SurfaceNormal(N)
+  ReflectiveReflector(Reflective)
 { }
 
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
 PhongBRDF::Sample(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
@@ -275,16 +274,18 @@ PhongBRDF::Sample(
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
 PhongBRDF::SampleWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return Sample(Incoming, Rng, Compositor);
+    return Sample(Incoming, SurfaceNormal, Rng, Compositor);
 }
 
 IrisSpectrum::ReflectorReference
 PhongBRDF::ComputeReflectance(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
@@ -308,31 +309,34 @@ PhongBRDF::ComputeReflectance(
 IrisSpectrum::ReflectorReference
 PhongBRDF::ComputeReflectanceWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return ComputeReflectance(Incoming, Outgoing, Compositor);
+    return ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
 PhongBRDF::ComputeReflectanceWithPdf(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 1.0f);
+    return make_tuple(ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor), 1.0f);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
 PhongBRDF::ComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 1.0f);
+    return make_tuple(ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor), 1.0f);
 }
 
 PhongMaterial::PhongMaterial(
@@ -365,7 +369,6 @@ IrisPhysx::BRDFReference
 PhongMaterial::Sample(
     _In_ const Iris::Point & ModelHitPoint,
     _In_ PCVOID AdditionalData,
-    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::MatrixReference & ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
     ) const
@@ -374,8 +377,7 @@ PhongMaterial::Sample(
                    DiffuseReflector.AsReflectorReference(),
                    SpecularReflector.AsReflectorReference(),
                    Shininess,
-                   ReflectiveReflector.AsReflectorReference(),
-                   SurfaceNormal);
+                   ReflectiveReflector.AsReflectorReference());
 
     return Allocator.Allocate(Brdf);
 }
@@ -398,8 +400,7 @@ TriangleInterpolatedPhongBRDF::TriangleInterpolatedPhongBRDF(
     _In_ IrisSpectrum::ReflectorReference Specular2,
     _In_ FLOAT S2,
     _In_ IrisSpectrum::ReflectorReference Reflective2,
-    _In_ FLOAT Scale2,
-    _In_ const Iris::Vector & N
+    _In_ FLOAT Scale2
     )
 : EmissiveReflector0(Emissive0),
   DiffuseReflector0(Diffuse0),
@@ -418,13 +419,13 @@ TriangleInterpolatedPhongBRDF::TriangleInterpolatedPhongBRDF(
   SpecularReflector2(Specular2),
   Shininess2(S2),
   ReflectiveReflector2(Reflective2),
-  Scalar2(Scale2),
-  SurfaceNormal(N)
+  Scalar2(Scale2)
 { }
 
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
 TriangleInterpolatedPhongBRDF::Sample(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
@@ -450,16 +451,18 @@ TriangleInterpolatedPhongBRDF::Sample(
 std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
 TriangleInterpolatedPhongBRDF::SampleWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ IrisAdvanced::RandomReference Rng,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return Sample(Incoming, Rng, Compositor);
+    return Sample(Incoming, SurfaceNormal, Rng, Compositor);
 }
 
 IrisSpectrum::ReflectorReference
 TriangleInterpolatedPhongBRDF::ComputeReflectance(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
@@ -493,31 +496,34 @@ TriangleInterpolatedPhongBRDF::ComputeReflectance(
 IrisSpectrum::ReflectorReference
 TriangleInterpolatedPhongBRDF::ComputeReflectanceWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return ComputeReflectance(Incoming, Outgoing, Compositor);
+    return ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
 TriangleInterpolatedPhongBRDF::ComputeReflectanceWithPdf(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 0.0f);
+    return make_tuple(ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor), 0.0f);
 }
 
 std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
 TriangleInterpolatedPhongBRDF::ComputeReflectanceWithPdfWithLambertianFalloff(
     _In_ const Iris::Vector & Incoming,
+    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::Vector & Outgoing,
     _In_ IrisSpectrum::ReflectorCompositorReference Compositor
     ) const
 {
-    return make_tuple(ComputeReflectance(Incoming, Outgoing, Compositor), 0.0f);
+    return make_tuple(ComputeReflectance(Incoming, SurfaceNormal, Outgoing, Compositor), 0.0f);
 }
 
 TriangleInterpolatedPhongMaterial::TriangleInterpolatedPhongMaterial(
@@ -587,7 +593,6 @@ IrisPhysx::BRDFReference
 TriangleInterpolatedPhongMaterial::Sample(
     _In_ const Iris::Point & ModelHitPoint,
     _In_ PCVOID AdditionalData,
-    _In_ const Iris::Vector & SurfaceNormal,
     _In_ const Iris::MatrixReference & ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
     ) const
@@ -611,8 +616,7 @@ TriangleInterpolatedPhongMaterial::Sample(
                                        SpecularReflector2.AsReflectorReference(),
                                        Shininess2,
                                        ReflectiveReflector2.AsReflectorReference(),
-                                       BarycentricCoordinates[2],
-                                       SurfaceNormal);
+                                       BarycentricCoordinates[2]);
 
     return Allocator.Allocate(Brdf);
 }

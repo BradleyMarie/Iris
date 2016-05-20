@@ -50,6 +50,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -61,6 +62,7 @@ public:
         
         Status = PbrBrdfSample(Data,
                                Incoming.AsVECTOR3(),
+                               SurfaceNormal.AsVECTOR3(),
                                Rng.AsPRANDOM_REFERENCE(),
                                Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                &Reflector,
@@ -79,6 +81,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ IrisAdvanced::RandomReference Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -90,6 +93,7 @@ public:
         
         Status = PbrBrdfSampleWithLambertianFalloff(Data,
                                                     Incoming.AsVECTOR3(),
+                                                    SurfaceNormal.AsVECTOR3(),
                                                     Rng.AsPRANDOM_REFERENCE(),
                                                     Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                                     &Reflector,
@@ -108,6 +112,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectance(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -117,6 +122,7 @@ public:
         
         Status = PbrBrdfComputeReflectance(Data,
                                            Incoming.AsVECTOR3(),
+                                           SurfaceNormal.AsVECTOR3(),
                                            Outgoing.AsVECTOR3(),
                                            Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                            &Reflector);
@@ -133,6 +139,7 @@ public:
     IrisSpectrum::ReflectorReference
     ComputeReflectanceWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -142,6 +149,7 @@ public:
         
         Status = PbrBrdfComputeReflectanceWithLambertianFalloff(Data,
                                                                 Incoming.AsVECTOR3(),
+                                                                SurfaceNormal.AsVECTOR3(),
                                                                 Outgoing.AsVECTOR3(),
                                                                 Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                                                 &Reflector);
@@ -158,6 +166,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdf(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -168,6 +177,7 @@ public:
         
         Status = PbrBrdfComputeReflectanceWithPdf(Data,
                                                   Incoming.AsVECTOR3(),
+                                                  SurfaceNormal.AsVECTOR3(),
                                                   Outgoing.AsVECTOR3(),
                                                   Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                                   &Reflector,
@@ -185,6 +195,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, FLOAT>
     ComputeReflectanceWithPdfWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
+        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::Vector & Outgoing,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
@@ -195,6 +206,7 @@ public:
         
         Status = PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(Data,
                                                                        Incoming.AsVECTOR3(),
+                                                                       SurfaceNormal.AsVECTOR3(),
                                                                        Outgoing.AsVECTOR3(),
                                                                        Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                                                        &Reflector,

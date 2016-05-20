@@ -28,7 +28,6 @@ ISTATUS
 SpectrumMirrorBrdfAllocate(
     _In_ PPBR_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
-    _In_ VECTOR3 SurfaceNormal,
     _Out_ PCPBR_BRDF *PbrBrdf
     );
 

@@ -28,7 +28,6 @@ MaterialSampleAdapter(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 ShapeSurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR Allocator,
     _Out_ PCPBR_BRDF *PbrBrdf
@@ -36,7 +35,6 @@ MaterialSampleAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
-    ASSERT(VectorValidate(ShapeSurfaceNormal) != FALSE);
     ASSERT(Allocator != NULL);
     ASSERT(PbrBrdf != NULL);
 
@@ -44,7 +42,6 @@ MaterialSampleAdapter(
 
     BRDFReference Result = (*MaterialBasePtr)->Sample(Iris::Point(ModelHitPoint),
                                                       AdditionalData,
-                                                      Iris::Vector(ShapeSurfaceNormal),
                                                       Iris::MatrixReference(ModelToWorld),
                                                       BRDFAllocator(Allocator));
 

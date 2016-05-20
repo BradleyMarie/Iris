@@ -236,11 +236,11 @@ StaticPinholeCameraRender(
 
             SubpixelOrigin = PointVectorAdd(SubpixelOrigin, SubpixelXDimensions);
 
-        } while (++FramebufferColumnSubpixelIndex < AdditionalXSamplesPerPixel);
+        } while (++FramebufferColumnSubpixelIndex <= AdditionalXSamplesPerPixel);
 
         SubpixelRowStart = PointVectorAdd(SubpixelRowStart, SubpixelYDimensions);
 
-    } while (++FramebufferRowSubpixelIndex < AdditionalYSamplesPerPixel);
+    } while (++FramebufferRowSubpixelIndex <= AdditionalYSamplesPerPixel);
 
     PixelColor = Color3ScaleByScalar(IntegrateContext->ColorSum,
                                      SubpixelWeight);
@@ -288,18 +288,17 @@ PinholeRender(
     POINT3 ImagePlaneCorner;
     VECTOR3 ImagePlaneHeightVector;
     VECTOR3 ImagePlaneWidthVector;
-    PINHOLE_INTEGRATE_CONTEXT IntegrateContext;
     PPBR_INTEGRATOR *Integrators;
     VECTOR3 NormalizedCameraDirection;
     VECTOR3 NormalizedUpVector;
-    SIZE_T NumberOfPixels;
-    SIZE_T NumberOfThreads;
-    SIZE_T PixelIndex;
+    INT32 NumberOfPixels;
+    INT32 NumberOfThreads;
+    INT32 PixelIndex;
     PVOID *ProcessHitContexts;
     PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
     PRANDOM_REFERENCE *Rngs;
     ISTATUS Status;
-    SIZE_T ThreadIndex;
+    INT32 ThreadIndex;
     PVOID *ToneMappingContexts;
     PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines;
 
@@ -410,11 +409,9 @@ PinholeRender(
     if (Parallelize != FALSE)
     {
         NumberOfThreads = (SIZE_T) omp_get_num_procs();
-        omp_set_num_threads((int) NumberOfThreads);
     }
     else
     {
-        omp_set_num_threads(1);
         NumberOfThreads = 1;
     }
 
@@ -501,17 +498,19 @@ PinholeRender(
         {
             NumberOfPixels = FramebufferRows * FramebufferColumns;
 
-            #pragma omp parallel default(shared) private(IntegrateContext, ThreadIndex) reduction(max, Status)
+            #pragma omp parallel default(shared) reduction(+: Status) num_threads(NumberOfThreads)
             {
-                ThreadIndex = (SIZE_T)omp_get_thread_num();
+                INT32 Index = (INT32) omp_get_thread_num();
 
-                IntegrateContext.ToneMappingRoutine = ToneMappingRoutines[ThreadIndex];
-                IntegrateContext.ProcessHitRoutine = ProcessHitRoutines[ThreadIndex];
-                IntegrateContext.ProcessHitContext = ProcessHitContexts[ThreadIndex];
-                IntegrateContext.ToneMappingContext = ToneMappingContexts[ThreadIndex];
+                PINHOLE_INTEGRATE_CONTEXT IntegrateContext;
+
+                IntegrateContext.ToneMappingRoutine = ToneMappingRoutines[Index];
+                IntegrateContext.ProcessHitRoutine = ProcessHitRoutines[Index];
+                IntegrateContext.ProcessHitContext = ProcessHitContexts[Index];
+                IntegrateContext.ToneMappingContext = ToneMappingContexts[Index];
 
                 #pragma omp for schedule(dynamic, 16)
-                for (PixelIndex = 0; PixelIndex < NumberOfPixels && Status == ISTATUS_SUCCESS; PixelIndex++)
+                for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex++)
                 {
                     Status = StaticPinholeCameraRender(PinholeLocation,
                                                        ImagePlaneCorner,
@@ -523,14 +522,19 @@ PinholeRender(
                                                        AdditionalYSamplesPerPixel,
                                                        Epsilon,
                                                        Jitter,
-                                                       Rngs[ThreadIndex],
-                                                       Integrators[ThreadIndex],
+                                                       Rngs[Index],
+                                                       Integrators[Index],
                                                        TestGeometryRoutine,
                                                        TestGeometryRoutineContext,
                                                        Lights,
                                                        NumberOfLights,
                                                        &IntegrateContext,
                                                        Framebuffer);
+
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        break;
+                    }
                 }
             }
         }

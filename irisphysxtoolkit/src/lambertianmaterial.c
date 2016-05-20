@@ -36,7 +36,6 @@ SimpleLambertianMaterialSample(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
     _In_opt_ PCVOID AdditionalData,
-    _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
     _Out_ PCPBR_BRDF *PbrBrdf
@@ -47,7 +46,6 @@ SimpleLambertianMaterialSample(
     
     ASSERT(Context != NULL);
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
-    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
     ASSERT(BrdfAllocator != NULL);
     ASSERT(PbrBrdf != NULL);
     
@@ -55,7 +53,6 @@ SimpleLambertianMaterialSample(
 
     Status = SpectrumLambertianBrdfAllocate(BrdfAllocator,
                                             Material->Reflectance,
-                                            SurfaceNormal,
                                             PbrBrdf);
                                             
     return Status;

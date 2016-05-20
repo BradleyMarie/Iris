@@ -40,7 +40,6 @@ public:
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
         _In_ PCVOID AdditionalData,
-        _In_ const Iris::Vector & SurfaceNormal,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ BRDFAllocator Allocator
         ) const = 0;
