@@ -153,3 +153,64 @@ IrisAdvancedCosineSampleHemisphere(
 
     return ISTATUS_SUCCESS;
 }
+
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+IrisAdvancedUniformSampleHemisphere(
+    _In_ VECTOR3 NormalizedNormal,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Out_ PVECTOR3 RandomVector
+    )
+{
+    FLOAT RandomNumber0;
+    FLOAT RandomNumber1;
+    FLOAT Radius;
+    VECTOR3 Result;
+    ISTATUS Status;
+    FLOAT Theta;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(VectorValidate(NormalizedNormal) != FALSE);
+    ASSERT(Rng != NULL);
+    ASSERT(RandomVector != NULL);
+
+    Status = RandomReferenceGenerateFloat(Rng,
+                                          (FLOAT) 0.0,
+                                          (FLOAT) 1.0,
+                                          &RandomNumber0);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RandomReferenceGenerateFloat(Rng,
+                                          (FLOAT) 0.0,
+                                          (FLOAT) 1.0,
+                                          &RandomNumber1);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    //
+    // Uniformly sample unit disk, must take 
+    // sqrt of r to make samples uniform
+    //
+
+    Radius = SqrtFloat(1.0f - RandomNumber0 * RandomNumber1);
+    Theta = IRIS_TWO_PI * RandomNumber1;
+
+    X = Radius * CosineFloat(Theta);
+    Y = Radius * SineFloat(Theta);
+    Z = RandomNumber0;
+
+    Result = VectorCreate(X, Y, Z);
+
+    *RandomVector = IrisAdvancedTransformVector(NormalizedNormal, Result);
+
+    return ISTATUS_SUCCESS;
+}

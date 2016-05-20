@@ -43,4 +43,13 @@ IrisAdvancedCosineSampleHemisphere(
     _Out_ PVECTOR3 RandomVector
     );
 
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+IrisAdvancedUniformSampleHemisphere(
+    _In_ VECTOR3 NormalizedNormal,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Out_ PVECTOR3 RandomVector
+    );
+
 #endif // _MATH_IRIS_ADVANCED_HEADER_

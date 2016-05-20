@@ -57,6 +57,59 @@ SpectrumLambertianBrdfSample(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
+    Status = IrisAdvancedUniformSampleHemisphere(SurfaceNormal,
+                                                 Rng,
+                                                 Outgoing);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
+                                                             Brdf->Reflectance,
+                                                             IRIS_INV_PI,
+                                                             Reflector);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *Pdf = IRIS_INV_PI;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+SpectrumLambertianBrdfSampleWithLambertianFalloff(
+    _In_ PCVOID Context,
+    _In_ VECTOR3 Incoming,
+    _In_ VECTOR3 SurfaceNormal,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCREFLECTOR *Reflector,
+    _Out_ PVECTOR3 Outgoing,
+    _Out_ PFLOAT Pdf
+    )
+{
+    PCSPECRUM_LAMBERTIAN_BRDF Brdf;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(VectorValidate(Incoming) != FALSE);
+    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
+    ASSERT(Rng != NULL);
+    ASSERT(Compositor != NULL);
+    ASSERT(Reflector != NULL);
+    ASSERT(Outgoing != NULL);
+    ASSERT(Pdf != NULL);
+
+    Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
+
     Status = IrisAdvancedCosineSampleHemisphere(SurfaceNormal,
                                                 Rng,
                                                 Outgoing);
@@ -77,64 +130,6 @@ SpectrumLambertianBrdfSample(
     }
 
     *Pdf = IRIS_INV_PI * VectorDotProduct(SurfaceNormal, *Outgoing);
-
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-SpectrumLambertianBrdfSampleWithLambertianFalloff(
-    _In_ PCVOID Context,
-    _In_ VECTOR3 Incoming,
-    _In_ VECTOR3 SurfaceNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCREFLECTOR *Reflector,
-    _Out_ PVECTOR3 Outgoing,
-    _Out_ PFLOAT Pdf
-    )
-{
-    FLOAT Attenuation;
-    PCSPECRUM_LAMBERTIAN_BRDF Brdf;
-    FLOAT DotProduct;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(VectorValidate(Incoming) != FALSE);
-    ASSERT(VectorValidate(SurfaceNormal) != FALSE);
-    ASSERT(Rng != NULL);
-    ASSERT(Compositor != NULL);
-    ASSERT(Reflector != NULL);
-    ASSERT(Outgoing != NULL);
-    ASSERT(Pdf != NULL);
-
-    Brdf = (PCSPECRUM_LAMBERTIAN_BRDF)Context;
-
-    Status = IrisAdvancedCosineSampleHemisphere(SurfaceNormal,
-                                                Rng,
-                                                Outgoing);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    DotProduct = VectorDotProduct(SurfaceNormal, *Outgoing);
-    Attenuation = DotProduct * IRIS_INV_PI;
-
-    Status = ReflectorCompositorReferenceAttenuateReflection(Compositor,
-                                                             Brdf->Reflectance,
-                                                             Attenuation,
-                                                             Reflector);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    *Pdf = Attenuation;
 
     return ISTATUS_SUCCESS;
 }
@@ -241,6 +236,8 @@ SpectrumLambertianBrdfComputeReflectanceWithPdf(
                                                              Brdf->Reflectance,
                                                              IRIS_INV_PI,
                                                              Reflector);
+
+    *Pdf = IRIS_INV_PI;
 
     return Status;
 }
