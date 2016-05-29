@@ -27,25 +27,34 @@ ISTATUS
 MaterialSampleAdapter(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 ModelSurfaceNormal,
+    _In_ VECTOR3 WorldSurfaceNormal,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR Allocator,
+    _Out_ PVECTOR3 WorldShadingNormal,
     _Out_ PCPBR_BRDF *PbrBrdf
     )
 {
     ASSERT(Context != NULL);
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
+    ASSERT(VectorValidate(ModelSurfaceNormal) != FALSE);
+    ASSERT(VectorValidate(WorldSurfaceNormal) != FALSE);
     ASSERT(Allocator != NULL);
     ASSERT(PbrBrdf != NULL);
 
     const MaterialBase **MaterialBasePtr = (const MaterialBase**) Context;
 
-    BRDFReference Result = (*MaterialBasePtr)->Sample(Iris::Point(ModelHitPoint),
-                                                      AdditionalData,
-                                                      Iris::MatrixReference(ModelToWorld),
-                                                      BRDFAllocator(Allocator));
+    auto Result = (*MaterialBasePtr)->Sample(Iris::Point(ModelHitPoint),
+                                             Iris::Vector(ModelSurfaceNormal),
+                                             Iris::Vector(WorldSurfaceNormal),
+                                             AdditionalData,
+                                             Iris::MatrixReference(ModelToWorld),
+                                             BRDFAllocator(Allocator));
 
-    *PbrBrdf = Result.AsPCPBR_BRDF();
+    *WorldShadingNormal = std::get<1>(Result).AsVECTOR3();
+    *PbrBrdf = std::get<0>(Result).AsPCPBR_BRDF();
+
     return ISTATUS_SUCCESS;
 }
 

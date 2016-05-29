@@ -34,11 +34,12 @@ protected:
         );
 
 public:
-    _Ret_
     virtual
-    BRDFReference
+    std::tuple<BRDFReference, Iris::Vector>
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
+        _In_ const Iris::Vector & ModelSurfaceNormal,
+        _In_ const Iris::Vector & WorldSurfaceNormal,
         _In_ PCVOID AdditionalData,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ BRDFAllocator Allocator

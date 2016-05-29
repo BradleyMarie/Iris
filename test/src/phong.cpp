@@ -365,9 +365,11 @@ PhongMaterial::Create(
     return MaterialBase::Create(std::unique_ptr<PhongMaterial>(new PhongMaterial(Emissive, Diffuse, Specular, S, Reflective)));
 }
 
-IrisPhysx::BRDFReference
+std::tuple<IrisPhysx::BRDFReference, Iris::Vector>
 PhongMaterial::Sample(
     _In_ const Iris::Point & ModelHitPoint,
+    _In_ const Iris::Vector & WorldSurfaceNormal,
+    _In_ const Iris::Vector & ModelSurfaceNormal,
     _In_ PCVOID AdditionalData,
     _In_ const Iris::MatrixReference & ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
@@ -379,7 +381,7 @@ PhongMaterial::Sample(
                    Shininess,
                    ReflectiveReflector.AsReflectorReference());
 
-    return Allocator.Allocate(Brdf);
+    return std::make_tuple(Allocator.Allocate(Brdf), WorldSurfaceNormal);
 }
 
 TriangleInterpolatedPhongBRDF::TriangleInterpolatedPhongBRDF(
@@ -589,9 +591,11 @@ TriangleInterpolatedPhongMaterial::Create(
     return Result;
 }
 
-IrisPhysx::BRDFReference
+std::tuple<IrisPhysx::BRDFReference, Iris::Vector>
 TriangleInterpolatedPhongMaterial::Sample(
     _In_ const Iris::Point & ModelHitPoint,
+    _In_ const Iris::Vector & WorldSurfaceNormal,
+    _In_ const Iris::Vector & ModelSurfaceNormal,
     _In_ PCVOID AdditionalData,
     _In_ const Iris::MatrixReference & ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
@@ -618,7 +622,7 @@ TriangleInterpolatedPhongMaterial::Sample(
                                        ReflectiveReflector2.AsReflectorReference(),
                                        BarycentricCoordinates[2]);
 
-    return Allocator.Allocate(Brdf);
+    return std::make_tuple(Allocator.Allocate(Brdf), WorldSurfaceNormal);
 }
 
 PhongDiffuseSpectrum::PhongDiffuseSpectrum(

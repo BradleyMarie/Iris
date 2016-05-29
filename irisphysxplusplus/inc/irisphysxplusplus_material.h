@@ -77,30 +77,35 @@ public:
         return MaterialReference(Data);
     }
 
-    _Ret_
-    BRDFReference
+    std::tuple<BRDFReference, Iris::Vector>
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
+        _In_ const Iris::Vector & ModelSurfaceNormal,
+        _In_ const Iris::Vector & WorldSurfaceNormal,
         _In_ PCVOID AdditionalData,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ BRDFAllocator Allocator
         ) const
     {
-        PCPBR_BRDF Result;
+        PCPBR_BRDF ResultBrdf;
+        VECTOR3 ResultVector;
         
         ISTATUS Status = PbrMaterialSample(Data,
                                            ModelHitPoint.AsPOINT3(),
+                                           ModelSurfaceNormal.AsVECTOR3(),
+                                           WorldSurfaceNormal.AsVECTOR3(),
                                            AdditionalData,
                                            ModelToWorld.AsPCMATRIX(),
                                            Allocator.AsPPBR_BRDF_ALLOCATOR(),
-                                           &Result);
+                                           &ResultVector,
+                                           &ResultBrdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
             throw std::runtime_error(Iris::ISTATUSToCString(Status));
         }
         
-        return BRDFReference(Result);
+        return std::make_tuple(BRDFReference(ResultBrdf), Iris::Vector(ResultVector));
     }
 
     Material(

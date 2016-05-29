@@ -226,7 +226,7 @@ PBRGeometryComputeNormal(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
-    _Out_ PVECTOR3 SurfaceNormal
+    _Out_ PVECTOR3 ModelSurfaceNormal
     )
 {
     ISTATUS Status;
@@ -241,7 +241,7 @@ PBRGeometryComputeNormal(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (SurfaceNormal == NULL)
+    if (ModelSurfaceNormal == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -249,7 +249,7 @@ PBRGeometryComputeNormal(
     Status = PBRGeometry->VTable->ComputeNormalRoutine(PBRGeometry->Data,
                                                        ModelHitPoint,
                                                        FaceHit,
-                                                       SurfaceNormal);
+                                                       ModelSurfaceNormal);
 
     return Status;
 }

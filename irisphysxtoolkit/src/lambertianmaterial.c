@@ -35,10 +35,13 @@ ISTATUS
 SimpleLambertianMaterialSample(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 ModelSurfaceNormal,
+    _In_ VECTOR3 WorldSurfaceNormal,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PCPBR_BRDF *PbrBrdf
+    _Out_ PVECTOR3 WorldShadingNormal,
+    _Out_ PCPBR_BRDF *Brdf
     )
 {
     PCSIMPLE_LAMBERTIAN_MATERIAL Material;
@@ -46,14 +49,17 @@ SimpleLambertianMaterialSample(
     
     ASSERT(Context != NULL);
     ASSERT(PointValidate(ModelHitPoint) != FALSE);
+    ASSERT(VectorValidate(ModelSurfaceNormal) != FALSE);
+    ASSERT(VectorValidate(WorldSurfaceNormal) != FALSE);
     ASSERT(BrdfAllocator != NULL);
-    ASSERT(PbrBrdf != NULL);
+    ASSERT(WorldShadingNormal != NULL);
+    ASSERT(Brdf != NULL);
     
     Material = (PCSIMPLE_LAMBERTIAN_MATERIAL) Context;
 
     Status = SpectrumLambertianBrdfAllocate(BrdfAllocator,
                                             Material->Reflectance,
-                                            PbrBrdf);
+                                            Brdf);
                                             
     return Status;
 }

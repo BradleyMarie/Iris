@@ -376,12 +376,13 @@ SFORCEINLINE
 ISTATUS
 TriangleComputeNormal(
     _In_ PCTRIANGLE Triangle,
-    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
     ASSERT(Triangle != NULL);
+    ASSERT(PointValidate(HitPoint) != FALSE);
     ASSERT(SurfaceNormal != NULL);
 
     if (FaceHit == TRIANGLE_FRONT_FACE)

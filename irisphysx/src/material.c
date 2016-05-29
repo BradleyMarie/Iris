@@ -107,17 +107,20 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
 PbrMaterialSample(
-    _In_ PCPBR_MATERIAL PbrMaterial,
+    _In_ PCPBR_MATERIAL Material,
     _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 ModelSurfaceNormal,
+    _In_ VECTOR3 WorldSurfaceNormal,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
-    _Out_ PCPBR_BRDF *PbrBrdf
+    _Out_ PVECTOR3 WorldShadingNormal,
+    _Out_ PCPBR_BRDF *Brdf
     )
 {
     ISTATUS Status;
     
-    if (PbrMaterial == NULL)
+    if (Material == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -127,24 +130,42 @@ PbrMaterialSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
+    if (VectorValidate(ModelSurfaceNormal) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (VectorValidate(WorldSurfaceNormal) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+    
     if (BrdfAllocator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
-    
-    if (PbrBrdf == NULL)
+
+    if (WorldShadingNormal == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
     
-    Status = PbrMaterial->VTable->SampleRoutine(PbrMaterial->Data,
-                                                ModelHitPoint,
-                                                AdditionalData,
-                                                ModelToWorld,
-                                                BrdfAllocator,
-                                                PbrBrdf);
+    if (Brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
     
-    return ISTATUS_SUCCESS;
+    Status = Material->VTable->SampleRoutine(Material->Data,
+                                             ModelHitPoint,
+                                             ModelSurfaceNormal,
+                                             WorldSurfaceNormal, 
+                                             AdditionalData,
+                                             ModelToWorld,
+                                             BrdfAllocator,
+                                             WorldShadingNormal,
+                                             Brdf);
+    
+    return Status;
 }
 
 VOID

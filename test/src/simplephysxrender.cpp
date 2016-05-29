@@ -76,9 +76,11 @@ public:
     }
 
     virtual
-    IrisPhysx::BRDFReference
+    std::tuple<IrisPhysx::BRDFReference, Iris::Vector>
     Sample(
         _In_ const Iris::Point & ModelHitPoint,
+        _In_ const Iris::Vector & ModelShadingNormal,
+        _In_ const Iris::Vector & WorldShadingNormal,
         _In_ PCVOID AdditionalData,
         _In_ const Iris::MatrixReference & ModelToWorld,
         _In_ IrisPhysx::BRDFAllocator Allocator
@@ -94,10 +96,10 @@ public:
 
         if (IsZeroFloat(CheckerboardIndex) == FALSE)
         {
-            return M0.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
+            return M0.Sample(ModelHitPoint, ModelShadingNormal, WorldShadingNormal, AdditionalData, ModelToWorld, Allocator);
         }
         
-        return M1.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
+        return M1.Sample(ModelHitPoint, ModelShadingNormal, WorldShadingNormal, AdditionalData, ModelToWorld, Allocator);
     }
 
 private:
@@ -140,10 +142,11 @@ TEST(PhysxRenderConstantRedWorldSphere)
                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
     };
 
@@ -224,10 +227,11 @@ TEST(PhysxRenderConstantRedModelSphere)
                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
     };
 
@@ -308,10 +312,11 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
     };
 
@@ -408,10 +413,11 @@ TEST(PhysxRenderPerfectSpecularSphere)
                                            IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                            IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         
         SpectrumReference ReflectedLight(nullptr);
 
@@ -511,10 +517,11 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                                            IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                            IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         
         SpectrumReference ReflectedLight(nullptr);
 
@@ -624,10 +631,11 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                                            IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                            IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
+        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
         
         SpectrumReference ReflectedLight(nullptr);
 
@@ -730,9 +738,10 @@ TEST(PhysxRenderPhongWorldSphere)
                                            IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                            IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
+        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
 
         SpectrumReference ReflectedLight(nullptr);
 
@@ -756,10 +765,10 @@ TEST(PhysxRenderPhongWorldSphere)
                 throw std::runtime_error(ISTATUSToCString(Status));
             }
 
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(ModelViewer, SurfaceNormal, Vector::Normalize(ModelToWorld.Inverse() * ToLight), ReflectorCompositor)));
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, ToLight, ReflectorCompositor)));
         }
 
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
 
         if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
         {
@@ -898,9 +907,10 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
                                            IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
                                            IrisAdvanced::RandomReference Rng) -> SpectrumReference
     {
-        Vector SurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
         MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = Mat.Sample(ModelHitPoint, AdditionalData, ModelToWorld, Allocator);
+        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
 
         SpectrumReference ReflectedLight(nullptr);
 
@@ -924,10 +934,10 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
                 throw std::runtime_error(ISTATUSToCString(Status));
             }
 
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(ModelViewer, SurfaceNormal, Vector::Normalize(ModelToWorld.Inverse() * ToLight), ReflectorCompositor)));
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, ToLight, ReflectorCompositor)));
         }
 
-        auto Ref = Brdf.Sample(ModelViewer, SurfaceNormal, Rng, ReflectorCompositor);
+        auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
 
         if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
         {

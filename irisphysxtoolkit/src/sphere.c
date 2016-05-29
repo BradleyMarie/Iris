@@ -188,7 +188,7 @@ SFORCEINLINE
 ISTATUS
 SphereComputeNormal(
     _In_ PCSPHERE Sphere,
-    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
     _Out_ PVECTOR3 SurfaceNormal
     )
@@ -196,10 +196,10 @@ SphereComputeNormal(
     VECTOR3 CenterToHitPoint;
 
     ASSERT(Sphere != NULL);
-    ASSERT(PointValidate(ModelHitPoint) != FALSE);
+    ASSERT(PointValidate(HitPoint) != FALSE);
     ASSERT(SurfaceNormal != NULL);
 
-    CenterToHitPoint = PointSubtract(ModelHitPoint, Sphere->Center);
+    CenterToHitPoint = PointSubtract(HitPoint, Sphere->Center);
     CenterToHitPoint = VectorNormalize(CenterToHitPoint, NULL, NULL);
 
     if (FaceHit == SPHERE_FRONT_FACE)

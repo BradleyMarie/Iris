@@ -28,9 +28,12 @@ ISTATUS
 (*PPBR_MATERIAL_SAMPLE_ROUTINE)(
     _In_ PCVOID Context,
     _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 ModelSurfaceNormal,
+    _In_ VECTOR3 WorldSurfaceNormal,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PVECTOR3 WorldShadingNormal,
     _Out_ PCPBR_BRDF *PbrBrdf
     );
 
@@ -67,9 +70,12 @@ ISTATUS
 PbrMaterialSample(
     _In_ PCPBR_MATERIAL Material,
     _In_ POINT3 ModelHitPoint,
+    _In_ VECTOR3 ModelSurfaceNormal,
+    _In_ VECTOR3 WorldSurfaceNormal,
     _In_opt_ PCVOID AdditionalData,
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Out_ PVECTOR3 WorldShadingNormal,
     _Out_ PCPBR_BRDF *Brdf
     );
 

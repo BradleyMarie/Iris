@@ -38,7 +38,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PPBR_GEOMETRY_COMPUTE_NORMAL_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
     _Out_ PVECTOR3 SurfaceNormal
     );
@@ -128,7 +128,7 @@ PBRGeometryComputeNormal(
     _In_ PCPBR_GEOMETRY PBRGeometry,
     _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
-    _Out_ PVECTOR3 SurfaceNormal
+    _Out_ PVECTOR3 ModelSurfaceNormal
     );
 
 _Success_(return == ISTATUS_SUCCESS)
