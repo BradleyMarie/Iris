@@ -66,8 +66,7 @@ PBRIntegratorIntegrate(
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_ PPBR_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
     _Inout_opt_ PVOID IntegrateRoutineContext,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-    _In_ SIZE_T NumberOfLights,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ FLOAT Epsilon,
     _In_ RAY WorldRay,
     _Inout_ PRANDOM_REFERENCE Rng

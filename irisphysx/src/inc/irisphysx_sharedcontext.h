@@ -29,8 +29,7 @@ typedef struct _PBR_SHARED_CONTEXT {
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
     PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
-    _Field_size_opt_(NumberOfLights) PCPBR_LIGHT *Lights;
-    SIZE_T NumberOfLights;
+    PCPHYSX_LIGHT_LIST LightList;
     PRANDOM_REFERENCE Rng;
     FLOAT Epsilon;
 } PBR_SHARED_CONTEXT, *PPBR_SHARED_CONTEXT;
@@ -81,8 +80,7 @@ PBRSharedContextInitialize(
     
     PBRSharedContext->TestGeometryRoutine = NULL;
     PBRSharedContext->TestGeometryRoutineContext = NULL;
-    PBRSharedContext->Lights = NULL;
-    PBRSharedContext->NumberOfLights = 0;
+    PBRSharedContext->LightList = NULL;
     PBRSharedContext->Rng = NULL;
     PBRSharedContext->Epsilon = (FLOAT) 0.0f;
     
@@ -95,15 +93,13 @@ PBRSharedContextSet(
     _Inout_ PPBR_SHARED_CONTEXT PBRSharedContext,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-    _In_ SIZE_T NumberOfLights,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ FLOAT Epsilon
     )
 {    
     ASSERT(PBRSharedContext != NULL);
     ASSERT(TestGeometryRoutine != NULL);
-    ASSERT((Lights == NULL && NumberOfLights == 0) || (Lights != NULL && NumberOfLights != 0));
     ASSERT(Rng != NULL);
     ASSERT(IsFiniteFloat(Epsilon));
     ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
@@ -119,8 +115,7 @@ PBRSharedContextSet(
 
     PBRSharedContext->TestGeometryRoutine = TestGeometryRoutine;
     PBRSharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
-    PBRSharedContext->Lights = Lights;
-    PBRSharedContext->NumberOfLights = NumberOfLights;
+    PBRSharedContext->LightList = LightList;
     PBRSharedContext->Rng = Rng;
     PBRSharedContext->Epsilon = Epsilon;
 }

@@ -5,6 +5,7 @@ include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../irisc
 add_library(irisphysx SHARED
     src/brdf.c
     src/light.c
+    src/lightlist.c
     src/material.c
     src/brdfallocator.c
     src/hitallocator.c

@@ -56,9 +56,9 @@ IntegrateRoutineAdapter(
     assert(PBRRayTracer != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
-    auto IntegrateFunction = static_cast<IntegrateRoutine *>(Context);
+    auto IntegrateContext = static_cast<IntegrateRoutine *>(Context);
 
-    (*IntegrateFunction)(Iris::Ray(WorldRay), RayTracer(PBRRayTracer));
+    (*IntegrateContext)(Iris::Ray(WorldRay), RayTracer(PBRRayTracer));
 
     return ISTATUS_SUCCESS;
 }
@@ -71,8 +71,7 @@ void
 Integrator::Integrate(
     _In_ const TestGeometryRoutine TestGeometryFunction,
     _In_ IntegrateRoutine IntegrateFunction,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-    _In_ SIZE_T NumberOfLights,
+    _In_ LightListReference Lights,
     _In_ FLOAT Epsilon,
     _In_ const Iris::Ray & WorldRay,
     _Inout_ IrisAdvanced::RandomReference Rng
@@ -83,8 +82,59 @@ Integrator::Integrate(
                                             &TestGeometryFunction,
                                             IntegrateRoutineAdapter,
                                             &IntegrateFunction,
-                                            Lights,
-                                            NumberOfLights,
+                                            Lights.AsPCPHYSX_LIGHT_LIST(),
+                                            Epsilon,
+                                            WorldRay.AsRAY(),
+                                            Rng.AsPRANDOM_REFERENCE());
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
+}
+
+void
+Integrator::Integrate(
+    _In_ const TestGeometryRoutine TestGeometryFunction,
+    _In_ IntegrateRoutine IntegrateFunction,
+    _In_ const LightList & Lights,
+    _In_ FLOAT Epsilon,
+    _In_ const Iris::Ray & WorldRay,
+    _Inout_ IrisAdvanced::RandomReference Rng
+    )
+{
+    ISTATUS Status = PBRIntegratorIntegrate(Data,
+                                            TestGeometryRoutineAdapter,
+                                            &TestGeometryFunction,
+                                            IntegrateRoutineAdapter,
+                                            &IntegrateFunction,
+                                            Lights.AsPCPHYSX_LIGHT_LIST(),
+                                            Epsilon,
+                                            WorldRay.AsRAY(),
+                                            Rng.AsPRANDOM_REFERENCE());
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
+}
+
+IRISPHYSXPLUSPLUSAPI
+void
+Integrator::Integrate(
+    _In_ const TestGeometryRoutine TestGeometryFunction,
+    _In_ IntegrateRoutine IntegrateFunction,
+    _In_ FLOAT Epsilon,
+    _In_ const Iris::Ray & WorldRay,
+    _Inout_ IrisAdvanced::RandomReference Rng
+    )
+{
+    ISTATUS Status = PBRIntegratorIntegrate(Data,
+                                            TestGeometryRoutineAdapter,
+                                            &TestGeometryFunction,
+                                            IntegrateRoutineAdapter,
+                                            &IntegrateFunction,
+                                            nullptr,
                                             Epsilon,
                                             WorldRay.AsRAY(),
                                             Rng.AsPRANDOM_REFERENCE());

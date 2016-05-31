@@ -22,6 +22,7 @@ Abstract:
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_light.h"
+#include "irisphysx_lightlist.h"
 #include "irisphysx_material.h"
 #include "irisphysx_hitallocator.h"
 #include "irisphysx_geometry.h"

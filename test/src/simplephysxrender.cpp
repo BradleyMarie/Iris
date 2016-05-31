@@ -133,9 +133,8 @@ TEST(PhysxRenderConstantRedWorldSphere)
                                           const Iris::Point & ModelHitPoint,
                                           const Iris::Point & WorldHitPoint,
                                           const Iris::Ray & WorldRay,
-                                          PCPBR_LIGHT *PbrLights,
-                                          SIZE_T NumberOfLights,
-                                          IrisPhysx::RayTracer * RayTracerPtr,
+                                          std::optional<LightListReference> Lights,
+                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                           VisibilityTester Tester,
                                           BRDFAllocator Allocator,
                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -185,7 +184,6 @@ TEST(PhysxRenderConstantRedWorldSphere)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -218,9 +216,8 @@ TEST(PhysxRenderConstantRedModelSphere)
                                           const Iris::Point & ModelHitPoint,
                                           const Iris::Point & WorldHitPoint,
                                           const Iris::Ray & WorldRay,
-                                          PCPBR_LIGHT *PbrLights,
-                                          SIZE_T NumberOfLights,
-                                          IrisPhysx::RayTracer * RayTracerPtr,
+                                          std::optional<LightListReference> Lights,
+                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                           VisibilityTester Tester,
                                           BRDFAllocator Allocator,
                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -270,7 +267,6 @@ TEST(PhysxRenderConstantRedModelSphere)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -303,9 +299,8 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
                                           const Iris::Point & ModelHitPoint,
                                           const Iris::Point & WorldHitPoint,
                                           const Iris::Ray & WorldRay,
-                                          PCPBR_LIGHT *PbrLights,
-                                          SIZE_T NumberOfLights,
-                                          IrisPhysx::RayTracer * RayTracerPtr,
+                                          std::optional<LightListReference> Lights,
+                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                           VisibilityTester Tester,
                                           BRDFAllocator Allocator,
                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -355,7 +350,6 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -404,9 +398,8 @@ TEST(PhysxRenderPerfectSpecularSphere)
                                            const Iris::Point & ModelHitPoint,
                                            const Iris::Point & WorldHitPoint,
                                            const Iris::Ray & WorldRay,
-                                           PCPBR_LIGHT *PbrLights,
-                                           SIZE_T NumberOfLights,
-                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           std::optional<LightListReference> Lights,
+                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                            VisibilityTester Tester,
                                            BRDFAllocator Allocator,
                                            IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -421,12 +414,12 @@ TEST(PhysxRenderPerfectSpecularSphere)
         
         SpectrumReference ReflectedLight(nullptr);
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
         }
@@ -473,7 +466,6 @@ TEST(PhysxRenderPerfectSpecularSphere)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -508,9 +500,8 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                                            const Iris::Point & ModelHitPoint,
                                            const Iris::Point & WorldHitPoint,
                                            const Iris::Ray & WorldRay,
-                                           PCPBR_LIGHT *PbrLights,
-                                           SIZE_T NumberOfLights,
-                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           std::optional<LightListReference> Lights,
+                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                            VisibilityTester Tester,
                                            BRDFAllocator Allocator,
                                            IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -525,12 +516,12 @@ TEST(PhysxRenderConstantRedWorldTriangle)
         
         SpectrumReference ReflectedLight(nullptr);
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
         }
@@ -577,7 +568,6 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -622,9 +612,8 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                                            const Iris::Point & ModelHitPoint,
                                            const Iris::Point & WorldHitPoint,
                                            const Iris::Ray & WorldRay,
-                                           PCPBR_LIGHT *PbrLights,
-                                           SIZE_T NumberOfLights,
-                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           std::optional<LightListReference> Lights,
+                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                            VisibilityTester Tester,
                                            BRDFAllocator Allocator,
                                            IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -639,12 +628,12 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
         
         SpectrumReference ReflectedLight(nullptr);
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
         }
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
         }
@@ -691,7 +680,6 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                           false,
                           false,
                           Scene.GetTestRoutine(),
-                          nullopt,
                           CreateState,
                           Fb);
 
@@ -716,10 +704,10 @@ TEST(PhysxRenderPhongWorldSphere)
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne);
 
-    std::vector<IrisPhysx::Light> Lights;
-    Lights.push_back(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
-                                             Color3::CreateBlack(),
-                                             Point(0.0f, 0.0f, 1000.0f)));
+    LightList Lights = LightList::Create();
+    Lights.Add(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
+                                       Color3::CreateBlack(),
+                                       Point(0.0f, 0.0f, 1000.0f)));
 
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
@@ -729,9 +717,8 @@ TEST(PhysxRenderPhongWorldSphere)
                                            const Iris::Point & ModelHitPoint,
                                            const Iris::Point & WorldHitPoint,
                                            const Iris::Ray & WorldRay,
-                                           PCPBR_LIGHT *PbrLights,
-                                           SIZE_T NumberOfLights,
-                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           std::optional<LightListReference> Lights,
+                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                            VisibilityTester Tester,
                                            BRDFAllocator Allocator,
                                            IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -745,32 +732,21 @@ TEST(PhysxRenderPhongWorldSphere)
 
         SpectrumReference ReflectedLight(nullptr);
 
-        for (SIZE_T Index = 0; Index < NumberOfLights; Index++)
+        for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
         {
-            PCSPECTRUM LightSpectrum;
-            FLOAT LightPdf;
-            VECTOR3 ToLight;
+            LightReference Light = Lights->Get(Index);
 
-            ISTATUS Status = PbrLightSample(PbrLights[Index],
-                                            WorldHitPoint.AsPOINT3(), 
-                                            Tester.AsPPBR_VISIBILITY_TESTER(), 
-                                            Rng.AsPRANDOM_REFERENCE(), 
-                                            SpectrumCompositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(), 
-                                            &LightSpectrum, 
-                                            &ToLight, 
-                                            &LightPdf);
+            auto Result = Light.Sample(WorldHitPoint,
+                                       Tester,
+                                       Rng,
+                                       SpectrumCompositor);
 
-            if (Status != ISTATUS_SUCCESS)
-            {
-                throw std::runtime_error(ISTATUSToCString(Status));
-            }
-
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, ToLight, ReflectorCompositor)));
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
         }
 
         auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
         }
@@ -872,23 +848,23 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
     Scene.AddGeometry(SphereTwo);
     Scene.AddGeometry(InfinitePlane);
 
-    std::vector<IrisPhysx::Light> Lights;
+    LightList Lights = LightList::Create();
 
-    Lights.push_back(PhongPointLight::Create(Color3(0.49f, 0.07f, 0.07f),
-                                             Color3(0.49f, 0.07f, 0.07f),
-                                             Point(-2.0f, 2.5f, 0.0f)));
+    Lights.Add(PhongPointLight::Create(Color3(0.49f, 0.07f, 0.07f),
+                                       Color3(0.49f, 0.07f, 0.07f),
+                                       Point(-2.0f, 2.5f, 0.0f)));
 
-    Lights.push_back(PhongPointLight::Create(Color3(0.07f, 0.07f, 0.49f),
-                                             Color3(0.07f, 0.07f, 0.49f),
-                                             Point(1.5f, 2.5f, 1.5f)));
+    Lights.Add(PhongPointLight::Create(Color3(0.07f, 0.07f, 0.49f),
+                                       Color3(0.07f, 0.07f, 0.49f),
+                                       Point(1.5f, 2.5f, 1.5f)));
 
-    Lights.push_back(PhongPointLight::Create(Color3(0.07f, 0.49f, 0.07f),
-                                             Color3(0.07f, 0.49f, 0.07f),
-                                             Point(1.5f, 2.5f, -1.5f)));
+    Lights.Add(PhongPointLight::Create(Color3(0.07f, 0.49f, 0.07f),
+                                       Color3(0.07f, 0.49f, 0.07f),
+                                       Point(1.5f, 2.5f, -1.5f)));
 
-    Lights.push_back(PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
-                                             Color3(0.21f, 0.21f, 0.35f),
-                                             Point(0.0f,3.5f, 0.0f)));
+    Lights.Add(PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
+                                       Color3(0.21f, 0.21f, 0.35f),
+                                       Point(0.0f,3.5f, 0.0f)));
 
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
@@ -898,9 +874,8 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
                                            const Iris::Point & ModelHitPoint,
                                            const Iris::Point & WorldHitPoint,
                                            const Iris::Ray & WorldRay,
-                                           PCPBR_LIGHT *PbrLights,
-                                           SIZE_T NumberOfLights,
-                                           IrisPhysx::RayTracer * RayTracerPtr,
+                                           std::optional<LightListReference> Lights,
+                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
                                            VisibilityTester Tester,
                                            BRDFAllocator Allocator,
                                            IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
@@ -914,32 +889,21 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
 
         SpectrumReference ReflectedLight(nullptr);
 
-        for (SIZE_T Index = 0; Index < NumberOfLights; Index++)
+        for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
         {
-            PCSPECTRUM LightSpectrum;
-            FLOAT LightPdf;
-            VECTOR3 ToLight;
+            LightReference Light = Lights->Get(Index);
 
-            ISTATUS Status = PbrLightSample(PbrLights[Index],
-                                            WorldHitPoint.AsPOINT3(),
-                                            Tester.AsPPBR_VISIBILITY_TESTER(),
-                                            Rng.AsPRANDOM_REFERENCE(),
-                                            SpectrumCompositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                            &LightSpectrum,
-                                            &ToLight,
-                                            &LightPdf);
+            auto Result = Light.Sample(WorldHitPoint,
+                                       Tester,
+                                       Rng,
+                                       SpectrumCompositor);
 
-            if (Status != ISTATUS_SUCCESS)
-            {
-                throw std::runtime_error(ISTATUSToCString(Status));
-            }
-
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(LightSpectrum, Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, ToLight, ReflectorCompositor)));
+            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
         }
 
         auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
 
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr != nullptr)
+        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
         {
             ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
         }

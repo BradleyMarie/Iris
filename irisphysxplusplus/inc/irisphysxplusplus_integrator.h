@@ -60,8 +60,28 @@ public:
     Integrate(
         _In_ const TestGeometryRoutine TestGeometryFunction,
         _In_ IntegrateRoutine IntegrateFunction,
-        _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-        _In_ SIZE_T NumberOfLights,
+        _In_ LightListReference Lights,
+        _In_ FLOAT Epsilon,
+        _In_ const Iris::Ray & WorldRay,
+        _Inout_ IrisAdvanced::RandomReference Rng
+        );
+
+    IRISPHYSXPLUSPLUSAPI
+    void
+    Integrate(
+        _In_ const TestGeometryRoutine TestGeometryFunction,
+        _In_ IntegrateRoutine IntegrateFunction,
+        _In_ const LightList & Lights,
+        _In_ FLOAT Epsilon,
+        _In_ const Iris::Ray & WorldRay,
+        _Inout_ IrisAdvanced::RandomReference Rng
+        );
+
+    IRISPHYSXPLUSPLUSAPI
+    void
+    Integrate(
+        _In_ const TestGeometryRoutine TestGeometryFunction,
+        _In_ IntegrateRoutine IntegrateFunction,
         _In_ FLOAT Epsilon,
         _In_ const Iris::Ray & WorldRay,
         _Inout_ IrisAdvanced::RandomReference Rng

@@ -69,7 +69,6 @@ public:
         return Data;
     }
 
-    _Ret_
     std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Point & HitPoint,
@@ -99,7 +98,6 @@ public:
         return std::make_tuple(IrisSpectrum::SpectrumReference(ResultSpectrum), Iris::Vector(ResultToLight), ResultPdf);
     }
 
-    _Ret_
     IrisSpectrum::SpectrumReference
     ComputeEmissive(
         _In_ const Iris::Ray & ToLight,
@@ -121,7 +119,6 @@ public:
         return IrisSpectrum::SpectrumReference(Result);
     }
     
-    _Ret_
     std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
     ComputeEmissiveWithPdf(
         _In_ const Iris::Ray & ToLight,
@@ -183,7 +180,6 @@ private:
 // Define VisibilityTester functions
 //
 
-_Ret_
 inline
 bool
 VisibilityTester::Test(

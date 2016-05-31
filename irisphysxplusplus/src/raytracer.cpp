@@ -34,8 +34,7 @@ ProcessHitAdapter(
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint,
     _In_ RAY WorldRay,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *LightsPtr,
-    _In_ SIZE_T NumberOfLights,
+    _In_ PCPHYSX_LIGHT_LIST LightsPtr,
     _Inout_opt_ PPBR_RAYTRACER RayTracerPtr,
     _Inout_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocatorPtr,
@@ -51,7 +50,6 @@ ProcessHitAdapter(
     assert(PointValidate(ModelHitPoint) != FALSE);
     assert(PointValidate(WorldHitPoint) != FALSE);
     assert(RayValidate(WorldRay) != FALSE);
-    assert(LightsPtr != nullptr || NumberOfLights == 0);
     assert(VisibilityTesterPtr != nullptr);
     assert(BrdfAllocatorPtr != nullptr);
     assert(SpectrumCompositorReferencePtr != nullptr);
@@ -59,52 +57,39 @@ ProcessHitAdapter(
     assert(Rng != nullptr);
     assert(SpectrumPtr != nullptr);
 
-    ProcessHitRoutine * HitRoutine = static_cast<ProcessHitRoutine *>(Context);
+    auto * ProcessHitContext = static_cast<ProcessHitRoutine *>(Context);
 
-    if (RayTracerPtr == nullptr)
+    std::optional<RayTracer> Tracer;
+
+    if (RayTracerPtr != nullptr)
     {
-        IrisSpectrum::SpectrumReference Result = (*HitRoutine)(GeometryReference(GeometryPtr),
-                                                               FaceHit,
-                                                               Iris::MatrixReference(ModelToWorld),
-                                                               AdditionalData,
-                                                               Iris::Vector(ModelViewer),
-                                                               Iris::Point(ModelHitPoint),
-                                                               Iris::Point(WorldHitPoint),
-                                                               Iris::Ray(WorldRay),
-                                                               LightsPtr,
-                                                               NumberOfLights,
-                                                               nullptr,
-                                                               VisibilityTester(VisibilityTesterPtr),
-                                                               BRDFAllocator(BrdfAllocatorPtr),
-                                                               IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
-                                                               IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
-                                                               IrisAdvanced::RandomReference(Rng));
-
-        *SpectrumPtr = Result.AsPCSPECTRUM();
+        Tracer = RayTracer(RayTracerPtr);
     }
-    else
+
+    std::optional<LightListReference> Lights;
+
+    if (LightsPtr != nullptr)
     {
-        RayTracer Rt(RayTracerPtr);
-
-        IrisSpectrum::SpectrumReference Result = (*HitRoutine)(GeometryReference(GeometryPtr),
-                                                               FaceHit,
-                                                               Iris::MatrixReference(ModelToWorld),
-                                                               AdditionalData,
-                                                               Iris::Vector(ModelViewer),
-                                                               Iris::Point(ModelHitPoint),
-                                                               Iris::Point(WorldHitPoint),
-                                                               Iris::Ray(WorldRay),
-                                                               LightsPtr,
-                                                               NumberOfLights,
-                                                               &Rt,
-                                                               VisibilityTester(VisibilityTesterPtr),
-                                                               BRDFAllocator(BrdfAllocatorPtr),
-                                                               IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
-                                                               IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
-                                                               IrisAdvanced::RandomReference(Rng));
-
-        *SpectrumPtr = Result.AsPCSPECTRUM();
+        Lights = LightListReference(LightsPtr);
     }
+
+    IrisSpectrum::SpectrumReference Result = (*ProcessHitContext)(GeometryReference(GeometryPtr),
+                                                                  FaceHit,
+                                                                  Iris::MatrixReference(ModelToWorld),
+                                                                  AdditionalData,
+                                                                  Iris::Vector(ModelViewer),
+                                                                  Iris::Point(ModelHitPoint),
+                                                                  Iris::Point(WorldHitPoint),
+                                                                  Iris::Ray(WorldRay),
+                                                                  Lights,
+                                                                  Tracer,
+                                                                  VisibilityTester(VisibilityTesterPtr),
+                                                                  BRDFAllocator(BrdfAllocatorPtr),
+                                                                  IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
+                                                                  IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
+                                                                  IrisAdvanced::RandomReference(Rng));
+
+    *SpectrumPtr = Result.AsPCSPECTRUM();
 
     return ISTATUS_SUCCESS;
 }

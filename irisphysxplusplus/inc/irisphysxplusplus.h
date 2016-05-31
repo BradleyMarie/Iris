@@ -36,6 +36,7 @@ extern "C" {
 #include <type_traits>
 #include <functional>
 #include <stdexcept>
+#include <vector>
 #include <memory>
 #include <tuple>
 
@@ -64,6 +65,8 @@ extern "C" {
 #include "irisphysxplusplus_lightreference.h"
 #include "irisphysxplusplus_light.h"
 #include "irisphysxplusplus_lightbase.h"
+#include "irisphysxplusplus_lightlistreference.h"
+#include "irisphysxplusplus_lightlist.h"
 #include "irisphysxplusplus_geometryreference.h"
 #include "irisphysxplusplus_geometry.h"
 #include "irisphysxplusplus_geometrybase.h"

@@ -35,15 +35,15 @@ struct CreateStateContext {
 };
 
 //
-// Adapter Functions
+// Adapter Function
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 static
-ISTATUS 
+ISTATUS
 ProcessHitAdapter(
-    _Inout_opt_ PVOID Context, 
+    _Inout_opt_ PVOID Context,
     _In_ PCPBR_GEOMETRY GeometryPtr,
     _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
@@ -52,8 +52,7 @@ ProcessHitAdapter(
     _In_ POINT3 ModelHitPoint,
     _In_ POINT3 WorldHitPoint,
     _In_ RAY WorldRay,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *LightsPtr,
-    _In_ SIZE_T NumberOfLights,
+    _In_ PCPHYSX_LIGHT_LIST LightsPtr,
     _Inout_opt_ PPBR_RAYTRACER RayTracerPtr,
     _Inout_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocatorPtr,
@@ -69,7 +68,6 @@ ProcessHitAdapter(
     assert(PointValidate(ModelHitPoint) != FALSE);
     assert(PointValidate(WorldHitPoint) != FALSE);
     assert(RayValidate(WorldRay) != FALSE);
-    assert(LightsPtr != nullptr || NumberOfLights == 0);
     assert(VisibilityTesterPtr != nullptr);
     assert(BrdfAllocatorPtr != nullptr);
     assert(SpectrumCompositorReferencePtr != nullptr);
@@ -77,52 +75,39 @@ ProcessHitAdapter(
     assert(Rng != nullptr);
     assert(SpectrumPtr != nullptr);
 
-    IrisPhysx::ProcessHitRoutine * HitRoutine = static_cast<IrisPhysx::ProcessHitRoutine *>(Context);
+    auto * ProcessHitContext = static_cast<IrisPhysx::ProcessHitRoutine *>(Context);
 
-    if (RayTracerPtr == nullptr)
+    std::optional<IrisPhysx::RayTracer> Tracer;
+
+    if (RayTracerPtr != nullptr)
     {
-        IrisSpectrum::SpectrumReference Result = (*HitRoutine)(IrisPhysx::GeometryReference(GeometryPtr),
-                                                               FaceHit,
-                                                               Iris::MatrixReference(ModelToWorld),
-                                                               AdditionalData,
-                                                               Iris::Vector(ModelViewer),
-                                                               Iris::Point(ModelHitPoint),
-                                                               Iris::Point(WorldHitPoint),
-                                                               Iris::Ray(WorldRay),
-                                                               LightsPtr,
-                                                               NumberOfLights,
-                                                               nullptr,
-                                                               IrisPhysx::VisibilityTester(VisibilityTesterPtr),
-                                                               IrisPhysx::BRDFAllocator(BrdfAllocatorPtr),
-                                                               IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
-                                                               IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
-                                                               IrisAdvanced::RandomReference(Rng));
-
-        *SpectrumPtr = Result.AsPCSPECTRUM();
+        Tracer = IrisPhysx::RayTracer(RayTracerPtr);
     }
-    else
+
+    std::optional<IrisPhysx::LightListReference> Lights;
+
+    if (LightsPtr != nullptr)
     {
-        IrisPhysx::RayTracer Rt(RayTracerPtr);
-
-        IrisSpectrum::SpectrumReference Result = (*HitRoutine)(IrisPhysx::GeometryReference(GeometryPtr),
-                                                               FaceHit,
-                                                               Iris::MatrixReference(ModelToWorld),
-                                                               AdditionalData,
-                                                               Iris::Vector(ModelViewer),
-                                                               Iris::Point(ModelHitPoint),
-                                                               Iris::Point(WorldHitPoint),
-                                                               Iris::Ray(WorldRay),
-                                                               LightsPtr,
-                                                               NumberOfLights,
-                                                               &Rt,
-                                                               IrisPhysx::VisibilityTester(VisibilityTesterPtr),
-                                                               IrisPhysx::BRDFAllocator(BrdfAllocatorPtr),
-                                                               IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
-                                                               IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
-                                                               IrisAdvanced::RandomReference(Rng));
-
-        *SpectrumPtr = Result.AsPCSPECTRUM();
+        Lights = IrisPhysx::LightListReference(LightsPtr);
     }
+
+    IrisSpectrum::SpectrumReference Result = (*ProcessHitContext)(IrisPhysx::GeometryReference(GeometryPtr),
+                                                                  FaceHit,
+                                                                  Iris::MatrixReference(ModelToWorld),
+                                                                  AdditionalData,
+                                                                  Iris::Vector(ModelViewer),
+                                                                  Iris::Point(ModelHitPoint),
+                                                                  Iris::Point(WorldHitPoint),
+                                                                  Iris::Ray(WorldRay),
+                                                                  Lights,
+                                                                  Tracer,
+                                                                  IrisPhysx::VisibilityTester(VisibilityTesterPtr),
+                                                                  IrisPhysx::BRDFAllocator(BrdfAllocatorPtr),
+                                                                  IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
+                                                                  IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
+                                                                  IrisAdvanced::RandomReference(Rng));
+
+    *SpectrumPtr = Result.AsPCSPECTRUM();
 
     return ISTATUS_SUCCESS;
 }
@@ -230,21 +215,10 @@ Render(
     _In_ bool Jitter,
     _In_ bool Parallelize,
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
-    _In_ std::optional<const std::vector<IrisPhysx::Light> &> Lights,
     _In_ CreateStateRoutine CreateStateFunction,
     _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
-)
+    )
 {
-    std::vector<PCPBR_LIGHT> IrisLights;
-
-    if (Lights)
-    {
-        for (auto & it : *Lights)
-        {
-            IrisLights.push_back(it.AsPCPBR_LIGHT());
-        }
-    }
-
     CreateStateContext CreateStateCtxt(CreateStateFunction);
 
     ISTATUS Status = PinholeRender(PinholeLocation.AsPOINT3(),
@@ -261,8 +235,93 @@ Render(
                                    (Parallelize) ? TRUE : FALSE,
                                    TestGeometryAdapter,
                                    &TestGeometryFunction,
-                                   IrisLights.data(),
-                                   IrisLights.size(),
+                                   nullptr,
+                                   CreateStateAdapter,
+                                   nullptr,
+                                   &CreateStateCtxt,
+                                   Framebuffer.AsPFRAMEBUFFER());
+}
+
+void
+Render(
+    _In_ const Iris::Point & PinholeLocation,
+    _In_ FLOAT ImagePlaneDistance,
+    _In_ FLOAT ImagePlaneHeight,
+    _In_ FLOAT ImagePlaneWidth,
+    _In_ const Iris::Vector & CameraDirection,
+    _In_ const Iris::Vector & Up,
+    _In_ SIZE_T AdditionalXSamplesPerPixel,
+    _In_ SIZE_T AdditionalYSamplesPerPixel,
+    _In_ FLOAT Epsilon,
+    _In_ SIZE_T MaxDepth,
+    _In_ bool Jitter,
+    _In_ bool Parallelize,
+    _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
+    _In_ IrisPhysx::LightListReference Lights,
+    _In_ CreateStateRoutine CreateStateFunction,
+    _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
+    )
+{
+    CreateStateContext CreateStateCtxt(CreateStateFunction);
+
+    ISTATUS Status = PinholeRender(PinholeLocation.AsPOINT3(),
+                                   ImagePlaneDistance,
+                                   ImagePlaneHeight,
+                                   ImagePlaneWidth,
+                                   CameraDirection.AsVECTOR3(),
+                                   Up.AsVECTOR3(),
+                                   AdditionalXSamplesPerPixel,
+                                   AdditionalYSamplesPerPixel,
+                                   Epsilon,
+                                   MaxDepth,
+                                   (Jitter) ? TRUE : FALSE,
+                                   (Parallelize) ? TRUE : FALSE,
+                                   TestGeometryAdapter,
+                                   &TestGeometryFunction,
+                                   Lights.AsPCPHYSX_LIGHT_LIST(),
+                                   CreateStateAdapter,
+                                   nullptr,
+                                   &CreateStateCtxt,
+                                   Framebuffer.AsPFRAMEBUFFER());
+}
+
+void
+Render(
+    _In_ const Iris::Point & PinholeLocation,
+    _In_ FLOAT ImagePlaneDistance,
+    _In_ FLOAT ImagePlaneHeight,
+    _In_ FLOAT ImagePlaneWidth,
+    _In_ const Iris::Vector & CameraDirection,
+    _In_ const Iris::Vector & Up,
+    _In_ SIZE_T AdditionalXSamplesPerPixel,
+    _In_ SIZE_T AdditionalYSamplesPerPixel,
+    _In_ FLOAT Epsilon,
+    _In_ SIZE_T MaxDepth,
+    _In_ bool Jitter,
+    _In_ bool Parallelize,
+    _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
+    _In_ const IrisPhysx::LightList & Lights,
+    _In_ CreateStateRoutine CreateStateFunction,
+    _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
+    )
+{
+    CreateStateContext CreateStateCtxt(CreateStateFunction);
+
+    ISTATUS Status = PinholeRender(PinholeLocation.AsPOINT3(),
+                                   ImagePlaneDistance,
+                                   ImagePlaneHeight,
+                                   ImagePlaneWidth,
+                                   CameraDirection.AsVECTOR3(),
+                                   Up.AsVECTOR3(),
+                                   AdditionalXSamplesPerPixel,
+                                   AdditionalYSamplesPerPixel,
+                                   Epsilon,
+                                   MaxDepth,
+                                   (Jitter) ? TRUE : FALSE,
+                                   (Parallelize) ? TRUE : FALSE,
+                                   TestGeometryAdapter,
+                                   &TestGeometryFunction,
+                                   Lights.AsPCPHYSX_LIGHT_LIST(),
                                    CreateStateAdapter,
                                    nullptr,
                                    &CreateStateCtxt,

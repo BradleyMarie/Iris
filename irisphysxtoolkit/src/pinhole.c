@@ -97,8 +97,7 @@ StaticPinholeCameraRender(
     _In_ PPBR_INTEGRATOR Integrator,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-    _In_ SIZE_T NumberOfLights,
+    _In_opt_ PCPHYSX_LIGHT_LIST Lights,
     _Inout_ PPINHOLE_INTEGRATE_CONTEXT IntegrateContext,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
@@ -224,7 +223,6 @@ StaticPinholeCameraRender(
                                             PinholeIntegrateRoutine,
                                             IntegrateContext,
                                             Lights,
-                                            NumberOfLights,
                                             Epsilon,
                                             WorldRay,
                                             Rng);
@@ -275,8 +273,7 @@ PinholeRender(
     _In_ BOOL Parallelize,
     _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_reads_(NumberOfLights) PCPBR_LIGHT *Lights,
-    _In_ SIZE_T NumberOfLights,
+    _In_opt_ PCPHYSX_LIGHT_LIST Lights,
     _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
     _In_opt_ PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
     _Inout_opt_ PVOID CreateStateContext,
@@ -345,24 +342,14 @@ PinholeRender(
         return ISTATUS_INVALID_ARGUMENT_12;
     }
 
-    if (Lights == NULL && NumberOfLights != 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-    
-    if (Lights != NULL && NumberOfLights == 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
-    }
-
     if (CreateStateRoutine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_16;
+        return ISTATUS_INVALID_ARGUMENT_15;
     }
 
     if (Framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_19;
+        return ISTATUS_INVALID_ARGUMENT_18;
     }
 
     FramebufferGetDimensions(Framebuffer, 
@@ -527,7 +514,6 @@ PinholeRender(
                                                        TestGeometryRoutine,
                                                        TestGeometryRoutineContext,
                                                        Lights,
-                                                       NumberOfLights,
                                                        &IntegrateContext,
                                                        Framebuffer);
 
