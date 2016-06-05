@@ -68,6 +68,7 @@ iristoolkit/inc/iristoolkit_api.h
 irisshadingmodel/inc/irisshadingmodel_api.h
 irisplusplus/inc/irisplusplus_api.h
 irisadvancedtoolkit/inc/irisadvancedtoolkit_api.h
+irisphysxtoolkit/inc/irisphysxtoolkit_api.h
 irisadvancedplusplus/inc/irisadvancedplusplus_api.h
 irisspectrumplusplus/inc/irisspectrumplusplus_api.h
 irisphysxplusplus/inc/irisphysxplusplus_api.h
