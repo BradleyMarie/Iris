@@ -58,6 +58,8 @@ typedef VOID *PVOID;
 typedef bool BOOL;
 typedef BOOL *PBOOL;
 
+typedef char *PCSTR;
+
 #define TRUE true
 #define FALSE false
 

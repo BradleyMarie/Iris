@@ -42,8 +42,10 @@ Abstract:
 #define _Inout_opt_
 #define _Inout_updates_(size)
 
+#define _Pre_opt_bytecount_(size)
 #define _Pre_invalid_
 #define _Pre_maybenull_
+#define _Post_valid_
 #define _Post_invalid_
 
 #define _Post_writable_byte_size_(size)
@@ -54,6 +56,7 @@ Abstract:
 #define _Out_range_(min, max)
 
 #define _Outptr_result_buffer_(size)
+#define _Outptr_result_bytebuffer_(size)
 #define _Outptr_result_maybenull_
 #define _Outptr_opt_result_bytebuffer_(size)
 #define _Outptr_opt_result_bytebuffer_maybenull_(size)
@@ -69,7 +72,7 @@ Abstract:
 #define _Ret_maybenull_
 
 #define _When_(expr0,expr1)
-#define _Pre_satisfies(exor0)
+#define _Pre_satisfies_(exor0)
 
 #endif // _SAL_IRIS_
 

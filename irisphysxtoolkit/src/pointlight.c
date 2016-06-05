@@ -156,7 +156,7 @@ SpectrumPointLightComputeEmissiveWithPdf(
 STATIC
 VOID
 SpectrumPointLightFree(
-    _In_ PCVOID Context
+    _In_ PVOID Context
     )
 {
     PCSPECTRUM_POINT_LIGHT Light;

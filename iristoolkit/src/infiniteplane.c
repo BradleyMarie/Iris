@@ -148,6 +148,7 @@ InfinitePlaneTestRay(
 }
 
 STATIC
+VOID
 InfinitePlaneFree(
     _In_ _Post_invalid_ PVOID Context
     )

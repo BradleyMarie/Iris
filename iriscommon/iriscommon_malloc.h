@@ -17,8 +17,10 @@ Abstract:
 #ifndef _MALLOC_IRIS_COMMON_
 #define _MALLOC_IRIS_COMMON_
 
-#ifndef _MSC_VER
-#include <stdalign.h>
+#ifdef _MSC_VER
+#include <malloc.h>
+#else
+#include <stdlib.h>
 #endif
 
 //
@@ -31,7 +33,7 @@ IrisAlignedFree(
     _Pre_maybenull_ _Post_invalid_ PVOID Header
     )
 {
-#ifndef _MSVC_VER
+#ifdef _MSVC_VER
     _aligned_free(Header);
 #else
     free(Header);
@@ -54,8 +56,13 @@ IrisAlignedAlloc(
     ASSERT((Alignment & (Alignment - 1)) == 0);
     ASSERT(SizeInBytes % Alignment == 0);
 
-#ifndef _MSVC_VER
+#ifdef _MSVC_VER
     Allocation = _aligned_malloc(SizeInBytes, Alignment);
+#elif defined __APPLE__
+    if (posix_memalign(&Allocation, Alignment, SizeInBytes) != 0)
+    {
+    	return NULL;
+    }
 #else
     Allocation = aligned_alloc(SizeInBytes, Alignment);
 #endif

@@ -78,3 +78,6 @@ iris.dir/
 irisshadingmodel.dir/
 iristoolkit.dir/
 iris-test.dir/
+
+#Makefiles
+Makefile

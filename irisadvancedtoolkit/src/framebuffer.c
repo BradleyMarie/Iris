@@ -275,7 +275,7 @@ FramebufferSaveAsPFM(
     }
 
     fprintf(File, "PF\n");
-    fprintf(File, "%u %u\n", (unsigned long) Width, (unsigned long) Height);
+    fprintf(File, "%lu %lu\n", (unsigned long) Width, (unsigned long) Height);
     fprintf(File, "%lf\n", Scale);
 
     for (RowIndex = 0; RowIndex < Height; RowIndex++)

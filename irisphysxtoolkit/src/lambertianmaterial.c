@@ -67,7 +67,7 @@ SimpleLambertianMaterialSample(
 STATIC
 VOID
 SimpleLambertianMaterialFree(
-    _In_ PCVOID Context
+    _In_ PVOID Context
     )
 {
     PCSIMPLE_LAMBERTIAN_MATERIAL Material;
