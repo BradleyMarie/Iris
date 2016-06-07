@@ -33,7 +33,7 @@ IrisAlignedFree(
     _Pre_maybenull_ _Post_invalid_ PVOID Header
     )
 {
-#ifdef _MSVC_VER
+#ifdef _MSC_VER
     _aligned_free(Header);
 #else
     free(Header);
@@ -56,7 +56,7 @@ IrisAlignedAlloc(
     ASSERT((Alignment & (Alignment - 1)) == 0);
     ASSERT(SizeInBytes % Alignment == 0);
 
-#ifdef _MSVC_VER
+#ifdef _MSC_VER
     Allocation = _aligned_malloc(SizeInBytes, Alignment);
 #elif defined __APPLE__
     if (posix_memalign(&Allocation, Alignment, SizeInBytes) != 0)

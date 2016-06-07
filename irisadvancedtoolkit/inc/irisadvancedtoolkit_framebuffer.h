@@ -72,7 +72,7 @@ IRISADVANCEDTOOLKITAPI
 ISTATUS
 FramebufferSaveAsPFM(
     _In_ PCFRAMEBUFFER Framebuffer,
-    _In_ PCCSTR Path
+    _In_ PCSTR Path
     );
 
 IRISADVANCEDTOOLKITAPI

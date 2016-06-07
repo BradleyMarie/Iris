@@ -232,7 +232,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 FramebufferSaveAsPFM(
     _In_ PCFRAMEBUFFER Framebuffer,
-    _In_ PCCSTR Path
+    _In_ PCSTR Path
     )
 {
     COLOR3 PixelColor;
