@@ -915,7 +915,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE YLightTriangleHeader = {
 };
 
 CONST STATIC PBR_GEOMETRY_VTABLE ZLightTriangleHeader = {
-    PhysxLightTriangleXDominantTestRay,
+    PhysxLightTriangleZDominantTestRay,
     PhysxLightTriangleComputeNormal,
     PhysxLightTriangleTestBounds,
     PhysxLightTriangleGetMaterial,

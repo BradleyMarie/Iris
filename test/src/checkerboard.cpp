@@ -82,7 +82,7 @@ STATIC
 VOID
 XZCheckerboardTextureFree(
     _In_ PVOID Context
-)
+    )
 {
     PCHECKERBOARD_TEXTURE CheckerboardTexture;
 
@@ -92,8 +92,6 @@ XZCheckerboardTextureFree(
 
     TranslucentShaderDereference(CheckerboardTexture->TranslucentShaders[0]);
     TranslucentShaderDereference(CheckerboardTexture->TranslucentShaders[1]);
-
-    free(Context);
 }
 
 //
@@ -102,7 +100,7 @@ XZCheckerboardTextureFree(
 
 CONST STATIC TEXTURE_VTABLE XZCheckerboardTextureVTable = {
     XZCheckerboardTextureGetShader,
-    free
+    XZCheckerboardTextureFree
 };
 
 //

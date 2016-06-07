@@ -122,17 +122,23 @@ public:
 
     void
     Add(
-        _In_ Light & LightRef
+        _In_ Light LightRef
         )
     {
         ISTATUS Status = PhysxLightListAddLight(Data,
                                                 LightRef.AsPPBR_LIGHT());
 
-        if (Status != ISTATUS_SUCCESS)
+        switch (Status)
         {
-            ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-            throw std::bad_alloc();
+            case ISTATUS_SUCCESS:
+                break;
+            case ISTATUS_ALLOCATION_FAILED:
+                throw std::bad_alloc();
+            case ISTATUS_INVALID_ARGUMENT_COMBINATION_00:
+                throw std::invalid_argument("LightRef is already in List");
         }
+        
+        assert(Status == ISTATUS_SUCCESS);
     }
 
     void

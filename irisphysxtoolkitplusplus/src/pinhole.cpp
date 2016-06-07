@@ -240,6 +240,11 @@ Render(
                                    nullptr,
                                    &CreateStateCtxt,
                                    Framebuffer.AsPFRAMEBUFFER());
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
 }
 
 void
@@ -283,6 +288,11 @@ Render(
                                    nullptr,
                                    &CreateStateCtxt,
                                    Framebuffer.AsPFRAMEBUFFER());
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
 }
 
 void
@@ -326,6 +336,11 @@ Render(
                                    nullptr,
                                    &CreateStateCtxt,
                                    Framebuffer.AsPFRAMEBUFFER());
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
 }
 
 } // namespace PinholeCamera

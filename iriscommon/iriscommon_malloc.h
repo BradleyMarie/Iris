@@ -85,6 +85,7 @@ IrisAlignedAllocWithHeader(
     )
 {
     SIZE_T AllocationAlignment;
+    SIZE_T AllocationPadding;
     SIZE_T AllocationSize;
     SIZE_T HeaderPadding;
     PUINT8 Allocation;
@@ -161,6 +162,13 @@ IrisAlignedAllocWithHeader(
         return FALSE;
     }
 
+    AllocationPadding = AllocationSize % AllocationAlignment;
+    
+    if (AllocationPadding != 0)
+    {
+        AllocationSize += AllocationAlignment - AllocationPadding;
+    }
+    
     Allocation = (PUINT8) IrisAlignedAlloc(AllocationSize, AllocationAlignment);
 
     if (Allocation == NULL)
@@ -348,6 +356,7 @@ IrisAlignedAllocWithTwoHeaders(
     )
 {
     SIZE_T AllocationAlignment;
+    SIZE_T AllocationPadding;
     SIZE_T AllocationSize;
     SIZE_T Header0Padding;
     SIZE_T Header1Padding;
@@ -463,6 +472,13 @@ IrisAlignedAllocWithTwoHeaders(
     if (Status != ISTATUS_SUCCESS)
     {
         return FALSE;
+    }
+
+    AllocationPadding = AllocationSize % AllocationAlignment;
+    
+    if (AllocationPadding != 0)
+    {
+        AllocationSize += AllocationAlignment - AllocationPadding;
     }
 
     Allocation = (PUINT8) IrisAlignedAlloc(AllocationSize, AllocationAlignment);

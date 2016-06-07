@@ -94,7 +94,7 @@ PhysxLightListAddLight(
 
         if (CurrentLight == Light)
         {
-            return ISTATUS_INVALID_ARGUMENT_01;
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
     }
 

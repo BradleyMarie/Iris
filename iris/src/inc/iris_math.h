@@ -177,7 +177,7 @@ Float4x4InverseInitialize(
          CurrentRow < 4 && ColumnIndex < 4; 
          CurrentRow++, ColumnIndex++)
     {
-        for (ColumnIndex = ColumnIndex;
+        for (; // No Initialization Needed
              ColumnIndex < 4;
              ColumnIndex++)
         {

@@ -331,7 +331,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxSphereGetBounds(
+PhysxSphereTestBounds(
     _In_ PCVOID Context,
     _In_ PCMATRIX ModelToWorld,
     _In_ BOUNDING_BOX WorldAlignedBoundingBox,
@@ -481,7 +481,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxSphereTestBounds(
+PhysxLightSphereTestBounds(
     _In_ PCVOID Context,
     _In_ PCMATRIX ModelToWorld,
     _In_ BOUNDING_BOX WorldAlignedBoundingBox,
@@ -567,7 +567,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE SphereHeader = {
 CONST STATIC PBR_GEOMETRY_VTABLE LightSphereHeader = {
     PhysxLightSphereTestRay,
     PhysxLightSphereComputeNormal,
-    PhysxSphereTestBounds,
+    PhysxLightSphereTestBounds,
     PhysxLightSphereGetMaterial,
     PhysxLightSphereGetLight,
     PhysxLightSphereFree

@@ -258,7 +258,7 @@ PBRVisibilityTesterTestVisibilityAnyDistance(
                                                                 WorldRay,
                                                                 PBRVisibilityTester->TestGeometryRoutine,
                                                                 PBRVisibilityTester->TestGeometryRoutineContext,
-                                                                RayTracerTestVisibilityAnyDistanceProcessHit,
+                                                                PBRVisibilityTesterTestVisibilityAnyDistanceProcessHit,
                                                                 &Context);
 
     if (Status != ISTATUS_SUCCESS)

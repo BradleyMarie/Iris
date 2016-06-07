@@ -171,7 +171,7 @@ InfinitePlaneFree(
 
 CONST STATIC DRAWING_SHAPE_VTABLE InfinitePlaneHeader = {
     InfinitePlaneTestRay, 
-    NULL,
+    InfinitePlaneFree,
     InfinitePlaneGetTexture,
     InfinitePlaneGetNormal
 };

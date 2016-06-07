@@ -705,12 +705,9 @@ TEST(PhysxRenderPhongWorldSphere)
     Scene.AddGeometry(SphereRadiusOne);
 
     LightList Lights = LightList::Create();
-
-    Light L = PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
-                                      Color3::CreateBlack(),
-                                      Point(0.0f, 0.0f, 1000.0f));
-
-    Lights.Add(L);
+    Lights.Add(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
+                                       Color3::CreateBlack(),
+                                       Point(0.0f, 0.0f, 1000.0f)));
 
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
@@ -853,28 +850,21 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
 
     LightList Lights = LightList::Create();
 
-    Light L = PhongPointLight::Create(Color3(0.49f, 0.07f, 0.07f),
-                                      Color3(0.49f, 0.07f, 0.07f),
-                                      Point(-2.0f, 2.5f, 0.0f));
-    Lights.Add(L);
+    Lights.Add(PhongPointLight::Create(Color3(0.49f, 0.07f, 0.07f),
+                                       Color3(0.49f, 0.07f, 0.07f),
+                                       Point(-2.0f, 2.5f, 0.0f)));
 
-    L = PhongPointLight::Create(Color3(0.07f, 0.07f, 0.49f),
-                                Color3(0.07f, 0.07f, 0.49f),
-                                Point(1.5f, 2.5f, 1.5f));
+    Lights.Add(PhongPointLight::Create(Color3(0.07f, 0.07f, 0.49f),
+                                       Color3(0.07f, 0.07f, 0.49f),
+                                       Point(1.5f, 2.5f, 1.5f)));
 
-    Lights.Add(L);
+    Lights.Add(PhongPointLight::Create(Color3(0.07f, 0.49f, 0.07f),
+                                       Color3(0.07f, 0.49f, 0.07f),
+                                       Point(1.5f, 2.5f, -1.5f)));
 
-    L = PhongPointLight::Create(Color3(0.07f, 0.49f, 0.07f),
-                                Color3(0.07f, 0.49f, 0.07f),
-                                Point(1.5f, 2.5f, -1.5f));
-
-    Lights.Add(L);
-
-    L = PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
-                                Color3(0.21f, 0.21f, 0.35f),
-                                Point(0.0f,3.5f, 0.0f));
-
-    Lights.Add(L);
+    Lights.Add(PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
+                                       Color3(0.21f, 0.21f, 0.35f),
+                                       Point(0.0f,3.5f, 0.0f)));
 
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
