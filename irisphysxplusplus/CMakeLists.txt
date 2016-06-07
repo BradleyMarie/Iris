@@ -31,6 +31,3 @@ generate_export_header(irisphysxplusplus
     EXPORT_MACRO_NAME IRISPHYSXPLUSPLUSAPI
     EXPORT_FILE_NAME inc/irisphysxplusplus_api.h
     STATIC_DEFINE IRISPHYSXPLUSPLUS_BUILT_AS_STATIC)
-
-set_property(TARGET irisphysxplusplus PROPERTY C_STANDARD 11)
-set_property(TARGET irisphysxplusplus PROPERTY C_STANDARD_REQUIRED ON)

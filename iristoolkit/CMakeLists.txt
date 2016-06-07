@@ -41,6 +41,3 @@ option(ENABLE_CSG "Enable constructive solid geometry" OFF)
 if (ENABLE_CSG)
     add_definitions(-DENABLE_CSG_SUPPORT)
 endif()
-
-set_property(TARGET iristoolkit PROPERTY C_STANDARD 11)
-set_property(TARGET iristoolkit PROPERTY C_STANDARD_REQUIRED ON)

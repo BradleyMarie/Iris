@@ -59,6 +59,7 @@ typedef bool BOOL;
 typedef BOOL *PBOOL;
 
 typedef char *PCSTR;
+typedef CONST char *PCCSTR;
 
 #define TRUE true
 #define FALSE false

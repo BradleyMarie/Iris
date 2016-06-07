@@ -123,20 +123,6 @@ public:
         
         return Result;
     }
-    
-    ReflectorCompositorReference(
-        _In_ ReflectorCompositorReference & ToCopy
-        )
-    : Data(ToCopy.Data)
-    { }
-        
-    ReflectorCompositorReference &
-    operator=(
-        _In_ const ReflectorCompositorReference & ToCopy
-        )
-    {
-        Data = ToCopy.Data;
-    }
 
 private:
     PREFLECTOR_COMPOSITOR_REFERENCE Data;

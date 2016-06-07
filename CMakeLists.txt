@@ -4,6 +4,11 @@ project (iris)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_subdirectory(iris)
 add_subdirectory(irisadvanced)
 add_subdirectory(irisspectrum)

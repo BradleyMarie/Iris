@@ -16,6 +16,3 @@ generate_export_header(iris
     EXPORT_MACRO_NAME IRISAPI
     EXPORT_FILE_NAME inc/iris_api.h
     STATIC_DEFINE IRIS_BUILT_AS_STATIC)
-
-set_property(TARGET iris PROPERTY C_STANDARD 11)
-set_property(TARGET iris PROPERTY C_STANDARD_REQUIRED ON)

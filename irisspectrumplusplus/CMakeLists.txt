@@ -25,6 +25,3 @@ generate_export_header(irisspectrumplusplus
     EXPORT_MACRO_NAME IRISSPECTRUMPLUSPLUSAPI
     EXPORT_FILE_NAME inc/irisspectrumplusplus_api.h
     STATIC_DEFINE IRISSPECTRUMPLUSPLUS_BUILT_AS_STATIC)
-
-set_property(TARGET irisspectrumplusplus PROPERTY CXX_STANDARD 11)
-set_property(TARGET irisspectrumplusplus PROPERTY CXX_STANDARD_REQUIRED ON)

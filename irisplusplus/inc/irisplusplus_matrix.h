@@ -21,6 +21,20 @@ Abstract:
 namespace Iris {
 
 //
+// Forward Declarations
+//
+
+class Matrix;
+
+static
+inline
+Matrix
+operator*(
+    _In_ const Matrix & Multiplicand0,
+    _In_ const Matrix & Multiplicand1
+    );
+
+//
 // Types
 //
 
@@ -188,7 +202,6 @@ public:
     }
 
     friend
-    static
     inline
     Matrix
     operator*(

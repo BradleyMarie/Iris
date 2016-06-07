@@ -29,6 +29,7 @@ extern "C" {
 
 #include <stdexcept>
 #include <memory>
+#include <string>
 
 //
 // Include IrisAdvanced++ Headers

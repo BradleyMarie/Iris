@@ -73,7 +73,3 @@ target_link_libraries(iris-test
     irisspectrumplusplus
     irisphysxplusplus
     irisphysxtoolkitplusplus)
-
-set_property(TARGET iris-test PROPERTY CXX_STANDARD 11)
-
-set_property(TARGET iris-test PROPERTY CXX_STANDARD_REQUIRED ON)

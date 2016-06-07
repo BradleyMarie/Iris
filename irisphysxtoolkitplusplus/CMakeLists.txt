@@ -33,6 +33,3 @@ generate_export_header(irisphysxtoolkitplusplus
     EXPORT_MACRO_NAME IRISPHYSXTOOLKITPLUSPLUSAPI
     EXPORT_FILE_NAME inc/irisphysxtoolkitplusplus_api.h
     STATIC_DEFINE IRISPHYSXTOOLKITPLUSPLUS_BUILT_AS_STATIC)
-
-set_property(TARGET irisphysxtoolkitplusplus PROPERTY C_STANDARD 11)
-set_property(TARGET irisphysxtoolkitplusplus PROPERTY C_STANDARD_REQUIRED ON)

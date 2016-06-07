@@ -29,6 +29,3 @@ generate_export_header(irisshadingmodel
     EXPORT_MACRO_NAME IRISSHADINGMODELAPI
     EXPORT_FILE_NAME inc/irisshadingmodel_api.h
     STATIC_DEFINE IRISSHADINGMODEL_BUILT_AS_STATIC)
-
-set_property(TARGET irisshadingmodel PROPERTY C_STANDARD 11)
-set_property(TARGET irisshadingmodel PROPERTY C_STANDARD_REQUIRED ON)

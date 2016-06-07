@@ -1,4 +1,5 @@
 include(GenerateExportHeader)
+include(FindOpenMP)
 
 include_directories(inc src/inc
     ../iris/inc 
@@ -37,5 +38,7 @@ if (ENABLE_CSG)
     add_definitions(-DENABLE_CSG_SUPPORT)
 endif()
 
-set_property(TARGET irisphysxtoolkit PROPERTY C_STANDARD 11)
-set_property(TARGET irisphysxtoolkit PROPERTY C_STANDARD_REQUIRED ON)
+if (OPENMP_FOUND)
+	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${C_FLAGS} ${OpenMP_C_FLAGS}”)
+	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${CXX_FLAGS} ${OpenMP_CXX_FLAGS}”)
+endif()

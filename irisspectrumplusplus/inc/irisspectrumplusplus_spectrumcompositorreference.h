@@ -235,20 +235,6 @@ public:
         
         return Result;
     }
-    
-    SpectrumCompositorReference(
-        _In_ SpectrumCompositorReference & ToCopy
-        )
-    : Data(ToCopy.Data)
-    { }
-        
-    SpectrumCompositorReference &
-    operator=(
-        _In_ const SpectrumCompositorReference & ToCopy
-        )
-    {
-        Data = ToCopy.Data;
-    }
         
 private:
     PSPECTRUM_COMPOSITOR_REFERENCE Data;

@@ -27,7 +27,7 @@ extern "C" {
 // Include C++ standard library headers
 //
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __APPLE__
 #include "optional.hpp"
 #else
 #include <optional>

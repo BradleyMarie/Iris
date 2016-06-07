@@ -13,7 +13,10 @@ Abstract:
 --*/
 
 #include <irisphysxtoolkitp.h>
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 //
 // Types
@@ -393,11 +396,13 @@ PinholeRender(
     ImagePlaneHeightVector = VectorScale(ImagePlaneHeightVector,
                                          (FLOAT) 1.0 / (FLOAT) FramebufferRows);
 
+#ifdef _OPENMP
     if (Parallelize != FALSE)
     {
         NumberOfThreads = (SIZE_T) omp_get_num_procs();
     }
     else
+#endif // _OPENMP
     {
         NumberOfThreads = 1;
     }
@@ -485,9 +490,15 @@ PinholeRender(
         {
             NumberOfPixels = FramebufferRows * FramebufferColumns;
 
+#ifdef _OPENMP
             #pragma omp parallel default(shared) reduction(+: Status) num_threads(NumberOfThreads)
+#endif // OPENMP
             {
+#ifdef _OPENMP
                 INT32 Index = (INT32) omp_get_thread_num();
+#else
+                INT32 Index = 0;
+#endif //_OPENMP
 
                 PINHOLE_INTEGRATE_CONTEXT IntegrateContext;
 

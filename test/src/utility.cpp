@@ -124,6 +124,8 @@ bool operator==(
            Ray1.Time == Ray2.Time;
 }
 
+namespace Iris {
+
 std::ostream & 
 operator<<(
     std::ostream & OStream,
@@ -204,3 +206,5 @@ operator==(
 {
     return Ray1.AsRAY() == Ray2.AsRAY();
 }
+
+} // namespace Iris

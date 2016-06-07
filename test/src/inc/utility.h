@@ -52,6 +52,8 @@ bool operator==(
     const RAY & Ray2
     );
 
+namespace Iris {
+
 std::ostream & 
 operator<<(
     std::ostream & OStream,
@@ -94,4 +96,6 @@ operator<<(
     const Iris::Ray & R
     );
 
+} // namespace Iris
+    
 #endif // _IRIS_TEST_UTILITY_HEADER_

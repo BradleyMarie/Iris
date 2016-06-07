@@ -59,10 +59,10 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
         
-        static_assert(sizeof(T) != 0);
-        static_assert(alignof(T) != 0);
-        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
-        static_assert(sizeof(T) % alignof(T) == 0);
+        static_assert(sizeof(T) != 0, "sizeof(T) == 0");
+        static_assert(alignof(T) != 0, "alignof(T) == 0");
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0, "(alignof(T) & (alignof(T) - 1)) != 0");
+        static_assert(sizeof(T) % alignof(T) == 0, "sizeof(T) % alignof(T) != 0");
 
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
@@ -88,10 +88,10 @@ public:
         static_assert(std::is_trivially_copyable<T>::value,
                       "AdditionalData must be trivially copyable");
         
-        static_assert(sizeof(T) != 0);
-        static_assert(alignof(T) != 0);
-        static_assert((alignof(T) & (alignof(T) - 1)) == 0);
-        static_assert(sizeof(T) % alignof(T) == 0);
+        static_assert(sizeof(T) != 0, "sizeof(T) == 0");
+        static_assert(alignof(T) != 0, "alignof(T) == 0");
+        static_assert((alignof(T) & (alignof(T) - 1)) == 0, "(alignof(T) & (alignof(T) - 1)) != 0");
+        static_assert(sizeof(T) % alignof(T) == 0, "sizeof(T) % alignof(T) != 0");
 
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,

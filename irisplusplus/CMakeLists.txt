@@ -18,6 +18,3 @@ generate_export_header(irisplusplus
     EXPORT_MACRO_NAME IRISPLUSPLUSAPI
     EXPORT_FILE_NAME inc/irisplusplus_api.h
     STATIC_DEFINE IRISPLUSPLUS_BUILT_AS_STATIC)
-
-set_property(TARGET irisplusplus PROPERTY CXX_STANDARD 11)
-set_property(TARGET irisplusplus PROPERTY CXX_STANDARD_REQUIRED ON)

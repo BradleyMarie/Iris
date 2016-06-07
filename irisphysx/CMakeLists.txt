@@ -26,6 +26,3 @@ generate_export_header(irisphysx
     EXPORT_MACRO_NAME IRISPHYSXAPI
     EXPORT_FILE_NAME inc/irisphysx_api.h
     STATIC_DEFINE IRISPHYSX_BUILT_AS_STATIC)
-
-set_property(TARGET irisphysx PROPERTY C_STANDARD 11)
-set_property(TARGET irisphysx PROPERTY C_STANDARD_REQUIRED ON)
