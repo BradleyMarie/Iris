@@ -113,7 +113,7 @@ LambertianIndirectShaderAllocate(
     IndirectShader = IndirectShaderAllocate(&LambertianShaderVTable,
                                             &LambertianIndirectShader,
                                             sizeof(LAMBERTIAN_INDIRECT_SHADER),
-                                            sizeof(PVOID));
+                                            _Alignof(LAMBERTIAN_INDIRECT_SHADER));
 
     return IndirectShader;
 }

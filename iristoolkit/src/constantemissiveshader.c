@@ -80,7 +80,7 @@ ConstantEmissiveShaderAllocate(
     EmissiveShader = EmissiveShaderAllocate(&ConstantEmissiveShaderVTable,
                                             &ConstantEmissiveShader,
                                             sizeof(CONSTANT_EMISSIVE_SHADER),
-                                            sizeof(PVOID));
+                                            _Alignof(CONSTANT_EMISSIVE_SHADER));
 
     return EmissiveShader;
 }

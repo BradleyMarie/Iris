@@ -105,7 +105,7 @@ ConstantNormalAllocate(
     SurfaceNormal = NormalAllocate(ConstantNormalVTable,
                                    &ConstantNormal,
                                    sizeof(CONSTANT_NORMAL),
-                                   sizeof(PVOID));
+                                   _Alignof(CONSTANT_NORMAL));
 
     return SurfaceNormal;
 }
