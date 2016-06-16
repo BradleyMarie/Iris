@@ -243,6 +243,16 @@ FramebufferSaveAsPFM(
     FLOAT Scale;
     FILE *File;
 
+    if (Framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (Path == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
 #if defined(_MSC_VER)
 
     errno_t error = fopen_s(&File, Path, "wb");

@@ -276,7 +276,7 @@ PinholeCameraRender(
 
     NormalizedUpVector = VectorNormalize(Up, NULL, NULL);
 
-    ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, Up);
+    ImagePlaneWidthVector = VectorCrossProduct(NormalizedCameraDirection, NormalizedUpVector);
 
     ImagePlaneWidthVector = VectorNormalize(ImagePlaneWidthVector, NULL, NULL);
 

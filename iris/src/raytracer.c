@@ -52,6 +52,7 @@ RayTracerAllocate(
 
     if (Status != ISTATUS_SUCCESS)
     {
+        free(RayTracer);
         return Status;
     }
 

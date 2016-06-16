@@ -83,6 +83,7 @@ PointerListAddPointer(
     PVOID *ResizedList;
 
     ASSERT(PointerList != NULL);
+    ASSERT(PointerList->PointerListCapacity != 0);
 
     if (PointerList->PointerListSize == PointerList->PointerListCapacity)
     {

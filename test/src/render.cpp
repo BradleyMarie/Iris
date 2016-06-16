@@ -298,5 +298,6 @@ TEST(RenderCornellBox)
                                  PathTracer,
                                  Framebuffer);
 
+    CHECK_EQUAL(ISTATUS_SUCCESS, Status);
     FramebufferSaveAsPFM(Framebuffer, "RenderCornellBox.pfm");
 }

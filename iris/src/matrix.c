@@ -703,7 +703,7 @@ MatrixAllocateScalar(
                                       (FLOAT) 1.0,
                                       Matrix);
 
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 _Check_return_

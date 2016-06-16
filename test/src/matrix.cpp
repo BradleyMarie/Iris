@@ -25,17 +25,17 @@ TEST(MatrixInitialize)
                             (FLOAT) 3.0,
                             (FLOAT) 4.0,
                             (FLOAT) 5.0,
-                            (FLOAT) 6.0,
+                            (FLOAT) 1.0,
                             (FLOAT) 7.0,
                             (FLOAT) 8.0,
                             (FLOAT) 9.0,
                             (FLOAT) 10.0,
-                            (FLOAT) 11.0,
+                            (FLOAT) 1.0,
                             (FLOAT) 12.0,
                             (FLOAT) 13.0,
                             (FLOAT) 14.0,
                             (FLOAT) 15.0,
-                            (FLOAT) 16.0,
+                            (FLOAT) 1.0,
                             &Matrix);
 
     CHECK_EQUAL(ISTATUS_SUCCESS, Status);
@@ -47,17 +47,17 @@ TEST(MatrixInitialize)
     CHECK_EQUAL((FLOAT) 3.0, Contents[0][2]);
     CHECK_EQUAL((FLOAT) 4.0, Contents[0][3]);
     CHECK_EQUAL((FLOAT) 5.0, Contents[1][0]);
-    CHECK_EQUAL((FLOAT) 6.0, Contents[1][1]);
+    CHECK_EQUAL((FLOAT) 1.0, Contents[1][1]);
     CHECK_EQUAL((FLOAT) 7.0, Contents[1][2]);
     CHECK_EQUAL((FLOAT) 8.0, Contents[1][3]);
     CHECK_EQUAL((FLOAT) 9.0, Contents[2][0]);
     CHECK_EQUAL((FLOAT) 10.0, Contents[2][1]);
-    CHECK_EQUAL((FLOAT) 11.0, Contents[2][2]);
+    CHECK_EQUAL((FLOAT) 1.0, Contents[2][2]);
     CHECK_EQUAL((FLOAT) 12.0, Contents[2][3]);
     CHECK_EQUAL((FLOAT) 13.0, Contents[3][0]);
     CHECK_EQUAL((FLOAT) 14.0, Contents[3][1]);
     CHECK_EQUAL((FLOAT) 15.0, Contents[3][2]);
-    CHECK_EQUAL((FLOAT) 16.0, Contents[3][3]);
+    CHECK_EQUAL((FLOAT) 1.0, Contents[3][3]);
 }
 
 TEST(MatrixInverse)

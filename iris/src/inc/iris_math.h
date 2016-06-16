@@ -39,10 +39,10 @@ Float4x4DivideRow(
 
     Scalar = (FLOAT) 1.0 / Divisor;
 
-    Matrix[Row][0] *= Divisor;
-    Matrix[Row][1] *= Divisor;
-    Matrix[Row][2] *= Divisor;
-    Matrix[Row][3] *= Divisor;
+    Matrix[Row][0] *= Scalar;
+    Matrix[Row][1] *= Scalar;
+    Matrix[Row][2] *= Scalar;
+    Matrix[Row][3] *= Scalar;
 }
 
 SFORCEINLINE
