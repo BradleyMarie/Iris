@@ -655,216 +655,6 @@ PhysxTriangleFree(
     PbrMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
 }
 
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightTriangleGetMaterial(
-    _In_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-
-    ASSERT(Context != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-    
-    if (FaceHit > TRIANGLE_BACK_FACE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    *Material = Triangle->Materials[FaceHit];
-
-    return ISTATUS_SUCCESS;
-}
-
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-PhysxLightTriangleGetLight(
-    _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Out_ PCPBR_LIGHT *Light
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-
-    ASSERT(Context != NULL);
-    ASSERT(Light != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-    
-    if (FaceHit > TRIANGLE_BACK_FACE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    *Light = Triangle->Lights[FaceHit];
-
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-PhysxLightTriangleComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
-    _In_ UINT32 FaceHit,
-    _Out_ PVECTOR3 SurfaceNormal
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(SurfaceNormal != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-    
-    Status = TriangleComputeNormal(&Triangle->Data,
-                                   ModelHitPoint,
-                                   FaceHit,
-                                   SurfaceNormal);
-                                   
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightTriangleTestBounds(
-    _In_ PCVOID Context,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
-    _Out_ PBOOL IsInsideBox
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(IsInsideBox != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-    
-    Status = TriangleCheckBounds(&Triangle->Data,
-                                 ModelToWorld,
-                                 WorldAlignedBoundingBox,
-                                 IsInsideBox);
-                                 
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightTriangleXDominantTestRay(
-    _In_opt_ PCVOID Context, 
-    _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
-    _Outptr_result_maybenull_ PHIT_LIST *HitList
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(HitAllocator != NULL);
-    ASSERT(HitList != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-
-    Status = TriangleXDominantTestRay(&Triangle->Data,
-                                      Ray,
-                                      HitAllocator,
-                                      HitList);
-
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightTriangleYDominantTestRay(
-    _In_opt_ PCVOID Context, 
-    _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
-    _Outptr_result_maybenull_ PHIT_LIST *HitList
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(HitAllocator != NULL);
-    ASSERT(HitList != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-
-    Status = TriangleYDominantTestRay(&Triangle->Data,
-                                      Ray,
-                                      HitAllocator,
-                                      HitList);
-
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightTriangleZDominantTestRay(
-    _In_opt_ PCVOID Context, 
-    _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
-    _Outptr_result_maybenull_ PHIT_LIST *HitList
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(HitAllocator != NULL);
-    ASSERT(HitList != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-
-    Status = TriangleZDominantTestRay(&Triangle->Data,
-                                      Ray,
-                                      HitAllocator,
-                                      HitList);
-
-    return Status;
-}
-
-STATIC
-VOID
-PhysxLightTriangleFree(
-    _In_ _Post_invalid_ PVOID Context
-    )
-{
-    PCPHYSX_LIGHT_TRIANGLE Triangle;
-
-    ASSERT(Context != NULL);
-
-    Triangle = (PCPHYSX_LIGHT_TRIANGLE) Context;
-
-    PbrMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
-    PbrMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
-    PbrLightRelease(Triangle->Lights[TRIANGLE_FRONT_FACE]);
-    PbrLightRelease(Triangle->Lights[TRIANGLE_BACK_FACE]);
-}
-
 //
 // Static Variables
 //
@@ -874,7 +664,6 @@ CONST STATIC PBR_GEOMETRY_VTABLE XTriangleHeader = {
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
     PhysxTriangleGetMaterial,
-    NULL,
     PhysxTriangleFree
 };
 
@@ -883,8 +672,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE YTriangleHeader = {
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
     PhysxTriangleGetMaterial,
-    NULL,
-    PhysxTriangleFree
+	PhysxTriangleFree
 };
 
 CONST STATIC PBR_GEOMETRY_VTABLE ZTriangleHeader = {
@@ -892,35 +680,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE ZTriangleHeader = {
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
     PhysxTriangleGetMaterial,
-    NULL,
-    PhysxTriangleFree
-};
-
-CONST STATIC PBR_GEOMETRY_VTABLE XLightTriangleHeader = {
-    PhysxLightTriangleXDominantTestRay,
-    PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleTestBounds,
-    PhysxLightTriangleGetMaterial,
-    PhysxLightTriangleGetLight,
-    PhysxLightTriangleFree
-};
-
-CONST STATIC PBR_GEOMETRY_VTABLE YLightTriangleHeader = {
-    PhysxLightTriangleYDominantTestRay,
-    PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleTestBounds,
-    PhysxLightTriangleGetMaterial,
-    PhysxLightTriangleGetLight,
-    PhysxLightTriangleFree
-};
-
-CONST STATIC PBR_GEOMETRY_VTABLE ZLightTriangleHeader = {
-    PhysxLightTriangleZDominantTestRay,
-    PhysxLightTriangleComputeNormal,
-    PhysxLightTriangleTestBounds,
-    PhysxLightTriangleGetMaterial,
-    PhysxLightTriangleGetLight,
-    PhysxLightTriangleFree
+	PhysxTriangleFree
 };
 
 //
@@ -936,13 +696,10 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex2,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _In_opt_ PPBR_LIGHT FrontLight,
-    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     )
 {
     PCPBR_GEOMETRY_VTABLE GeometryVTable;
-    PHYSX_LIGHT_TRIANGLE LightTriangle;
     VECTOR_AXIS DominantAxis;
     PHYSX_TRIANGLE Triangle;
     SIZE_T DataAlignment;
@@ -970,76 +727,38 @@ PhysxTriangleAllocate(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (FrontLight != NULL || 
-        BackLight != NULL)
-    {
-        Status = TriangleInitialize(&LightTriangle.Data,
-                                    Vertex0,
-                                    Vertex1,
-                                    Vertex2,
-                                    &DominantAxis);
 
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        LightTriangle.Materials[TRIANGLE_FRONT_FACE] = FrontMaterial;
-        LightTriangle.Materials[TRIANGLE_BACK_FACE] = BackMaterial;
-        LightTriangle.Lights[TRIANGLE_FRONT_FACE] = FrontLight;
-        LightTriangle.Lights[TRIANGLE_BACK_FACE] = BackLight;
-        
-        Data = &LightTriangle;
-        DataSize = sizeof(PHYSX_LIGHT_TRIANGLE);
-        DataAlignment = _Alignof(PHYSX_LIGHT_TRIANGLE);
-        
-        switch (DominantAxis)
-        {
-            case VECTOR_X_AXIS:
-                GeometryVTable = &XLightTriangleHeader;
-                break;
-            case VECTOR_Y_AXIS:
-                GeometryVTable = &YLightTriangleHeader;
-                break;
-            default:
-                GeometryVTable = &ZLightTriangleHeader;
-                break;
-        }
-    }
-    else
-    {
-        Status = TriangleInitialize(&Triangle.Data,
-                                    Vertex0,
-                                    Vertex1,
-                                    Vertex2,
-                                    &DominantAxis);
+	Status = TriangleInitialize(&Triangle.Data,
+								Vertex0,
+								Vertex1,
+								Vertex2,
+								&DominantAxis);
 
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        Triangle.Materials[TRIANGLE_FRONT_FACE] = FrontMaterial;
-        Triangle.Materials[TRIANGLE_BACK_FACE] = BackMaterial;
-        
-        Data = &Triangle;
-        DataSize = sizeof(PHYSX_TRIANGLE);
-        DataAlignment = _Alignof(PHYSX_TRIANGLE);
+	if (Status != ISTATUS_SUCCESS)
+	{
+		return Status;
+	}
 
-        switch (DominantAxis)
-        {
-            case VECTOR_X_AXIS:
-                GeometryVTable = &XTriangleHeader;
-                break;
-            case VECTOR_Y_AXIS:
-                GeometryVTable = &YTriangleHeader;
-                break;
-            default:
-                GeometryVTable = &ZTriangleHeader;
-                break;
-        }
-    }
-    
+	Triangle.Materials[TRIANGLE_FRONT_FACE] = FrontMaterial;
+	Triangle.Materials[TRIANGLE_BACK_FACE] = BackMaterial;
+
+	Data = &Triangle;
+	DataSize = sizeof(PHYSX_TRIANGLE);
+	DataAlignment = _Alignof(PHYSX_TRIANGLE);
+
+	switch (DominantAxis)
+	{
+		case VECTOR_X_AXIS:
+			GeometryVTable = &XTriangleHeader;
+			break;
+		case VECTOR_Y_AXIS:
+			GeometryVTable = &YTriangleHeader;
+			break;
+		default:
+			GeometryVTable = &ZTriangleHeader;
+			break;
+	}
+
     Status = PBRGeometryAllocate(GeometryVTable,
                                  Data,
                                  DataSize,
@@ -1053,8 +772,6 @@ PhysxTriangleAllocate(
 
     PbrMaterialRetain(FrontMaterial);
     PbrMaterialRetain(BackMaterial);
-    PbrLightRetain(FrontLight);
-    PbrLightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

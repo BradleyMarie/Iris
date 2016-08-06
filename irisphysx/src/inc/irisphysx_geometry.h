@@ -31,4 +31,9 @@ PBRGeometryTestRayAdapter(
     _Out_ PHIT_LIST *HitList
     );
 
+VOID
+PBRGeometryFree(
+    _In_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
+    );
+
 #endif // _PBR_GEOMETRY_IRIS_PHYSX_INTERNAL_

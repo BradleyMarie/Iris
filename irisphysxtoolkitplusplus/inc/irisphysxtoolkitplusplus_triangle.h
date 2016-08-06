@@ -32,15 +32,11 @@ Create(
     _In_ const Iris::Point & Vertex1,
     _In_ const Iris::Point & Vertex2,
     _In_ std::optional<IrisPhysx::Material> FrontMaterial,
-    _In_ std::optional<IrisPhysx::Material> BackMaterial,
-    _In_ std::optional<IrisPhysx::Light> FrontLight,
-    _In_ std::optional<IrisPhysx::Light> BackLight
+    _In_ std::optional<IrisPhysx::Material> BackMaterial
     )
 {
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
-    PPBR_LIGHT IrisFrontLight = (FrontLight) ? FrontLight->AsPPBR_LIGHT() : nullptr;
-    PPBR_LIGHT IrisBackLight = (BackLight) ? BackLight->AsPPBR_LIGHT() : nullptr;
 
     PPBR_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxTriangleAllocate(Vertex0.AsPOINT3(),
@@ -48,8 +44,6 @@ Create(
                                            Vertex2.AsPOINT3(),
                                            IrisFrontMaterial,
                                            IrisBackMaterial,
-                                           IrisFrontLight,
-                                           IrisBackLight,
                                            &GeometryPtr);
 
     switch (Status)

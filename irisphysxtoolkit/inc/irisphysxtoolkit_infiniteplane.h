@@ -30,8 +30,6 @@ PhysxInfinitePlaneAllocate(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _In_opt_ PPBR_LIGHT FrontLight,
-    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     );
 

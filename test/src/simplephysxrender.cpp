@@ -118,9 +118,7 @@ TEST(PhysxRenderConstantRedWorldSphere)
     Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
                                               1.0f,
                                               ConstantMaterial,
-                                              ConstantMaterial,
-                                              nullopt,
-                                              nullopt);
+                                              ConstantMaterial);
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne);
@@ -201,9 +199,7 @@ TEST(PhysxRenderConstantRedModelSphere)
     Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
                                               1.0f,
                                               ConstantMaterial,
-                                              ConstantMaterial,
-                                              nullopt,
-                                              nullopt);
+                                              ConstantMaterial);
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(0.5f, 0.5f, 0.5f));
@@ -284,9 +280,7 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
     Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
                                               1.0f,
                                               ConstantMaterial,
-                                              ConstantMaterial,
-                                              nullopt,
-                                              nullopt);
+                                              ConstantMaterial);
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(1.0f, 1.0f, 1.0f), true);
@@ -369,9 +363,7 @@ TEST(PhysxRenderPerfectSpecularSphere)
     Geometry SphereOne = Sphere::Create(Point(1.0f, 0.0f, -1.0f),
                                         1.0f,
                                         ConstantMaterial,
-                                        ConstantMaterial,
-                                        nullopt,
-                                        nullopt);
+                                        ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
 
@@ -384,9 +376,7 @@ TEST(PhysxRenderPerfectSpecularSphere)
     Geometry SphereTwo = Sphere::Create(Point(-1.0f, 0.0f, -1.0f),
                                         1.0f,
                                         RefletiveMaterial,
-                                        RefletiveMaterial,
-                                        nullopt,
-                                        nullopt);
+                                        RefletiveMaterial);
 
     Scene.AddGeometry(SphereTwo);
 
@@ -486,9 +476,7 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                                           Point(0.0f, 1.5f, 0.0f),
                                           Point(1.5f, 0.0f, 0.0f),
                                           ConstantMaterial,
-                                          ConstantMaterial,
-                                          nullopt,
-                                          nullopt);
+                                          ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
 
@@ -598,9 +586,7 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                                           Point(0.0f, 1.5f, 0.0f),
                                           Point(1.5f, 0.0f, 0.0f),
                                           ConstantMaterial,
-                                          ConstantMaterial,
-                                          nullopt,
-                                          nullopt);
+                                          ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
 
@@ -697,9 +683,7 @@ TEST(PhysxRenderPhongWorldSphere)
     Geometry SphereRadiusOne = Sphere::Create(Point(0.0f, 0.0f, 0.0f),
                                               1.0f,
                                               ConstantMaterial,
-                                              ConstantMaterial,
-                                              nullopt,
-                                              nullopt);
+                                              ConstantMaterial);
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne);
@@ -825,23 +809,17 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
     Geometry SphereOne = Sphere::Create(Point(0.0f, 1.0f, 0.0f),
                                         1.0f,
                                         SphereMaterial,
-                                        SphereMaterial,
-                                        nullopt,
-                                        nullopt);
+                                        SphereMaterial);
 
     Geometry SphereTwo = Sphere::Create(Point(-1.0f, 0.5f, 1.5f),
                                         0.5f,
                                         SphereMaterial,
-                                        SphereMaterial,
-                                        nullopt,
-                                        nullopt);
+                                        SphereMaterial);
 
     Geometry InfinitePlane = InfinitePlane::Create(Point(0.0f, 0.0f, 0.0f),
                                                    Vector(0.0f, 1.0f, 0.0f),
                                                    Checkerboard,
-                                                   Checkerboard,
-                                                   nullopt,
-                                                   nullopt);
+                                                   Checkerboard);
 
     TestListScene Scene;
     Scene.AddGeometry(SphereOne);

@@ -31,23 +31,17 @@ Create(
     _In_ const Iris::Point & Point,
     _In_ const Iris::Vector & SurfaceNormal,
     _In_ std::optional<IrisPhysx::Material> FrontMaterial,
-    _In_ std::optional<IrisPhysx::Material> BackMaterial,
-    _In_ std::optional<IrisPhysx::Light> FrontLight,
-    _In_ std::optional<IrisPhysx::Light> BackLight
+    _In_ std::optional<IrisPhysx::Material> BackMaterial
     )
 {
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
-    PPBR_LIGHT IrisFrontLight = (FrontLight) ? FrontLight->AsPPBR_LIGHT() : nullptr;
-    PPBR_LIGHT IrisBackLight = (BackLight) ? BackLight->AsPPBR_LIGHT() : nullptr;
 
     PPBR_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxInfinitePlaneAllocate(Point.AsPOINT3(),
                                                 SurfaceNormal.AsVECTOR3(),
                                                 IrisFrontMaterial,
                                                 IrisBackMaterial,
-                                                IrisFrontLight,
-                                                IrisBackLight,
                                                 &GeometryPtr);
 
     switch (Status)

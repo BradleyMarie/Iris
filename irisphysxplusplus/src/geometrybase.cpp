@@ -119,34 +119,6 @@ GeometryGetMaterialAdapter(
     return ISTATUS_SUCCESS;
 }
 
-_Success_(return == ISTATUS_SUCCESS)
-static
-ISTATUS
-GeometryGetLightAdapter(
-    _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
-    )
-{
-    assert(Context != nullptr);
-    assert(Light != nullptr);
-
-    const GeometryBase **GeometryBasePtr = (const GeometryBase**) Context;
-    
-    std::optional<LightReference> LightOpt = (*GeometryBasePtr)->GetLight(FaceHit);
-
-    if (LightOpt)
-    {
-        *Light = LightOpt->AsPCPBR_LIGHT();
-    }
-    else
-    {
-        *Light = nullptr;
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
 static
 VOID
 GeometryFreeAdapter(
@@ -164,7 +136,6 @@ const static PBR_GEOMETRY_VTABLE InteropVTable {
     GeometryComputeNormalAdapter,
     GeometryCheckBoundsAdapter,
     GeometryGetMaterialAdapter,
-    GeometryGetLightAdapter,
     GeometryFreeAdapter
 };
 

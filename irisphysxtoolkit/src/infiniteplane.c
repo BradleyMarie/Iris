@@ -478,17 +478,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE InfinitePlaneHeader = {
     PhysxInfinitePlaneComputeNormal,
     PhysxInfinitePlaneTestBounds,
     PhysxInfinitePlaneGetMaterial,
-    NULL,
     PhysxInfinitePlaneFree
-};
-
-CONST STATIC PBR_GEOMETRY_VTABLE LightInfinitePlaneHeader = {
-    PhysxLightInfinitePlaneTestRay,
-    PhysxLightInfinitePlaneComputeNormal,
-    PhysxLightInfinitePlaneTestBounds,
-    PhysxLightInfinitePlaneGetMaterial,
-    PhysxLightInfinitePlaneGetLight,
-    PhysxLightInfinitePlaneFree
 };
 
 //
@@ -503,13 +493,10 @@ PhysxInfinitePlaneAllocate(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _In_opt_ PPBR_LIGHT FrontLight,
-    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     )
 {
     PCPBR_GEOMETRY_VTABLE GeometryVTable;
-    PHYSX_LIGHT_INFINITE_PLANE LightInfinitePlane;
     PHYSX_INFINITE_PLANE InfinitePlane;
     SIZE_T DataAlignment;
     SIZE_T DataSize;
@@ -521,47 +508,22 @@ PhysxInfinitePlaneAllocate(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (FrontLight != NULL || 
-        BackLight != NULL)
-    {
-        Status = InfinitePlaneInitialize(Point,
-                                         SurfaceNormal,
-                                         &LightInfinitePlane.Data);
+	Status = InfinitePlaneInitialize(Point,
+									 SurfaceNormal,
+									 &InfinitePlane.Data);
 
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        LightInfinitePlane.Materials[INFINITE_PLANE_FRONT_FACE] = FrontMaterial;
-        LightInfinitePlane.Materials[INFINITE_PLANE_BACK_FACE] = BackMaterial;
-        LightInfinitePlane.Lights[INFINITE_PLANE_FRONT_FACE] = FrontLight;
-        LightInfinitePlane.Lights[INFINITE_PLANE_BACK_FACE] = BackLight;
-        
-        GeometryVTable = &LightInfinitePlaneHeader;
-        Data = &LightInfinitePlane;
-        DataSize = sizeof(PHYSX_LIGHT_INFINITE_PLANE);
-        DataAlignment = _Alignof(PHYSX_LIGHT_INFINITE_PLANE);
-    }
-    else
-    {
-        Status = InfinitePlaneInitialize(Point,
-                                         SurfaceNormal,
-                                         &InfinitePlane.Data);
+	if (Status != ISTATUS_SUCCESS)
+	{
+		return Status;
+	}
 
-        if (Status != ISTATUS_SUCCESS)
-        {
-            return Status;
-        }
-        
-        InfinitePlane.Materials[INFINITE_PLANE_FRONT_FACE] = FrontMaterial;
-        InfinitePlane.Materials[INFINITE_PLANE_BACK_FACE] = BackMaterial;
+	InfinitePlane.Materials[INFINITE_PLANE_FRONT_FACE] = FrontMaterial;
+	InfinitePlane.Materials[INFINITE_PLANE_BACK_FACE] = BackMaterial;
 
-        GeometryVTable = &InfinitePlaneHeader;
-        Data = &InfinitePlane;
-        DataSize = sizeof(PHYSX_INFINITE_PLANE);
-        DataAlignment = _Alignof(PHYSX_INFINITE_PLANE);
-    }
+	GeometryVTable = &InfinitePlaneHeader;
+	Data = &InfinitePlane;
+	DataSize = sizeof(PHYSX_INFINITE_PLANE);
+	DataAlignment = _Alignof(PHYSX_INFINITE_PLANE);
     
     Status = PBRGeometryAllocate(GeometryVTable,
                                  Data,
@@ -576,8 +538,6 @@ PhysxInfinitePlaneAllocate(
 
     PbrMaterialRetain(FrontMaterial);
     PbrMaterialRetain(BackMaterial);
-    PbrLightRetain(FrontLight);
-    PbrLightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

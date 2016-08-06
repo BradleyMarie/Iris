@@ -38,7 +38,7 @@ public:
     virtual
     PHIT_LIST
     TestRay(
-        _In_ Iris::Ray WorldRay,
+        _In_ const Iris::Ray & WorldRay,
         _In_ HitAllocator Allocator
         ) const = 0;
 
@@ -64,14 +64,7 @@ public:
     GetMaterial(
         _In_ const UINT32 FaceHit
         ) const = 0;
-    
-    _Ret_
-    virtual
-    std::optional<LightReference>
-    GetLight(
-        _In_ const UINT32 FaceHit
-        ) const = 0;
-    
+
     virtual
     ~GeometryBase(
         void

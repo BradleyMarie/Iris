@@ -18,10 +18,165 @@ Abstract:
 // Types
 //
 
+typedef union _PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT {
+    PPHYSX_LIGHTED_GEOMETRY Owner;
+    SIZE_T Value;
+} PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT;
+
 struct _PBR_GEOMETRY {
     PCPBR_GEOMETRY_VTABLE VTable;
-    SIZE_T ReferenceCount;
+    PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT ReferenceCount;
     PVOID Data;
+};
+
+typedef struct _PHYSX_GEOMETRY_WITH_LIGHTS {
+    PPBR_GEOMETRY Geometry;
+    _Field_size_(NumberOfLights) PPBR_LIGHT Lights;
+    SIZE_T NumberOfLights;
+} PHYSX_GEOMETRY_WITH_LIGHTS, *PPHYSX_GEOMETRY_WITH_LIGHTS;
+
+typedef CONST PHYSX_GEOMETRY_WITH_LIGHTS *PCPHYSX_GEOMETRY_WITH_LIGHTS;
+
+//
+// Static Functions
+//
+
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxGeometryWithLightsGetMaterial(
+    _In_ PCVOID Context, 
+    _In_ UINT32 FaceHit,
+    _Out_opt_ PCPBR_MATERIAL *Material
+    )
+{
+    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+
+    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    
+    Status = PBRGeometryGetMaterial(GeometryWithLights->Geometry,
+                                    FaceHit,
+                                    Material);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxGeometryWithLightsComputeNormal(
+    _In_ PCVOID Context, 
+    _In_ POINT3 ModelHitPoint,
+    _In_ UINT32 FaceHit,
+    _Out_ PVECTOR3 SurfaceNormal
+    )
+{
+    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(SurfaceNormal != NULL);
+
+    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    
+    Status = PBRGeometryComputeNormal(GeometryWithLights->Geometry,
+                                      ModelHitPoint,
+                                      FaceHit,
+                                      SurfaceNormal);
+                                   
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxGeometryWithLightsTestBounds(
+    _In_ PCVOID Context,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    )
+{
+    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(IsInsideBox != NULL);
+
+    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    
+    Status = PBRGeometryCheckBounds(GeometryWithLights->Geometry,
+                                    ModelToWorld,
+                                    WorldAlignedBoundingBox,
+                                    IsInsideBox);
+                                 
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxGeometryWithLightsTestRay(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+
+    //
+    // Call directly through VTable to avoid modifying
+    // the Hit Allocator to point to the nested geometry
+    //
+
+    Status = GeometryWithLights->Geometry->VTable->TestRayRoutine(GeometryWithLights->Geometry->Data,
+                                                                  Ray,
+                                                                  HitAllocator,
+                                                                  HitList);
+
+    return Status;
+}
+
+STATIC
+VOID
+PhysxGeometryWithLightsFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+
+    ASSERT(Context != NULL);
+
+    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+
+    PBRGeometryRelease(GeometryWithLights->Geometry);
+}
+
+//
+// Static Variables
+//
+
+CONST STATIC PBR_GEOMETRY_VTABLE GeometryWithLightsVTable = {
+    PhysxGeometryWithLightsTestRay,
+    PhysxGeometryWithLightsComputeNormal,
+    PhysxGeometryWithLightsTestBounds,
+    PhysxGeometryWithLightsGetMaterial,
+    PhysxGeometryWithLightsFree
 };
 
 //
@@ -82,6 +237,8 @@ PBRGeometryAllocate(
     PVOID DataAllocation;
     PPBR_GEOMETRY AllocatedGeometry;
 
+    ASSERT(PBRGeometryVTable != &GeometryWithLightsVTable);
+
     if (PBRGeometryVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -128,7 +285,7 @@ PBRGeometryAllocate(
 
     AllocatedGeometry->VTable = PBRGeometryVTable;
     AllocatedGeometry->Data = DataAllocation;
-    AllocatedGeometry->ReferenceCount = 1;
+    AllocatedGeometry->ReferenceCount.Value = 1;
 
     if (DataSizeInBytes != 0)
     {
@@ -289,8 +446,6 @@ PBRGeometryGetLight(
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     )
 {
-    ISTATUS Status;
-    
     if (PBRGeometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -301,11 +456,16 @@ PBRGeometryGetLight(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    Status = PBRGeometry->VTable->GetLightRoutine(PBRGeometry->Data,
-                                                  FaceHit,
-                                                  Light);
+    if (PBRGeometry->VTable != &GeometryWithLightsVTable)
+    {
+        *Light = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
-    return Status;
+    // TODO
+
+    *Light = NULL;
+    return ISTATUS_SUCCESS;
 }
     
 VOID
@@ -318,7 +478,14 @@ PBRGeometryRetain(
         return;
     }
 
-    PBRGeometry->ReferenceCount += 1;
+    if (PBRGeometry->VTable == &GeometryWithLightsVTable)
+    {
+        LightedGeometryRetain(PBRGeometry->ReferenceCount.Owner);
+    }
+    else
+    {
+        PBRGeometry->ReferenceCount.Value += 1;
+    }
 }
     
 VOID
@@ -326,24 +493,43 @@ PBRGeometryRelease(
     _In_opt_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
     )
 {
-    PFREE_ROUTINE FreeRoutine;
+    SIZE_T ReferenceCount;
 
     if (PBRGeometry == NULL)
     {
         return;
     }
 
-    PBRGeometry->ReferenceCount -= 1;
-
-    if (PBRGeometry->ReferenceCount == 0)
+    if (PBRGeometry->VTable == &GeometryWithLightsVTable)
     {
-        FreeRoutine = PBRGeometry->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
-        {
-            FreeRoutine(PBRGeometry->Data);
-        }
-
-        IrisAlignedFree(PBRGeometry);
+        LightedGeometryRelease(PBRGeometry->ReferenceCount.Owner);
     }
+    else
+    {
+        ReferenceCount = (PBRGeometry->ReferenceCount.Value -= 1);
+
+        if (ReferenceCount == 0)
+        {
+            PBRGeometryFree(PBRGeometry);
+        }
+    }
+}
+
+VOID
+PBRGeometryFree(
+    _In_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+
+    ASSERT(PBRGeometry != NULL);
+    
+    FreeRoutine = PBRGeometry->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(PBRGeometry->Data);
+    }
+
+    IrisAlignedFree(PBRGeometry);
 }

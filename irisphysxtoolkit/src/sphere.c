@@ -399,158 +399,6 @@ PhysxSphereFree(
     PbrMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
 }
 
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightSphereGetMaterial(
-    _In_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-
-    ASSERT(Context != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-    
-    if (FaceHit > SPHERE_BACK_FACE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    *Material = Sphere->Materials[FaceHit];
-
-    return ISTATUS_SUCCESS;
-}
-
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-PhysxLightSphereGetLight(
-    _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Out_ PCPBR_LIGHT *Light
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-
-    ASSERT(Context != NULL);
-    ASSERT(Light != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-    
-    if (FaceHit > SPHERE_BACK_FACE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    *Light = Sphere->Lights[FaceHit];
-
-    return ISTATUS_SUCCESS;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-PhysxLightSphereComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
-    _In_ UINT32 FaceHit,
-    _Out_ PVECTOR3 SurfaceNormal
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(SurfaceNormal != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-    
-    Status = SphereComputeNormal(&Sphere->Data,
-                                 ModelHitPoint,
-                                 FaceHit,
-                                 SurfaceNormal);
-                                   
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightSphereTestBounds(
-    _In_ PCVOID Context,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
-    _Out_ PBOOL IsInsideBox
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(IsInsideBox != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-    
-    Status = SphereCheckBounds(&Sphere->Data,
-                               ModelToWorld,
-                               WorldAlignedBoundingBox,
-                               IsInsideBox);
-                                 
-    return Status;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS 
-PhysxLightSphereTestRay(
-    _In_opt_ PCVOID Context, 
-    _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
-    _Outptr_result_maybenull_ PHIT_LIST *HitList
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-    ISTATUS Status;
-
-    ASSERT(Context != NULL);
-    ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(HitAllocator != NULL);
-    ASSERT(HitList != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-
-    Status = SphereTestRay(&Sphere->Data,
-                           Ray,
-                           HitAllocator,
-                           HitList);
-
-    return Status;
-}
-
-STATIC
-VOID
-PhysxLightSphereFree(
-    _In_ _Post_invalid_ PVOID Context
-    )
-{
-    PCPHYSX_LIGHT_SPHERE Sphere;
-
-    ASSERT(Context != NULL);
-
-    Sphere = (PCPHYSX_LIGHT_SPHERE) Context;
-
-    PbrMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
-    PbrMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
-    PbrLightRelease(Sphere->Lights[SPHERE_FRONT_FACE]);
-    PbrLightRelease(Sphere->Lights[SPHERE_BACK_FACE]);
-}
-
 //
 // Static Variables
 //
@@ -560,17 +408,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE SphereHeader = {
     PhysxSphereComputeNormal,
     PhysxSphereTestBounds,
     PhysxSphereGetMaterial,
-    NULL,
     PhysxSphereFree
-};
-
-CONST STATIC PBR_GEOMETRY_VTABLE LightSphereHeader = {
-    PhysxLightSphereTestRay,
-    PhysxLightSphereComputeNormal,
-    PhysxLightSphereTestBounds,
-    PhysxLightSphereGetMaterial,
-    PhysxLightSphereGetLight,
-    PhysxLightSphereFree
 };
 
 //
@@ -585,13 +423,10 @@ PhysxSphereAllocate(
     _In_ FLOAT Radius,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _In_opt_ PPBR_LIGHT FrontLight,
-    _In_opt_ PPBR_LIGHT BackLight,
     _Out_ PPBR_GEOMETRY *Geometry
     )
 {
     PCPBR_GEOMETRY_VTABLE GeometryVTable;
-    PHYSX_LIGHT_SPHERE LightSphere;
     PHYSX_SPHERE Sphere;
     SIZE_T DataAlignment;
     FLOAT RadiusSquared;
@@ -622,37 +457,17 @@ PhysxSphereAllocate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (FrontLight != NULL || 
-        BackLight != NULL)
-    {
-        SphereInitialize(&LightSphere.Data,
-                         Center,
-                         RadiusSquared);
-        
-        LightSphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
-        LightSphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
-        LightSphere.Lights[SPHERE_FRONT_FACE] = FrontLight;
-        LightSphere.Lights[SPHERE_BACK_FACE] = BackLight;
-        
-        Data = &LightSphere;
-        DataSize = sizeof(PHYSX_LIGHT_SPHERE);
-        DataAlignment = _Alignof(PHYSX_LIGHT_SPHERE);
-        GeometryVTable = &LightSphereHeader;
-    }
-    else
-    {
-        SphereInitialize(&Sphere.Data,
-                         Center,
-                         RadiusSquared);
-        
-        Sphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
-        Sphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
-        
-        Data = &Sphere;
-        DataSize = sizeof(PHYSX_SPHERE);
-        DataAlignment = _Alignof(PHYSX_SPHERE);
-        GeometryVTable = &SphereHeader;
-    }
+	SphereInitialize(&Sphere.Data,
+					 Center,
+					 RadiusSquared);
+
+	Sphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
+	Sphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
+
+	Data = &Sphere;
+	DataSize = sizeof(PHYSX_SPHERE);
+	DataAlignment = _Alignof(PHYSX_SPHERE);
+	GeometryVTable = &SphereHeader;
     
     Status = PBRGeometryAllocate(GeometryVTable,
                                  Data,
@@ -666,9 +481,6 @@ PhysxSphereAllocate(
     }
 
     PbrMaterialRetain(FrontMaterial);
-    PbrMaterialRetain(BackMaterial);
-    PbrLightRetain(FrontLight);
-    PbrLightRetain(BackLight);
 
     return ISTATUS_SUCCESS;
 }

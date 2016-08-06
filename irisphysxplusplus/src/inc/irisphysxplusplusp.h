@@ -21,4 +21,7 @@ Abstract:
 
 #include <irisphysxplusplus.h>
 
+#include <mutex>
+#include <map>
+
 #endif // _IRIS_PHYSX_PLUS_PLUS_INTERNAL_HEADER_

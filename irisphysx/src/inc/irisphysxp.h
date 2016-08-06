@@ -21,10 +21,12 @@ Abstract:
 #include <iriscommon_pointerlist.h>
 #include <iriscommon_visibility.h>
 
+#include "irisphysx_types.h"
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_hitallocator.h"
 #include "irisphysx_geometry.h"
+#include "irisphysx_lightedgeometry.h"
 #include "irisphysx_hittester.h"
 #include "irisphysx_raytraceradapter.h"
 #include "irisphysx_visibilitytester.h"

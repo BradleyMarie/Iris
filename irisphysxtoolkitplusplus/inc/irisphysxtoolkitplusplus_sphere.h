@@ -31,23 +31,17 @@ Create(
     _In_ const Iris::Point & Center,
     _In_ FLOAT Radius,
     _In_ std::optional<IrisPhysx::Material> FrontMaterial,
-    _In_ std::optional<IrisPhysx::Material> BackMaterial,
-    _In_ std::optional<IrisPhysx::Light> FrontLight,
-    _In_ std::optional<IrisPhysx::Light> BackLight
+    _In_ std::optional<IrisPhysx::Material> BackMaterial
     )
 {
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
-    PPBR_LIGHT IrisFrontLight = (FrontLight) ? FrontLight->AsPPBR_LIGHT() : nullptr;
-    PPBR_LIGHT IrisBackLight = (BackLight) ? BackLight->AsPPBR_LIGHT() : nullptr;
 
     PPBR_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxSphereAllocate(Center.AsPOINT3(),
                                          Radius,
                                          IrisFrontMaterial,
                                          IrisBackMaterial,
-                                         IrisFrontLight,
-                                         IrisBackLight,
                                          &GeometryPtr);
 
     switch (Status)

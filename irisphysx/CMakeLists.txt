@@ -10,6 +10,7 @@ add_library(irisphysx SHARED
     src/brdfallocator.c
     src/hitallocator.c
     src/geometry.c
+    src/lightedgeometry.c
     src/hittester.c
     src/raytraceradapter.c
     src/visibilitytester.c

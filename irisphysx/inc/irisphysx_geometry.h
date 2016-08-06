@@ -63,21 +63,11 @@ ISTATUS
     _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
     );
 
-typedef
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-(*PPBR_GEOMETRY_GET_LIGHT_ROUTINE)(
-    _In_opt_ PCVOID Context, 
-    _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
-    );
-
 typedef struct _PBR_GEOMETRY_VTABLE {
     PPBR_GEOMETRY_TEST_RAY_ROUTINE TestRayRoutine;
     PPBR_GEOMETRY_COMPUTE_NORMAL_ROUTINE ComputeNormalRoutine;
     PPBR_GEOMETRY_CHECK_BOUNDS_ROUTINE CheckBoundsRoutine;
     PPBR_GEOMETRY_GET_MATERIAL_ROUTINE GetMaterialRoutine;
-    PPBR_GEOMETRY_GET_LIGHT_ROUTINE GetLightRoutine;
     PFREE_ROUTINE FreeRoutine;
 } PBR_GEOMETRY_VTABLE, *PPBR_GEOMETRY_VTABLE;
 
