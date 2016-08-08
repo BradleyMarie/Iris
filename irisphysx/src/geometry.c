@@ -18,6 +18,14 @@ Abstract:
 // Types
 //
 
+typedef struct _PHYSX_GEOMETRY_WITH_LIGHTS {
+    PPBR_GEOMETRY Geometry;
+    _Field_size_(HighestLightIndex + 1) PPBR_LIGHT *Lights;
+    UINT32 HighestLightIndex;
+} PHYSX_GEOMETRY_WITH_LIGHTS, *PPHYSX_GEOMETRY_WITH_LIGHTS;
+
+typedef CONST PHYSX_GEOMETRY_WITH_LIGHTS *PCPHYSX_GEOMETRY_WITH_LIGHTS;
+
 typedef union _PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT {
     PPHYSX_LIGHTED_GEOMETRY Owner;
     SIZE_T Value;
@@ -28,14 +36,6 @@ struct _PBR_GEOMETRY {
     PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT ReferenceCount;
     PVOID Data;
 };
-
-typedef struct _PHYSX_GEOMETRY_WITH_LIGHTS {
-    PPBR_GEOMETRY Geometry;
-    _Field_size_(NumberOfLights) PPBR_LIGHT Lights;
-    SIZE_T NumberOfLights;
-} PHYSX_GEOMETRY_WITH_LIGHTS, *PPHYSX_GEOMETRY_WITH_LIGHTS;
-
-typedef CONST PHYSX_GEOMETRY_WITH_LIGHTS *PCPHYSX_GEOMETRY_WITH_LIGHTS;
 
 //
 // Static Functions

@@ -20,6 +20,7 @@ Abstract:
 
 struct _PBR_LIGHT {
     PCPBR_LIGHT_VTABLE VTable;
+    PPHYSX_LIGHTED_GEOMETRY Owner;
     SIZE_T ReferenceCount;
     PVOID Data;
 };
@@ -91,6 +92,7 @@ PbrLightAllocate(
     AllocatedPbrLight->VTable = PbrLightVTable;
     AllocatedPbrLight->Data = DataAllocation;
     AllocatedPbrLight->ReferenceCount = 1;
+    AllocatedPbrLight->Owner = NULL;
 
     if (DataSizeInBytes != 0)
     {
@@ -267,8 +269,34 @@ PbrLightRetain(
     {
         return;
     }
+    
+    if (PbrLight->Owner != NULL)
+    {
+        LightedGeometryRetain(PbrLight->Owner);
+    }
+    else
+    {
+        PbrLight->ReferenceCount += 1;
+    }
+}
 
-    PbrLight->ReferenceCount += 1;
+VOID
+PBRLightFree(
+    _In_ _Post_invalid_ PPBR_LIGHT PbrLight
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+    
+    ASSERT(PbrLight != NULL);
+    
+    FreeRoutine = PbrLight->VTable->FreeRoutine;
+    
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(PbrLight->Data);
+    }
+    
+    IrisAlignedFree(PbrLight);
 }
 
 VOID
@@ -276,24 +304,22 @@ PbrLightRelease(
     _In_opt_ _Post_invalid_ PPBR_LIGHT PbrLight
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-
     if (PbrLight == NULL)
     {
         return;
     }
 
-    PbrLight->ReferenceCount -= 1;
-
-    if (PbrLight->ReferenceCount == 0)
+    if (PbrLight->Owner != NULL)
     {
-        FreeRoutine = PbrLight->VTable->FreeRoutine;
-
-        if (FreeRoutine != NULL)
+        LightedGeometryRelease(PbrLight->Owner);
+    }
+    else
+    {
+        PbrLight->ReferenceCount -= 1;
+        
+        if (PbrLight->ReferenceCount == 0)
         {
-            FreeRoutine(PbrLight->Data);
+            PBRLightFree(PbrLight);
         }
-
-        IrisAlignedFree(PbrLight);
     }
 }
