@@ -10,12 +10,12 @@ add_library(irisphysx SHARED
     src/brdfallocator.c
     src/hitallocator.c
     src/geometry.c
-    src/lightedgeometry.c
     src/hittester.c
     src/raytraceradapter.c
     src/visibilitytester.c
     src/raytracer.c
-    src/integrator.c)
+    src/integrator.c
+    src/arealightbuilder.c)
 
 target_link_libraries(irisphysx 
     iris

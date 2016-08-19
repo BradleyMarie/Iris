@@ -20,14 +20,15 @@ Abstract:
 #include <iriscommon_dynamicallocator.h>
 #include <iriscommon_pointerlist.h>
 #include <iriscommon_visibility.h>
+#include <iriscommon_uint32toindexmap.h>
 
 #include "irisphysx_types.h"
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_hitallocator.h"
+#include "irisphysx_arealightbuilder.h"
 #include "irisphysx_light.h"
 #include "irisphysx_geometry.h"
-#include "irisphysx_lightedgeometry.h"
 #include "irisphysx_hittester.h"
 #include "irisphysx_raytraceradapter.h"
 #include "irisphysx_visibilitytester.h"

@@ -15,20 +15,32 @@ Abstract:
 #include <irisphysxp.h>
 
 //
+// Macros
+//
+
+#define PHYSX_LIGHTED_GEOMETRY_MAX_ATTACHED_LIGHTS \
+    (SIZE_MAX / sizeof(PHYSX_LIGHTED_GEOMETRY))
+
+//
 // Types
 //
 
-typedef struct _PHYSX_GEOMETRY_WITH_LIGHTS {
-    PPBR_GEOMETRY Geometry;
-    _Field_size_(HighestLightIndex + 1) PPBR_LIGHT *Lights;
-    UINT32 HighestLightIndex;
-} PHYSX_GEOMETRY_WITH_LIGHTS, *PPHYSX_GEOMETRY_WITH_LIGHTS;
+typedef struct _PHYSX_ATTACHED_LIGHT {
+    PPBR_LIGHT Light;
+    UINT32 Face;
+} PHYSX_ATTACHED_LIGHT, *PPHYSX_ATTACHED_LIGHT;
 
-typedef CONST PHYSX_GEOMETRY_WITH_LIGHTS *PCPHYSX_GEOMETRY_WITH_LIGHTS;
+typedef struct _PHYSX_LIGHTED_GEOMETRY {
+    PPBR_GEOMETRY Geometry;
+    _Field_size_(NumberOfLights) PPHYSX_ATTACHED_LIGHT Lights;
+    SIZE_T NumberOfLights;
+} PHYSX_LIGHTED_GEOMETRY, *PPHYSX_LIGHTED_GEOMETRY;
+
+typedef CONST PHYSX_LIGHTED_GEOMETRY *PCPHYSX_LIGHTED_GEOMETRY;
 
 typedef union _PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT {
-    PPHYSX_LIGHTED_GEOMETRY Owner;
-    SIZE_T Value;
+    PPHYSX_AREA_LIGHT_REFERENCE_COUNT Area;
+    SIZE_T Simple;
 } PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT;
 
 struct _PBR_GEOMETRY {
@@ -38,26 +50,26 @@ struct _PBR_GEOMETRY {
 };
 
 //
-// Static Functions
+// Lighted Geometry Static Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxGeometryWithLightsGetMaterial(
+PhysxLightedGeometryGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
     _Out_opt_ PCPBR_MATERIAL *Material
     )
 {
-    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
 
-    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) Context;
     
-    Status = PBRGeometryGetMaterial(GeometryWithLights->Geometry,
+    Status = PBRGeometryGetMaterial(LightedGeometry->Geometry,
                                     FaceHit,
                                     Material);
 
@@ -68,22 +80,22 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PhysxGeometryWithLightsComputeNormal(
+PhysxLightedGeometryComputeNormal(
     _In_ PCVOID Context, 
     _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
-    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
     ASSERT(SurfaceNormal != NULL);
 
-    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) Context;
     
-    Status = PBRGeometryComputeNormal(GeometryWithLights->Geometry,
+    Status = PBRGeometryComputeNormal(LightedGeometry->Geometry,
                                       ModelHitPoint,
                                       FaceHit,
                                       SurfaceNormal);
@@ -95,22 +107,22 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxGeometryWithLightsTestBounds(
+PhysxLightedGeometryTestBounds(
     _In_ PCVOID Context,
     _In_ PCMATRIX ModelToWorld,
     _In_ BOUNDING_BOX WorldAlignedBoundingBox,
     _Out_ PBOOL IsInsideBox
     )
 {
-    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
     ASSERT(IsInsideBox != NULL);
 
-    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) Context;
     
-    Status = PBRGeometryCheckBounds(GeometryWithLights->Geometry,
+    Status = PBRGeometryCheckBounds(LightedGeometry->Geometry,
                                     ModelToWorld,
                                     WorldAlignedBoundingBox,
                                     IsInsideBox);
@@ -122,14 +134,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS 
-PhysxGeometryWithLightsTestRay(
+PhysxLightedGeometryTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
     _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
-    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
@@ -137,51 +149,237 @@ PhysxGeometryWithLightsTestRay(
     ASSERT(HitAllocator != NULL);
     ASSERT(HitList != NULL);
 
-    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) Context;
 
     //
     // Call directly through VTable to avoid modifying
     // the Hit Allocator to point to the nested geometry
     //
 
-    Status = GeometryWithLights->Geometry->VTable->TestRayRoutine(GeometryWithLights->Geometry->Data,
-                                                                  Ray,
-                                                                  HitAllocator,
-                                                                  HitList);
+    Status = LightedGeometry->Geometry->VTable->TestRayRoutine(LightedGeometry->Geometry->Data,
+                                                               Ray,
+                                                               HitAllocator,
+                                                               HitList);
 
     return Status;
 }
 
 STATIC
 VOID
-PhysxGeometryWithLightsFree(
+PhysxLightedGeometryFree(
     _In_ _Post_invalid_ PVOID Context
     )
 {
-    PCPHYSX_GEOMETRY_WITH_LIGHTS GeometryWithLights;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
 
     ASSERT(Context != NULL);
 
-    GeometryWithLights = (PCPHYSX_GEOMETRY_WITH_LIGHTS) Context;
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) Context;
 
-    PBRGeometryRelease(GeometryWithLights->Geometry);
+    PBRGeometryRelease(LightedGeometry->Geometry);
 }
 
 //
 // Static Variables
 //
 
-CONST STATIC PBR_GEOMETRY_VTABLE GeometryWithLightsVTable = {
-    PhysxGeometryWithLightsTestRay,
-    PhysxGeometryWithLightsComputeNormal,
-    PhysxGeometryWithLightsTestBounds,
-    PhysxGeometryWithLightsGetMaterial,
-    PhysxGeometryWithLightsFree
+CONST STATIC PBR_GEOMETRY_VTABLE LightedGeometryVTable = {
+    PhysxLightedGeometryTestRay,
+    PhysxLightedGeometryComputeNormal,
+    PhysxLightedGeometryTestBounds,
+    PhysxLightedGeometryGetMaterial,
+    PhysxLightedGeometryFree
 };
+
+//
+// Static Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PBRGeometryAllocateImplementation(
+    _In_ PCPBR_GEOMETRY_VTABLE PBRGeometryVTable,
+    _In_opt_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PPBR_GEOMETRY *PBRGeometry
+    )
+{
+    ASSERT(PBRGeometryVTable != NULL);
+    ASSERT(ReferenceCount == NULL || PBRGeometryVTable == &LightedGeometryVTable);
+    ASSERT(DataSizeInBytes == 0 || 
+           (Data != NULL && DataAlignment != 0 && 
+           (DataAlignment & DataAlignment - 1) == 0 &&
+           DataSizeInBytes % DataAlignment == 0));
+    ASSERT(PBRGeometry != NULL);
+
+    BOOL AllocationSuccessful;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
+    PPBR_GEOMETRY AllocatedGeometry;
+
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_GEOMETRY),
+                                                      _Alignof(PBR_GEOMETRY),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
+
+    if (AllocationSuccessful == FALSE)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedGeometry = (PPBR_GEOMETRY) HeaderAllocation;
+
+    AllocatedGeometry->VTable = PBRGeometryVTable;
+    AllocatedGeometry->Data = DataAllocation;
+
+    if (ReferenceCount != NULL)
+    {
+        AllocatedGeometry->ReferenceCount.Area = ReferenceCount;
+    }
+    else
+    {
+        AllocatedGeometry->ReferenceCount.Simple = 1;
+    }
+
+    if (DataSizeInBytes != 0)
+    {
+        memcpy(DataAllocation, Data, DataSizeInBytes);
+    }
+
+    *PBRGeometry = AllocatedGeometry;
+
+    return ISTATUS_SUCCESS;
+}
 
 //
 // Internal Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxLightedGeometryAllocate(
+    _In_ PCPBR_GEOMETRY_VTABLE PBRGeometryVTable,
+    _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
+    _In_ SIZE_T AttachCount,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PPBR_GEOMETRY *PBRGeometry
+    )
+{
+    PPHYSX_LIGHTED_GEOMETRY AllocatedLightedGeometry;
+    PHYSX_LIGHTED_GEOMETRY LightedGeometry;
+    PPBR_GEOMETRY NestedGeometry;
+    PPBR_GEOMETRY ResultGeometry;
+    ISTATUS Status;
+
+    ASSERT(PBRGeometryVTable != NULL);
+    ASSERT(ReferenceCount != NULL);
+    ASSERT(DataSizeInBytes == 0 || 
+           (Data != NULL && DataAlignment != 0 && 
+           (DataAlignment & DataAlignment - 1) && 
+           DataSizeInBytes % DataAlignment == 0));
+    ASSERT(PBRGeometry != NULL);
+
+    if (PHYSX_LIGHTED_GEOMETRY_MAX_ATTACHED_LIGHTS < AttachCount)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (AttachCount != 0)
+    {
+        LightedGeometry.Lights = malloc(sizeof(PHYSX_ATTACHED_LIGHT) * AttachCount);
+
+        if (LightedGeometry.Lights == NULL)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+    else
+    {
+        LightedGeometry.Lights = NULL;
+    }
+
+    LightedGeometry.NumberOfLights = 0;
+    LightedGeometry.Geometry = NULL;
+
+    Status = PBRGeometryAllocateImplementation(&LightedGeometryVTable, 
+                                               ReferenceCount,
+                                               &LightedGeometry,
+                                               sizeof(PHYSX_LIGHTED_GEOMETRY),
+                                               _Alignof(PHYSX_LIGHTED_GEOMETRY),
+                                               &ResultGeometry);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        free(LightedGeometry.Lights);
+        return Status;
+    }
+
+    //
+    // The nested geometry must be allocated last. We should never call the
+    // destructor of the nested geometry from this routine as it may have 
+    // side affects.
+    //
+
+    Status = PBRGeometryAllocateImplementation(PBRGeometryVTable, 
+                                               NULL,
+                                               Data,
+                                               DataSizeInBytes,
+                                               DataAlignment,
+                                               &NestedGeometry);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        PBRGeometryFree(ResultGeometry);
+        return Status;
+    }
+
+    AllocatedLightedGeometry = (PPHYSX_LIGHTED_GEOMETRY) ResultGeometry->Data;
+    AllocatedLightedGeometry->Geometry = NestedGeometry;
+
+    *PBRGeometry = ResultGeometry;
+
+    return Status;
+}
+
+VOID
+PhysxLightedGeometryAttachLight(
+    _Inout_ PPBR_GEOMETRY LightedGeometry,
+    _In_ PPBR_LIGHT Light,
+    _In_ UINT32 Face
+    )
+{
+    PPHYSX_LIGHTED_GEOMETRY LightedGeometryData;
+    PPHYSX_ATTACHED_LIGHT AttachedLight;
+
+    ASSERT(LightedGeometry->VTable == &LightedGeometryVTable);
+
+    LightedGeometryData = (PPHYSX_LIGHTED_GEOMETRY) LightedGeometry->Data;
+
+    AttachedLight = LightedGeometryData->Lights + LightedGeometryData->NumberOfLights;
+    LightedGeometryData->NumberOfLights += 1;
+
+    AttachedLight->Light = Light;
+    AttachedLight->Face = Face;
+}
+
+VOID
+PhysxLightedGeometryFinalize(
+    _Inout_ PPBR_GEOMETRY LightedGeometry
+    )
+{
+    // TODO
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -232,14 +430,10 @@ PBRGeometryAllocate(
     _Out_ PPBR_GEOMETRY *PBRGeometry
     )
 {
-    BOOL AllocationSuccessful;
-    PVOID HeaderAllocation;
-    PVOID DataAllocation;
-    PPBR_GEOMETRY AllocatedGeometry;
+    ISTATUS Status;
 
-    ASSERT(PBRGeometryVTable != &GeometryWithLightsVTable);
-
-    if (PBRGeometryVTable == NULL)
+    if (PBRGeometryVTable == NULL ||
+        PBRGeometryVTable == &LightedGeometryVTable)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -268,33 +462,14 @@ PBRGeometryAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_GEOMETRY),
-                                                      _Alignof(PBR_GEOMETRY),
-                                                      &HeaderAllocation,
-                                                      DataSizeInBytes,
-                                                      DataAlignment,
-                                                      &DataAllocation,
-                                                      NULL);
+    Status = PBRGeometryAllocateImplementation(PBRGeometryVTable, 
+                                               NULL,
+                                               Data,
+                                               DataSizeInBytes,
+                                               DataAlignment,
+                                               PBRGeometry);
 
-    if (AllocationSuccessful == FALSE)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    AllocatedGeometry = (PPBR_GEOMETRY) HeaderAllocation;
-
-    AllocatedGeometry->VTable = PBRGeometryVTable;
-    AllocatedGeometry->Data = DataAllocation;
-    AllocatedGeometry->ReferenceCount.Value = 1;
-
-    if (DataSizeInBytes != 0)
-    {
-        memcpy(DataAllocation, Data, DataSizeInBytes);
-    }
-
-    *PBRGeometry = AllocatedGeometry;
-
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 _Check_return_
@@ -456,7 +631,7 @@ PBRGeometryGetLight(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    if (PBRGeometry->VTable != &GeometryWithLightsVTable)
+    if (PBRGeometry->VTable != &LightedGeometryVTable)
     {
         *Light = NULL;
         return ISTATUS_SUCCESS;
@@ -478,13 +653,13 @@ PBRGeometryRetain(
         return;
     }
 
-    if (PBRGeometry->VTable == &GeometryWithLightsVTable)
+    if (PBRGeometry->VTable == &LightedGeometryVTable)
     {
-        LightedGeometryRetain(PBRGeometry->ReferenceCount.Owner);
+        AreaLightReferenceCountRetain(PBRGeometry->ReferenceCount.Area);
     }
     else
     {
-        PBRGeometry->ReferenceCount.Value += 1;
+        PBRGeometry->ReferenceCount.Simple += 1;
     }
 }
     
@@ -500,13 +675,13 @@ PBRGeometryRelease(
         return;
     }
 
-    if (PBRGeometry->VTable == &GeometryWithLightsVTable)
+    if (PBRGeometry->VTable == &LightedGeometryVTable)
     {
-        LightedGeometryRelease(PBRGeometry->ReferenceCount.Owner);
+        AreaLightReferenceCountRelease(PBRGeometry->ReferenceCount.Area);
     }
     else
     {
-        ReferenceCount = (PBRGeometry->ReferenceCount.Value -= 1);
+        ReferenceCount = (PBRGeometry->ReferenceCount.Simple -= 1);
 
         if (ReferenceCount == 0)
         {
