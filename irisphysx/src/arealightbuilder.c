@@ -30,7 +30,7 @@ struct _PHYSX_AREA_LIGHT_REFERENCE_COUNT {
 };
 
 typedef struct _PHYSX_AREA_LIGHT_GEOMETRY_DATA {
-    PCPBR_GEOMETRY_VTABLE VTable;
+    PCPHYSX_LIGHTED_GEOMETRY_VTABLE VTable;
     _Field_size_bytes_(DataSizeInBytes) PVOID Data;
     SIZE_T DataSizeInBytes;
     SIZE_T DataAlignment;
@@ -38,7 +38,7 @@ typedef struct _PHYSX_AREA_LIGHT_GEOMETRY_DATA {
 } PHYSX_AREA_LIGHT_GEOMETRY_DATA, *PPHYSX_AREA_LIGHT_GEOMETRY_DATA;
 
 typedef struct _PHYSX_AREA_LIGHT_LIGHT_DATA {
-    PCPBR_LIGHT_VTABLE VTable;
+    PCPHYSX_AREA_LIGHT_VTABLE VTable;
     _Field_size_bytes_(DataSizeInBytes) PVOID Data;
     SIZE_T DataSizeInBytes;
     SIZE_T DataAlignment;
@@ -105,7 +105,7 @@ PhysxAreaLightBuilderClear(
         
         if (Builder->CallDestructorsOnClear != FALSE)
         {
-            GeometryData->VTable->FreeRoutine(GeometryData->Data);
+            GeometryData->VTable->Header.FreeRoutine(GeometryData->Data);
         }
         
         free(GeometryData->Data);
@@ -220,7 +220,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxAreaLightBuilderAddGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _In_ PCPBR_GEOMETRY_VTABLE GeometryVTable,
+    _In_ PCPHYSX_LIGHTED_GEOMETRY_VTABLE LightedGeometryVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
@@ -236,7 +236,7 @@ PhysxAreaLightBuilderAddGeometry(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (GeometryVTable == NULL)
+    if (LightedGeometryVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -306,7 +306,7 @@ PhysxAreaLightBuilderAddGeometry(
 
     memcpy(GeometryData->Data, Data, DataSizeInBytes);
 
-    GeometryData->VTable = GeometryVTable;
+    GeometryData->VTable = LightedGeometryVTable;
     GeometryData->DataSizeInBytes = DataSizeInBytes;
     GeometryData->DataAlignment = DataAlignment;
     *GeometryIndex = Index;
@@ -321,7 +321,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxAreaLightBuilderAddLight(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _In_ PCPBR_LIGHT_VTABLE LightVTable,
+    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
@@ -337,7 +337,7 @@ PhysxAreaLightBuilderAddLight(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (LightVTable == NULL)
+    if (AreaLightVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -396,7 +396,7 @@ PhysxAreaLightBuilderAddLight(
 
     memcpy(LightData->Data, Data, DataSizeInBytes);
 
-    LightData->VTable = LightVTable;
+    LightData->VTable = AreaLightVTable;
     LightData->DataSizeInBytes = DataSizeInBytes;
     LightData->DataAlignment = DataAlignment;
     LightData->AttachCount = 0;
@@ -642,7 +642,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
 
         NumberOfAttachedLights = UInt32ToIndexMapGetSize(&GeometryData->AttachedLights);
 
-        Status = PhysxLightedGeometryAllocate(GeometryData->VTable,
+        Status = PhysxLightedGeometryAllocate(&GeometryData->VTable->Header,
                                               ReferenceCount,
                                               NumberOfAttachedLights,
                                               GeometryData->Data,

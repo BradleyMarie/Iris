@@ -21,6 +21,51 @@ Abstract:
 // Types
 //
 
+typedef
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PPHYSX_LIGHTED_GEOMETRY_COMPUTE_SURFACE_AREA)(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 FaceHit,
+    _Out_ PFLOAT SurfaceArea
+    );
+
+typedef
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PPHYSX_LIGHTED_GEOMETRY_SAMPLE_FACE)(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 FaceHit,
+    _Out_ PPOINT3 Sample
+    );
+
+typedef struct _PHYSX_LIGHTED_GEOMETRY_VTABLE {
+    PBR_GEOMETRY_VTABLE Header;
+    PPHYSX_LIGHTED_GEOMETRY_SAMPLE_FACE SampleFaceRoutine;
+    PPHYSX_LIGHTED_GEOMETRY_COMPUTE_SURFACE_AREA ComputeSurfaceAreaRoutine;
+} PHYSX_LIGHTED_GEOMETRY_VTABLE, *PPHYSX_LIGHTED_GEOMETRY_VTABLE;
+
+typedef CONST PHYSX_LIGHTED_GEOMETRY_VTABLE *PCPHYSX_LIGHTED_GEOMETRY_VTABLE;
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PPBR_PHYSX_AREA_LIGHT_COMPUTE_EMISSIVE)(
+    _In_ PCVOID Context,
+    _In_ POINT3 OnLight,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCSPECTRUM *Spectrum
+    );
+
+typedef struct _PHYSX_AREA_LIGHT_VTABLE {
+    PPBR_PHYSX_AREA_LIGHT_COMPUTE_EMISSIVE ComputeEmissiveRoutine;
+    PFREE_ROUTINE FreeRoutine;
+} PHYSX_AREA_LIGHT_VTABLE, *PPHYSX_AREA_LIGHT_VTABLE;
+
+typedef CONST PHYSX_AREA_LIGHT_VTABLE *PCPHYSX_AREA_LIGHT_VTABLE; 
+
 typedef struct _PHYSX_AREA_LIGHT_BUILDER PHYSX_AREA_LIGHT_BUILDER, *PPHYSX_AREA_LIGHT_BUILDER;
 typedef CONST PHYSX_AREA_LIGHT_BUILDER *PCPHYSX_AREA_LIGHT_BUILDER;
 
@@ -42,7 +87,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxAreaLightBuilderAddGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _In_ PCPBR_GEOMETRY_VTABLE GeometryVTable,
+    _In_ PCPHYSX_LIGHTED_GEOMETRY_VTABLE LightedGeometryVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
@@ -55,7 +100,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxAreaLightBuilderAddLight(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _In_ PCPBR_LIGHT_VTABLE LightVTable,
+    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,

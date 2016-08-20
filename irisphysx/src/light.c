@@ -19,24 +19,29 @@ Abstract:
 //
 
 #define PHYSX_AREA_LIGHT_MAX_ATTACHED_LIGHTS \
-    (SIZE_MAX / sizeof(PHYSX_AREA_LIGHT))
+    (SIZE_MAX / sizeof(PHYSX_AREA_LIGHT_ADAPTER))
 
 //
 // Types
 //
+
+typedef struct _PHYSX_AREA_LIGHT {
+    PCPHYSX_AREA_LIGHT_VTABLE VTable;
+    PVOID Data;
+} PHYSX_AREA_LIGHT, *PPHYSX_AREA_LIGHT;
 
 typedef struct _PHYSX_ATTACHED_GEOMETRY {
     PPBR_GEOMETRY Geometry;
     UINT32 Face;
 } PHYSX_ATTACHED_GEOMETRY, *PPHYSX_ATTACHED_GEOMETRY;
 
-typedef struct _PHYSX_AREA_LIGHT {
-    PPBR_LIGHT Light;
+typedef struct _PHYSX_AREA_LIGHT_ADAPTER {
+    PPHYSX_AREA_LIGHT Light;
     _Field_size_(NumberOfGeometry) PPHYSX_ATTACHED_GEOMETRY Geometry;
     SIZE_T NumberOfGeometry;
-} PHYSX_AREA_LIGHT, *PPHYSX_AREA_LIGHT;
+} PHYSX_AREA_LIGHT_ADAPTER, *PPHYSX_AREA_LIGHT_ADAPTER;
 
-typedef CONST PHYSX_AREA_LIGHT *PCPHYSX_AREA_LIGHT;
+typedef CONST PHYSX_AREA_LIGHT_ADAPTER *PCPHYSX_AREA_LIGHT_ADAPTER;
 
 typedef union _PHYSX_LIGHT_SHARED_REFERENCE_COUNT {
     PPHYSX_AREA_LIGHT_REFERENCE_COUNT Area;
@@ -53,7 +58,7 @@ struct _PBR_LIGHT {
 // Static Variables
 //
 
-CONST STATIC PBR_LIGHT_VTABLE AreaLightVTable = {
+CONST STATIC PBR_LIGHT_VTABLE AreaLightAdapterVTable = {
     NULL,
     NULL,
     NULL,
@@ -77,7 +82,7 @@ PbrLightAllocateImplementation(
     )
 {
     ASSERT(PbrLightVTable != NULL);
-    ASSERT(ReferenceCount == NULL || PbrLightVTable == &AreaLightVTable);
+    ASSERT(ReferenceCount == NULL || PbrLightVTable == &AreaLightAdapterVTable);
     ASSERT(DataSizeInBytes == 0 || 
            (Data != NULL && DataAlignment != 0 && 
            (DataAlignment & DataAlignment - 1) == 0 &&
@@ -134,7 +139,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxAreaLightAllocate(
-    _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
+    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
     _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _In_ SIZE_T AttachCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
@@ -143,13 +148,16 @@ PhysxAreaLightAllocate(
     _Out_ PPBR_LIGHT *PbrLight
     )
 {
-    PPHYSX_AREA_LIGHT AllocatedAreaLight;
-    PHYSX_AREA_LIGHT AreaLight;
-    PPBR_LIGHT NestedLight;
+    PPHYSX_AREA_LIGHT_ADAPTER AllocatedAreaLight;
+    PHYSX_AREA_LIGHT_ADAPTER AreaLight;
+    PPHYSX_AREA_LIGHT NestedLight;
+    BOOL AllocationSuccessful;
+    PVOID HeaderAllocation;
+    PVOID DataAllocation;
     PPBR_LIGHT ResultLight;
     ISTATUS Status;
 
-    ASSERT(PbrLightVTable != NULL);
+    ASSERT(AreaLightVTable != NULL);
     ASSERT(ReferenceCount != NULL);
     ASSERT(DataSizeInBytes == 0 || 
            (Data != NULL && DataAlignment != 0 && 
@@ -179,11 +187,11 @@ PhysxAreaLightAllocate(
     AreaLight.NumberOfGeometry = 0;
     AreaLight.Light = NULL;
 
-    Status = PbrLightAllocateImplementation(&AreaLightVTable, 
+    Status = PbrLightAllocateImplementation(&AreaLightAdapterVTable,
                                             ReferenceCount,
                                             &AreaLight,
-                                            sizeof(PHYSX_AREA_LIGHT),
-                                            _Alignof(PHYSX_AREA_LIGHT),
+                                            sizeof(PHYSX_AREA_LIGHT_ADAPTER),
+                                            _Alignof(PHYSX_AREA_LIGHT_ADAPTER),
                                             &ResultLight);
 
     if (Status != ISTATUS_SUCCESS)
@@ -199,21 +207,31 @@ PhysxAreaLightAllocate(
     // side affects.
     //
 
-    Status = PbrLightAllocateImplementation(PbrLightVTable, 
-                                            NULL,
-                                            Data,
-                                            DataSizeInBytes,
-                                            DataAlignment,
-                                            &NestedLight);
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PHYSX_AREA_LIGHT),
+                                                      _Alignof(PHYSX_AREA_LIGHT),
+                                                      &HeaderAllocation,
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataAllocation,
+                                                      NULL);
 
-    if (Status != ISTATUS_SUCCESS)
+    if (AllocationSuccessful == FALSE)
     {
-        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         PBRLightFree(ResultLight);
-        return Status;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedAreaLight = (PPHYSX_AREA_LIGHT) ResultLight->Data;
+    NestedLight = (PPHYSX_AREA_LIGHT) HeaderAllocation;
+
+    NestedLight->VTable = AreaLightVTable;
+    NestedLight->Data = DataAllocation;
+
+    if (DataSizeInBytes != 0)
+    {
+        memcpy(DataAllocation, Data, DataSizeInBytes);
+    }
+
+    AllocatedAreaLight = (PPHYSX_AREA_LIGHT_ADAPTER) ResultLight->Data;
     AllocatedAreaLight->Light = NestedLight;
 
     *PbrLight = ResultLight;
@@ -228,12 +246,12 @@ PhysxAreaLightAttachGeometry(
     _In_ UINT32 Face
     )
 {
-    PPHYSX_AREA_LIGHT AreaLightData;
+    PPHYSX_AREA_LIGHT_ADAPTER AreaLightData;
     PPHYSX_ATTACHED_GEOMETRY AttachedGeometry;
 
-    ASSERT(AreaLight->VTable == &AreaLightVTable);
+    ASSERT(AreaLight->VTable == &AreaLightAdapterVTable);
 
-    AreaLightData = (PPHYSX_AREA_LIGHT) AreaLight->Data;
+    AreaLightData = (PPHYSX_AREA_LIGHT_ADAPTER) AreaLight->Data;
 
     AttachedGeometry = AreaLightData->Geometry + AreaLightData->NumberOfGeometry;
     AreaLightData->NumberOfGeometry += 1;
@@ -273,7 +291,7 @@ PbrLightAllocate(
     ISTATUS Status;
 
     if (PbrLightVTable == NULL || 
-        PbrLightVTable == &AreaLightVTable)
+        PbrLightVTable == &AreaLightAdapterVTable)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -478,7 +496,7 @@ PbrLightRetain(
         return;
     }
     
-    if (PbrLight->VTable == &AreaLightVTable)
+    if (PbrLight->VTable == &AreaLightAdapterVTable)
     {
         AreaLightReferenceCountRetain(PbrLight->ReferenceCount.Area);
     }
@@ -517,7 +535,7 @@ PbrLightRelease(
         return;
     }
 
-    if (PbrLight->VTable == &AreaLightVTable)
+    if (PbrLight->VTable == &AreaLightAdapterVTable)
     {
         AreaLightReferenceCountRelease(PbrLight->ReferenceCount.Area);
     }

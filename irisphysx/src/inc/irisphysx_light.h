@@ -25,7 +25,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxAreaLightAllocate(
-    _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
+    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
     _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _In_ SIZE_T AttachCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
