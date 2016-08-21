@@ -30,6 +30,8 @@ typedef struct _PHYSX_ATTACHED_LIGHT {
     UINT32 Face;
 } PHYSX_ATTACHED_LIGHT, *PPHYSX_ATTACHED_LIGHT;
 
+typedef CONST PHYSX_ATTACHED_LIGHT *PCPHYSX_ATTACHED_LIGHT;
+
 typedef struct _PHYSX_LIGHTED_GEOMETRY {
     PPBR_GEOMETRY Geometry;
     _Field_size_(NumberOfLights) PPHYSX_ATTACHED_LIGHT Lights;
@@ -257,6 +259,31 @@ PBRGeometryAllocateImplementation(
     return ISTATUS_SUCCESS;
 }
 
+int 
+PhysxLightedGeometryCompareLights(
+    _In_ const void * Ptr0,
+    _In_ const void * Ptr1
+    )
+{
+    PCPHYSX_ATTACHED_LIGHT AttachedLight0;
+    PCPHYSX_ATTACHED_LIGHT AttachedLight1;
+
+    AttachedLight0 = (PCPHYSX_ATTACHED_LIGHT) Ptr0;
+    AttachedLight1 = (PCPHYSX_ATTACHED_LIGHT) Ptr1;
+
+    if (AttachedLight0->Face < AttachedLight1->Face)
+    {
+        return -1;
+    }
+
+    if (AttachedLight0->Face > AttachedLight1->Face)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 //
 // Internal Functions
 //
@@ -378,7 +405,16 @@ PhysxLightedGeometryFinalize(
     _Inout_ PPBR_GEOMETRY LightedGeometry
     )
 {
-    // TODO
+    PPHYSX_LIGHTED_GEOMETRY LightedGeometryData;
+    
+    ASSERT(LightedGeometry != NULL);
+    
+    LightedGeometryData = (PPHYSX_LIGHTED_GEOMETRY) LightedGeometry->Data;
+    
+    qsort(LightedGeometryData->Lights,
+          LightedGeometryData->NumberOfLights,
+          sizeof(PHYSX_ATTACHED_LIGHT),
+          PhysxLightedGeometryCompareLights);
 }
 
 _Check_return_
@@ -621,6 +657,11 @@ PBRGeometryGetLight(
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     )
 {
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
+    PHYSX_ATTACHED_LIGHT Key;
+    PCPHYSX_ATTACHED_LIGHT ResultAttachedLight;
+    void* Result;
+
     if (PBRGeometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -637,9 +678,26 @@ PBRGeometryGetLight(
         return ISTATUS_SUCCESS;
     }
 
-    // TODO
+    LightedGeometry = (PCPHYSX_LIGHTED_GEOMETRY) PBRGeometry->Data;
 
-    *Light = NULL;
+    Key.Face = FaceHit;
+    Key.Light = NULL;
+
+    Result = bsearch(&Key,
+                     LightedGeometry->Lights,
+                     LightedGeometry->NumberOfLights,
+                     sizeof(PHYSX_ATTACHED_LIGHT),
+                     PhysxLightedGeometryCompareLights);
+
+    if (Result == NULL)
+    {
+        *Light = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    ResultAttachedLight = (PCPHYSX_ATTACHED_LIGHT) Result;
+    *Light = ResultAttachedLight->Light;
+
     return ISTATUS_SUCCESS;
 }
     
