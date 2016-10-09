@@ -92,4 +92,19 @@ PBRVisibilityTesterDestroy(
     RayTracerFree(PBRVisibilityTester->RayTracer);
 }
 
+//
+// Internal Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PBRVisibilityTesterFindDistanceToLight(
+    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _In_ RAY WorldRay,
+    _In_ PCPBR_LIGHT Light,
+    _Out_ PBOOL Visible,
+    _Out_ PFLOAT DistanceToLight
+    );
+
 #endif // _PBR_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_

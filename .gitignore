@@ -56,6 +56,9 @@ launch.json
 # Images
 *.pfm
 
+# OSX Files
+*.DS_Store
+
 # Directories
 CMakeFiles/
 CMakeScripts/

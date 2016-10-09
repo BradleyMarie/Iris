@@ -21,14 +21,6 @@ Abstract:
 // Types
 //
 
-struct _PHYSX_AREA_LIGHT_REFERENCE_COUNT {
-    _Field_size_(NumberOfGeometry) PPBR_GEOMETRY *Geometry;
-    SIZE_T NumberOfGeometry;
-    _Field_size_(NumberOfLights) PPBR_LIGHT *Lights;
-    SIZE_T NumberOfLights;
-    SIZE_T ReferenceCount;
-};
-
 typedef struct _PHYSX_AREA_LIGHT_GEOMETRY_DATA {
     PCPHYSX_LIGHTED_GEOMETRY_VTABLE VTable;
     _Field_size_bytes_(DataSizeInBytes) PVOID Data;
@@ -54,29 +46,6 @@ struct _PHYSX_AREA_LIGHT_BUILDER {
 //
 // Static Functions
 //
-
-STATIC
-VOID
-AreaLightReferenceCountFree(
-    _In_ _Post_invalid_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT AreaLightReferenceCount
-    )
-{
-    SIZE_T Index;
-
-    ASSERT(AreaLightReferenceCount != NULL);
-
-    for (Index = 0; Index < AreaLightReferenceCount->NumberOfGeometry; Index++)
-    {
-        PBRGeometryFree(AreaLightReferenceCount->Geometry[Index]);
-    }
-
-    for (Index = 0; Index < AreaLightReferenceCount->NumberOfLights; Index++)
-    {
-        PBRLightFree(AreaLightReferenceCount->Lights[Index]);
-    }
-
-    free(AreaLightReferenceCount);
-}
 
 STATIC
 VOID
@@ -133,35 +102,6 @@ PhysxAreaLightBuilderClear(
     }
     
     PointerListClear(&Builder->LightDataList);
-}
-
-//
-// Internal Exports
-//
-
-VOID
-AreaLightReferenceCountRetain(
-    _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT AreaLightReferenceCount
-    )
-{
-    ASSERT(AreaLightReferenceCount != NULL);
-
-    AreaLightReferenceCount->ReferenceCount += 1;
-}
-
-VOID
-AreaLightReferenceCountRelease(
-    _In_ _Post_invalid_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT AreaLightReferenceCount
-    )
-{
-    ASSERT(AreaLightReferenceCount != NULL);
-
-    AreaLightReferenceCount->ReferenceCount -= 1;
-
-    if (AreaLightReferenceCount->ReferenceCount == 0)
-    {
-        AreaLightReferenceCountFree(AreaLightReferenceCount);
-    }
 }
 
 //
@@ -417,6 +357,7 @@ PhysxAreaLightBuilderAttachLightToGeometry(
     _In_ SIZE_T LightIndex
     )
 {
+    FLOAT Area;
     PVOID Data;
     PPHYSX_AREA_LIGHT_GEOMETRY_DATA GeometryData;
     PPHYSX_AREA_LIGHT_LIGHT_DATA LightData;
@@ -449,9 +390,15 @@ PhysxAreaLightBuilderAttachLightToGeometry(
 
     GeometryData = (PPHYSX_AREA_LIGHT_GEOMETRY_DATA) Data;
 
-    //
-    // TODO: Check area of face before adding. Return combo error 00 if has bad area.
-    //
+    Status = GeometryData->VTable->ComputeSurfaceAreaRoutine(GeometryData->Data,
+                                                             FaceIndex,
+                                                             &Area);
+    if (Status != ISTATUS_SUCCESS ||
+        IsLessThanOrEqualToZeroFloat(Area) != FALSE ||
+        IsFiniteFloat(Area) != FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
 
     Status = UInt32ToIndexMapAddMapping(&GeometryData->AttachedLights,
                                         FaceIndex,
@@ -492,6 +439,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     )
 {
     SIZE_T AttachedLightIndex;
+    FLOAT Area;
     SIZE_T LightIndex;
     PVOID Allocation;
     PVOID Data;
@@ -506,6 +454,9 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     PPBR_GEOMETRY *LocalGeometry;
     PPBR_LIGHT *LocalLights;
     ISTATUS Status;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
+    PPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter;
+    PPHYSX_AREA_LIGHT_ADAPTER *LocalAreaLightAdapters;
 
     if (Builder == NULL)
     {
@@ -539,50 +490,28 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     // be managed together for simplicity.
     //
 
-    Allocation = malloc(sizeof(PHYSX_AREA_LIGHT_REFERENCE_COUNT));
-
-    if (Allocation == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    ReferenceCount = (PPHYSX_AREA_LIGHT_REFERENCE_COUNT) Allocation;
-
     LocalNumberOfGeometry = PointerListGetSize(&Builder->GeometryDataList);
-    Allocation = malloc(sizeof(PPBR_GEOMETRY) * LocalNumberOfGeometry);
-
-    if (Allocation == NULL)
-    {
-        free(ReferenceCount);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-    
-    ReferenceCount->Geometry = (PPBR_GEOMETRY*) Allocation;
-    ReferenceCount->NumberOfGeometry = 0;
-
     LocalNumberOfLights = PointerListGetSize(&Builder->LightDataList);
-    Allocation = malloc(sizeof(PPBR_LIGHT) * LocalNumberOfLights);
 
-    if (Allocation == NULL)
+    Status = AreaLightReferenceCountAllocate(LocalNumberOfGeometry,
+                                             LocalNumberOfLights,
+                                             &ReferenceCount);
+
+    if (Status != ISTATUS_SUCCESS)
     {
-        free(ReferenceCount->Geometry);
-        free(ReferenceCount);
-        return ISTATUS_ALLOCATION_FAILED;
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
     }
 
-    ReferenceCount->Lights = (PPBR_LIGHT*) Allocation;
-    ReferenceCount->NumberOfLights = 0;
-
     //
-    // Beyond this point, the reference count is a valid object
-    // so we can just use it's destructor to release it
+    // Allocate Result Arrays
     //
     
     Allocation = malloc(sizeof(PPBR_GEOMETRY) * LocalNumberOfGeometry);
     
     if (Allocation == NULL)
     {
-        free(ReferenceCount);
+        AreaLightReferenceCountFree(ReferenceCount);
         return ISTATUS_ALLOCATION_FAILED;
     }
     
@@ -598,7 +527,27 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     }
     
     LocalLights = (PPBR_LIGHT*) Allocation;
+
+    //
+    // Allocate Local Light Adapter Array
+    //
+
+    Allocation = malloc(sizeof(PPHYSX_AREA_LIGHT_ADAPTER) * LocalNumberOfLights);
     
+    if (Allocation == NULL)
+    {
+        AreaLightReferenceCountFree(ReferenceCount);
+        free(LocalGeometry);
+        free(LocalLights);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    LocalAreaLightAdapters = (PPHYSX_AREA_LIGHT_ADAPTER*) Allocation;
+    
+    //
+    // Create Lights
+    //
+
     for (Index = 0; Index < LocalNumberOfLights; Index++)
     {
         Data = PointerListRetrieveAtIndex(&Builder->LightDataList,
@@ -606,13 +555,14 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
 
         LightData = (PPHYSX_AREA_LIGHT_LIGHT_DATA) Data;
 
-        Status = PhysxAreaLightAllocate(LightData->VTable,
-                                        ReferenceCount,
-                                        LightData->AttachCount,
-                                        LightData->Data,
-                                        LightData->DataSizeInBytes,
-                                        LightData->DataAlignment,
-                                        &ReferenceCount->Lights[Index]);
+        Status = PhysxAreaLightAdapterAllocate(ReferenceCount,
+                                               LightData->AttachCount,
+                                               LightData->VTable,
+                                               LightData->Data,
+                                               LightData->DataSizeInBytes,
+                                               LightData->DataAlignment,
+                                               &LocalAreaLightAdapters[Index],
+                                               &LocalLights[Index]);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -620,18 +570,17 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
             AreaLightReferenceCountFree(ReferenceCount);
             free(LocalGeometry);
             free(LocalLights);
+            free(LocalAreaLightAdapters);
             return Status;
         }
         
-        LocalLights[Index] = ReferenceCount->Lights[Index];
-
-        //
-        // Increment NumberOfLights last so the destructor doesn't 
-        // try to deallocate a light that hasn't been created
-        //
-
-        ReferenceCount->NumberOfLights = Index;
+        AreaLightReferenceCountAddLight(ReferenceCount,
+                                        LocalLights[Index]);
     }
+
+    //
+    // Create Geometry
+    //
 
     for (Index = 0; Index < LocalNumberOfGeometry; Index++)
     {
@@ -642,13 +591,15 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
 
         NumberOfAttachedLights = UInt32ToIndexMapGetSize(&GeometryData->AttachedLights);
 
-        Status = PhysxLightedGeometryAllocate(&GeometryData->VTable->Header,
-                                              ReferenceCount,
-                                              NumberOfAttachedLights,
-                                              GeometryData->Data,
-                                              GeometryData->DataSizeInBytes,
-                                              GeometryData->DataAlignment,
-                                              &ReferenceCount->Geometry[Index]);
+        Status = PhysxLightedGeometryAdapterAllocate(ReferenceCount,
+                                                     NumberOfAttachedLights,
+                                                     GeometryData->VTable,
+                                                     GeometryData->Data,
+                                                     GeometryData->DataSizeInBytes,
+                                                     GeometryData->DataAlignment,
+                                                     &LightedGeometry,
+                                                     &LightedGeometryAdapter,
+                                                     &LocalGeometry[Index]);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -656,11 +607,17 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
             AreaLightReferenceCountFree(ReferenceCount);
             free(LocalGeometry);
             free(LocalLights);
+            free(LocalAreaLightAdapters);
             return Status;
         }
-
-        LocalGeometry[Index] = ReferenceCount->Geometry[Index];
         
+        AreaLightReferenceCountAddGeometry(ReferenceCount,
+                                           LocalGeometry[Index]);
+        
+        //
+        // Attach Lights And Geometry
+        //
+
         for (AttachedLightIndex = 0; 
              AttachedLightIndex < NumberOfAttachedLights; 
              AttachedLightIndex++)
@@ -671,28 +628,42 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
             LightIndex = UInt32ToIndexMapGetValueByIndex(&GeometryData->AttachedLights,
                                                          AttachedLightIndex);
 
-            PhysxAreaLightAttachGeometry(ReferenceCount->Lights[LightIndex],
-                                         ReferenceCount->Geometry[Index],
-                                         Face);
+            Status = PhysxLightedGeometryComputeSurfaceArea(LightedGeometry,
+                                                            Face,
+                                                            &Area);
 
-            PhysxLightedGeometryAttachLight(ReferenceCount->Geometry[Index],
-                                            ReferenceCount->Lights[LightIndex],
-                                            Face);
+            if (Status != ISTATUS_SUCCESS)
+            {
+                ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+                AreaLightReferenceCountFree(ReferenceCount);
+                free(LocalGeometry);
+                free(LocalLights);
+                free(LocalAreaLightAdapters);
+                return Status;
+            }
+
+            PhysxAreaLightAdapterAttachGeometry(LocalAreaLightAdapters[LightIndex],
+                                                LightedGeometry,
+                                                Face,
+                                                Area);
+
+            PhysxLightedGeometryAdapterAttachLight(LightedGeometryAdapter,
+                                                   LocalLights[LightIndex],
+                                                   Face);
         }
 
-        PhysxLightedGeometryFinalize(ReferenceCount->Geometry[Index]);
-
-        //
-        // Increment NumberOfGeometry last so the destructor doesn't 
-        // try to deallocate a geometry that hasn't been created
-        //
-
-        ReferenceCount->NumberOfGeometry = Index;
+        PhysxLightedGeometryAdapterFinalize(LightedGeometryAdapter);
     }
+
+    free(LocalAreaLightAdapters);
+
+    //
+    // TODO: Move NULL lights to end of array
+    //
 
     for (Index = 0; Index < LocalNumberOfLights; Index++)
     {
-        PhysxAreaLightFinalize(ReferenceCount->Lights[Index]);
+        PhysxAreaLightAdapterFinalize(LocalAreaLightAdapters[Index]);
     }
     
     //

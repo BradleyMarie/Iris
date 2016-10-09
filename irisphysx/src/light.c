@@ -15,33 +15,8 @@ Abstract:
 #include <irisphysxp.h>
 
 //
-// Macros
-//
-
-#define PHYSX_AREA_LIGHT_MAX_ATTACHED_LIGHTS \
-    (SIZE_MAX / sizeof(PHYSX_AREA_LIGHT_ADAPTER))
-
-//
 // Types
 //
-
-typedef struct _PHYSX_AREA_LIGHT {
-    PCPHYSX_AREA_LIGHT_VTABLE VTable;
-    PVOID Data;
-} PHYSX_AREA_LIGHT, *PPHYSX_AREA_LIGHT;
-
-typedef struct _PHYSX_ATTACHED_GEOMETRY {
-    PPBR_GEOMETRY Geometry;
-    UINT32 Face;
-} PHYSX_ATTACHED_GEOMETRY, *PPHYSX_ATTACHED_GEOMETRY;
-
-typedef struct _PHYSX_AREA_LIGHT_ADAPTER {
-    PPHYSX_AREA_LIGHT Light;
-    _Field_size_(NumberOfGeometry) PPHYSX_ATTACHED_GEOMETRY Geometry;
-    SIZE_T NumberOfGeometry;
-} PHYSX_AREA_LIGHT_ADAPTER, *PPHYSX_AREA_LIGHT_ADAPTER;
-
-typedef CONST PHYSX_AREA_LIGHT_ADAPTER *PCPHYSX_AREA_LIGHT_ADAPTER;
 
 typedef union _PHYSX_LIGHT_SHARED_REFERENCE_COUNT {
     PPHYSX_AREA_LIGHT_REFERENCE_COUNT Area;
@@ -55,24 +30,13 @@ struct _PBR_LIGHT {
 };
 
 //
-// Static Variables
-//
-
-CONST STATIC PBR_LIGHT_VTABLE AreaLightAdapterVTable = {
-    NULL,
-    NULL,
-    NULL,
-    NULL
-};
-
-//
-// Static Functions
+// Internal Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrLightAllocateImplementation(
+PbrLightAllocateInternal(
     _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
     _In_opt_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
@@ -131,150 +95,37 @@ PbrLightAllocateImplementation(
     return ISTATUS_SUCCESS;
 }
 
-//
-// Internal Functions
-//
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-PhysxAreaLightAllocate(
-    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
-    _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
-    _In_ SIZE_T AttachCount,
-    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_LIGHT *PbrLight
+_Ret_
+PVOID
+PBRLightGetData(
+    _In_ PPBR_LIGHT PBRLight
     )
 {
-    PPHYSX_AREA_LIGHT_ADAPTER AllocatedAreaLight;
-    PHYSX_AREA_LIGHT_ADAPTER AreaLight;
-    PPHYSX_AREA_LIGHT NestedLight;
-    BOOL AllocationSuccessful;
-    PVOID HeaderAllocation;
-    PVOID DataAllocation;
-    PPBR_LIGHT ResultLight;
-    ISTATUS Status;
-
-    ASSERT(AreaLightVTable != NULL);
-    ASSERT(ReferenceCount != NULL);
-    ASSERT(DataSizeInBytes == 0 || 
-           (Data != NULL && DataAlignment != 0 && 
-           (DataAlignment & DataAlignment - 1) && 
-           DataSizeInBytes % DataAlignment == 0));
-    ASSERT(PbrLight != NULL);
-
-    if (PHYSX_AREA_LIGHT_MAX_ATTACHED_LIGHTS < AttachCount)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    if (AttachCount != 0)
-    {
-        AreaLight.Geometry = malloc(sizeof(PHYSX_ATTACHED_GEOMETRY) * AttachCount);
-
-        if (AreaLight.Geometry == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-    }
-    else
-    {
-        AreaLight.Geometry = NULL;
-    }
-
-    AreaLight.NumberOfGeometry = 0;
-    AreaLight.Light = NULL;
-
-    Status = PbrLightAllocateImplementation(&AreaLightAdapterVTable,
-                                            ReferenceCount,
-                                            &AreaLight,
-                                            sizeof(PHYSX_AREA_LIGHT_ADAPTER),
-                                            _Alignof(PHYSX_AREA_LIGHT_ADAPTER),
-                                            &ResultLight);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-        free(AreaLight.Geometry);
-        return Status;
-    }
-
-    //
-    // The nested light must be allocated last. We should never call the
-    // destructor of the nested light from this routine as it may have 
-    // side affects.
-    //
-
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PHYSX_AREA_LIGHT),
-                                                      _Alignof(PHYSX_AREA_LIGHT),
-                                                      &HeaderAllocation,
-                                                      DataSizeInBytes,
-                                                      DataAlignment,
-                                                      &DataAllocation,
-                                                      NULL);
-
-    if (AllocationSuccessful == FALSE)
-    {
-        PBRLightFree(ResultLight);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    NestedLight = (PPHYSX_AREA_LIGHT) HeaderAllocation;
-
-    NestedLight->VTable = AreaLightVTable;
-    NestedLight->Data = DataAllocation;
-
-    if (DataSizeInBytes != 0)
-    {
-        memcpy(DataAllocation, Data, DataSizeInBytes);
-    }
-
-    AllocatedAreaLight = (PPHYSX_AREA_LIGHT_ADAPTER) ResultLight->Data;
-    AllocatedAreaLight->Light = NestedLight;
-
-    *PbrLight = ResultLight;
-
-    return Status;
+    ASSERT(PBRLight != NULL);
+    return PBRLight->Data;
 }
 
 VOID
-PhysxAreaLightAttachGeometry(
-    _Inout_ PPBR_LIGHT AreaLight,
-    _In_ PPBR_GEOMETRY Geometry,
-    _In_ UINT32 Face
+PBRLightFree(
+    _In_ _Post_invalid_ PPBR_LIGHT PbrLight
     )
 {
-    PPHYSX_AREA_LIGHT_ADAPTER AreaLightData;
-    PPHYSX_ATTACHED_GEOMETRY AttachedGeometry;
-
-    ASSERT(AreaLight->VTable == &AreaLightAdapterVTable);
-
-    AreaLightData = (PPHYSX_AREA_LIGHT_ADAPTER) AreaLight->Data;
-
-    AttachedGeometry = AreaLightData->Geometry + AreaLightData->NumberOfGeometry;
-    AreaLightData->NumberOfGeometry += 1;
-
-    AttachedGeometry->Geometry = Geometry;
-    AttachedGeometry->Face = Face;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-PhysxAreaLightFinalize(
-    _Inout_ PPBR_LIGHT AreaLight
-    )
-{
-    // TODO. Fails if light area becomes infinite.
-    // Determine best order to add numbers together.
-
-    return ISTATUS_SUCCESS;
+    PFREE_ROUTINE FreeRoutine;
+    
+    ASSERT(PbrLight != NULL);
+    
+    FreeRoutine = PbrLight->VTable->FreeRoutine;
+    
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(PbrLight->Data);
+    }
+    
+    IrisAlignedFree(PbrLight);
 }
 
 //
-// Functions
+// Public Functions
 //
 
 _Check_return_
@@ -320,12 +171,12 @@ PbrLightAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Status = PbrLightAllocateImplementation(PbrLightVTable,
-                                            NULL,
-                                            Data,
-                                            DataSizeInBytes,
-                                            DataAlignment,
-                                            PbrLight);
+    Status = PbrLightAllocateInternal(PbrLightVTable,
+                                      NULL,
+                                      Data,
+                                      DataSizeInBytes,
+                                      DataAlignment,
+                                      PbrLight);
 
     return Status;
 }
@@ -504,25 +355,6 @@ PbrLightRetain(
     {
         PbrLight->ReferenceCount.Simple += 1;
     }
-}
-
-VOID
-PBRLightFree(
-    _In_ _Post_invalid_ PPBR_LIGHT PbrLight
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-    
-    ASSERT(PbrLight != NULL);
-    
-    FreeRoutine = PbrLight->VTable->FreeRoutine;
-    
-    if (FreeRoutine != NULL)
-    {
-        FreeRoutine(PbrLight->Data);
-    }
-    
-    IrisAlignedFree(PbrLight);
 }
 
 VOID

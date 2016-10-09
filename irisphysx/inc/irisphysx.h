@@ -26,6 +26,8 @@ Abstract:
 #include "irisphysx_material.h"
 #include "irisphysx_hitallocator.h"
 #include "irisphysx_geometry.h"
+#include "irisphysx_lightedgeometry.h"
+#include "irisphysx_arealight.h"
 #include "irisphysx_arealightbuilder.h"
 #include "irisphysx_hittester.h"
 #include "irisphysx_visibilitytester.h"

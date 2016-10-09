@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _PHYSX_AREA_LIGHT_IRIS_PHYSX_INTERNAL_
-#define _PHYSX_AREA_LIGHT_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_AREA_LIGHT_IRIS_BUILDER_PHYSX_INTERNAL_
+#define _PHYSX_AREA_LIGHT_IRIS_BUILDER_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -37,4 +37,4 @@ AreaLightReferenceCountRelease(
     _In_ _Post_invalid_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount
     );
 
-#endif // _PHYSX_AREA_LIGHT_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_AREA_LIGHT_IRIS_BUILDER_PHYSX_INTERNAL_

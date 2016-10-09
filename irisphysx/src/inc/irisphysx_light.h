@@ -24,28 +24,19 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PhysxAreaLightAllocate(
-    _In_ PCPHYSX_AREA_LIGHT_VTABLE AreaLightVTable,
-    _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
-    _In_ SIZE_T AttachCount,
+PbrLightAllocateInternal(
+    _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
+    _In_opt_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PPBR_LIGHT *PbrLight
     );
 
-VOID
-PhysxAreaLightAttachGeometry(
-    _Inout_ PPBR_LIGHT AreaLight,
-    _In_ PPBR_GEOMETRY Geometry,
-    _In_ UINT32 Face
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-PhysxAreaLightFinalize(
-    _Inout_ PPBR_LIGHT AreaLight
+_Ret_
+PVOID
+PBRLightGetData(
+    _In_ PPBR_LIGHT PBRLight
     );
 
 VOID

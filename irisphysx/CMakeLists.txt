@@ -15,7 +15,10 @@ add_library(irisphysx SHARED
     src/visibilitytester.c
     src/raytracer.c
     src/integrator.c
-    src/arealightbuilder.c)
+    src/arealightbuilder.c
+    src/arealightadapter.c
+    src/lightedgeometryadapter.c
+    src/arealightreferencecount.c)
 
 target_link_libraries(irisphysx 
     iris
