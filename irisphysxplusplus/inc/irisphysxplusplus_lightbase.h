@@ -49,7 +49,8 @@ public:
     IrisSpectrum::SpectrumReference
     ComputeEmissive(
         _In_ const Iris::Ray & ToLight,
-        _In_ VisibilityTester Tester
+        _In_ VisibilityTester Tester,
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const = 0;
     
     _Ret_
@@ -57,7 +58,8 @@ public:
     std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
     ComputeEmissiveWithPdf(
         _In_ const Iris::Ray & ToLight,
-        _In_ VisibilityTester Tester
+        _In_ VisibilityTester Tester,
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const = 0;
     
     virtual

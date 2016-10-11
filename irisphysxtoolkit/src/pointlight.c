@@ -116,12 +116,14 @@ SpectrumPointLightComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
     ASSERT(Tester != NULL);
+    ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
 
     *Spectrum = NULL;
@@ -137,6 +139,7 @@ SpectrumPointLightComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )
@@ -144,6 +147,7 @@ SpectrumPointLightComputeEmissiveWithPdf(
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
     ASSERT(Tester != NULL);
+    ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Pdf != NULL);
 

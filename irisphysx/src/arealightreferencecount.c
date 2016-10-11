@@ -22,10 +22,12 @@ Abstract:
 //
 
 struct _PHYSX_AREA_LIGHT_REFERENCE_COUNT {
-    _Field_size_(NumberOfGeometry) PPBR_GEOMETRY *Geometry;
+    _Field_size_(GeometryCapacity) PPBR_GEOMETRY *Geometry;
     SIZE_T NumberOfGeometry;
-    _Field_size_(NumberOfLights) PPBR_LIGHT *Lights;
+    SIZE_T GeometryCapacity;
+    _Field_size_(LightsCapacity) PPBR_LIGHT *Lights;
     SIZE_T NumberOfLights;
+    SIZE_T LightsCapacity;
     SIZE_T ReferenceCount;
 };
 
@@ -58,7 +60,7 @@ AreaLightReferenceCountAllocate(
 
     AllocatedReferenceCount = (PPHYSX_AREA_LIGHT_REFERENCE_COUNT) Allocation;
 
-    Allocation = malloc(sizeof(PPBR_GEOMETRY) * NumberOfGeometry);
+    Allocation = calloc(NumberOfGeometry, sizeof(PPBR_GEOMETRY));
 
     if (Allocation == NULL)
     {
@@ -68,8 +70,9 @@ AreaLightReferenceCountAllocate(
     
     AllocatedReferenceCount->Geometry = (PPBR_GEOMETRY*) Allocation;
     AllocatedReferenceCount->NumberOfGeometry = 0;
+    AllocatedReferenceCount->GeometryCapacity = NumberOfGeometry;
 
-    Allocation = malloc(sizeof(PPBR_LIGHT) * NumberOfLights);
+    Allocation = calloc(NumberOfLights, sizeof(PPBR_LIGHT));
 
     if (Allocation == NULL)
     {
@@ -80,6 +83,7 @@ AreaLightReferenceCountAllocate(
 
     AllocatedReferenceCount->Lights = (PPBR_LIGHT*) Allocation;
     AllocatedReferenceCount->NumberOfLights = 0;
+    AllocatedReferenceCount->LightsCapacity = NumberOfLights;
 
     *ReferenceCount = AllocatedReferenceCount;
 
@@ -94,6 +98,7 @@ AreaLightReferenceCountAddGeometry(
 {
     ASSERT(ReferenceCount != NULL);
     ASSERT(Geometry != NULL);
+    ASSERT(ReferenceCount->NumberOfGeometry < ReferenceCount->GeometryCapacity);
 
     ReferenceCount->Geometry[ReferenceCount->NumberOfGeometry] = Geometry;
     ReferenceCount->NumberOfGeometry += 1;
@@ -107,6 +112,7 @@ AreaLightReferenceCountAddLight(
 {
     ASSERT(ReferenceCount != NULL);
     ASSERT(Light != NULL);
+    ASSERT(ReferenceCount->NumberOfLights < ReferenceCount->LightsCapacity);
 
     ReferenceCount->Lights[ReferenceCount->NumberOfLights] = Light;
     ReferenceCount->NumberOfLights += 1;
@@ -156,5 +162,7 @@ AreaLightReferenceCountFree(
         PBRLightFree(AreaLightReferenceCount->Lights[Index]);
     }
 
+    free(AreaLightReferenceCount->Geometry);
+    free(AreaLightReferenceCount->Lights);
     free(AreaLightReferenceCount);
 }

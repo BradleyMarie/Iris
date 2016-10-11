@@ -38,6 +38,8 @@ struct _PHYSX_AREA_LIGHT_ADAPTER {
     PPHYSX_AREA_LIGHT AreaLight;
     _Field_size_(NumberOfGeometry) PPHYSX_ATTACHED_GEOMETRY Geometry;
     SIZE_T NumberOfGeometry;
+    PCPBR_LIGHT SelfReference;
+    FLOAT SamplePdf;
 };
 
 //
@@ -90,10 +92,13 @@ PhysxAreaLightAdapterSample(
     PHYSX_ATTACHED_GEOMETRY Key;
     VECTOR3 DirectionToLight;
     POINT3 SampledLocation;
+    POINT3 PointOnLight;
+    FLOAT DistanceToLight;
     PCVOID Result;
     ISTATUS Status;
     FLOAT TotalArea;
     RAY RayToLight;
+    BOOL Visible;
 
     ASSERT(Context != NULL);
     ASSERT(PointValidate(HitPoint) != FALSE);
@@ -143,9 +148,39 @@ PhysxAreaLightAdapterSample(
 
     RayToLight = RayCreate(HitPoint, DirectionToLight);
     
-    // TODO Finish
+    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
+                                                    RayToLight,
+                                                    AreaLightAdapter->SelfReference,
+                                                    &Visible,
+                                                    &DistanceToLight);
 
-    return ISTATUS_SUCCESS;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (Visible == FALSE)
+    {
+        *Spectrum = NULL;
+        *ToLight = DirectionToLight;
+        *Pdf = (FLOAT) 0.0f; 
+        return ISTATUS_SUCCESS;
+    }
+
+    PointOnLight = RayEndpoint(RayToLight, DistanceToLight);
+
+    Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
+                                           PointOnLight,
+                                           Compositor,
+                                           Spectrum);
+
+    if (Status == ISTATUS_SUCCESS)
+    {
+        *ToLight = DirectionToLight;
+        *Pdf = AreaLightAdapter->SamplePdf; 
+    }
+
+    return Status;
 }
 
 _Check_return_
@@ -155,11 +190,49 @@ ISTATUS
 PhysxAreaLightAdapterComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
-    return ISTATUS_SUCCESS;
+    PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
+    FLOAT DistanceToLight;
+    POINT3 PointOnLight;
+    ISTATUS Status;
+    BOOL Visible;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(ToLight) != FALSE);
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Spectrum != NULL);
+
+    AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
+    
+    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
+                                                    ToLight,
+                                                    AreaLightAdapter->SelfReference,
+                                                    &Visible,
+                                                    &DistanceToLight);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (Visible == FALSE)
+    {
+        *Spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    PointOnLight = RayEndpoint(ToLight, DistanceToLight);
+
+    Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
+                                           PointOnLight,
+                                           Compositor,
+                                           Spectrum);
+
+    return Status;
 }
 
 _Check_return_
@@ -169,11 +242,61 @@ ISTATUS
 PhysxAreaLightAdapterComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )
 {
+    PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
+    FLOAT DistanceToLight;
+    POINT3 PointOnLight;
+    ISTATUS Status;
+    BOOL Visible;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(ToLight) != FALSE);
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Spectrum != NULL);
+    ASSERT(Pdf != NULL);
+
+    AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
+    
+    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
+                                                    ToLight,
+                                                    AreaLightAdapter->SelfReference,
+                                                    &Visible,
+                                                    &DistanceToLight);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    if (Visible == FALSE)
+    {
+        *Spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    PointOnLight = RayEndpoint(ToLight, DistanceToLight);
+
+    Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
+                                           PointOnLight,
+                                           Compositor,
+                                           Spectrum);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+    
+    //
+    // TODO: Compute PDF Correctly
+    //
+
+    *Pdf = 1.0f;
+
     return ISTATUS_SUCCESS;
 }
 
@@ -297,6 +420,8 @@ PhysxAreaLightAdapterAllocate(
         return Status;
     }
 
+    AllocatedAreaLightAdapterData->SelfReference = AllocatedAreaLightAdapter;
+
     *AreaLightAdapter = AllocatedAreaLightAdapterData;
     *Light = AllocatedAreaLightAdapter;
 
@@ -356,6 +481,8 @@ PhysxAreaLightAdapterFinalize(
 
         TotalArea = AttachedGeometryInstance->EndArea;
     }
+
+    AreaLightAdapter->SamplePdf = (FLOAT) 1.0f / TotalArea;
 
     return ISTATUS_SUCCESS;
 }

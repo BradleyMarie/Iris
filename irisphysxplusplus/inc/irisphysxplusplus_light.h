@@ -101,7 +101,8 @@ public:
     IrisSpectrum::SpectrumReference
     ComputeEmissive(
         _In_ const Iris::Ray & ToLight,
-        _In_ VisibilityTester Tester
+        _In_ VisibilityTester Tester,
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const
     {
         PCSPECTRUM Result;
@@ -109,6 +110,7 @@ public:
         ISTATUS Status = PbrLightComputeEmissive(Data,
                                                  ToLight.AsRAY(),
                                                  Tester.AsPPBR_VISIBILITY_TESTER(),
+                                                 Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
                                                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
@@ -122,7 +124,8 @@ public:
     std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
     ComputeEmissiveWithPdf(
         _In_ const Iris::Ray & ToLight,
-        _In_ VisibilityTester Tester
+        _In_ VisibilityTester Tester,
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const
     {
         PCSPECTRUM ResultSpectrum;
@@ -131,6 +134,7 @@ public:
         ISTATUS Status = PbrLightComputeEmissiveWithPdf(Data,
                                                         ToLight.AsRAY(),
                                                         Tester.AsPPBR_VISIBILITY_TESTER(),
+                                                        Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
                                                         &ResultSpectrum,
                                                         &ResultPdf);
 

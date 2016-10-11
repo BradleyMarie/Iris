@@ -89,7 +89,6 @@ ISTATUS
 PhysxAreaLightComputeEmissive(
     _In_ PCPHYSX_AREA_LIGHT AreaLight,
     _In_ POINT3 OnLight,
-    _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
@@ -98,13 +97,11 @@ PhysxAreaLightComputeEmissive(
 
     ASSERT(AreaLight != NULL);
     ASSERT(PointValidate(OnLight) != FALSE);
-    ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
 
     Status = AreaLight->VTable->ComputeEmissiveRoutine(AreaLight->Data,
                                                        OnLight,
-                                                       Rng,
                                                        Compositor,
                                                        Spectrum);
     

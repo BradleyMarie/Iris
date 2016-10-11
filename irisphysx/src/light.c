@@ -256,6 +256,7 @@ PbrLightComputeEmissive(
     _In_ PCPBR_LIGHT PbrLight,
     _In_ RAY ToPbrLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
@@ -276,14 +277,20 @@ PbrLightComputeEmissive(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Spectrum == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     Status = PbrLight->VTable->ComputeEmissiveRoutine(PbrLight->Data,
                                                       ToPbrLight,
                                                       Tester,
+                                                      Compositor,
                                                       Spectrum);
 
     return Status;
@@ -297,6 +304,7 @@ PbrLightComputeEmissiveWithPdf(
     _In_ PCPBR_LIGHT PbrLight,
     _In_ RAY ToPbrLight,
     _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )
@@ -318,19 +326,25 @@ PbrLightComputeEmissiveWithPdf(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (Spectrum == NULL)
+    if (Compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Pdf == NULL)
+    if (Spectrum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (Pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     Status = PbrLight->VTable->ComputeEmissiveWithPdfRoutine(PbrLight->Data,
                                                              ToPbrLight,
                                                              Tester,
+                                                             Compositor,
                                                              Spectrum,
                                                              Pdf);
 

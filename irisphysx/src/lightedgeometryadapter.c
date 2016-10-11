@@ -142,11 +142,6 @@ PhysxLightedGeometryAdapterTestRay(
     
     LightedGeometryAdapter = (PCPHYSX_LIGHTED_GEOMETRY_ADAPTER) Context;
 
-    //
-    // Call directly through VTable to avoid modifying
-    // the Hit Allocator to point to the nested geometry
-    //
-
     Status = PhysxLightedGeometryTestRay(LightedGeometryAdapter->LightedGeometry,
                                          Ray,
                                          HitAllocator,

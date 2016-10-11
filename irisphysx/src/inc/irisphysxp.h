@@ -31,7 +31,6 @@ Abstract:
 #include "irisphysx_lightedgeometry.h"
 #include "irisphysx_arealightadapter.h"
 #include "irisphysx_lightedgeometryadapter.h"
-#include "irisphysx_arealightbuilder.h"
 #include "irisphysx_light.h"
 #include "irisphysx_geometry.h"
 #include "irisphysx_hittester.h"

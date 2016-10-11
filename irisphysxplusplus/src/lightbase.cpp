@@ -65,19 +65,22 @@ ISTATUS
 LightComputeEmissiveAdapter(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPBR_VISIBILITY_TESTER PhysxVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(PhysxVisibilityTester != NULL);
+    ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
 
     const LightBase **LightBasePtr = (const LightBase**) Context;
 
     auto Result = (*LightBasePtr)->ComputeEmissive(Iris::Ray(ToLight),
-                                                   VisibilityTester(PBRVisibilityTester));
+                                                   VisibilityTester(PhysxVisibilityTester),
+                                                   IrisSpectrum::SpectrumCompositorReference(Compositor));
 
     *Spectrum = Result.AsPCSPECTRUM();
     return ISTATUS_SUCCESS;
@@ -90,21 +93,24 @@ ISTATUS
 LightComputeEmissiveWithPdfAdapter(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPBR_VISIBILITY_TESTER PhysxVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     )
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(PhysxVisibilityTester != NULL);
+    ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Pdf != NULL);
 
     const LightBase **LightBasePtr = (const LightBase**) Context;
 
     auto Result = (*LightBasePtr)->ComputeEmissiveWithPdf(Iris::Ray(ToLight),
-                                                          VisibilityTester(PBRVisibilityTester));
+                                                          VisibilityTester(PhysxVisibilityTester),
+                                                          IrisSpectrum::SpectrumCompositorReference(Compositor));
 
     *Spectrum = std::get<0>(Result).AsPCSPECTRUM();
     *Pdf = std::get<1>(Result);

@@ -47,6 +47,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     );
 
@@ -58,6 +59,7 @@ ISTATUS
     _In_ PCVOID Context,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );
@@ -113,6 +115,7 @@ PbrLightComputeEmissive(
     _In_ PCPBR_LIGHT Light,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     );
 
@@ -124,6 +127,7 @@ PbrLightComputeEmissiveWithPdf(
     _In_ PCPBR_LIGHT Light,
     _In_ RAY ToLight,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );

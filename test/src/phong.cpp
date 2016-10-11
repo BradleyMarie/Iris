@@ -742,7 +742,8 @@ PhongPointLight::Sample(
 IrisSpectrum::SpectrumReference
 PhongPointLight::ComputeEmissive(
     _In_ const Iris::Ray & ToLight,
-    _In_ IrisPhysx::VisibilityTester Tester
+    _In_ IrisPhysx::VisibilityTester Tester,
+    _In_ IrisSpectrum::SpectrumCompositorReference Compositor
     ) const
 {
     return IrisSpectrum::SpectrumReference(nullptr);
@@ -751,7 +752,8 @@ PhongPointLight::ComputeEmissive(
 std::tuple<IrisSpectrum::SpectrumReference, FLOAT>
 PhongPointLight::ComputeEmissiveWithPdf(
     _In_ const Iris::Ray & ToLight,
-    _In_ IrisPhysx::VisibilityTester Tester
+    _In_ IrisPhysx::VisibilityTester Tester,
+    _In_ IrisSpectrum::SpectrumCompositorReference Compositor
     ) const
 {
     return make_tuple(IrisSpectrum::SpectrumReference(nullptr), 0.0f);
