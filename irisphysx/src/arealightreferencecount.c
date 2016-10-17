@@ -22,7 +22,7 @@ Abstract:
 //
 
 struct _PHYSX_AREA_LIGHT_REFERENCE_COUNT {
-    _Field_size_(GeometryCapacity) PPBR_GEOMETRY *Geometry;
+    _Field_size_(GeometryCapacity) PPHYSX_GEOMETRY *Geometry;
     SIZE_T NumberOfGeometry;
     SIZE_T GeometryCapacity;
     _Field_size_(LightsCapacity) PPBR_LIGHT *Lights;
@@ -60,7 +60,7 @@ AreaLightReferenceCountAllocate(
 
     AllocatedReferenceCount = (PPHYSX_AREA_LIGHT_REFERENCE_COUNT) Allocation;
 
-    Allocation = calloc(NumberOfGeometry, sizeof(PPBR_GEOMETRY));
+    Allocation = calloc(NumberOfGeometry, sizeof(PPHYSX_GEOMETRY));
 
     if (Allocation == NULL)
     {
@@ -68,7 +68,7 @@ AreaLightReferenceCountAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    AllocatedReferenceCount->Geometry = (PPBR_GEOMETRY*) Allocation;
+    AllocatedReferenceCount->Geometry = (PPHYSX_GEOMETRY*) Allocation;
     AllocatedReferenceCount->NumberOfGeometry = 0;
     AllocatedReferenceCount->GeometryCapacity = NumberOfGeometry;
 
@@ -93,7 +93,7 @@ AreaLightReferenceCountAllocate(
 VOID
 AreaLightReferenceCountAddGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
-    _In_ PPBR_GEOMETRY Geometry
+    _In_ PPHYSX_GEOMETRY Geometry
     )
 {
     ASSERT(ReferenceCount != NULL);
@@ -154,7 +154,7 @@ AreaLightReferenceCountFree(
 
     for (Index = 0; Index < AreaLightReferenceCount->NumberOfGeometry; Index++)
     {
-        PBRGeometryFree(AreaLightReferenceCount->Geometry[Index]);
+        PhysxGeometryFree(AreaLightReferenceCount->Geometry[Index]);
     }
 
     for (Index = 0; Index < AreaLightReferenceCount->NumberOfLights; Index++)

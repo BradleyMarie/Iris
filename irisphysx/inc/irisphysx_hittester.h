@@ -34,7 +34,7 @@ IRISPHYSXAPI
 ISTATUS
 PBRHitTesterTestGeometry(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+    _In_ PCPHYSX_GEOMETRY Geometry
     );
 
 _Check_return_
@@ -43,7 +43,7 @@ IRISPHYSXAPI
 ISTATUS
 PBRHitTesterTestGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
     );
@@ -54,7 +54,7 @@ IRISPHYSXAPI
 ISTATUS
 PBRHitTesterTestPremultipliedGeometryWithTransform(
     _Inout_ PPBR_HIT_TESTER PBRHitTester,
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld
     );
 

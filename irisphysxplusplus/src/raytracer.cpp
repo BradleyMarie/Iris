@@ -26,7 +26,7 @@ static
 ISTATUS 
 ProcessHitAdapter(
     _Inout_opt_ PVOID Context, 
-    _In_ PCPBR_GEOMETRY GeometryPtr,
+    _In_ PCPHYSX_GEOMETRY GeometryPtr,
     _In_ UINT32 FaceHit,
     _In_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,

@@ -74,7 +74,7 @@ PBRRayTracerProcessHitAdapter(
     PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReference;
     PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
     PPBR_SHARED_CONTEXT SharedContext;
-    PCPBR_GEOMETRY PBRGeometry;
+    PCPHYSX_GEOMETRY Geometry;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
@@ -84,12 +84,12 @@ PBRRayTracerProcessHitAdapter(
     
     SharedContext = AdapterContext->SharedContext;
 
-    PBRGeometry = (PCPBR_GEOMETRY) Hit->Data;
+    Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
     SpectrumCompositorReference = SpectrumCompositorGetSpectrumCompositorReference(SharedContext->SpectrumCompositor);
     ReflectorCompositorReference = ReflectorCompositorGetReflectorCompositorReference(SharedContext->ReflectorCompositor);
 
     Status = AdapterContext->ProcessHitRoutine(AdapterContext->ProcessHitContext,
-                                               PBRGeometry,
+                                               Geometry,
                                                Hit->FrontFace,
                                                ModelToWorld,
                                                Hit->AdditionalData,

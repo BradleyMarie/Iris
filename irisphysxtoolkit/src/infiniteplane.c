@@ -43,7 +43,7 @@ ISTATUS
 InfinitePlaneTestRay(
     _In_ PCINFINITE_PLANE Plane,
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -91,15 +91,15 @@ InfinitePlaneTestRay(
         BackFace = INFINITE_PLANE_FRONT_FACE;
     }
 
-    Status = PBRHitAllocatorAllocate(HitAllocator,
-                                     NULL,
-                                     Distance,
-                                     FrontFace,
-                                     BackFace,
-                                     NULL,
-                                     0,
-                                     0,
-                                     HitList);
+    Status = PhysxHitAllocatorAllocate(HitAllocator,
+                                       NULL,
+                                       Distance,
+                                       FrontFace,
+                                       BackFace,
+                                       NULL,
+                                       0,
+                                       0,
+                                       HitList);
 
     return Status;
 }
@@ -290,7 +290,7 @@ ISTATUS
 PhysxInfinitePlaneTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -332,7 +332,7 @@ PhysxInfinitePlaneFree(
 // Static Variables
 //
 
-CONST STATIC PBR_GEOMETRY_VTABLE InfinitePlaneHeader = {
+CONST STATIC PHYSX_GEOMETRY_VTABLE InfinitePlaneHeader = {
     PhysxInfinitePlaneTestRay,
     PhysxInfinitePlaneComputeNormal,
     PhysxInfinitePlaneTestBounds,
@@ -352,10 +352,10 @@ PhysxInfinitePlaneAllocate(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
-    PCPBR_GEOMETRY_VTABLE GeometryVTable;
+    PCPHYSX_GEOMETRY_VTABLE GeometryVTable;
     PHYSX_INFINITE_PLANE InfinitePlane;
     SIZE_T DataAlignment;
     SIZE_T DataSize;
@@ -384,11 +384,11 @@ PhysxInfinitePlaneAllocate(
 	DataSize = sizeof(PHYSX_INFINITE_PLANE);
 	DataAlignment = _Alignof(PHYSX_INFINITE_PLANE);
     
-    Status = PBRGeometryAllocate(GeometryVTable,
-                                 Data,
-                                 DataSize,
-                                 DataAlignment,
-                                 Geometry);
+    Status = PhysxGeometryAllocate(GeometryVTable,
+                                   Data,
+                                   DataSize,
+                                   DataAlignment,
+                                   Geometry);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -30,7 +30,7 @@ PhysxInfinitePlaneAllocate(
     _In_ VECTOR3 SurfaceNormal,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
 #endif // _INFINITE_PLANE_IRIS_PHYSX_TOOLKIT_

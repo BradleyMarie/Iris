@@ -23,8 +23,8 @@ typedef union _PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT {
     SIZE_T Simple;
 } PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT;
 
-struct _PBR_GEOMETRY {
-    PCPBR_GEOMETRY_VTABLE VTable;
+struct _PHYSX_GEOMETRY {
+    PCPHYSX_GEOMETRY_VTABLE VTable;
     PHYSX_GEOMETRY_SHARED_REFERENCE_COUNT ReferenceCount;
     PVOID Data;
 };
@@ -36,30 +36,30 @@ struct _PBR_GEOMETRY {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryAllocateInternal(
-    _In_ PCPBR_GEOMETRY_VTABLE PBRGeometryVTable,
+PhysxGeometryAllocateInternal(
+    _In_ PCPHYSX_GEOMETRY_VTABLE GeometryVTable,
     _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_GEOMETRY *PBRGeometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
-    ASSERT(PBRGeometryVTable != NULL);
-    ASSERT(ReferenceCount == NULL || PBRGeometryVTable == &LightedGeometryAdapterVTable);
+    ASSERT(GeometryVTable != NULL);
+    ASSERT(ReferenceCount == NULL || GeometryVTable == &LightedGeometryAdapterVTable);
     ASSERT(DataSizeInBytes == 0 || 
            (Data != NULL && DataAlignment != 0 && 
            (DataAlignment & DataAlignment - 1) == 0 &&
            DataSizeInBytes % DataAlignment == 0));
-    ASSERT(PBRGeometry != NULL);
+    ASSERT(Geometry != NULL);
 
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PPBR_GEOMETRY AllocatedGeometry;
+    PPHYSX_GEOMETRY AllocatedGeometry;
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_GEOMETRY),
-                                                      _Alignof(PBR_GEOMETRY),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PHYSX_GEOMETRY),
+                                                      _Alignof(PHYSX_GEOMETRY),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -71,9 +71,9 @@ PBRGeometryAllocateInternal(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedGeometry = (PPBR_GEOMETRY) HeaderAllocation;
+    AllocatedGeometry = (PPHYSX_GEOMETRY) HeaderAllocation;
 
-    AllocatedGeometry->VTable = PBRGeometryVTable;
+    AllocatedGeometry->VTable = GeometryVTable;
     AllocatedGeometry->Data = DataAllocation;
 
     if (ReferenceCount != NULL)
@@ -90,7 +90,7 @@ PBRGeometryAllocateInternal(
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    *PBRGeometry = AllocatedGeometry;
+    *Geometry = AllocatedGeometry;
 
     return ISTATUS_SUCCESS;
 }
@@ -98,15 +98,15 @@ PBRGeometryAllocateInternal(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryTestRayAdapter(
+PhysxGeometryTestRayAdapter(
     _In_ PCVOID Context,
     _In_ RAY Ray,
     _In_ PHIT_ALLOCATOR HitAllocator,
     _Out_ PHIT_LIST *HitList
     )
 {
-    PCPBR_GEOMETRY PBRGeometry;
-    PBR_HIT_ALLOCATOR PBRHitAllocator;
+    PCPHYSX_GEOMETRY Geometry;
+    PHYSX_HIT_ALLOCATOR PhysxHitAllocator;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
@@ -114,68 +114,68 @@ PBRGeometryTestRayAdapter(
     ASSERT(HitAllocator != NULL);
     ASSERT(HitList != NULL);
     
-    PBRGeometry = (PCPBR_GEOMETRY) Context;
+    Geometry = (PCPHYSX_GEOMETRY) Context;
     
-    PBRHitAllocatorInitialize(&PBRHitAllocator,
-                              HitAllocator,
-                              PBRGeometry,
-                              Ray);
+    PhysxHitAllocatorInitialize(&PhysxHitAllocator,
+                                HitAllocator,
+                                Geometry,
+                                Ray);
     
-    Status = PBRGeometry->VTable->TestRayRoutine(PBRGeometry->Data,
-                                                 Ray,
-                                                 &PBRHitAllocator,
-                                                 HitList);
+    Status = Geometry->VTable->TestRayRoutine(Geometry->Data,
+                                              Ray,
+                                              &PhysxHitAllocator,
+                                              HitList);
 
     return Status;
 }
 
 _Ret_
-PCPBR_GEOMETRY_VTABLE
-PBRGeometryGetVTable(
-    _In_ PCPBR_GEOMETRY PBRGeometry
+PCPHYSX_GEOMETRY_VTABLE
+PhysxGeometryGetVTable(
+    _In_ PCPHYSX_GEOMETRY Geometry
     )
 {
-    ASSERT(PBRGeometry != NULL);
-    return PBRGeometry->VTable;
+    ASSERT(Geometry != NULL);
+    return Geometry->VTable;
 }
 
 _Ret_
 PVOID
-PBRGeometryGetMutableData(
-    _In_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryGetMutableData(
+    _In_ PCPHYSX_GEOMETRY Geometry
     )
 {
-    ASSERT(PBRGeometry != NULL);
-    return PBRGeometry->Data;
+    ASSERT(Geometry != NULL);
+    return Geometry->Data;
 }
 
 _Ret_
 PCVOID
-PBRGeometryGetData(
-    _In_ PCPBR_GEOMETRY PBRGeometry
+PhysxGeometryGetData(
+    _In_ PCPHYSX_GEOMETRY Geometry
     )
 {
-    ASSERT(PBRGeometry != NULL);
-    return PBRGeometry->Data;
+    ASSERT(Geometry != NULL);
+    return Geometry->Data;
 }
 
 VOID
-PBRGeometryFree(
-    _In_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryFree(
+    _In_ _Post_invalid_ PPHYSX_GEOMETRY Geometry
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    ASSERT(PBRGeometry != NULL);
+    ASSERT(Geometry != NULL);
     
-    FreeRoutine = PBRGeometry->VTable->FreeRoutine;
+    FreeRoutine = Geometry->VTable->FreeRoutine;
 
     if (FreeRoutine != NULL)
     {
-        FreeRoutine(PBRGeometry->Data);
+        FreeRoutine(Geometry->Data);
     }
 
-    IrisAlignedFree(PBRGeometry);
+    IrisAlignedFree(Geometry);
 }
 
 //
@@ -185,18 +185,18 @@ PBRGeometryFree(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryAllocate(
-    _In_ PCPBR_GEOMETRY_VTABLE PBRGeometryVTable,
+PhysxGeometryAllocate(
+    _In_ PCPHYSX_GEOMETRY_VTABLE GeometryVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_GEOMETRY *PBRGeometry
+    _Out_ PPHYSX_GEOMETRY *PBRGeometry
     )
 {
     ISTATUS Status;
 
-    if (PBRGeometryVTable == NULL ||
-        PBRGeometryVTable == &LightedGeometryAdapterVTable)
+    if (GeometryVTable == NULL ||
+        GeometryVTable == &LightedGeometryAdapterVTable)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -225,12 +225,12 @@ PBRGeometryAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    Status = PBRGeometryAllocateInternal(PBRGeometryVTable, 
-                                         NULL,
-                                         Data,
-                                         DataSizeInBytes,
-                                         DataAlignment,
-                                         PBRGeometry);
+    Status = PhysxGeometryAllocateInternal(GeometryVTable,
+                                           NULL,
+                                           Data,
+                                           DataSizeInBytes,
+                                           DataAlignment,
+                                           PBRGeometry);
 
     return Status;
 }
@@ -240,21 +240,21 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
 PBRGeometryTestNestedGeometry(
-    _In_ PCPBR_GEOMETRY PBRGeometry,
-    _In_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+    _In_ PCPHYSX_GEOMETRY Geometry,
+    _In_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Out_ PHIT_LIST *HitList
     )
 {
-    PCPBR_GEOMETRY OldGeometry;
+    PCPHYSX_GEOMETRY OldGeometry;
     ISTATUS Status;
     RAY Ray;
     
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
     
-    if (PBRHitAllocator == NULL)
+    if (HitAllocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -264,17 +264,17 @@ PBRGeometryTestNestedGeometry(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    Ray = PBRHitAllocatorGetRay(PBRHitAllocator);
+    Ray = PhysxHitAllocatorGetRay(HitAllocator);
     
-    OldGeometry = PBRHitAllocatorGetGeometry(PBRHitAllocator);
-    PBRHitAllocatorSetGeometry(PBRHitAllocator, PBRGeometry);
+    OldGeometry = PhysxHitAllocatorGetGeometry(HitAllocator);
+    PhysxHitAllocatorSetGeometry(HitAllocator, Geometry);
     
-    Status = PBRGeometry->VTable->TestRayRoutine(PBRGeometry->Data,
-                                                 Ray,
-                                                 PBRHitAllocator,
-                                                 HitList);
+    Status = Geometry->VTable->TestRayRoutine(Geometry->Data,
+                                              Ray,
+                                              HitAllocator,
+                                              HitList);
 
-    PBRHitAllocatorSetGeometry(PBRHitAllocator, OldGeometry);
+    PhysxHitAllocatorSetGeometry(HitAllocator, OldGeometry);
 
     return Status;
 }
@@ -282,8 +282,8 @@ PBRGeometryTestNestedGeometry(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-PBRGeometryCheckBounds(
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+PhysxGeometryCheckBounds(
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ PCMATRIX ModelToWorld,
     _In_ BOUNDING_BOX WorldAlignedBoundingBox,
     _Out_ PBOOL IsInsideBox
@@ -291,7 +291,7 @@ PBRGeometryCheckBounds(
 {
     ISTATUS Status;
     
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -306,10 +306,10 @@ PBRGeometryCheckBounds(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
     
-    Status = PBRGeometry->VTable->CheckBoundsRoutine(PBRGeometry->Data,
-                                                     ModelToWorld,
-                                                     WorldAlignedBoundingBox,
-                                                     IsInsideBox);
+    Status = Geometry->VTable->CheckBoundsRoutine(Geometry->Data,
+                                                  ModelToWorld,
+                                                  WorldAlignedBoundingBox,
+                                                  IsInsideBox);
 
     return Status;
 }
@@ -317,8 +317,8 @@ PBRGeometryCheckBounds(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryComputeNormal(
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+PhysxGeometryComputeNormal(
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
     _Out_ PVECTOR3 ModelSurfaceNormal
@@ -326,7 +326,7 @@ PBRGeometryComputeNormal(
 {
     ISTATUS Status;
     
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -341,25 +341,25 @@ PBRGeometryComputeNormal(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
     
-    Status = PBRGeometry->VTable->ComputeNormalRoutine(PBRGeometry->Data,
-                                                       ModelHitPoint,
-                                                       FaceHit,
-                                                       ModelSurfaceNormal);
+    Status = Geometry->VTable->ComputeNormalRoutine(Geometry->Data,
+                                                    ModelHitPoint,
+                                                    FaceHit,
+                                                    ModelSurfaceNormal);
 
     return Status;
 }
     
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryGetMaterial(
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+PhysxGeometryGetMaterial(
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 FaceHit,
     _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
     )
 {
     ISTATUS Status;
     
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -369,17 +369,17 @@ PBRGeometryGetMaterial(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    Status = PBRGeometry->VTable->GetMaterialRoutine(PBRGeometry->Data,
-                                                     FaceHit,
-                                                     Material);
+    Status = Geometry->VTable->GetMaterialRoutine(Geometry->Data,
+                                                  FaceHit,
+                                                  Material);
 
     return Status;
 }
     
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryGetLight(
-    _In_ PCPBR_GEOMETRY Geometry,
+PhysxGeometryGetLight(
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     )
@@ -410,48 +410,48 @@ PBRGeometryGetLight(
 }
     
 VOID
-PBRGeometryRetain(
-    _In_opt_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryRetain(
+    _In_opt_ PPHYSX_GEOMETRY Geometry
     )
 {
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return;
     }
 
-    if (PBRGeometry->VTable == &LightedGeometryAdapterVTable)
+    if (Geometry->VTable == &LightedGeometryAdapterVTable)
     {
-        AreaLightReferenceCountRetain(PBRGeometry->ReferenceCount.Area);
+        AreaLightReferenceCountRetain(Geometry->ReferenceCount.Area);
     }
     else
     {
-        PBRGeometry->ReferenceCount.Simple += 1;
+        Geometry->ReferenceCount.Simple += 1;
     }
 }
     
 VOID
-PBRGeometryRelease(
-    _In_opt_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryRelease(
+    _In_opt_ _Post_invalid_ PPHYSX_GEOMETRY Geometry
     )
 {
     SIZE_T ReferenceCount;
 
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return;
     }
 
-    if (PBRGeometry->VTable == &LightedGeometryAdapterVTable)
+    if (Geometry->VTable == &LightedGeometryAdapterVTable)
     {
-        AreaLightReferenceCountRelease(PBRGeometry->ReferenceCount.Area);
+        AreaLightReferenceCountRelease(Geometry->ReferenceCount.Area);
     }
     else
     {
-        ReferenceCount = (PBRGeometry->ReferenceCount.Simple -= 1);
+        ReferenceCount = (Geometry->ReferenceCount.Simple -= 1);
 
         if (ReferenceCount == 0)
         {
-            PBRGeometryFree(PBRGeometry);
+            PhysxGeometryFree(Geometry);
         }
     }
 }

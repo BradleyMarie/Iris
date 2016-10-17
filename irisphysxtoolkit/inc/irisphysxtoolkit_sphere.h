@@ -30,7 +30,7 @@ PhysxSphereAllocate(
     _In_ FLOAT Radius,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
 #endif // _SPHERE_IRIS_PHYSX_TOOLKIT_

@@ -52,7 +52,7 @@ public:
         )
     {
         ISTATUS Status = PBRHitTesterTestGeometry(Data,
-                                                  GeometryRef.AsPCPBR_GEOMETRY());
+                                                  GeometryRef.AsPCPHYSX_GEOMETRY());
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -67,7 +67,7 @@ public:
         )
     {
         ISTATUS Status = PBRHitTesterTestPremultipliedGeometryWithTransform(Data,
-                                                                            GeometryRef.AsPCPBR_GEOMETRY(),
+                                                                            GeometryRef.AsPCPHYSX_GEOMETRY(),
                                                                             MatrixRef.AsPCMATRIX());
 
         if (Status != ISTATUS_SUCCESS)
@@ -86,7 +86,7 @@ public:
         BOOL IrisPremultiplied = (Premultiplied) ? TRUE : FALSE;
         
         ISTATUS Status = PBRHitTesterTestGeometryWithTransform(Data,
-                                                               GeometryRef.AsPCPBR_GEOMETRY(),
+                                                               GeometryRef.AsPCPHYSX_GEOMETRY(),
                                                                MatrixRef.AsPCMATRIX(),
                                                                IrisPremultiplied);
 

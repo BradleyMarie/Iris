@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class Geometry final {
 public:
     Geometry(
-        _In_ PPBR_GEOMETRY GeometryPtr,
+        _In_ PPHYSX_GEOMETRY GeometryPtr,
         _In_ bool Retain
         )
     : Data(GeometryPtr)
@@ -39,13 +39,13 @@ public:
 
         if (Retain)
         {
-            PBRGeometryRetain(GeometryPtr);
+            PhysxGeometryRetain(GeometryPtr);
         }
     }
     
     _Ret_
-    PPBR_GEOMETRY
-    AsPPBR_GEOMETRY(
+    PPHYSX_GEOMETRY
+    AsPPHYSX_GEOMETRY(
         void
         )
     {
@@ -53,8 +53,8 @@ public:
     }
 
     _Ret_
-    PCPBR_GEOMETRY
-    AsPCPBR_GEOMETRY(
+    PCPHYSX_GEOMETRY
+    AsPCPHYSX_GEOMETRY(
         void
         ) const
     {
@@ -69,9 +69,9 @@ public:
     {
         PHIT_LIST Result;
 
-        ISTATUS Status = PBRGeometryTestNestedGeometry(Data,
-                                                       Allocator.AsPPBR_HIT_ALLOCATOR(),
-                                                       &Result);
+        ISTATUS Status = PhysxGeometryTestNestedGeometry(Data,
+                                                         Allocator.AsPPHYSX_HIT_ALLOCATOR(),
+                                                         &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -90,10 +90,10 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PBRGeometryCheckBounds(Data,
-                                                ModelToWorld.AsPCMATRIX(),
-                                                WorldAlignedBoundingBox,
-                                                &Result);
+        ISTATUS Status = PhysxGeometryCheckBounds(Data,
+                                                  ModelToWorld.AsPCMATRIX(),
+                                                  WorldAlignedBoundingBox,
+                                                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -112,10 +112,10 @@ public:
     {
         VECTOR3 Result;
 
-        ISTATUS Status = PBRGeometryComputeNormal(Data,
-                                                  HitPoint.AsPOINT3(),
-                                                  FaceHit,
-                                                  &Result);
+        ISTATUS Status = PhysxGeometryComputeNormal(Data,
+                                                    HitPoint.AsPOINT3(),
+                                                    FaceHit,
+                                                    &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -133,9 +133,9 @@ public:
     {
         PCPBR_MATERIAL Result;
 
-        ISTATUS Status = PBRGeometryGetMaterial(Data,
-                                                FaceHit,
-                                                &Result);
+        ISTATUS Status = PhysxGeometryGetMaterial(Data,
+                                                  FaceHit,
+                                                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -158,9 +158,9 @@ public:
     {
         PCPBR_LIGHT Result;
 
-        ISTATUS Status = PBRGeometryGetLight(Data,
-                                             FaceHit,
-                                             &Result);
+        ISTATUS Status = PhysxGeometryGetLight(Data,
+                                               FaceHit,
+                                               &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -180,7 +180,7 @@ public:
         )
     : Data(ToCopy.Data)
     {
-        PBRGeometryRetain(Data);
+        PhysxGeometryRetain(Data);
     }
     
     Geometry(
@@ -198,9 +198,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PBRGeometryRelease(Data);
+            PhysxGeometryRelease(Data);
             Data = ToCopy.Data;
-            PBRGeometryRetain(Data);
+            PhysxGeometryRetain(Data);
         }
 
         return *this;
@@ -210,11 +210,11 @@ public:
         void
         )
     {
-        PBRGeometryRelease(Data);    
+        PhysxGeometryRelease(Data);
     }
     
 private:
-    PPBR_GEOMETRY Data;
+    PPHYSX_GEOMETRY Data;
 };
 
 } // namespace Iris

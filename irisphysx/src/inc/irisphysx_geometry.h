@@ -24,19 +24,19 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryAllocateInternal(
-    _In_ PCPBR_GEOMETRY_VTABLE PBRGeometryVTable,
+PhysxGeometryAllocateInternal(
+    _In_ PCPHYSX_GEOMETRY_VTABLE GeometryVTable,
     _In_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_GEOMETRY *PBRGeometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRGeometryTestRayAdapter(
+PhysxGeometryTestRayAdapter(
     _In_ PCVOID Context,
     _In_ RAY Ray,
     _In_ PHIT_ALLOCATOR HitAllocator,
@@ -44,26 +44,26 @@ PBRGeometryTestRayAdapter(
     );
 
 _Ret_
-PCPBR_GEOMETRY_VTABLE
-PBRGeometryGetVTable(
-    _In_ PCPBR_GEOMETRY PBRGeometry
+PCPHYSX_GEOMETRY_VTABLE
+PhysxGeometryGetVTable(
+    _In_ PCPHYSX_GEOMETRY Geometry
     );
 
 _Ret_
 PVOID
-PBRGeometryGetMutableData(
-    _In_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryGetMutableData(
+    _In_ PCPHYSX_GEOMETRY Geometry
     );
 
 _Ret_
 PCVOID
-PBRGeometryGetData(
-    _In_ PCPBR_GEOMETRY PBRGeometry
+PhysxGeometryGetData(
+    _In_ PCPHYSX_GEOMETRY Geometry
     );
 
 VOID
-PBRGeometryFree(
-    _In_ _Post_invalid_ PPBR_GEOMETRY PBRGeometry
+PhysxGeometryFree(
+    _In_ _Post_invalid_ PPHYSX_GEOMETRY Geometry
     );
 
 #endif // _PBR_GEOMETRY_IRIS_PHYSX_INTERNAL_

@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class HitAllocator final {
 public:
     HitAllocator(
-        _In_ PPBR_HIT_ALLOCATOR HitAllocatorPtr
+        _In_ PPHYSX_HIT_ALLOCATOR HitAllocatorPtr
         )
     : Data(HitAllocatorPtr)
     { 
@@ -38,8 +38,8 @@ public:
     }
     
     _Ret_
-    PPBR_HIT_ALLOCATOR
-    AsPPBR_HIT_ALLOCATOR(
+    PPHYSX_HIT_ALLOCATOR
+    AsPPHYSX_HIT_ALLOCATOR(
         void
         )
     {
@@ -151,7 +151,7 @@ public:
     }
     
 private:
-    PPBR_HIT_ALLOCATOR Data;
+    PPHYSX_HIT_ALLOCATOR Data;
 
     _Ret_
     PHIT_LIST
@@ -174,15 +174,15 @@ private:
                 (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
                 AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
 
-        ISTATUS Status = PBRHitAllocatorAllocate(Data,
-                                                 NextHit,
-                                                 Distance,
-                                                 FrontFace,
-                                                 BackFace,
-                                                 AdditionalData,
-                                                 AdditionalDataSizeInBytes,
-                                                 AdditionalDataAlignment,
-                                                 &Result);
+        ISTATUS Status = PhysxHitAllocatorAllocate(Data,
+                                                   NextHit,
+                                                   Distance,
+                                                   FrontFace,
+                                                   BackFace,
+                                                   AdditionalData,
+                                                   AdditionalDataSizeInBytes,
+                                                   AdditionalDataAlignment,
+                                                   &Result);
 
         if (Status == ISTATUS_SUCCESS)
         {
@@ -222,16 +222,16 @@ private:
                 (AdditionalDataAlignment & (AdditionalDataAlignment - 1)) == 0 &&
                 AdditionalDataSizeInBytes % AdditionalDataAlignment == 0));
 
-        ISTATUS Status = PBRHitAllocatorAllocateWithHitPoint(Data,
-                                                             NextHit,
-                                                             Distance,
-                                                             FrontFace,
-                                                             BackFace,
-                                                             AdditionalData,
-                                                             AdditionalDataSizeInBytes,
-                                                             AdditionalDataAlignment,
-                                                             HitPoint.AsPOINT3(),
-                                                             &Result);
+        ISTATUS Status = PhysxHitAllocatorAllocateWithHitPoint(Data,
+                                                               NextHit,
+                                                               Distance,
+                                                               FrontFace,
+                                                               BackFace,
+                                                               AdditionalData,
+                                                               AdditionalDataSizeInBytes,
+                                                               AdditionalDataAlignment,
+                                                               HitPoint.AsPOINT3(),
+                                                               &Result);
 
         if (Status == ISTATUS_SUCCESS)
         {

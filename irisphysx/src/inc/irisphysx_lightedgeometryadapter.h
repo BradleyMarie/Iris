@@ -28,7 +28,7 @@ typedef CONST PHYSX_LIGHTED_GEOMETRY_ADAPTER *PCPHYSX_LIGHTED_GEOMETRY_ADAPTER;
 // Variables
 //
 
-extern CONST PBR_GEOMETRY_VTABLE LightedGeometryAdapterVTable;
+extern CONST PHYSX_GEOMETRY_VTABLE LightedGeometryAdapterVTable;
 
 //
 // Prototypes
@@ -46,7 +46,7 @@ PhysxLightedGeometryAdapterAllocate(
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PCPHYSX_LIGHTED_GEOMETRY *LightedGeometry,
     _Out_ PPHYSX_LIGHTED_GEOMETRY_ADAPTER *LightedGeometryAdapter,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
 VOID
@@ -65,7 +65,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightedGeometryAdapterGetLight(
-    _In_ PCPBR_GEOMETRY Geometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     );
@@ -73,7 +73,7 @@ PhysxLightedGeometryAdapterGetLight(
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightedGeometryAdapterGetLightedGeometry(
-    _In_ PCPBR_GEOMETRY Geometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _Outptr_ PCPHYSX_LIGHTED_GEOMETRY *LightedGeometry
     );
 

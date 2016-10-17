@@ -31,7 +31,7 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex2,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
 #endif // _TRIANGLE_IRIS_PHYSX_TOOLKIT_

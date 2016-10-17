@@ -40,7 +40,7 @@ AreaLightReferenceCountAllocate(
 VOID
 AreaLightReferenceCountAddGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
-    _In_ PPBR_GEOMETRY Geometry
+    _In_ PPHYSX_GEOMETRY Geometry
     );
 
 VOID

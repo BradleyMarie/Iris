@@ -38,7 +38,7 @@ Create(
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
 
-    PPBR_GEOMETRY GeometryPtr;
+    PPHYSX_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxTriangleAllocate(Vertex0.AsPOINT3(),
                                            Vertex1.AsPOINT3(),
                                            Vertex2.AsPOINT3(),

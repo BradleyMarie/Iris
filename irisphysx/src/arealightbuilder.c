@@ -432,7 +432,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxAreaLightBuilderBuildLightsAndGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _Outptr_result_buffer_(*NumberOfGeometry) PPBR_GEOMETRY **Geometry,
+    _Outptr_result_buffer_(*NumberOfGeometry) PPHYSX_GEOMETRY **Geometry,
     _Out_ PSIZE_T NumberOfGeometry,
     _Outptr_result_buffer_(*NumberOfLights) PPBR_LIGHT **Lights,
     _Out_ PSIZE_T NumberOfLights
@@ -451,7 +451,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     SIZE_T LocalNumberOfGeometry;
     SIZE_T LocalNumberOfLights;
     PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount;
-    PPBR_GEOMETRY *LocalGeometry;
+    PPHYSX_GEOMETRY *LocalGeometry;
     PPBR_LIGHT *LocalLights;
     ISTATUS Status;
     PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
@@ -507,7 +507,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     // Allocate Result Arrays
     //
     
-    Allocation = malloc(sizeof(PPBR_GEOMETRY) * LocalNumberOfGeometry);
+    Allocation = malloc(sizeof(PPHYSX_GEOMETRY) * LocalNumberOfGeometry);
     
     if (Allocation == NULL)
     {
@@ -515,7 +515,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    LocalGeometry = (PPBR_GEOMETRY*) Allocation;
+    LocalGeometry = (PPHYSX_GEOMETRY*) Allocation;
     
     Allocation = malloc(sizeof(PPBR_LIGHT) * LocalNumberOfLights);
     

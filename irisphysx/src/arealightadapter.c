@@ -95,7 +95,7 @@ PhysxAreaLightAdapterProcessHitCallback(
     )
 {
     PCPBR_LIGHT BackLight;
-    PCPBR_GEOMETRY Geometry;
+    PCPHYSX_GEOMETRY Geometry;
     VECTOR3 ModelSurfaceNormal;
     VECTOR3 NormalizedWorldSurfaceNormal;
     PCPBR_LIGHT FrontLight;
@@ -109,11 +109,11 @@ PhysxAreaLightAdapterProcessHitCallback(
 
     ProcessHitContext = (PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT) Context;
 
-    Geometry = (PCPBR_GEOMETRY) Hit->Data;
+    Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
     
-    PBRGeometryGetLight(Geometry,
-                        Hit->FrontFace,
-                        &FrontLight);
+    PhysxGeometryGetLight(Geometry,
+                          Hit->FrontFace,
+                          &FrontLight);
 
     if (FrontLight != ProcessHitContext->Light)
     {
@@ -125,10 +125,10 @@ PhysxAreaLightAdapterProcessHitCallback(
         return ISTATUS_SUCCESS;
     }
     
-    Status = PBRGeometryComputeNormal(Geometry,
-                                      ModelHitPoint,
-                                      Hit->FrontFace,
-                                      &ModelSurfaceNormal);
+    Status = PhysxGeometryComputeNormal(Geometry,
+                                        ModelHitPoint,
+                                        Hit->FrontFace,
+                                        &ModelSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -152,9 +152,9 @@ PhysxAreaLightAdapterProcessHitCallback(
           VectorDotProduct(WorldToLight, WorldToLight) /
           VectorDotProduct(ProcessHitContext->ToLight.Direction, WorldSurfaceNormal);
 
-    PBRGeometryGetLight(Geometry,
-                        Hit->BackFace,
-                        &BackLight);
+    PhysxGeometryGetLight(Geometry,
+                          Hit->BackFace,
+                          &BackLight);
     
     if (BackLight == ProcessHitContext->Light)
     {

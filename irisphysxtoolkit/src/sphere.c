@@ -43,7 +43,7 @@ ISTATUS
 SphereTestRay(
     _In_opt_ PCSPHERE Sphere,
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -157,15 +157,15 @@ SphereTestRay(
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
-    Status = PBRHitAllocatorAllocate(HitAllocator,
-                                     NULL,
-                                     Distance0,
-                                     FrontFace0,
-                                     BackFace0,
-                                     NULL,
-                                     0,
-                                     0,
-                                     HitList);
+    Status = PhysxHitAllocatorAllocate(HitAllocator,
+                                       NULL,
+                                       Distance0,
+                                       FrontFace0,
+                                       BackFace0,
+                                       NULL,
+                                       0,
+                                       0,
+                                       HitList);
 
 #if defined(ENABLE_CSG_SUPPORT)
 
@@ -177,15 +177,15 @@ SphereTestRay(
     Distance1 = (NegatedScalarProjectionOriginToCenterOntoRay + Discriminant) /
                 LengthOfRaySquared;
 
-    Status = PBRHitAllocatorAllocate(HitAllocator,
-                                     *HitList,
-                                     Distance1,
-                                     FrontFace1,
-                                     BackFace1,
-                                     NULL,
-                                     0,
-                                     0,
-                                     HitList);
+    Status = PhysxHitAllocatorAllocate(HitAllocator,
+                                       *HitList,
+                                       Distance1,
+                                       FrontFace1,
+                                       BackFace1,
+                                       NULL,
+                                       0,
+                                       0,
+                                       HitList);
 
 #endif // defined(ENABLE_CSG_SUPPORT)
 
@@ -371,7 +371,7 @@ ISTATUS
 PhysxSphereTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -413,7 +413,7 @@ PhysxSphereFree(
 // Static Variables
 //
 
-CONST STATIC PBR_GEOMETRY_VTABLE SphereHeader = {
+CONST STATIC PHYSX_GEOMETRY_VTABLE SphereHeader = {
     PhysxSphereTestRay,
     PhysxSphereComputeNormal,
     PhysxSphereTestBounds,
@@ -433,10 +433,10 @@ PhysxSphereAllocate(
     _In_ FLOAT Radius,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
-    PCPBR_GEOMETRY_VTABLE GeometryVTable;
+    PCPHYSX_GEOMETRY_VTABLE GeometryVTable;
     PHYSX_SPHERE Sphere;
     SIZE_T DataAlignment;
     FLOAT RadiusSquared;
@@ -479,11 +479,11 @@ PhysxSphereAllocate(
 	DataAlignment = _Alignof(PHYSX_SPHERE);
 	GeometryVTable = &SphereHeader;
     
-    Status = PBRGeometryAllocate(GeometryVTable,
-                                 Data,
-                                 DataSize,
-                                 DataAlignment,
-                                 Geometry);
+    Status = PhysxGeometryAllocate(GeometryVTable,
+                                   Data,
+                                   DataSize,
+                                   DataAlignment,
+                                   Geometry);
 
     if (Status != ISTATUS_SUCCESS)
     {

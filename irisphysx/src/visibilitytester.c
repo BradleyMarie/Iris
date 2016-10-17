@@ -134,13 +134,13 @@ PBRVisibilityTesterTestLightVisibilityProcessHit(
     )
 {
     PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
-    PCPBR_GEOMETRY PBRGeometry;
+    PCPHYSX_GEOMETRY Geometry;
     PCPBR_LIGHT ClosestPbrLight;
     
     TestContext = (PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
-    PBRGeometry = (PCPBR_GEOMETRY) Hit->Data;
+    Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
 
-    PBRGeometryGetLight(PBRGeometry, Hit->FrontFace, &ClosestPbrLight);
+    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestPbrLight);
     
     if (ClosestPbrLight == TestContext->TargetPbrLight)
     {
@@ -206,13 +206,13 @@ PBRVisibilityTesterFindDistaneToLightProcessHit(
     )
 {
     PPBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT TestContext;
-    PCPBR_GEOMETRY PBRGeometry;
+    PCPHYSX_GEOMETRY Geometry;
     PCPBR_LIGHT ClosestPbrLight;
     
     TestContext = (PPBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT) Context;
-    PBRGeometry = (PCPBR_GEOMETRY) Hit->Data;
+    Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
 
-    PBRGeometryGetLight(PBRGeometry, Hit->FrontFace, &ClosestPbrLight);
+    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestPbrLight);
     
     if (ClosestPbrLight == TestContext->TargetPbrLight)
     {

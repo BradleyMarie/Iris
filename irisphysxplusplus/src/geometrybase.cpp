@@ -27,7 +27,7 @@ ISTATUS
 GeometryTestRayAdapter(
     _In_ PCVOID Context,
     _In_ RAY ModelRay,
-    _In_ PPBR_HIT_ALLOCATOR Allocator,
+    _In_ PPHYSX_HIT_ALLOCATOR Allocator,
     _Out_ PHIT_LIST *HitList
     )
 {
@@ -131,7 +131,7 @@ GeometryFreeAdapter(
     delete *GeometryBasePtr;
 }
 
-const static PBR_GEOMETRY_VTABLE InteropVTable {
+const static PHYSX_GEOMETRY_VTABLE InteropVTable {
     GeometryTestRayAdapter,
     GeometryComputeNormalAdapter,
     GeometryCheckBoundsAdapter,
@@ -154,13 +154,13 @@ GeometryBase::Create(
     }
     
     GeometryBase *UnmanagedGeometryBasePtr = GeometryBasePtr.release();
-    PPBR_GEOMETRY GeometryPtr;
+    PPHYSX_GEOMETRY GeometryPtr;
 
-    ISTATUS Success = PBRGeometryAllocate(&InteropVTable,
-                                          &UnmanagedGeometryBasePtr,
-                                          sizeof(GeometryBase*),
-                                          alignof(GeometryBase*),
-                                          &GeometryPtr);
+    ISTATUS Success = PhysxGeometryAllocate(&InteropVTable,
+                                            &UnmanagedGeometryBasePtr,
+                                            sizeof(GeometryBase*),
+                                            alignof(GeometryBase*),
+                                            &GeometryPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

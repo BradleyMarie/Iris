@@ -37,7 +37,7 @@ Create(
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
 
-    PPBR_GEOMETRY GeometryPtr;
+    PPHYSX_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxInfinitePlaneAllocate(Point.AsPOINT3(),
                                                 SurfaceNormal.AsVECTOR3(),
                                                 IrisFrontMaterial,

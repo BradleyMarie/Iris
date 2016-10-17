@@ -91,7 +91,7 @@ ISTATUS
 PhysxLightedGeometryTestRay(
     _In_ PCPHYSX_LIGHTED_GEOMETRY LightedGeometry,
     _In_ RAY Ray,
-    _In_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+    _In_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Out_ PHIT_LIST *HitList
     )
 {
@@ -99,12 +99,12 @@ PhysxLightedGeometryTestRay(
     
     ASSERT(LightedGeometry != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
-    ASSERT(PBRHitAllocator != NULL);
+    ASSERT(HitAllocator != NULL);
     ASSERT(HitList != NULL);
     
     Status = LightedGeometry->VTable->Header.TestRayRoutine(LightedGeometry->Data,
                                                             Ray,
-                                                            PBRHitAllocator,
+                                                            HitAllocator,
                                                             HitList);
 
     return Status;

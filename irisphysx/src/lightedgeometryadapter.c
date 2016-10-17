@@ -128,7 +128,7 @@ ISTATUS
 PhysxLightedGeometryAdapterTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -170,7 +170,7 @@ PhysxLightedGeometryAdapterFree(
 // Static Variables
 //
 
-CONST PBR_GEOMETRY_VTABLE LightedGeometryAdapterVTable = {
+CONST PHYSX_GEOMETRY_VTABLE LightedGeometryAdapterVTable = {
     PhysxLightedGeometryAdapterTestRay,
     PhysxLightedGeometryAdapterComputeNormal,
     PhysxLightedGeometryAdapterTestBounds,
@@ -223,10 +223,10 @@ PhysxLightedGeometryAdapterAllocate(
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PCPHYSX_LIGHTED_GEOMETRY *LightedGeometry,
     _Out_ PPHYSX_LIGHTED_GEOMETRY_ADAPTER *LightedGeometryAdapter,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
-    PPBR_GEOMETRY AllocatedGeometry;
+    PPHYSX_GEOMETRY AllocatedGeometry;
     PPHYSX_LIGHTED_GEOMETRY AllocatedLightedGeometry;
     PVOID DataAllocation;
     PHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapterData;
@@ -258,12 +258,12 @@ PhysxLightedGeometryAdapterAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Status = PBRGeometryAllocateInternal(&LightedGeometryAdapterVTable,
-                                         ReferenceCount,
-                                         &LightedGeometryAdapterData,
-                                         sizeof(PHYSX_LIGHTED_GEOMETRY),
-                                         _Alignof(PHYSX_LIGHTED_GEOMETRY),
-                                         &AllocatedGeometry);
+    Status = PhysxGeometryAllocateInternal(&LightedGeometryAdapterVTable,
+                                           ReferenceCount,
+                                           &LightedGeometryAdapterData,
+                                           sizeof(PHYSX_LIGHTED_GEOMETRY),
+                                           _Alignof(PHYSX_LIGHTED_GEOMETRY),
+                                           &AllocatedGeometry);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -287,11 +287,11 @@ PhysxLightedGeometryAdapterAllocate(
     if (Status != ISTATUS_SUCCESS)
     {
         ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-        PBRGeometryFree(AllocatedGeometry);
+        PhysxGeometryFree(AllocatedGeometry);
         return Status;
     }
 
-    DataAllocation = PBRGeometryGetMutableData(AllocatedGeometry);
+    DataAllocation = PhysxGeometryGetMutableData(AllocatedGeometry);
 
     *LightedGeometry = AllocatedLightedGeometry;
     *LightedGeometryAdapter = (PPHYSX_LIGHTED_GEOMETRY_ADAPTER) DataAllocation;
@@ -333,7 +333,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightedGeometryAdapterGetLight(
-    _In_ PCPBR_GEOMETRY Geometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     )
@@ -347,7 +347,7 @@ PhysxLightedGeometryAdapterGetLight(
     ASSERT(Geometry != NULL);
     ASSERT(Light != NULL);
 
-    Data = PBRGeometryGetData(Geometry);
+    Data = PhysxGeometryGetData(Geometry);
     LightedGeometryAdapter = (PCPHYSX_LIGHTED_GEOMETRY_ADAPTER) Data;
 
     Key.Face = Face;
@@ -374,7 +374,7 @@ PhysxLightedGeometryAdapterGetLight(
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightedGeometryAdapterGetLightedGeometry(
-    _In_ PCPBR_GEOMETRY Geometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _Outptr_ PCPHYSX_LIGHTED_GEOMETRY *LightedGeometry
     )
 {
@@ -382,10 +382,10 @@ PhysxLightedGeometryAdapterGetLightedGeometry(
     PCPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter;
     
     ASSERT(Geometry != NULL);
-    ASSERT(PBRGeometryGetVTable(Geometry) == &LightedGeometryAdapterVTable);
+    ASSERT(PhysxGeometryGetVTable(Geometry) == &LightedGeometryAdapterVTable);
     ASSERT(LightedGeometry != NULL);
 
-    Data = PBRGeometryGetData(Geometry);
+    Data = PhysxGeometryGetData(Geometry);
     LightedGeometryAdapter = (PCPHYSX_LIGHTED_GEOMETRY_ADAPTER) Data;
 
     *LightedGeometry = LightedGeometryAdapter->LightedGeometry;

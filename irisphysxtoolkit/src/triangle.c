@@ -46,7 +46,7 @@ ISTATUS
 TriangleXDominantTestRay(
     _In_ PCTRIANGLE Triangle,
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -132,16 +132,16 @@ TriangleXDominantTestRay(
         BackFace = TRIANGLE_FRONT_FACE;
     }
 
-    Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
-                                                 NULL,
-                                                 Distance,
-                                                 FrontFace,
-                                                 BackFace,
-                                                 &BarycentricCoordinates,
-                                                 sizeof(BarycentricCoordinates),
-                                                 _Alignof(FLOAT),
-                                                 Hit,
-                                                 HitList);
+    Status = PhysxHitAllocatorAllocateWithHitPoint(HitAllocator,
+                                                   NULL,
+                                                   Distance,
+                                                   FrontFace,
+                                                   BackFace,
+                                                   &BarycentricCoordinates,
+                                                   sizeof(BarycentricCoordinates),
+                                                   _Alignof(FLOAT),
+                                                   Hit,
+                                                   HitList);
 
     return Status;
 }
@@ -153,7 +153,7 @@ ISTATUS
 TriangleYDominantTestRay(
     _In_ PCTRIANGLE Triangle,
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -239,16 +239,16 @@ TriangleYDominantTestRay(
         BackFace = TRIANGLE_FRONT_FACE;
     }
     
-    Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
-                                                 NULL,
-                                                 Distance,
-                                                 FrontFace,
-                                                 BackFace,
-                                                 &BarycentricCoordinates,
-                                                 sizeof(BarycentricCoordinates),
-                                                 _Alignof(FLOAT),
-                                                 Hit,
-                                                 HitList);
+    Status = PhysxHitAllocatorAllocateWithHitPoint(HitAllocator,
+                                                   NULL,
+                                                   Distance,
+                                                   FrontFace,
+                                                   BackFace,
+                                                   &BarycentricCoordinates,
+                                                   sizeof(BarycentricCoordinates),
+                                                   _Alignof(FLOAT),
+                                                   Hit,
+                                                   HitList);
 
     return Status;
 }
@@ -260,7 +260,7 @@ ISTATUS
 TriangleZDominantTestRay(
     _In_ PCTRIANGLE Triangle,
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -346,16 +346,16 @@ TriangleZDominantTestRay(
         BackFace = TRIANGLE_FRONT_FACE;
     }
     
-    Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
-                                                 NULL,
-                                                 Distance,
-                                                 FrontFace,
-                                                 BackFace,
-                                                 &BarycentricCoordinates,
-                                                 sizeof(BarycentricCoordinates),
-                                                 _Alignof(FLOAT),
-                                                 Hit,
-                                                 HitList);
+    Status = PhysxHitAllocatorAllocateWithHitPoint(HitAllocator,
+                                                   NULL,
+                                                   Distance,
+                                                   FrontFace,
+                                                   BackFace,
+                                                   &BarycentricCoordinates,
+                                                   sizeof(BarycentricCoordinates),
+                                                   _Alignof(FLOAT),
+                                                   Hit,
+                                                   HitList);
 
     return Status;
 }
@@ -593,7 +593,7 @@ ISTATUS
 PhysxTriangleXDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -622,7 +622,7 @@ ISTATUS
 PhysxTriangleYDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -651,7 +651,7 @@ ISTATUS
 PhysxTriangleZDominantTestRay(
     _In_opt_ PCVOID Context, 
     _In_ RAY Ray,
-    _Inout_ PPBR_HIT_ALLOCATOR HitAllocator,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
@@ -693,7 +693,7 @@ PhysxTriangleFree(
 // Static Variables
 //
 
-CONST STATIC PBR_GEOMETRY_VTABLE XTriangleHeader = {
+CONST STATIC PHYSX_GEOMETRY_VTABLE XTriangleHeader = {
     PhysxTriangleXDominantTestRay,
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
@@ -701,7 +701,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE XTriangleHeader = {
     PhysxTriangleFree
 };
 
-CONST STATIC PBR_GEOMETRY_VTABLE YTriangleHeader = {
+CONST STATIC PHYSX_GEOMETRY_VTABLE YTriangleHeader = {
     PhysxTriangleYDominantTestRay,
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
@@ -709,7 +709,7 @@ CONST STATIC PBR_GEOMETRY_VTABLE YTriangleHeader = {
 	PhysxTriangleFree
 };
 
-CONST STATIC PBR_GEOMETRY_VTABLE ZTriangleHeader = {
+CONST STATIC PHYSX_GEOMETRY_VTABLE ZTriangleHeader = {
     PhysxTriangleZDominantTestRay,
     PhysxTriangleComputeNormal,
     PhysxTriangleTestBounds,
@@ -730,10 +730,10 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex2,
     _In_opt_ PPBR_MATERIAL FrontMaterial,
     _In_opt_ PPBR_MATERIAL BackMaterial,
-    _Out_ PPBR_GEOMETRY *Geometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
-    PCPBR_GEOMETRY_VTABLE GeometryVTable;
+    PCPHYSX_GEOMETRY_VTABLE GeometryVTable;
     VECTOR_AXIS DominantAxis;
     PHYSX_TRIANGLE Triangle;
     SIZE_T DataAlignment;
@@ -793,11 +793,11 @@ PhysxTriangleAllocate(
 			break;
 	}
 
-    Status = PBRGeometryAllocate(GeometryVTable,
-                                 Data,
-                                 DataSize,
-                                 DataAlignment,
-                                 Geometry);
+    Status = PhysxGeometryAllocate(GeometryVTable,
+                                   Data,
+                                   DataSize,
+                                   DataAlignment,
+                                   Geometry);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This module implements the PBR_HIT_ALLOCATOR public functions.
+    This module implements the PHYSX_HIT_ALLOCATOR public functions.
 
 --*/
 
@@ -21,11 +21,8 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_GEOMETRY PBR_GEOMETRY, *PPBR_GEOMETRY;
-typedef CONST PBR_GEOMETRY *PCPBR_GEOMETRY;
-
-typedef struct _PBR_HIT_ALLOCATOR PBR_HIT_ALLOCATOR, *PPBR_HIT_ALLOCATOR;
-typedef CONST PBR_HIT_ALLOCATOR *PCPBR_HIT_ALLOCATOR;
+typedef struct _PHYSX_HIT_ALLOCATOR PHYSX_HIT_ALLOCATOR, *PPHYSX_HIT_ALLOCATOR;
+typedef CONST PHYSX_HIT_ALLOCATOR *PCPHYSX_HIT_ALLOCATOR;
 
 //
 // Functions
@@ -35,8 +32,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRHitAllocatorAllocate(
-    _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+PhysxHitAllocatorAllocate(
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ UINT32 FrontFace,
@@ -51,8 +48,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRHitAllocatorAllocateWithHitPoint(
-    _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+PhysxHitAllocatorAllocateWithHitPoint(
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ UINT32 FrontFace,

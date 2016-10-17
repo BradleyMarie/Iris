@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class GeometryReference final {
 public:
     GeometryReference(
-        _In_ PCPBR_GEOMETRY GeometryPtr
+        _In_ PCPHYSX_GEOMETRY GeometryPtr
         )
     : Data(GeometryPtr)
     {
@@ -38,8 +38,8 @@ public:
     }
 
     _Ret_
-    PCPBR_GEOMETRY
-    AsPCPBR_GEOMETRY(
+    PCPHYSX_GEOMETRY
+    AsPCPHYSX_GEOMETRY(
         void
         ) const
     {
@@ -54,9 +54,9 @@ public:
     {
         PHIT_LIST Result;
 
-        ISTATUS Status = PBRGeometryTestNestedGeometry(Data,
-                                                       Allocator.AsPPBR_HIT_ALLOCATOR(),
-                                                       &Result);
+        ISTATUS Status = PhysxGeometryTestNestedGeometry(Data,
+                                                         Allocator.AsPPHYSX_HIT_ALLOCATOR(),
+                                                         &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -75,10 +75,10 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PBRGeometryCheckBounds(Data,
-                                                ModelToWorld.AsPCMATRIX(),
-												WorldAlignedBoundingBox,
-                                                &Result);
+        ISTATUS Status = PhysxGeometryCheckBounds(Data,
+                                                  ModelToWorld.AsPCMATRIX(),
+                                                  WorldAlignedBoundingBox,
+                                                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -97,10 +97,10 @@ public:
     {
         VECTOR3 Result;
 
-        ISTATUS Status = PBRGeometryComputeNormal(Data,
-						                          HitPoint.AsPOINT3(),
-								                  FaceHit,
-										          &Result);
+        ISTATUS Status = PhysxGeometryComputeNormal(Data,
+						                            HitPoint.AsPOINT3(),
+								                    FaceHit,
+                                                    &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -118,9 +118,9 @@ public:
     {
         PCPBR_MATERIAL Result;
 
-        ISTATUS Status = PBRGeometryGetMaterial(Data,
-						                        FaceHit,
-								                &Result);
+        ISTATUS Status = PhysxGeometryGetMaterial(Data,
+						                          FaceHit,
+								                  &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -143,9 +143,9 @@ public:
     {
         PCPBR_LIGHT Result;
 
-        ISTATUS Status = PBRGeometryGetLight(Data,
-						                     FaceHit,
-								             &Result);
+        ISTATUS Status = PhysxGeometryGetLight(Data,
+						                       FaceHit,
+								               &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -161,7 +161,7 @@ public:
     }
     
 private:
-    PCPBR_GEOMETRY Data;
+    PCPHYSX_GEOMETRY Data;
 };
 
 } // namespace Iris

@@ -79,7 +79,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxAreaLightBuilderBuildLightsAndGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
-    _Outptr_result_buffer_(*NumberOfGeometry) PPBR_GEOMETRY **Geometry,
+    _Outptr_result_buffer_(*NumberOfGeometry) PPHYSX_GEOMETRY **Geometry,
     _Out_ PSIZE_T NumberOfGeometry,
     _Outptr_result_buffer_(*NumberOfLights) PPBR_LIGHT **Lights,
     _Out_ PSIZE_T NumberOfLights

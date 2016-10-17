@@ -30,7 +30,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PPBR_RAYTRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ PVOID Context, 
-    _In_ PCPBR_GEOMETRY PBRGeometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 FrontFace,
     _In_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,

@@ -21,8 +21,8 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitAllocatorAllocate(
-    _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+PhysxHitAllocatorAllocate(
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ UINT32 FrontFace,
@@ -35,9 +35,9 @@ PBRHitAllocatorAllocate(
 {
     ISTATUS Status;
     
-    Status = HitAllocatorAllocate(PBRHitAllocator->Allocator,
+    Status = HitAllocatorAllocate(HitAllocator->Allocator,
                                   NextHit,
-                                  PBRHitAllocator->Geometry,
+                                  HitAllocator->Geometry,
                                   Distance,
                                   FrontFace,
                                   BackFace,
@@ -63,8 +63,8 @@ PBRHitAllocatorAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitAllocatorAllocateWithHitPoint(
-    _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+PhysxHitAllocatorAllocateWithHitPoint(
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
     _In_ UINT32 FrontFace,
@@ -78,9 +78,9 @@ PBRHitAllocatorAllocateWithHitPoint(
 {
     ISTATUS Status;
     
-    Status = HitAllocatorAllocateWithHitPoint(PBRHitAllocator->Allocator,
+    Status = HitAllocatorAllocateWithHitPoint(HitAllocator->Allocator,
                                               NextHit,
-                                              PBRHitAllocator->Geometry,
+                                              HitAllocator->Geometry,
                                               Distance,
                                               FrontFace,
                                               BackFace,

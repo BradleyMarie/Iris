@@ -21,9 +21,9 @@ Abstract:
 // Types
 //
 
-struct _PBR_HIT_ALLOCATOR {
+struct _PHYSX_HIT_ALLOCATOR {
     PHIT_ALLOCATOR Allocator;
-    PCPBR_GEOMETRY Geometry;
+    PCPHYSX_GEOMETRY Geometry;
     RAY TraceRay;
 };
 
@@ -33,56 +33,56 @@ struct _PBR_HIT_ALLOCATOR {
 
 SFORCEINLINE
 VOID
-PBRHitAllocatorInitialize(
-    _Out_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
+PhysxHitAllocatorInitialize(
+    _Out_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _In_ PHIT_ALLOCATOR Allocator,
-    _In_ PCPBR_GEOMETRY Geometry,
+    _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ RAY TraceRay
     )
 {
-    ASSERT(PBRHitAllocator != NULL);
+    ASSERT(HitAllocator != NULL);
     ASSERT(Allocator != NULL);
     ASSERT(Geometry != NULL);
     ASSERT(RayValidate(TraceRay) != FALSE);
     
-    PBRHitAllocator->Allocator = Allocator;
-    PBRHitAllocator->Geometry = Geometry;
-    PBRHitAllocator->TraceRay = TraceRay;
+    HitAllocator->Allocator = Allocator;
+    HitAllocator->Geometry = Geometry;
+    HitAllocator->TraceRay = TraceRay;
 }
 
 SFORCEINLINE
 VOID
-PBRHitAllocatorSetGeometry(
-    _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
-    _In_ PCPBR_GEOMETRY PBRGeometry
+PhysxHitAllocatorSetGeometry(
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
+    _In_ PCPHYSX_GEOMETRY Geometry
     )
 {
-    ASSERT(PBRHitAllocator != NULL);
-    ASSERT(PBRGeometry != NULL);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(Geometry != NULL);
     
-    PBRHitAllocator->Geometry = PBRGeometry;
+    HitAllocator->Geometry = Geometry;
 }
 
 SFORCEINLINE
-PCPBR_GEOMETRY
-PBRHitAllocatorGetGeometry(
-    _In_ PCPBR_HIT_ALLOCATOR PBRHitAllocator
+PCPHYSX_GEOMETRY
+PhysxHitAllocatorGetGeometry(
+    _In_ PCPHYSX_HIT_ALLOCATOR HitAllocator
     )
 {
-    ASSERT(PBRHitAllocator != NULL);
+    ASSERT(HitAllocator != NULL);
     
-    return PBRHitAllocator->Geometry;
+    return HitAllocator->Geometry;
 }
 
 SFORCEINLINE
 RAY
-PBRHitAllocatorGetRay(
-    _In_ PCPBR_HIT_ALLOCATOR PBRHitAllocator
+PhysxHitAllocatorGetRay(
+    _In_ PCPHYSX_HIT_ALLOCATOR HitAllocator
     )
 {
-    ASSERT(PBRHitAllocator != NULL);
+    ASSERT(HitAllocator != NULL);
     
-    return PBRHitAllocator->TraceRay;
+    return HitAllocator->TraceRay;
 }
 
 #endif // _PBR_HIT_ALLOCATOR_IRIS_PHYSX_INTERNAL_

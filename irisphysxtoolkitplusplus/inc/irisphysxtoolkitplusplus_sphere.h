@@ -37,7 +37,7 @@ Create(
     PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
     PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
 
-    PPBR_GEOMETRY GeometryPtr;
+    PPHYSX_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxSphereAllocate(Center.AsPOINT3(),
                                          Radius,
                                          IrisFrontMaterial,
