@@ -26,9 +26,9 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXTOOLKITAPI
 ISTATUS
 SpectrumLambertianBrdfAllocate(
-    _In_ PPBR_BRDF_ALLOCATOR Allocator,
+    _In_ PPHYSX_BRDF_ALLOCATOR Allocator,
     _In_ PCREFLECTOR Reflectance,
-    _Out_ PCPBR_BRDF *PbrBrdf
+    _Out_ PCPHYSX_BRDF *Brdf
     );
 
 #endif // _LAMBERTIAN_BRDF_IRIS_PHYSX_TOOLKIT_

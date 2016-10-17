@@ -23,7 +23,7 @@ namespace Iris {
 //
 // Types
 //
-
+    
 class RayTracer final {
 public:
     RayTracer(
@@ -43,13 +43,16 @@ public:
         return RayTracer();
     }
 
+    typedef std::function<bool(PCVOID, FLOAT, UINT32, UINT32, PCVOID, SIZE_T)> ProcessHitsFunction;
+    typedef std::function<bool(PCVOID, FLOAT, UINT32, UINT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitsWithCoordinatesFunction;
+    
     IRISPLUSPLUSAPI
     void
     TraceClosestHit(
         _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> ProcessHitRoutine
+        _In_ ProcessHitsFunction ProcessHitsRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -58,7 +61,7 @@ public:
         _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
         _In_ FLOAT MinimumDistance,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+        _In_ ProcessHitsWithCoordinatesFunction ProcessHitsRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -66,7 +69,7 @@ public:
     TraceAllHitsOutOfOrder(
         _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+        _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
         );
     
     IRISPLUSPLUSAPI
@@ -74,7 +77,7 @@ public:
     TraceAllHitsInOrder(
         _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
         _In_ const Ray & WorldRay,
-        _In_ std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T, MatrixReference, const Vector &, const Point &, const Point &)> ProcessHitRoutine
+        _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
         );
         
     RayTracer(

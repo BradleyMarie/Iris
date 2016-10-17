@@ -47,9 +47,10 @@ InfinitePlaneTestRay(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
+    UINT32 BackFace;
     FLOAT Distance;
     FLOAT DotProduct;
-    INT32 Face;
+    UINT32 FrontFace;
     ISTATUS Status;
     VECTOR3 Temp;
 
@@ -79,12 +80,22 @@ InfinitePlaneTestRay(
 
 #endif // !defined(ENABLE_CSG_SUPPORT)
 
-    Face = ((FLOAT) 0.0 > DotProduct) ? INFINITE_PLANE_FRONT_FACE : INFINITE_PLANE_BACK_FACE;
+    if ((FLOAT) 0.0 > DotProduct)
+    {
+        FrontFace = INFINITE_PLANE_FRONT_FACE;
+        BackFace = INFINITE_PLANE_BACK_FACE;
+    }
+    else
+    {
+        FrontFace = INFINITE_PLANE_BACK_FACE;
+        BackFace = INFINITE_PLANE_FRONT_FACE;
+    }
 
     Status = PBRHitAllocatorAllocate(HitAllocator,
                                      NULL,
                                      Distance,
-                                     Face,
+                                     FrontFace,
+                                     BackFace,
                                      NULL,
                                      0,
                                      0,

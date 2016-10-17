@@ -27,7 +27,8 @@ typedef CONST HIT_ALLOCATOR *PCHIT_ALLOCATOR;
 typedef struct _HIT {
     PCVOID Data;
     FLOAT Distance;
-    INT32 FaceHit;
+    UINT32 FrontFace;
+    UINT32 BackFace;
     _Field_size_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData;
     SIZE_T AdditionalDataSizeInBytes;
 } HIT, *PHIT;
@@ -54,7 +55,8 @@ HitAllocatorAllocate(
     _In_opt_ PHIT_LIST NextHit,
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
@@ -70,7 +72,8 @@ HitAllocatorAllocateWithHitPoint(
     _In_opt_ PHIT_LIST NextHit,
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,

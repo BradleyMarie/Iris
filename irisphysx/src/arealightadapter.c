@@ -94,10 +94,11 @@ PhysxAreaLightAdapterProcessHitCallback(
     _In_ POINT3 WorldHitPoint
     )
 {
+    PCPBR_LIGHT BackLight;
     PCPBR_GEOMETRY Geometry;
     VECTOR3 ModelSurfaceNormal;
     VECTOR3 NormalizedWorldSurfaceNormal;
-    PCPBR_LIGHT Light;
+    PCPBR_LIGHT FrontLight;
     PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     FLOAT Pdf;
     PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
@@ -111,10 +112,10 @@ PhysxAreaLightAdapterProcessHitCallback(
     Geometry = (PCPBR_GEOMETRY) Hit->Data;
     
     PBRGeometryGetLight(Geometry,
-                        Hit->FaceHit, 
-                        &Light);
+                        Hit->FrontFace,
+                        &FrontLight);
 
-    if (Light != ProcessHitContext->Light)
+    if (FrontLight != ProcessHitContext->Light)
     {
         if (ProcessHitContext->FirstHit != FALSE)
         {
@@ -126,7 +127,7 @@ PhysxAreaLightAdapterProcessHitCallback(
     
     Status = PBRGeometryComputeNormal(Geometry,
                                       ModelHitPoint,
-                                      Hit->FaceHit,
+                                      Hit->FrontFace,
                                       &ModelSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)
@@ -137,7 +138,7 @@ PhysxAreaLightAdapterProcessHitCallback(
     PhysxLightedGeometryAdapterGetLightedGeometry(Geometry, &LightedGeometry);
 
     PhysxLightedGeometryComputeSurfaceArea(LightedGeometry,
-                                           Hit->FaceHit,
+                                           Hit->FrontFace,
                                            &SurfaceArea);
 
     WorldSurfaceNormal = VectorMatrixInverseTransposedMultiply(ModelToWorld,
@@ -151,6 +152,15 @@ PhysxAreaLightAdapterProcessHitCallback(
           VectorDotProduct(WorldToLight, WorldToLight) /
           VectorDotProduct(ProcessHitContext->ToLight.Direction, WorldSurfaceNormal);
 
+    PBRGeometryGetLight(Geometry,
+                        Hit->BackFace,
+                        &BackLight);
+    
+    if (BackLight == ProcessHitContext->Light)
+    {
+        Pdf *= (FLOAT) 2.0f;
+    }
+    
     ProcessHitContext->Pdf += Pdf * SurfaceArea * ProcessHitContext->InverseTotalSurfaceArea;
 
     if (ProcessHitContext->FirstHit != FALSE)

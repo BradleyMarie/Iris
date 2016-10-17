@@ -47,10 +47,11 @@ SphereTestRay(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
+    UINT32 BackFace0;
     VECTOR3 CenterToRayOrigin;
     FLOAT Discriminant;
     FLOAT Distance0;
-    UINT32 Face0;
+    UINT32 FrontFace0;
     FLOAT LengthOfRaySquared;
     FLOAT LengthSquaredCenterToOrigin;
     FLOAT NegatedScalarProjectionOriginToCenterOntoRay;
@@ -58,8 +59,9 @@ SphereTestRay(
     ISTATUS Status;
 
 #if defined(ENABLE_CSG_SUPPORT)
-
-    UINT32 Face1;
+    
+    UINT32 BackFace1;
+    UINT32 FrontFace1;
     FLOAT Distance1;
 
 #endif // defined(ENABLE_CSG_SUPPORT)
@@ -129,30 +131,37 @@ SphereTestRay(
 
     if (LengthSquaredCenterToOrigin < Sphere->RadiusSquared)
     {
-        Face0 = SPHERE_BACK_FACE;
+        FrontFace0 = SPHERE_BACK_FACE;
+        BackFace0 = SPHERE_FRONT_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
-        Face1 = SPHERE_BACK_FACE;
+        FrontFace1 = SPHERE_BACK_FACE;
+        BackFace1 = SPHERE_FRONT_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
     else if (Distance0 >(FLOAT) 0.0)
     {
-        Face0 = SPHERE_FRONT_FACE;
+        FrontFace0 = SPHERE_BACK_FACE;
+        BackFace0 = SPHERE_FRONT_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
-        Face1 = SPHERE_BACK_FACE;
+        FrontFace1 = SPHERE_BACK_FACE;
+        BackFace1 = SPHERE_FRONT_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
     else
     {
-        Face0 = SPHERE_BACK_FACE;
+        FrontFace0 = SPHERE_BACK_FACE;
+        BackFace0 = SPHERE_FRONT_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
-        Face1 = SPHERE_FRONT_FACE;
+        FrontFace1 = SPHERE_FRONT_FACE;
+        BackFace1 = SPHERE_BACK_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
 
     Status = PBRHitAllocatorAllocate(HitAllocator,
                                      NULL,
                                      Distance0,
-                                     Face0,
+                                     FrontFace0,
+                                     BackFace0,
                                      NULL,
                                      0,
                                      0,
@@ -171,7 +180,8 @@ SphereTestRay(
     Status = PBRHitAllocatorAllocate(HitAllocator,
                                      *HitList,
                                      Distance1,
-                                     Face1,
+                                     FrontFace1,
+                                     BackFace1,
                                      NULL,
                                      0,
                                      0,

@@ -8,33 +8,122 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_BRDF type.
+    This file contains the definitions for the PHYSX_BRDF type.
 
 --*/
 
 #include <irisphysxp.h>
 
 //
-// Functions
+// Types
+//
+
+struct _PHYSX_BRDF {
+    PCPHYSX_BRDF_VTABLE VTable;
+    SIZE_T ReferenceCount;
+    PVOID Data;
+};
+
+//
+// Internal Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfAllocate(
-    _In_ PCPBR_BRDF_VTABLE PbrBrdfVTable,
+PhysxBrdfAllocateUsingAllocator(
+    _Inout_ PDYNAMIC_MEMORY_ALLOCATOR Allocator,
+    _In_ PCPHYSX_BRDF_VTABLE BrdfVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_BRDF *PbrBrdf
+    _Out_ PCPHYSX_BRDF *Brdf
+    )
+{
+    PPHYSX_BRDF AllocatedBrdf;
+    PVOID DataDestination;
+    PVOID Header;
+    
+    if (Allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+    
+    if (BrdfVTable == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (DataSizeInBytes != 0)
+    {
+        if (Data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+        
+        if (DataAlignment == 0 ||
+            DataAlignment & DataAlignment - 1)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;    
+        }
+        
+        if (DataSizeInBytes % DataAlignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
+    }
+    
+    if (Brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    Header = DynamicMemoryAllocatorAllocateWithHeader(Allocator,
+                                                      sizeof(PHYSX_BRDF),
+                                                      _Alignof(PHYSX_BRDF),
+                                                      DataSizeInBytes,
+                                                      DataAlignment,
+                                                      &DataDestination);
+                                                      
+    if (Header == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    AllocatedBrdf = (PPHYSX_BRDF) Header;
+    
+    AllocatedBrdf->VTable = BrdfVTable;
+    AllocatedBrdf->ReferenceCount = 0;
+    AllocatedBrdf->Data = DataDestination;
+    
+    memcpy(DataDestination, Data, DataSizeInBytes);
+    
+    *Brdf = AllocatedBrdf;
+
+    return ISTATUS_SUCCESS;
+}
+
+//
+// Public Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxBrdfAllocate(
+    _In_ PCPHYSX_BRDF_VTABLE BrdfVTable,
+    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
+    _In_ SIZE_T DataSizeInBytes,
+    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
+    _Out_ PPHYSX_BRDF *Brdf
     )
 {
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
-    PPBR_BRDF AllocatedBrdf;
+    PPHYSX_BRDF AllocatedBrdf;
 
-    if (PbrBrdfVTable == NULL)
+    if (BrdfVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -58,13 +147,13 @@ PbrBrdfAllocate(
         }
     }
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PBR_BRDF),
-                                                      _Alignof(PBR_BRDF),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(PHYSX_BRDF),
+                                                      _Alignof(PHYSX_BRDF),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -76,9 +165,9 @@ PbrBrdfAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedBrdf = (PPBR_BRDF) HeaderAllocation;
+    AllocatedBrdf = (PPHYSX_BRDF) HeaderAllocation;
 
-    AllocatedBrdf->VTable = PbrBrdfVTable;
+    AllocatedBrdf->VTable = BrdfVTable;
     AllocatedBrdf->Data = DataAllocation;
     AllocatedBrdf->ReferenceCount = 1;
 
@@ -87,7 +176,7 @@ PbrBrdfAllocate(
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    *PbrBrdf = AllocatedBrdf;
+    *Brdf = AllocatedBrdf;
 
     return ISTATUS_SUCCESS;
 }
@@ -95,8 +184,8 @@ PbrBrdfAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfSample(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfSample(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -108,7 +197,7 @@ PbrBrdfSample(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -148,14 +237,14 @@ PbrBrdfSample(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    Status = PbrBrdf->VTable->SampleRoutine(PbrBrdf->Data,
-                                            Incoming,
-                                            SurfaceNormal,
-                                            Rng, 
-                                            Compositor,
-                                            Reflector,
-                                            Outgoing,
-                                            Pdf);
+    Status = Brdf->VTable->SampleRoutine(Brdf->Data,
+                                         Incoming,
+                                         SurfaceNormal,
+                                         Rng, 
+                                         Compositor,
+                                         Reflector,
+                                         Outgoing,
+                                         Pdf);
 
     return Status;
 }
@@ -163,8 +252,8 @@ PbrBrdfSample(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfSampleWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfSampleWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -176,7 +265,7 @@ PbrBrdfSampleWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -216,14 +305,14 @@ PbrBrdfSampleWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    Status = PbrBrdf->VTable->SampleRoutineWithLambertianFalloff(PbrBrdf->Data,
-                                                                 Incoming,
-                                                                 SurfaceNormal,
-                                                                 Rng, 
-                                                                 Compositor,
-                                                                 Reflector,
-                                                                 Outgoing,
-                                                                 Pdf);
+    Status = Brdf->VTable->SampleRoutineWithLambertianFalloff(Brdf->Data,
+                                                              Incoming,
+                                                              SurfaceNormal,
+                                                              Rng, 
+                                                              Compositor,
+                                                              Reflector,
+                                                              Outgoing,
+                                                              Pdf);
 
     return Status;
 }
@@ -231,8 +320,8 @@ PbrBrdfSampleWithLambertianFalloff(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfComputeReflectance(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectance(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -242,7 +331,7 @@ PbrBrdfComputeReflectance(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -272,12 +361,12 @@ PbrBrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Status = PbrBrdf->VTable->ComputeReflectanceRoutine(PbrBrdf->Data,
-                                                        Incoming,
-                                                        SurfaceNormal,
-                                                        Outgoing,
-                                                        Compositor,
-                                                        Reflector);
+    Status = Brdf->VTable->ComputeReflectanceRoutine(Brdf->Data,
+                                                     Incoming,
+                                                     SurfaceNormal,
+                                                     Outgoing,
+                                                     Compositor,
+                                                     Reflector);
 
     return Status;
 }
@@ -285,8 +374,8 @@ PbrBrdfComputeReflectance(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfComputeReflectanceWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -296,7 +385,7 @@ PbrBrdfComputeReflectanceWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -326,12 +415,12 @@ PbrBrdfComputeReflectanceWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Status = PbrBrdf->VTable->ComputeReflectanceRoutineWithLambertianFalloff(PbrBrdf->Data,
-                                                                             Incoming,
-                                                                             SurfaceNormal,
-                                                                             Outgoing,
-                                                                             Compositor,
-                                                                             Reflector);
+    Status = Brdf->VTable->ComputeReflectanceRoutineWithLambertianFalloff(Brdf->Data,
+                                                                          Incoming,
+                                                                          SurfaceNormal,
+                                                                          Outgoing,
+                                                                          Compositor,
+                                                                          Reflector);
 
     return Status;
 }
@@ -339,8 +428,8 @@ PbrBrdfComputeReflectanceWithLambertianFalloff(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfComputeReflectanceWithPdf(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithPdf(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -351,7 +440,7 @@ PbrBrdfComputeReflectanceWithPdf(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -386,13 +475,13 @@ PbrBrdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutine(PbrBrdf->Data,
-                                                               Incoming,
-                                                               SurfaceNormal,
-                                                               Outgoing,
-                                                               Compositor,
-                                                               Reflector,
-                                                               Pdf);
+    Status = Brdf->VTable->ComputeReflectanceWithPdfRoutine(Brdf->Data,
+                                                            Incoming,
+                                                            SurfaceNormal,
+                                                            Outgoing,
+                                                            Compositor,
+                                                            Reflector,
+                                                            Pdf);
 
     return Status;
 }
@@ -400,8 +489,8 @@ PbrBrdfComputeReflectanceWithPdf(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithPdfWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -412,7 +501,7 @@ PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
 {
     ISTATUS Status;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -447,53 +536,53 @@ PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    Status = PbrBrdf->VTable->ComputeReflectanceWithPdfRoutineWithLambertianFalloff(PbrBrdf->Data,
-                                                                                    Incoming,
-                                                                                    SurfaceNormal,
-                                                                                    Outgoing,
-                                                                                    Compositor,
-                                                                                    Reflector,
-                                                                                    Pdf);
+    Status = Brdf->VTable->ComputeReflectanceWithPdfRoutineWithLambertianFalloff(Brdf->Data,
+                                                                                 Incoming,
+                                                                                 SurfaceNormal,
+                                                                                 Outgoing,
+                                                                                 Compositor,
+                                                                                 Reflector,
+                                                                                 Pdf);
 
     return Status;
 }
 
 VOID
-PbrBrdfRetain(
-    _In_opt_ PPBR_BRDF PbrBrdf
+PhysxBrdfRetain(
+    _In_opt_ PPHYSX_BRDF Brdf
     )
 {
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return;
     }
 
-    PbrBrdf->ReferenceCount += 1;
+    Brdf->ReferenceCount += 1;
 }
 
 VOID
-PbrBrdfRelease(
-    _In_opt_ _Post_invalid_ PPBR_BRDF PbrBrdf
+PhysxBrdfRelease(
+    _In_opt_ _Post_invalid_ PPHYSX_BRDF Brdf
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    if (PbrBrdf == NULL)
+    if (Brdf == NULL)
     {
         return;
     }
 
-    PbrBrdf->ReferenceCount -= 1;
+    Brdf->ReferenceCount -= 1;
 
-    if (PbrBrdf->ReferenceCount == 0)
+    if (Brdf->ReferenceCount == 0)
     {
-        FreeRoutine = PbrBrdf->VTable->FreeRoutine;
+        FreeRoutine = Brdf->VTable->FreeRoutine;
 
         if (FreeRoutine != NULL)
         {
-            FreeRoutine(PbrBrdf->Data);
+            FreeRoutine(Brdf->Data);
         }
 
-        IrisAlignedFree(PbrBrdf);
+        IrisAlignedFree(Brdf);
     }
 }

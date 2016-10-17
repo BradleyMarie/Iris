@@ -234,7 +234,7 @@ BRDFFreeAdapter(
     delete *BRDFBasePtr;
 }
 
-const static PBR_BRDF_VTABLE InteropVTable {
+const static PHYSX_BRDF_VTABLE InteropVTable {
     BRDFSampleAdapter,
     BRDFSampleWithLambertianFalloffAdapter,
     BRFFComputeReflectanceAdapter,
@@ -259,13 +259,13 @@ BRDFBase::Create(
     }
     
     BRDFBase *UnmanagedBRDFBasePtr = BRDFBasePtr.release();
-    PPBR_BRDF BRDFPtr;
+    PPHYSX_BRDF BRDFPtr;
 
-    ISTATUS Success = PbrBrdfAllocate(&InteropVTable,
-                                      &UnmanagedBRDFBasePtr,
-                                      sizeof(BRDFBase*),
-                                      alignof(BRDFBase*),
-                                      &BRDFPtr);
+    ISTATUS Success = PhysxBrdfAllocate(&InteropVTable,
+                                        &UnmanagedBRDFBasePtr,
+                                        sizeof(BRDFBase*),
+                                        alignof(BRDFBase*),
+                                        &BRDFPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

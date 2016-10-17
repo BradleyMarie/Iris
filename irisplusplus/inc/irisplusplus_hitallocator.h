@@ -47,7 +47,8 @@ public:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const Point & HitPoint
         )
     {
@@ -56,7 +57,8 @@ public:
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     IrisHitPoint,
                                     nullptr,
                                     0,
@@ -72,7 +74,8 @@ public:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const Point & HitPoint,
         _In_ const T & AdditionalData
         )
@@ -90,7 +93,8 @@ public:
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     IrisHitPoint,
                                     static_cast<PCVOID>(AdditionalData),
                                     sizeof(T),
@@ -105,13 +109,15 @@ public:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace
         )
     {
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     nullptr,
                                     0,
                                     0);
@@ -126,7 +132,8 @@ public:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const T & AdditionalData
         )
     {
@@ -141,7 +148,8 @@ public:
         PHIT_LIST Output = Allocate(NextHit,
                                     DataPtr,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     static_cast<PCVOID>(AdditionalData),
                                     sizeof(T),
                                     alignof(T));
@@ -158,7 +166,8 @@ private:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
         _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment
@@ -178,7 +187,8 @@ private:
                                       NextHit,
                                       DataPtr,
                                       Distance,
-                                      FaceHit,
+                                      FrontFace,
+                                      BackFace,
                                       AdditionalData,
                                       AdditionalDataSizeInBytes,
                                       AdditionalDataAlignment,
@@ -205,7 +215,8 @@ private:
         _In_opt_ PHIT_LIST NextHit,
         _In_ PCVOID DataPtr,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const POINT3 & HitPoint,
         _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
@@ -226,7 +237,8 @@ private:
                                                   NextHit,
                                                   DataPtr,
                                                   Distance,
-                                                  FaceHit,
+                                                  FrontFace,
+                                                  BackFace,
                                                   AdditionalData,
                                                   AdditionalDataSizeInBytes,
                                                   AdditionalDataAlignment,
@@ -242,7 +254,7 @@ private:
         {
             case ISTATUS_INVALID_ARGUMENT_03:
                 throw std::invalid_argument("Distance");
-            case ISTATUS_INVALID_ARGUMENT_08:
+            case ISTATUS_INVALID_ARGUMENT_09:
                 throw std::invalid_argument("HitPoint");
             default:
                 assert(Status == ISTATUS_ALLOCATION_FAILED);

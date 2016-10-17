@@ -52,7 +52,8 @@ public:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const T & AdditionalData
         )
     {
@@ -66,7 +67,8 @@ public:
 
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     &AdditionalData,
                                     sizeof(T),
                                     alignof(T));
@@ -80,7 +82,8 @@ public:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const T & AdditionalData,
         _In_ const Iris::Point & HitPoint
         )
@@ -95,7 +98,8 @@ public:
 
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     &AdditionalData,
                                     sizeof(T),
                                     alignof(T),
@@ -109,12 +113,14 @@ public:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace
         )
     {
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     nullptr,
                                     0,
                                     0);
@@ -127,13 +133,15 @@ public:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_ const Iris::Point & HitPoint
         )
     {
         PHIT_LIST Result = Allocate(NextHit,
                                     Distance,
-                                    FaceHit,
+                                    FrontFace,
+                                    BackFace,
                                     nullptr,
                                     0,
                                     0,
@@ -150,7 +158,8 @@ private:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
         _In_ SIZE_T AdditionalDataAlignment
@@ -168,7 +177,8 @@ private:
         ISTATUS Status = PBRHitAllocatorAllocate(Data,
                                                  NextHit,
                                                  Distance,
-                                                 FaceHit,
+                                                 FrontFace,
+                                                 BackFace,
                                                  AdditionalData,
                                                  AdditionalDataSizeInBytes,
                                                  AdditionalDataAlignment,
@@ -195,7 +205,8 @@ private:
     Allocate(
         _In_opt_ PHIT_LIST NextHit,
         _In_ FLOAT Distance,
-        _In_ INT32 FaceHit,
+        _In_ UINT32 FrontFace,
+        _In_ UINT32 BackFace,
         _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
         _In_ SIZE_T AdditionalDataSizeInBytes,
         _In_ SIZE_T AdditionalDataAlignment,
@@ -214,7 +225,8 @@ private:
         ISTATUS Status = PBRHitAllocatorAllocateWithHitPoint(Data,
                                                              NextHit,
                                                              Distance,
-                                                             FaceHit,
+                                                             FrontFace,
+                                                             BackFace,
                                                              AdditionalData,
                                                              AdditionalDataSizeInBytes,
                                                              AdditionalDataAlignment,
@@ -231,7 +243,7 @@ private:
             case ISTATUS_INVALID_ARGUMENT_02:
                 throw std::invalid_argument("Distance");
                 break;
-            case ISTATUS_INVALID_ARGUMENT_07:
+            case ISTATUS_INVALID_ARGUMENT_08:
                 throw std::invalid_argument("HitPoint");
                 break;
             default:

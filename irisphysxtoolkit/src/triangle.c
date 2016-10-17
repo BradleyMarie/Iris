@@ -50,10 +50,11 @@ TriangleXDominantTestRay(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
+    UINT32 BackFace;
     FLOAT BarycentricCoordinates[3];
     FLOAT Distance;
     FLOAT DotProduct;
-    INT32 Face;
+    UINT32 FrontFace;
     POINT3 Hit;
     VECTOR3 P;
     ISTATUS Status;
@@ -120,12 +121,22 @@ TriangleXDominantTestRay(
         return ISTATUS_SUCCESS;
     }
 
-    Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
+    if ((FLOAT) 0.0 > DotProduct)
+    {
+        FrontFace = TRIANGLE_FRONT_FACE;
+        BackFace = TRIANGLE_BACK_FACE;
+    }
+    else
+    {
+        FrontFace = TRIANGLE_BACK_FACE;
+        BackFace = TRIANGLE_FRONT_FACE;
+    }
 
     Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
                                                  NULL,
                                                  Distance,
-                                                 Face,
+                                                 FrontFace,
+                                                 BackFace,
                                                  &BarycentricCoordinates,
                                                  sizeof(BarycentricCoordinates),
                                                  _Alignof(FLOAT),
@@ -146,10 +157,11 @@ TriangleYDominantTestRay(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
+    UINT32 BackFace;
     FLOAT BarycentricCoordinates[3];
     FLOAT Distance;
     FLOAT DotProduct;
-    INT32 Face;
+    UINT32 FrontFace;
     POINT3 Hit;
     VECTOR3 P;
     ISTATUS Status;
@@ -215,12 +227,23 @@ TriangleYDominantTestRay(
         *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
-    Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
-
+    
+    if ((FLOAT) 0.0 > DotProduct)
+    {
+        FrontFace = TRIANGLE_FRONT_FACE;
+        BackFace = TRIANGLE_BACK_FACE;
+    }
+    else
+    {
+        FrontFace = TRIANGLE_BACK_FACE;
+        BackFace = TRIANGLE_FRONT_FACE;
+    }
+    
     Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
                                                  NULL,
                                                  Distance,
-                                                 Face,
+                                                 FrontFace,
+                                                 BackFace,
                                                  &BarycentricCoordinates,
                                                  sizeof(BarycentricCoordinates),
                                                  _Alignof(FLOAT),
@@ -241,10 +264,11 @@ TriangleZDominantTestRay(
     _Outptr_result_maybenull_ PHIT_LIST *HitList
     )
 {
+    UINT32 BackFace;
     FLOAT BarycentricCoordinates[3];
     FLOAT Distance;
     FLOAT DotProduct;
-    INT32 Face;
+    UINT32 FrontFace;
     POINT3 Hit;
     VECTOR3 P;
     ISTATUS Status;
@@ -310,13 +334,23 @@ TriangleZDominantTestRay(
         *HitList = NULL;
         return ISTATUS_SUCCESS;
     }
-
-    Face = ((FLOAT) 0.0 > DotProduct) ? TRIANGLE_FRONT_FACE : TRIANGLE_BACK_FACE;
-
+    
+    if ((FLOAT) 0.0 > DotProduct)
+    {
+        FrontFace = TRIANGLE_FRONT_FACE;
+        BackFace = TRIANGLE_BACK_FACE;
+    }
+    else
+    {
+        FrontFace = TRIANGLE_BACK_FACE;
+        BackFace = TRIANGLE_FRONT_FACE;
+    }
+    
     Status = PBRHitAllocatorAllocateWithHitPoint(HitAllocator,
                                                  NULL,
                                                  Distance,
-                                                 Face,
+                                                 FrontFace,
+                                                 BackFace,
                                                  &BarycentricCoordinates,
                                                  sizeof(BarycentricCoordinates),
                                                  _Alignof(FLOAT),

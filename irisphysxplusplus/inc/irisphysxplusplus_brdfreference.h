@@ -27,19 +27,19 @@ namespace IrisPhysx {
 class BRDFReference final {
 public:
     BRDFReference(
-        _In_ PCPBR_BRDF PbrBrdf
+        _In_ PCPHYSX_BRDF Brdf
         )
-    : Data(PbrBrdf)
+    : Data(Brdf)
     { 
-        if (PbrBrdf == nullptr)
+        if (Brdf == nullptr)
         {
-            throw std::invalid_argument("PbrBrdf");
+            throw std::invalid_argument("Brdf");
         }
     }
      
     _Ret_
-    PCPBR_BRDF
-    AsPCPBR_BRDF(
+    PCPHYSX_BRDF
+    AsPCPHYSX_BRDF(
         void
         ) const
     {
@@ -60,14 +60,14 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfSample(Data,
-                               Incoming.AsVECTOR3(),
-                               SurfaceNormal.AsVECTOR3(),
-                               Rng.AsPRANDOM_REFERENCE(),
-                               Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                               &Reflector,
-                               &Outgoing,
-                               &Pdf);
+        Status = PhysxBrdfSample(Data,
+                                 Incoming.AsVECTOR3(),
+                                 SurfaceNormal.AsVECTOR3(),
+                                 Rng.AsPRANDOM_REFERENCE(),
+                                 Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                 &Reflector,
+                                 &Outgoing,
+                                 &Pdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -91,14 +91,14 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfSampleWithLambertianFalloff(Data,
-                                                    Incoming.AsVECTOR3(),
-                                                    SurfaceNormal.AsVECTOR3(),
-                                                    Rng.AsPRANDOM_REFERENCE(),
-                                                    Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                                                    &Reflector,
-                                                    &Outgoing,
-                                                    &Pdf);
+        Status = PhysxBrdfSampleWithLambertianFalloff(Data,
+                                                      Incoming.AsVECTOR3(),
+                                                      SurfaceNormal.AsVECTOR3(),
+                                                      Rng.AsPRANDOM_REFERENCE(),
+                                                      Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                      &Reflector,
+                                                      &Outgoing,
+                                                      &Pdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -120,12 +120,12 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfComputeReflectance(Data,
-                                           Incoming.AsVECTOR3(),
-                                           SurfaceNormal.AsVECTOR3(),
-                                           Outgoing.AsVECTOR3(),
-                                           Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                                           &Reflector);
+        Status = PhysxBrdfComputeReflectance(Data,
+                                             Incoming.AsVECTOR3(),
+                                             SurfaceNormal.AsVECTOR3(),
+                                             Outgoing.AsVECTOR3(),
+                                             Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                             &Reflector);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -147,12 +147,12 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfComputeReflectanceWithLambertianFalloff(Data,
-                                                                Incoming.AsVECTOR3(),
-                                                                SurfaceNormal.AsVECTOR3(),
-                                                                Outgoing.AsVECTOR3(),
-                                                                Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                                                                &Reflector);
+        Status = PhysxBrdfComputeReflectanceWithLambertianFalloff(Data,
+                                                                  Incoming.AsVECTOR3(),
+                                                                  SurfaceNormal.AsVECTOR3(),
+                                                                  Outgoing.AsVECTOR3(),
+                                                                  Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                                  &Reflector);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -175,13 +175,13 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfComputeReflectanceWithPdf(Data,
-                                                  Incoming.AsVECTOR3(),
-                                                  SurfaceNormal.AsVECTOR3(),
-                                                  Outgoing.AsVECTOR3(),
-                                                  Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                                                  &Reflector,
-                                                  &Pdf);
+        Status = PhysxBrdfComputeReflectanceWithPdf(Data,
+                                                    Incoming.AsVECTOR3(),
+                                                    SurfaceNormal.AsVECTOR3(),
+                                                    Outgoing.AsVECTOR3(),
+                                                    Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                    &Reflector,
+                                                    &Pdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -204,13 +204,13 @@ public:
         PCREFLECTOR Reflector;
         ISTATUS Status;
         
-        Status = PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(Data,
-                                                                       Incoming.AsVECTOR3(),
-                                                                       SurfaceNormal.AsVECTOR3(),
-                                                                       Outgoing.AsVECTOR3(),
-                                                                       Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
-                                                                       &Reflector,
-                                                                       &Pdf);
+        Status = PhysxBrdfComputeReflectanceWithPdfWithLambertianFalloff(Data,
+                                                                         Incoming.AsVECTOR3(),
+                                                                         SurfaceNormal.AsVECTOR3(),
+                                                                         Outgoing.AsVECTOR3(),
+                                                                         Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                                                         &Reflector,
+                                                                         &Pdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -221,7 +221,7 @@ public:
     }
     
 private:
-    PCPBR_BRDF Data;
+    PCPHYSX_BRDF Data;
 };
 
 } // namespace Iris

@@ -24,7 +24,7 @@ Abstract:
 
 typedef struct _PBR_SHARED_CONTEXT {
     PBR_VISIBILITY_TESTER PBRVisibilityTester;
-    PBR_BRDF_ALLOCATOR BrdfAllocator;
+    PHYSX_BRDF_ALLOCATOR BrdfAllocator;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
     PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
@@ -57,13 +57,13 @@ PBRSharedContextInitialize(
         return Status;
     }
     
-    PbrBrdfAllocatorInitialize(&PBRSharedContext->BrdfAllocator);
+    PhysxBrdfAllocatorInitialize(&PBRSharedContext->BrdfAllocator);
     
     Status = SpectrumCompositorAllocate(&PBRSharedContext->SpectrumCompositor);
     
     if (Status != ISTATUS_SUCCESS)
     {
-        PbrBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
+        PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
         PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
         return Status;
     }
@@ -73,7 +73,7 @@ PBRSharedContextInitialize(
     if (Status != ISTATUS_SUCCESS)
     {
         SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
-        PbrBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
+        PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
         PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
         return Status;
     }
@@ -106,7 +106,7 @@ PBRSharedContextSet(
 
     ReflectorCompositorClear(PBRSharedContext->ReflectorCompositor);
     SpectrumCompositorClear(PBRSharedContext->SpectrumCompositor);
-    PbrBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
+    PhysxBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
 
     PBRVisibilityTesterSetSceneAndEpsilon(&PBRSharedContext->PBRVisibilityTester,
                                           TestGeometryRoutine,
@@ -128,7 +128,7 @@ PBRSharedContextDestroy(
 {
     ReflectorCompositorFree(PBRSharedContext->ReflectorCompositor);
     SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
-    PbrBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
+    PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
     PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
 }
 

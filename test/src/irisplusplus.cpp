@@ -614,7 +614,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
     Scene.Add(TrianglePtr, Matrix::Identity(), false);
     RayTracer Tracer = RayTracer::Create();
 
-    std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+    std::function<bool(PCVOID, FLOAT, UINT32, UINT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
 
@@ -623,10 +623,11 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
         Scene.Trace(Tester);
     };
 
-    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, UINT32 FrontFace, UINT32 BackFace, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
         CHECK_EQUAL((FLOAT) 1.0, Distance);
-        CHECK_EQUAL(0, FaceHit);
+        CHECK_EQUAL(0, FrontFace);
+        CHECK_EQUAL(1, BackFace);
         CHECK_EQUAL(true, !!AdditionalData);
         CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
         FirstHitFound = true;
@@ -653,7 +654,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
 
     RayTracer Tracer = RayTracer::Create();
 
-    std::function<bool(PCVOID, FLOAT, INT32, PCVOID, SIZE_T)> EvaluateFirstHit;
+    std::function<bool(PCVOID, FLOAT, UINT32, UINT32, PCVOID, SIZE_T)> EvaluateFirstHit;
 
     bool FirstHitFound = false;
 
@@ -662,10 +663,11 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
         Scene.Trace(Tester);
     };
 
-    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, INT32 FaceHit, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
+    EvaluateFirstHit = [&](PCVOID DataPtr, FLOAT Distance, UINT32 FrontFace, UINT32 BackFace, PCVOID AdditionalData, SIZE_T AdditionalDataSize) -> bool
     {
         CHECK_EQUAL((FLOAT) 2.0, Distance);
-        CHECK_EQUAL(0, FaceHit);
+        CHECK_EQUAL(0, FrontFace);
+        CHECK_EQUAL(1, BackFace);
         CHECK_EQUAL(true, !!AdditionalData);
         CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
         FirstHitFound = true;

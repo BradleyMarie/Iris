@@ -37,7 +37,7 @@ ProcessHitAdapter(
     _In_ PCPHYSX_LIGHT_LIST LightsPtr,
     _Inout_opt_ PPBR_RAYTRACER RayTracerPtr,
     _Inout_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr,
-    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocatorPtr,
+    _Inout_ PPHYSX_BRDF_ALLOCATOR AllocatorPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -51,7 +51,7 @@ ProcessHitAdapter(
     assert(PointValidate(WorldHitPoint) != FALSE);
     assert(RayValidate(WorldRay) != FALSE);
     assert(VisibilityTesterPtr != nullptr);
-    assert(BrdfAllocatorPtr != nullptr);
+    assert(AllocatorPtr != nullptr);
     assert(SpectrumCompositorReferencePtr != nullptr);
     assert(ReflectorCompositorReferencePtr != nullptr);
     assert(Rng != nullptr);
@@ -84,7 +84,7 @@ ProcessHitAdapter(
                                                                   Lights,
                                                                   Tracer,
                                                                   VisibilityTester(VisibilityTesterPtr),
-                                                                  BRDFAllocator(BrdfAllocatorPtr),
+                                                                  BRDFAllocator(AllocatorPtr),
                                                                   IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
                                                                   IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
                                                                   IrisAdvanced::RandomReference(Rng));

@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
-#define _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -21,7 +21,7 @@ Abstract:
 // Types
 //
 
-struct _PBR_BRDF_ALLOCATOR {
+struct _PHYSX_BRDF_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR Allocator;
 };
 
@@ -31,35 +31,35 @@ struct _PBR_BRDF_ALLOCATOR {
 
 SFORCEINLINE
 VOID
-PbrBrdfAllocatorInitialize(
-    _Out_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
+PhysxBrdfAllocatorInitialize(
+    _Out_ PPHYSX_BRDF_ALLOCATOR Allocator
     )
 {
-    ASSERT(PbrBrdfAllocator != NULL);
+    ASSERT(Allocator != NULL);
     
-    DynamicMemoryAllocatorInitialize(&PbrBrdfAllocator->Allocator);
+    DynamicMemoryAllocatorInitialize(&Allocator->Allocator);
 }
 
 SFORCEINLINE
 VOID
-PbrBrdfAllocatorFreeAll(
-    _Inout_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
+PhysxBrdfAllocatorFreeAll(
+    _Inout_ PPHYSX_BRDF_ALLOCATOR Allocator
     )
 {
-    ASSERT(PbrBrdfAllocator != NULL);
+    ASSERT(Allocator != NULL);
     
-    DynamicMemoryAllocatorFreeAll(&PbrBrdfAllocator->Allocator);
+    DynamicMemoryAllocatorFreeAll(&Allocator->Allocator);
 }
 
 SFORCEINLINE
 VOID
-PbrBrdfAllocatorDestroy(
-    _In_ _Post_invalid_ PPBR_BRDF_ALLOCATOR PbrBrdfAllocator
+PhysxBrdfAllocatorDestroy(
+    _In_ _Post_invalid_ PPHYSX_BRDF_ALLOCATOR Allocator
     )
 {
-    ASSERT(PbrBrdfAllocator != NULL);
+    ASSERT(Allocator != NULL);
     
-    DynamicMemoryAllocatorDestroy(&PbrBrdfAllocator->Allocator);
+    DynamicMemoryAllocatorDestroy(&Allocator->Allocator);
 }
 
-#endif // _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_INTERNAL_

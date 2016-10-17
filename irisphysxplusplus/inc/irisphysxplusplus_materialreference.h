@@ -56,7 +56,7 @@ public:
         _In_ BRDFAllocator Allocator
         ) const
     {
-        PCPBR_BRDF ResultBrdf;
+        PCPHYSX_BRDF ResultBrdf;
         VECTOR3 ResultVector;
         
         ISTATUS Status = PbrMaterialSample(Data,
@@ -65,7 +65,7 @@ public:
                                            WorldSurfaceNormal.AsVECTOR3(),
                                            AdditionalData,
                                            ModelToWorld.AsPCMATRIX(),
-                                           Allocator.AsPPBR_BRDF_ALLOCATOR(),
+                                           Allocator.AsPPHYSX_BRDF_ALLOCATOR(),
                                            &ResultVector,
                                            &ResultBrdf);
 

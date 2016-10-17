@@ -23,7 +23,8 @@ HitAllocatorAllocateInternal(
     _In_opt_ PHIT_LIST NextHit,
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
@@ -113,7 +114,8 @@ HitAllocatorAllocateInternal(
 
     Hit->Data = Data;
     Hit->Distance = Distance;
-    Hit->FaceHit = FaceHit;
+    Hit->FrontFace = FrontFace;
+    Hit->BackFace = BackFace;
     Hit->AdditionalDataSizeInBytes = AdditionalDataSizeInBytes;
     Hit->AdditionalData = Allocation;
 
@@ -143,7 +145,8 @@ HitAllocatorAllocate(
     _In_ PHIT_LIST NextHit,
     _In_opt_ PCVOID Data,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
@@ -154,14 +157,15 @@ HitAllocatorAllocate(
 
     if (HitList == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     Status = HitAllocatorAllocateInternal(HitAllocator,
                                           NextHit,
                                           Data,
                                           Distance,
-                                          FaceHit,
+                                          FrontFace,
+                                          BackFace,
                                           AdditionalData,
                                           AdditionalDataSizeInBytes,
                                           AdditionalDataAlignment,
@@ -179,7 +183,8 @@ HitAllocatorAllocateWithHitPoint(
     _In_opt_ PHIT_LIST NextHit,
     _In_ PCVOID Data,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _When_(AdditionalDataSizeInBytes != 0, _In_reads_bytes_opt_(AdditionalDataSizeInBytes)) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _When_(AdditionalDataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && AdditionalDataSizeInBytes % _Curr_ == 0)) SIZE_T AdditionalDataAlignment,
@@ -191,19 +196,20 @@ HitAllocatorAllocateWithHitPoint(
 
     if (PointValidate(HitPoint) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     if (HitList == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_09;
+        return ISTATUS_INVALID_ARGUMENT_10;
     }
 
     Status = HitAllocatorAllocateInternal(HitAllocator,
                                           NextHit,
                                           Data,
                                           Distance,
-                                          FaceHit,
+                                          FrontFace,
+                                          BackFace,
                                           AdditionalData,
                                           AdditionalDataSizeInBytes,
                                           AdditionalDataAlignment,

@@ -90,7 +90,7 @@ PBRRayTracerProcessHitAdapter(
 
     Status = AdapterContext->ProcessHitRoutine(AdapterContext->ProcessHitContext,
                                                PBRGeometry,
-                                               Hit->FaceHit,
+                                               Hit->FrontFace,
                                                ModelToWorld,
                                                Hit->AdditionalData,
                                                ModelViewer,

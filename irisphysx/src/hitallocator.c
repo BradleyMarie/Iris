@@ -25,7 +25,8 @@ PBRHitAllocatorAllocate(
     _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ SIZE_T AdditionalDataAlignment,
@@ -38,7 +39,8 @@ PBRHitAllocatorAllocate(
                                   NextHit,
                                   PBRHitAllocator->Geometry,
                                   Distance,
-                                  FaceHit,
+                                  FrontFace,
+                                  BackFace,
                                   AdditionalData,
                                   AdditionalDataSizeInBytes,
                                   AdditionalDataAlignment,
@@ -50,7 +52,7 @@ PBRHitAllocatorAllocate(
     }
  
     if (ISTATUS_INVALID_ARGUMENT_03 <= Status &&
-        Status <= ISTATUS_INVALID_ARGUMENT_08)
+        Status <= ISTATUS_INVALID_ARGUMENT_09)
     {
         Status -= 1;
     }
@@ -65,7 +67,8 @@ PBRHitAllocatorAllocateWithHitPoint(
     _Inout_ PPBR_HIT_ALLOCATOR PBRHitAllocator,
     _In_opt_ PHIT_LIST NextHit,
     _In_ FLOAT Distance,
-    _In_ INT32 FaceHit,
+    _In_ UINT32 FrontFace,
+    _In_ UINT32 BackFace,
     _In_reads_bytes_opt_(AdditionalDataSizeInBytes) PCVOID AdditionalData,
     _In_ SIZE_T AdditionalDataSizeInBytes,
     _In_ SIZE_T AdditionalDataAlignment,
@@ -79,7 +82,8 @@ PBRHitAllocatorAllocateWithHitPoint(
                                               NextHit,
                                               PBRHitAllocator->Geometry,
                                               Distance,
-                                              FaceHit,
+                                              FrontFace,
+                                              BackFace,
                                               AdditionalData,
                                               AdditionalDataSizeInBytes,
                                               AdditionalDataAlignment,
@@ -92,7 +96,7 @@ PBRHitAllocatorAllocateWithHitPoint(
     }
  
     if (ISTATUS_INVALID_ARGUMENT_03 <= Status &&
-        Status <= ISTATUS_INVALID_ARGUMENT_09)
+        Status <= ISTATUS_INVALID_ARGUMENT_10)
     {
         Status -= 1;
     }

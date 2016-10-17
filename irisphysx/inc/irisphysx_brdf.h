@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_BRDF type.
+    This file contains the definitions for the PHYSX_BRDF type.
 
 --*/
 
-#ifndef _PBR_BRDF_IRIS_PHYSX_
-#define _PBR_BRDF_IRIS_PHYSX_
+#ifndef _PHYSX_BRDF_IRIS_PHYSX_
+#define _PHYSX_BRDF_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -25,7 +25,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_BRDF_SAMPLE)(
+(*PPHYSX_BRDF_SAMPLE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
@@ -40,7 +40,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_BRDF_COMPUTE_REFLECTANCE)(
+(*PPHYSX_BRDF_COMPUTE_REFLECTANCE)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
@@ -53,7 +53,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF)(
+(*PPHYSX_BRDF_COMPUTE_REFLECTANCE_WITH_PDF)(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
@@ -63,20 +63,20 @@ ISTATUS
     _Out_ PFLOAT Pdf
     );
 
-typedef struct _PBR_BRDF_VTABLE {
-    PPBR_BRDF_SAMPLE SampleRoutine;
-    PPBR_BRDF_SAMPLE SampleRoutineWithLambertianFalloff;
-    PPBR_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
-    PPBR_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutineWithLambertianFalloff;
-    PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutine;
-    PPBR_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutineWithLambertianFalloff;
+typedef struct _PHYSX_BRDF_VTABLE {
+    PPHYSX_BRDF_SAMPLE SampleRoutine;
+    PPHYSX_BRDF_SAMPLE SampleRoutineWithLambertianFalloff;
+    PPHYSX_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutine;
+    PPHYSX_BRDF_COMPUTE_REFLECTANCE ComputeReflectanceRoutineWithLambertianFalloff;
+    PPHYSX_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutine;
+    PPHYSX_BRDF_COMPUTE_REFLECTANCE_WITH_PDF ComputeReflectanceWithPdfRoutineWithLambertianFalloff;
     PFREE_ROUTINE FreeRoutine;
-} PBR_BRDF_VTABLE, *PPBR_BRDF_VTABLE;
+} PHYSX_BRDF_VTABLE, *PPHYSX_BRDF_VTABLE;
 
-typedef CONST PBR_BRDF_VTABLE *PCPBR_BRDF_VTABLE;
+typedef CONST PHYSX_BRDF_VTABLE *PCPHYSX_BRDF_VTABLE;
 
-typedef struct _PBR_BRDF PBR_BRDF, *PPBR_BRDF;
-typedef CONST PBR_BRDF *PCPBR_BRDF;
+typedef struct _PHYSX_BRDF PHYSX_BRDF, *PPHYSX_BRDF;
+typedef CONST PHYSX_BRDF *PCPHYSX_BRDF;
 
 //
 // Functions
@@ -86,20 +86,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfAllocate(
-    _In_ PCPBR_BRDF_VTABLE PbrBrdfVTable,
+PhysxBrdfAllocate(
+    _In_ PCPHYSX_BRDF_VTABLE BrdfVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_BRDF *PbrBrdf
+    _Out_ PPHYSX_BRDF *Brdf
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfSample(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfSample(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -113,8 +113,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfSampleWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfSampleWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
@@ -128,8 +128,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfComputeReflectance(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectance(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -141,8 +141,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfComputeReflectanceWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -154,8 +154,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfComputeReflectanceWithPdf(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithPdf(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -168,8 +168,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
-    _In_ PCPBR_BRDF PbrBrdf,
+PhysxBrdfComputeReflectanceWithPdfWithLambertianFalloff(
+    _In_ PCPHYSX_BRDF Brdf,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
     _In_ VECTOR3 Outgoing,
@@ -180,14 +180,14 @@ PbrBrdfComputeReflectanceWithPdfWithLambertianFalloff(
 
 IRISPHYSXAPI
 VOID
-PbrBrdfRetain(
-    _In_opt_ PPBR_BRDF PbrBrdf
+PhysxBrdfRetain(
+    _In_opt_ PPHYSX_BRDF Brdf
     );
 
 IRISPHYSXAPI
 VOID
-PbrBrdfRelease(
-    _In_opt_ _Post_invalid_ PPBR_BRDF PbrBrdf
+PhysxBrdfRelease(
+    _In_opt_ _Post_invalid_ PPHYSX_BRDF Brdf
     );
 
-#endif // _PBR_BRDF_IRIS_PHYSX_
+#endif // _PHYSX_BRDF_IRIS_PHYSX_

@@ -260,7 +260,7 @@ RayShaderProcessHit(
     DrawingShape = (PCDRAWING_SHAPE) Hit->Data;
 
     Texture = DrawingShapeGetTexture(DrawingShape,
-                                     Hit->FaceHit);
+                                     Hit->FrontFace);
 
     if (Texture == NULL)
     {
@@ -268,7 +268,7 @@ RayShaderProcessHit(
     }
 
     Normal = DrawingShapeGetNormal(DrawingShape,
-                                   Hit->FaceHit);
+                                   Hit->FrontFace);
 
     AdditionalData = Hit->AdditionalData;
 

@@ -31,7 +31,7 @@ ISTATUS
 (*PPBR_RAYTRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ PVOID Context, 
     _In_ PCPBR_GEOMETRY PBRGeometry,
-    _In_ UINT32 FaceHit,
+    _In_ UINT32 FrontFace,
     _In_ PCMATRIX ModelToWorld,
     _In_opt_ PCVOID AdditionalData,
     _In_ VECTOR3 ModelViewer,
@@ -41,7 +41,7 @@ ISTATUS
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _Inout_opt_ PPBR_RAYTRACER PBRRayTracer,
     _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
-    _Inout_ PPBR_BRDF_ALLOCATOR BrdfAllocator,
+    _Inout_ PPHYSX_BRDF_ALLOCATOR Allocator,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
     _Inout_ PRANDOM_REFERENCE Rng,

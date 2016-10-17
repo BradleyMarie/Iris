@@ -27,19 +27,19 @@ namespace IrisPhysx {
 class BRDFAllocator final {    
 public:
     BRDFAllocator(
-        _In_ PPBR_BRDF_ALLOCATOR BrdfAllocator
+        _In_ PPHYSX_BRDF_ALLOCATOR Allocator
         )
-    : Data(BrdfAllocator)
+    : Data(Allocator)
     { 
-        if (BrdfAllocator == nullptr)
+        if (Allocator == nullptr)
         {
-            throw std::invalid_argument("BrdfAllocator");
+            throw std::invalid_argument("Allocator");
         }
     }
     
     _Ret_
-    PPBR_BRDF_ALLOCATOR
-    AsPPBR_BRDF_ALLOCATOR(
+    PPHYSX_BRDF_ALLOCATOR
+    AsPPHYSX_BRDF_ALLOCATOR(
         void
         )
     {
@@ -60,7 +60,7 @@ public:
         static_assert((alignof(T) & (alignof(T) - 1)) == 0, "Alignment of type must not be a power of two");
         static_assert(sizeof(T) % alignof(T) == 0, "Size of type must be evenly divisible by the alignment");
     
-        static const PBR_BRDF_VTABLE VTable {
+        static const PHYSX_BRDF_VTABLE VTable {
             BRDFSampleAdapter<T>,
             BRDFSampleWithLambertianFalloffAdapter<T>,
             BRDFComputeReflectanceAdapter<T>,
@@ -70,14 +70,14 @@ public:
             nullptr
         };
         
-        PCPBR_BRDF AllocatedBrdf;
+        PCPHYSX_BRDF AllocatedBrdf;
         
-        ISTATUS Status = PbrBrdfAllocatorAllocate(Data,
-                                                  &VTable,
-                                                  &BRDFData,
-                                                  sizeof(T),
-                                                  alignof(T),
-                                                  &AllocatedBrdf);
+        ISTATUS Status = PhysxBrdfAllocatorAllocate(Data,
+                                                    &VTable,
+                                                    &BRDFData,
+                                                    sizeof(T),
+                                                    alignof(T),
+                                                    &AllocatedBrdf);
     
         if (Status != ISTATUS_SUCCESS)
         {
@@ -89,7 +89,7 @@ public:
     }
     
 private:
-    PPBR_BRDF_ALLOCATOR Data;
+    PPHYSX_BRDF_ALLOCATOR Data;
 
     _Check_return_
     _Success_(return == ISTATUS_SUCCESS)
