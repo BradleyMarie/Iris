@@ -42,6 +42,15 @@ struct _PHYSX_AREA_LIGHT_ADAPTER {
     FLOAT SamplePdf;
 };
 
+typedef struct _PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT {
+    PCPBR_LIGHT Light;
+    RAY ToLight;
+    FLOAT InverseTotalSurfaceArea;
+    FLOAT Pdf;
+    BOOL FirstHit;
+    POINT3 ClosestWorldPointOnLight;
+} PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT, *PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT;
+
 //
 // Static Functions
 //
@@ -59,7 +68,7 @@ PhysxAreaLightAdapterCompareGeometry(
     AttachedGeometry0 = (PCPHYSX_ATTACHED_GEOMETRY) Ptr0;
     AttachedGeometry1 = (PCPHYSX_ATTACHED_GEOMETRY) Ptr1;
 
-    if (AttachedGeometry0->StartArea < AttachedGeometry1->StartArea)
+    if (AttachedGeometry0->EndArea < AttachedGeometry1->StartArea)
     {
         return -1;
     }
@@ -76,112 +85,110 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PhysxAreaLightAdapterSample(
-    _In_ PCVOID Context,
-    _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
-    _Out_ PCSPECTRUM *Spectrum,
-    _Out_ PVECTOR3 ToLight,
-    _Out_ PFLOAT Pdf
+PhysxAreaLightAdapterProcessHitCallback(
+    _Inout_ PVOID Context,
+    _In_ PCHIT Hit,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ VECTOR3 ModelViewer,
+    _In_ POINT3 ModelHitPoint,
+    _In_ POINT3 WorldHitPoint
     )
 {
-    PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
-    PCPHYSX_ATTACHED_GEOMETRY SampledGeometry;
-    PHYSX_ATTACHED_GEOMETRY Key;
-    VECTOR3 DirectionToLight;
-    POINT3 SampledLocation;
-    POINT3 PointOnLight;
-    FLOAT DistanceToLight;
-    PCVOID Result;
+    PCPBR_GEOMETRY Geometry;
+    VECTOR3 ModelSurfaceNormal;
+    VECTOR3 NormalizedWorldSurfaceNormal;
+    PCPBR_LIGHT Light;
+    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
+    FLOAT Pdf;
+    PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
     ISTATUS Status;
-    FLOAT TotalArea;
-    RAY RayToLight;
-    BOOL Visible;
+    FLOAT SurfaceArea;
+    VECTOR3 WorldSurfaceNormal;
+    VECTOR3 WorldToLight;
 
-    ASSERT(Context != NULL);
-    ASSERT(PointValidate(HitPoint) != FALSE);
-    ASSERT(VisibilityTester != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(Compositor != NULL);
-    ASSERT(Spectrum != NULL);
-    ASSERT(ToLight != NULL);
-    ASSERT(Pdf != NULL);
+    ProcessHitContext = (PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT) Context;
 
-    AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
-
-    TotalArea = AreaLightAdapter->Geometry[AreaLightAdapter->NumberOfGeometry - 1].EndArea;
-
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0f,
-                                          TotalArea,
-                                          &Key.StartArea);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    Key.LightedGeometry = NULL;
-    Key.Face = 0;
-    Key.EndArea = Key.StartArea;
-
-    Result = bsearch(&Key,
-                     AreaLightAdapter->Geometry,
-                     AreaLightAdapter->NumberOfGeometry,
-                     sizeof(PHYSX_ATTACHED_GEOMETRY),
-                     PhysxAreaLightAdapterCompareGeometry);
-
-    SampledGeometry = (PCPHYSX_ATTACHED_GEOMETRY) Result;
-
-    Status = PhysxLightedGeometrySampleSurface(SampledGeometry->LightedGeometry,
-                                               SampledGeometry->Face,
-                                               &SampledLocation);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    DirectionToLight = PointSubtract(SampledLocation, HitPoint);
-
-    RayToLight = RayCreate(HitPoint, DirectionToLight);
+    Geometry = (PCPBR_GEOMETRY) Hit->Data;
     
-    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
-                                                    RayToLight,
-                                                    AreaLightAdapter->SelfReference,
-                                                    &Visible,
-                                                    &DistanceToLight);
+    PBRGeometryGetLight(Geometry,
+                        Hit->FaceHit, 
+                        &Light);
 
-    if (Status != ISTATUS_SUCCESS)
+    if (Light != ProcessHitContext->Light)
     {
-        return Status;
-    }
+        if (ProcessHitContext->FirstHit != FALSE)
+        {
+            return ISTATUS_NO_MORE_DATA;
+        }
 
-    if (Visible == FALSE)
-    {
-        *Spectrum = NULL;
-        *ToLight = DirectionToLight;
-        *Pdf = (FLOAT) 0.0f; 
         return ISTATUS_SUCCESS;
     }
+    
+    Status = PBRGeometryComputeNormal(Geometry,
+                                      ModelHitPoint,
+                                      Hit->FaceHit,
+                                      &ModelSurfaceNormal);
 
-    PointOnLight = RayEndpoint(RayToLight, DistanceToLight);
-
-    Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
-                                           PointOnLight,
-                                           Compositor,
-                                           Spectrum);
-
-    if (Status == ISTATUS_SUCCESS)
+    if (Status != ISTATUS_SUCCESS)
     {
-        *ToLight = DirectionToLight;
-        *Pdf = AreaLightAdapter->SamplePdf; 
+        return Status;
     }
 
-    return Status;
+    PhysxLightedGeometryAdapterGetLightedGeometry(Geometry, &LightedGeometry);
+
+    PhysxLightedGeometryComputeSurfaceArea(LightedGeometry,
+                                           Hit->FaceHit,
+                                           &SurfaceArea);
+
+    WorldSurfaceNormal = VectorMatrixInverseTransposedMultiply(ModelToWorld,
+                                                               ModelSurfaceNormal);
+
+    NormalizedWorldSurfaceNormal = VectorNormalize(WorldSurfaceNormal, NULL, NULL);
+
+    WorldToLight = PointSubtract(WorldHitPoint, ProcessHitContext->ToLight.Origin);
+
+    Pdf = SurfaceArea *
+          VectorDotProduct(WorldToLight, WorldToLight) /
+          VectorDotProduct(ProcessHitContext->ToLight.Direction, WorldSurfaceNormal);
+
+    ProcessHitContext->Pdf += Pdf * SurfaceArea * ProcessHitContext->InverseTotalSurfaceArea;
+
+    if (ProcessHitContext->FirstHit != FALSE)
+    {
+        ProcessHitContext->ClosestWorldPointOnLight = WorldHitPoint;
+        ProcessHitContext->FirstHit = FALSE;
+    }
+
+    return ISTATUS_SUCCESS;
 }
+
+SFORCEINLINE
+PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT
+PhysxAreaLightAdapterProcessHitContextCreate(
+    _In_ PCPBR_LIGHT Light,
+    _In_ RAY ToLight,
+    _In_ FLOAT InverseTotalSurfaceArea
+    )
+{
+    PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT Context;
+
+    ASSERT(Light != NULL);
+    ASSERT(RayValidate(ToLight) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(InverseTotalSurfaceArea) != FALSE);
+    ASSERT(IsFiniteFloat(InverseTotalSurfaceArea) != FALSE);
+
+    Context.Light = Light;
+    Context.ToLight = ToLight;
+    Context.InverseTotalSurfaceArea = InverseTotalSurfaceArea;
+    Context.FirstHit = TRUE;
+    Context.Pdf = (FLOAT) 0.0f;
+
+    return Context;
+}
+
+//
+// Static Light Function
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -249,10 +256,8 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     )
 {
     PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
-    FLOAT DistanceToLight;
-    POINT3 PointOnLight;
+    PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
     ISTATUS Status;
-    BOOL Visible;
 
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
@@ -262,27 +267,37 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
 
     AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
     
-    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
-                                                    ToLight,
-                                                    AreaLightAdapter->SelfReference,
-                                                    &Visible,
-                                                    &DistanceToLight);
+    //
+    // Verify Light Visibility and Compute PDF
+    //
+
+    ProcessHitContext = PhysxAreaLightAdapterProcessHitContextCreate(AreaLightAdapter->SelfReference,
+                                                                     ToLight,
+                                                                     AreaLightAdapter->SamplePdf);
+
+    Status = PBRVisibilityTesterTestCustom(VisibilityTester,
+                                           ToLight,
+                                           PhysxAreaLightAdapterProcessHitCallback,
+                                           &ProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (Visible == FALSE)
+    if (IsZeroFloat(ProcessHitContext.Pdf))
     {
         *Spectrum = NULL;
+        *Pdf = (FLOAT) 0.0f;
         return ISTATUS_SUCCESS;
     }
 
-    PointOnLight = RayEndpoint(ToLight, DistanceToLight);
+    //
+    // Compute Lighting
+    //
 
     Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
-                                           PointOnLight,
+                                           ProcessHitContext.ClosestWorldPointOnLight,
                                            Compositor,
                                            Spectrum);
 
@@ -290,14 +305,114 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     {
         return Status;
     }
-    
-    //
-    // TODO: Compute PDF Correctly
-    //
 
-    *Pdf = 1.0f;
+    if (*Spectrum == NULL)
+    {
+        *Pdf = (FLOAT) 0.0f;
+    }
+    else
+    {
+        *Pdf = ProcessHitContext.Pdf;
+    }
 
     return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxAreaLightAdapterSample(
+    _In_ PCVOID Context,
+    _In_ POINT3 HitPoint,
+    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
+    _Out_ PCSPECTRUM *Spectrum,
+    _Out_ PVECTOR3 ToLight,
+    _Out_ PFLOAT Pdf
+    )
+{
+    PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
+    VECTOR3 DirectionToLight;
+    PHYSX_ATTACHED_GEOMETRY Key;
+    VECTOR3 NormalizedDirectionToLight;
+    RAY RayToLight;
+    PCVOID Result;
+    PCPHYSX_ATTACHED_GEOMETRY SampledGeometry;
+    POINT3 SampledLocation;
+    ISTATUS Status;
+    FLOAT TotalArea;
+
+    ASSERT(Context != NULL);
+    ASSERT(PointValidate(HitPoint) != FALSE);
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(Compositor != NULL);
+    ASSERT(Spectrum != NULL);
+    ASSERT(ToLight != NULL);
+    ASSERT(Pdf != NULL);
+
+    AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
+
+    //
+    // Sample Surface
+    //
+    
+    TotalArea = AreaLightAdapter->Geometry[AreaLightAdapter->NumberOfGeometry - 1].EndArea;
+
+    Status = RandomReferenceGenerateFloat(Rng,
+                                          (FLOAT) 0.0f,
+                                          TotalArea,
+                                          &Key.StartArea);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Key.LightedGeometry = NULL;
+    Key.Face = 0;
+    Key.EndArea = Key.StartArea;
+
+    Result = bsearch(&Key,
+                     AreaLightAdapter->Geometry,
+                     AreaLightAdapter->NumberOfGeometry,
+                     sizeof(PHYSX_ATTACHED_GEOMETRY),
+                     PhysxAreaLightAdapterCompareGeometry);
+
+    SampledGeometry = (PCPHYSX_ATTACHED_GEOMETRY) Result;
+
+    Status = PhysxLightedGeometrySampleSurface(SampledGeometry->LightedGeometry,
+                                               SampledGeometry->Face,
+                                               &SampledLocation);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    //
+    // Compute Spectrum and PDF
+    //
+    
+    DirectionToLight = PointSubtract(SampledLocation, HitPoint);
+    NormalizedDirectionToLight = VectorNormalize(DirectionToLight, NULL, NULL);
+    RayToLight = RayCreate(HitPoint, NormalizedDirectionToLight);
+
+    Status = PhysxAreaLightAdapterComputeEmissiveWithPdf(AreaLightAdapter,
+                                                         RayToLight,
+                                                         VisibilityTester,
+                                                         Compositor,
+                                                         Spectrum,
+                                                         Pdf);
+
+    if (Status == ISTATUS_SUCCESS)
+    {
+        *ToLight = NormalizedDirectionToLight;
+    }                     
+
+    return Status;
 }
 
 STATIC

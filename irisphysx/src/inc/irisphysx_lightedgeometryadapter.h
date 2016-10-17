@@ -70,4 +70,11 @@ PhysxLightedGeometryAdapterGetLight(
     _Outptr_result_maybenull_ PCPBR_LIGHT *Light
     );
 
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxLightedGeometryAdapterGetLightedGeometry(
+    _In_ PCPBR_GEOMETRY Geometry,
+    _Outptr_ PCPHYSX_LIGHTED_GEOMETRY *LightedGeometry
+    );
+
 #endif // _PHYSX_LIGHTED_GEOMETRY_ADAPTER_IRIS_PHYSX_INTERNAL_

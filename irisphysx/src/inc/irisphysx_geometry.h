@@ -44,7 +44,19 @@ PBRGeometryTestRayAdapter(
     );
 
 _Ret_
+PCPBR_GEOMETRY_VTABLE
+PBRGeometryGetVTable(
+    _In_ PCPBR_GEOMETRY PBRGeometry
+    );
+
+_Ret_
 PVOID
+PBRGeometryGetMutableData(
+    _In_ PPBR_GEOMETRY PBRGeometry
+    );
+
+_Ret_
+PCVOID
 PBRGeometryGetData(
     _In_ PCPBR_GEOMETRY PBRGeometry
     );

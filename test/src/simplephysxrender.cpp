@@ -72,7 +72,8 @@ public:
         _In_ const IrisPhysx::Material & m1
         )
     {
-        return MaterialBase::Create(std::unique_ptr<CheckerBoardMaterial>(new CheckerBoardMaterial(m0, m1)));
+        std::unique_ptr<MaterialBase> Checkerboard(new CheckerBoardMaterial(m0, m1));
+        return MaterialBase::Create(std::move(Checkerboard));
     }
 
     virtual

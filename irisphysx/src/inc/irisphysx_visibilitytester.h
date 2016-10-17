@@ -81,6 +81,33 @@ PBRVisibilityTesterSetSceneAndEpsilon(
     PBRVisibilityTester->Epsilon = Epsilon;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+PBRVisibilityTesterTestCustom(
+    _In_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _In_ RAY WorldRay,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(RayValidate(WorldRay) != FALSE);
+    ASSERT(ProcessHitRoutine != NULL);
+
+    Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
+                                                                            WorldRay,
+                                                                            VisibilityTester->TestGeometryRoutine,
+                                                                            VisibilityTester->TestGeometryRoutineContext,
+                                                                            ProcessHitRoutine,
+                                                                            ProcessHitContext);
+
+    return Status;
+}
+
 SFORCEINLINE
 VOID
 PBRVisibilityTesterDestroy(

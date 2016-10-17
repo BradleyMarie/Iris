@@ -63,7 +63,8 @@ PhongEmissiveReflector::Create(
     _In_ const IrisAdvanced::Color3 & Emissive
     )
 {
-    return ReflectorBase::Create(std::unique_ptr<PhongEmissiveReflector>(new PhongEmissiveReflector(Emissive)));
+    std::unique_ptr<ReflectorBase> EmissiveReflector(new PhongEmissiveReflector(Emissive));
+    return ReflectorBase::Create(std::move(EmissiveReflector));
 }
 
 FLOAT
@@ -101,7 +102,8 @@ PhongDiffuseReflector::Create(
     _In_ const IrisAdvanced::Color3 & Diffuse
     )
 {
-    return ReflectorBase::Create(std::unique_ptr<PhongDiffuseReflector>(new PhongDiffuseReflector(Diffuse)));
+    std::unique_ptr<ReflectorBase> DiffuseReflector(new PhongDiffuseReflector(Diffuse));
+    return ReflectorBase::Create(std::move(DiffuseReflector));
 }
 
 FLOAT
@@ -139,7 +141,8 @@ PhongSpecularReflector::Create(
     _In_ const IrisAdvanced::Color3 & Specular
     )
 {
-    return ReflectorBase::Create(std::unique_ptr<PhongSpecularReflector>(new PhongSpecularReflector(Specular)));
+    std::unique_ptr<ReflectorBase> SpecularReflector(new PhongSpecularReflector(Specular));
+    return ReflectorBase::Create(std::move(SpecularReflector));
 }
 
 FLOAT
@@ -181,8 +184,9 @@ PhongReflectiveReflector::Create(
     {
         return IrisSpectrum::Reflector(nullptr, false);
     }
-
-    return ReflectorBase::Create(std::unique_ptr<PhongReflectiveReflector>(new PhongReflectiveReflector(Reflective)));
+    
+    std::unique_ptr<ReflectorBase> ReflectiveReflector(new PhongReflectiveReflector(Reflective));
+    return ReflectorBase::Create(std::move(ReflectiveReflector));
 }
 
 FLOAT
@@ -362,7 +366,8 @@ PhongMaterial::Create(
     _In_ const IrisAdvanced::Color3 & Reflective
     )
 {
-    return MaterialBase::Create(std::unique_ptr<PhongMaterial>(new PhongMaterial(Emissive, Diffuse, Specular, S, Reflective)));
+    std::unique_ptr<MaterialBase> PhongMat(new PhongMaterial(Emissive, Diffuse, Specular, S, Reflective));
+    return MaterialBase::Create(std::move(PhongMat));
 }
 
 std::tuple<IrisPhysx::BRDFReference, Iris::Vector>
@@ -581,14 +586,13 @@ TriangleInterpolatedPhongMaterial::Create(
     _In_ const IrisAdvanced::Color3 & Reflective2
     )
 {
-    IrisPhysx::Material Result = MaterialBase::Create(
-            std::unique_ptr<TriangleInterpolatedPhongMaterial>(
-                new TriangleInterpolatedPhongMaterial(
-                    Emissive0, Diffuse0, Specular0, S0, Reflective0,
-                    Emissive1, Diffuse1, Specular1, S1, Reflective1,
-                    Emissive2, Diffuse2, Specular2, S2, Reflective2)));
-
-    return Result;
+    MaterialBase *TriangleMaterial = new TriangleInterpolatedPhongMaterial(
+        Emissive0, Diffuse0, Specular0, S0, Reflective0,
+        Emissive1, Diffuse1, Specular1, S1, Reflective1,
+        Emissive2, Diffuse2, Specular2, S2, Reflective2);
+    
+    std::unique_ptr<MaterialBase> InterpolatedMaterial(TriangleMaterial);
+    return MaterialBase::Create(std::move(InterpolatedMaterial));
 }
 
 std::tuple<IrisPhysx::BRDFReference, Iris::Vector>
@@ -636,7 +640,8 @@ PhongDiffuseSpectrum::Create(
     _In_ const IrisAdvanced::Color3 & Diffuse
     )
 {
-    return SpectrumBase::Create(std::unique_ptr<PhongDiffuseSpectrum>(new PhongDiffuseSpectrum(Diffuse)));
+    std::unique_ptr<SpectrumBase> DiffuseSpectrum(new PhongDiffuseSpectrum(Diffuse));
+    return SpectrumBase::Create(std::move(DiffuseSpectrum));
 }
 
 FLOAT
@@ -673,7 +678,8 @@ PhongSpecularSpectrum::Create(
     _In_ const IrisAdvanced::Color3 & Specular
     )
 {
-    return SpectrumBase::Create(std::unique_ptr<PhongSpecularSpectrum>(new PhongSpecularSpectrum(Specular)));
+    std::unique_ptr<SpectrumBase> SpecularSpectrum(new PhongSpecularSpectrum(Specular));
+    return SpectrumBase::Create(std::move(SpecularSpectrum));
 }
 
 FLOAT
@@ -716,7 +722,8 @@ PhongPointLight::Create(
     _In_ const Iris::Point & Loc
     )
 {
-    return LightBase::Create(std::unique_ptr<PhongPointLight>(new PhongPointLight(Diffuse, Specular, Loc)));
+    std::unique_ptr<LightBase> PhongLight(new PhongPointLight(Diffuse, Specular, Loc));
+    return LightBase::Create(std::move(PhongLight));
 }
 
 std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
