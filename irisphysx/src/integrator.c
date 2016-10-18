@@ -45,7 +45,7 @@ PhysxIntegratorAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    Allocation = malloc(sizeof(PPHYSX_INTEGRATOR));
+    Allocation = malloc(sizeof(PHYSX_INTEGRATOR));
     
     if (Allocation == NULL)
     {

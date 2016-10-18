@@ -307,7 +307,7 @@ PhysxAreaLightBuilderAddLight(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    Allocation = malloc(sizeof(PPHYSX_AREA_LIGHT_LIGHT_DATA));
+    Allocation = malloc(sizeof(PHYSX_AREA_LIGHT_LIGHT_DATA));
     LightData = (PPHYSX_AREA_LIGHT_LIGHT_DATA) Allocation;
 
     if (LightData == NULL)
