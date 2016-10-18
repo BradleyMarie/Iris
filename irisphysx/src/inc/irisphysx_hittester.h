@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_HIT_ALLOCATOR type.
+    This file contains the definitions for the PHYSX_HIT_TESTER type.
 
 --*/
 
-#ifndef _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
-#define _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_HIT_TESTER_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_HIT_TESTER_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-struct _PBR_HIT_TESTER {
+struct _PHYSX_HIT_TESTER {
     PHIT_TESTER Tester;
 };
 
-#endif // _PBR_HIT_TESTER_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_HIT_TESTER_IRIS_PHYSX_INTERNAL_

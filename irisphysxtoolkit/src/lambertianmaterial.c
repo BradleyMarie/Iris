@@ -83,7 +83,7 @@ SimpleLambertianMaterialFree(
 // Static Variables
 //
 
-CONST STATIC PBR_MATERIAL_VTABLE SimpleLambertianMaterialVTable = {
+CONST STATIC PHYSX_MATERIAL_VTABLE SimpleLambertianMaterialVTable = {
     SimpleLambertianMaterialSample,
     SimpleLambertianMaterialFree
 };
@@ -98,7 +98,7 @@ IRISPHYSXTOOLKITAPI
 ISTATUS
 LambertianMaterialAllocate(
     _In_ PREFLECTOR Reflectance,
-    _Out_ PPBR_MATERIAL *Material
+    _Out_ PPHYSX_MATERIAL *Material
     )
 {
     SIMPLE_LAMBERTIAN_MATERIAL SimpleMaterial;
@@ -116,11 +116,11 @@ LambertianMaterialAllocate(
     
     SimpleMaterial.Reflectance = Reflectance;
     
-    Status = PbrMaterialAllocate(&SimpleLambertianMaterialVTable,
-                                 &SimpleMaterial,
-                                 sizeof(SIMPLE_LAMBERTIAN_MATERIAL),
-                                 _Alignof(SIMPLE_LAMBERTIAN_MATERIAL),
-                                 Material);
+    Status = PhysxMaterialAllocate(&SimpleLambertianMaterialVTable,
+                                   &SimpleMaterial,
+                                   sizeof(SIMPLE_LAMBERTIAN_MATERIAL),
+                                   _Alignof(SIMPLE_LAMBERTIAN_MATERIAL),
+                                   Material);
                             
     if (Status != ISTATUS_SUCCESS)
     {

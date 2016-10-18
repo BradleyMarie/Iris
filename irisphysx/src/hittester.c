@@ -21,14 +21,14 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitTesterTestGeometry(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestGeometry(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry
     )
 {
     ISTATUS Status;
     
-    if (PBRHitTester == NULL)
+    if (HitTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -38,7 +38,7 @@ PBRHitTesterTestGeometry(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    Status = HitTesterTestGeometry(PBRHitTester->Tester,
+    Status = HitTesterTestGeometry(HitTester->Tester,
                                    PhysxGeometryTestRayAdapter,
                                    Geometry);
 
@@ -48,8 +48,8 @@ PBRHitTesterTestGeometry(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitTesterTestGeometryWithTransform(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestGeometryWithTransform(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
@@ -57,7 +57,7 @@ PBRHitTesterTestGeometryWithTransform(
 {
     ISTATUS Status;
     
-    if (PBRHitTester == NULL)
+    if (HitTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -67,7 +67,7 @@ PBRHitTesterTestGeometryWithTransform(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    Status = HitTesterTestGeometryWithTransform(PBRHitTester->Tester,
+    Status = HitTesterTestGeometryWithTransform(HitTester->Tester,
                                                 PhysxGeometryTestRayAdapter,
                                                 Geometry,
                                                 ModelToWorld,
@@ -79,15 +79,15 @@ PBRHitTesterTestGeometryWithTransform(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitTesterTestPremultipliedGeometryWithTransform(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestPremultipliedGeometryWithTransform(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld
     )
 {
     ISTATUS Status;
     
-    if (PBRHitTester == NULL)
+    if (HitTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -97,7 +97,7 @@ PBRHitTesterTestPremultipliedGeometryWithTransform(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    Status = HitTesterTestPremultipliedGeometryWithTransform(PBRHitTester->Tester,
+    Status = HitTesterTestPremultipliedGeometryWithTransform(HitTester->Tester,
                                                              PhysxGeometryTestRayAdapter,
                                                              Geometry,
                                                              ModelToWorld);

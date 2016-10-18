@@ -38,12 +38,12 @@ struct _PHYSX_AREA_LIGHT_ADAPTER {
     PPHYSX_AREA_LIGHT AreaLight;
     _Field_size_(NumberOfGeometry) PPHYSX_ATTACHED_GEOMETRY Geometry;
     SIZE_T NumberOfGeometry;
-    PCPBR_LIGHT SelfReference;
+    PCPHYSX_LIGHT SelfReference;
     FLOAT SamplePdf;
 };
 
 typedef struct _PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT {
-    PCPBR_LIGHT Light;
+    PCPHYSX_LIGHT Light;
     RAY ToLight;
     FLOAT InverseTotalSurfaceArea;
     FLOAT Pdf;
@@ -94,11 +94,11 @@ PhysxAreaLightAdapterProcessHitCallback(
     _In_ POINT3 WorldHitPoint
     )
 {
-    PCPBR_LIGHT BackLight;
+    PCPHYSX_LIGHT BackLight;
     PCPHYSX_GEOMETRY Geometry;
     VECTOR3 ModelSurfaceNormal;
     VECTOR3 NormalizedWorldSurfaceNormal;
-    PCPBR_LIGHT FrontLight;
+    PCPHYSX_LIGHT FrontLight;
     PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     FLOAT Pdf;
     PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
@@ -150,7 +150,7 @@ PhysxAreaLightAdapterProcessHitCallback(
 
     Pdf = SurfaceArea *
           VectorDotProduct(WorldToLight, WorldToLight) /
-          VectorDotProduct(ProcessHitContext->ToLight.Direction, WorldSurfaceNormal);
+          VectorDotProduct(ProcessHitContext->ToLight.Direction, NormalizedWorldSurfaceNormal);
 
     PhysxGeometryGetLight(Geometry,
                           Hit->BackFace,
@@ -175,7 +175,7 @@ PhysxAreaLightAdapterProcessHitCallback(
 SFORCEINLINE
 PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT
 PhysxAreaLightAdapterProcessHitContextCreate(
-    _In_ PCPBR_LIGHT Light,
+    _In_ PCPHYSX_LIGHT Light,
     _In_ RAY ToLight,
     _In_ FLOAT InverseTotalSurfaceArea
     )
@@ -207,7 +207,7 @@ ISTATUS
 PhysxAreaLightAdapterComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
@@ -225,11 +225,11 @@ PhysxAreaLightAdapterComputeEmissive(
 
     AreaLightAdapter = (PCPHYSX_AREA_LIGHT_ADAPTER) Context;
     
-    Status = PBRVisibilityTesterFindDistanceToLight(VisibilityTester,
-                                                    ToLight,
-                                                    AreaLightAdapter->SelfReference,
-                                                    &Visible,
-                                                    &DistanceToLight);
+    Status = PhysxVisibilityTesterFindDistanceToLight(VisibilityTester,
+                                                      ToLight,
+                                                      AreaLightAdapter->SelfReference,
+                                                      &Visible,
+                                                      &DistanceToLight);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -259,7 +259,7 @@ ISTATUS
 PhysxAreaLightAdapterComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
@@ -285,10 +285,10 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
                                                                      ToLight,
                                                                      AreaLightAdapter->SamplePdf);
 
-    Status = PBRVisibilityTesterTestCustom(VisibilityTester,
-                                           ToLight,
-                                           PhysxAreaLightAdapterProcessHitCallback,
-                                           &ProcessHitContext);
+    Status = PhysxVisibilityTesterTestCustom(VisibilityTester,
+                                             ToLight,
+                                             PhysxAreaLightAdapterProcessHitCallback,
+                                             &ProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -335,7 +335,7 @@ ISTATUS
 PhysxAreaLightAdapterSample(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -445,7 +445,7 @@ PhysxAreaLightAdapterFree(
 // Public Variables
 //
 
-CONST PBR_LIGHT_VTABLE AreaLightAdapterVTable = {
+CONST PHYSX_LIGHT_VTABLE AreaLightAdapterVTable = {
     PhysxAreaLightAdapterSample,
     PhysxAreaLightAdapterComputeEmissive,
     PhysxAreaLightAdapterComputeEmissiveWithPdf,
@@ -467,10 +467,10 @@ PhysxAreaLightAdapterAllocate(
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PPHYSX_AREA_LIGHT_ADAPTER *AreaLightAdapter,
-    _Out_ PPBR_LIGHT *Light
+    _Out_ PPHYSX_LIGHT *Light
     )
 {
-    PPBR_LIGHT AllocatedAreaLightAdapter;
+    PPHYSX_LIGHT AllocatedAreaLightAdapter;
     PHYSX_AREA_LIGHT_ADAPTER AreaLightAdapterData;
     PPHYSX_AREA_LIGHT_ADAPTER AllocatedAreaLightAdapterData;
     PVOID DataAllocation;
@@ -509,12 +509,12 @@ PhysxAreaLightAdapterAllocate(
     // Allocate Adapter
     //
 
-    Status = PbrLightAllocateInternal(&AreaLightAdapterVTable,
-                                      ReferenceCount,
-                                      &AreaLightAdapterData,
-                                      sizeof(PHYSX_AREA_LIGHT_ADAPTER),
-                                      _Alignof(PHYSX_AREA_LIGHT_ADAPTER),
-                                      &AllocatedAreaLightAdapter);
+    Status = PhysxLightAllocateInternal(&AreaLightAdapterVTable,
+                                        ReferenceCount,
+                                        &AreaLightAdapterData,
+                                        sizeof(PHYSX_AREA_LIGHT_ADAPTER),
+                                        _Alignof(PHYSX_AREA_LIGHT_ADAPTER),
+                                        &AllocatedAreaLightAdapter);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -523,7 +523,7 @@ PhysxAreaLightAdapterAllocate(
         return Status;
     }
 
-    DataAllocation = PBRLightGetData(AllocatedAreaLightAdapter);
+    DataAllocation = PhysxLightGetData(AllocatedAreaLightAdapter);
     AllocatedAreaLightAdapterData = (PPHYSX_AREA_LIGHT_ADAPTER) DataAllocation;
 
     //
@@ -541,7 +541,7 @@ PhysxAreaLightAdapterAllocate(
     if (Status != ISTATUS_SUCCESS)
     {
         ASSERT(Status = ISTATUS_ALLOCATION_FAILED);
-        PBRLightFree(AllocatedAreaLightAdapter);
+        PhysxLightFree(AllocatedAreaLightAdapter);
         return Status;
     }
 

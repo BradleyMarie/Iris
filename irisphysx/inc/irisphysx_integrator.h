@@ -28,9 +28,9 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE)(
+(*PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE)(
     _In_opt_ PCVOID Context, 
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ RAY Ray
     );
 
@@ -38,9 +38,9 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PPBR_INTEGRATOR_INTEGRATE_ROUTINE)(
+(*PPHYSX_INTEGRATOR_INTEGRATE_ROUTINE)(
     _Inout_opt_ PVOID Context, 
-    _Inout_ PPBR_RAYTRACER PBRRayTracer,
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
     _In_ RAY Ray
     );
 
@@ -62,9 +62,9 @@ IRISPHYSXAPI
 ISTATUS
 PBRIntegratorIntegrate(
     _In_ PPBR_INTEGRATOR PBRIntegrator,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_ PPBR_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
+    _In_ PPHYSX_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
     _Inout_opt_ PVOID IntegrateRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ FLOAT Epsilon,

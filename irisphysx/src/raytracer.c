@@ -19,9 +19,9 @@ Abstract:
 //
 
 typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
-    PPBR_RAYTRACER NextPRBRayTracer;
+    PPHYSX_RAYTRACER NextRayTracer;
     PPBR_SHARED_CONTEXT SharedContext;
-    PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
+    PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
     PCSPECTRUM *Output;
@@ -33,11 +33,11 @@ typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
 
 SFORCEINLINE
 VOID
-PBRRayTracerProcessHitAdapterContextInitialize(
+PhysxRayTracerProcessHitAdapterContextInitialize(
     _Out_ PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext,
-    _In_ PPBR_RAYTRACER NextPRBRayTracer,
+    _In_ PPHYSX_RAYTRACER NextRayTracer,
     _In_ PPBR_SHARED_CONTEXT SharedContext,
-    _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
     _In_ RAY WorldRay,
     _In_ PCSPECTRUM *Output
@@ -49,7 +49,7 @@ PBRRayTracerProcessHitAdapterContextInitialize(
     ASSERT(RayValidate(WorldRay) != FALSE);
     ASSERT(Output != NULL);
     
-    AdapterContext->NextPRBRayTracer = NextPRBRayTracer;
+    AdapterContext->NextRayTracer = NextRayTracer;
     AdapterContext->SharedContext = SharedContext;
     AdapterContext->ProcessHitRoutine = ProcessHitRoutine;
     AdapterContext->ProcessHitContext = ProcessHitContext;
@@ -61,7 +61,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PBRRayTracerProcessHitAdapter(
+PhysxRayTracerProcessHitAdapter(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit,
     _In_ PCMATRIX ModelToWorld,
@@ -98,8 +98,8 @@ PBRRayTracerProcessHitAdapter(
                                                WorldHitPoint,
                                                AdapterContext->WorldRay,
                                                SharedContext->LightList,
-                                               AdapterContext->NextPRBRayTracer,
-                                               &SharedContext->PBRVisibilityTester,
+                                               AdapterContext->NextRayTracer,
+                                               &SharedContext->VisibilityTester,
                                                &SharedContext->BrdfAllocator,
                                                SpectrumCompositorReference,
                                                ReflectorCompositorReference,
@@ -116,10 +116,10 @@ PBRRayTracerProcessHitAdapter(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRRayTracerTraceSceneProcessClosestHit(
-    _Inout_ PPBR_RAYTRACER PBRRayTracer,
+PhysxRayTracerTraceSceneProcessClosestHit(
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
     _In_ RAY Ray,
-    _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
@@ -129,7 +129,7 @@ PBRRayTracerTraceSceneProcessClosestHit(
     PCSPECTRUM Result;
     ISTATUS Status;
     
-    if (PBRRayTracer == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -144,23 +144,23 @@ PBRRayTracerTraceSceneProcessClosestHit(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
     
-    SharedContext = PBRRayTracer->SharedContext;
+    SharedContext = RayTracer->SharedContext;
     Result = NULL;
 
-    PBRRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
-                                                   PBRRayTracer->NextPRBRayTracer,
-                                                   SharedContext,
-                                                   ProcessHitRoutine,
-                                                   ProcessHitContext,
-                                                   Ray,
-                                                   &Result);
+    PhysxRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
+                                                     RayTracer->NextRayTracer,
+                                                     SharedContext,
+                                                     ProcessHitRoutine,
+                                                     ProcessHitContext,
+                                                     Ray,
+                                                     &Result);
 
-    Status = RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(PBRRayTracer->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(RayTracer->RayTracer,
                                                                         Ray,
                                                                         SharedContext->Epsilon,
                                                                         SharedContext->TestGeometryRoutine,
                                                                         SharedContext->TestGeometryRoutineContext,
-                                                                        PBRRayTracerProcessHitAdapter,
+                                                                        PhysxRayTracerProcessHitAdapter,
                                                                         &AdapterContext);
 
     if (Status != ISTATUS_SUCCESS)
@@ -176,10 +176,10 @@ PBRRayTracerTraceSceneProcessClosestHit(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRRayTracerTraceSceneProcessAllHitsInOrder(
-    _Inout_ PPBR_RAYTRACER PBRRayTracer,
+PhysxRayTracerTraceSceneProcessAllHitsInOrder(
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
     _In_ RAY Ray,
-    _In_ PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
+    _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext,
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
@@ -189,7 +189,7 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
     PCSPECTRUM Result;
     ISTATUS Status;
     
-    if (PBRRayTracer == NULL)
+    if (RayTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -204,21 +204,21 @@ PBRRayTracerTraceSceneProcessAllHitsInOrder(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    SharedContext = PBRRayTracer->SharedContext;
+    SharedContext = RayTracer->SharedContext;
     
-    PBRRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
-                                                   PBRRayTracer->NextPRBRayTracer,
-                                                   SharedContext,
-                                                   ProcessHitRoutine,
-                                                   ProcessHitContext,
-                                                   Ray,
-                                                   &Result);
+    PhysxRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
+                                                     RayTracer->NextRayTracer,
+                                                     SharedContext,
+                                                     ProcessHitRoutine,
+                                                     ProcessHitContext,
+                                                     Ray,
+                                                     &Result);
 
-    Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(PBRRayTracer->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(RayTracer->RayTracer,
                                                                             Ray,
                                                                             SharedContext->TestGeometryRoutine,
                                                                             SharedContext->TestGeometryRoutineContext,
-                                                                            PBRRayTracerProcessHitAdapter,
+                                                                            PhysxRayTracerProcessHitAdapter,
                                                                             &AdapterContext);
 
     if (Status != ISTATUS_SUCCESS)

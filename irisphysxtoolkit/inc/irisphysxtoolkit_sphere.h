@@ -28,8 +28,8 @@ ISTATUS
 PhysxSphereAllocate(
     _In_ POINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PPBR_MATERIAL FrontMaterial,
-    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
     _Out_ PPHYSX_GEOMETRY *Geometry
     );
 

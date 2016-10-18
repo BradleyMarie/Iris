@@ -53,8 +53,8 @@ ProcessHitAdapter(
     _In_ POINT3 WorldHitPoint,
     _In_ RAY WorldRay,
     _In_ PCPHYSX_LIGHT_LIST LightsPtr,
-    _Inout_opt_ PPBR_RAYTRACER RayTracerPtr,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr,
+    _Inout_opt_ PPHYSX_RAYTRACER RayTracerPtr,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PPHYSX_BRDF_ALLOCATOR AllocatorPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr,
@@ -118,17 +118,17 @@ static
 ISTATUS 
 TestGeometryAdapter(
     _In_opt_ PCVOID Context, 
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+    _Inout_ PPHYSX_HIT_TESTER HitTesterPtr,
     _In_ RAY WorldRay
     )
 {
     assert(Context != nullptr);
-    assert(PBRHitTester != nullptr);
+    assert(HitTesterPtr != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
     auto TestGeometryFunction = static_cast<const IrisPhysx::TestGeometryRoutine *>(Context);
 
-    (*TestGeometryFunction)(Iris::Ray(WorldRay), IrisPhysx::HitTester(PBRHitTester));
+    (*TestGeometryFunction)(Iris::Ray(WorldRay), IrisPhysx::HitTester(HitTesterPtr));
 
     return ISTATUS_SUCCESS;
 }
@@ -162,7 +162,7 @@ ISTATUS
 CreateStateAdapter(
     _In_opt_ PVOID Context,
     _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
-    _Out_writes_(NumberOfThreads) PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
+    _Out_writes_(NumberOfThreads) PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
     _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
     _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,

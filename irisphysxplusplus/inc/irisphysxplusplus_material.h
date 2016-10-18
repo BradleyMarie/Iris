@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class Material final {
 public:
     Material(
-        _In_ PPBR_MATERIAL MaterialPtr,
+        _In_ PPHYSX_MATERIAL MaterialPtr,
         _In_ bool Retain
         )
     : Data(MaterialPtr)
@@ -39,7 +39,7 @@ public:
         
         if (Retain)
         {
-            PbrMaterialRetain(MaterialPtr);
+            PhysxMaterialRetain(MaterialPtr);
         }
     }
 
@@ -52,8 +52,8 @@ public:
     }
     
     _Ret_
-    PPBR_MATERIAL
-    AsPPBR_MATERIAL(
+    PPHYSX_MATERIAL
+    AsPPHYSX_MATERIAL(
         void
         )
     {
@@ -61,8 +61,8 @@ public:
     }
     
     _Ret_
-    PCPBR_MATERIAL
-    AsPCPBR_MATERIAL(
+    PCPHYSX_MATERIAL
+    AsPCPHYSX_MATERIAL(
         void
         )
     {
@@ -90,15 +90,15 @@ public:
         PCPHYSX_BRDF ResultBrdf;
         VECTOR3 ResultVector;
         
-        ISTATUS Status = PbrMaterialSample(Data,
-                                           ModelHitPoint.AsPOINT3(),
-                                           ModelSurfaceNormal.AsVECTOR3(),
-                                           WorldSurfaceNormal.AsVECTOR3(),
-                                           AdditionalData,
-                                           ModelToWorld.AsPCMATRIX(),
-                                           Allocator.AsPPHYSX_BRDF_ALLOCATOR(),
-                                           &ResultVector,
-                                           &ResultBrdf);
+        ISTATUS Status = PhysxMaterialSample(Data,
+                                             ModelHitPoint.AsPOINT3(),
+                                             ModelSurfaceNormal.AsVECTOR3(),
+                                             WorldSurfaceNormal.AsVECTOR3(),
+                                             AdditionalData,
+                                             ModelToWorld.AsPCMATRIX(),
+                                             Allocator.AsPPHYSX_BRDF_ALLOCATOR(),
+                                             &ResultVector,
+                                             &ResultBrdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -113,7 +113,7 @@ public:
         )
     : Data(ToCopy.Data)
     {
-        PbrMaterialRetain(Data);
+        PhysxMaterialRetain(Data);
     }
 
     Material & 
@@ -123,9 +123,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PbrMaterialRetain(Data);
+            PhysxMaterialRetain(Data);
             Data = ToCopy.Data;
-            PbrMaterialRelease(Data);
+            PhysxMaterialRelease(Data);
         }
 
         return *this;
@@ -135,11 +135,11 @@ public:
         void
         )
     {
-        PbrMaterialRelease(Data);    
+        PhysxMaterialRelease(Data);
     }
     
 private:
-    PPBR_MATERIAL Data;
+    PPHYSX_MATERIAL Data;
 };
 
 } // namespace Iris

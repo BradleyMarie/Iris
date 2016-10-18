@@ -38,7 +38,7 @@ ISTATUS
 (*PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE)(
     _In_opt_ PVOID Context, 
     _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
-    _Out_writes_(NumberOfThreads) PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
+    _Out_writes_(NumberOfThreads) PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
     _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
     _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,
@@ -73,7 +73,7 @@ PinholeRender(
     _In_ SIZE_T MaxDepth,
     _In_ BOOL Jitter,
     _In_ BOOL Parallelize,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
     _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,

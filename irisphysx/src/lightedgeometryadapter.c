@@ -26,7 +26,7 @@ Abstract:
 //
 
 typedef struct _PHYSX_ATTACHED_LIGHT {
-    PCPBR_LIGHT Light;
+    PCPHYSX_LIGHT Light;
     UINT32 Face;
 } PHYSX_ATTACHED_LIGHT, *PPHYSX_ATTACHED_LIGHT;
 
@@ -50,7 +50,7 @@ ISTATUS
 PhysxLightedGeometryAdapterGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
+    _Out_opt_ PCPHYSX_MATERIAL *Material
     )
 {
     PCPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter;
@@ -64,7 +64,7 @@ PhysxLightedGeometryAdapterGetMaterial(
                                              FaceHit,
                                              Material);
 
-    return ISTATUS_SUCCESS;
+    return Status;
 }
 
 _Check_return_
@@ -303,7 +303,7 @@ PhysxLightedGeometryAdapterAllocate(
 VOID
 PhysxLightedGeometryAdapterAttachLight(
     _Inout_ PPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter,
-    _In_ PCPBR_LIGHT Light,
+    _In_ PCPHYSX_LIGHT Light,
     _In_ UINT32 Face
     )
 {
@@ -335,7 +335,7 @@ ISTATUS
 PhysxLightedGeometryAdapterGetLight(
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
-    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
+    _Outptr_result_maybenull_ PCPHYSX_LIGHT *Light
     )
 {
     PCPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter;

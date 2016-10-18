@@ -70,7 +70,7 @@ MaterialFreeAdapter(
     delete *MaterialBasePtr;
 }
 
-const static PBR_MATERIAL_VTABLE InteropVTable {
+const static PHYSX_MATERIAL_VTABLE InteropVTable {
     MaterialSampleAdapter,
     MaterialFreeAdapter
 };
@@ -90,13 +90,13 @@ MaterialBase::Create(
     }
     
     MaterialBase *UnmanagedMaterialBasePtr = MaterialBasePtr.release();
-    PPBR_MATERIAL MaterialPtr;
+    PPHYSX_MATERIAL MaterialPtr;
 
-    ISTATUS Success = PbrMaterialAllocate(&InteropVTable,
-                                          &UnmanagedMaterialBasePtr,
-                                          sizeof(MaterialBase*),
-                                          alignof(MaterialBase*),
-                                          &MaterialPtr);
+    ISTATUS Success = PhysxMaterialAllocate(&InteropVTable,
+                                            &UnmanagedMaterialBasePtr,
+                                            sizeof(MaterialBase*),
+                                            alignof(MaterialBase*),
+                                            &MaterialPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This module implements the PBR_HIT_TESTER public functions.
+    This module implements the PHYSX_HIT_TESTER public functions.
 
 --*/
 
@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_HIT_TESTER PBR_HIT_TESTER, *PPBR_HIT_TESTER;
-typedef CONST PBR_HIT_TESTER *PCPBR_HIT_TESTER;
+typedef struct _PHYSX_HIT_TESTER PHYSX_HIT_TESTER, *PPHYSX_HIT_TESTER;
+typedef CONST PHYSX_HIT_TESTER *PCPHYSX_HIT_TESTER;
 
 //
 // Functions
@@ -32,8 +32,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRHitTesterTestGeometry(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestGeometry(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry
     );
 
@@ -41,8 +41,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRHitTesterTestGeometryWithTransform(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestGeometryWithTransform(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld,
     _In_ BOOL Premultiplied
@@ -52,8 +52,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRHitTesterTestPremultipliedGeometryWithTransform(
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterTestPremultipliedGeometryWithTransform(
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_opt_ PCMATRIX ModelToWorld
     );

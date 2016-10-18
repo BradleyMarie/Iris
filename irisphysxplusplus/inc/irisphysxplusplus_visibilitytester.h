@@ -34,7 +34,7 @@ class Light;
 class VisibilityTester final {
 public:
     VisibilityTester(
-        _In_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr
+        _In_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr
         )
     : Data(VisibilityTesterPtr)
     { 
@@ -45,8 +45,8 @@ public:
     }
     
     _Ret_
-    PPBR_VISIBILITY_TESTER
-    AsPPBR_VISIBILITY_TESTER(
+    PPHYSX_VISIBILITY_TESTER
+    AsPPHYSX_VISIBILITY_TESTER(
         void
         )
     {
@@ -61,9 +61,9 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PBRVisibilityTesterTestVisibilityAnyDistance(Data,
-                                                                      WorldRay.AsRAY(),
-                                                                      &Result);
+        ISTATUS Status = PhysxVisibilityTesterTestVisibilityAnyDistance(Data,
+                                                                        WorldRay.AsRAY(),
+                                                                        &Result);
     
         if (Status != ISTATUS_SUCCESS)
         {
@@ -82,10 +82,10 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PBRVisibilityTesterTestVisibility(Data,
-                                                           WorldRay.AsRAY(),
-                                                           Distance,
-                                                           &Result);
+        ISTATUS Status = PhysxVisibilityTesterTestVisibility(Data,
+                                                             WorldRay.AsRAY(),
+                                                             Distance,
+                                                             &Result);
     
         if (Status != ISTATUS_SUCCESS)
         {
@@ -110,7 +110,7 @@ public:
         );
 
 private:
-    PPBR_VISIBILITY_TESTER Data;
+    PPHYSX_VISIBILITY_TESTER Data;
 };
 
 } // namespace Iris

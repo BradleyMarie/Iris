@@ -9,12 +9,12 @@ Module Name:
 Abstract:
 
     This file contains the internal definitions for the 
-    PBR_VISIBILITY_TESTER type.
+    PHYSX_VISIBILITY_TESTER type.
 
 --*/
 
-#ifndef _PBR_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_
-#define _PBR_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -22,9 +22,9 @@ Abstract:
 // Types
 //
 
-struct _PBR_VISIBILITY_TESTER {
+struct _PHYSX_VISIBILITY_TESTER {
     PRAYTRACER RayTracer;
-    PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
     FLOAT Epsilon;
 };
@@ -37,14 +37,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-PBRVisibilityTesterInitialize(
-    _Out_ PPBR_VISIBILITY_TESTER PBRVisibilityTester
+PhysxVisibilityTesterInitialize(
+    _Out_ PPHYSX_VISIBILITY_TESTER VisibilityTester
     )
 {
     PRAYTRACER RayTracer;
     ISTATUS Status;
 
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(VisibilityTester != NULL);
 
     Status = RayTracerAllocate(&RayTracer);
 
@@ -53,40 +53,40 @@ PBRVisibilityTesterInitialize(
         return Status;
     }
 
-    PBRVisibilityTester->RayTracer = RayTracer;
-    PBRVisibilityTester->TestGeometryRoutine = NULL;
-    PBRVisibilityTester->TestGeometryRoutineContext = NULL;
-    PBRVisibilityTester->Epsilon = (FLOAT) 0.0;
+    VisibilityTester->RayTracer = RayTracer;
+    VisibilityTester->TestGeometryRoutine = NULL;
+    VisibilityTester->TestGeometryRoutineContext = NULL;
+    VisibilityTester->Epsilon = (FLOAT) 0.0;
 
     return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
 VOID
-PBRVisibilityTesterSetSceneAndEpsilon(
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+PhysxVisibilityTesterSetSceneAndEpsilon(
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_ PCVOID TestGeometryRoutineContext,
     _In_ FLOAT Epsilon
     )
 {
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(VisibilityTester != NULL);
     ASSERT(TestGeometryRoutine != NULL);
     ASSERT(TestGeometryRoutineContext != NULL);
     ASSERT(IsFiniteFloat(Epsilon) != FALSE);
     ASSERT(IsGreaterThanZeroFloat(Epsilon) != FALSE);
     
-    PBRVisibilityTester->TestGeometryRoutine = TestGeometryRoutine;
-    PBRVisibilityTester->TestGeometryRoutineContext = TestGeometryRoutineContext;
-    PBRVisibilityTester->Epsilon = Epsilon;
+    VisibilityTester->TestGeometryRoutine = TestGeometryRoutine;
+    VisibilityTester->TestGeometryRoutineContext = TestGeometryRoutineContext;
+    VisibilityTester->Epsilon = Epsilon;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-PBRVisibilityTesterTestCustom(
-    _In_ PPBR_VISIBILITY_TESTER VisibilityTester,
+PhysxVisibilityTesterTestCustom(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
@@ -110,13 +110,13 @@ PBRVisibilityTesterTestCustom(
 
 SFORCEINLINE
 VOID
-PBRVisibilityTesterDestroy(
-    _In_opt_ _Post_invalid_ PPBR_VISIBILITY_TESTER PBRVisibilityTester
+PhysxVisibilityTesterDestroy(
+    _In_opt_ _Post_invalid_ PPHYSX_VISIBILITY_TESTER VisibilityTester
     )
 {
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(VisibilityTester != NULL);
 
-    RayTracerFree(PBRVisibilityTester->RayTracer);
+    RayTracerFree(VisibilityTester->RayTracer);
 }
 
 //
@@ -126,12 +126,12 @@ PBRVisibilityTesterDestroy(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRVisibilityTesterFindDistanceToLight(
-    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+PhysxVisibilityTesterFindDistanceToLight(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PCPBR_LIGHT Light,
+    _In_ PCPHYSX_LIGHT Light,
     _Out_ PBOOL Visible,
     _Out_ PFLOAT DistanceToLight
     );
 
-#endif // _PBR_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_VISIBILITY_TESTER_IRIS_PHYSX_INTERNAL_

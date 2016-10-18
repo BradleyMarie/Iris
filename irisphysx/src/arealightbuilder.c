@@ -268,6 +268,7 @@ PhysxAreaLightBuilderAddLight(
     _Out_ PSIZE_T LightIndex
     )
 {
+    PVOID Allocation;
     SIZE_T Index;
     PPHYSX_AREA_LIGHT_LIGHT_DATA LightData;
     ISTATUS Status;
@@ -306,7 +307,8 @@ PhysxAreaLightBuilderAddLight(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    LightData = (PPHYSX_AREA_LIGHT_LIGHT_DATA) malloc(sizeof(PPHYSX_AREA_LIGHT_LIGHT_DATA));
+    Allocation = malloc(sizeof(PPHYSX_AREA_LIGHT_LIGHT_DATA));
+    LightData = (PPHYSX_AREA_LIGHT_LIGHT_DATA) Allocation;
 
     if (LightData == NULL)
     {
@@ -434,7 +436,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     _Inout_ PPHYSX_AREA_LIGHT_BUILDER Builder,
     _Outptr_result_buffer_(*NumberOfGeometry) PPHYSX_GEOMETRY **Geometry,
     _Out_ PSIZE_T NumberOfGeometry,
-    _Outptr_result_buffer_(*NumberOfLights) PPBR_LIGHT **Lights,
+    _Outptr_result_buffer_(*NumberOfLights) PPHYSX_LIGHT **Lights,
     _Out_ PSIZE_T NumberOfLights
     )
 {
@@ -452,7 +454,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     SIZE_T LocalNumberOfLights;
     PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount;
     PPHYSX_GEOMETRY *LocalGeometry;
-    PPBR_LIGHT *LocalLights;
+    PPHYSX_LIGHT *LocalLights;
     ISTATUS Status;
     PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
     PPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter;
@@ -517,7 +519,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     
     LocalGeometry = (PPHYSX_GEOMETRY*) Allocation;
     
-    Allocation = malloc(sizeof(PPBR_LIGHT) * LocalNumberOfLights);
+    Allocation = malloc(sizeof(PPHYSX_LIGHT) * LocalNumberOfLights);
     
     if (Allocation == NULL)
     {
@@ -526,7 +528,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    LocalLights = (PPBR_LIGHT*) Allocation;
+    LocalLights = (PPHYSX_LIGHT*) Allocation;
 
     //
     // Allocate Local Light Adapter Array
@@ -655,8 +657,6 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
         PhysxLightedGeometryAdapterFinalize(LightedGeometryAdapter);
     }
 
-    free(LocalAreaLightAdapters);
-
     //
     // TODO: Move NULL lights to end of array
     //
@@ -665,6 +665,8 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     {
         PhysxAreaLightAdapterFinalize(LocalAreaLightAdapters[Index]);
     }
+    
+    free(LocalAreaLightAdapters);
     
     //
     // Reset the builder and copy out results

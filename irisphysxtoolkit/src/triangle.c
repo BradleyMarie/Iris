@@ -488,15 +488,15 @@ TriangleCheckBounds(
 //
 
 typedef struct _PHYSX_TRIANGLE {
-    PPBR_MATERIAL Materials[2];
+    PPHYSX_MATERIAL Materials[2];
     TRIANGLE Data;
 } PHYSX_TRIANGLE, *PPHYSX_TRIANGLE;
 
 typedef CONST PHYSX_TRIANGLE *PCPHYSX_TRIANGLE;
 
 typedef struct _PHYSX_LIGHT_TRIANGLE {
-    PPBR_MATERIAL Materials[2];
-    PPBR_LIGHT Lights[2];
+    PPHYSX_MATERIAL Materials[2];
+    PPHYSX_LIGHT Lights[2];
     TRIANGLE Data;
 } PHYSX_LIGHT_TRIANGLE, *PPHYSX_LIGHT_TRIANGLE;
 
@@ -512,7 +512,7 @@ ISTATUS
 PhysxTriangleGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
+    _Out_opt_ PCPHYSX_MATERIAL *Material
     )
 {
     PCPHYSX_TRIANGLE Triangle;
@@ -685,8 +685,8 @@ PhysxTriangleFree(
 
     Triangle = (PCPHYSX_TRIANGLE) Context;
 
-    PbrMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
-    PbrMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
+    PhysxMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
+    PhysxMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
 }
 
 //
@@ -728,8 +728,8 @@ PhysxTriangleAllocate(
     _In_ POINT3 Vertex0,
     _In_ POINT3 Vertex1,
     _In_ POINT3 Vertex2,
-    _In_opt_ PPBR_MATERIAL FrontMaterial,
-    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
     _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
@@ -804,8 +804,8 @@ PhysxTriangleAllocate(
         return Status;
     }
 
-    PbrMaterialRetain(FrontMaterial);
-    PbrMaterialRetain(BackMaterial);
+    PhysxMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(BackMaterial);
 
     return ISTATUS_SUCCESS;
 }

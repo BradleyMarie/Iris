@@ -97,7 +97,7 @@ ISTATUS
 GeometryGetMaterialAdapter(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
+    _Outptr_result_maybenull_ PCPHYSX_MATERIAL *Material
     )
 {
     assert(Context != nullptr);
@@ -109,7 +109,7 @@ GeometryGetMaterialAdapter(
 
     if (MaterialOpt)
     {
-        *Material = MaterialOpt->AsPCPBR_MATERIAL();
+        *Material = MaterialOpt->AsPCPHYSX_MATERIAL();
     }
     else
     {

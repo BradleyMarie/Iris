@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_LIGHT type.
+    This file contains the definitions for the PHYSX_LIGHT type.
 
 --*/
 
-#ifndef _PBR_LIGHT_IRIS_PHYSX_
-#define _PBR_LIGHT_IRIS_PHYSX_
+#ifndef _PHYSX_LIGHT_IRIS_PHYSX_
+#define _PHYSX_LIGHT_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -21,17 +21,17 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_VISIBILITY_TESTER PBR_VISIBILITY_TESTER, *PPBR_VISIBILITY_TESTER;
-typedef CONST PBR_VISIBILITY_TESTER *PCPBR_VISIBILITY_TESTER;
+typedef struct _PHYSX_VISIBILITY_TESTER PHYSX_VISIBILITY_TESTER, *PPHYSX_VISIBILITY_TESTER;
+typedef CONST PHYSX_VISIBILITY_TESTER *PCPHYSX_VISIBILITY_TESTER;
 
 typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_LIGHT_SAMPLE)(
+(*PPHYSX_LIGHT_SAMPLE)(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -43,10 +43,10 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_LIGHT_COMPUTE_EMISSIVE)(
+(*PPHYSX_LIGHT_COMPUTE_EMISSIVE)(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     );
@@ -55,26 +55,26 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_LIGHT_COMPUTE_EMISSIVE_WITH_PDF)(
+(*PPHYSX_LIGHT_COMPUTE_EMISSIVE_WITH_PDF)(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
     );
 
-typedef struct _PBR_LIGHT_VTABLE {
-    PPBR_LIGHT_SAMPLE SampleRoutine;
-    PPBR_LIGHT_COMPUTE_EMISSIVE ComputeEmissiveRoutine;
-    PPBR_LIGHT_COMPUTE_EMISSIVE_WITH_PDF ComputeEmissiveWithPdfRoutine;
+typedef struct _PHYSX_LIGHT_VTABLE {
+    PPHYSX_LIGHT_SAMPLE SampleRoutine;
+    PPHYSX_LIGHT_COMPUTE_EMISSIVE ComputeEmissiveRoutine;
+    PPHYSX_LIGHT_COMPUTE_EMISSIVE_WITH_PDF ComputeEmissiveWithPdfRoutine;
     PFREE_ROUTINE FreeRoutine;
-} PBR_LIGHT_VTABLE, *PPBR_LIGHT_VTABLE;
+} PHYSX_LIGHT_VTABLE, *PPHYSX_LIGHT_VTABLE;
 
-typedef CONST PBR_LIGHT_VTABLE *PCPBR_LIGHT_VTABLE;
+typedef CONST PHYSX_LIGHT_VTABLE *PCPHYSX_LIGHT_VTABLE;
 
-typedef struct _PBR_LIGHT PBR_LIGHT, *PPBR_LIGHT;
-typedef CONST PBR_LIGHT *PCPBR_LIGHT;
+typedef struct _PHYSX_LIGHT PHYSX_LIGHT, *PPHYSX_LIGHT;
+typedef CONST PHYSX_LIGHT *PCPHYSX_LIGHT;
 
 //
 // Functions
@@ -84,22 +84,22 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrLightAllocate(
-    _In_ PCPBR_LIGHT_VTABLE PbrLightVTable,
+PhysxLightAllocate(
+    _In_ PCPHYSX_LIGHT_VTABLE LightVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPBR_LIGHT *PbrLight
+    _Out_ PPHYSX_LIGHT *Light
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrLightSample(
-    _In_ PCPBR_LIGHT Light,
+PhysxLightSample(
+    _In_ PCPHYSX_LIGHT Light,
     _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -111,10 +111,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrLightComputeEmissive(
-    _In_ PCPBR_LIGHT Light,
+PhysxLightComputeEmissive(
+    _In_ PCPHYSX_LIGHT Light,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     );
@@ -123,10 +123,10 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PbrLightComputeEmissiveWithPdf(
-    _In_ PCPBR_LIGHT Light,
+PhysxLightComputeEmissiveWithPdf(
+    _In_ PCPHYSX_LIGHT Light,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
@@ -134,14 +134,14 @@ PbrLightComputeEmissiveWithPdf(
 
 IRISPHYSXAPI
 VOID
-PbrLightRetain(
-    _In_opt_ PPBR_LIGHT Light
+PhysxLightRetain(
+    _In_opt_ PPHYSX_LIGHT Light
     );
 
 IRISPHYSXAPI
 VOID
-PbrLightRelease(
-    _In_opt_ _Post_invalid_ PPBR_LIGHT Light
+PhysxLightRelease(
+    _In_opt_ _Post_invalid_ PPHYSX_LIGHT Light
     );
 
 #endif // _PBR_LIGHT_IRIS_PHYSX_

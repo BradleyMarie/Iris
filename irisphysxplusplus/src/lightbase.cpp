@@ -27,7 +27,7 @@ ISTATUS
 LightSampleAdapter(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -37,7 +37,7 @@ LightSampleAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(PointValidate(HitPoint) != FALSE);
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(VisibilityTesterPtr != NULL);
     ASSERT(Rng != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
@@ -47,7 +47,7 @@ LightSampleAdapter(
     const LightBase **LightBasePtr = (const LightBase**) Context;
 
     auto Result = (*LightBasePtr)->Sample(Iris::Point(HitPoint),
-                                          VisibilityTester(PBRVisibilityTester),
+                                          VisibilityTester(VisibilityTesterPtr),
                                           IrisAdvanced::RandomReference(Rng),
                                           IrisSpectrum::SpectrumCompositorReference(Compositor));
 
@@ -65,21 +65,21 @@ ISTATUS
 LightComputeEmissiveAdapter(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PhysxVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(PhysxVisibilityTester != NULL);
+    ASSERT(VisibilityTesterPtr != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
 
     const LightBase **LightBasePtr = (const LightBase**) Context;
 
     auto Result = (*LightBasePtr)->ComputeEmissive(Iris::Ray(ToLight),
-                                                   VisibilityTester(PhysxVisibilityTester),
+                                                   VisibilityTester(VisibilityTesterPtr),
                                                    IrisSpectrum::SpectrumCompositorReference(Compositor));
 
     *Spectrum = Result.AsPCSPECTRUM();
@@ -93,7 +93,7 @@ ISTATUS
 LightComputeEmissiveWithPdfAdapter(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER PhysxVisibilityTester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
@@ -101,7 +101,7 @@ LightComputeEmissiveWithPdfAdapter(
 {
     ASSERT(Context != NULL);
     ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(PhysxVisibilityTester != NULL);
+    ASSERT(VisibilityTesterPtr != NULL);
     ASSERT(Compositor != NULL);
     ASSERT(Spectrum != NULL);
     ASSERT(Pdf != NULL);
@@ -109,7 +109,7 @@ LightComputeEmissiveWithPdfAdapter(
     const LightBase **LightBasePtr = (const LightBase**) Context;
 
     auto Result = (*LightBasePtr)->ComputeEmissiveWithPdf(Iris::Ray(ToLight),
-                                                          VisibilityTester(PhysxVisibilityTester),
+                                                          VisibilityTester(VisibilityTesterPtr),
                                                           IrisSpectrum::SpectrumCompositorReference(Compositor));
 
     *Spectrum = std::get<0>(Result).AsPCSPECTRUM();
@@ -130,7 +130,7 @@ LightFreeAdapter(
     delete *LightBasePtr;
 }
 
-const static PBR_LIGHT_VTABLE InteropVTable {
+const static PHYSX_LIGHT_VTABLE InteropVTable {
     LightSampleAdapter,
     LightComputeEmissiveAdapter,
     LightComputeEmissiveWithPdfAdapter,
@@ -152,13 +152,13 @@ LightBase::Create(
     }
     
     LightBase *UnmanagedLightBasePtr = LightBasePtr.release();
-    PPBR_LIGHT LightPtr;
+    PPHYSX_LIGHT LightPtr;
 
-    ISTATUS Success = PbrLightAllocate(&InteropVTable,
-                                       &UnmanagedLightBasePtr,
-                                       sizeof(LightBase*),
-                                       alignof(LightBase*),
-                                       &LightPtr);
+    ISTATUS Success = PhysxLightAllocate(&InteropVTable,
+                                         &UnmanagedLightBasePtr,
+                                         sizeof(LightBase*),
+                                         alignof(LightBase*),
+                                         &LightPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

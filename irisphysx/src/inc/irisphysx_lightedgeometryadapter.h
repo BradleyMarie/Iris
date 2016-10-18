@@ -52,7 +52,7 @@ PhysxLightedGeometryAdapterAllocate(
 VOID
 PhysxLightedGeometryAdapterAttachLight(
     _Inout_ PPHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapter,
-    _In_ PCPBR_LIGHT Light,
+    _In_ PCPHYSX_LIGHT Light,
     _In_ UINT32 Face
     );
 
@@ -67,7 +67,7 @@ ISTATUS
 PhysxLightedGeometryAdapterGetLight(
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
-    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
+    _Outptr_result_maybenull_ PCPHYSX_LIGHT *Light
     );
 
 _Success_(return == ISTATUS_SUCCESS)

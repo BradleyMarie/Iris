@@ -42,7 +42,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxLightListAddLight(
     _In_ PPHYSX_LIGHT_LIST LightList,
-    _In_ PPBR_LIGHT Light
+    _In_ PPHYSX_LIGHT Light
     );
 
 _Check_return_
@@ -52,7 +52,7 @@ ISTATUS
 PhysxLightListGetLight(
     _In_ PCPHYSX_LIGHT_LIST LightList,
     _In_ SIZE_T Index,
-    _Out_ PCPBR_LIGHT *Light
+    _Out_ PCPHYSX_LIGHT *Light
     );
 
 IRISPHYSXAPI
@@ -75,7 +75,7 @@ ISTATUS
 PhysxLightListGetRandomLight(
     _In_ PCPHYSX_LIGHT_LIST LightList,
     _In_ PRANDOM_REFERENCE Rng,
-    _Out_ PCPBR_LIGHT *Light
+    _Out_ PCPHYSX_LIGHT *Light
     );
 
 IRISPHYSXAPI

@@ -27,17 +27,17 @@ static
 ISTATUS 
 TestGeometryRoutineAdapter(
     _In_opt_ PCVOID Context, 
-    _Inout_ PPBR_HIT_TESTER PBRHitTester,
+    _Inout_ PPHYSX_HIT_TESTER HitTesterPtr,
     _In_ RAY WorldRay
     )
 {
     assert(Context != nullptr);
-    assert(PBRHitTester != nullptr);
+    assert(HitTesterPtr != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
     auto TestGeometryFunction = static_cast<const TestGeometryRoutine *>(Context);
 
-    (*TestGeometryFunction)(Iris::Ray(WorldRay), HitTester(PBRHitTester));
+    (*TestGeometryFunction)(Iris::Ray(WorldRay), HitTester(HitTesterPtr));
 
     return ISTATUS_SUCCESS;
 }
@@ -48,17 +48,17 @@ static
 ISTATUS 
 IntegrateRoutineAdapter(
     _Inout_opt_ PVOID Context,
-    _Inout_ PPBR_RAYTRACER PBRRayTracer,
+    _Inout_ PPHYSX_RAYTRACER RayTracerPtr,
     _In_ RAY WorldRay
     )
 {
     assert(Context != nullptr);
-    assert(PBRRayTracer != nullptr);
+    assert(RayTracerPtr != nullptr);
     assert(RayValidate(WorldRay) != FALSE);
 
     auto IntegrateContext = static_cast<IntegrateRoutine *>(Context);
 
-    (*IntegrateContext)(Iris::Ray(WorldRay), RayTracer(PBRRayTracer));
+    (*IntegrateContext)(Iris::Ray(WorldRay), RayTracer(RayTracerPtr));
 
     return ISTATUS_SUCCESS;
 }

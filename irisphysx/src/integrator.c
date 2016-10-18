@@ -20,7 +20,7 @@ Abstract:
 
 struct _PBR_INTEGRATOR {
     PBR_SHARED_CONTEXT PBRSharedContext;
-    PPBR_RAYTRACER NextPBRRayTracer;
+    PPHYSX_RAYTRACER NextRayTracer;
 };
 
 //
@@ -35,7 +35,7 @@ PBRIntegratorAllocate(
     )
 {
     PPBR_INTEGRATOR PBRIntegrator;
-    PPBR_RAYTRACER PBRRayTracer;
+    PPHYSX_RAYTRACER RayTracer;
     PVOID Allocation;
     SIZE_T Index;
     ISTATUS Status;
@@ -62,24 +62,24 @@ PBRIntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    PBRRayTracer = NULL;
+    RayTracer = NULL;
     
     for (Index = 0; Index <= MaximumDepth; Index++)
     {
-        Status = PBRRayTracerAllocate(PBRRayTracer,
-                                      &PBRIntegrator->PBRSharedContext,
-                                      &PBRRayTracer);
+        Status = PhysxRayTracerAllocate(RayTracer,
+                                        &PBRIntegrator->PBRSharedContext,
+                                        &RayTracer);
     
         if (Status != ISTATUS_SUCCESS)
         {
-            PBRRayTracerFree(PBRRayTracer);
+            PhysxRayTracerFree(RayTracer);
             PBRSharedContextDestroy(&PBRIntegrator->PBRSharedContext);
             free(Allocation);
             return ISTATUS_ALLOCATION_FAILED;
         }
     }
     
-    PBRIntegrator->NextPBRRayTracer = PBRRayTracer;
+    PBRIntegrator->NextRayTracer = RayTracer;
 
     *Result = PBRIntegrator;
     
@@ -91,9 +91,9 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PBRIntegratorIntegrate(
     _In_ PPBR_INTEGRATOR PBRIntegrator,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_ PPBR_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
+    _In_ PPHYSX_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
     _Inout_opt_ PVOID IntegrateRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ FLOAT Epsilon,
@@ -142,7 +142,7 @@ PBRIntegratorIntegrate(
                         Epsilon);
 
     Status = IntegrateRoutine(IntegrateRoutineContext,
-                              PBRIntegrator->NextPBRRayTracer,
+                              PBRIntegrator->NextRayTracer,
                               WorldRay);
 
     return Status;
@@ -158,7 +158,7 @@ PBRIntegratorFree(
         return;
     }
     
-    PBRRayTracerFree(PBRIntegrator->NextPBRRayTracer);
+    PhysxRayTracerFree(PBRIntegrator->NextRayTracer);
     PBRSharedContextDestroy(&PBRIntegrator->PBRSharedContext);
     free(PBRIntegrator);
 }

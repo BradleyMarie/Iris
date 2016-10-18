@@ -266,15 +266,15 @@ SphereInitialize(
 //
 
 typedef struct _PHYSX_SPHERE {
-    PPBR_MATERIAL Materials[2];
+    PPHYSX_MATERIAL Materials[2];
     SPHERE Data;
 } PHYSX_SPHERE, *PPHYSX_SPHERE;
 
 typedef CONST PHYSX_SPHERE *PCPHYSX_SPHERE;
 
 typedef struct _PHYSX_LIGHT_SPHERE {
-    PPBR_MATERIAL Materials[2];
-    PPBR_LIGHT Lights[2];
+    PPHYSX_MATERIAL Materials[2];
+    PPHYSX_LIGHT Lights[2];
     SPHERE Data;
 } PHYSX_LIGHT_SPHERE, *PPHYSX_LIGHT_SPHERE;
 
@@ -290,7 +290,7 @@ ISTATUS
 PhysxSphereGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
+    _Out_opt_ PCPHYSX_MATERIAL *Material
     )
 {
     PCPHYSX_SPHERE Sphere;
@@ -405,8 +405,8 @@ PhysxSphereFree(
 
     Sphere = (PCPHYSX_SPHERE) Context;
 
-    PbrMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
-    PbrMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
+    PhysxMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    PhysxMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
 }
 
 //
@@ -431,8 +431,8 @@ ISTATUS
 PhysxSphereAllocate(
     _In_ POINT3 Center,
     _In_ FLOAT Radius,
-    _In_opt_ PPBR_MATERIAL FrontMaterial,
-    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
     _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
@@ -490,7 +490,7 @@ PhysxSphereAllocate(
         return Status;
     }
 
-    PbrMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(FrontMaterial);
 
     return ISTATUS_SUCCESS;
 }

@@ -34,8 +34,8 @@ Create(
     _In_ std::optional<IrisPhysx::Material> BackMaterial
     )
 {
-    PPBR_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPBR_MATERIAL() : nullptr;
-    PPBR_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPBR_MATERIAL() : nullptr;
+    PPHYSX_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPHYSX_MATERIAL() : nullptr;
+    PPHYSX_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPHYSX_MATERIAL() : nullptr;
 
     PPHYSX_GEOMETRY GeometryPtr;
     ISTATUS Status = PhysxSphereAllocate(Center.AsPOINT3(),

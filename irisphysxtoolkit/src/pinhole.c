@@ -24,7 +24,7 @@ Abstract:
 
 typedef struct _PINHOLE_INTEGRATE_CONTEXT {
     PPBR_TONE_MAPPING_ROUTINE ToneMappingRoutine;
-    PPBR_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
+    PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     PCVOID ToneMappingContext;
     COLOR3 ColorSum;
@@ -40,7 +40,7 @@ STATIC
 ISTATUS 
 PinholeIntegrateRoutine(
     _Inout_opt_ PVOID Context, 
-    _Inout_ PPBR_RAYTRACER PBRRayTracer,
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
     _In_ RAY Ray
     )
 {
@@ -50,16 +50,16 @@ PinholeIntegrateRoutine(
     ISTATUS Status;
 
     ASSERT(Context != NULL);
-    ASSERT(PBRRayTracer != NULL);
+    ASSERT(RayTracer != NULL);
     ASSERT(RayValidate(Ray) != FALSE);
 
     IntegrateContext = (PPINHOLE_INTEGRATE_CONTEXT) Context;
 
-    Status = PBRRayTracerTraceSceneProcessClosestHit(PBRRayTracer,
-                                                     Ray,
-                                                     IntegrateContext->ProcessHitRoutine,
-                                                     IntegrateContext->ProcessHitContext,
-                                                     &ResultSpectrum);
+    Status = PhysxRayTracerTraceSceneProcessClosestHit(RayTracer,
+                                                       Ray,
+                                                       IntegrateContext->ProcessHitRoutine,
+                                                       IntegrateContext->ProcessHitContext,
+                                                       &ResultSpectrum);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -98,7 +98,7 @@ StaticPinholeCameraRender(
     _In_ BOOL Jitter,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ PPBR_INTEGRATOR Integrator,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
     _Inout_ PPINHOLE_INTEGRATE_CONTEXT IntegrateContext,
@@ -274,7 +274,7 @@ PinholeRender(
     _In_ SIZE_T MaxDepth,
     _In_ BOOL Jitter,
     _In_ BOOL Parallelize,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
     _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
@@ -295,7 +295,7 @@ PinholeRender(
     INT32 NumberOfThreads;
     INT32 PixelIndex;
     PVOID *ProcessHitContexts;
-    PPBR_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
+    PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
     PRANDOM_REFERENCE *Rngs;
     ISTATUS Status;
     INT32 ThreadIndex;
@@ -414,7 +414,7 @@ PinholeRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    ProcessHitRoutines = calloc(NumberOfThreads, sizeof(PPBR_RAYTRACER_PROCESS_HIT_ROUTINE));
+    ProcessHitRoutines = calloc(NumberOfThreads, sizeof(PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE));
 
     if (ProcessHitRoutines == NULL)
     {

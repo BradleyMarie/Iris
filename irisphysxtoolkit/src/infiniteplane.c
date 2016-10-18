@@ -185,15 +185,15 @@ InfinitePlaneCheckBounds(
 //
 
 typedef struct _PHYSX_INFINITE_PLANE {
-    PPBR_MATERIAL Materials[2];
+    PPHYSX_MATERIAL Materials[2];
     INFINITE_PLANE Data;
 } PHYSX_INFINITE_PLANE, *PPHYSX_INFINITE_PLANE;
 
 typedef CONST PHYSX_INFINITE_PLANE *PCPHYSX_INFINITE_PLANE;
 
 typedef struct _PHYSX_LIGHT_INFINITE_PLANE {
-    PPBR_MATERIAL Materials[2];
-    PPBR_LIGHT Lights[2];
+    PPHYSX_MATERIAL Materials[2];
+    PPHYSX_LIGHT Lights[2];
     INFINITE_PLANE Data;
 } PHYSX_LIGHT_INFINITE_PLANE, *PPHYSX_LIGHT_INFINITE_PLANE;
 
@@ -209,7 +209,7 @@ ISTATUS
 PhysxInfinitePlaneGetMaterial(
     _In_ PCVOID Context, 
     _In_ UINT32 FaceHit,
-    _Out_opt_ PCPBR_MATERIAL *Material
+    _Out_opt_ PCPHYSX_MATERIAL *Material
     )
 {
     PCPHYSX_INFINITE_PLANE InfinitePlane;
@@ -324,8 +324,8 @@ PhysxInfinitePlaneFree(
 
     InfinitePlane = (PCPHYSX_INFINITE_PLANE) Context;
 
-    PbrMaterialRelease(InfinitePlane->Materials[INFINITE_PLANE_FRONT_FACE]);
-    PbrMaterialRelease(InfinitePlane->Materials[INFINITE_PLANE_BACK_FACE]);
+    PhysxMaterialRelease(InfinitePlane->Materials[INFINITE_PLANE_FRONT_FACE]);
+    PhysxMaterialRelease(InfinitePlane->Materials[INFINITE_PLANE_BACK_FACE]);
 }
 
 //
@@ -350,8 +350,8 @@ ISTATUS
 PhysxInfinitePlaneAllocate(
     _In_ POINT3 Point,
     _In_ VECTOR3 SurfaceNormal,
-    _In_opt_ PPBR_MATERIAL FrontMaterial,
-    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
     _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
@@ -395,8 +395,8 @@ PhysxInfinitePlaneAllocate(
         return Status;
     }
 
-    PbrMaterialRetain(FrontMaterial);
-    PbrMaterialRetain(BackMaterial);
+    PhysxMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(BackMaterial);
 
     return ISTATUS_SUCCESS;
 }

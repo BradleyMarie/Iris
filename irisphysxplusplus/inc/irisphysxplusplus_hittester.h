@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class HitTester final {
 public:
     HitTester(
-        _In_ PPBR_HIT_TESTER HitTesterPtr
+        _In_ PPHYSX_HIT_TESTER HitTesterPtr
         )
     : Data(HitTesterPtr)
     { 
@@ -38,8 +38,8 @@ public:
     }
     
     _Ret_
-    PPBR_HIT_TESTER
-    AsPPBR_HIT_TESTER(
+    PPHYSX_HIT_TESTER
+    AsPPHYSX_HIT_TESTER(
         void
         )
     {
@@ -51,8 +51,8 @@ public:
         _In_ const Geometry & GeometryRef
         )
     {
-        ISTATUS Status = PBRHitTesterTestGeometry(Data,
-                                                  GeometryRef.AsPCPHYSX_GEOMETRY());
+        ISTATUS Status = PhysxHitTesterTestGeometry(Data,
+                                                    GeometryRef.AsPCPHYSX_GEOMETRY());
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -66,9 +66,9 @@ public:
         _In_ const Iris::Matrix & MatrixRef
         )
     {
-        ISTATUS Status = PBRHitTesterTestPremultipliedGeometryWithTransform(Data,
-                                                                            GeometryRef.AsPCPHYSX_GEOMETRY(),
-                                                                            MatrixRef.AsPCMATRIX());
+        ISTATUS Status = PhysxHitTesterTestPremultipliedGeometryWithTransform(Data,
+                                                                              GeometryRef.AsPCPHYSX_GEOMETRY(),
+                                                                              MatrixRef.AsPCMATRIX());
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -85,10 +85,10 @@ public:
     {
         BOOL IrisPremultiplied = (Premultiplied) ? TRUE : FALSE;
         
-        ISTATUS Status = PBRHitTesterTestGeometryWithTransform(Data,
-                                                               GeometryRef.AsPCPHYSX_GEOMETRY(),
-                                                               MatrixRef.AsPCMATRIX(),
-                                                               IrisPremultiplied);
+        ISTATUS Status = PhysxHitTesterTestGeometryWithTransform(Data,
+                                                                 GeometryRef.AsPCPHYSX_GEOMETRY(),
+                                                                 MatrixRef.AsPCMATRIX(),
+                                                                 IrisPremultiplied);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -97,7 +97,7 @@ public:
     }
 
 private:
-    PPBR_HIT_TESTER Data;
+    PPHYSX_HIT_TESTER Data;
 };
 
 } // namespace IrisPhysx

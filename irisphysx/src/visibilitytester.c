@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_VISIBILITY_TESTER type.
+    This file contains the definitions for the PHYSX_VISIBILITY_TESTER type.
 
 --*/
 
@@ -18,41 +18,41 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT {
+typedef struct _PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT {
     FLOAT MinimumDistance;
     BOOL Visible;
-} PBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT;
+} PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT, *PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT;
 
-typedef struct _PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT {
+typedef struct _PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT {
     FLOAT DistanceToObject;
     FLOAT Epsilon;
     BOOL Visible;
-} PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT;
+} PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT, *PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT;
 
-typedef struct _PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT {
-    PCPBR_LIGHT TargetPbrLight;
+typedef struct _PHYSX_VISIBILITY_TESTER_TEST_PHYSX_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT {
+    PCPHYSX_LIGHT TargetLight;
     BOOL Visible;
-} PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT;
+} PHYSX_VISIBILITY_TESTER_TEST_PHYSX_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT, *PPHYSX_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT;
 
-typedef struct _PBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT {
-    PCPBR_LIGHT TargetPbrLight;
+typedef struct _PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT {
+    PCPHYSX_LIGHT TargetLight;
     FLOAT DistanceToLight;
     BOOL Visible;
-} PBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT, *PPBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT;
+} PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT, *PPHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT;
 
 //
 // Context Creation Functions
 //
 
 SFORCEINLINE
-PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT
-PBRVisibilityTesterTestVisibilityProcessHitCreateContext(
+PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT
+PhysxVisibilityTesterTestVisibilityProcessHitCreateContext(
     _In_ FLOAT DistanceToObject,
     _In_ FLOAT Epsilon,
     _In_ BOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
 
     ASSERT(IsFiniteFloat(DistanceToObject) != FALSE);
     ASSERT(IsGreaterThanOrEqualToZeroFloat(DistanceToObject) != FALSE);
@@ -67,13 +67,13 @@ PBRVisibilityTesterTestVisibilityProcessHitCreateContext(
 }
 
 SFORCEINLINE
-PBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT
-PBRVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(
+PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT
+PhysxVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(
     _In_ FLOAT MinimumDistance,
     _In_ BOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
 
     ASSERT(IsFiniteFloat(MinimumDistance) != FALSE);
     ASSERT(IsGreaterThanOrEqualToZeroFloat(MinimumDistance) != FALSE);
@@ -85,35 +85,35 @@ PBRVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(
 }
 
 SFORCEINLINE
-PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT
-PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(
-    _In_ PCPBR_LIGHT TargetPbrLight,
+PHYSX_VISIBILITY_TESTER_TEST_PHYSX_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT
+PhysxVisibilityTesterTestLightVisibilityProcessHitCreateContext(
+    _In_ PCPHYSX_LIGHT TargetLight,
     _In_ BOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_TEST_PHYSX_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT Context;
 
-    ASSERT(TargetPbrLight != NULL);
+    ASSERT(TargetLight != NULL);
 
-    Context.TargetPbrLight = TargetPbrLight;
+    Context.TargetLight = TargetLight;
     Context.Visible = Visible;
 
     return Context;
 }
 
 SFORCEINLINE
-PBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT
-PBRVisibilityTesterFindDistanceToLightProcessHitCreateContext(
-    _In_ PCPBR_LIGHT TargetPbrLight,
+PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT
+PhysxVisibilityTesterFindDistanceToLightProcessHitCreateContext(
+    _In_ PCPHYSX_LIGHT TargetLight,
     _In_ FLOAT DistanceToLight,
     _In_ BOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT Context;
 
-    ASSERT(TargetPbrLight != NULL);
+    ASSERT(TargetLight != NULL);
 
-    Context.TargetPbrLight = TargetPbrLight;
+    Context.TargetLight = TargetLight;
     Context.DistanceToLight = DistanceToLight;
     Context.Visible = Visible;
 
@@ -128,21 +128,21 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PBRVisibilityTesterTestLightVisibilityProcessHit(
+PhysxVisibilityTesterTestLightVisibilityProcessHit(
     _Inout_ PVOID Context,
     _In_ PCHIT Hit
     )
 {
-    PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
+    PPHYSX_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
     PCPHYSX_GEOMETRY Geometry;
-    PCPBR_LIGHT ClosestPbrLight;
+    PCPHYSX_LIGHT ClosestLight;
     
-    TestContext = (PPBR_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
+    TestContext = (PPHYSX_VISIBILITY_TESTER_TEST_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
     Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
 
-    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestPbrLight);
+    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestLight);
     
-    if (ClosestPbrLight == TestContext->TargetPbrLight)
+    if (ClosestLight == TestContext->TargetLight)
     {
         TestContext->Visible = TRUE;
     }
@@ -154,14 +154,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PBRVisibilityTesterTestVisibilityAnyDistanceProcessHit(
+PhysxVisibilityTesterTestVisibilityAnyDistanceProcessHit(
     _Inout_ PVOID Context,
     _In_ PCHIT Hit
     )
 {
-    PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT TestContext;
+    PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT TestContext;
     
-    TestContext = (PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT) Context;
+    TestContext = (PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT) Context;
     
     if (TestContext->MinimumDistance < Hit->Distance &&
         IsInfiniteFloat(Hit->Distance) != FALSE)
@@ -177,14 +177,14 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PBRVisibilityTesterTestVisibilityProcessHit(
+PhysxVisibilityTesterTestVisibilityProcessHit(
     _Inout_ PVOID Context,
     _In_ PCHIT Hit
     )
 {
-    PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
+    PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT TestContext;
     
-    TestContext = (PPBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
+    TestContext = (PPHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT) Context;
     
     if (TestContext->Epsilon < Hit->Distance &&
         Hit->Distance < TestContext->DistanceToObject)
@@ -200,21 +200,21 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PBRVisibilityTesterFindDistaneToLightProcessHit(
+PhysxVisibilityTesterFindDistaneToLightProcessHit(
     _Inout_ PVOID Context,
     _In_ PCHIT Hit
     )
 {
-    PPBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT TestContext;
+    PPHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT TestContext;
     PCPHYSX_GEOMETRY Geometry;
-    PCPBR_LIGHT ClosestPbrLight;
+    PCPHYSX_LIGHT ClosestLight;
     
-    TestContext = (PPBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT) Context;
+    TestContext = (PPHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT) Context;
     Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
 
-    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestPbrLight);
+    PhysxGeometryGetLight(Geometry, Hit->FrontFace, &ClosestLight);
     
-    if (ClosestPbrLight == TestContext->TargetPbrLight)
+    if (ClosestLight == TestContext->TargetLight)
     {
         TestContext->Visible = TRUE;
         TestContext->DistanceToLight = Hit->Distance;
@@ -230,33 +230,33 @@ PBRVisibilityTesterFindDistaneToLightProcessHit(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRVisibilityTesterFindDistanceToLight(
-    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+PhysxVisibilityTesterFindDistanceToLight(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PCPBR_LIGHT Light,
+    _In_ PCPHYSX_LIGHT Light,
     _Out_ PBOOL Visible,
     _Out_ PFLOAT DistanceToLight
     )
 {
-    PBR_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
+    PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
     ISTATUS Status;
 
-    ASSERT(PBRVisibilityTester != NULL);
+    ASSERT(VisibilityTester != NULL);
     ASSERT(RayValidate(WorldRay) != FALSE);
     ASSERT(Light != NULL);
     ASSERT(Visible != NULL);
     ASSERT(DistanceToLight != NULL);
 
-    ProcessHitContext = PBRVisibilityTesterFindDistanceToLightProcessHitCreateContext(Light, 
+    ProcessHitContext = PhysxVisibilityTesterFindDistanceToLightProcessHitCreateContext(Light, 
                                                                                       (FLOAT) 0.0f,
                                                                                       FALSE);
 
-    Status = RayTracerAdapterTraceSceneProcessClosestHit(PBRVisibilityTester->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessClosestHit(VisibilityTester->RayTracer,
                                                          WorldRay,
-                                                         PBRVisibilityTester->Epsilon,
-                                                         PBRVisibilityTester->TestGeometryRoutine,
-                                                         PBRVisibilityTester->TestGeometryRoutineContext,
-                                                         PBRVisibilityTesterFindDistaneToLightProcessHit,
+                                                         VisibilityTester->Epsilon,
+                                                         VisibilityTester->TestGeometryRoutine,
+                                                         VisibilityTester->TestGeometryRoutineContext,
+                                                         PhysxVisibilityTesterFindDistaneToLightProcessHit,
                                                          &ProcessHitContext);
     
     if (Status != ISTATUS_SUCCESS)
@@ -277,17 +277,17 @@ PBRVisibilityTesterFindDistanceToLight(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRVisibilityTesterTestVisibility(
-    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+PhysxVisibilityTesterTestVisibility(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
     _Out_ PBOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
     
-    if (PBRVisibilityTester == NULL)
+    if (VisibilityTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -308,15 +308,15 @@ PBRVisibilityTesterTestVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Context = PBRVisibilityTesterTestVisibilityProcessHitCreateContext(DistanceToObject,
-                                                                       PBRVisibilityTester->Epsilon,
-                                                                       TRUE);
+    Context = PhysxVisibilityTesterTestVisibilityProcessHitCreateContext(DistanceToObject,
+                                                                         VisibilityTester->Epsilon,
+                                                                         TRUE);
     
-    Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(PBRVisibilityTester->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(VisibilityTester->RayTracer,
                                                                 WorldRay,
-                                                                PBRVisibilityTester->TestGeometryRoutine,
-                                                                PBRVisibilityTester->TestGeometryRoutineContext,
-                                                                PBRVisibilityTesterTestVisibilityProcessHit,
+                                                                VisibilityTester->TestGeometryRoutine,
+                                                                VisibilityTester->TestGeometryRoutineContext,
+                                                                PhysxVisibilityTesterTestVisibilityProcessHit,
                                                                 &Context);
 
     if (Status != ISTATUS_SUCCESS)
@@ -331,16 +331,16 @@ PBRVisibilityTesterTestVisibility(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRVisibilityTesterTestVisibilityAnyDistance(
-    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+PhysxVisibilityTesterTestVisibilityAnyDistance(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
     _Out_ PBOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
+    PHYSX_VISIBILITY_TESTER_TEST_VISIBILITY_ANY_DISTANCE_PROCESS_HIT_CONTEXT Context;
     ISTATUS Status;
 
-    if (PBRVisibilityTester == NULL)
+    if (VisibilityTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -355,13 +355,13 @@ PBRVisibilityTesterTestVisibilityAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
     
-    Context = PBRVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(PBRVisibilityTester->Epsilon, TRUE);
+    Context = PhysxVisibilityTesterTestVisibilityAnyDistanceProcessHitCreateContext(VisibilityTester->Epsilon, TRUE);
 
-    Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(PBRVisibilityTester->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(VisibilityTester->RayTracer,
                                                                 WorldRay,
-                                                                PBRVisibilityTester->TestGeometryRoutine,
-                                                                PBRVisibilityTester->TestGeometryRoutineContext,
-                                                                PBRVisibilityTesterTestVisibilityAnyDistanceProcessHit,
+                                                                VisibilityTester->TestGeometryRoutine,
+                                                                VisibilityTester->TestGeometryRoutineContext,
+                                                                PhysxVisibilityTesterTestVisibilityAnyDistanceProcessHit,
                                                                 &Context);
 
     if (Status != ISTATUS_SUCCESS)
@@ -376,17 +376,17 @@ PBRVisibilityTesterTestVisibilityAnyDistance(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRVisibilityTesterTestLightVisibility(
-    _In_ PPBR_VISIBILITY_TESTER PBRVisibilityTester,
+PhysxVisibilityTesterTestLightVisibility(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PCPBR_LIGHT PbrLight,
+    _In_ PCPHYSX_LIGHT Light,
     _Out_ PBOOL Visible
     )
 {
-    PBR_VISIBILITY_TESTER_TEST_PBR_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
+    PHYSX_VISIBILITY_TESTER_TEST_PHYSX_LIGHT_VISIBILITY_PROCESS_HIT_CONTEXT ProcessHitContext;
     ISTATUS Status;
     
-    if (PBRVisibilityTester == NULL)
+    if (VisibilityTester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -396,7 +396,7 @@ PBRVisibilityTesterTestLightVisibility(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    if (PbrLight == NULL)
+    if (Light == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -406,14 +406,14 @@ PBRVisibilityTesterTestLightVisibility(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    ProcessHitContext = PBRVisibilityTesterTestLightVisibilityProcessHitCreateContext(PbrLight, FALSE);
+    ProcessHitContext = PhysxVisibilityTesterTestLightVisibilityProcessHitCreateContext(Light, FALSE);
 
-    Status = RayTracerAdapterTraceSceneProcessClosestHit(PBRVisibilityTester->RayTracer,
+    Status = RayTracerAdapterTraceSceneProcessClosestHit(VisibilityTester->RayTracer,
                                                          WorldRay,
-                                                         PBRVisibilityTester->Epsilon,
-                                                         PBRVisibilityTester->TestGeometryRoutine,
-                                                         PBRVisibilityTester->TestGeometryRoutineContext,
-                                                         PBRVisibilityTesterTestLightVisibilityProcessHit,
+                                                         VisibilityTester->Epsilon,
+                                                         VisibilityTester->TestGeometryRoutine,
+                                                         VisibilityTester->TestGeometryRoutineContext,
+                                                         PhysxVisibilityTesterTestLightVisibilityProcessHit,
                                                          &ProcessHitContext);
     
     if (Status != ISTATUS_SUCCESS)

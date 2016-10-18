@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-struct _PBR_RAYTRACER {
-    PPBR_RAYTRACER NextPRBRayTracer;
+struct _PHYSX_RAYTRACER {
+    PPHYSX_RAYTRACER NextRayTracer;
     PPBR_SHARED_CONTEXT SharedContext;
     PRAYTRACER RayTracer;
 };
@@ -35,28 +35,28 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-PBRRayTracerAllocate(
-    _In_opt_ PPBR_RAYTRACER NextPRBRayTracer,
+PhysxRayTracerAllocate(
+    _In_opt_ PPHYSX_RAYTRACER NextRayTracer,
     _In_ PPBR_SHARED_CONTEXT SharedContext,
-    _Out_ PPBR_RAYTRACER *Result
+    _Out_ PPHYSX_RAYTRACER *Result
     )
 {
-    PPBR_RAYTRACER PBRRayTracer;
+    PPHYSX_RAYTRACER RayTracer;
     PVOID Allocation;
     ISTATUS Status;
     
     ASSERT(Result != NULL);
     
-    Allocation = malloc(sizeof(PBR_RAYTRACER));
+    Allocation = malloc(sizeof(PHYSX_RAYTRACER));
     
     if (Allocation == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    PBRRayTracer = (PPBR_RAYTRACER) Allocation;
+    RayTracer = (PPHYSX_RAYTRACER) Allocation;
     
-    Status = RayTracerAllocate(&PBRRayTracer->RayTracer);
+    Status = RayTracerAllocate(&RayTracer->RayTracer);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -64,28 +64,28 @@ PBRRayTracerAllocate(
         return Status;
     }
     
-    PBRRayTracer->SharedContext = SharedContext;
-    PBRRayTracer->NextPRBRayTracer = NextPRBRayTracer;
+    RayTracer->SharedContext = SharedContext;
+    RayTracer->NextRayTracer = NextRayTracer;
     
-    *Result = PBRRayTracer;
+    *Result = RayTracer;
     
     return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
 VOID
-PBRRayTracerFree(
-    _In_opt_ _Post_invalid_ PPBR_RAYTRACER PBRRayTracer
+PhysxRayTracerFree(
+    _In_opt_ _Post_invalid_ PPHYSX_RAYTRACER RayTracer
     )
 {
-    if (PBRRayTracer == NULL)
+    if (RayTracer == NULL)
     {
         return;
     }
     
-    PBRRayTracerFree(PBRRayTracer->NextPRBRayTracer);
-    RayTracerFree(PBRRayTracer->RayTracer);
-    free(PBRRayTracer);
+    PhysxRayTracerFree(RayTracer->NextRayTracer);
+    RayTracerFree(RayTracer->RayTracer);
+    free(RayTracer);
 }
 
 #endif // _RAYTRACER_IRIS_PHYSX_INTERNAL_

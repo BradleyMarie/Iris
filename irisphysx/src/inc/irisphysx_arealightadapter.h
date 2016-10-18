@@ -28,7 +28,7 @@ typedef CONST PHYSX_AREA_LIGHT_ADAPTER *PCPHYSX_AREA_LIGHT_ADAPTER;
 // Variables
 //
 
-extern CONST PBR_LIGHT_VTABLE AreaLightAdapterVTable;
+extern CONST PHYSX_LIGHT_VTABLE AreaLightAdapterVTable;
 
 //
 // Functions
@@ -45,7 +45,7 @@ PhysxAreaLightAdapterAllocate(
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PPHYSX_AREA_LIGHT_ADAPTER *AreaLightAdapter,
-    _Out_ PPBR_LIGHT *Light
+    _Out_ PPHYSX_LIGHT *Light
     );
 
 VOID

@@ -354,7 +354,7 @@ ISTATUS
 PhysxGeometryGetMaterial(
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 FaceHit,
-    _Outptr_result_maybenull_ PCPBR_MATERIAL *Material
+    _Outptr_result_maybenull_ PCPHYSX_MATERIAL *Material
     )
 {
     ISTATUS Status;
@@ -381,7 +381,7 @@ ISTATUS
 PhysxGeometryGetLight(
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ UINT32 Face,
-    _Outptr_result_maybenull_ PCPBR_LIGHT *Light
+    _Outptr_result_maybenull_ PCPHYSX_LIGHT *Light
     )
 {
     ISTATUS Status;

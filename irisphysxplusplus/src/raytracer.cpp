@@ -35,8 +35,8 @@ ProcessHitAdapter(
     _In_ POINT3 WorldHitPoint,
     _In_ RAY WorldRay,
     _In_ PCPHYSX_LIGHT_LIST LightsPtr,
-    _Inout_opt_ PPBR_RAYTRACER RayTracerPtr,
-    _Inout_ PPBR_VISIBILITY_TESTER VisibilityTesterPtr,
+    _Inout_opt_ PPHYSX_RAYTRACER RayTracerPtr,
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
     _Inout_ PPHYSX_BRDF_ALLOCATOR AllocatorPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr,
@@ -106,11 +106,11 @@ RayTracer::TraceClosestHit(
 {
     PCSPECTRUM Result;
 
-    ISTATUS Status = PBRRayTracerTraceSceneProcessClosestHit(Data,
-                                                             WorldRay.AsRAY(),
-                                                             ProcessHitAdapter,
-                                                             &ProcessHitFunction,
-                                                             &Result);
+    ISTATUS Status = PhysxRayTracerTraceSceneProcessClosestHit(Data,
+                                                               WorldRay.AsRAY(),
+                                                               ProcessHitAdapter,
+                                                               &ProcessHitFunction,
+                                                               &Result);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -128,11 +128,11 @@ RayTracer::TraceAllHitsInOrder(
 {
     PCSPECTRUM Result;
 
-    ISTATUS Status = PBRRayTracerTraceSceneProcessAllHitsInOrder(Data,
-                                                                 WorldRay.AsRAY(),
-                                                                 ProcessHitAdapter,
-                                                                 &ProcessHitFunction,
-                                                                 &Result);
+    ISTATUS Status = PhysxRayTracerTraceSceneProcessAllHitsInOrder(Data,
+                                                                   WorldRay.AsRAY(),
+                                                                   ProcessHitAdapter,
+                                                                   &ProcessHitFunction,
+                                                                   &Result);
 
     if (Status != ISTATUS_SUCCESS)
     {

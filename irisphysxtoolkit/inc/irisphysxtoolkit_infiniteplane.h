@@ -28,8 +28,8 @@ ISTATUS
 PhysxInfinitePlaneAllocate(
     _In_ POINT3 Point,
     _In_ VECTOR3 SurfaceNormal,
-    _In_opt_ PPBR_MATERIAL FrontMaterial,
-    _In_opt_ PPBR_MATERIAL BackMaterial,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
     _Out_ PPHYSX_GEOMETRY *Geometry
     );
 

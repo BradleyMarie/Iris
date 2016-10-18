@@ -63,7 +63,7 @@ public:
         _In_ SIZE_T Index
         ) const
     {
-        PCPBR_LIGHT LightPtr;
+        PCPHYSX_LIGHT LightPtr;
 
         ISTATUS Status = PhysxLightListGetLight(Data,
                                                 Index,
@@ -83,7 +83,7 @@ public:
         _In_ IrisAdvanced::RandomReference Rng
         ) const
     {
-        PCPBR_LIGHT LightPtr;
+        PCPHYSX_LIGHT LightPtr;
 
         ISTATUS Status = PhysxLightListGetRandomLight(Data,
                                                       Rng.AsPRANDOM_REFERENCE(),

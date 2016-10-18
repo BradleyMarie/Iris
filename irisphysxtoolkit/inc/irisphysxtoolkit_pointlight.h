@@ -28,7 +28,7 @@ ISTATUS
 SpectrumPointLightAllocate(
     _In_ PSPECTRUM Intensity,
     _In_ POINT3 WorldLocation,
-    _Out_ PPBR_LIGHT *Light
+    _Out_ PPHYSX_LIGHT *Light
     );
 
 #endif // _POINT_LIGHT_IRIS_PHYSX_TOOLKIT_

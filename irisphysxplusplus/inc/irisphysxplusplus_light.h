@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class Light final {
 public:
     Light(
-        _In_ PPBR_LIGHT LightPtr,
+        _In_ PPHYSX_LIGHT LightPtr,
         _In_ bool Retain
         )
     : Data(LightPtr)
@@ -39,7 +39,7 @@ public:
 
         if (Retain)
         {
-            PbrLightRetain(LightPtr);
+            PhysxLightRetain(LightPtr);
         }
     }
 
@@ -52,8 +52,8 @@ public:
     }
     
     _Ret_
-    PPBR_LIGHT
-    AsPPBR_LIGHT(
+    PPHYSX_LIGHT
+    AsPPHYSX_LIGHT(
         void
         )
     {
@@ -61,8 +61,8 @@ public:
     }
     
     _Ret_
-    PCPBR_LIGHT
-    AsPCPBR_LIGHT(
+    PCPHYSX_LIGHT
+    AsPCPHYSX_LIGHT(
         void
         ) const
     {
@@ -81,14 +81,14 @@ public:
         VECTOR3 ResultToLight;
         FLOAT ResultPdf;
 
-        ISTATUS Status = PbrLightSample(Data,
-                                        HitPoint.AsPOINT3(),
-                                        Tester.AsPPBR_VISIBILITY_TESTER(),
-                                        Rng.AsPRANDOM_REFERENCE(),
-                                        Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                        &ResultSpectrum,
-                                        &ResultToLight,
-                                        &ResultPdf);
+        ISTATUS Status = PhysxLightSample(Data,
+                                          HitPoint.AsPOINT3(),
+                                          Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                          Rng.AsPRANDOM_REFERENCE(),
+                                          Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                          &ResultSpectrum,
+                                          &ResultToLight,
+                                          &ResultPdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -107,11 +107,11 @@ public:
     {
         PCSPECTRUM Result;
 
-        ISTATUS Status = PbrLightComputeEmissive(Data,
-                                                 ToLight.AsRAY(),
-                                                 Tester.AsPPBR_VISIBILITY_TESTER(),
-                                                 Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                                 &Result);
+        ISTATUS Status = PhysxLightComputeEmissive(Data,
+                                                   ToLight.AsRAY(),
+                                                   Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                                   Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                                   &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -131,12 +131,12 @@ public:
         PCSPECTRUM ResultSpectrum;
         FLOAT ResultPdf;
 
-        ISTATUS Status = PbrLightComputeEmissiveWithPdf(Data,
-                                                        ToLight.AsRAY(),
-                                                        Tester.AsPPBR_VISIBILITY_TESTER(),
-                                                        Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                                        &ResultSpectrum,
-                                                        &ResultPdf);
+        ISTATUS Status = PhysxLightComputeEmissiveWithPdf(Data,
+                                                          ToLight.AsRAY(),
+                                                          Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                                          Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                                          &ResultSpectrum,
+                                                          &ResultPdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -151,7 +151,7 @@ public:
         )
     : Data(ToCopy.Data)
     {
-        PbrLightRetain(Data);
+        PhysxLightRetain(Data);
     }
 
     Light & 
@@ -161,9 +161,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PbrLightRetain(Data);
+            PhysxLightRetain(Data);
             Data = ToCopy.Data;
-            PbrLightRelease(Data);
+            PhysxLightRelease(Data);
         }
 
         return *this;
@@ -173,11 +173,11 @@ public:
         void
         )
     {
-        PbrLightRelease(Data);    
+        PhysxLightRelease(Data);
     }
     
 private:
-    PPBR_LIGHT Data;
+    PPHYSX_LIGHT Data;
 };
 
 //
@@ -193,10 +193,10 @@ VisibilityTester::Test(
 {
     BOOL Result;
 
-    ISTATUS Status = PBRVisibilityTesterTestLightVisibility(Data,
-                                                            WorldRay.AsRAY(),
-                                                            LightRef.AsPCPBR_LIGHT(),
-                                                            &Result);
+    ISTATUS Status = PhysxVisibilityTesterTestLightVisibility(Data,
+                                                              WorldRay.AsRAY(),
+                                                              LightRef.AsPCPHYSX_LIGHT(),
+                                                              &Result);
 
     if (Status != ISTATUS_SUCCESS)
     {

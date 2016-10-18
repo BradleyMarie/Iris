@@ -27,7 +27,7 @@ IRISPHYSXTOOLKITAPI
 ISTATUS
 LambertianMaterialAllocate(
     _In_ PREFLECTOR Reflectance,
-    _Out_ PPBR_MATERIAL *Material
+    _Out_ PPHYSX_MATERIAL *Material
     );
 
 #endif // _LAMBERTIAN_MATERIAL_IRIS_PHYSX_TOOLKIT_

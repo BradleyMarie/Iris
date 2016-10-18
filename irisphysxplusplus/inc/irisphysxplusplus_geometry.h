@@ -131,7 +131,7 @@ public:
         _In_ const UINT32 FaceHit
         ) const
     {
-        PCPBR_MATERIAL Result;
+        PCPHYSX_MATERIAL Result;
 
         ISTATUS Status = PhysxGeometryGetMaterial(Data,
                                                   FaceHit,
@@ -156,7 +156,7 @@ public:
         _In_ const UINT32 FaceHit
         ) const
     {
-        PCPBR_LIGHT Result;
+        PCPHYSX_LIGHT Result;
 
         ISTATUS Status = PhysxGeometryGetLight(Data,
                                                FaceHit,

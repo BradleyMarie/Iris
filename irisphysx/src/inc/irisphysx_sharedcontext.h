@@ -23,11 +23,11 @@ Abstract:
 //
 
 typedef struct _PBR_SHARED_CONTEXT {
-    PBR_VISIBILITY_TESTER PBRVisibilityTester;
+    PHYSX_VISIBILITY_TESTER VisibilityTester;
     PHYSX_BRDF_ALLOCATOR BrdfAllocator;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
-    PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
     PCPHYSX_LIGHT_LIST LightList;
     PRANDOM_REFERENCE Rng;
@@ -50,7 +50,7 @@ PBRSharedContextInitialize(
      
     ASSERT(PBRSharedContext != NULL);
     
-    Status = PBRVisibilityTesterInitialize(&PBRSharedContext->PBRVisibilityTester);
+    Status = PhysxVisibilityTesterInitialize(&PBRSharedContext->VisibilityTester);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -64,7 +64,7 @@ PBRSharedContextInitialize(
     if (Status != ISTATUS_SUCCESS)
     {
         PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-        PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
+        PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
         return Status;
     }
     
@@ -74,7 +74,7 @@ PBRSharedContextInitialize(
     {
         SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
         PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-        PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
+        PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
         return Status;
     }
     
@@ -91,7 +91,7 @@ SFORCEINLINE
 VOID
 PBRSharedContextSet(
     _Inout_ PPBR_SHARED_CONTEXT PBRSharedContext,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ PRANDOM_REFERENCE Rng,
@@ -108,10 +108,10 @@ PBRSharedContextSet(
     SpectrumCompositorClear(PBRSharedContext->SpectrumCompositor);
     PhysxBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
 
-    PBRVisibilityTesterSetSceneAndEpsilon(&PBRSharedContext->PBRVisibilityTester,
-                                          TestGeometryRoutine,
-                                          TestGeometryRoutineContext,
-                                          Epsilon);
+    PhysxVisibilityTesterSetSceneAndEpsilon(&PBRSharedContext->VisibilityTester,
+                                            TestGeometryRoutine,
+                                            TestGeometryRoutineContext,
+                                            Epsilon);
 
     PBRSharedContext->TestGeometryRoutine = TestGeometryRoutine;
     PBRSharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
@@ -129,7 +129,7 @@ PBRSharedContextDestroy(
     ReflectorCompositorFree(PBRSharedContext->ReflectorCompositor);
     SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
     PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-    PBRVisibilityTesterDestroy(&PBRSharedContext->PBRVisibilityTester);
+    PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
 }
 
 #endif // _PBR_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_

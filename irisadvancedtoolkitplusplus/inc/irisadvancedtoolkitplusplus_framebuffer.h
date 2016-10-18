@@ -92,17 +92,19 @@ public:
                                              Column,
                                              &Result);
 
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return IrisAdvanced::Color3(Result);
+        }
+        
         switch (Status)
         {
-            case ISTATUS_SUCCESS:
-                return IrisAdvanced::Color3(Result);
             case ISTATUS_INVALID_ARGUMENT_01:
                 throw std::out_of_range("Row");
-            case ISTATUS_INVALID_ARGUMENT_02:
+            default:
+                assert(Status == ISTATUS_INVALID_ARGUMENT_02);
                 throw std::out_of_range("Column");
         }
-
-        assert(false);
     }
 
     std::tuple<SIZE_T, SIZE_T>
@@ -127,15 +129,11 @@ public:
         ISTATUS Status = FramebufferSaveAsPFM(Data,
                                               Path.c_str());
 
-        switch (Status)
+        if (Status != ISTATUS_SUCCESS)
         {
-            case ISTATUS_SUCCESS:
-                return;
-            case ISTATUS_IO_ERROR:
-                throw std::runtime_error("ISTATUS_IO_ERROR");
+            assert(Status == ISTATUS_IO_ERROR);
+            throw std::runtime_error("ISTATUS_IO_ERROR");
         }
-
-        assert(false);
     }
 
     Framebuffer(
@@ -168,21 +166,23 @@ private:
                                              Columns,
                                              &Data);
 
+        if (Status == ISTATUS_SUCCESS)
+        {
+            return;
+        }
+        
         switch (Status)
         {
-            case ISTATUS_SUCCESS:
-                return;
             case ISTATUS_INVALID_ARGUMENT_00:
                 throw std::invalid_argument("InitialColor");;
             case ISTATUS_INVALID_ARGUMENT_01:
                 throw std::invalid_argument("Rows");
             case ISTATUS_INVALID_ARGUMENT_02:
                 throw std::invalid_argument("Columns");
-            case ISTATUS_ALLOCATION_FAILED:
+            default:
+                assert(Status == ISTATUS_ALLOCATION_FAILED);
                 throw std::bad_alloc();
         }
-
-        assert(false);
     }
 };
 

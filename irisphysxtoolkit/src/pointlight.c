@@ -36,7 +36,7 @@ ISTATUS
 SpectrumPointLightSample(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
-    _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER Tester,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -72,10 +72,10 @@ SpectrumPointLightSample(
 
     RayToLight = RayCreate(HitPoint, DirectionToLight);
 
-    Status = PBRVisibilityTesterTestVisibility(Tester,
-                                               RayToLight,
-                                               DistanceToLight,
-                                               &Visible);
+    Status = PhysxVisibilityTesterTestVisibility(Tester,
+                                                 RayToLight,
+                                                 DistanceToLight,
+                                                 &Visible);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -115,7 +115,7 @@ ISTATUS
 SpectrumPointLightComputeEmissive(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER Tester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
     )
@@ -138,7 +138,7 @@ ISTATUS
 SpectrumPointLightComputeEmissiveWithPdf(
     _In_ PCVOID Context,
     _In_ RAY ToLight,
-    _Inout_ PPBR_VISIBILITY_TESTER Tester,
+    _Inout_ PPHYSX_VISIBILITY_TESTER Tester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PFLOAT Pdf
@@ -176,7 +176,7 @@ SpectrumPointLightFree(
 // Static Variables
 //
 
-CONST STATIC PBR_LIGHT_VTABLE PointLightVTable = {
+CONST STATIC PHYSX_LIGHT_VTABLE PointLightVTable = {
     SpectrumPointLightSample,
     SpectrumPointLightComputeEmissive,
     SpectrumPointLightComputeEmissiveWithPdf,
@@ -193,7 +193,7 @@ ISTATUS
 SpectrumPointLightAllocate(
     _In_ PSPECTRUM Intensity,
     _In_ POINT3 WorldLocation,
-    _Out_ PPBR_LIGHT *Light
+    _Out_ PPHYSX_LIGHT *Light
     )
 {
     SPECTRUM_POINT_LIGHT LightData;
@@ -202,11 +202,11 @@ SpectrumPointLightAllocate(
     LightData.Location = WorldLocation;
     LightData.Intensity = Intensity;
 
-    Status = PbrLightAllocate(&PointLightVTable,
-                              &LightData,
-                              sizeof(SPECTRUM_POINT_LIGHT),
-                              _Alignof(SPECTRUM_POINT_LIGHT),
-                              Light);
+    Status = PhysxLightAllocate(&PointLightVTable,
+                                &LightData,
+                                sizeof(SPECTRUM_POINT_LIGHT),
+                                _Alignof(SPECTRUM_POINT_LIGHT),
+                                Light);
 
     if (Status != ISTATUS_SUCCESS)
     {

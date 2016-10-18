@@ -27,14 +27,14 @@ namespace IrisPhysx {
 class LightReference final {
 public:
     LightReference(
-        _In_ PCPBR_LIGHT LightPtr
+        _In_ PCPHYSX_LIGHT LightPtr
         )
     : Data(LightPtr)
     { }
     
     _Ret_
-    PCPBR_LIGHT
-    AsPCPBR_LIGHT(
+    PCPHYSX_LIGHT
+    AsPCPHYSX_LIGHT(
         void
         ) const
     {
@@ -54,14 +54,14 @@ public:
         VECTOR3 ResultToLight;
         FLOAT ResultPdf;
 
-        ISTATUS Status = PbrLightSample(Data,
-                                        HitPoint.AsPOINT3(),
-                                        Tester.AsPPBR_VISIBILITY_TESTER(),
-                                        Rng.AsPRANDOM_REFERENCE(),
-                                        Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                        &ResultSpectrum,
-                                        &ResultToLight,
-                                        &ResultPdf);
+        ISTATUS Status = PhysxLightSample(Data,
+                                          HitPoint.AsPOINT3(),
+                                          Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                          Rng.AsPRANDOM_REFERENCE(),
+                                          Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                          &ResultSpectrum,
+                                          &ResultToLight,
+                                          &ResultPdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -81,11 +81,11 @@ public:
     {
         PCSPECTRUM Result;
 
-        ISTATUS Status = PbrLightComputeEmissive(Data,
-                                                 ToLight.AsRAY(),
-                                                 Tester.AsPPBR_VISIBILITY_TESTER(),
-                                                 Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                                 &Result);
+        ISTATUS Status = PhysxLightComputeEmissive(Data,
+                                                   ToLight.AsRAY(),
+                                                   Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                                   Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                                   &Result);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -106,12 +106,12 @@ public:
         PCSPECTRUM ResultSpectrum;
         FLOAT ResultPdf;
 
-        ISTATUS Status = PbrLightComputeEmissiveWithPdf(Data,
-                                                        ToLight.AsRAY(),
-                                                        Tester.AsPPBR_VISIBILITY_TESTER(),
-                                                        Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
-                                                        &ResultSpectrum,
-                                                        &ResultPdf);
+        ISTATUS Status = PhysxLightComputeEmissiveWithPdf(Data,
+                                                          ToLight.AsRAY(),
+                                                          Tester.AsPPHYSX_VISIBILITY_TESTER(),
+                                                          Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                                          &ResultSpectrum,
+                                                          &ResultPdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -122,7 +122,7 @@ public:
     }
     
 private:
-    PCPBR_LIGHT Data;
+    PCPHYSX_LIGHT Data;
 };
 
 //
@@ -139,9 +139,9 @@ VisibilityTester::Test(
 {
     BOOL Result;
 
-    ISTATUS Status = PBRVisibilityTesterTestLightVisibility(Data,
+    ISTATUS Status = PhysxVisibilityTesterTestLightVisibility(Data,
                                                             WorldRay.AsRAY(),
-                                                            LightRef.AsPCPBR_LIGHT(),
+                                                            LightRef.AsPCPHYSX_LIGHT(),
                                                             &Result);
 
     if (Status != ISTATUS_SUCCESS)

@@ -46,7 +46,7 @@ AreaLightReferenceCountAddGeometry(
 VOID
 AreaLightReferenceCountAddLight(
     _Inout_ PPHYSX_AREA_LIGHT_REFERENCE_COUNT ReferenceCount,
-    _In_ PPBR_LIGHT Light
+    _In_ PPHYSX_LIGHT Light
     );
 
 VOID

@@ -49,7 +49,7 @@ typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
 class RayTracer final {
 public:
     RayTracer(
-        _In_ PPBR_RAYTRACER RayTracerPtr
+        _In_ PPHYSX_RAYTRACER RayTracerPtr
         )
     : Data(RayTracerPtr)
     { 
@@ -60,8 +60,8 @@ public:
     }
     
     _Ret_
-    PPBR_RAYTRACER
-    AsPPBR_RAYTRACER(
+    PPHYSX_RAYTRACER
+    AsPPHYSX_RAYTRACER(
         void
         )
     {
@@ -83,7 +83,7 @@ public:
         );
 
 private:
-    PPBR_RAYTRACER Data;
+    PPHYSX_RAYTRACER Data;
 };
 
 } // namespace IrisPhysx

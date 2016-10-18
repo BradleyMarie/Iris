@@ -21,12 +21,12 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_HIT_TESTER_ADAPTER_CONTEXT {
-    PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+typedef struct _PHYSX_HIT_TESTER_ADAPTER_CONTEXT {
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
-} PBR_HIT_TESTER_ADAPTER_CONTEXT, *PPBR_HIT_TESTER_ADAPTER_CONTEXT;
+} PHYSX_HIT_TESTER_ADAPTER_CONTEXT, *PPHYSX_HIT_TESTER_ADAPTER_CONTEXT;
 
-typedef CONST PBR_HIT_TESTER_ADAPTER_CONTEXT *PCPBR_HIT_TESTER_ADAPTER_CONTEXT;
+typedef CONST PHYSX_HIT_TESTER_ADAPTER_CONTEXT *PCPHYSX_HIT_TESTER_ADAPTER_CONTEXT;
 
 //
 // Prototypes
@@ -35,7 +35,7 @@ typedef CONST PBR_HIT_TESTER_ADAPTER_CONTEXT *PCPBR_HIT_TESTER_ADAPTER_CONTEXT;
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRHitTesterAdapter(
+PhysxHitTesterAdapter(
     _In_opt_ PCVOID Context, 
     _Inout_ PHIT_TESTER HitTester,
     _In_ RAY Ray
@@ -47,31 +47,31 @@ PBRHitTesterAdapter(
 
 SFORCEINLINE
 VOID
-PBRHitTesterAdapterContextInitialize(
-    _Out_ PPBR_HIT_TESTER_ADAPTER_CONTEXT PBRHitTesterAdapterContext,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+PhysxHitTesterAdapterContextInitialize(
+    _Out_ PPHYSX_HIT_TESTER_ADAPTER_CONTEXT HitTesterAdapterContext,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_ PCVOID TestGeometryRoutineContext
     )
 {
-    ASSERT(PBRHitTesterAdapterContext != NULL);
+    ASSERT(HitTesterAdapterContext != NULL);
     ASSERT(TestGeometryRoutine != NULL);
     ASSERT(TestGeometryRoutineContext != NULL);
     
-    PBRHitTesterAdapterContext->TestGeometryRoutine = TestGeometryRoutine;
-    PBRHitTesterAdapterContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
+    HitTesterAdapterContext->TestGeometryRoutine = TestGeometryRoutine;
+    HitTesterAdapterContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
 }
 
 SFORCEINLINE
 VOID
-PBRHitTesterInitialize(
-    _Out_ PPBR_HIT_TESTER PBRHitTester,
+PhysxHitTesterInitialize(
+    _Out_ PPHYSX_HIT_TESTER HitTester,
     _In_ PHIT_TESTER Tester
     )
 {
-    ASSERT(PBRHitTester != NULL);
+    ASSERT(HitTester != NULL);
     ASSERT(Tester != NULL);
     
-    PBRHitTester->Tester = Tester;
+    HitTester->Tester = Tester;
 }
 
 _Check_return_
@@ -82,13 +82,13 @@ RayTracerAdapterTraceSceneProcessClosestHit(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryContext,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PBR_HIT_TESTER_ADAPTER_CONTEXT PBRHitTesterAdapterContext;
+    PHYSX_HIT_TESTER_ADAPTER_CONTEXT HitTesterAdapterContext;
     ISTATUS Status;
     
     ASSERT(RayTracer != NULL);
@@ -103,15 +103,15 @@ RayTracerAdapterTraceSceneProcessClosestHit(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    PBRHitTesterAdapterContextInitialize(&PBRHitTesterAdapterContext,
-                                         TestGeometryRoutine,
-                                         TestGeometryContext);
+    PhysxHitTesterAdapterContextInitialize(&HitTesterAdapterContext,
+                                           TestGeometryRoutine,
+                                           TestGeometryContext);
 
     Status = RayTracerTraceSceneProcessClosestHit(RayTracer,
                                                   Ray,
                                                   MinimumDistance,
-                                                  PBRHitTesterAdapter,
-                                                  &PBRHitTesterAdapterContext,
+                                                  PhysxHitTesterAdapter,
+                                                  &HitTesterAdapterContext,
                                                   ProcessHitRoutine,
                                                   ProcessHitContext);
 
@@ -126,13 +126,13 @@ RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,
     _In_ FLOAT MinimumDistance,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryContext,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PBR_HIT_TESTER_ADAPTER_CONTEXT PBRHitTesterAdapterContext;
+    PHYSX_HIT_TESTER_ADAPTER_CONTEXT HitTesterAdapterContext;
     ISTATUS Status;
     
     ASSERT(RayTracer != NULL);
@@ -147,15 +147,15 @@ RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
     
-    PBRHitTesterAdapterContextInitialize(&PBRHitTesterAdapterContext,
-                                         TestGeometryRoutine,
-                                         TestGeometryContext);
+    PhysxHitTesterAdapterContextInitialize(&HitTesterAdapterContext,
+                                           TestGeometryRoutine,
+                                           TestGeometryContext);
 
     Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(RayTracer,
                                                                  Ray,
                                                                  MinimumDistance,
-                                                                 PBRHitTesterAdapter,
-                                                                 &PBRHitTesterAdapterContext,
+                                                                 PhysxHitTesterAdapter,
+                                                                 &HitTesterAdapterContext,
                                                                  ProcessHitRoutine,
                                                                  ProcessHitContext);
 
@@ -169,13 +169,13 @@ ISTATUS
 RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryContext,
     _In_ PRAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PBR_HIT_TESTER_ADAPTER_CONTEXT PBRHitTesterAdapterContext;
+    PHYSX_HIT_TESTER_ADAPTER_CONTEXT HitTesterAdapterContext;
     ISTATUS Status;
     
     ASSERT(RayTracer != NULL);
@@ -190,14 +190,14 @@ RayTracerAdapterTraceSceneProcessAllHitsOutOfOrder(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
     
-    PBRHitTesterAdapterContextInitialize(&PBRHitTesterAdapterContext,
-                                         TestGeometryRoutine,
-                                         TestGeometryContext);
+    PhysxHitTesterAdapterContextInitialize(&HitTesterAdapterContext,
+                                           TestGeometryRoutine,
+                                           TestGeometryContext);
 
     Status = RayTracerTraceSceneProcessAllHitsOutOfOrder(RayTracer,
                                                          Ray,
-                                                         PBRHitTesterAdapter,
-                                                         &PBRHitTesterAdapterContext,
+                                                         PhysxHitTesterAdapter,
+                                                         &HitTesterAdapterContext,
                                                          ProcessHitRoutine,
                                                          ProcessHitContext);
 
@@ -211,13 +211,13 @@ ISTATUS
 RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,
-    _In_ PPBR_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryContext,
     _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
     _Inout_opt_ PVOID ProcessHitContext
     )
 {
-    PBR_HIT_TESTER_ADAPTER_CONTEXT PBRHitTesterAdapterContext;
+    PHYSX_HIT_TESTER_ADAPTER_CONTEXT HitTesterAdapterContext;
     ISTATUS Status;
     
     ASSERT(RayTracer != NULL);
@@ -232,14 +232,14 @@ RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
     
-    PBRHitTesterAdapterContextInitialize(&PBRHitTesterAdapterContext,
-                                         TestGeometryRoutine,
-                                         TestGeometryContext);
+    PhysxHitTesterAdapterContextInitialize(&HitTesterAdapterContext,
+                                           TestGeometryRoutine,
+                                           TestGeometryContext);
 
     Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(RayTracer,
                                                                      Ray,
-                                                                     PBRHitTesterAdapter,
-                                                                     &PBRHitTesterAdapterContext,
+                                                                     PhysxHitTesterAdapter,
+                                                                     &HitTesterAdapterContext,
                                                                      ProcessHitRoutine,
                                                                      ProcessHitContext);
 

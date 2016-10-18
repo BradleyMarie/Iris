@@ -27,7 +27,7 @@ namespace IrisPhysx {
 class MaterialReference final {
 public:
     MaterialReference(
-        _In_ PCPBR_MATERIAL MaterialPtr
+        _In_ PCPHYSX_MATERIAL MaterialPtr
         )
     : Data(MaterialPtr)
     { 
@@ -38,8 +38,8 @@ public:
     }
     
     _Ret_
-    PCPBR_MATERIAL
-    AsPCPBR_MATERIAL(
+    PCPHYSX_MATERIAL
+    AsPCPHYSX_MATERIAL(
         void
         )
     {
@@ -59,15 +59,15 @@ public:
         PCPHYSX_BRDF ResultBrdf;
         VECTOR3 ResultVector;
         
-        ISTATUS Status = PbrMaterialSample(Data,
-                                           ModelHitPoint.AsPOINT3(),
-                                           ModelSurfaceNormal.AsVECTOR3(),
-                                           WorldSurfaceNormal.AsVECTOR3(),
-                                           AdditionalData,
-                                           ModelToWorld.AsPCMATRIX(),
-                                           Allocator.AsPPHYSX_BRDF_ALLOCATOR(),
-                                           &ResultVector,
-                                           &ResultBrdf);
+        ISTATUS Status = PhysxMaterialSample(Data,
+                                             ModelHitPoint.AsPOINT3(),
+                                             ModelSurfaceNormal.AsVECTOR3(),
+                                             WorldSurfaceNormal.AsVECTOR3(),
+                                             AdditionalData,
+                                             ModelToWorld.AsPCMATRIX(),
+                                             Allocator.AsPPHYSX_BRDF_ALLOCATOR(),
+                                             &ResultVector,
+                                             &ResultBrdf);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    PCPBR_MATERIAL Data;
+    PCPHYSX_MATERIAL Data;
 };
 
 } // namespace Iris
