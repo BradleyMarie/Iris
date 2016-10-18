@@ -23,7 +23,7 @@ Abstract:
 //
 
 typedef struct _PINHOLE_INTEGRATE_CONTEXT {
-    PPBR_TONE_MAPPING_ROUTINE ToneMappingRoutine;
+    PPHYSX_TONE_MAPPING_ROUTINE ToneMappingRoutine;
     PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     PCVOID ToneMappingContext;
@@ -97,7 +97,7 @@ StaticPinholeCameraRender(
     _In_ FLOAT Epsilon,
     _In_ BOOL Jitter,
     _In_ PRANDOM_REFERENCE Rng,
-    _In_ PPBR_INTEGRATOR Integrator,
+    _In_ PPHYSX_INTEGRATOR Integrator,
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
@@ -220,15 +220,15 @@ StaticPinholeCameraRender(
 
             WorldRay = RayCreate(RayOrigin, Direction);
 
-            Status = PBRIntegratorIntegrate(Integrator,
-                                            TestGeometryRoutine,
-                                            TestGeometryRoutineContext,
-                                            PinholeIntegrateRoutine,
-                                            IntegrateContext,
-                                            Lights,
-                                            Epsilon,
-                                            WorldRay,
-                                            Rng);
+            Status = PhysxIntegratorIntegrate(Integrator,
+                                              TestGeometryRoutine,
+                                              TestGeometryRoutineContext,
+                                              PinholeIntegrateRoutine,
+                                              IntegrateContext,
+                                              Lights,
+                                              Epsilon,
+                                              WorldRay,
+                                              Rng);
 
             if (Status != ISTATUS_SUCCESS)
             {
@@ -277,8 +277,8 @@ PinholeRender(
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
-    _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
-    _In_opt_ PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
+    _In_ PPHYSX_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
+    _In_opt_ PPHYSX_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
     _Inout_opt_ PVOID CreateStateContext,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
@@ -288,7 +288,7 @@ PinholeRender(
     POINT3 ImagePlaneCorner;
     VECTOR3 ImagePlaneHeightVector;
     VECTOR3 ImagePlaneWidthVector;
-    PPBR_INTEGRATOR *Integrators;
+    PPHYSX_INTEGRATOR *Integrators;
     VECTOR3 NormalizedCameraDirection;
     VECTOR3 NormalizedUpVector;
     INT32 NumberOfPixels;
@@ -300,7 +300,7 @@ PinholeRender(
     ISTATUS Status;
     INT32 ThreadIndex;
     PVOID *ToneMappingContexts;
-    PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines;
+    PPHYSX_TONE_MAPPING_ROUTINE *ToneMappingRoutines;
 
     if (PointValidate(PinholeLocation) == FALSE)
     {
@@ -431,7 +431,7 @@ PinholeRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    ToneMappingRoutines = calloc(NumberOfThreads, sizeof(PPBR_TONE_MAPPING_ROUTINE));
+    ToneMappingRoutines = calloc(NumberOfThreads, sizeof(PPHYSX_TONE_MAPPING_ROUTINE));
 
     if (ToneMappingRoutines == NULL)
     {
@@ -452,7 +452,7 @@ PinholeRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    Integrators = calloc(NumberOfThreads, sizeof(PPBR_INTEGRATOR));
+    Integrators = calloc(NumberOfThreads, sizeof(PPHYSX_INTEGRATOR));
 
     if (Integrators == NULL)
     {
@@ -468,7 +468,7 @@ PinholeRender(
          ThreadIndex < NumberOfThreads;
          ThreadIndex++)
     {
-        Status = PBRIntegratorAllocate(MaxDepth, Integrators + ThreadIndex);
+        Status = PhysxIntegratorAllocate(MaxDepth, Integrators + ThreadIndex);
 
         if (Status != ISTATUS_SUCCESS)
         {
@@ -549,7 +549,7 @@ PinholeRender(
          ThreadIndex < NumberOfThreads;
          ThreadIndex++)
     {
-        PBRIntegratorFree(Integrators[ThreadIndex]);
+        PhysxIntegratorFree(Integrators[ThreadIndex]);
     }
 
     free(Integrators);

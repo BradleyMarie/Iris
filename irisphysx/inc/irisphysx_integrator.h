@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_INTEGRATOR type.
+    This file contains the definitions for the PHYSX_INTEGRATOR type.
 
 --*/
 
-#ifndef _PBR_INTEGRATOR_IRIS_PHYSX_
-#define _PBR_INTEGRATOR_IRIS_PHYSX_
+#ifndef _PHYSX_INTEGRATOR_IRIS_PHYSX_
+#define _PHYSX_INTEGRATOR_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -21,8 +21,8 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_INTEGRATOR PBR_INTEGRATOR, *PPBR_INTEGRATOR;
-typedef CONST PBR_INTEGRATOR *PCPBR_INTEGRATOR;
+typedef struct _PHYSX_INTEGRATOR PHYSX_INTEGRATOR, *PPHYSX_INTEGRATOR;
+typedef CONST PHYSX_INTEGRATOR *PCPHYSX_INTEGRATOR;
 
 typedef
 _Check_return_
@@ -51,17 +51,17 @@ ISTATUS
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRIntegratorAllocate(
+PhysxIntegratorAllocate(
     _In_ SIZE_T MaximumDepth,
-    _Out_ PPBR_INTEGRATOR *PBRIntegrator
+    _Out_ PPHYSX_INTEGRATOR *Integrator
     );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRIntegratorIntegrate(
-    _In_ PPBR_INTEGRATOR PBRIntegrator,
+PhysxIntegratorIntegrate(
+    _In_ PPHYSX_INTEGRATOR Integrator,
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_ PPHYSX_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
@@ -74,8 +74,8 @@ PBRIntegratorIntegrate(
 
 IRISPHYSXAPI
 VOID
-PBRIntegratorFree(
-    _In_opt_ _Post_invalid_ PPBR_INTEGRATOR PBRIntegrator
+PhysxIntegratorFree(
+    _In_opt_ _Post_invalid_ PPHYSX_INTEGRATOR Integrator
     );
 
-#endif // _PBR_INTEGRATOR_IRIS_PHYSX_
+#endif // _PHYSX_INTEGRATOR_IRIS_PHYSX_

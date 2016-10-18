@@ -23,7 +23,7 @@ Abstract:
 
 struct _PHYSX_RAYTRACER {
     PPHYSX_RAYTRACER NextRayTracer;
-    PPBR_SHARED_CONTEXT SharedContext;
+    PPHYSX_SHARED_CONTEXT SharedContext;
     PRAYTRACER RayTracer;
 };
 
@@ -37,7 +37,7 @@ SFORCEINLINE
 ISTATUS
 PhysxRayTracerAllocate(
     _In_opt_ PPHYSX_RAYTRACER NextRayTracer,
-    _In_ PPBR_SHARED_CONTEXT SharedContext,
+    _In_ PPHYSX_SHARED_CONTEXT SharedContext,
     _Out_ PPHYSX_RAYTRACER *Result
     )
 {

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_GEOMETRY type.
+    This file contains the definitions for the PHYSX_GEOMETRY type.
 
 --*/
 
@@ -190,7 +190,7 @@ PhysxGeometryAllocate(
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PPHYSX_GEOMETRY *PBRGeometry
+    _Out_ PPHYSX_GEOMETRY *Geometry
     )
 {
     ISTATUS Status;
@@ -220,7 +220,7 @@ PhysxGeometryAllocate(
         }
     }
 
-    if (PBRGeometry == NULL)
+    if (Geometry == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -230,7 +230,7 @@ PhysxGeometryAllocate(
                                            Data,
                                            DataSizeInBytes,
                                            DataAlignment,
-                                           PBRGeometry);
+                                           Geometry);
 
     return Status;
 }
@@ -239,7 +239,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PBRGeometryTestNestedGeometry(
+PhysxGeometryTestNestedGeometry(
     _In_ PCPHYSX_GEOMETRY Geometry,
     _In_ PPHYSX_HIT_ALLOCATOR HitAllocator,
     _Out_ PHIT_LIST *HitList

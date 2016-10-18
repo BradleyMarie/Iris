@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_INTEGRATOR type.
+    This file contains the definitions for the PHYSX_INTEGRATOR type.
 
 --*/
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-struct _PBR_INTEGRATOR {
-    PBR_SHARED_CONTEXT PBRSharedContext;
+struct _PHYSX_INTEGRATOR {
+    PHYSX_SHARED_CONTEXT SharedContext;
     PPHYSX_RAYTRACER NextRayTracer;
 };
 
@@ -29,12 +29,12 @@ struct _PBR_INTEGRATOR {
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRIntegratorAllocate(
+PhysxIntegratorAllocate(
     _In_ SIZE_T MaximumDepth,
-    _Out_ PPBR_INTEGRATOR *Result
+    _Out_ PPHYSX_INTEGRATOR *Result
     )
 {
-    PPBR_INTEGRATOR PBRIntegrator;
+    PPHYSX_INTEGRATOR Integrator;
     PPHYSX_RAYTRACER RayTracer;
     PVOID Allocation;
     SIZE_T Index;
@@ -45,16 +45,16 @@ PBRIntegratorAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
     
-    Allocation = malloc(sizeof(PBR_INTEGRATOR));
+    Allocation = malloc(sizeof(PPHYSX_INTEGRATOR));
     
     if (Allocation == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    PBRIntegrator = (PPBR_INTEGRATOR) Allocation;
+    Integrator = (PPHYSX_INTEGRATOR) Allocation;
     
-    Status = PBRSharedContextInitialize(&PBRIntegrator->PBRSharedContext);
+    Status = PhysxSharedContextInitialize(&Integrator->SharedContext);
     
     if (Status != ISTATUS_SUCCESS)
     {
@@ -67,21 +67,21 @@ PBRIntegratorAllocate(
     for (Index = 0; Index <= MaximumDepth; Index++)
     {
         Status = PhysxRayTracerAllocate(RayTracer,
-                                        &PBRIntegrator->PBRSharedContext,
+                                        &Integrator->SharedContext,
                                         &RayTracer);
     
         if (Status != ISTATUS_SUCCESS)
         {
             PhysxRayTracerFree(RayTracer);
-            PBRSharedContextDestroy(&PBRIntegrator->PBRSharedContext);
+            PhysxSharedContextDestroy(&Integrator->SharedContext);
             free(Allocation);
             return ISTATUS_ALLOCATION_FAILED;
         }
     }
     
-    PBRIntegrator->NextRayTracer = RayTracer;
+    Integrator->NextRayTracer = RayTracer;
 
-    *Result = PBRIntegrator;
+    *Result = Integrator;
     
     return ISTATUS_SUCCESS;
 }
@@ -89,8 +89,8 @@ PBRIntegratorAllocate(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PBRIntegratorIntegrate(
-    _In_ PPBR_INTEGRATOR PBRIntegrator,
+PhysxIntegratorIntegrate(
+    _In_ PPHYSX_INTEGRATOR Integrator,
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_ PPHYSX_INTEGRATOR_INTEGRATE_ROUTINE IntegrateRoutine,
@@ -103,7 +103,7 @@ PBRIntegratorIntegrate(
 {
     ISTATUS Status;
     
-    if (PBRIntegrator == NULL)
+    if (Integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -134,31 +134,31 @@ PBRIntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
     
-    PBRSharedContextSet(&PBRIntegrator->PBRSharedContext,
-                        TestGeometryRoutine,
-                        TestGeometryRoutineContext,
-                        LightList,
-                        Rng,
-                        Epsilon);
+    PhysxSharedContextSet(&Integrator->SharedContext,
+                          TestGeometryRoutine,
+                          TestGeometryRoutineContext,
+                          LightList,
+                          Rng,
+                          Epsilon);
 
     Status = IntegrateRoutine(IntegrateRoutineContext,
-                              PBRIntegrator->NextRayTracer,
+                              Integrator->NextRayTracer,
                               WorldRay);
 
     return Status;
 }
 
 VOID
-PBRIntegratorFree(
-    _In_opt_ _Post_invalid_ PPBR_INTEGRATOR PBRIntegrator
+PhysxIntegratorFree(
+    _In_opt_ _Post_invalid_ PPHYSX_INTEGRATOR Integrator
     )
 {
-    if (PBRIntegrator == NULL)
+    if (Integrator == NULL)
     {
         return;
     }
     
-    PhysxRayTracerFree(PBRIntegrator->NextRayTracer);
-    PBRSharedContextDestroy(&PBRIntegrator->PBRSharedContext);
-    free(PBRIntegrator);
+    PhysxRayTracerFree(Integrator->NextRayTracer);
+    PhysxSharedContextDestroy(&Integrator->SharedContext);
+    free(Integrator);
 }

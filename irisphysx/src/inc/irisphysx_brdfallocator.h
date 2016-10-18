@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_BRDF_ALLOCATOR type.
+    This file contains the definitions for the PHYSX_BRDF_ALLOCATOR type.
 
 --*/
 

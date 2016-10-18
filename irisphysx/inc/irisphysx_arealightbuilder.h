@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _PBR_AREA_LIGHT_BUILDER_IRIS_PHYSX_
-#define _PBR_AREA_LIGHT_BUILDER_IRIS_PHYSX_
+#ifndef _PHYSX_AREA_LIGHT_BUILDER_IRIS_PHYSX_
+#define _PHYSX_AREA_LIGHT_BUILDER_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -91,4 +91,4 @@ PhysxAreaLightBuilderFree(
     _In_opt_ _Post_invalid_ PPHYSX_AREA_LIGHT_BUILDER Builder
     );
 
-#endif // _PBR_AREA_LIGHT_BUILDER_IRIS_PHYSX_
+#endif // _PHYSX_AREA_LIGHT_BUILDER_IRIS_PHYSX_

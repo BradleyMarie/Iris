@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _PBR_AREA_LIGHT_IRIS_PHYSX_
-#define _PBR_AREA_LIGHT_IRIS_PHYSX_
+#ifndef _PHYSX_AREA_LIGHT_IRIS_PHYSX_
+#define _PHYSX_AREA_LIGHT_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -39,4 +39,4 @@ typedef struct _PHYSX_AREA_LIGHT_VTABLE {
 
 typedef CONST PHYSX_AREA_LIGHT_VTABLE *PCPHYSX_AREA_LIGHT_VTABLE;
 
-#endif // _PBR_AREA_LIGHT_IRIS_PHYSX_
+#endif // _PHYSX_AREA_LIGHT_IRIS_PHYSX_

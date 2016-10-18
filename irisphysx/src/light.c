@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_LIGHT type.
+    This file contains the definitions for the PHYSX_LIGHT type.
 
 --*/
 
@@ -191,7 +191,7 @@ PhysxLightSample(
     _Inout_ PRANDOM_REFERENCE Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
-    _Out_ PVECTOR3 ToPbrLight,
+    _Out_ PVECTOR3 ToLight,
     _Out_ PFLOAT Pdf
     )
 {
@@ -227,7 +227,7 @@ PhysxLightSample(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (ToPbrLight == NULL)
+    if (ToLight == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -243,7 +243,7 @@ PhysxLightSample(
                                           Rng,
                                           Compositor,
                                           Spectrum,
-                                          ToPbrLight,
+                                          ToLight,
                                           Pdf);
 
     return Status;
@@ -254,7 +254,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightComputeEmissive(
     _In_ PCPHYSX_LIGHT Light,
-    _In_ RAY ToPbrLight,
+    _In_ RAY ToLight,
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum
@@ -267,7 +267,7 @@ PhysxLightComputeEmissive(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (RayValidate(ToPbrLight) == FALSE)
+    if (RayValidate(ToLight) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -288,7 +288,7 @@ PhysxLightComputeEmissive(
     }
 
     Status = Light->VTable->ComputeEmissiveRoutine(Light->Data,
-                                                   ToPbrLight,
+                                                   ToLight,
                                                    VisibilityTester,
                                                    Compositor,
                                                    Spectrum);
@@ -302,7 +302,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxLightComputeEmissiveWithPdf(
     _In_ PCPHYSX_LIGHT Light,
-    _In_ RAY ToPbrLight,
+    _In_ RAY ToLight,
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
@@ -316,7 +316,7 @@ PhysxLightComputeEmissiveWithPdf(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (RayValidate(ToPbrLight) == FALSE)
+    if (RayValidate(ToLight) == FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -342,7 +342,7 @@ PhysxLightComputeEmissiveWithPdf(
     }
 
     Status = Light->VTable->ComputeEmissiveWithPdfRoutine(Light->Data,
-                                                          ToPbrLight,
+                                                          ToLight,
                                                           VisibilityTester,
                                                           Compositor,
                                                           Spectrum,

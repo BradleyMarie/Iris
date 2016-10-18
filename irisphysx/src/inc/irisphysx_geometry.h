@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_GEOMETRY type.
+    This file contains the definitions for the PHYSX_GEOMETRY type.
 
 --*/
 
-#ifndef _PBR_GEOMETRY_IRIS_PHYSX_INTERNAL_
-#define _PBR_GEOMETRY_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_GEOMETRY_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_GEOMETRY_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -66,4 +66,4 @@ PhysxGeometryFree(
     _In_ _Post_invalid_ PPHYSX_GEOMETRY Geometry
     );
 
-#endif // _PBR_GEOMETRY_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_GEOMETRY_IRIS_PHYSX_INTERNAL_

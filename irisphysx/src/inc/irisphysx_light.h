@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_LIGHT type.
+    This file contains the definitions for the PHYSX_LIGHT type.
 
 --*/
 
-#ifndef _PBR_LIGHT_IRIS_PHYSX_INTERNAL_
-#define _PBR_LIGHT_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_LIGHT_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_LIGHT_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -44,4 +44,4 @@ PhysxLightFree(
     _In_ _Post_invalid_ PPHYSX_LIGHT Light
     );
 
-#endif // _PBR_LIGHT_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_LIGHT_IRIS_PHYSX_INTERNAL_

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_HIT_TESTER type.
+    This file contains the definitions for the PHYSX_HIT_TESTER type.
 
 --*/
 

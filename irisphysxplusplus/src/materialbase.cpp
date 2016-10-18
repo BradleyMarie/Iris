@@ -33,7 +33,7 @@ MaterialSampleAdapter(
     _In_opt_ PCMATRIX ModelToWorld,
     _Inout_ PPHYSX_BRDF_ALLOCATOR Allocator,
     _Out_ PVECTOR3 WorldShadingNormal,
-    _Out_ PCPHYSX_BRDF *PbrBrdf
+    _Out_ PCPHYSX_BRDF *Brdf
     )
 {
     ASSERT(Context != NULL);
@@ -41,7 +41,7 @@ MaterialSampleAdapter(
     ASSERT(VectorValidate(ModelSurfaceNormal) != FALSE);
     ASSERT(VectorValidate(WorldSurfaceNormal) != FALSE);
     ASSERT(Allocator != NULL);
-    ASSERT(PbrBrdf != NULL);
+    ASSERT(Brdf != NULL);
 
     const MaterialBase **MaterialBasePtr = (const MaterialBase**) Context;
 
@@ -53,7 +53,7 @@ MaterialSampleAdapter(
                                              BRDFAllocator(Allocator));
 
     *WorldShadingNormal = std::get<1>(Result).AsVECTOR3();
-    *PbrBrdf = std::get<0>(Result).AsPCPHYSX_BRDF();
+    *Brdf = std::get<0>(Result).AsPCPHYSX_BRDF();
 
     return ISTATUS_SUCCESS;
 }

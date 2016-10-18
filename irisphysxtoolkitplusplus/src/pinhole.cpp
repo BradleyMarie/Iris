@@ -164,7 +164,7 @@ CreateStateAdapter(
     _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
     _Out_writes_(NumberOfThreads) PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
-    _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
+    _Out_writes_(NumberOfThreads) PPHYSX_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
     _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,
     _In_ SIZE_T NumberOfThreads
     )

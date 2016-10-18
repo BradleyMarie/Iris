@@ -9,12 +9,12 @@ Module Name:
 Abstract:
 
     This file contains the internal definitions for the 
-    PBR_SHARED_CONTEXT type.
+    PHYSX_SHARED_CONTEXT type.
 
 --*/
 
-#ifndef _PBR_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_
-#define _PBR_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_
+#ifndef _PHYSX_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_
+#define _PHYSX_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_
 
 #include <irisphysxp.h>
 
@@ -22,7 +22,7 @@ Abstract:
 // Types
 //
 
-typedef struct _PBR_SHARED_CONTEXT {
+typedef struct _PHYSX_SHARED_CONTEXT {
     PHYSX_VISIBILITY_TESTER VisibilityTester;
     PHYSX_BRDF_ALLOCATOR BrdfAllocator;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
@@ -32,7 +32,7 @@ typedef struct _PBR_SHARED_CONTEXT {
     PCPHYSX_LIGHT_LIST LightList;
     PRANDOM_REFERENCE Rng;
     FLOAT Epsilon;
-} PBR_SHARED_CONTEXT, *PPBR_SHARED_CONTEXT;
+} PHYSX_SHARED_CONTEXT, *PPHYSX_SHARED_CONTEXT;
 
 //
 // Functions
@@ -42,55 +42,55 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
-PBRSharedContextInitialize(
-    _Out_ PPBR_SHARED_CONTEXT PBRSharedContext
+PhysxSharedContextInitialize(
+    _Out_ PPHYSX_SHARED_CONTEXT SharedContext
     )
 {   
     ISTATUS Status;
      
-    ASSERT(PBRSharedContext != NULL);
+    ASSERT(SharedContext != NULL);
     
-    Status = PhysxVisibilityTesterInitialize(&PBRSharedContext->VisibilityTester);
+    Status = PhysxVisibilityTesterInitialize(&SharedContext->VisibilityTester);
     
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
     
-    PhysxBrdfAllocatorInitialize(&PBRSharedContext->BrdfAllocator);
+    PhysxBrdfAllocatorInitialize(&SharedContext->BrdfAllocator);
     
-    Status = SpectrumCompositorAllocate(&PBRSharedContext->SpectrumCompositor);
-    
-    if (Status != ISTATUS_SUCCESS)
-    {
-        PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-        PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
-        return Status;
-    }
-    
-    Status = ReflectorCompositorAllocate(&PBRSharedContext->ReflectorCompositor);
+    Status = SpectrumCompositorAllocate(&SharedContext->SpectrumCompositor);
     
     if (Status != ISTATUS_SUCCESS)
     {
-        SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
-        PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-        PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
+        PhysxBrdfAllocatorDestroy(&SharedContext->BrdfAllocator);
+        PhysxVisibilityTesterDestroy(&SharedContext->VisibilityTester);
         return Status;
     }
     
-    PBRSharedContext->TestGeometryRoutine = NULL;
-    PBRSharedContext->TestGeometryRoutineContext = NULL;
-    PBRSharedContext->LightList = NULL;
-    PBRSharedContext->Rng = NULL;
-    PBRSharedContext->Epsilon = (FLOAT) 0.0f;
+    Status = ReflectorCompositorAllocate(&SharedContext->ReflectorCompositor);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        SpectrumCompositorFree(SharedContext->SpectrumCompositor);
+        PhysxBrdfAllocatorDestroy(&SharedContext->BrdfAllocator);
+        PhysxVisibilityTesterDestroy(&SharedContext->VisibilityTester);
+        return Status;
+    }
+    
+    SharedContext->TestGeometryRoutine = NULL;
+    SharedContext->TestGeometryRoutineContext = NULL;
+    SharedContext->LightList = NULL;
+    SharedContext->Rng = NULL;
+    SharedContext->Epsilon = (FLOAT) 0.0f;
     
     return ISTATUS_SUCCESS;
 }
 
 SFORCEINLINE
 VOID
-PBRSharedContextSet(
-    _Inout_ PPBR_SHARED_CONTEXT PBRSharedContext,
+PhysxSharedContextSet(
+    _Inout_ PPHYSX_SHARED_CONTEXT SharedContext,
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
@@ -98,38 +98,40 @@ PBRSharedContextSet(
     _In_ FLOAT Epsilon
     )
 {    
-    ASSERT(PBRSharedContext != NULL);
+    ASSERT(SharedContext != NULL);
     ASSERT(TestGeometryRoutine != NULL);
     ASSERT(Rng != NULL);
     ASSERT(IsFiniteFloat(Epsilon));
     ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
 
-    ReflectorCompositorClear(PBRSharedContext->ReflectorCompositor);
-    SpectrumCompositorClear(PBRSharedContext->SpectrumCompositor);
-    PhysxBrdfAllocatorFreeAll(&PBRSharedContext->BrdfAllocator);
+    ReflectorCompositorClear(SharedContext->ReflectorCompositor);
+    SpectrumCompositorClear(SharedContext->SpectrumCompositor);
+    PhysxBrdfAllocatorFreeAll(&SharedContext->BrdfAllocator);
 
-    PhysxVisibilityTesterSetSceneAndEpsilon(&PBRSharedContext->VisibilityTester,
+    PhysxVisibilityTesterSetSceneAndEpsilon(&SharedContext->VisibilityTester,
                                             TestGeometryRoutine,
                                             TestGeometryRoutineContext,
                                             Epsilon);
 
-    PBRSharedContext->TestGeometryRoutine = TestGeometryRoutine;
-    PBRSharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
-    PBRSharedContext->LightList = LightList;
-    PBRSharedContext->Rng = Rng;
-    PBRSharedContext->Epsilon = Epsilon;
+    SharedContext->TestGeometryRoutine = TestGeometryRoutine;
+    SharedContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
+    SharedContext->LightList = LightList;
+    SharedContext->Rng = Rng;
+    SharedContext->Epsilon = Epsilon;
 }
 
 SFORCEINLINE
 VOID
-PBRSharedContextDestroy(
-    _In_opt_ _Post_invalid_ PPBR_SHARED_CONTEXT PBRSharedContext
+PhysxSharedContextDestroy(
+    _In_ _Post_invalid_ PPHYSX_SHARED_CONTEXT SharedContext
     )
 {
-    ReflectorCompositorFree(PBRSharedContext->ReflectorCompositor);
-    SpectrumCompositorFree(PBRSharedContext->SpectrumCompositor);
-    PhysxBrdfAllocatorDestroy(&PBRSharedContext->BrdfAllocator);
-    PhysxVisibilityTesterDestroy(&PBRSharedContext->VisibilityTester);
+    ASSERT(SharedContext != NULL);
+    
+    ReflectorCompositorFree(SharedContext->ReflectorCompositor);
+    SpectrumCompositorFree(SharedContext->SpectrumCompositor);
+    PhysxBrdfAllocatorDestroy(&SharedContext->BrdfAllocator);
+    PhysxVisibilityTesterDestroy(&SharedContext->VisibilityTester);
 }
 
-#endif // _PBR_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_
+#endif // _PHYSX_SHARED_CONTEXT_IRIS_PHYSX_INTERNAL_

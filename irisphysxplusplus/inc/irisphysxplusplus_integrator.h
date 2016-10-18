@@ -47,8 +47,8 @@ public:
     }
 
     _Ret_
-    PPBR_INTEGRATOR
-    AsPPBR_INTEGRATOR(
+    PPHYSX_INTEGRATOR
+    AsPPHYSX_INTEGRATOR(
         void
         )
     {
@@ -100,17 +100,17 @@ public:
         void
         )
      {
-         PBRIntegratorFree(Data);
+         PhysxIntegratorFree(Data);
      }
 
 private:
-    PPBR_INTEGRATOR Data;
+    PPHYSX_INTEGRATOR Data;
 
     Integrator(
         _In_ SIZE_T MaximumRecursions
         )
     {
-        ISTATUS Status = PBRIntegratorAllocate(MaximumRecursions, &Data);
+        ISTATUS Status = PhysxIntegratorAllocate(MaximumRecursions, &Data);
 
         if (Status != ISTATUS_SUCCESS)
         {

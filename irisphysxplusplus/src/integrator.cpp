@@ -77,15 +77,15 @@ Integrator::Integrate(
     _Inout_ IrisAdvanced::RandomReference Rng
     )
 {
-    ISTATUS Status = PBRIntegratorIntegrate(Data,
-                                            TestGeometryRoutineAdapter,
-                                            &TestGeometryFunction,
-                                            IntegrateRoutineAdapter,
-                                            &IntegrateFunction,
-                                            Lights.AsPCPHYSX_LIGHT_LIST(),
-                                            Epsilon,
-                                            WorldRay.AsRAY(),
-                                            Rng.AsPRANDOM_REFERENCE());
+    ISTATUS Status = PhysxIntegratorIntegrate(Data,
+                                              TestGeometryRoutineAdapter,
+                                              &TestGeometryFunction,
+                                              IntegrateRoutineAdapter,
+                                              &IntegrateFunction,
+                                              Lights.AsPCPHYSX_LIGHT_LIST(),
+                                              Epsilon,
+                                              WorldRay.AsRAY(),
+                                              Rng.AsPRANDOM_REFERENCE());
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -103,15 +103,15 @@ Integrator::Integrate(
     _Inout_ IrisAdvanced::RandomReference Rng
     )
 {
-    ISTATUS Status = PBRIntegratorIntegrate(Data,
-                                            TestGeometryRoutineAdapter,
-                                            &TestGeometryFunction,
-                                            IntegrateRoutineAdapter,
-                                            &IntegrateFunction,
-                                            Lights.AsPCPHYSX_LIGHT_LIST(),
-                                            Epsilon,
-                                            WorldRay.AsRAY(),
-                                            Rng.AsPRANDOM_REFERENCE());
+    ISTATUS Status = PhysxIntegratorIntegrate(Data,
+                                              TestGeometryRoutineAdapter,
+                                              &TestGeometryFunction,
+                                              IntegrateRoutineAdapter,
+                                              &IntegrateFunction,
+                                              Lights.AsPCPHYSX_LIGHT_LIST(),
+                                              Epsilon,
+                                              WorldRay.AsRAY(),
+                                              Rng.AsPRANDOM_REFERENCE());
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -129,15 +129,15 @@ Integrator::Integrate(
     _Inout_ IrisAdvanced::RandomReference Rng
     )
 {
-    ISTATUS Status = PBRIntegratorIntegrate(Data,
-                                            TestGeometryRoutineAdapter,
-                                            &TestGeometryFunction,
-                                            IntegrateRoutineAdapter,
-                                            &IntegrateFunction,
-                                            nullptr,
-                                            Epsilon,
-                                            WorldRay.AsRAY(),
-                                            Rng.AsPRANDOM_REFERENCE());
+    ISTATUS Status = PhysxIntegratorIntegrate(Data,
+                                              TestGeometryRoutineAdapter,
+                                              &TestGeometryFunction,
+                                              IntegrateRoutineAdapter,
+                                              &IntegrateFunction,
+                                              nullptr,
+                                              Epsilon,
+                                              WorldRay.AsRAY(),
+                                              Rng.AsPRANDOM_REFERENCE());
 
     if (Status != ISTATUS_SUCCESS)
     {

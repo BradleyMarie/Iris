@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_RAYTRACER type.
+    This file contains the definitions for the PHYSX_RAYTRACER type.
 
 --*/
 
-#ifndef _PBR_RAYTRACER_IRIS_PHYSX_
-#define _PBR_RAYTRACER_IRIS_PHYSX_
+#ifndef _PHYSX_RAYTRACER_IRIS_PHYSX_
+#define _PHYSX_RAYTRACER_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -76,4 +76,4 @@ PhysxRayTracerTraceSceneProcessAllHitsInOrder(
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     );
 
-#endif // _PBR_RAYTRACER_IRIS_PHYSX_
+#endif // _PHYSX_RAYTRACER_IRIS_PHYSX_

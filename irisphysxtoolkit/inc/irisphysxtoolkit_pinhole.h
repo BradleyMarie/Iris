@@ -25,7 +25,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPBR_TONE_MAPPING_ROUTINE)(
+(*PPHYSX_TONE_MAPPING_ROUTINE)(
     _In_opt_ PCVOID Context,
     _In_opt_ PCSPECTRUM Spectrum,
     _Out_ PCOLOR3 Color
@@ -35,12 +35,12 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE)(
+(*PPHYSX_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE)(
     _In_opt_ PVOID Context, 
     _Out_writes_(NumberOfThreads) PRANDOM_REFERENCE *Rngs,
     _Out_writes_(NumberOfThreads) PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutine,
     _Out_writes_(NumberOfThreads) PVOID *ProcessHitContexts,
-    _Out_writes_(NumberOfThreads) PPBR_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
+    _Out_writes_(NumberOfThreads) PPHYSX_TONE_MAPPING_ROUTINE *ToneMappingRoutines,
     _Out_writes_(NumberOfThreads) PVOID *ToneMappingContexts,
     _In_ SIZE_T NumberOfThreads
     );
@@ -49,7 +49,7 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
-(*PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE)(
+(*PPHYSX_TOOLKIT_FREE_CAMERA_STATE_ROUTINE)(
     _In_opt_ PVOID Context,
     _In_reads_(NumberOfThreads) PVOID *ProcessHitContexts,
     _In_reads_(NumberOfThreads) PVOID *ToneMappingContexts,
@@ -76,8 +76,8 @@ PinholeRender(
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST Lights,
-    _In_ PPBR_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
-    _In_opt_ PPBR_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
+    _In_ PPHYSX_TOOLKIT_CREATE_CAMERA_STATE_ROUTINE CreateStateRoutine,
+    _In_opt_ PPHYSX_TOOLKIT_FREE_CAMERA_STATE_ROUTINE FreeCameraStateRoutine,
     _Inout_opt_ PVOID CreateStateContext,
     _Inout_ PFRAMEBUFFER Framebuffer
     );

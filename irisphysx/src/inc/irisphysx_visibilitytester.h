@@ -30,7 +30,7 @@ struct _PHYSX_VISIBILITY_TESTER {
 };
 
 //
-// PBRVisibilityTester Static Functions
+// PhysxVisibilityTester Static Functions
 //
 
 _Check_return_

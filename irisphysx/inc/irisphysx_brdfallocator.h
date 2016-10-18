@@ -8,12 +8,12 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_BRDF_ALLOCATOR type.
+    This file contains the definitions for the PHYSX_BRDF_ALLOCATOR type.
 
 --*/
 
-#ifndef _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_
-#define _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_
+#ifndef _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_
+#define _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_
 
 #include <irisphysx.h>
 
@@ -41,4 +41,4 @@ PhysxBrdfAllocatorAllocate(
     _Out_ PCPHYSX_BRDF *Brdf
     );
 
-#endif // _PBR_BRDF_ALLOCATOR_IRIS_PHYSX_
+#endif // _PHYSX_BRDF_ALLOCATOR_IRIS_PHYSX_

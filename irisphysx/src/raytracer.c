@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the PBR_RAYTRACER type.
+    This file contains the definitions for the PHYSX_RAYTRACER type.
 
 --*/
 
@@ -20,7 +20,7 @@ Abstract:
 
 typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     PPHYSX_RAYTRACER NextRayTracer;
-    PPBR_SHARED_CONTEXT SharedContext;
+    PPHYSX_SHARED_CONTEXT SharedContext;
     PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
@@ -36,7 +36,7 @@ VOID
 PhysxRayTracerProcessHitAdapterContextInitialize(
     _Out_ PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext,
     _In_ PPHYSX_RAYTRACER NextRayTracer,
-    _In_ PPBR_SHARED_CONTEXT SharedContext,
+    _In_ PPHYSX_SHARED_CONTEXT SharedContext,
     _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
     _In_ RAY WorldRay,
@@ -73,7 +73,7 @@ PhysxRayTracerProcessHitAdapter(
     PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReference;
     PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReference;
     PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_SHARED_CONTEXT SharedContext;
+    PPHYSX_SHARED_CONTEXT SharedContext;
     PCPHYSX_GEOMETRY Geometry;
     ISTATUS Status;
     
@@ -125,7 +125,7 @@ PhysxRayTracerTraceSceneProcessClosestHit(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_SHARED_CONTEXT SharedContext;
+    PPHYSX_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
     
@@ -185,7 +185,7 @@ PhysxRayTracerTraceSceneProcessAllHitsInOrder(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPBR_SHARED_CONTEXT SharedContext;
+    PPHYSX_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
     

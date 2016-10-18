@@ -144,4 +144,4 @@ PhysxLightRelease(
     _In_opt_ _Post_invalid_ PPHYSX_LIGHT Light
     );
 
-#endif // _PBR_LIGHT_IRIS_PHYSX_
+#endif // _PHYSX_LIGHT_IRIS_PHYSX_
