@@ -161,9 +161,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PhysxLightRetain(Data);
-            Data = ToCopy.Data;
             PhysxLightRelease(Data);
+            Data = ToCopy.Data;
+            PhysxLightRetain(Data);
         }
 
         return *this;

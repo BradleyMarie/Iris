@@ -266,9 +266,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PhysxBrdfRetain(Data);
-            Data = ToCopy.Data;
             PhysxBrdfRelease(Data);
+            Data = ToCopy.Data;
+            PhysxBrdfRetain(Data);
         }
 
         return *this;

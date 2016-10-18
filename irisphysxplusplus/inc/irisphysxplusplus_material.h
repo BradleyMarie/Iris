@@ -123,9 +123,9 @@ public:
     {
         if (this != &ToCopy)
         {
-            PhysxMaterialRetain(Data);
-            Data = ToCopy.Data;
             PhysxMaterialRelease(Data);
+            Data = ToCopy.Data;
+            PhysxMaterialRetain(Data);
         }
 
         return *this;
