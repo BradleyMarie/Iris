@@ -22,7 +22,6 @@ Abstract:
 #include <iriscommon_visibility.h>
 #include <iriscommon_uint32toindexmap.h>
 
-#include "irisphysx_types.h"
 #include "irisphysx_brdf.h"
 #include "irisphysx_brdfallocator.h"
 #include "irisphysx_hitallocator.h"

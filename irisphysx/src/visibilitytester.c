@@ -40,6 +40,13 @@ typedef struct _PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTE
     BOOL Visible;
 } PHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT, *PPHYSX_VISIBILITY_TESTER_FIND_DISTANCE_TO_LIGHT_PROCESS_HIT_CONTEXT;
 
+struct _PHYSX_VISIBILITY_TESTER {
+    PRAYTRACER RayTracer;
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PCVOID TestGeometryRoutineContext;
+    FLOAT Epsilon;
+};
+
 //
 // Context Creation Functions
 //
@@ -230,6 +237,91 @@ PhysxVisibilityTesterFindDistaneToLightProcessHit(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
+PhysxVisibilityTesterAllocate(
+    _Out_ PPHYSX_VISIBILITY_TESTER *VisibilityTester
+    )
+{
+    PVOID Allocation;
+    PPHYSX_VISIBILITY_TESTER AllocatedVisibilityTester;
+    PRAYTRACER RayTracer;
+    ISTATUS Status;
+
+    ASSERT(VisibilityTester != NULL);
+
+    Allocation = malloc(sizeof(PHYSX_VISIBILITY_TESTER));
+    AllocatedVisibilityTester = (PPHYSX_VISIBILITY_TESTER) Allocation;
+
+    if (AllocatedVisibilityTester == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    Status = RayTracerAllocate(&RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        free(AllocatedVisibilityTester);
+        return Status;
+    }
+
+    AllocatedVisibilityTester->RayTracer = RayTracer;
+    AllocatedVisibilityTester->TestGeometryRoutine = NULL;
+    AllocatedVisibilityTester->TestGeometryRoutineContext = NULL;
+    AllocatedVisibilityTester->Epsilon = (FLOAT) 0.0;
+
+    *VisibilityTester = AllocatedVisibilityTester;
+
+    return ISTATUS_SUCCESS;
+}
+
+VOID
+PhysxVisibilityTesterSetSceneAndEpsilon(
+    _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PCVOID TestGeometryRoutineContext,
+    _In_ FLOAT Epsilon
+    )
+{
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(TestGeometryRoutine != NULL);
+    ASSERT(TestGeometryRoutineContext != NULL);
+    ASSERT(IsFiniteFloat(Epsilon) != FALSE);
+    ASSERT(IsGreaterThanZeroFloat(Epsilon) != FALSE);
+    
+    VisibilityTester->TestGeometryRoutine = TestGeometryRoutine;
+    VisibilityTester->TestGeometryRoutineContext = TestGeometryRoutineContext;
+    VisibilityTester->Epsilon = Epsilon;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxVisibilityTesterTestCustom(
+    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
+    _In_ RAY WorldRay,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
+    )
+{
+    ISTATUS Status;
+
+    ASSERT(VisibilityTester != NULL);
+    ASSERT(RayValidate(WorldRay) != FALSE);
+    ASSERT(ProcessHitRoutine != NULL);
+
+    Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
+                                                                            WorldRay,
+                                                                            VisibilityTester->TestGeometryRoutine,
+                                                                            VisibilityTester->TestGeometryRoutineContext,
+                                                                            ProcessHitRoutine,
+                                                                            ProcessHitContext);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 PhysxVisibilityTesterFindDistanceToLight(
     _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
@@ -268,6 +360,17 @@ PhysxVisibilityTesterFindDistanceToLight(
     *DistanceToLight = ProcessHitContext.DistanceToLight;
     
     return ISTATUS_SUCCESS;
+}
+
+VOID
+PhysxVisibilityTesterFree(
+    _In_opt_ _Post_invalid_ PPHYSX_VISIBILITY_TESTER VisibilityTester
+    )
+{
+    ASSERT(VisibilityTester != NULL);
+
+    RayTracerFree(VisibilityTester->RayTracer);
+    free(VisibilityTester);
 }
 
 //

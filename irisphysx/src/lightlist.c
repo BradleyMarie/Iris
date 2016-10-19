@@ -170,9 +170,23 @@ PhysxLightListClear(
     _In_ PPHYSX_LIGHT_LIST LightList
     )
 {
+    PPHYSX_LIGHT Light;
+    SIZE_T Index;
+    SIZE_T Size;
+
     if (LightList == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    Size = PointerListGetSize(&LightList->Data);
+
+    for (Index = 0; Index < Size; Index++)
+    {
+        Light = PointerListRetrieveAtIndex(&LightList->Data,
+                                           Index);
+
+        PhysxLightRelease(Light);
     }
 
     PointerListClear(&LightList->Data);

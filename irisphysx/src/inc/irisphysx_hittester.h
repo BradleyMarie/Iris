@@ -25,4 +25,21 @@ struct _PHYSX_HIT_TESTER {
     PHIT_TESTER Tester;
 };
 
+//
+// Function
+//
+
+SFORCEINLINE
+VOID
+PhysxHitTesterInitialize(
+    _Out_ PPHYSX_HIT_TESTER HitTester,
+    _In_ PHIT_TESTER Tester
+    )
+{
+    ASSERT(HitTester != NULL);
+    ASSERT(Tester != NULL);
+    
+    HitTester->Tester = Tester;
+}
+
 #endif // _PHYSX_HIT_TESTER_IRIS_PHYSX_INTERNAL_

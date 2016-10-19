@@ -61,19 +61,6 @@ PhysxHitTesterAdapterContextInitialize(
     HitTesterAdapterContext->TestGeometryRoutineContext = TestGeometryRoutineContext;
 }
 
-SFORCEINLINE
-VOID
-PhysxHitTesterInitialize(
-    _Out_ PPHYSX_HIT_TESTER HitTester,
-    _In_ PHIT_TESTER Tester
-    )
-{
-    ASSERT(HitTester != NULL);
-    ASSERT(Tester != NULL);
-    
-    HitTester->Tester = Tester;
-}
-
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
