@@ -18,15 +18,27 @@ Abstract:
 // Types
 //
 
+typedef struct _PHYSX_RAYTRACER_SHARED_CONTEXT {
+    PPHYSX_VISIBILITY_TESTER VisibilityTester;
+    PPHYSX_BRDF_ALLOCATOR BrdfAllocator;
+    PSPECTRUM_COMPOSITOR SpectrumCompositor;
+    PREFLECTOR_COMPOSITOR ReflectorCompositor;
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PCVOID TestGeometryRoutineContext;
+    PCPHYSX_LIGHT_LIST LightList;
+    PRANDOM_REFERENCE Rng;
+    FLOAT Epsilon;
+} PHYSX_RAYTRACER_SHARED_CONTEXT, *PPHYSX_RAYTRACER_SHARED_CONTEXT;
+
 struct _PHYSX_RAYTRACER {
     PPHYSX_RAYTRACER NextRayTracer;
-    PPHYSX_SHARED_CONTEXT SharedContext;
+    PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PRAYTRACER RayTracer;
 };
 
 typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
     PPHYSX_RAYTRACER NextRayTracer;
-    PPHYSX_SHARED_CONTEXT SharedContext;
+    PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
@@ -42,7 +54,7 @@ VOID
 PhysxRayTracerProcessHitAdapterContextInitialize(
     _Out_ PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext,
     _In_ PPHYSX_RAYTRACER NextRayTracer,
-    _In_ PPHYSX_SHARED_CONTEXT SharedContext,
+    _In_ PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext,
     _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
     _In_ RAY WorldRay,
@@ -79,7 +91,7 @@ PhysxRayTracerProcessHitAdapter(
     PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReference;
     PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReference;
     PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPHYSX_SHARED_CONTEXT SharedContext;
+    PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCPHYSX_GEOMETRY Geometry;
     ISTATUS Status;
     
@@ -115,6 +127,197 @@ PhysxRayTracerProcessHitAdapter(
     return Status;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+PhysxRayTracerSharedContextAllocate(
+    _Out_ PPHYSX_RAYTRACER_SHARED_CONTEXT *Context
+    )
+{   
+    PPHYSX_RAYTRACER_SHARED_CONTEXT AllocatedContext;
+    PVOID Allocation;
+    ISTATUS Status;
+     
+    ASSERT(Context != NULL);
+    
+    Allocation = malloc(sizeof(PHYSX_RAYTRACER_SHARED_CONTEXT));
+
+    if (Allocation == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+    
+    AllocatedContext = (PPHYSX_RAYTRACER_SHARED_CONTEXT) Allocation;
+
+    Status = PhysxVisibilityTesterAllocate(&AllocatedContext->VisibilityTester);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        free(AllocatedContext);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+    
+    Status = PhysxBrdfAllocatorCreate(&AllocatedContext->BrdfAllocator);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        PhysxVisibilityTesterFree(AllocatedContext->VisibilityTester);
+        free(AllocatedContext);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+    
+    Status = SpectrumCompositorAllocate(&AllocatedContext->SpectrumCompositor);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        PhysxBrdfAllocatorFree(AllocatedContext->BrdfAllocator);
+        PhysxVisibilityTesterFree(AllocatedContext->VisibilityTester);
+        free(AllocatedContext);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+    
+    Status = ReflectorCompositorAllocate(&AllocatedContext->ReflectorCompositor);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        SpectrumCompositorFree(AllocatedContext->SpectrumCompositor);
+        PhysxBrdfAllocatorFree(AllocatedContext->BrdfAllocator);
+        PhysxVisibilityTesterFree(AllocatedContext->VisibilityTester);
+        free(AllocatedContext);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+    
+    AllocatedContext->TestGeometryRoutine = NULL;
+    AllocatedContext->TestGeometryRoutineContext = NULL;
+    AllocatedContext->LightList = NULL;
+    AllocatedContext->Rng = NULL;
+    AllocatedContext->Epsilon = (FLOAT) 0.0f;
+
+    *Context = AllocatedContext;
+    
+    return ISTATUS_SUCCESS;
+}
+
+SFORCEINLINE
+VOID
+PhysxRayTracerSharedContextSet(
+    _Inout_ PPHYSX_RAYTRACER_SHARED_CONTEXT Context,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
+    _In_ PRANDOM_REFERENCE Rng,
+    _In_ FLOAT Epsilon
+    )
+{    
+    ASSERT(Context != NULL);
+    ASSERT(TestGeometryRoutine != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(IsFiniteFloat(Epsilon));
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
+
+    ReflectorCompositorClear(Context->ReflectorCompositor);
+    SpectrumCompositorClear(Context->SpectrumCompositor);
+    PhysxBrdfAllocatorFreeAll(Context->BrdfAllocator);
+
+    PhysxVisibilityTesterSetSceneAndEpsilon(Context->VisibilityTester,
+                                            TestGeometryRoutine,
+                                            TestGeometryRoutineContext,
+                                            Epsilon);
+
+    Context->TestGeometryRoutine = TestGeometryRoutine;
+    Context->TestGeometryRoutineContext = TestGeometryRoutineContext;
+    Context->LightList = LightList;
+    Context->Rng = Rng;
+    Context->Epsilon = Epsilon;
+}
+
+SFORCEINLINE
+VOID
+PhysxRayTracerSharedContextFree(
+    _In_opt_ _Post_invalid_ PPHYSX_RAYTRACER_SHARED_CONTEXT Context
+    )
+{
+    if (Context == NULL)
+    {
+        return;
+    }
+
+    ReflectorCompositorFree(Context->ReflectorCompositor);
+    SpectrumCompositorFree(Context->SpectrumCompositor);
+    PhysxBrdfAllocatorFree(Context->BrdfAllocator);
+    PhysxVisibilityTesterFree(Context->VisibilityTester);
+    free(Context);
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
+PhysxRayTracerAllocateInternal(
+    _In_ SIZE_T MaximumDepth,
+    _Out_opt_ PPHYSX_RAYTRACER_SHARED_CONTEXT *SharedContext,
+    _Out_ PPHYSX_RAYTRACER *RayTracer
+    )
+{
+    PPHYSX_RAYTRACER AllocatedRayTracer;
+    PVOID Allocation;
+    ISTATUS Status;
+
+    ASSERT(RayTracer != NULL);
+
+    Allocation = malloc(sizeof(PHYSX_RAYTRACER));
+    
+    if (Allocation == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    AllocatedRayTracer = (PPHYSX_RAYTRACER) Allocation;
+
+    Status = RayTracerAllocate(&AllocatedRayTracer->RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        free(AllocatedRayTracer);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    if (MaximumDepth != 0)
+    {
+        Status = PhysxRayTracerAllocateInternal(MaximumDepth - 1,
+                                                &AllocatedRayTracer->SharedContext,
+                                                &AllocatedRayTracer->NextRayTracer);
+    }
+    else
+    {
+        AllocatedRayTracer->NextRayTracer = NULL;
+        Status = PhysxRayTracerSharedContextAllocate(&AllocatedRayTracer->SharedContext);
+    }
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        RayTracerFree(AllocatedRayTracer->RayTracer);
+        free(AllocatedRayTracer);
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    if (SharedContext != NULL)
+    {
+        *SharedContext = AllocatedRayTracer->SharedContext;
+    }
+    
+    *RayTracer = AllocatedRayTracer;
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Internal Functions
 //
@@ -123,40 +326,43 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxRayTracerAllocate(
-    _In_opt_ PPHYSX_RAYTRACER NextRayTracer,
-    _In_ PPHYSX_SHARED_CONTEXT SharedContext,
-    _Out_ PPHYSX_RAYTRACER *Result
+    _In_ SIZE_T MaximumDepth,
+    _Out_ PPHYSX_RAYTRACER *RayTracer
     )
 {
-    PPHYSX_RAYTRACER RayTracer;
-    PVOID Allocation;
     ISTATUS Status;
     
-    ASSERT(Result != NULL);
+    ASSERT(RayTracer != NULL);
     
-    Allocation = malloc(sizeof(PHYSX_RAYTRACER));
-    
-    if (Allocation == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-    
-    RayTracer = (PPHYSX_RAYTRACER) Allocation;
-    
-    Status = RayTracerAllocate(&RayTracer->RayTracer);
-    
-    if (Status != ISTATUS_SUCCESS)
-    {
-        free(Allocation);
-        return Status;
-    }
-    
-    RayTracer->SharedContext = SharedContext;
-    RayTracer->NextRayTracer = NextRayTracer;
-    
-    *Result = RayTracer;
-    
-    return ISTATUS_SUCCESS;
+    Status = PhysxRayTracerAllocateInternal(MaximumDepth,
+                                            NULL,
+                                            RayTracer);
+
+    return Status;
+}
+
+VOID
+PhysxRayTracerConfigure(
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
+    _In_ PRANDOM_REFERENCE Rng,
+    _In_ FLOAT Epsilon
+    )
+{
+    ASSERT(RayTracer != NULL);
+    ASSERT(TestGeometryRoutine != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(IsFiniteFloat(Epsilon));
+    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
+
+    PhysxRayTracerSharedContextSet(RayTracer->SharedContext,
+                                   TestGeometryRoutine,
+                                   TestGeometryRoutineContext,
+                                   LightList,
+                                   Rng,
+                                   Epsilon);
 }
 
 VOID
@@ -169,7 +375,15 @@ PhysxRayTracerFree(
         return;
     }
     
-    PhysxRayTracerFree(RayTracer->NextRayTracer);
+    if (RayTracer->NextRayTracer == NULL)
+    {
+        PhysxRayTracerSharedContextFree(RayTracer->SharedContext);
+    }
+    else
+    {
+        PhysxRayTracerFree(RayTracer->NextRayTracer);
+    }
+    
     RayTracerFree(RayTracer->RayTracer);
     free(RayTracer);
 }
@@ -190,7 +404,7 @@ PhysxRayTracerTraceSceneProcessClosestHit(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPHYSX_SHARED_CONTEXT SharedContext;
+    PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
     
@@ -250,7 +464,7 @@ PhysxRayTracerTraceSceneProcessAllHitsInOrder(
     )
 {
     RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
-    PPHYSX_SHARED_CONTEXT SharedContext;
+    PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
     

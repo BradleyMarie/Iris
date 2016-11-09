@@ -291,9 +291,9 @@ PinholeRender(
     PPHYSX_INTEGRATOR *Integrators;
     VECTOR3 NormalizedCameraDirection;
     VECTOR3 NormalizedUpVector;
-    INT32 NumberOfPixels;
+    SIZE_T NumberOfPixels;
     INT32 NumberOfThreads;
-    INT32 PixelIndex;
+    SIZE_T PixelIndex;
     PVOID *ProcessHitContexts;
     PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE *ProcessHitRoutines;
     PRANDOM_REFERENCE *Rngs;

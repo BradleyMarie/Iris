@@ -19,8 +19,7 @@ Abstract:
 //
 
 struct _PHYSX_INTEGRATOR {
-    PHYSX_SHARED_CONTEXT SharedContext;
-    PPHYSX_RAYTRACER NextRayTracer;
+    PPHYSX_RAYTRACER RayTracer;
 };
 
 //
@@ -31,16 +30,14 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxIntegratorAllocate(
     _In_ SIZE_T MaximumDepth,
-    _Out_ PPHYSX_INTEGRATOR *Result
+    _Out_ PPHYSX_INTEGRATOR *Integrator
     )
 {
-    PPHYSX_INTEGRATOR Integrator;
-    PPHYSX_RAYTRACER RayTracer;
+    PPHYSX_INTEGRATOR AllocatedIntegrator;
     PVOID Allocation;
-    SIZE_T Index;
     ISTATUS Status;
     
-    if (Result == NULL)
+    if (Integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -52,36 +49,19 @@ PhysxIntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
     
-    Integrator = (PPHYSX_INTEGRATOR) Allocation;
+    AllocatedIntegrator = (PPHYSX_INTEGRATOR) Allocation;
     
-    Status = PhysxSharedContextInitialize(&Integrator->SharedContext);
-    
+    Status = PhysxRayTracerAllocate(MaximumDepth,
+                                    &AllocatedIntegrator->RayTracer);
+
     if (Status != ISTATUS_SUCCESS)
     {
-        free(Allocation);
-        return ISTATUS_ALLOCATION_FAILED;
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        free(AllocatedIntegrator);
+        return Status;
     }
-    
-    RayTracer = NULL;
-    
-    for (Index = 0; Index <= MaximumDepth; Index++)
-    {
-        Status = PhysxRayTracerAllocate(RayTracer,
-                                        &Integrator->SharedContext,
-                                        &RayTracer);
-    
-        if (Status != ISTATUS_SUCCESS)
-        {
-            PhysxRayTracerFree(RayTracer);
-            PhysxSharedContextDestroy(&Integrator->SharedContext);
-            free(Allocation);
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-    }
-    
-    Integrator->NextRayTracer = RayTracer;
 
-    *Result = Integrator;
+    *Integrator = AllocatedIntegrator;
     
     return ISTATUS_SUCCESS;
 }
@@ -134,15 +114,15 @@ PhysxIntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
     
-    PhysxSharedContextSet(&Integrator->SharedContext,
-                          TestGeometryRoutine,
-                          TestGeometryRoutineContext,
-                          LightList,
-                          Rng,
-                          Epsilon);
+    PhysxRayTracerConfigure(Integrator->RayTracer,
+                            TestGeometryRoutine,
+                            TestGeometryRoutineContext,
+                            LightList,
+                            Rng,
+                            Epsilon);
 
     Status = IntegrateRoutine(IntegrateRoutineContext,
-                              Integrator->NextRayTracer,
+                              Integrator->RayTracer,
                               WorldRay);
 
     return Status;
@@ -158,7 +138,6 @@ PhysxIntegratorFree(
         return;
     }
     
-    PhysxRayTracerFree(Integrator->NextRayTracer);
-    PhysxSharedContextDestroy(&Integrator->SharedContext);
+    PhysxRayTracerFree(Integrator->RayTracer);
     free(Integrator);
 }

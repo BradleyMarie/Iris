@@ -675,7 +675,7 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
     *Lights = LocalLights;
     *NumberOfLights = LocalNumberOfLights;
     *Geometry = LocalGeometry;
-    *NumberOfGeometry = LocalGeometry;
+    *NumberOfGeometry = LocalNumberOfGeometry;
     
     Builder->CallDestructorsOnClear = FALSE;
     PhysxAreaLightBuilderClear(Builder);

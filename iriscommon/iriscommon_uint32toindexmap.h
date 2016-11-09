@@ -105,7 +105,7 @@ UInt32ToIndexMapFindKeyIndex(
     {
         if (Map->Keys[SearchIndex] == Key)
         {
-            *Index = Index;
+            *Index = SearchIndex;
             return TRUE;
         }
     }

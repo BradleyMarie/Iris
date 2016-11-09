@@ -25,9 +25,18 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxRayTracerAllocate(
-    _In_opt_ PPHYSX_RAYTRACER NextRayTracer,
-    _In_ PPHYSX_SHARED_CONTEXT SharedContext,
-    _Out_ PPHYSX_RAYTRACER *Result
+    _In_ SIZE_T MaximumDepth,
+    _Out_ PPHYSX_RAYTRACER *RayTracer
+    );
+
+VOID
+PhysxRayTracerConfigure(
+    _Inout_ PPHYSX_RAYTRACER RayTracer,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
+    _In_ PRANDOM_REFERENCE Rng,
+    _In_ FLOAT Epsilon
     );
 
 VOID
