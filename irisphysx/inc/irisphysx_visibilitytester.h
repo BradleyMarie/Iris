@@ -25,7 +25,7 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PhysxVisibilityTesterTestVisibility(
+PhysxVisibilityTesterTest(
     _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
     _In_ FLOAT DistanceToObject,
@@ -36,20 +36,9 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISPHYSXAPI
 ISTATUS
-PhysxVisibilityTesterTestVisibilityAnyDistance(
+PhysxVisibilityTesterTestAnyDistance(
     _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
-    _Out_ PBOOL Visible
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISPHYSXAPI
-ISTATUS
-PhysxVisibilityTesterTestLightVisibility(
-    _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
-    _In_ RAY WorldRay,
-    _In_ PCPHYSX_LIGHT Light,
     _Out_ PBOOL Visible
     );
 

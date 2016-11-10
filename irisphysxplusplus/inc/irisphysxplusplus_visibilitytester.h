@@ -61,9 +61,9 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PhysxVisibilityTesterTestVisibilityAnyDistance(Data,
-                                                                        WorldRay.AsRAY(),
-                                                                        &Result);
+        ISTATUS Status = PhysxVisibilityTesterTestAnyDistance(Data,
+                                                              WorldRay.AsRAY(),
+                                                              &Result);
     
         if (Status != ISTATUS_SUCCESS)
         {
@@ -82,10 +82,10 @@ public:
     {
         BOOL Result;
 
-        ISTATUS Status = PhysxVisibilityTesterTestVisibility(Data,
-                                                             WorldRay.AsRAY(),
-                                                             Distance,
-                                                             &Result);
+        ISTATUS Status = PhysxVisibilityTesterTest(Data,
+                                                   WorldRay.AsRAY(),
+                                                   Distance,
+                                                   &Result);
     
         if (Status != ISTATUS_SUCCESS)
         {
@@ -94,20 +94,6 @@ public:
 
         return Result != FALSE;
     }
-
-    _Ret_
-    bool
-    Test(
-        _In_ const Iris::Ray & WorldRay,
-        _In_ const LightReference & LightRef
-        );
-
-    _Ret_
-    bool
-    Test(
-        _In_ const Iris::Ray & WorldRay,
-        _In_ const Light & LightRef
-        );
 
 private:
     PPHYSX_VISIBILITY_TESTER Data;

@@ -42,15 +42,6 @@ struct _PHYSX_AREA_LIGHT_ADAPTER {
     FLOAT SamplePdf;
 };
 
-typedef struct _PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT {
-    PCPHYSX_LIGHT Light;
-    RAY ToLight;
-    FLOAT InverseTotalSurfaceArea;
-    FLOAT Pdf;
-    BOOL FirstHit;
-    POINT3 ClosestWorldPointOnLight;
-} PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT, *PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT;
-
 //
 // Static Functions
 //
@@ -79,121 +70,6 @@ PhysxAreaLightAdapterCompareGeometry(
     }
 
     return 0;
-}
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-STATIC
-ISTATUS
-PhysxAreaLightAdapterProcessHitCallback(
-    _Inout_ PVOID Context,
-    _In_ PCHIT Hit,
-    _In_ PCMATRIX ModelToWorld,
-    _In_ VECTOR3 ModelViewer,
-    _In_ POINT3 ModelHitPoint,
-    _In_ POINT3 WorldHitPoint
-    )
-{
-    PCPHYSX_LIGHT BackLight;
-    PCPHYSX_GEOMETRY Geometry;
-    VECTOR3 ModelSurfaceNormal;
-    VECTOR3 NormalizedWorldSurfaceNormal;
-    PCPHYSX_LIGHT FrontLight;
-    PCPHYSX_LIGHTED_GEOMETRY LightedGeometry;
-    FLOAT Pdf;
-    PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
-    ISTATUS Status;
-    FLOAT SurfaceArea;
-    VECTOR3 WorldSurfaceNormal;
-    VECTOR3 WorldToLight;
-
-    ProcessHitContext = (PPHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT) Context;
-
-    Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
-    
-    PhysxGeometryGetLight(Geometry,
-                          Hit->FrontFace,
-                          &FrontLight);
-
-    if (FrontLight != ProcessHitContext->Light)
-    {
-        if (ProcessHitContext->FirstHit != FALSE)
-        {
-            return ISTATUS_NO_MORE_DATA;
-        }
-
-        return ISTATUS_SUCCESS;
-    }
-    
-    Status = PhysxGeometryComputeNormal(Geometry,
-                                        ModelHitPoint,
-                                        Hit->FrontFace,
-                                        &ModelSurfaceNormal);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return Status;
-    }
-
-    PhysxLightedGeometryAdapterGetLightedGeometry(Geometry, &LightedGeometry);
-
-    PhysxLightedGeometryComputeSurfaceArea(LightedGeometry,
-                                           Hit->FrontFace,
-                                           &SurfaceArea);
-
-    WorldSurfaceNormal = VectorMatrixInverseTransposedMultiply(ModelToWorld,
-                                                               ModelSurfaceNormal);
-
-    NormalizedWorldSurfaceNormal = VectorNormalize(WorldSurfaceNormal, NULL, NULL);
-
-    WorldToLight = PointSubtract(WorldHitPoint, ProcessHitContext->ToLight.Origin);
-
-    Pdf = SurfaceArea *
-          VectorDotProduct(WorldToLight, WorldToLight) /
-          VectorDotProduct(ProcessHitContext->ToLight.Direction, NormalizedWorldSurfaceNormal);
-
-    PhysxGeometryGetLight(Geometry,
-                          Hit->BackFace,
-                          &BackLight);
-    
-    if (BackLight == ProcessHitContext->Light)
-    {
-        Pdf *= (FLOAT) 2.0f;
-    }
-    
-    ProcessHitContext->Pdf += Pdf * SurfaceArea * ProcessHitContext->InverseTotalSurfaceArea;
-
-    if (ProcessHitContext->FirstHit != FALSE)
-    {
-        ProcessHitContext->ClosestWorldPointOnLight = WorldHitPoint;
-        ProcessHitContext->FirstHit = FALSE;
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-SFORCEINLINE
-PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT
-PhysxAreaLightAdapterProcessHitContextCreate(
-    _In_ PCPHYSX_LIGHT Light,
-    _In_ RAY ToLight,
-    _In_ FLOAT InverseTotalSurfaceArea
-    )
-{
-    PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT Context;
-
-    ASSERT(Light != NULL);
-    ASSERT(RayValidate(ToLight) != FALSE);
-    ASSERT(IsGreaterThanZeroFloat(InverseTotalSurfaceArea) != FALSE);
-    ASSERT(IsFiniteFloat(InverseTotalSurfaceArea) != FALSE);
-
-    Context.Light = Light;
-    Context.ToLight = ToLight;
-    Context.InverseTotalSurfaceArea = InverseTotalSurfaceArea;
-    Context.FirstHit = TRUE;
-    Context.Pdf = (FLOAT) 0.0f;
-
-    return Context;
 }
 
 //
@@ -266,7 +142,8 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     )
 {
     PCPHYSX_AREA_LIGHT_ADAPTER AreaLightAdapter;
-    PHYSX_AREA_LIGHT_PROCESS_HIT_CONTEXT ProcessHitContext;
+    POINT3 ClosestPointOnLight;
+    FLOAT LocalPdf;
     ISTATUS Status;
 
     ASSERT(Context != NULL);
@@ -281,21 +158,19 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     // Verify Light Visibility and Compute PDF
     //
 
-    ProcessHitContext = PhysxAreaLightAdapterProcessHitContextCreate(AreaLightAdapter->SelfReference,
-                                                                     ToLight,
-                                                                     AreaLightAdapter->SamplePdf);
-
-    Status = PhysxVisibilityTesterTestCustom(VisibilityTester,
+    Status = PhysxVisibilityTesterComputePdf(VisibilityTester,
                                              ToLight,
-                                             PhysxAreaLightAdapterProcessHitCallback,
-                                             &ProcessHitContext);
+                                             AreaLightAdapter->SelfReference,
+                                             AreaLightAdapter->SamplePdf,
+                                             &ClosestPointOnLight,
+                                             &LocalPdf);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    if (IsZeroFloat(ProcessHitContext.Pdf))
+    if (IsZeroFloat(LocalPdf))
     {
         *Spectrum = NULL;
         *Pdf = (FLOAT) 0.0f;
@@ -307,7 +182,7 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     //
 
     Status = PhysxAreaLightComputeEmissive(AreaLightAdapter->AreaLight,
-                                           ProcessHitContext.ClosestWorldPointOnLight,
+                                           ClosestPointOnLight,
                                            Compositor,
                                            Spectrum);
 
@@ -322,7 +197,7 @@ PhysxAreaLightAdapterComputeEmissiveWithPdf(
     }
     else
     {
-        *Pdf = ProcessHitContext.Pdf;
+        *Pdf = LocalPdf;
     }
 
     return ISTATUS_SUCCESS;

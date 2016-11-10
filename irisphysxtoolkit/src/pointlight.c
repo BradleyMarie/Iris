@@ -72,10 +72,10 @@ SpectrumPointLightSample(
 
     RayToLight = RayCreate(HitPoint, DirectionToLight);
 
-    Status = PhysxVisibilityTesterTestVisibility(Tester,
-                                                 RayToLight,
-                                                 DistanceToLight,
-                                                 &Visible);
+    Status = PhysxVisibilityTesterTest(Tester,
+                                       RayToLight,
+                                       DistanceToLight,
+                                       &Visible);
 
     if (Status != ISTATUS_SUCCESS)
     {

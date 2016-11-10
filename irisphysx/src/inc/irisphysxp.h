@@ -33,7 +33,6 @@ Abstract:
 #include "irisphysx_light.h"
 #include "irisphysx_geometry.h"
 #include "irisphysx_hittester.h"
-#include "irisphysx_raytraceradapter.h"
 #include "irisphysx_visibilitytester.h"
 #include "irisphysx_raytracer.h"
 

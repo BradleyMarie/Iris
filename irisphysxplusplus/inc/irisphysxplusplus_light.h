@@ -180,32 +180,6 @@ private:
     PPHYSX_LIGHT Data;
 };
 
-//
-// Define VisibilityTester functions
-//
-
-inline
-bool
-VisibilityTester::Test(
-    _In_ const Iris::Ray & WorldRay,
-    _In_ const Light & LightRef
-    )
-{
-    BOOL Result;
-
-    ISTATUS Status = PhysxVisibilityTesterTestLightVisibility(Data,
-                                                              WorldRay.AsRAY(),
-                                                              LightRef.AsPCPHYSX_LIGHT(),
-                                                              &Result);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        throw std::runtime_error(Iris::ISTATUSToCString(Status));
-    }
-
-    return Result != FALSE;
-}
-
 } // namespace Iris
 
 #endif // _LIGHT_IRIS_PHYSX_PLUS_PLUS_

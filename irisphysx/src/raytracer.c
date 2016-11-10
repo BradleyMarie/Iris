@@ -36,24 +36,81 @@ struct _PHYSX_RAYTRACER {
     PRAYTRACER RayTracer;
 };
 
-typedef struct _RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT {
+typedef struct _PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT {
+    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PCVOID TestGeometryRoutineContext;
+} PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT, *PPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT;
+
+typedef CONST PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT *PCPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT;
+
+typedef struct _PHYSX_RAYTRACER_PROCESS_HIT_CONTEXT {
     PPHYSX_RAYTRACER NextRayTracer;
     PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine;
     PVOID ProcessHitContext;
     RAY WorldRay;
     PCSPECTRUM *Output;
-} RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT, *PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT;
+} PHYSX_RAYTRACER_PROCESS_HIT_CONTEXT, *PPHYSX_RAYTRACER_PROCESS_HIT_CONTEXT;
 
 //
-// Static Functions
+// Static Test Geometry Functions
 //
 
 SFORCEINLINE
 VOID
-PhysxRayTracerProcessHitAdapterContextInitialize(
-    _Out_ PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext,
-    _In_ PPHYSX_RAYTRACER NextRayTracer,
+PhysxRayTracerTestGeometryContextInitialize(
+    _Out_ PPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT Context,
+    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PCVOID TestGeometryRoutineContext
+    )
+{
+    ASSERT(Context != NULL);
+    ASSERT(TestGeometryRoutine != NULL);
+    ASSERT(TestGeometryRoutineContext != NULL);
+    
+    Context->TestGeometryRoutine = TestGeometryRoutine;
+    Context->TestGeometryRoutineContext = TestGeometryRoutineContext;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxRayTracerTestGeometryCallback(
+    _In_opt_ PCVOID Context, 
+    _Inout_ PHIT_TESTER HitTester,
+    _In_ RAY Ray
+    )
+{
+    PCPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT TestGeometryContext;
+    PHYSX_HIT_TESTER PhysxHitTester;
+    ISTATUS Status;
+    
+    ASSERT(Context != NULL);
+    ASSERT(HitTester != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+
+    PhysxHitTesterInitialize(&PhysxHitTester,
+                             HitTester);
+    
+    TestGeometryContext = (PCPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT) Context;
+    
+    Status = TestGeometryContext->TestGeometryRoutine(TestGeometryContext->TestGeometryRoutineContext,
+                                                      &PhysxHitTester,
+                                                      Ray);
+
+    return Status;
+}
+
+//
+// Static Process Hit Functions
+//
+
+SFORCEINLINE
+VOID
+PhysxRayTracerProcessHitContextInitialize(
+    _Out_ PPHYSX_RAYTRACER_PROCESS_HIT_CONTEXT Context,
+    _In_opt_ PPHYSX_RAYTRACER NextRayTracer,
     _In_ PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext,
     _In_ PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE ProcessHitRoutine,
     _In_opt_ PVOID ProcessHitContext,
@@ -61,25 +118,25 @@ PhysxRayTracerProcessHitAdapterContextInitialize(
     _In_ PCSPECTRUM *Output
     )
 {
-    ASSERT(AdapterContext != NULL);
+    ASSERT(Context != NULL);
     ASSERT(SharedContext != NULL);
     ASSERT(ProcessHitRoutine != NULL);
     ASSERT(RayValidate(WorldRay) != FALSE);
     ASSERT(Output != NULL);
     
-    AdapterContext->NextRayTracer = NextRayTracer;
-    AdapterContext->SharedContext = SharedContext;
-    AdapterContext->ProcessHitRoutine = ProcessHitRoutine;
-    AdapterContext->ProcessHitContext = ProcessHitContext;
-    AdapterContext->WorldRay = WorldRay;
-    AdapterContext->Output = Output;
+    Context->NextRayTracer = NextRayTracer;
+    Context->SharedContext = SharedContext;
+    Context->ProcessHitRoutine = ProcessHitRoutine;
+    Context->ProcessHitContext = ProcessHitContext;
+    Context->WorldRay = WorldRay;
+    Context->Output = Output;
 }
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
-PhysxRayTracerProcessHitAdapter(
+PhysxRayTracerProcessHitCallback(
     _Inout_opt_ PVOID Context, 
     _In_ PCHIT Hit,
     _In_ PCMATRIX ModelToWorld,
@@ -90,42 +147,49 @@ PhysxRayTracerProcessHitAdapter(
 {
     PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReference;
     PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReference;
-    PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
+    PPHYSX_RAYTRACER_PROCESS_HIT_CONTEXT ProcessHitContext;
     PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCPHYSX_GEOMETRY Geometry;
     ISTATUS Status;
     
     ASSERT(Context != NULL);
     ASSERT(Hit != NULL);
+    ASSERT(VectorValidate(ModelViewer) != FALSE);
+    ASSERT(PointValidate(ModelHitPoint) != FALSE);
+    ASSERT(PointValidate(WorldHitPoint) != FALSE);
     
-    AdapterContext = (PRAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT) Context;
+    ProcessHitContext = (PPHYSX_RAYTRACER_PROCESS_HIT_CONTEXT) Context;
     
-    SharedContext = AdapterContext->SharedContext;
+    SharedContext = ProcessHitContext->SharedContext;
 
     Geometry = (PCPHYSX_GEOMETRY) Hit->Data;
     SpectrumCompositorReference = SpectrumCompositorGetSpectrumCompositorReference(SharedContext->SpectrumCompositor);
     ReflectorCompositorReference = ReflectorCompositorGetReflectorCompositorReference(SharedContext->ReflectorCompositor);
 
-    Status = AdapterContext->ProcessHitRoutine(AdapterContext->ProcessHitContext,
-                                               Geometry,
-                                               Hit->FrontFace,
-                                               ModelToWorld,
-                                               Hit->AdditionalData,
-                                               ModelViewer,
-                                               ModelHitPoint,
-                                               WorldHitPoint,
-                                               AdapterContext->WorldRay,
-                                               SharedContext->LightList,
-                                               AdapterContext->NextRayTracer,
-                                               SharedContext->VisibilityTester,
-                                               SharedContext->BrdfAllocator,
-                                               SpectrumCompositorReference,
-                                               ReflectorCompositorReference,
-                                               SharedContext->Rng,
-                                               AdapterContext->Output);
+    Status = ProcessHitContext->ProcessHitRoutine(ProcessHitContext->ProcessHitContext,
+                                                  Geometry,
+                                                  Hit->FrontFace,
+                                                  ModelToWorld,
+                                                  Hit->AdditionalData,
+                                                  ModelViewer,
+                                                  ModelHitPoint,
+                                                  WorldHitPoint,
+                                                  ProcessHitContext->WorldRay,
+                                                  SharedContext->LightList,
+                                                  ProcessHitContext->NextRayTracer,
+                                                  SharedContext->VisibilityTester,
+                                                  SharedContext->BrdfAllocator,
+                                                  SpectrumCompositorReference,
+                                                  ReflectorCompositorReference,
+                                                  SharedContext->Rng,
+                                                  ProcessHitContext->Output);
     
     return Status;
 }
+
+//
+// Static Shared Context Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -253,6 +317,10 @@ PhysxRayTracerSharedContextFree(
     PhysxVisibilityTesterFree(Context->VisibilityTester);
     free(Context);
 }
+
+//
+// Static Ray Tracer Functions
+//
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
@@ -403,7 +471,8 @@ PhysxRayTracerTraceSceneProcessClosestHit(
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
 {
-    RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
+    PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT IntermediateTestGeometryContext;
+    PHYSX_RAYTRACER_PROCESS_HIT_CONTEXT IntermediateProcessHitContext;
     PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
@@ -426,21 +495,25 @@ PhysxRayTracerTraceSceneProcessClosestHit(
     SharedContext = RayTracer->SharedContext;
     Result = NULL;
 
-    PhysxRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
-                                                     RayTracer->NextRayTracer,
-                                                     SharedContext,
-                                                     ProcessHitRoutine,
-                                                     ProcessHitContext,
-                                                     Ray,
-                                                     &Result);
+    PhysxRayTracerTestGeometryContextInitialize(&IntermediateTestGeometryContext,
+                                                SharedContext->TestGeometryRoutine,
+                                                SharedContext->TestGeometryRoutineContext);
 
-    Status = RayTracerAdapterTraceSceneProcessClosestHitWithCoordinates(RayTracer->RayTracer,
-                                                                        Ray,
-                                                                        SharedContext->Epsilon,
-                                                                        SharedContext->TestGeometryRoutine,
-                                                                        SharedContext->TestGeometryRoutineContext,
-                                                                        PhysxRayTracerProcessHitAdapter,
-                                                                        &AdapterContext);
+    PhysxRayTracerProcessHitContextInitialize(&IntermediateProcessHitContext,
+                                              RayTracer->NextRayTracer,
+                                              SharedContext,
+                                              ProcessHitRoutine,
+                                              ProcessHitContext,
+                                              Ray,
+                                              &Result);
+
+    Status = RayTracerTraceSceneProcessClosestHitWithCoordinates(RayTracer->RayTracer,
+                                                                 Ray,
+                                                                 SharedContext->Epsilon,
+                                                                 PhysxRayTracerTestGeometryCallback,
+                                                                 &IntermediateTestGeometryContext,
+                                                                 PhysxRayTracerProcessHitCallback,
+                                                                 &IntermediateProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -463,7 +536,8 @@ PhysxRayTracerTraceSceneProcessAllHitsInOrder(
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     )
 {
-    RAYTRACER_PROCESS_HIT_ADAPTER_CONTEXT AdapterContext;
+    PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT IntermediateTestGeometryContext;
+    PHYSX_RAYTRACER_PROCESS_HIT_CONTEXT IntermediateProcessHitContext;
     PPHYSX_RAYTRACER_SHARED_CONTEXT SharedContext;
     PCSPECTRUM Result;
     ISTATUS Status;
@@ -482,23 +556,28 @@ PhysxRayTracerTraceSceneProcessAllHitsInOrder(
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
-
-    SharedContext = RayTracer->SharedContext;
     
-    PhysxRayTracerProcessHitAdapterContextInitialize(&AdapterContext,
-                                                     RayTracer->NextRayTracer,
-                                                     SharedContext,
-                                                     ProcessHitRoutine,
-                                                     ProcessHitContext,
-                                                     Ray,
-                                                     &Result);
+    SharedContext = RayTracer->SharedContext;
+    Result = NULL;
 
-    Status = RayTracerAdapterTraceSceneProcessAllHitsInOrderWithCoordinates(RayTracer->RayTracer,
-                                                                            Ray,
-                                                                            SharedContext->TestGeometryRoutine,
-                                                                            SharedContext->TestGeometryRoutineContext,
-                                                                            PhysxRayTracerProcessHitAdapter,
-                                                                            &AdapterContext);
+    PhysxRayTracerTestGeometryContextInitialize(&IntermediateTestGeometryContext,
+                                                SharedContext->TestGeometryRoutine,
+                                                SharedContext->TestGeometryRoutineContext);
+
+    PhysxRayTracerProcessHitContextInitialize(&IntermediateProcessHitContext,
+                                              RayTracer->NextRayTracer,
+                                              SharedContext,
+                                              ProcessHitRoutine,
+                                              ProcessHitContext,
+                                              Ray,
+                                              &Result);
+
+    Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(RayTracer->RayTracer,
+                                                                     Ray,
+                                                                     PhysxRayTracerTestGeometryCallback,
+                                                                     &IntermediateTestGeometryContext,
+                                                                     PhysxRayTracerProcessHitCallback,
+                                                                     &IntermediateProcessHitContext);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -40,11 +40,13 @@ PhysxVisibilityTesterSetSceneAndEpsilon(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-PhysxVisibilityTesterTestCustom(
+PhysxVisibilityTesterComputePdf(
     _In_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
     _In_ RAY WorldRay,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
-    _Inout_opt_ PVOID ProcessHitContext
+    _In_ PCPHYSX_LIGHT Light,
+    _In_ FLOAT InverseLightSurfaceArea,
+    _In_ PPOINT3 ClosestPointOnLight,
+    _Out_ PFLOAT Pdf
     );
 
 _Check_return_
