@@ -251,7 +251,7 @@ public:
     }
     
     SpectrumCompositor(
-        _In_ SpectrumCompositor & ToCopy
+        _In_ const SpectrumCompositor & ToCopy
         ) = delete;
         
     SpectrumCompositor &

@@ -66,6 +66,15 @@ public:
         void
         );
 
+    AreaLightBuilder(
+        _In_ const AreaLightBuilder & ToCopy
+        ) = delete;
+        
+    AreaLightBuilder &
+    operator=(
+        _In_ const AreaLightBuilder & ToCopy
+        ) = delete;
+
     virtual
     ~AreaLightBuilder(
         void

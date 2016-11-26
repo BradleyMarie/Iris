@@ -81,7 +81,7 @@ public:
         );
         
     RayTracer(
-        _In_ RayTracer & ToCopy
+        _In_ const RayTracer & ToCopy
         ) = delete;
         
     RayTracer &

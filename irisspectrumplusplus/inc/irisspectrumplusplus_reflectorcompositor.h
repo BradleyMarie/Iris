@@ -139,7 +139,7 @@ public:
     }
     
     ReflectorCompositor(
-        _In_ ReflectorCompositor & ToCopy
+        _In_ const ReflectorCompositor & ToCopy
         ) = delete;
         
     ReflectorCompositor &

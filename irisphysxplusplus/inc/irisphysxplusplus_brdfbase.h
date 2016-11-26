@@ -88,6 +88,15 @@ public:
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const = 0;
     
+    BRDFBase(
+        _In_ const BRDFBase & ToCopy
+        ) = delete;
+        
+    BRDFBase &
+    operator=(
+        _In_ const BRDFBase & ToCopy
+        ) = delete;
+
     virtual
     ~BRDFBase(
         void

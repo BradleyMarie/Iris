@@ -30,7 +30,9 @@ public:
         _In_ Framebuffer && ToMove
         )
     : Data(ToMove.Data)
-    { }
+    { 
+        ToMove.Data = nullptr;
+    }
 
     static
     Framebuffer
@@ -137,7 +139,7 @@ public:
     }
 
     Framebuffer(
-        _In_ Framebuffer & ToCopy
+        _In_ const Framebuffer & ToCopy
         ) = delete;
         
     Framebuffer &
