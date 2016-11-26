@@ -31,5 +31,6 @@ Abstract:
 #include "irisphysxtoolkit_sphere.h"
 #include "irisphysxtoolkit_pinhole.h"
 #include "irisphysxtoolkit_infiniteplane.h"
+#include "irisphysxtoolkit_constantarealight.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_HEADER_

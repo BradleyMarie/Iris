@@ -54,5 +54,6 @@ extern "C" {
 #include "irisphysxtoolkitplusplus_sphere.h"
 #include "irisphysxtoolkitplusplus_triangle.h"
 #include "irisphysxtoolkitplusplus_infiniteplane.h"
+#include "irisphysxtoolkitplusplus_constantarealight.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_PLUS_PLUS_HEADER_
