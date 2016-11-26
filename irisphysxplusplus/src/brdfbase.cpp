@@ -269,6 +269,7 @@ BRDFBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedBRDFBasePtr;
         throw std::bad_alloc();
     }
     

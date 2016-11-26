@@ -34,6 +34,11 @@ protected:
         );
 
 public:
+    ReflectorBase(
+        void
+        )
+    { }
+    
     _Ret_
     virtual
     FLOAT
@@ -41,6 +46,15 @@ public:
         _In_ FLOAT Wavelength,
         _In_ FLOAT IncomingIntensity
         ) const = 0;
+
+    ReflectorBase(
+        _In_ const ReflectorBase & ToCopy
+        ) = delete;
+        
+    ReflectorBase &
+    operator=(
+        _In_ const ReflectorBase & ToCopy
+        ) = delete;
 
     virtual
     ~ReflectorBase(

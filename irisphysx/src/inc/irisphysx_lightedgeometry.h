@@ -141,8 +141,8 @@ SFORCEINLINE
 ISTATUS
 PhysxLightedGeometryComputeNormal(
     _In_ PCPHYSX_LIGHTED_GEOMETRY LightedGeometry,
-    _In_ POINT3 ModelHitPoint,
     _In_ UINT32 Face,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 ModelSurfaceNormal
     )
 {
@@ -153,8 +153,8 @@ PhysxLightedGeometryComputeNormal(
     ASSERT(ModelSurfaceNormal != NULL);
     
     Status = LightedGeometry->VTable->Header.ComputeNormalRoutine(LightedGeometry->Data,
-                                                                  ModelHitPoint,
                                                                   Face,
+                                                                  ModelHitPoint,
                                                                   ModelSurfaceNormal);
 
     return Status;
@@ -208,16 +208,19 @@ ISTATUS
 PhysxLightedGeometrySampleSurface(
     _In_ PCPHYSX_LIGHTED_GEOMETRY LightedGeometry,
     _In_ UINT32 Face,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Out_ PPOINT3 Sample
     )
 {
     ISTATUS Status;
     
     ASSERT(LightedGeometry != NULL);
+    ASSERT(Rng != NULL);
     ASSERT(Sample != NULL);
     
     Status = LightedGeometry->VTable->SampleSurfaceRoutine(LightedGeometry->Data,
                                                            Face,
+                                                           Rng,
                                                            Sample);
 
     return Status;

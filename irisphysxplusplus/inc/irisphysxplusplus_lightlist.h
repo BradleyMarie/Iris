@@ -150,7 +150,7 @@ public:
     }
 
     LightList(
-        _In_ LightList & ToCopy
+        _In_ const LightList & ToCopy
         ) = delete;
         
     LightList &

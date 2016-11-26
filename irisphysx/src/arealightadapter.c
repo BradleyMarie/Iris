@@ -270,6 +270,7 @@ PhysxAreaLightAdapterSample(
 
     Status = PhysxLightedGeometrySampleSurface(SampledGeometry->LightedGeometry,
                                                SampledGeometry->Face,
+                                               Rng,
                                                &SampledLocation);
 
     if (Status != ISTATUS_SUCCESS)

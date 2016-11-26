@@ -72,9 +72,9 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 PhysxLightedGeometryAdapterComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
+    _In_ PCVOID Context,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -87,8 +87,8 @@ PhysxLightedGeometryAdapterComputeNormal(
     LightedGeometryAdapter = (PCPHYSX_LIGHTED_GEOMETRY_ADAPTER) Context;
     
     Status = PhysxLightedGeometryComputeNormal(LightedGeometryAdapter->LightedGeometry,
-                                               ModelHitPoint,
                                                FaceHit,
+                                               ModelHitPoint,
                                                SurfaceNormal);
                                    
     return Status;

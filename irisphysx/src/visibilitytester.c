@@ -176,8 +176,8 @@ PhysxVisibilityTesterComputePdfProcessHitCallback(
     }
     
     Status = PhysxGeometryComputeNormal(Geometry,
-                                        ModelHitPoint,
                                         Hit->FrontFace,
+                                        ModelHitPoint,
                                         &ModelSurfaceNormal);
 
     if (Status != ISTATUS_SUCCESS)

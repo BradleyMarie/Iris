@@ -34,6 +34,11 @@ protected:
         );
 
 public:
+    LightBase(
+        void
+        )
+    { }
+    
     _Ret_
     virtual
     std::tuple<IrisSpectrum::SpectrumReference, Iris::Vector, FLOAT>
@@ -62,6 +67,15 @@ public:
         _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const = 0;
     
+    LightBase(
+        _In_ const LightBase & ToCopy
+        ) = delete;
+        
+    LightBase &
+    operator=(
+        _In_ const LightBase & ToCopy
+        ) = delete;
+
     virtual
     ~LightBase(
         void

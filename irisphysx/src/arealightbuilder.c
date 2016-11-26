@@ -399,7 +399,7 @@ PhysxAreaLightBuilderAttachLightToGeometry(
         IsLessThanOrEqualToZeroFloat(Area) != FALSE ||
         IsFiniteFloat(Area) != FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     Status = UInt32ToIndexMapAddMapping(&GeometryData->AttachedLights,
@@ -416,7 +416,7 @@ PhysxAreaLightBuilderAttachLightToGeometry(
 
     if (UpdateSucceeded == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
 
     Data = PointerListRetrieveAtIndex(&Builder->LightDataList,

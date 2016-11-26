@@ -410,8 +410,8 @@ SFORCEINLINE
 ISTATUS
 TriangleComputeNormal(
     _In_ PCTRIANGLE Triangle,
-    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 HitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -537,9 +537,9 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 PhysxTriangleComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
+    _In_ PCVOID Context,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -552,8 +552,8 @@ PhysxTriangleComputeNormal(
     Triangle = (PCPHYSX_TRIANGLE) Context;
     
     Status = TriangleComputeNormal(&Triangle->Data,
-                                   ModelHitPoint,
                                    FaceHit,
+                                   ModelHitPoint,
                                    SurfaceNormal);
                                    
     return Status;

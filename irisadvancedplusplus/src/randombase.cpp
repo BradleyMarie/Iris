@@ -108,6 +108,7 @@ RandomBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedRandomBasePtr;
         throw std::bad_alloc();
     }
     

@@ -32,8 +32,13 @@ protected:
     Create(
         _In_ std::unique_ptr<GeometryBase> GeometryBasePtr
         );
-
+    
 public:
+    GeometryBase(
+         void
+        )
+    { }
+    
     _Ret_
     virtual
     PHIT_LIST
@@ -64,6 +69,15 @@ public:
     GetMaterial(
         _In_ const UINT32 FaceHit
         ) const = 0;
+
+    GeometryBase(
+        _In_ const GeometryBase & ToCopy
+        ) = delete;
+        
+    GeometryBase &
+    operator=(
+        _In_ const GeometryBase & ToCopy
+        ) = delete;
 
     virtual
     ~GeometryBase(

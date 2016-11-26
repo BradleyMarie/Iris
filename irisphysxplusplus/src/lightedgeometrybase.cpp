@@ -4,12 +4,12 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    geometrybase.cpp
+    lightedgeometrybase.cpp
 
 Abstract:
 
-    This file contains the definitions for the 
-    IrisPysx++ GeometryBase type.
+    This file contains the definitions for the IrisPysx++
+    LightedGeometryBase and GeometryBase types.
 
 --*/
 
@@ -50,8 +50,8 @@ static
 ISTATUS
 GeometryComputeNormalAdapter(
     _In_ PCVOID Context,
-    _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -131,12 +131,59 @@ GeometryFreeAdapter(
     delete *GeometryBasePtr;
 }
 
-const static PHYSX_GEOMETRY_VTABLE InteropVTable {
-    GeometryTestRayAdapter,
-    GeometryComputeNormalAdapter,
-    GeometryCheckBoundsAdapter,
-    GeometryGetMaterialAdapter,
-    GeometryFreeAdapter
+static
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+LightedGeometryComputeSurfaceAreaAdapter(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Out_ PFLOAT SurfaceArea
+    )
+{
+    assert(Context != nullptr);
+    assert(SurfaceArea != nullptr);
+
+    const LightedGeometryBase **LightedGeometryBasePtr = (const LightedGeometryBase**) Context;
+
+    FLOAT Result = (*LightedGeometryBasePtr)->ComputeSurfaceArea(Face);
+
+    *SurfaceArea = Result;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+LightedGeometrySampleSurfaceAdapter(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Out_ PPOINT3 Sample
+    )
+{
+    assert(Context != nullptr);
+    assert(Rng != nullptr);
+    assert(Sample != nullptr);
+
+    const LightedGeometryBase **LightedGeometryBasePtr = (const LightedGeometryBase**) Context;
+
+    Iris::Point Result = (*LightedGeometryBasePtr)->SampleSurface(Face,
+                                                                  IrisAdvanced::RandomReference(Rng));
+
+    *Sample = Result.AsPOINT3();
+
+    return ISTATUS_SUCCESS;
+}
+
+const static PHYSX_LIGHTED_GEOMETRY_VTABLE InteropVTable {
+    { GeometryTestRayAdapter,
+      GeometryComputeNormalAdapter,
+      GeometryCheckBoundsAdapter,
+      GeometryGetMaterialAdapter,
+      GeometryFreeAdapter },
+    LightedGeometryComputeSurfaceAreaAdapter,
+    LightedGeometrySampleSurfaceAdapter
 };
 
 //
@@ -156,7 +203,7 @@ GeometryBase::Create(
     GeometryBase *UnmanagedGeometryBasePtr = GeometryBasePtr.release();
     PPHYSX_GEOMETRY GeometryPtr;
 
-    ISTATUS Success = PhysxGeometryAllocate(&InteropVTable,
+    ISTATUS Success = PhysxGeometryAllocate(&InteropVTable.Header,
                                             &UnmanagedGeometryBasePtr,
                                             sizeof(GeometryBase*),
                                             alignof(GeometryBase*),
@@ -164,10 +211,41 @@ GeometryBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedGeometryBasePtr;
         throw std::bad_alloc();
     }
     
     return Geometry(GeometryPtr, false);
+}
+
+SIZE_T
+LightedGeometryBase::Create(
+    _In_ AreaLightBuilder & Builder,
+    _In_ std::unique_ptr<LightedGeometryBase> LightedGeometryBasePtr
+    )
+{
+    if (!LightedGeometryBasePtr)
+    {
+        throw std::invalid_argument("LightedGeometryBasePtr");
+    }
+
+    LightedGeometryBase *UnmanagedLightedGeometryBasePtr = LightedGeometryBasePtr.release();
+    SIZE_T LightedGeometryIndex;
+
+    ISTATUS Success = PhysxAreaLightBuilderAddGeometry(Builder.AsPPHYSX_AREA_LIGHT_BUILDER(),
+                                                       &InteropVTable,
+                                                       &UnmanagedLightedGeometryBasePtr,
+                                                       sizeof(LightedGeometryBase*),
+                                                       alignof(LightedGeometryBase*),
+                                                       &LightedGeometryIndex);
+
+    if (Success != ISTATUS_SUCCESS)
+    {
+        delete UnmanagedLightedGeometryBasePtr;
+        throw std::bad_alloc();
+    }
+    
+    return LightedGeometryIndex;
 }
 
 } // namespace IrisPhysx

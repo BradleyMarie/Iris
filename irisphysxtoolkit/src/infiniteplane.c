@@ -234,9 +234,9 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 PhysxInfinitePlaneComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
+    _In_ PCVOID Context,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {

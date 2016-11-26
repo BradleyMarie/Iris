@@ -319,8 +319,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxGeometryComputeNormal(
     _In_ PCPHYSX_GEOMETRY Geometry,
-    _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 ModelSurfaceNormal
     )
 {
@@ -333,7 +333,7 @@ PhysxGeometryComputeNormal(
     
     if (PointValidate(ModelHitPoint) == FALSE)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (ModelSurfaceNormal == NULL)
@@ -342,8 +342,8 @@ PhysxGeometryComputeNormal(
     }
     
     Status = Geometry->VTable->ComputeNormalRoutine(Geometry->Data,
-                                                    ModelHitPoint,
                                                     FaceHit,
+                                                    ModelHitPoint,
                                                     ModelSurfaceNormal);
 
     return Status;

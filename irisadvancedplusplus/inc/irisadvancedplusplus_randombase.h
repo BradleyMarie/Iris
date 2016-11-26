@@ -34,6 +34,11 @@ protected:
         );
 
 public:
+    RandomBase(
+        void
+        )
+    { }
+    
     _Ret_range_(Minimum, Maximum)
     virtual
     FLOAT
@@ -49,6 +54,15 @@ public:
         _In_ SIZE_T Minimum,
         _In_ SIZE_T Maximum
         ) = 0;
+
+    RandomBase(
+        _In_ const RandomBase & ToCopy
+        ) = delete;
+        
+    RandomBase &
+    operator=(
+        _In_ const RandomBase & ToCopy
+        ) = delete;
 
     virtual
     ~RandomBase(

@@ -89,6 +89,7 @@ ReflectorBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedReflectorBasePtr;
         throw std::bad_alloc();
     }
     

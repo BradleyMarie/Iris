@@ -198,8 +198,8 @@ SFORCEINLINE
 ISTATUS
 SphereComputeNormal(
     _In_ PCSPHERE Sphere,
-    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 HitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -315,9 +315,9 @@ _Success_(return == ISTATUS_SUCCESS)
 STATIC
 ISTATUS
 PhysxSphereComputeNormal(
-    _In_ PCVOID Context, 
-    _In_ POINT3 ModelHitPoint,
+    _In_ PCVOID Context,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     )
 {
@@ -330,8 +330,8 @@ PhysxSphereComputeNormal(
     Sphere = (PCPHYSX_SPHERE) Context;
     
     Status = SphereComputeNormal(&Sphere->Data,
-                                 ModelHitPoint,
                                  FaceHit,
+                                 ModelHitPoint,
                                  SurfaceNormal);
                                    
     return Status;

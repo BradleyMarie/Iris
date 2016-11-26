@@ -10,9 +10,11 @@ include_directories(inc src/inc
     ../irisspectrumplusplus/inc)
 
 add_library(irisphysxplusplus SHARED
+    src/arealightbase.cpp
+    src/arealightbuilder.cpp
+    src/lightedgeometrybase.cpp
     src/raytracer.cpp
     src/integrator.cpp
-    src/geometrybase.cpp
     src/materialbase.cpp
     src/lightbase.cpp
     src/brdfbase.cpp)

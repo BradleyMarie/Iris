@@ -162,6 +162,7 @@ LightBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedLightBasePtr;
         throw std::bad_alloc();
     }
     

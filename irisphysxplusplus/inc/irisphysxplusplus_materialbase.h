@@ -34,6 +34,11 @@ protected:
         );
 
 public:
+    MaterialBase(
+        void
+        )
+    { }
+    
     virtual
     std::tuple<BRDFReference, Iris::Vector>
     Sample(
@@ -45,6 +50,15 @@ public:
         _In_ BRDFAllocator Allocator
         ) const = 0;
     
+    MaterialBase(
+        _In_ const MaterialBase & ToCopy
+        ) = delete;
+        
+    MaterialBase &
+    operator=(
+        _In_ const MaterialBase & ToCopy
+        ) = delete;
+
     virtual
     ~MaterialBase(
         void

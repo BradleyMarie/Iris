@@ -34,12 +34,26 @@ protected:
         );
 
 public:
+    SpectrumBase(
+        void
+        )
+    { }
+    
     _Ret_
     virtual
     FLOAT
     Sample(
         _In_ FLOAT Wavelength
         ) const = 0;
+
+    SpectrumBase(
+        _In_ const SpectrumBase & ToCopy
+        ) = delete;
+        
+    SpectrumBase &
+    operator=(
+        _In_ const SpectrumBase & ToCopy
+        ) = delete;
 
     virtual
     ~SpectrumBase(

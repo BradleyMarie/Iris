@@ -36,6 +36,7 @@ ISTATUS
 (*PPHYSX_LIGHTED_GEOMETRY_SAMPLE_SURFACE)(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 Face,
+    _Inout_ PRANDOM_REFERENCE Rng,
     _Out_ PPOINT3 Sample
     );
 

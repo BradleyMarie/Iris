@@ -88,7 +88,7 @@ public:
         );
 
     Integrator(
-        _In_ Integrator & ToCopy
+        _In_ const Integrator & ToCopy
         ) = delete;
         
     Integrator &

@@ -100,6 +100,7 @@ MaterialBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedMaterialBasePtr;
         throw std::bad_alloc();
     }
     

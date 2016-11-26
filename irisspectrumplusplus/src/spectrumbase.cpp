@@ -86,6 +86,7 @@ SpectrumBase::Create(
 
     if (Success != ISTATUS_SUCCESS)
     {
+        delete UnmanagedSpectrumBasePtr;
         throw std::bad_alloc();
     }
     

@@ -38,8 +38,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PPHYSX_GEOMETRY_COMPUTE_NORMAL_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ POINT3 HitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 HitPoint,
     _Out_ PVECTOR3 SurfaceNormal
     );
 
@@ -119,8 +119,8 @@ IRISPHYSXAPI
 ISTATUS
 PhysxGeometryComputeNormal(
     _In_ PCPHYSX_GEOMETRY Geometry,
-    _In_ POINT3 ModelHitPoint,
     _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
     _Out_ PVECTOR3 ModelSurfaceNormal
     );
 

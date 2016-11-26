@@ -98,8 +98,8 @@ public:
         VECTOR3 Result;
 
         ISTATUS Status = PhysxGeometryComputeNormal(Data,
+                                                    FaceHit,
 						                            HitPoint.AsPOINT3(),
-								                    FaceHit,
                                                     &Result);
 
         if (Status != ISTATUS_SUCCESS)
