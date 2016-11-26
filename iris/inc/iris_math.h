@@ -37,6 +37,7 @@ Abstract:
 
 #define SqrtFloat(number) sqrtf(number)
 #define AbsFloat(number) fabsf(number)
+#define ArccosineFloat(number) acosf(number)
 #define CosineFloat(number) cosf(number)
 #define SineFloat(number) sinf(number)
 #define PowFloat(base, exponent) powf(base, exponent)

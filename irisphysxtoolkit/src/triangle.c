@@ -494,16 +494,16 @@ typedef struct _PHYSX_TRIANGLE {
 
 typedef CONST PHYSX_TRIANGLE *PCPHYSX_TRIANGLE;
 
-typedef struct _PHYSX_LIGHT_TRIANGLE {
+typedef struct _PHYSX_LIGHTED_TRIANGLE {
     PPHYSX_MATERIAL Materials[2];
-    PPHYSX_LIGHT Lights[2];
     TRIANGLE Data;
-} PHYSX_LIGHT_TRIANGLE, *PPHYSX_LIGHT_TRIANGLE;
+    FLOAT SurfaceArea;
+} PHYSX_LIGHTED_TRIANGLE, *PPHYSX_LIGHTED_TRIANGLE;
 
-typedef CONST PHYSX_LIGHT_TRIANGLE *PCPHYSX_LIGHT_TRIANGLE;
+typedef CONST PHYSX_LIGHTED_TRIANGLE *PCPHYSX_LIGHTED_TRIANGLE;
 
 //
-// Static Functions
+// Triangle Static Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -690,6 +690,292 @@ PhysxTriangleFree(
 }
 
 //
+// Lighted Triangle Static Functions
+//
+
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleGetMaterial(
+    _In_ PCVOID Context, 
+    _In_ UINT32 FaceHit,
+    _Out_opt_ PCPHYSX_MATERIAL *Material
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+
+    ASSERT(Context != NULL);
+    ASSERT(Material != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    if (FaceHit > TRIANGLE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    *Material = Triangle->Materials[FaceHit];
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxLightedTriangleComputeNormal(
+    _In_ PCVOID Context,
+    _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
+    _Out_ PVECTOR3 SurfaceNormal
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(SurfaceNormal != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+    
+    Status = TriangleComputeNormal(&Triangle->Data,
+                                   FaceHit,
+                                   ModelHitPoint,
+                                   SurfaceNormal);
+                                   
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleTestBounds(
+    _In_ PCVOID Context,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(IsInsideBox != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+    
+    Status = TriangleCheckBounds(&Triangle->Data,
+                                 ModelToWorld,
+                                 WorldAlignedBoundingBox,
+                                 IsInsideBox);
+                                 
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleComputeSurfaceArea(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Out_ PFLOAT SurfaceArea
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+
+    ASSERT(Context != NULL);
+    ASSERT(SurfaceArea != NULL);
+
+    if (Face > TRIANGLE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+    
+    *SurfaceArea = Triangle->SurfaceArea;
+                                 
+    return ISTATUS_SUCCESS;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxLightedTriangleSampleSurface(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Out_ PPOINT3 Sample
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    POINT3 Vertex0;
+    POINT3 Vertex1;
+    POINT3 Vertex2;
+    FLOAT SqrtRandom0;
+    FLOAT Random0;
+    FLOAT Random1;
+    FLOAT Scalar0;
+    FLOAT Scalar1;
+    FLOAT Scalar2;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(Context != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(Sample != NULL);
+
+    if (Face > TRIANGLE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    RandomReferenceGenerateFloat(Rng, 
+                                 (FLOAT) 0.0f, 
+                                 (FLOAT) 1.0f,
+                                 &Random0);
+
+    SqrtRandom0 = SqrtFloat(Random0);
+
+    RandomReferenceGenerateFloat(Rng, 
+                                 (FLOAT) 0.0f, 
+                                 (FLOAT) 1.0f,
+                                 &Random1);
+
+    Vertex0 = Triangle->Data.Vertex0;
+    Vertex1 = PointVectorAdd(Vertex0, Triangle->Data.B);
+    Vertex2 = PointVectorAdd(Vertex0, Triangle->Data.C);
+
+    Scalar0 = (FLOAT) 1.0f - SqrtRandom0;
+    Scalar1 = SqrtRandom0 * ((FLOAT) 1.0f - Random1);
+    Scalar2 = SqrtRandom0 * Random1;
+
+    X = Scalar0 * Vertex0.X +
+        Scalar1 * Vertex1.X +
+        Scalar2 * Vertex2.X;
+
+    Y = Scalar0 * Vertex0.Y +
+        Scalar1 * Vertex1.Y +
+        Scalar2 * Vertex2.Y;
+
+    Z = Scalar0 * Vertex0.Z +
+        Scalar1 * Vertex1.Z +
+        Scalar2 * Vertex2.Z;
+
+    *Sample = PointCreate(X, Y, Z);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleXDominantTestRay(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    Status = TriangleXDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleYDominantTestRay(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    Status = TriangleYDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedTriangleZDominantTestRay(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    Status = TriangleZDominantTestRay(&Triangle->Data,
+                                      Ray,
+                                      HitAllocator,
+                                      HitList);
+
+    return Status;
+}
+
+STATIC
+VOID
+PhysxLightedTriangleFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PCPHYSX_LIGHTED_TRIANGLE Triangle;
+
+    ASSERT(Context != NULL);
+
+    Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
+
+    PhysxMaterialRelease(Triangle->Materials[TRIANGLE_FRONT_FACE]);
+    PhysxMaterialRelease(Triangle->Materials[TRIANGLE_BACK_FACE]);
+}
+
+//
 // Static Variables
 //
 
@@ -715,6 +1001,36 @@ CONST STATIC PHYSX_GEOMETRY_VTABLE ZTriangleHeader = {
     PhysxTriangleTestBounds,
     PhysxTriangleGetMaterial,
 	PhysxTriangleFree
+};
+
+CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE XLightedTriangleHeader = {
+    { PhysxLightedTriangleXDominantTestRay,
+      PhysxLightedTriangleComputeNormal,
+      PhysxLightedTriangleTestBounds,
+      PhysxLightedTriangleGetMaterial,
+      PhysxLightedTriangleFree },
+    PhysxLightedTriangleComputeSurfaceArea,
+    PhysxLightedTriangleSampleSurface
+};
+
+CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE YLightedTriangleHeader = {
+    { PhysxLightedTriangleYDominantTestRay,
+      PhysxLightedTriangleComputeNormal,
+      PhysxLightedTriangleTestBounds,
+      PhysxLightedTriangleGetMaterial,
+	  PhysxLightedTriangleFree },
+    PhysxLightedTriangleComputeSurfaceArea,
+    PhysxLightedTriangleSampleSurface
+};
+
+CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE ZLightedTriangleHeader = {
+    { PhysxLightedTriangleZDominantTestRay,
+      PhysxLightedTriangleComputeNormal,
+      PhysxLightedTriangleTestBounds,
+      PhysxLightedTriangleGetMaterial,
+   	  PhysxLightedTriangleFree },
+    PhysxLightedTriangleComputeSurfaceArea,
+    PhysxLightedTriangleSampleSurface
 };
 
 //
@@ -758,7 +1074,7 @@ PhysxTriangleAllocate(
     
     if (Geometry == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_07;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
 
@@ -798,6 +1114,119 @@ PhysxTriangleAllocate(
                                    DataSize,
                                    DataAlignment,
                                    Geometry);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    PhysxMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(BackMaterial);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxLightedTriangleAllocate(
+    _In_ PPHYSX_AREA_LIGHT_BUILDER Builder,
+    _In_ POINT3 Vertex0,
+    _In_ POINT3 Vertex1,
+    _In_ POINT3 Vertex2,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
+    _Out_ PSIZE_T AreaGeometryIndex
+    )
+{
+    PCPHYSX_LIGHTED_GEOMETRY_VTABLE LightedGeometryVTable;
+    VECTOR_AXIS DominantAxis;
+    PHYSX_LIGHTED_TRIANGLE Triangle;
+    FLOAT OneHalfPerimeter;
+    SIZE_T DataAlignment;
+    FLOAT SideALength;
+    FLOAT SideBLength;
+    FLOAT SideCLength;
+    SIZE_T DataSize;
+    ISTATUS Status;
+    VECTOR3 SideA;
+    PCVOID Data;
+
+    if (Builder == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (PointValidate(Vertex0) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (PointValidate(Vertex1) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (PointValidate(Vertex2) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+    
+    if (AreaGeometryIndex == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+	Status = TriangleInitialize(&Triangle.Data,
+								Vertex0,
+								Vertex1,
+								Vertex2,
+								&DominantAxis);
+
+	if (Status != ISTATUS_SUCCESS)
+	{
+		return Status;
+	}
+
+	Triangle.Materials[TRIANGLE_FRONT_FACE] = FrontMaterial;
+	Triangle.Materials[TRIANGLE_BACK_FACE] = BackMaterial;
+
+	Data = &Triangle;
+	DataSize = sizeof(PHYSX_LIGHTED_TRIANGLE);
+	DataAlignment = _Alignof(PHYSX_LIGHTED_TRIANGLE);
+
+	switch (DominantAxis)
+	{
+		case VECTOR_X_AXIS:
+			LightedGeometryVTable = &XLightedTriangleHeader;
+			break;
+		case VECTOR_Y_AXIS:
+			LightedGeometryVTable = &YLightedTriangleHeader;
+			break;
+		default:
+			LightedGeometryVTable = &ZLightedTriangleHeader;
+			break;
+	}
+
+    SideA = PointSubtract(Vertex1, Vertex2);
+
+    SideALength = VectorLength(SideA);
+    SideBLength = VectorLength(Triangle.Data.B);
+    SideCLength = VectorLength(Triangle.Data.C);
+    
+    OneHalfPerimeter = (FLOAT) 0.5f * (SideALength + SideBLength + SideCLength);
+
+    Triangle.SurfaceArea = SqrtFloat(OneHalfPerimeter *
+                                     OneHalfPerimeter * (OneHalfPerimeter - SideALength) *
+                                     OneHalfPerimeter * (OneHalfPerimeter - SideBLength) *
+                                     OneHalfPerimeter * (OneHalfPerimeter - SideBLength));
+
+    Status = PhysxAreaLightBuilderAddGeometry(Builder,
+                                              LightedGeometryVTable,
+                                              Data,
+                                              DataSize,
+                                              DataAlignment,
+                                              AreaGeometryIndex);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -64,6 +64,48 @@ Create(
     return IrisPhysx::Geometry(GeometryPtr, false);
 }
 
+static
+inline
+SIZE_T
+Create(
+    _In_ IrisPhysx::AreaLightBuilder & Builder,
+    _In_ const Iris::Point & Vertex0,
+    _In_ const Iris::Point & Vertex1,
+    _In_ const Iris::Point & Vertex2,
+    _In_ std::optional<IrisPhysx::Material> FrontMaterial,
+    _In_ std::optional<IrisPhysx::Material> BackMaterial
+    )
+{
+    PPHYSX_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPHYSX_MATERIAL() : nullptr;
+    PPHYSX_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPHYSX_MATERIAL() : nullptr;
+
+    SIZE_T AreaGeometryIndex;
+    ISTATUS Status = PhysxLightedTriangleAllocate(Builder.AsPPHYSX_AREA_LIGHT_BUILDER(),
+                                                  Vertex0.AsPOINT3(),
+                                                  Vertex1.AsPOINT3(),
+                                                  Vertex2.AsPOINT3(),
+                                                  IrisFrontMaterial,
+                                                  IrisBackMaterial,
+                                                  &AreaGeometryIndex);
+
+    switch (Status)
+    {
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_01:
+            throw std::invalid_argument("Vertex0");
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("Vertex1");
+        case ISTATUS_INVALID_ARGUMENT_03:
+            throw std::invalid_argument("Vertex2");
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+    }
+
+    assert(Status == ISTATUS_SUCCESS);
+    return AreaGeometryIndex;
+}
+
 } // namespace Triangle
 } // namespace IrisPhysxToolkit
 

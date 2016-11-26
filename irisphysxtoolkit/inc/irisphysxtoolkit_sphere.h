@@ -33,4 +33,17 @@ PhysxSphereAllocate(
     _Out_ PPHYSX_GEOMETRY *Geometry
     );
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXTOOLKITAPI
+ISTATUS
+PhysxLightedSphereAllocate(
+    _In_ PPHYSX_AREA_LIGHT_BUILDER Builder,
+    _In_ POINT3 Center,
+    _In_ FLOAT Radius,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
+    _Out_ PSIZE_T AreaGeometryIndex
+    );
+
 #endif // _SPHERE_IRIS_PHYSX_TOOLKIT_

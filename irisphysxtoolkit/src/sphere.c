@@ -272,16 +272,17 @@ typedef struct _PHYSX_SPHERE {
 
 typedef CONST PHYSX_SPHERE *PCPHYSX_SPHERE;
 
-typedef struct _PHYSX_LIGHT_SPHERE {
+typedef struct _PHYSX_LIGHTED_SPHERE {
     PPHYSX_MATERIAL Materials[2];
-    PPHYSX_LIGHT Lights[2];
     SPHERE Data;
-} PHYSX_LIGHT_SPHERE, *PPHYSX_LIGHT_SPHERE;
+    FLOAT SurfaceArea;
+    FLOAT Radius;
+} PHYSX_LIGHTED_SPHERE, *PPHYSX_LIGHTED_SPHERE;
 
-typedef CONST PHYSX_LIGHT_SPHERE *PCPHYSX_LIGHT_SPHERE;
+typedef CONST PHYSX_LIGHTED_SPHERE *PCPHYSX_LIGHTED_SPHERE;
 
 //
-// Static Functions
+// Sphere Static Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -410,6 +411,214 @@ PhysxSphereFree(
 }
 
 //
+// Lighted Sphere Static Functions
+//
+
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedSphereGetMaterial(
+    _In_ PCVOID Context, 
+    _In_ UINT32 FaceHit,
+    _Out_opt_ PCPHYSX_MATERIAL *Material
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+
+    ASSERT(Context != NULL);
+    ASSERT(Material != NULL);
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+
+    if (FaceHit > SPHERE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    *Material = Sphere->Materials[FaceHit];
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxLightedSphereComputeNormal(
+    _In_ PCVOID Context,
+    _In_ UINT32 FaceHit,
+    _In_ POINT3 ModelHitPoint,
+    _Out_ PVECTOR3 SurfaceNormal
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(SurfaceNormal != NULL);
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+    
+    Status = SphereComputeNormal(&Sphere->Data,
+                                 FaceHit,
+                                 ModelHitPoint,
+                                 SurfaceNormal);
+                                   
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedSphereTestBounds(
+    _In_ PCVOID Context,
+    _In_ PCMATRIX ModelToWorld,
+    _In_ BOUNDING_BOX WorldAlignedBoundingBox,
+    _Out_ PBOOL IsInsideBox
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(IsInsideBox != NULL);
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+    
+    Status = SphereCheckBounds(&Sphere->Data,
+                               ModelToWorld,
+                               WorldAlignedBoundingBox,
+                               IsInsideBox);
+                                 
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedSphereTestRay(
+    _In_opt_ PCVOID Context, 
+    _In_ RAY Ray,
+    _Inout_ PPHYSX_HIT_ALLOCATOR HitAllocator,
+    _Outptr_result_maybenull_ PHIT_LIST *HitList
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(RayValidate(Ray) != FALSE);
+    ASSERT(HitAllocator != NULL);
+    ASSERT(HitList != NULL);
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+
+    Status = SphereTestRay(&Sphere->Data,
+                           Ray,
+                           HitAllocator,
+                           HitList);
+
+    return Status;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS 
+PhysxLightedSphereComputeSurfaceArea(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Out_ PFLOAT SurfaceArea
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+
+    ASSERT(Context != NULL);
+    ASSERT(SurfaceArea != NULL);
+
+    if (Face > SPHERE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+    
+    *SurfaceArea = Sphere->SurfaceArea;
+                                 
+    return ISTATUS_SUCCESS;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
+ISTATUS
+PhysxLightedSphereSampleSurface(
+    _In_opt_ PCVOID Context, 
+    _In_ UINT32 Face,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Out_ PPOINT3 Sample
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+    FLOAT Random0;
+    FLOAT Random1;
+    FLOAT Theta;
+    FLOAT Phi;
+    FLOAT X;
+    FLOAT Y;
+    FLOAT Z;
+
+    ASSERT(Context != NULL);
+    ASSERT(Rng != NULL);
+    ASSERT(Sample != NULL);
+
+    if (Face > SPHERE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+
+    RandomReferenceGenerateFloat(Rng, 
+                                 (FLOAT) 0.0f, 
+                                 (FLOAT) 1.0f,
+                                 &Random0);
+
+    RandomReferenceGenerateFloat(Rng, 
+                                 (FLOAT) 0.0f, 
+                                 (FLOAT) 1.0f,
+                                 &Random1);
+
+    Theta = (FLOAT) 2.0 * IRIS_PI * Random0;
+    Phi = ArccosineFloat((FLOAT) 1.0f * (FLOAT) 2.0f * Random1);
+
+    X = Sphere->Radius * SineFloat(Phi) * CosineFloat(Theta) + Sphere->Data.Center.X;
+    Y = Sphere->Radius * SineFloat(Phi) * SineFloat(Theta) + Sphere->Data.Center.Y;
+    Z = Sphere->Radius * CosineFloat(Phi) + Sphere->Data.Center.Z;
+
+    *Sample = PointCreate(X, Y, Z);
+
+    return ISTATUS_SUCCESS;
+}
+
+STATIC
+VOID
+PhysxLightedSphereFree(
+    _In_ _Post_invalid_ PVOID Context
+    )
+{
+    PCPHYSX_LIGHTED_SPHERE Sphere;
+
+    ASSERT(Context != NULL);
+
+    Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
+
+    PhysxMaterialRelease(Sphere->Materials[SPHERE_FRONT_FACE]);
+    PhysxMaterialRelease(Sphere->Materials[SPHERE_BACK_FACE]);
+}
+
+//
 // Static Variables
 //
 
@@ -419,6 +628,16 @@ CONST STATIC PHYSX_GEOMETRY_VTABLE SphereHeader = {
     PhysxSphereTestBounds,
     PhysxSphereGetMaterial,
     PhysxSphereFree
+};
+
+CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE LightedSphereHeader = {
+    { PhysxLightedSphereTestRay,
+      PhysxLightedSphereComputeNormal,
+      PhysxLightedSphereTestBounds,
+      PhysxLightedSphereGetMaterial,
+      PhysxLightedSphereFree },
+    PhysxLightedSphereComputeSurfaceArea,
+    PhysxLightedSphereSampleSurface
 };
 
 //
@@ -464,7 +683,7 @@ PhysxSphereAllocate(
     
     if (Geometry == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
 	SphereInitialize(&Sphere.Data,
@@ -491,6 +710,87 @@ PhysxSphereAllocate(
     }
 
     PhysxMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(BackMaterial);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+PhysxLightedSphereAllocate(
+    _In_ PPHYSX_AREA_LIGHT_BUILDER Builder,
+    _In_ POINT3 Center,
+    _In_ FLOAT Radius,
+    _In_opt_ PPHYSX_MATERIAL FrontMaterial,
+    _In_opt_ PPHYSX_MATERIAL BackMaterial,
+    _Out_ PSIZE_T AreaGeometryIndex
+    )
+{
+    PCPHYSX_LIGHTED_GEOMETRY_VTABLE LightedGeometryVTable;
+    PHYSX_LIGHTED_SPHERE LightedSphere;
+    SIZE_T DataAlignment;
+    FLOAT RadiusSquared;
+    SIZE_T DataSize;
+    ISTATUS Status;
+    PCVOID Data;
+
+    if (Builder == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (PointValidate(Center) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (IsFiniteFloat(Radius) == FALSE ||
+        IsGreaterThanZeroFloat(Radius) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    RadiusSquared = Radius * Radius;
+    
+    if (IsFiniteFloat(Radius) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (AreaGeometryIndex == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+	SphereInitialize(&LightedSphere.Data,
+					 Center,
+					 RadiusSquared);
+
+	LightedSphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
+	LightedSphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
+    LightedSphere.SurfaceArea = (FLOAT) 4.0f * IRIS_PI * RadiusSquared;
+    LightedSphere.Radius = Radius;
+
+	Data = &LightedSphere;
+	DataSize = sizeof(PHYSX_LIGHTED_SPHERE);
+	DataAlignment = _Alignof(PHYSX_LIGHTED_SPHERE);
+	LightedGeometryVTable = &LightedSphereHeader;
+    
+    Status = PhysxAreaLightBuilderAddGeometry(Builder,
+                                              LightedGeometryVTable,
+                                              Data,
+                                              DataSize,
+                                              DataAlignment,
+                                              AreaGeometryIndex);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    PhysxMaterialRetain(FrontMaterial);
+    PhysxMaterialRetain(BackMaterial);
 
     return ISTATUS_SUCCESS;
 }

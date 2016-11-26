@@ -60,6 +60,44 @@ Create(
     return IrisPhysx::Geometry(GeometryPtr, false);
 }
 
+static
+inline
+SIZE_T
+Create(
+    _In_ IrisPhysx::AreaLightBuilder & Builder,
+    _In_ const Iris::Point & Center,
+    _In_ FLOAT Radius,
+    _In_ std::optional<IrisPhysx::Material> FrontMaterial,
+    _In_ std::optional<IrisPhysx::Material> BackMaterial
+    )
+{
+    PPHYSX_MATERIAL IrisFrontMaterial = (FrontMaterial) ? FrontMaterial->AsPPHYSX_MATERIAL() : nullptr;
+    PPHYSX_MATERIAL IrisBackMaterial = (BackMaterial) ? BackMaterial->AsPPHYSX_MATERIAL() : nullptr;
+
+    SIZE_T AreaGeometryIndex;
+    ISTATUS Status = PhysxLightedSphereAllocate(Builder.AsPPHYSX_AREA_LIGHT_BUILDER(),
+                                                Center.AsPOINT3(),
+                                                Radius,
+                                                IrisFrontMaterial,
+                                                IrisBackMaterial,
+                                                &AreaGeometryIndex);
+
+    switch (Status)
+    {
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_INVALID_ARGUMENT_01:
+            throw std::invalid_argument("Center");
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("Radius");
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+    }
+
+    assert(Status == ISTATUS_SUCCESS);
+    return AreaGeometryIndex;
+}
+
 } // namespace Sphere
 } // namespace IrisPhysxToolkit
 
