@@ -23,7 +23,6 @@ Abstract:
 #include <vector>
 
 extern "C" {
-#include <iristoolkit.h>
 #include <irisadvancedtoolkit.h>
 #include <irisphysxtoolkit.h>
 }
@@ -37,8 +36,6 @@ extern "C" {
 
 #include "phong.h"
 #include "utility.h"
-#include "checkerboard.h"
-#include "trianglecreator.h"
 
 using namespace std;
 

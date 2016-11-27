@@ -54,7 +54,7 @@ public:
 
     IRISPHYSXPLUSPLUSAPI
     void
-    AttachLightToGemoetry(
+    AttachLightToGeometry(
         _In_ SIZE_T GeometryIndex,
         _In_ UINT32 FaceIndex,
         _In_ SIZE_T LightIndex

@@ -228,6 +228,7 @@ PhysxLightedGeometryAdapterAllocate(
 {
     PPHYSX_GEOMETRY AllocatedGeometry;
     PPHYSX_LIGHTED_GEOMETRY AllocatedLightedGeometry;
+    PPHYSX_LIGHTED_GEOMETRY_ADAPTER AllocatedLightedGeometryAdapter;
     PVOID DataAllocation;
     PHYSX_LIGHTED_GEOMETRY_ADAPTER LightedGeometryAdapterData;
     ISTATUS Status;
@@ -237,7 +238,7 @@ PhysxLightedGeometryAdapterAllocate(
     ASSERT(PhysxLightedGeometryVTable != NULL);
     ASSERT(DataSizeInBytes == 0 || 
            (Data != NULL && DataAlignment != 0 && 
-           (DataAlignment & DataAlignment - 1) && 
+           (DataAlignment & DataAlignment - 1) == 0 &&
            DataSizeInBytes % DataAlignment == 0));
     ASSERT(LightedGeometry != NULL);
     ASSERT(LightedGeometryAdapter != NULL);
@@ -261,8 +262,8 @@ PhysxLightedGeometryAdapterAllocate(
     Status = PhysxGeometryAllocateInternal(&LightedGeometryAdapterVTable,
                                            ReferenceCount,
                                            &LightedGeometryAdapterData,
-                                           sizeof(PHYSX_LIGHTED_GEOMETRY),
-                                           _Alignof(PHYSX_LIGHTED_GEOMETRY),
+                                           sizeof(PHYSX_LIGHTED_GEOMETRY_ADAPTER),
+                                           _Alignof(PHYSX_LIGHTED_GEOMETRY_ADAPTER),
                                            &AllocatedGeometry);
 
     if (Status != ISTATUS_SUCCESS)
@@ -292,9 +293,11 @@ PhysxLightedGeometryAdapterAllocate(
     }
 
     DataAllocation = PhysxGeometryGetMutableData(AllocatedGeometry);
+    AllocatedLightedGeometryAdapter = (PPHYSX_LIGHTED_GEOMETRY_ADAPTER) DataAllocation;
+    AllocatedLightedGeometryAdapter->LightedGeometry = AllocatedLightedGeometry;
 
     *LightedGeometry = AllocatedLightedGeometry;
-    *LightedGeometryAdapter = (PPHYSX_LIGHTED_GEOMETRY_ADAPTER) DataAllocation;
+    *LightedGeometryAdapter = AllocatedLightedGeometryAdapter;
     *Geometry = AllocatedGeometry;
 
     return ISTATUS_SUCCESS;

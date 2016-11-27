@@ -629,7 +629,7 @@ TEST(RayTracePlusPlusTestIdentityTriangle)
         CHECK_EQUAL(0, FrontFace);
         CHECK_EQUAL(1, BackFace);
         CHECK_EQUAL(true, !!AdditionalData);
-        CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
+        CHECK_EQUAL(sizeof(FLOAT[3]), AdditionalDataSize);
         FirstHitFound = true;
         return true;
     };
@@ -669,7 +669,7 @@ TEST(RayTracePlusPlusTestTranslatedTriangle)
         CHECK_EQUAL(0, FrontFace);
         CHECK_EQUAL(1, BackFace);
         CHECK_EQUAL(true, !!AdditionalData);
-        CHECK_EQUAL(sizeof(BARYCENTRIC_COORDINATES), AdditionalDataSize);
+        CHECK_EQUAL(sizeof(FLOAT[3]), AdditionalDataSize);
         FirstHitFound = true;
         return true;
     };

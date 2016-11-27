@@ -55,5 +55,6 @@ extern "C" {
 #include "irisphysxtoolkitplusplus_triangle.h"
 #include "irisphysxtoolkitplusplus_infiniteplane.h"
 #include "irisphysxtoolkitplusplus_constantarealight.h"
+#include "irisphysxtoolkitplusplus_lambertianmaterial.h"
 
 #endif // _IRIS_PHYSX_TOOLKIT_PLUS_PLUS_HEADER_

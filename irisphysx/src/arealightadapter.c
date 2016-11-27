@@ -357,7 +357,7 @@ PhysxAreaLightAdapterAllocate(
     ASSERT(AreaLightVTable != NULL);
     ASSERT(DataSizeInBytes == 0 || 
            (Data != NULL && DataAlignment != 0 && 
-           (DataAlignment & DataAlignment - 1) && 
+           (DataAlignment & DataAlignment - 1) == 0 &&
            DataSizeInBytes % DataAlignment == 0));
     ASSERT(AreaLightAdapter != NULL);
     ASSERT(Light != NULL);

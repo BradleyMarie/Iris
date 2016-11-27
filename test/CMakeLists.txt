@@ -5,8 +5,6 @@ include_directories(src/inc
     ../irisspectrum/inc 
     ../irisphysx/inc 
     ../irisphysxtoolkit/inc 
-    ../iristoolkit/inc
-    ../irisshadingmodel/inc 
     ../irisplusplus/inc
     ../irisadvancedplusplus/inc
     ../irisadvancedtoolkitplusplus/inc
@@ -48,13 +46,10 @@ add_executable(iris-test
     ${unittest-platform-sources}
     src/main.cpp
     src/utility.cpp
-    src/trianglecreator.cpp
-    src/checkerboard.cpp
     src/vector.cpp
     src/matrix.cpp
     src/point.cpp
     src/ray.cpp
-    src/render.cpp
     src/irisplusplus.cpp
     src/spectrum.cpp
     src/phong.cpp
@@ -62,12 +57,10 @@ add_executable(iris-test
 
 target_link_libraries(iris-test 
     iris 
-    irisshadingmodel
     irisadvanced
     irisspectrum
     irisphysx
     irisphysxtoolkit
-    iristoolkit
     irisplusplus
     irisadvancedplusplus
     irisspectrumplusplus

@@ -16,7 +16,8 @@ Reimplement Add routines using an extended VTable identified when ReferenceCount
 // IrisPhysx
 //
 
-1) Function/Arg Naming/Casing unification
+1) Function/Arg Naming/Casing unification (Toolkit)
+2) Determine how to handle dropped hits for PDF calculations (for CSG)
 
 //
 // IrisPlusPlus

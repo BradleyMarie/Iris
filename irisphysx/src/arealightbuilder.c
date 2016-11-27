@@ -397,7 +397,7 @@ PhysxAreaLightBuilderAttachLightToGeometry(
                                                              &Area);
     if (Status != ISTATUS_SUCCESS ||
         IsLessThanOrEqualToZeroFloat(Area) != FALSE ||
-        IsFiniteFloat(Area) != FALSE)
+        IsInfiniteFloat(Area) != FALSE)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -578,6 +578,8 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
         
         AreaLightReferenceCountAddLight(ReferenceCount,
                                         LocalLights[Index]);
+
+        AreaLightReferenceCountRetain(ReferenceCount);
     }
 
     //
@@ -615,6 +617,8 @@ PhysxAreaLightBuilderBuildLightsAndGeometry(
         
         AreaLightReferenceCountAddGeometry(ReferenceCount,
                                            LocalGeometry[Index]);
+
+        AreaLightReferenceCountRetain(ReferenceCount);
         
         //
         // Attach Lights And Geometry

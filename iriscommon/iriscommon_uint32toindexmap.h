@@ -215,7 +215,7 @@ UInt32ToIndexMapAddMapping(
                                          Key,
                                          &Index);
 
-    if (Found != TRUE)
+    if (Found != FALSE)
     {
         if (UpdateExisting != FALSE)
         {

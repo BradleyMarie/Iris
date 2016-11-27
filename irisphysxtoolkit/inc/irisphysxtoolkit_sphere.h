@@ -18,6 +18,13 @@ Abstract:
 #include <irisphysxtoolkit.h>
 
 //
+// Constants
+//
+
+#define PHYSX_SPHERE_FRONT_FACE 0
+#define PHYSX_SPHERE_BACK_FACE  1
+
+//
 // Functions
 //
 

@@ -84,6 +84,8 @@ AreaLightReferenceCountAllocate(
     AllocatedReferenceCount->Lights = (PPHYSX_LIGHT*) Allocation;
     AllocatedReferenceCount->NumberOfLights = 0;
     AllocatedReferenceCount->LightsCapacity = NumberOfLights;
+    
+    AllocatedReferenceCount->ReferenceCount = 0;
 
     *ReferenceCount = AllocatedReferenceCount;
 
