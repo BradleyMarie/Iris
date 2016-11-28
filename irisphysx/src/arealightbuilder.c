@@ -212,7 +212,7 @@ PhysxAreaLightBuilderAddGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    GeometryData->Data = IrisAlignedAlloc(DataSizeInBytes, DataAlignment);
+    GeometryData->Data = malloc(DataSizeInBytes);
     
     if (GeometryData->Data == NULL)
     {
@@ -225,7 +225,7 @@ PhysxAreaLightBuilderAddGeometry(
     if (Status != ISTATUS_SUCCESS)
     {
         ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-        IrisAlignedFree(GeometryData->Data);
+        free(GeometryData->Data);
         free(GeometryData);
         return Status;
     }
@@ -239,7 +239,7 @@ PhysxAreaLightBuilderAddGeometry(
     {
         ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
         UInt32ToIndexMapDestroy(&GeometryData->AttachedLights);
-        IrisAlignedFree(GeometryData->Data);
+        free(GeometryData->Data);
         free(GeometryData);
         return Status;
     }
@@ -315,7 +315,7 @@ PhysxAreaLightBuilderAddLight(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    LightData->Data = IrisAlignedAlloc(DataSizeInBytes, DataAlignment);
+    LightData->Data = malloc(DataSizeInBytes);
 
     if (LightData->Data == NULL)
     {
@@ -331,7 +331,7 @@ PhysxAreaLightBuilderAddLight(
     if (Status != ISTATUS_SUCCESS)
     {
         ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-        IrisAlignedFree(LightData->Data);
+        free(LightData->Data);
         free(LightData);
         return Status;
     }

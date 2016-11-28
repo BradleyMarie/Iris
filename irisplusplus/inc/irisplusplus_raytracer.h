@@ -71,7 +71,16 @@ public:
         _In_ const Ray & WorldRay,
         _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
         );
-    
+
+    IRISPLUSPLUSAPI
+    void
+    TraceHitsInOrder(
+        _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+        _In_ const Ray & WorldRay,
+        _In_ FLOAT MinimumDistance,
+        _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
+        );
+
     IRISPLUSPLUSAPI
     void
     TraceAllHitsInOrder(

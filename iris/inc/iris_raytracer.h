@@ -113,6 +113,20 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISAPI
 ISTATUS
+RayTracerTraceSceneProcessHitsInOrderWithCoordinates(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ RAY Ray,
+    _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestShapesContext,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISAPI
+ISTATUS
 RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,

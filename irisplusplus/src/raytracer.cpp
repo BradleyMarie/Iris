@@ -140,6 +140,8 @@ RayTracer::TraceClosestHit(
     {
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("MinimumDistance");
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
     }
@@ -170,6 +172,8 @@ RayTracer::TraceClosestHit(
     {
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("MinimumDistance");
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
     }
@@ -198,6 +202,38 @@ RayTracer::TraceAllHitsOutOfOrder(
     {
         case ISTATUS_ALLOCATION_FAILED:
             throw std::bad_alloc();
+        default:
+            throw std::runtime_error(ISTATUSToCString(Status));
+    }
+}
+
+void
+RayTracer::TraceHitsInOrder(
+    _In_ const std::function<void(HitTester, const Ray &)> & TestGeometryRoutine,
+    _In_ const Ray & WorldRay,
+    _In_ FLOAT MinimumDistance,
+    _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
+    )
+{
+    ISTATUS Status = RayTracerTraceSceneProcessHitsInOrderWithCoordinates(Data,
+                                                                          WorldRay.AsRAY(),
+																	     MinimumDistance,
+                                                                          TestGeometryAdapter,
+                                                                          &TestGeometryRoutine,
+                                                                          ProcessHitsWithCoordinatesAdapter,
+                                                                          &ProcessHitRoutine);
+
+    if (Status == ISTATUS_SUCCESS)
+    {
+        return;
+    }
+
+    switch (Status)
+    {
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+        case ISTATUS_INVALID_ARGUMENT_02:
+            throw std::invalid_argument("MinimumDistance");
         default:
             throw std::runtime_error(ISTATUSToCString(Status));
     }

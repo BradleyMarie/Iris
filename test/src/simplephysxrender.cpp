@@ -1104,15 +1104,27 @@ TEST(PhysxRenderCornellBox)
     SIZE_T LightIndex = ConstantAreaLight::Create(Builder, LightSpectrum);
 
     Builder.AttachLightToGeometry(Triangle0Index,
-                                  PHYSX_TRIANGLE_FRONT_FACE,
+                                  PHYSX_TRIANGLE_BACK_FACE,
                                   LightIndex);
 
     Builder.AttachLightToGeometry(Triangle1Index,
-                                  PHYSX_TRIANGLE_FRONT_FACE,
+                                  PHYSX_TRIANGLE_BACK_FACE,
                                   LightIndex);
     
     auto GeometryAndLights = Builder.Build();
-    
+
+    LightList Lights = LightList::Create();
+
+    for (Light & light : std::get<1>(GeometryAndLights))
+    {
+        Lights.Add(light);
+    }
+
+    for (Geometry & geometry : std::get<0>(GeometryAndLights))
+    {
+        Scene.AddGeometry(geometry);
+    }
+
     //
     // Back Wall, Floor, and Ceiling
     //
@@ -1266,13 +1278,6 @@ TEST(PhysxRenderCornellBox)
     // Render
     //
     
-    LightList Lights = LightList::Create();
-    
-    for (Light & light : std::get<1>(GeometryAndLights))
-    {
-        Lights.Add(light);
-    }
-    
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
                                            Iris::MatrixReference ModelToWorld,
@@ -1291,10 +1296,25 @@ TEST(PhysxRenderCornellBox)
     {
         Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
         Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-        
+
         SpectrumReference ReflectedLight(nullptr);
+
+        auto OptionalLight = Geom.GetLight(FaceHit);
+
+        if (OptionalLight)
+        {
+            ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
+        }
+
+        auto OptionalMaterial = Geom.GetMaterial(FaceHit);
+
+        if (!OptionalMaterial)
+        {
+            return ReflectedLight;
+        }
+
+        MaterialReference Mat = *OptionalMaterial;
+        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
         
         for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
         {

@@ -439,12 +439,13 @@ PhysxVisibilityTesterComputePdf(
                                                                Light,
                                                                InverseLightSurfaceArea);
     
-    Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
-                                                                     WorldRay,
-                                                                     PhysxVisibilityTesterTestGeometryCallback,
-                                                                     &VisibilityTester->TestGeometryContext,
-                                                                     PhysxVisibilityTesterComputePdfProcessHitCallback,
-                                                                     &Context);
+    Status = RayTracerTraceSceneProcessHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
+                                                                  WorldRay,
+                                                                  VisibilityTester->Epsilon,
+                                                                  PhysxVisibilityTesterTestGeometryCallback,
+                                                                  &VisibilityTester->TestGeometryContext,
+                                                                  PhysxVisibilityTesterComputePdfProcessHitCallback,
+                                                                  &Context);
 
     *ClosestPointOnLight = Context.ClosestWorldPointOnLight;
     *Pdf = Context.Pdf;

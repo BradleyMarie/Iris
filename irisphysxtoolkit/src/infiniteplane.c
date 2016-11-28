@@ -368,8 +368,8 @@ PhysxInfinitePlaneAllocate(
     }
 
 	Status = InfinitePlaneInitialize(Point,
-									 SurfaceNormal,
-									 &InfinitePlane.Data);
+                                     SurfaceNormal,
+                                     &InfinitePlane.Data);
 
 	if (Status != ISTATUS_SUCCESS)
 	{
