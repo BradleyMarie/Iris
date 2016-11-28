@@ -1361,5 +1361,5 @@ TEST(PhysxRenderCornellBox)
                           CreateState,
                           Fb);
     
-    Fb.SaveAsPFM("RenderCornellBosPlusPlus.pfm");
+    Fb.SaveAsPFM("RenderCornellBoxPlusPlus.pfm");
 }

@@ -543,7 +543,7 @@ PhysxVisibilityTesterTest(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (VisibilityTester->Epsilon * (FLOAT) 2.0f < DistanceToObject)
+    if (VisibilityTester->Epsilon * (FLOAT) 2.0f > DistanceToObject)
     {
         *Visible = TRUE;
         return ISTATUS_SUCCESS;
