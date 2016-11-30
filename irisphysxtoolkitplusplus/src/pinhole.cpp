@@ -216,7 +216,7 @@ Render(
     _In_ bool Parallelize,
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_ CreateStateRoutine CreateStateFunction,
-    _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
+    _Inout_ IrisAdvanced::Framebuffer & Framebuffer
     )
 {
     CreateStateContext CreateStateCtxt(CreateStateFunction);
@@ -264,7 +264,7 @@ Render(
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_ const IrisPhysx::LightList & Lights,
     _In_ CreateStateRoutine CreateStateFunction,
-    _Inout_ IrisAdvancedToolkit::Framebuffer & Framebuffer
+    _Inout_ IrisAdvanced::Framebuffer & Framebuffer
     )
 {
     CreateStateContext CreateStateCtxt(CreateStateFunction);

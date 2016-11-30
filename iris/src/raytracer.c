@@ -379,6 +379,110 @@ RayTracerTraceSceneProcessAllHitsOutOfOrder(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
+RayTracerTraceSceneProcessHitsInOrderWithCoordinates(
+    _Inout_ PRAYTRACER RayTracer,
+    _In_ RAY Ray,
+    _In_ FLOAT MinimumDistance,
+    _In_ PRAYTRACER_TEST_GEOMETRY_ROUTINE TestShapesRoutine,
+    _In_opt_ PCVOID TestShapesContext,
+    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE ProcessHitRoutine,
+    _Inout_opt_ PVOID ProcessHitContext
+    )
+{
+    PCMATRIX ModelToWorld;
+    PCINTERNAL_HIT CurrentHit;
+    PHIT_TESTER HitTester;
+    VECTOR3 ModelViewer;
+    POINT3 ModelHit;
+    POINT3 WorldHit;
+    ISTATUS Status;
+
+    if (RayTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (RayValidate(Ray) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+    
+    if (IsLessThanZeroFloat(MinimumDistance) != FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+    
+    if (TestShapesRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+    
+    if (ProcessHitRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+    
+    HitTester = &RayTracer->HitTester;
+    
+    HitTesterSetRay(HitTester, Ray);
+
+    Status = TestShapesRoutine(TestShapesContext, 
+                               HitTester,
+                               Ray);
+    
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+    
+    HitTesterSort(HitTester);
+    
+    Status = HitTesterGetNextHit(HitTester,
+                                 &CurrentHit);
+
+    while (Status != ISTATUS_NO_MORE_DATA &&
+           CurrentHit->Hit.Distance < MinimumDistance)
+    {
+        Status = HitTesterGetNextHit(HitTester,
+                                     &CurrentHit);
+    }
+
+    while (Status != ISTATUS_NO_MORE_DATA)
+    {
+        HitTesterComputeHitData(HitTester,
+                                CurrentHit,
+                                &ModelToWorld,
+                                &ModelViewer,
+                                &ModelHit,
+                                &WorldHit);
+
+        Status = ProcessHitRoutine(ProcessHitContext,
+                                   &CurrentHit->Hit,
+                                   ModelToWorld,
+                                   ModelViewer,
+                                   ModelHit,
+                                   WorldHit);
+        
+        if (Status == ISTATUS_NO_MORE_DATA)
+        {
+            break;
+        }
+        
+        if (Status != ISTATUS_SUCCESS)
+        {
+            return Status;
+        }
+        
+        Status = HitTesterGetNextHit(HitTester,
+                                     &CurrentHit);
+    }
+    
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
 RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(
     _Inout_ PRAYTRACER RayTracer,
     _In_ RAY Ray,

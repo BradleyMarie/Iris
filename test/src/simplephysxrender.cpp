@@ -277,7 +277,7 @@ TEST(PhysxRenderConstantRedWorldSphere)
             ToneMap.push_back(ToneMappingFunc);
         }
     };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
     PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
                           1.0f,
@@ -295,7 +295,7 @@ TEST(PhysxRenderConstantRedWorldSphere)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderConstantRedWorldSpherePlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedModelSphere)
@@ -376,7 +376,7 @@ TEST(PhysxRenderConstantRedModelSphere)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderConstantRedModelSpherePlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedModelSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedPremultipliedSphere)
@@ -457,7 +457,7 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderConstantRedPremultipliedSpherePlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedPremultipliedSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderPerfectSpecularSphere)
@@ -569,7 +569,7 @@ TEST(PhysxRenderPerfectSpecularSphere)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderPerfectSpecularWorldSpherePlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderPerfectSpecularWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedWorldTriangle)
@@ -669,7 +669,7 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderConstantRedWorldTrianglePlusPlus.pfm");    
+    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedWorldTrianglePlusPlus.pfm");
 }
 
 TEST(PhysxRenderInterpolatedRedWorldTriangle)
@@ -779,7 +779,7 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");    
+    FramebufferIO::SaveAsPFM(Fb, "RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
 }
 
 TEST(PhysxRenderPhongWorldSphere)
@@ -891,7 +891,7 @@ TEST(PhysxRenderPhongWorldSphere)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderPhongWorldSpherePlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderPhongWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
@@ -1046,7 +1046,7 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
                           CreateState,
                           Fb);
 
-    Fb.SaveAsPFM("RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
 }
 
 void
@@ -1104,15 +1104,27 @@ TEST(PhysxRenderCornellBox)
     SIZE_T LightIndex = ConstantAreaLight::Create(Builder, LightSpectrum);
 
     Builder.AttachLightToGeometry(Triangle0Index,
-                                  PHYSX_TRIANGLE_FRONT_FACE,
+                                  PHYSX_TRIANGLE_BACK_FACE,
                                   LightIndex);
 
     Builder.AttachLightToGeometry(Triangle1Index,
-                                  PHYSX_TRIANGLE_FRONT_FACE,
+                                  PHYSX_TRIANGLE_BACK_FACE,
                                   LightIndex);
     
     auto GeometryAndLights = Builder.Build();
-    
+
+    LightList Lights = LightList::Create();
+
+    for (Light & light : std::get<1>(GeometryAndLights))
+    {
+        Lights.Add(light);
+    }
+
+    for (Geometry & geometry : std::get<0>(GeometryAndLights))
+    {
+        Scene.AddGeometry(geometry);
+    }
+
     //
     // Back Wall, Floor, and Ceiling
     //
@@ -1266,13 +1278,6 @@ TEST(PhysxRenderCornellBox)
     // Render
     //
     
-    LightList Lights = LightList::Create();
-    
-    for (Light & light : std::get<1>(GeometryAndLights))
-    {
-        Lights.Add(light);
-    }
-    
     ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                            UINT32 FaceHit,
                                            Iris::MatrixReference ModelToWorld,
@@ -1291,10 +1296,25 @@ TEST(PhysxRenderCornellBox)
     {
         Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
         Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-        
+
         SpectrumReference ReflectedLight(nullptr);
+
+        auto OptionalLight = Geom.GetLight(FaceHit);
+
+        if (OptionalLight)
+        {
+            ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
+        }
+
+        auto OptionalMaterial = Geom.GetMaterial(FaceHit);
+
+        if (!OptionalMaterial)
+        {
+            return ReflectedLight;
+        }
+
+        MaterialReference Mat = *OptionalMaterial;
+        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
         
         for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
         {
@@ -1361,5 +1381,5 @@ TEST(PhysxRenderCornellBox)
                           CreateState,
                           Fb);
     
-    Fb.SaveAsPFM("RenderCornellBosPlusPlus.pfm");
+    FramebufferIO::SaveAsPFM(Fb, "RenderCornellBoxPlusPlus.pfm");
 }

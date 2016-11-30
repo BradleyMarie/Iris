@@ -138,10 +138,10 @@ SphereTestRay(
         BackFace1 = SPHERE_FRONT_FACE;
 #endif // defined(ENABLE_CSG_SUPPORT)
     }
-    else if (Distance0 >(FLOAT) 0.0)
+    else if (Distance0 > (FLOAT) 0.0)
     {
-        FrontFace0 = SPHERE_BACK_FACE;
-        BackFace0 = SPHERE_FRONT_FACE;
+        FrontFace0 = SPHERE_FRONT_FACE;
+        BackFace0 = SPHERE_BACK_FACE;
 #if defined(ENABLE_CSG_SUPPORT)
         FrontFace1 = SPHERE_BACK_FACE;
         BackFace1 = SPHERE_FRONT_FACE;
@@ -687,8 +687,8 @@ PhysxSphereAllocate(
     }
 
 	SphereInitialize(&Sphere.Data,
-					 Center,
-					 RadiusSquared);
+				    Center,
+				    RadiusSquared);
 
 	Sphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
 	Sphere.Materials[SPHERE_BACK_FACE] = BackMaterial;
@@ -764,8 +764,8 @@ PhysxLightedSphereAllocate(
     }
 
 	SphereInitialize(&LightedSphere.Data,
-					 Center,
-					 RadiusSquared);
+				    Center,
+				    RadiusSquared);
 
 	LightedSphere.Materials[SPHERE_FRONT_FACE] = FrontMaterial;
 	LightedSphere.Materials[SPHERE_BACK_FACE] = BackMaterial;

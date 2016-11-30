@@ -1018,7 +1018,7 @@ CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE YLightedTriangleHeader = {
       PhysxLightedTriangleComputeNormal,
       PhysxLightedTriangleTestBounds,
       PhysxLightedTriangleGetMaterial,
-	  PhysxLightedTriangleFree },
+      PhysxLightedTriangleFree },
     PhysxLightedTriangleComputeSurfaceArea,
     PhysxLightedTriangleSampleSurface
 };
@@ -1028,7 +1028,7 @@ CONST STATIC PHYSX_LIGHTED_GEOMETRY_VTABLE ZLightedTriangleHeader = {
       PhysxLightedTriangleComputeNormal,
       PhysxLightedTriangleTestBounds,
       PhysxLightedTriangleGetMaterial,
-   	  PhysxLightedTriangleFree },
+      PhysxLightedTriangleFree },
     PhysxLightedTriangleComputeSurfaceArea,
     PhysxLightedTriangleSampleSurface
 };

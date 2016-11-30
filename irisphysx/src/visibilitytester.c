@@ -439,12 +439,13 @@ PhysxVisibilityTesterComputePdf(
                                                                Light,
                                                                InverseLightSurfaceArea);
     
-    Status = RayTracerTraceSceneProcessAllHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
-                                                                     WorldRay,
-                                                                     PhysxVisibilityTesterTestGeometryCallback,
-                                                                     &VisibilityTester->TestGeometryContext,
-                                                                     PhysxVisibilityTesterComputePdfProcessHitCallback,
-                                                                     &Context);
+    Status = RayTracerTraceSceneProcessHitsInOrderWithCoordinates(VisibilityTester->RayTracer,
+                                                                  WorldRay,
+                                                                  VisibilityTester->Epsilon,
+                                                                  PhysxVisibilityTesterTestGeometryCallback,
+                                                                  &VisibilityTester->TestGeometryContext,
+                                                                  PhysxVisibilityTesterComputePdfProcessHitCallback,
+                                                                  &Context);
 
     *ClosestPointOnLight = Context.ClosestWorldPointOnLight;
     *Pdf = Context.Pdf;
@@ -543,7 +544,7 @@ PhysxVisibilityTesterTest(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (VisibilityTester->Epsilon * (FLOAT) 2.0f < DistanceToObject)
+    if (VisibilityTester->Epsilon * (FLOAT) 2.0f > DistanceToObject)
     {
         *Visible = TRUE;
         return ISTATUS_SUCCESS;

@@ -400,7 +400,7 @@ SpectrumCompositorReferenceAddAttenuatedAndAttenuatedReflectionSpectra(
 
         Status = SpectrumCompositorReferenceAddSpectra(Compositor,
                                                        AttenuatedSpectrum0->Spectrum,
-													   IntermediateSpectrum,
+                                                       IntermediateSpectrum,
                                                        &IntermediateSpectrum);
 
         if (Status != ISTATUS_SUCCESS)
@@ -410,7 +410,7 @@ SpectrumCompositorReferenceAddAttenuatedAndAttenuatedReflectionSpectra(
         }
 
         Status = SpectrumCompositorReferenceAttenuateSpectrum(Compositor,
-															  IntermediateSpectrum,
+                                                              IntermediateSpectrum,
                                                               AttenuatedSpectrum0->Attenuation,
                                                               Sum);
 
@@ -944,30 +944,30 @@ SpectrumCompositorReferenceAddTwoSpectra(
 
 CONST STATIC PSPECTRUM_COMPOSITOR_ADD_SPECTRA AddSpectrumRoutines[5][5] = {
     { SpectrumCompositorReferenceAddTwoAttenuatedSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddAttenuatedAndAttenuatedReflectionSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra },
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddAttenuatedAndAttenuatedReflectionSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra },
     { SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSumSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra },
+      SpectrumCompositorReferenceAddTwoSumSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra },
     { SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoReflectionSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra },
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoReflectionSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra },
     { SpectrumCompositorReferenceAddAttenuatedReflectionAndAttenuatedSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoAttenuatedReflectionSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra },
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoAttenuatedReflectionSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra },
     { SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra, 
-	  SpectrumCompositorReferenceAddTwoSpectra }
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra, 
+      SpectrumCompositorReferenceAddTwoSpectra }
 };
 
 //

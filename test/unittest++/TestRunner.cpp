@@ -36,9 +36,9 @@ int TestRunner::Finish() const
 {
     float const secondsElapsed = m_timer->GetTimeInMs() / 1000.0f;
     m_reporter->ReportSummary(m_result->GetTotalTestCount(), 
-							  m_result->GetFailedTestCount(), 
-							  m_result->GetFailureCount(), 
-							  secondsElapsed);
+						     m_result->GetFailedTestCount(), 
+						     m_result->GetFailureCount(), 
+						     secondsElapsed);
     
 	return m_result->GetFailureCount();
 }
@@ -63,11 +63,11 @@ void TestRunner::RunTest(TestResults* const result, Test* const curTest, int con
 	int const testTimeInMs = testTimer.GetTimeInMs();
 	if (maxTestTimeInMs > 0 && testTimeInMs > maxTestTimeInMs && !curTest->m_timeConstraintExempt)
 	{
-	    MemoryOutStream stream;
-	    stream << "Global time constraint failed. Expected under " << maxTestTimeInMs <<
-	            "ms but took " << testTimeInMs << "ms.";
+       MemoryOutStream stream;
+       stream << "Global time constraint failed. Expected under " << maxTestTimeInMs <<
+               "ms but took " << testTimeInMs << "ms.";
 
-	    result->OnTestFailure(curTest->m_details, stream.GetText());
+       result->OnTestFailure(curTest->m_details, stream.GetText());
 	}
 
 	result->OnTestFinish(curTest->m_details, testTimeInMs/1000.0f);
