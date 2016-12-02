@@ -22,6 +22,7 @@ Abstract:
 #include "irisadvanced_framebuffer.h"
 #include "irisadvanced_randomreference.h"
 #include "irisadvanced_random.h"
+#include "irisadvanced_randomgenerator.h"
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_math.h"
 
