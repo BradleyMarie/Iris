@@ -1,16 +1,19 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc inc src/inc ../iriscommon)
+include_directories(../iris/inc 
+    ../irisrandom/inc 
+    inc 
+    src/inc 
+    ../iriscommon)
 
 add_library(irisadvanced SHARED
     src/randomgenerator.c
-    src/randomreference.c
-    src/random.c
     src/framebuffer.c
     src/math.c)
 
 target_link_libraries(irisadvanced 
-    iris)
+    iris
+    irisrandom)
 
 generate_export_header(irisadvanced
     BASE_NAME irisadvanced

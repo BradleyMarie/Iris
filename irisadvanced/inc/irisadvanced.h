@@ -15,13 +15,11 @@ Abstract:
 #ifndef _IRIS_ADVANCED_HEADER_
 #define _IRIS_ADVANCED_HEADER_
 
-#include <iris.h>
+#include <irisrandom.h>
 
 #include "irisadvanced_api.h"
 #include "irisadvanced_color3.h"
 #include "irisadvanced_framebuffer.h"
-#include "irisadvanced_randomreference.h"
-#include "irisadvanced_random.h"
 #include "irisadvanced_randomgenerator.h"
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_math.h"

@@ -1,5 +1,6 @@
 include_directories(src/inc
     ../iris/inc 
+    ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisadvancedtoolkit/inc 
     ../irisspectrum/inc 
@@ -57,6 +58,7 @@ add_executable(iris-test
 
 target_link_libraries(iris-test 
     iris 
+    irisrandom
     irisadvanced
     irisspectrum
     irisphysx

@@ -1,10 +1,10 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_random.h
+    irisrandom_random.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _RANDOM_IRIS_ADVANCED_
-#define _RANDOM_IRIS_ADVANCED_
+#ifndef _RANDOM_IRIS_RANDOM_
+#define _RANDOM_IRIS_RANDOM_
 
-#include <irisadvanced.h>
+#include <irisrandom.h>
 
 //
 // Types
@@ -58,7 +58,7 @@ typedef CONST RANDOM *PCRANDOM;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISRANDOMAPI
 ISTATUS
 RandomAllocate(
     _In_ PCRANDOM_VTABLE RandomVTable,
@@ -69,14 +69,14 @@ RandomAllocate(
     );
 
 _Ret_
-IRISADVANCEDAPI
+IRISRANDOMAPI
 PRANDOM_REFERENCE
 RandomGetRandomReference(
     _In_ PRANDOM Rng
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISRANDOMAPI
 ISTATUS
 RandomGenerateFloat(
     _In_ PRANDOM Rng,
@@ -86,7 +86,7 @@ RandomGenerateFloat(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISRANDOMAPI
 ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM Rng,
@@ -95,10 +95,10 @@ RandomGenerateIndex(
     _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     );
 
-IRISADVANCEDAPI
+IRISRANDOMAPI
 VOID
 RandomFree(
     _In_opt_ _Post_invalid_ PRANDOM Rng
     );
 
-#endif // _RANDOM_IRIS_ADVANCED_
+#endif // _RANDOM_IRIS_RANDOM_

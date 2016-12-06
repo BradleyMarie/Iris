@@ -1,6 +1,11 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc ../iriscommon inc src/inc)
+include_directories(../iris/inc 
+    ../irisrandom/inc 
+    ../irisadvanced/inc 
+    ../iriscommon 
+    inc 
+    src/inc)
 
 add_library(irisadvancedtoolkit SHARED
     src/framebuffer.c
@@ -8,6 +13,7 @@ add_library(irisadvancedtoolkit SHARED
 
 target_link_libraries(irisadvancedtoolkit 
     iris
+    irisrandom
     irisadvanced)
 
 generate_export_header(irisadvancedtoolkit

@@ -3,6 +3,7 @@ include(FindOpenMP)
 
 include_directories(inc src/inc
     ../iris/inc 
+    ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisadvancedtoolkit/inc 
     ../irisspectrum/inc 
@@ -22,6 +23,7 @@ add_library(irisphysxtoolkit SHARED
 
 target_link_libraries(irisphysxtoolkit 
     iris 
+    irisrandom
     irisadvanced
     irisadvancedtoolkit
     irisspectrum

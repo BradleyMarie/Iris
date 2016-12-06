@@ -1,10 +1,10 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_randomreference.h
+    irisrandom_randomreference.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#include <irisadvanced.h>
+#include <irisrandom.h>
 
-#ifndef _RANDOM_REFERENCE_IRIS_ADVANCED_
-#define _RANDOM_REFERENCE_IRIS_ADVANCED_
+#ifndef _RANDOM_REFERENCE_IRIS_RANDOM_
+#define _RANDOM_REFERENCE_IRIS_RANDOM_
 
 //
 // Types
@@ -28,10 +28,10 @@ typedef CONST RANDOM_REFERENCE *PCRANDOM_REFERENCE;
 // Functions
 //
 
-#ifndef _DISABLE_IRIS_ADVANCED_RANDOM_REFERENCE_EXPORTS_
+#ifndef _DISABLE_IRIS_RANDOM_RANDOM_REFERENCE_EXPORTS_
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISRANDOMAPI
 ISTATUS
 RandomReferenceGenerateFloat(
     _In_ PRANDOM_REFERENCE Rng,
@@ -41,7 +41,7 @@ RandomReferenceGenerateFloat(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISRANDOMAPI
 ISTATUS
 RandomReferenceGenerateIndex(
     _In_ PRANDOM_REFERENCE Rng,
@@ -50,6 +50,6 @@ RandomReferenceGenerateIndex(
     _Out_range_(Minimum, Maximum) PSIZE_T RandomValue
     );
 
-#endif // _DISABLE_IRIS_ADVANCED_RANDOM_REFERENCE_EXPORTS_
+#endif // _DISABLE_IRIS_RANDOM_RANDOM_REFERENCE_EXPORTS_
 
-#endif // _RANDOM_REFERENCE_IRIS_ADVANCED_
+#endif // _RANDOM_REFERENCE_IRIS_RANDOM_

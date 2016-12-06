@@ -13,7 +13,7 @@ Abstract:
 
 --*/
 
-#include <irisadvancedplusplus.h>
+#include <irisspectrumplusplus.h>
 
 #ifndef _SPECTRUM_BASE_IRIS_SPECTRUM_PLUS_PLUS_
 #define _SPECTRUM_BASE_IRIS_SPECTRUM_PLUS_PLUS_

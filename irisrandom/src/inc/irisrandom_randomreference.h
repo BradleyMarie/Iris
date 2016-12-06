@@ -4,24 +4,24 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_randomreference.h
+    irisrandom_randomreference.h
 
 Abstract:
 
-    Internal definitions and declarations for randomreference type.
+    Internal definitions and declarations for RANDOM_REFERENCE type.
 
 --*/
 
-#ifndef _IRIS_ADVANCED_RANDOM_REFERENCE_INTERNAL_
-#define _IRIS_ADVANCED_RANDOM_REFERENCE_INTERNAL_
+#ifndef _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_
+#define _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_
 
-#include <irisadvancedp.h>
+#include <irisrandomp.h>
 
 //
 // Macros
 //
 
-#ifdef _IRIS_ADVANCED_EXPORT_RANDOM_REFERENCE_ROUTINES_
+#ifdef _IRIS_RANDOM_EXPORT_RANDOM_REFERENCE_ROUTINES_
 #define RandomReferenceGenerateFloat(Rng,Minimum,Maximum,RandomValue) \
         StaticRandomReferenceGenerateFloat(Rng,Minimum,Maximum,RandomValue)
 
@@ -155,9 +155,9 @@ RandomReferenceDestroy(
     }
 }
 
-#ifdef _IRIS_ADVANCED_EXPORT_RANDOM_REFERENCE_ROUTINES_
+#ifdef _IRIS_RANDOM_EXPORT_RANDOM_REFERENCE_ROUTINES_
 #undef RandomReferenceGenerateFloat
 #undef RandomReferenceGenerateIndex
 #endif
 
-#endif // _IRIS_ADVANCED_RANDOM_REFERENCE_INTERNAL_
+#endif // _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_

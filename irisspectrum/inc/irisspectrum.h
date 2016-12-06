@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_SPECTRUM_HEADER_
 #define _IRIS_SPECTRUM_HEADER_
 
-#include <irisadvanced.h>
+#include <iris.h>
 
 #include "irisspectrum_api.h"
 #include "irisspectrum_spectrum.h"

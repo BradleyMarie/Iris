@@ -1,6 +1,7 @@
 include(GenerateExportHeader)
 
 include_directories(../iris/inc 
+    ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisplusplus/inc
     inc 
@@ -11,6 +12,7 @@ add_library(irisadvancedplusplus SHARED
 
 target_link_libraries(irisadvancedplusplus 
     iris
+    irisrandom
     irisadvanced
     irisplusplus)
 

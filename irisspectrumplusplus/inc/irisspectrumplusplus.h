@@ -30,11 +30,10 @@ extern "C" {
 #include <memory>
 
 //
-// Include Iris++/IrisAdvanced++ Headers
+// Include Iris++ Headers
 //
 
 #include <irisplusplus.h>
-#include <irisadvancedplusplus.h>
 
 //
 // Include IrisSpectrum++ Headers

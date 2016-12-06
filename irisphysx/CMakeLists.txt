@@ -1,6 +1,12 @@
 include(GenerateExportHeader)
 
-include_directories(../iris/inc ../irisadvanced/inc ../irisspectrum/inc ../iriscommon inc src/inc)
+include_directories(../iris/inc 
+    ../irisrandom/inc 
+    ../irisadvanced/inc 
+    ../irisspectrum/inc 
+    ../iriscommon 
+    inc 
+    src/inc)
 
 add_library(irisphysx SHARED
     src/brdf.c
@@ -21,6 +27,7 @@ add_library(irisphysx SHARED
 
 target_link_libraries(irisphysx 
     iris
+    irisrandom
     irisadvanced
     irisspectrum)
 
