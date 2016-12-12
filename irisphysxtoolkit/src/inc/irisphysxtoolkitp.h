@@ -16,5 +16,6 @@ Abstract:
 #define _IRIS_PHYSX_TOOLKIT_INTERNAL_HEADER_
 
 #include <irisphysxtoolkit.h>
+#include <irisadvancedtoolkit.h>
 
 #endif // _IRIS_PHYSX_TOOLKIT_INTERNAL_HEADER_

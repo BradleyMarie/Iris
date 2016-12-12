@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisrandomtoolkit_math.h
+    irisadvancedtoolkit_math.h
 
 Abstract:
 
@@ -12,17 +12,17 @@ Abstract:
 
 --*/
 
-#ifndef _MATH_IRIS_RANDOM_TOOLKIT_HEADER_
-#define _MATH_IRIS_RANDOM_TOOLKIT_HEADER_
+#ifndef _MATH_IRIS_ADVANCED_TOOLKIT_HEADER_
+#define _MATH_IRIS_ADVANCED_TOOLKIT_HEADER_
 
-#include <irisrandomtoolkit.h>
+#include <irisadvancedtoolkit.h>
 
 //
 // Functions
 //
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISRANDOMTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 CosineSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
@@ -31,7 +31,7 @@ CosineSampleHemisphere(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISRANDOMTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 UniformSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
@@ -39,4 +39,4 @@ UniformSampleHemisphere(
     _Out_ PVECTOR3 RandomVector
     );
 
-#endif // _MATH_IRIS_RANDOM_TOOLKIT_HEADER_
+#endif // _MATH_IRIS_ADVANCED_TOOLKIT_HEADER_

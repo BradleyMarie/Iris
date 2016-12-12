@@ -4,16 +4,16 @@ include_directories(inc
     ${PROJECT_BINARY_DIR}/inc
     src/inc
     ../iris/inc 
-    ../irisrandom/inc 
     ../irisadvanced/inc 
+    ../iriscamera/inc 
     ../irisspectrum/inc
     ../irisphysx/inc
     ../irisplusplus/inc 
     ../irisadvancedplusplus/inc 
+    ../iriscameraplusplus/inc 
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
-    ../irisrandomtoolkit/inc 
-    ../irisadvancedtoolkit/inc
+    ../irisadvancedtoolkit/inc 
     ../irisadvancedtoolkitplusplus/inc
     ../irisphysxtoolkit/inc)
 
@@ -22,15 +22,14 @@ add_library(irisphysxtoolkitplusplus SHARED
 
 target_link_libraries(irisphysxtoolkitplusplus 
     iris
-    irisrandom
     irisadvanced
+    iriscamera
     irisspectrum
     irisphysx
     irisplusplus
     irisadvancedplusplus
     irisspectrumplusplus
     irisphysxplusplus
-    irisadvancedtoolkit
     irisphysxtoolkit)
 
 generate_export_header(irisphysxtoolkitplusplus

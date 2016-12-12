@@ -29,20 +29,17 @@ extern "C" {
 
 #include <stdexcept>
 #include <memory>
-#include <string>
 
 //
 // Include IrisAdvanced++ Headers
 //
 
 #include <irisadvancedplusplus.h>
-#include <irisrandomtoolkit.h>
 
 //
 // Include IrisAdvanced++ Headers
 //
 
-#include "irisadvancedtoolkitplusplus_framebuffer.h"
 #include "irisadvancedtoolkitplusplus_mwc.h"
 
 #endif // _IRIS_ADVANCED_TOOLKIT_PLUS_PLUS_HEADER_

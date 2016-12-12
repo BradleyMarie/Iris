@@ -1,18 +1,18 @@
 include_directories(src/inc
     ${PROJECT_BINARY_DIR}/inc
     ../iris/inc 
-    ../irisrandom/inc 
-    ../irisrandomtoolkit/inc 
     ../irisadvanced/inc 
-    ../irisadvancedtoolkit/inc 
+    ../iriscamera/inc 
     ../irisspectrum/inc 
     ../irisphysx/inc 
+    ../irisadvancedtoolkit/inc 
     ../irisphysxtoolkit/inc 
     ../irisplusplus/inc
     ../irisadvancedplusplus/inc
-    ../irisadvancedtoolkitplusplus/inc
+    ../iriscameraplusplus/inc
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
+    ../irisadvancedtoolkitplusplus/inc
     ../irisphysxtoolkitplusplus/inc
     ../iriscommon
     unittest++)
@@ -60,11 +60,10 @@ add_executable(iris-test
 
 target_link_libraries(iris-test 
     iris 
-    irisrandom
     irisadvanced
+    iriscamera
     irisspectrum
     irisphysx
-    irisrandomtoolkit
     irisadvancedtoolkit
     irisphysxtoolkit
     irisplusplus

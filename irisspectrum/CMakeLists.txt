@@ -1,7 +1,6 @@
 include(GenerateExportHeader)
 
 include_directories(../iris/inc 
-    ../irisadvanced/inc 
     ../iriscommon 
     inc 
     ${PROJECT_BINARY_DIR}/inc
@@ -14,8 +13,7 @@ add_library(irisspectrum SHARED
     src/reflectorcompositor.c)
 
 target_link_libraries(irisspectrum 
-    iris
-    irisadvanced)
+    iris)
 
 generate_export_header(irisspectrum
     BASE_NAME irisspectrum

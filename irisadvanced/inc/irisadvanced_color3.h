@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2014 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_ADVANCED_COLOR3_
 #define _IRIS_ADVANCED_COLOR3_
 
-#include <iris.h>
+#include <irisadvanced.h>
 
 //
 // Types

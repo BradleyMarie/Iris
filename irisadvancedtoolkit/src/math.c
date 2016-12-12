@@ -8,11 +8,11 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions the IrisRandomToolkit math routines.
+    This file contains the definitions the IrisAdvancedToolkit math routines.
 
 --*/
 
-#include <irisrandomtoolkit.h>
+#include <irisadvancedtoolkit.h>
 
 //
 // Static Functions

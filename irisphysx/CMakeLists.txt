@@ -1,7 +1,6 @@
 include(GenerateExportHeader)
 
 include_directories(../iris/inc 
-    ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisspectrum/inc 
     ../iriscommon 
@@ -28,7 +27,6 @@ add_library(irisphysx SHARED
 
 target_link_libraries(irisphysx 
     iris
-    irisrandom
     irisadvanced
     irisspectrum)
 

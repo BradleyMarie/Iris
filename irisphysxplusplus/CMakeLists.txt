@@ -4,7 +4,6 @@ include_directories(inc
     ${PROJECT_BINARY_DIR}/inc
     src/inc
     ../iris/inc 
-    ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisspectrum/inc
     ../irisphysx/inc
@@ -24,7 +23,6 @@ add_library(irisphysxplusplus SHARED
 
 target_link_libraries(irisphysxplusplus 
     iris
-    irisrandom
     irisadvanced
     irisspectrum
     irisphysx

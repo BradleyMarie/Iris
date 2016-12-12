@@ -15,6 +15,7 @@ Abstract:
 #include <iristest.h>
 using namespace Iris;
 using namespace IrisAdvanced;
+using namespace IrisCamera;
 using namespace IrisPhysx;
 using namespace IrisSpectrum;
 using namespace IrisAdvancedToolkit;
@@ -295,7 +296,7 @@ TEST(PhysxRenderConstantRedWorldSphere)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedWorldSpherePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderConstantRedWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedModelSphere)
@@ -376,7 +377,7 @@ TEST(PhysxRenderConstantRedModelSphere)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedModelSpherePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderConstantRedModelSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedPremultipliedSphere)
@@ -457,7 +458,7 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedPremultipliedSpherePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderConstantRedPremultipliedSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderPerfectSpecularSphere)
@@ -569,7 +570,7 @@ TEST(PhysxRenderPerfectSpecularSphere)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderPerfectSpecularWorldSpherePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderPerfectSpecularWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderConstantRedWorldTriangle)
@@ -669,7 +670,7 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderConstantRedWorldTrianglePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderConstantRedWorldTrianglePlusPlus.pfm");
 }
 
 TEST(PhysxRenderInterpolatedRedWorldTriangle)
@@ -779,7 +780,7 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
 }
 
 TEST(PhysxRenderPhongWorldSphere)
@@ -891,7 +892,7 @@ TEST(PhysxRenderPhongWorldSphere)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderPhongWorldSpherePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderPhongWorldSpherePlusPlus.pfm");
 }
 
 TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
@@ -1046,7 +1047,7 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
                           CreateState,
                           Fb);
 
-    FramebufferIO::SaveAsPFM(Fb, "RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
+    Fb.SaveAsPFM("RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
 }
 
 void
@@ -1381,5 +1382,5 @@ TEST(PhysxRenderCornellBox)
                           CreateState,
                           Fb);
     
-    FramebufferIO::SaveAsPFM(Fb, "RenderCornellBoxPlusPlus.pfm");
+    Fb.SaveAsPFM("RenderCornellBoxPlusPlus.pfm");
 }

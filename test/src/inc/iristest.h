@@ -22,16 +22,13 @@ Abstract:
 #include <atomic>
 #include <vector>
 
-extern "C" {
-#include <irisadvancedtoolkit.h>
-#include <irisphysxtoolkit.h>
-}
-
 #include <irisplusplus.h>
 #include <irisadvancedplusplus.h>
-#include <irisadvancedtoolkitplusplus.h>
+#include <iriscameraplusplus.h>
 #include <irisspectrumplusplus.h>
 #include <irisphysxplusplus.h>
+
+#include <irisadvancedtoolkitplusplus.h>
 #include <irisphysxtoolkitplusplus.h>
 
 #include "phong.h"

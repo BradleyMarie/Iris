@@ -15,10 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_TOOLKIT_HEADER_
 #define _IRIS_PHYSX_TOOLKIT_HEADER_
 
-#include <iris.h>
-#include <irisadvanced.h>
-#include <irisrandomtoolkit.h>
-#include <irisspectrum.h>
+#include <iriscamera.h>
 #include <irisphysx.h>
 
 #include "irisphysxtoolkit_api.h"

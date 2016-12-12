@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2013 Brad Weinberger
+Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
@@ -8,19 +8,19 @@ Module Name:
 
 Abstract:
 
-    This module includes all of the Iris Shading Model public headers.
+    This module includes all of the IrisAdvanced public headers.
 
 --*/
 
 #ifndef _IRIS_ADVANCED_HEADER_
 #define _IRIS_ADVANCED_HEADER_
 
-#include <irisrandom.h>
+#include <iris.h>
 
 #include "irisadvanced_api.h"
-#include "irisadvanced_color3.h"
-#include "irisadvanced_framebuffer.h"
-#include "irisadvanced_randomgenerator.h"
 #include "irisadvanced_boundingbox.h"
+#include "irisadvanced_color3.h"
+#include "irisadvanced_randomreference.h"
+#include "irisadvanced_random.h"
 
 #endif // _IRIS_ADVANCED_HEADER_

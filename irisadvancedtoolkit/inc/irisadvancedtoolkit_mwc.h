@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisrandomtoolkit_mwc.h
+    irisadvancedtoolkit_mwc.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _MULTIPLY_WITH_CARRY_IRIS_RANDOM_TOOLKIT_
-#define _MULTIPLY_WITH_CARRY_IRIS_RANDOM_TOOLKIT_
+#ifndef _MULTIPLY_WITH_CARRY_IRIS_ADVANCED_TOOLKIT_
+#define _MULTIPLY_WITH_CARRY_IRIS_ADVANCED_TOOLKIT_
 
-#include <irisrandomtoolkit.h>
+#include <irisadvancedtoolkit.h>
 
 //
 // Prototypes
@@ -23,10 +23,10 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISRANDOMTOOLKITAPI
+IRISADVANCEDTOOLKITAPI
 ISTATUS
 MultiplyWithCarryRngAllocate(
     _Out_ PRANDOM *Rng
     );
 
-#endif // _MULTIPLY_WITH_CARRY_IRIS_RANDOM_TOOLKIT_
+#endif // _MULTIPLY_WITH_CARRY_IRIS_ADVANCED_TOOLKIT_

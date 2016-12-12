@@ -10,16 +10,19 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(iris)
-add_subdirectory(irisrandom)
 add_subdirectory(irisadvanced)
+add_subdirectory(iriscamera)
 add_subdirectory(irisspectrum)
 add_subdirectory(irisphysx)
-add_subdirectory(irisrandomtoolkit)
+
 add_subdirectory(irisadvancedtoolkit)
 add_subdirectory(irisphysxtoolkit)
+
 add_subdirectory(irisplusplus)
 add_subdirectory(irisadvancedplusplus)
 add_subdirectory(irisspectrumplusplus)
 add_subdirectory(irisphysxplusplus)
+
 add_subdirectory(irisphysxtoolkitplusplus)
+
 add_subdirectory(test)

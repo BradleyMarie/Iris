@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#define _IRIS_RANDOM_EXPORT_RANDOM_REFERENCE_ROUTINES_
-#include <irisrandomp.h>
+#define _IRIS_ADVANCED_EXPORT_RANDOM_REFERENCE_ROUTINES_
+#include <irisadvancedp.h>
 
 ISTATUS
 RandomReferenceGenerateFloat(

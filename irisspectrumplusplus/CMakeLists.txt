@@ -2,8 +2,6 @@ include(GenerateExportHeader)
 
 include_directories(../iris/inc 
     ../irisplusplus/inc
-    ../irisadvanced/inc 
-    ../irisadvancedplusplus/inc
     ../irisspectrum/inc 
     inc 
     ${PROJECT_BINARY_DIR}/inc
@@ -15,11 +13,8 @@ add_library(irisspectrumplusplus SHARED
 
 target_link_libraries(irisspectrumplusplus 
     iris
-    irisplusplus
-    irisadvanced
-    irisadvancedplusplus
     irisspectrum
-    irisspectrum)
+    irisplusplus)
 
 generate_export_header(irisspectrumplusplus
     BASE_NAME irisspectrumplusplus

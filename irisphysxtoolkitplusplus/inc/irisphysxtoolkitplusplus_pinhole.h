@@ -41,7 +41,7 @@ Render(
     _In_ bool Parallelize,
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_ CreateStateRoutine CreateStateFunction,
-    _Inout_ IrisAdvanced::Framebuffer & Framebuffer
+    _Inout_ IrisCamera::Framebuffer & Framebuffer
     );
 
 IRISPHYSXTOOLKITPLUSPLUSAPI
@@ -62,7 +62,7 @@ Render(
     _In_ const IrisPhysx::TestGeometryRoutine TestGeometryFunction,
     _In_ const IrisPhysx::LightList & Lights,
     _In_ CreateStateRoutine CreateStateFunction,
-    _Inout_ IrisAdvanced::Framebuffer & Framebuffer
+    _Inout_ IrisCamera::Framebuffer & Framebuffer
     );
 
 } // namespace PinholeCamera

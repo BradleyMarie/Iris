@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisrandomp.h>
+#include <irisadvancedp.h>
 
 //
 // Types

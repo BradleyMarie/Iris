@@ -4,21 +4,21 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvancedplusplus_framebuffer.h
+    iriscameraplusplus_framebuffer.h
 
 Abstract:
 
     This file contains the definitions for the 
-    IrisAdvanced++ Framebuffer type.
+    IrisCamera++ Framebuffer type.
 
 --*/
 
-#include <irisadvancedplusplus.h>
+#include <iriscameraplusplus.h>
 
-#ifndef _FRAMEBUFFER_IRIS_ADVANCED_PLUS_PLUS_HEADER_
-#define _FRAMEBUFFER_IRIS_ADVANCED_PLUS_PLUS_HEADER_
+#ifndef _FRAMEBUFFER_IRIS_CAMERA_PLUS_PLUS_HEADER_
+#define _FRAMEBUFFER_IRIS_CAMERA_PLUS_PLUS_HEADER_
 
-namespace IrisAdvanced {
+namespace IrisCamera {
 
 //
 // Types
@@ -132,6 +132,20 @@ public:
         return std::make_tuple(Rows, Columns);
     }
 
+    void
+    SaveAsPFM(
+        _In_ const std::string & Path
+        ) const
+    {
+        ISTATUS Status = FramebufferSaveAsPFM(Data, Path.c_str());
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            assert(Status == ISTATUS_IO_ERROR);
+            throw std::runtime_error("ISTATUS_IO_ERROR");
+        }
+    }
+
     Framebuffer(
         _In_ const Framebuffer & ToCopy
         ) = delete;
@@ -182,6 +196,6 @@ private:
     }
 };
 
-} // namespace IrisAdvanced
+} // namespace IrisCamera
 
-#endif // _FRAMEBUFFER_IRIS_ADVANCED_PLUS_PLUS_HEADER_
+#endif // _FRAMEBUFFER_IRIS_CAMERA_PLUS_PLUS_HEADER_

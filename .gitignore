@@ -69,18 +69,24 @@ iris.xcodeproj/
 # Generated files
 iris/inc/iris_api.h
 irisrandom/inc/irisrandom_api.h
-irisadvanced/inc/irisadvanced_api.h
+iriscamera/inc/iriscamera_api.h
 irisspectrum/inc/irisspectrum_api.h
 irisphysx/inc/irisphysx_api.h
 iristoolkit/inc/iristoolkit_api.h
 
+irisrandomtoolkit/inc/irisrandomtoolkit_api.h
+iriscameratoolkit/inc/iriscameratoolkit_api.h
+irisphysxtoolkit/inc/irisphysxtoolkit_api.h
+
 irisplusplus/inc/irisplusplus_api.h
 irisrandomplusplus/inc/irisrandomplusplus_api.h
-irisadvancedtoolkit/inc/irisadvancedtoolkit_api.h
-irisphysxtoolkit/inc/irisphysxtoolkit_api.h
+iriscameraplusplus/inc/iriscameraplusplus_api.h
 irisadvancedplusplus/inc/irisadvancedplusplus_api.h
 irisspectrumplusplus/inc/irisspectrumplusplus_api.h
 irisphysxplusplus/inc/irisphysxplusplus_api.h
+
+irisrandomtoolkitplusplus/inc/irisrandomtoolkitplusplus_api.h
+iriscameratoolkitplusplus/inc/iriscameratoolkitplusplus_api.h
 irisphysxtoolkitplusplus/inc/irisphysxtoolkitplusplus_api.h
 
 #Analysis files

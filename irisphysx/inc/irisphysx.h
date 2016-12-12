@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_HEADER_
 #define _IRIS_PHYSX_HEADER_
 
+#include <iris.h>
 #include <irisadvanced.h>
 #include <irisspectrum.h>
 

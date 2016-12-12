@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvancedp.h>
+#include <iriscamerap.h>
 
 //
 // Types

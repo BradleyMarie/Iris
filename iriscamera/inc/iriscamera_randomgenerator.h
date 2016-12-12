@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_randomgenerator.h
+    iriscamera_randomgenerator.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _RANDOM_GENERATOR_IRIS_ADVANCED_
-#define _RANDOM_GENERATOR_IRIS_ADVANCED_
+#ifndef _RANDOM_GENERATOR_IRIS_CAMERA_
+#define _RANDOM_GENERATOR_IRIS_CAMERA_
 
-#include <irisadvanced.h>
+#include <iriscamera.h>
 
 //
 // Types
@@ -45,7 +45,7 @@ typedef CONST RANDOM_GENERATOR *PCRANDOM_GENERATOR;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 RandomGeneratorAllocate(
     _In_ PCRANDOM_GENERATOR_VTABLE RandomGeneratorVTable,
@@ -57,17 +57,17 @@ RandomGeneratorAllocate(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 RandomGeneratorAllocateRandom(
     _In_ PRANDOM_GENERATOR RngGenerator,
     _Out_ PRANDOM *Rng 
     );
 
-IRISADVANCEDAPI
+IRISCAMERAAPI
 VOID
 RandomGeneratorFree(
     _In_opt_ _Post_invalid_ PRANDOM_GENERATOR RngGenerator
     );
 
-#endif // _RANDOM_GENERATOR_IRIS_ADVANCED_
+#endif // _RANDOM_GENERATOR_IRIS_CAMERA_

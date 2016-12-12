@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisrandom_randomreference.h
+    irisadvanced_randomreference.h
 
 Abstract:
 
@@ -12,16 +12,16 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_
-#define _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_
+#ifndef _IRIS_RANDOM_ADVANCED_REFERENCE_INTERNAL_
+#define _IRIS_RANDOM_ADVANCED_REFERENCE_INTERNAL_
 
-#include <irisrandomp.h>
+#include <irisadvancedp.h>
 
 //
 // Macros
 //
 
-#ifdef _IRIS_RANDOM_EXPORT_RANDOM_REFERENCE_ROUTINES_
+#ifdef _IRIS_ADVANCED_EXPORT_RANDOM_REFERENCE_ROUTINES_
 #define RandomReferenceGenerateFloat(Rng,Minimum,Maximum,RandomValue) \
         StaticRandomReferenceGenerateFloat(Rng,Minimum,Maximum,RandomValue)
 
@@ -155,9 +155,9 @@ RandomReferenceDestroy(
     }
 }
 
-#ifdef _IRIS_RANDOM_EXPORT_RANDOM_REFERENCE_ROUTINES_
+#ifdef _IRIS_ADVANCED_EXPORT_RANDOM_REFERENCE_ROUTINES_
 #undef RandomReferenceGenerateFloat
 #undef RandomReferenceGenerateIndex
 #endif
 
-#endif // _IRIS_RANDOM_RANDOM_REFERENCE_INTERNAL_
+#endif // _IRIS_RANDOM_ADVANCED_REFERENCE_INTERNAL_

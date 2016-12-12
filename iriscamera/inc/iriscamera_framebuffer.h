@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    irisadvanced_framebuffer.h
+    iriscamera_framebuffer.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _FRAMEBUFFER_IRIS_ADVANCED_
-#define _FRAMEBUFFER_IRIS_ADVANCED_
+#ifndef _FRAMEBUFFER_IRIS_CAMERA_
+#define _FRAMEBUFFER_IRIS_CAMERA_
 
-#include <irisadvanced.h>
+#include <iriscamera.h>
 
 //
 // Types
@@ -30,7 +30,7 @@ typedef CONST FRAMEBUFFER *PCFRAMEBUFFER;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 FramebufferAllocate(
     _In_ COLOR3 InitialColor,
@@ -40,7 +40,7 @@ FramebufferAllocate(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 FramebufferSetPixel(
     _Inout_ PFRAMEBUFFER Framebuffer,
@@ -50,7 +50,7 @@ FramebufferSetPixel(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 FramebufferGetPixel(
     _In_ PCFRAMEBUFFER Framebuffer,
@@ -59,7 +59,7 @@ FramebufferGetPixel(
     _Out_ PCOLOR3 Color
     );
 
-IRISADVANCEDAPI
+IRISCAMERAAPI
 ISTATUS
 FramebufferGetDimensions(
     _In_ PCFRAMEBUFFER Framebuffer,
@@ -67,10 +67,18 @@ FramebufferGetDimensions(
     _Out_ PSIZE_T Columns
     );
 
-IRISADVANCEDAPI
+_Success_(return == ISTATUS_SUCCESS)
+IRISCAMERAAPI
+ISTATUS
+FramebufferSaveAsPFM(
+    _In_ PCFRAMEBUFFER Framebuffer,
+    _In_ PCSTR Path
+    );
+
+IRISCAMERAAPI
 VOID
 FramebufferFree(
     _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     );
 
-#endif // _FRAMEBUFFER_IRIS_ADVANCED_
+#endif // _FRAMEBUFFER_IRIS_CAMERA_

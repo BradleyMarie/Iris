@@ -34,12 +34,13 @@ extern "C" {
 #include <tuple>
 
 //
-// Include Iris++, IrisAdvanced++, IrisSpectrum++,
-// IrisPhysx++, IrisAdvancedToolkit++
+// Include Iris++, IrisAdvanced++, IrisCamera++,
+// IrisSpectrum++, IrisPhysx++, IrisAdvancedToolkit++
 //
 
 #include <irisplusplus.h>
 #include <irisadvancedplusplus.h>
+#include <iriscameraplusplus.h>
 #include <irisadvancedtoolkitplusplus.h>
 #include <irisspectrumplusplus.h>
 #include <irisphysxplusplus.h>

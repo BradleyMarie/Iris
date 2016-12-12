@@ -1,20 +1,18 @@
 include(GenerateExportHeader)
 
 include_directories(../iris/inc 
-    ../irisrandom/inc 
     ../irisadvanced/inc 
-    ../irisrandomtoolkit/inc 
-    ../iriscommon 
     inc 
     ${PROJECT_BINARY_DIR}/inc
-    src/inc)
+    src/inc 
+    ../iriscommon)
 
 add_library(irisadvancedtoolkit SHARED
-    src/framebuffer.c)
+    src/mwc.c
+    src/math.c)
 
 target_link_libraries(irisadvancedtoolkit 
     iris
-    irisrandom
     irisadvanced)
 
 generate_export_header(irisadvancedtoolkit
