@@ -3,6 +3,7 @@ include(GenerateExportHeader)
 include_directories(../iris/inc 
     ../irisrandom/inc 
     inc 
+    ${PROJECT_BINARY_DIR}/inc
     src/inc 
     ../iriscommon)
 
@@ -18,5 +19,5 @@ target_link_libraries(irisadvanced
 generate_export_header(irisadvanced
     BASE_NAME irisadvanced
     EXPORT_MACRO_NAME IRISADVANCEDAPI
-    EXPORT_FILE_NAME inc/irisadvanced_api.h
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/irisadvanced_api.h
     STATIC_DEFINE IRISADVANCED_BUILT_AS_STATIC)

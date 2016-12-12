@@ -1,4 +1,5 @@
 include_directories(src/inc
+    ${PROJECT_BINARY_DIR}/inc
     ../iris/inc 
     ../irisrandom/inc 
     ../irisadvanced/inc 

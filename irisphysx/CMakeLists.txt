@@ -6,6 +6,7 @@ include_directories(../iris/inc
     ../irisspectrum/inc 
     ../iriscommon 
     inc 
+    ${PROJECT_BINARY_DIR}/inc
     src/inc)
 
 add_library(irisphysx SHARED
@@ -34,5 +35,5 @@ target_link_libraries(irisphysx
 generate_export_header(irisphysx
     BASE_NAME irisphysx
     EXPORT_MACRO_NAME IRISPHYSXAPI
-    EXPORT_FILE_NAME inc/irisphysx_api.h
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/irisphysx_api.h
     STATIC_DEFINE IRISPHYSX_BUILT_AS_STATIC)

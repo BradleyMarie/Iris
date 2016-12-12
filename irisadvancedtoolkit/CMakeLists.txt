@@ -5,6 +5,7 @@ include_directories(../iris/inc
     ../irisadvanced/inc 
     ../iriscommon 
     inc 
+    ${PROJECT_BINARY_DIR}/inc
     src/inc)
 
 add_library(irisadvancedtoolkit SHARED
@@ -19,5 +20,5 @@ target_link_libraries(irisadvancedtoolkit
 generate_export_header(irisadvancedtoolkit
     BASE_NAME irisadvancedtoolkit
     EXPORT_MACRO_NAME IRISADVANCEDTOOLKITAPI
-    EXPORT_FILE_NAME inc/irisadvancedtoolkit_api.h
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/irisadvancedtoolkit_api.h
     STATIC_DEFINE IRISADVANCEDTOOLKIT_BUILT_AS_STATIC)

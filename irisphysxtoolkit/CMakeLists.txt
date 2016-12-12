@@ -1,7 +1,9 @@
 include(GenerateExportHeader)
 include(FindOpenMP)
 
-include_directories(inc src/inc
+include_directories(inc 
+    ${PROJECT_BINARY_DIR}/inc
+    src/inc
     ../iris/inc 
     ../irisrandom/inc 
     ../irisadvanced/inc 
@@ -32,7 +34,7 @@ target_link_libraries(irisphysxtoolkit
 generate_export_header(irisphysxtoolkit
     BASE_NAME irisphysxtoolkit
     EXPORT_MACRO_NAME IRISPHYSXTOOLKITAPI
-    EXPORT_FILE_NAME inc/irisphysxtoolkit_api.h
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/irisphysxtoolkit_api.h
     STATIC_DEFINE IRISPHYSXTOOLKIT_BUILT_AS_STATIC)
 
 option(ENABLE_CSG "Enable constructive solid geometry" OFF)

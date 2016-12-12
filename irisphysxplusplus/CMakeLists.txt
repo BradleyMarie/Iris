@@ -1,6 +1,8 @@
 include(GenerateExportHeader)
 
-include_directories(inc src/inc
+include_directories(inc 
+    ${PROJECT_BINARY_DIR}/inc
+    src/inc
     ../iris/inc 
     ../irisrandom/inc 
     ../irisadvanced/inc 
@@ -33,5 +35,5 @@ target_link_libraries(irisphysxplusplus
 generate_export_header(irisphysxplusplus
     BASE_NAME irisphysxplusplus
     EXPORT_MACRO_NAME IRISPHYSXPLUSPLUSAPI
-    EXPORT_FILE_NAME inc/irisphysxplusplus_api.h
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/irisphysxplusplus_api.h
     STATIC_DEFINE IRISPHYSXPLUSPLUS_BUILT_AS_STATIC)
