@@ -22,6 +22,5 @@ Abstract:
 #include "irisadvanced_framebuffer.h"
 #include "irisadvanced_randomgenerator.h"
 #include "irisadvanced_boundingbox.h"
-#include "irisadvanced_math.h"
 
 #endif // _IRIS_ADVANCED_HEADER_

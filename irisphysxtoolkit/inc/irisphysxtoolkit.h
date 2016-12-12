@@ -17,7 +17,7 @@ Abstract:
 
 #include <iris.h>
 #include <irisadvanced.h>
-#include <irisadvancedtoolkit.h>
+#include <irisrandomtoolkit.h>
 #include <irisspectrum.h>
 #include <irisphysx.h>
 

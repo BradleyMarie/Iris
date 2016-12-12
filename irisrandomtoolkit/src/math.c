@@ -8,18 +8,19 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions the Iris Advanced math routines.
+    This file contains the definitions the IrisRandomToolkit math routines.
 
 --*/
 
-#include <irisadvancedp.h>
+#include <irisrandomtoolkit.h>
 
 //
-// Functions
+// Static Functions
 //
 
+STATIC
 VECTOR3
-IrisAdvancedCreateOrthogonalVector(
+CreateOrthogonalVector(
     _In_ VECTOR3 NormalizedVector
     )
 {
@@ -57,8 +58,9 @@ IrisAdvancedCreateOrthogonalVector(
     return OrthogonalVector;
 }
 
+STATIC
 VECTOR3
-IrisAdvancedTransformVector(
+TransformVector(
     _In_ VECTOR3 NormalizedNormal,
     _In_ VECTOR3 VectorToTransform
     )
@@ -73,7 +75,7 @@ IrisAdvancedTransformVector(
     ASSERT(VectorValidate(NormalizedNormal) != FALSE);
     ASSERT(VectorValidate(VectorToTransform) != FALSE);
 
-    OrthogonalVector = IrisAdvancedCreateOrthogonalVector(NormalizedNormal);
+    OrthogonalVector = CreateOrthogonalVector(NormalizedNormal);
     CrossProduct = VectorCrossProduct(NormalizedNormal, OrthogonalVector);
 
     X = OrthogonalVector.X * VectorToTransform.X + 
@@ -93,9 +95,13 @@ IrisAdvancedTransformVector(
     return TransformedVector;
 }
 
+//
+// Static Functions
+//
+
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-IrisAdvancedCosineSampleHemisphere(
+CosineSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Out_ PVECTOR3 RandomVector
@@ -149,14 +155,14 @@ IrisAdvancedCosineSampleHemisphere(
 
     Result = VectorCreate(X, Y, Z);
 
-    *RandomVector = IrisAdvancedTransformVector(NormalizedNormal, Result);
+    *RandomVector = TransformVector(NormalizedNormal, Result);
 
     return ISTATUS_SUCCESS;
 }
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-IrisAdvancedUniformSampleHemisphere(
+UniformSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
     _Inout_ PRANDOM_REFERENCE Rng,
     _Out_ PVECTOR3 RandomVector
@@ -210,7 +216,7 @@ IrisAdvancedUniformSampleHemisphere(
 
     Result = VectorCreate(X, Y, Z);
 
-    *RandomVector = IrisAdvancedTransformVector(NormalizedNormal, Result);
+    *RandomVector = TransformVector(NormalizedNormal, Result);
 
     return ISTATUS_SUCCESS;
 }

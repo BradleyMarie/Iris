@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <irisadvancedtoolkitp.h>
+#include <irisrandomtoolkit.h>
 #include <time.h>
 #include <math.h>
 

@@ -36,6 +36,7 @@ extern "C" {
 //
 
 #include <irisadvancedplusplus.h>
+#include <irisrandomtoolkit.h>
 
 //
 // Include IrisAdvanced++ Headers

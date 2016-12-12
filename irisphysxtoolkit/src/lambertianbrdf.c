@@ -57,9 +57,9 @@ SpectrumLambertianBrdfSample(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    Status = IrisAdvancedUniformSampleHemisphere(SurfaceNormal,
-                                                 Rng,
-                                                 Outgoing);
+    Status = UniformSampleHemisphere(SurfaceNormal,
+                                     Rng,
+                                     Outgoing);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -110,9 +110,9 @@ SpectrumLambertianBrdfSampleWithLambertianFalloff(
 
     Brdf = (PCSPECRUM_LAMBERTIAN_BRDF) Context;
 
-    Status = IrisAdvancedCosineSampleHemisphere(SurfaceNormal,
-                                                Rng,
-                                                Outgoing);
+    Status = CosineSampleHemisphere(SurfaceNormal,
+                                    Rng,
+                                    Outgoing);
 
     if (Status != ISTATUS_SUCCESS)
     {

@@ -12,6 +12,7 @@ include_directories(inc
     ../irisadvancedplusplus/inc 
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
+    ../irisrandomtoolkit/inc 
     ../irisadvancedtoolkit/inc
     ../irisadvancedtoolkitplusplus/inc
     ../irisphysxtoolkit/inc)

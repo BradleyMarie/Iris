@@ -7,7 +7,7 @@ include_directories(inc
     ../iris/inc 
     ../irisrandom/inc 
     ../irisadvanced/inc 
-    ../irisadvancedtoolkit/inc 
+    ../irisrandomtoolkit/inc 
     ../irisspectrum/inc 
     ../irisphysx/inc 
     ../iriscommon)
@@ -27,7 +27,7 @@ target_link_libraries(irisphysxtoolkit
     iris 
     irisrandom
     irisadvanced
-    irisadvancedtoolkit
+    irisrandomtoolkit
     irisspectrum
     irisphysx)
 

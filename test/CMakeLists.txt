@@ -2,6 +2,7 @@ include_directories(src/inc
     ${PROJECT_BINARY_DIR}/inc
     ../iris/inc 
     ../irisrandom/inc 
+    ../irisrandomtoolkit/inc 
     ../irisadvanced/inc 
     ../irisadvancedtoolkit/inc 
     ../irisspectrum/inc 
@@ -63,6 +64,8 @@ target_link_libraries(iris-test
     irisadvanced
     irisspectrum
     irisphysx
+    irisrandomtoolkit
+    irisadvancedtoolkit
     irisphysxtoolkit
     irisplusplus
     irisadvancedplusplus

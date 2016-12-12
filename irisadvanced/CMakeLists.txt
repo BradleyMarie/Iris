@@ -9,8 +9,7 @@ include_directories(../iris/inc
 
 add_library(irisadvanced SHARED
     src/randomgenerator.c
-    src/framebuffer.c
-    src/math.c)
+    src/framebuffer.c)
 
 target_link_libraries(irisadvanced 
     iris

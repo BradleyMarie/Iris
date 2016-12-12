@@ -4,6 +4,7 @@ include_directories(../iris/inc
     ../irisrandom/inc 
     ../irisadvanced/inc 
     ../irisplusplus/inc
+    ../irisrandomtoolkit/inc 
     inc 
     ${PROJECT_BINARY_DIR}/inc
     src/inc)
@@ -14,6 +15,7 @@ add_library(irisadvancedplusplus SHARED
 target_link_libraries(irisadvancedplusplus 
     iris
     irisrandom
+    irisrandomtoolkit
     irisadvanced
     irisplusplus)
 
