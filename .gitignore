@@ -60,9 +60,11 @@ launch.json
 *.DS_Store
 
 # Directories
+build/
 CMakeFiles/
 CMakeScripts/
 iris.xcodeproj/
+.vscode/
 
 # Generated files
 iris/inc/iris_api.h
