@@ -22,6 +22,7 @@ Abstract:
 //
 
 typedef
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PRANDOM_GENERATOR_ALLOCATE_RANDOM_ROUTINE)(

@@ -16,6 +16,7 @@ add_subdirectory(irisspectrum)
 add_subdirectory(irisphysx)
 
 add_subdirectory(irisadvancedtoolkit)
+add_subdirectory(iriscameratoolkit)
 add_subdirectory(irisphysxtoolkit)
 
 add_subdirectory(irisplusplus)

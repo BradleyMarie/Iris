@@ -17,7 +17,6 @@ add_library(iriscamera SHARED
     src/camera.c
     src/raygenerator.c)
 
-
 target_link_libraries(iriscamera 
     iris
     irisadvanced)
