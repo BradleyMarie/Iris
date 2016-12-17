@@ -1,4 +1,5 @@
 include(GenerateExportHeader)
+include(FindOpenMP)
 
 include_directories(../iris/inc 
     ../irisadvanced/inc 
@@ -9,7 +10,13 @@ include_directories(../iris/inc
 
 add_library(iriscamera SHARED
     src/randomgenerator.c
-    src/framebuffer.c)
+    src/framebuffer.c
+    src/raytracer.c
+    src/render.c
+    src/pixelsampler.c
+    src/camera.c
+    src/raygenerator.c)
+
 
 target_link_libraries(iriscamera 
     iris
@@ -20,3 +27,8 @@ generate_export_header(iriscamera
     EXPORT_MACRO_NAME IRISCAMERAAPI
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/inc/iriscamera_api.h
     STATIC_DEFINE IRISCAMERA_BUILT_AS_STATIC)
+
+if (OPENMP_FOUND)
+	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${C_FLAGS} ${OpenMP_C_FLAGS}”)
+	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${CXX_FLAGS} ${OpenMP_CXX_FLAGS}”)
+endif()

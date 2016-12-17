@@ -24,28 +24,26 @@ Abstract:
 typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PPIXEL_SAMPLER_GENERATE_RAY_CALLBACK)(
-    _In_ PVOID Context,
-    _In_ FLOAT PixelU,
-    _In_ FLOAT PixelV,
-    _In_ FLOAT LensU,
-    _In_ FLOAT LensV,
-    _In_ FLOAT Time,
-    _Out_ PRAY WorldRay
-    );
-
-typedef
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-(*PPIXEL_SAMPLER_RENDER_ROUTINE)(
+(*PPIXEL_SAMPLER_SAMPLE_PIXEL)(
     _In_ PCVOID Context,
-    _In_ PPIXEL_SAMPLER_RENDER_CALLBACK Callback,
-    _In_ PCVOID CallbackContext,
-    _Inout_ PFRAMEBUFFER Framebuffer
+    _In_ PCRAY_GENERATOR RayGenerator,
+    _In_ PCCAMERA_RAYTRACER RayTracer,
+    _In_ PRANDOM_REFERENCE Rng,
+    _In_ BOOL SamplePixel,
+    _In_ BOOL SampleLens,
+    _In_ FLOAT MinPixelU,
+    _In_ FLOAT MaxPixelU,
+    _In_ FLOAT MinPixelV,
+    _In_ FLOAT MaxPixelV,
+    _In_ FLOAT MinLensU,
+    _In_ FLOAT MaxLensU,
+    _In_ FLOAT MinLensV,
+    _In_ FLOAT MaxLensV,
+    _Out_ PCOLOR3 Color
     );
 
 typedef struct _PIXEL_SAMPLER_VTABLE {
-    PPIXEL_SAMPLER_RENDER_ROUTINE RenderRoutine;
+    PPIXEL_SAMPLER_SAMPLE_PIXEL SamplePixelRoutine;
     PFREE_ROUTINE FreeRoutine;
 } PIXEL_SAMPLER_VTABLE, *PPIXEL_SAMPLER_VTABLE;
 
@@ -68,21 +66,6 @@ PixelSamplerAllocate(
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PPIXEL_SAMPLER *PixelSampler
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
-ISTATUS
-PixelSamplerRender(
-    _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ SIZE_T Row,
-    _In_ SIZE_T Column,
-    _In_ SIZE_T NumberOfRows,
-    _In_ SIZE_T NumberOfColumns
-    _In_ PPIXEL_SAMPLER_RENDER_CALLBACK Callback,
-    _In_ PCVOID CallbackContext,
-    _Out_ PCOLOR3 Color
     );
 
 IRISCAMERAAPI

@@ -24,24 +24,38 @@ Abstract:
 typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PCAMERA_RENDER_CALLBACK)(
-    _In_ PVOID Context,
-    _In_ RAY WorldRay,
-    _Out_ PCOLOR3 Color
+(*PCAMERA_COMPUTE_RAY_ROUTINE)(
+    _In_ PCVOID Context,
+    _In_range_(0, NumberOfRows - 1) SIZE_T Row,
+    _In_ SIZE_T NumberOfRows,
+    _In_range_(0, NumberOfColumns - 1) SIZE_T Column,
+    _In_ SIZE_T NumberOfColumns,
+    _In_ FLOAT PixelU,
+    _In_ FLOAT PixelV,
+    _In_ FLOAT LensU,
+    _In_ FLOAT LensV,
+    _Out_ PRAY WorldRay
     );
 
 typedef
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-(*PCAMERA_RENDER_ROUTINE)(
+VOID
+(*PCAMERA_GET_PARAMETERS_ROUTINE)(
     _In_ PCVOID Context,
-    _In_ PCAMERA_RENDER_CALLBACK Callback,
-    _In_ PCVOID CallbackContext,
-    _Inout_ PFRAMEBUFFER Framebuffer
+    _Out_ PBOOL SamplePixel,
+    _Out_ PBOOL SampleLens,
+    _Out_ PFLOAT MinPixelU,
+    _Out_ PFLOAT MaxPixelU,
+    _Out_ PFLOAT MinPixelV,
+    _Out_ PFLOAT MaxPixelV,
+    _Out_ PFLOAT MinLensU,
+    _Out_ PFLOAT MaxLensU,
+    _Out_ PFLOAT MinLensV,
+    _Out_ PFLOAT MaxLensV
     );
 
 typedef struct _CAMERA_VTABLE {
-    PCAMERA_RENDER_ROUTINE RenderRoutine;
+    PCAMERA_COMPUTE_RAY_ROUTINE ComputeRayRoutine;
+    PCAMERA_GET_PARAMETERS_ROUTINE GetParamtersRoutine;
     PFREE_ROUTINE FreeRoutine;
 } CAMERA_VTABLE, *PCAMERA_VTABLE;
 
@@ -64,23 +78,6 @@ CameraAllocate(
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PCAMERA *Camera
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
-ISTATUS
-CameraRender(
-    _In_ PCCAMERA Camera,
-    _In_ SIZE_T Row,
-    _In_ SIZE_T Column,
-    _In_ SIZE_T NumberOfRows,
-    _In_ SIZE_T NumberOfColumns,
-    _In_ PSAMPLER_2D PixelSampler,
-    _In_ PSAMPLER_2D LensSampler,
-    _In_ PCAMERA_RENDER_CALLBACK Callback,
-    _In_ PCVOID CallbackContext,
-    _Out_ PCOLOR3 Color
     );
 
 IRISCAMERAAPI

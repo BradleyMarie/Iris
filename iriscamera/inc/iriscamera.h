@@ -20,5 +20,10 @@ Abstract:
 #include "iriscamera_api.h"
 #include "iriscamera_framebuffer.h"
 #include "iriscamera_randomgenerator.h"
+#include "iriscamera_camera.h"
+#include "iriscamera_raygenerator.h"
+#include "iriscamera_raytracer.h"
+#include "iriscamera_pixelsampler.h"
+#include "iriscamera_render.h"
 
 #endif // _IRIS_CAMERA_HEADER_

@@ -18,4 +18,8 @@ Abstract:
 #include <iriscamera.h>
 #include <iriscommon_malloc.h>
 
+#include "iriscamera_camera.h"
+#include "iriscamera_pixelsampler.h"
+#include "iriscamera_raygenerator.h"
+
 #endif // _IRIS_CAMERA_INTERNAL_HEADER_

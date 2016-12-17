@@ -25,7 +25,7 @@ typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PRANDOM_GENERATOR_ALLOCATE_RANDOM_ROUTINE)(
-    _In_ PVOID Context,
+    _In_ PCVOID Context,
     _Out_ PRANDOM *Rng
     );
 
@@ -60,7 +60,7 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISCAMERAAPI
 ISTATUS
 RandomGeneratorAllocateRandom(
-    _In_ PRANDOM_GENERATOR RngGenerator,
+    _In_ PCRANDOM_GENERATOR RngGenerator,
     _Out_ PRANDOM *Rng 
     );
 
