@@ -6,6 +6,7 @@ include_directories(src/inc
     ../irisspectrum/inc 
     ../irisphysx/inc 
     ../irisadvancedtoolkit/inc 
+    ../iriscameratoolkit/inc 
     ../irisphysxtoolkit/inc 
     ../irisplusplus/inc
     ../irisadvancedplusplus/inc
@@ -13,6 +14,7 @@ include_directories(src/inc
     ../irisspectrumplusplus/inc
     ../irisphysxplusplus/inc
     ../irisadvancedtoolkitplusplus/inc
+    ../iriscameratoolkitplusplus/inc 
     ../irisphysxtoolkitplusplus/inc
     ../iriscommon
     unittest++)
@@ -65,6 +67,7 @@ target_link_libraries(iris-test
     irisspectrum
     irisphysx
     irisadvancedtoolkit
+    iriscameratoolkit
     irisphysxtoolkit
     irisplusplus
     irisadvancedplusplus

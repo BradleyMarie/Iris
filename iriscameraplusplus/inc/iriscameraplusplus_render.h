@@ -25,8 +25,32 @@ namespace IrisCamera {
 //
 
 static
+inline
 void
 Render(
+    _In_ const Camera & CameraRef,
+    _In_ const PixelSampler & PixelSamplerRef,
+    _In_ const SampleTracer & SampleTracerRef,
+    _Inout_ IrisAdvanced::RandomReference & RandomReferenceRef,
+    _Inout_ Framebuffer & FramebufferRef
+    )
+{
+    ISTATUS Status = IrisCameraRender(CameraRef.AsPCCAMERA(),
+                                      PixelSamplerRef.AsPCPIXEL_SAMPLER(),
+                                      SampleTracerRef.AsPCSAMPLE_TRACER(),
+                                      RandomReferenceRef.AsPRANDOM_REFERENCE(),
+                                      FramebufferRef.AsPFRAMEBUFFER());
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
+}
+
+static
+inline
+void
+RenderParallel(
     _In_ const Camera & CameraRef,
     _In_ const PixelSampler & PixelSamplerRef,
     _In_ const SampleTracerGenerator & SampleTracerGeneratorRef,
@@ -34,11 +58,11 @@ Render(
     _Inout_ Framebuffer & FramebufferRef
     )
 {
-    ISTATUS Status = IrisCameraRender(CameraRef.AsPCCAMERA(),
-                                      PixelSamplerRef.AsPCPIXEL_SAMPLER(),
-                                      SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
-                                      RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
-                                      FramebufferRef.AsPFRAMEBUFFER());
+    ISTATUS Status = IrisCameraRenderParallel(CameraRef.AsPCCAMERA(),
+                                              PixelSamplerRef.AsPCPIXEL_SAMPLER(),
+                                              SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
+                                              RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
+                                              FramebufferRef.AsPFRAMEBUFFER());
 
     if (Status != ISTATUS_SUCCESS)
     {

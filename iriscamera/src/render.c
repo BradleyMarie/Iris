@@ -23,6 +23,116 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER SampleTracer,
+    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PFRAMEBUFFER Framebuffer
+    )
+{
+    RAY_GENERATOR RayGenerator;
+    SIZE_T FramebufferColumns;
+    SIZE_T FramebufferRows;
+    SIZE_T PixelColumn;
+    SIZE_T PixelRow; 
+    COLOR3 PixelColor; 
+    BOOL SamplePixel;
+    BOOL SampleLens;
+    FLOAT MinPixelU;
+    FLOAT MaxPixelU;
+    FLOAT MinPixelV;
+    FLOAT MaxPixelV;
+    FLOAT MinLensU;
+    FLOAT MaxLensU;
+    FLOAT MinLensV;
+    FLOAT MaxLensV;
+    ISTATUS Status;
+
+    if (Camera == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (PixelSampler == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (SampleTracer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    FramebufferGetDimensions(Framebuffer, 
+                             &FramebufferRows,
+                             &FramebufferColumns);
+
+    CameraGetParameters(Camera,
+                        &SamplePixel,
+                        &SampleLens,
+                        &MinPixelU,
+                        &MaxPixelU,
+                        &MinPixelV,
+                        &MaxPixelV,
+                        &MinLensU,
+                        &MaxLensU,
+                        &MinLensV,
+                        &MaxLensV);
+
+    for (PixelRow = 0; PixelRow < FramebufferRows; PixelRow += 1)
+    {
+        for (PixelColumn = 0; PixelColumn < FramebufferColumns; PixelColumn += 1)
+        {
+            RayGenerator = RayGeneratorCreate(Camera,
+                                              PixelRow,
+                                              FramebufferRows,
+                                              PixelColumn,
+                                              FramebufferColumns);
+            
+            Status = PixelSamplerSamplePixel(PixelSampler,
+                                             &RayGenerator,
+                                             SampleTracer,
+                                             Rng,
+                                             SamplePixel,
+                                             SampleLens,
+                                             MinPixelU,
+                                             MaxPixelU,
+                                             MinPixelV,
+                                             MaxPixelV,
+                                             MinLensU,
+                                             MaxLensU,
+                                             MinLensV,
+                                             MaxLensV,
+                                             &PixelColor);
+
+            if (Status != ISTATUS_SUCCESS)
+            {
+                return Status;
+            }
+
+            FramebufferSetPixel(Framebuffer,
+                                PixelColor,
+                                PixelRow,
+                                PixelColumn);
+        }
+    }
+
+    return Status;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+IrisCameraRenderParallel(
+    _In_ PCCAMERA Camera,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _Inout_ PFRAMEBUFFER Framebuffer

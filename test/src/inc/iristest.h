@@ -29,6 +29,7 @@ Abstract:
 #include <irisphysxplusplus.h>
 
 #include <irisadvancedtoolkitplusplus.h>
+#include <iriscameratoolkitplusplus.h>
 #include <irisphysxtoolkitplusplus.h>
 
 #include "phong.h"
