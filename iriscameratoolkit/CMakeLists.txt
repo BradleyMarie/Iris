@@ -11,7 +11,8 @@ include_directories(../iris/inc
 
 add_library(iriscameratoolkit SHARED
     src/pinhole.c
-    src/mwcgenerator.c)
+    src/mwcgenerator.c
+    src/gridpixelsampler.c)
 
 target_link_libraries(iriscameratoolkit
     iris
