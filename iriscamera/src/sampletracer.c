@@ -4,11 +4,11 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    raytracer.c
+    sampletracer.c
 
 Abstract:
 
-    This file contains the definitions for the CAMERA_RAYTRACER type.
+    This file contains the definitions for the SAMPLE_TRACER type.
 
 --*/
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-struct _CAMERA_RAYTRACER {
-    PCCAMERA_RAYTRACER_VTABLE VTable;
+struct _SAMPLE_TRACER {
+    PCSAMPLE_TRACER_VTABLE VTable;
     PVOID Data;
 };
 
@@ -30,20 +30,20 @@ struct _CAMERA_RAYTRACER {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-CameraRayTracerAllocate(
-    _In_ PCCAMERA_RAYTRACER_VTABLE CameraRayTracerVTable,
+SampleTracerAllocate(
+    _In_ PCSAMPLE_TRACER_VTABLE SampleTracerVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PCAMERA_RAYTRACER *CameraRayTracer
+    _Out_ PSAMPLE_TRACER *SampleTracer
     )
 {
-    PCAMERA_RAYTRACER AllocatedCameraRayTracer;
+    PSAMPLE_TRACER AllocatedSampleTracer;
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
 
-    if (CameraRayTracerVTable == NULL)
+    if (SampleTracerVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -67,13 +67,13 @@ CameraRayTracerAllocate(
         }
     }
 
-    if (CameraRayTracer == NULL)
+    if (SampleTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(CAMERA_RAYTRACER),
-                                                      _Alignof(CAMERA_RAYTRACER),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(SAMPLE_TRACER),
+                                                      _Alignof(SAMPLE_TRACER),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -85,25 +85,25 @@ CameraRayTracerAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedCameraRayTracer = (PCAMERA_RAYTRACER) HeaderAllocation;
+    AllocatedSampleTracer = (PSAMPLE_TRACER) HeaderAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    AllocatedCameraRayTracer->VTable = CameraRayTracerVTable;
-    AllocatedCameraRayTracer->Data = DataAllocation;
+    AllocatedSampleTracer->VTable = SampleTracerVTable;
+    AllocatedSampleTracer->Data = DataAllocation;
 
-    *CameraRayTracer = AllocatedCameraRayTracer;
+    *SampleTracer = AllocatedSampleTracer;
 
     return ISTATUS_SUCCESS;
 }
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-CameraRayTracerTraceRay(
-    _In_ PCCAMERA_RAYTRACER CameraRayTracer,
+SampleTracerTraceRay(
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ RAY WorldRay,
     _In_ PRANDOM_REFERENCE Rng,
     _Out_ PCOLOR3 Color
@@ -111,7 +111,7 @@ CameraRayTracerTraceRay(
 {
     ISTATUS Status;
 
-    if (CameraRayTracer == NULL)
+    if (SampleTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -131,7 +131,7 @@ CameraRayTracerTraceRay(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = CameraRayTracer->VTable->TraceRayRoutine(CameraRayTracer->Data,
+    Status = SampleTracer->VTable->TraceRayRoutine(SampleTracer->Data,
                                                       WorldRay,
                                                       Rng,
                                                       Color);
@@ -140,23 +140,23 @@ CameraRayTracerTraceRay(
 }
 
 VOID
-CameraRayTracerFree(
-    _In_opt_ _Post_invalid_ PCAMERA_RAYTRACER CameraRayTracer
+SampleTracerFree(
+    _In_opt_ _Post_invalid_ PSAMPLE_TRACER SampleTracer
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    if (CameraRayTracer == NULL)
+    if (SampleTracer == NULL)
     {
         return;
     }
     
-    FreeRoutine = CameraRayTracer->VTable->FreeRoutine;
+    FreeRoutine = SampleTracer->VTable->FreeRoutine;
 
     if (FreeRoutine != NULL)
     {
-        FreeRoutine(CameraRayTracer->Data);
+        FreeRoutine(SampleTracer->Data);
     }
 
-    IrisAlignedFree(CameraRayTracer);
+    IrisAlignedFree(SampleTracer);
 }

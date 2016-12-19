@@ -22,8 +22,8 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
-    _In_opt_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCCAMERA_RAYTRACER CameraRayTracer,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
@@ -39,7 +39,12 @@ IrisCameraRender(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (CameraRayTracer == NULL)
+    if (PixelSampler == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (SampleTracerGenerator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -87,30 +92,34 @@ IrisCameraRender(
                             &MaxLensV);
 
         PRANDOM Rng;
-        Status = RandomGeneratorAllocateRandom(RandomGenerator, &Rng);
+        Status = RandomGeneratorGenerateRandom(RandomGenerator, &Rng);
 
         if (Status == ISTATUS_SUCCESS)
         {
             PRANDOM_REFERENCE RngReference = RandomGetRandomReference(Rng);
 
-            #pragma omp for schedule(dynamic, 16)
-            for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex++)
-            {
-                SIZE_T PixelRow = PixelIndex / FramebufferColumns;
-                SIZE_T PixelColumn = PixelIndex % FramebufferColumns;
+            PSAMPLE_TRACER SampleTracer;
+            Status = SampleTracerGeneratorGenerateSampleTracer(SampleTracerGenerator,
+                                                               &SampleTracer);
 
-                RAY_GENERATOR RayGenerator = RayGeneratorCreate(Camera,
-                                                                PixelRow,
-                                                                FramebufferRows,
-                                                                PixelColumn,
-                                                                FramebufferColumns);
-                
-                COLOR3 PixelColor;
-                if (PixelSampler != NULL)
+            if (Status == ISTATUS_SUCCESS)
+            {
+                #pragma omp for schedule(dynamic, 16)
+                for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex++)
                 {
+                    SIZE_T PixelRow = PixelIndex / FramebufferColumns;
+                    SIZE_T PixelColumn = PixelIndex % FramebufferColumns;
+
+                    RAY_GENERATOR RayGenerator = RayGeneratorCreate(Camera,
+                                                                    PixelRow,
+                                                                    FramebufferRows,
+                                                                    PixelColumn,
+                                                                    FramebufferColumns);
+                    
+                    COLOR3 PixelColor;
                     Status = PixelSamplerSamplePixel(PixelSampler,
                                                     &RayGenerator,
-                                                    CameraRayTracer,
+                                                    SampleTracer,
                                                     RngReference,
                                                     SamplePixel,
                                                     SampleLens,
@@ -123,37 +132,19 @@ IrisCameraRender(
                                                     MinLensV,
                                                     MaxLensV,
                                                     &PixelColor);
-                }
-                else
-                {
-                    FLOAT PixelU = (FLOAT) 0.5f * (MaxPixelU - MinPixelU);
-                    FLOAT PixelV = (FLOAT) 0.5f * (MaxPixelU - MinPixelU);
-                    FLOAT LensU = (FLOAT) 0.5f * (MaxLensU - MinLensU);
-                    FLOAT LensV = (FLOAT) 0.5f * (MaxLensV - MinLensV);
 
-                    RAY WorldRay;
-                    RayGeneratorGenerateRay(&RayGenerator,
-                                            PixelU,
-                                            PixelV,
-                                            LensU,
-                                            LensV,
-                                            &WorldRay);
+                    if (Status != ISTATUS_SUCCESS)
+                    {
+                        break;
+                    }
 
-                    Status = CameraRayTracerTraceRay(CameraRayTracer,
-                                                     WorldRay,
-                                                     RngReference,
-                                                     &PixelColor);
+                    FramebufferSetPixel(Framebuffer,
+                                        PixelColor,
+                                        PixelRow,
+                                        PixelColumn);
                 }
 
-                if (Status != ISTATUS_SUCCESS)
-                {
-                    break;
-                }
-
-                FramebufferSetPixel(Framebuffer,
-                                    PixelColor,
-                                    PixelRow,
-                                    PixelColumn);
+                SampleTracerFree(SampleTracer);
             }
             
             RandomFree(Rng);

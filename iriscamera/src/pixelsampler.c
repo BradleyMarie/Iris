@@ -32,7 +32,7 @@ ISTATUS
 PixelSamplerSamplePixel(
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCRAY_GENERATOR RayGenerator,
-    _In_ PCCAMERA_RAYTRACER RayTracer,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PRANDOM_REFERENCE Rng,
     _In_ BOOL SamplePixel,
     _In_ BOOL SampleLens,
@@ -51,13 +51,13 @@ PixelSamplerSamplePixel(
 
     ASSERT(PixelSampler != NULL);
     ASSERT(RayGenerator != NULL);
-    ASSERT(RayTracer != NULL);
+    ASSERT(SampleTracer != NULL);
     ASSERT(Rng != NULL);
     ASSERT(Color != NULL);
 
     Status = PixelSampler->VTable->SamplePixelRoutine(PixelSampler->Data,
                                                       RayGenerator,
-                                                      RayTracer,
+                                                      SampleTracer,
                                                       Rng,
                                                       SamplePixel,
                                                       SampleLens,

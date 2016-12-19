@@ -26,8 +26,8 @@ IRISCAMERAAPI
 ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
-    _In_opt_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCCAMERA_RAYTRACER CameraRayTracer,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _Inout_ PFRAMEBUFFER FrameBuffer
     );

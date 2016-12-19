@@ -4,11 +4,11 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    randomgenerator.c
+    sampletracergenerator.c
 
 Abstract:
 
-    This file contains the definitions for the RANDOM_GENERATOR type.
+    This file contains the definitions for the SAMPLE_TRACER type.
 
 --*/
 
@@ -18,8 +18,8 @@ Abstract:
 // Types
 //
 
-struct _RANDOM_GENERATOR {
-    PCRANDOM_GENERATOR_VTABLE VTable;
+struct _SAMPLE_TRACER_GENERATOR {
+    PCSAMPLE_TRACER_GENERATOR_VTABLE VTable;
     PVOID Data;
 };
 
@@ -30,18 +30,18 @@ struct _RANDOM_GENERATOR {
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RandomGeneratorGenerateRandom(
-    _In_ PCRANDOM_GENERATOR RngGenerator,
-    _Out_ PRANDOM *Rng 
+SampleTracerGeneratorGenerateSampleTracer(
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _Out_ PSAMPLE_TRACER *SampleTracer 
     )
 {
     ISTATUS Status;
 
-    ASSERT(RngGenerator != NULL);
-    ASSERT(Rng != NULL);
+    ASSERT(SampleTracerGenerator != NULL);
+    ASSERT(SampleTracer != NULL);
     
-    Status = RngGenerator->VTable->GenerateRandomRoutine(RngGenerator->Data,
-                                                         Rng);
+    Status = SampleTracerGenerator->VTable->GenerateSampleTracerRoutine(SampleTracerGenerator->Data,
+                                                                        SampleTracer);
 
     return Status;
 }
@@ -53,20 +53,20 @@ RandomGeneratorGenerateRandom(
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-RandomGeneratorAllocate(
-    _In_ PCRANDOM_GENERATOR_VTABLE RandomGeneratorVTable,
+SampleTracerGeneratorAllocate(
+    _In_ PCSAMPLE_TRACER_GENERATOR_VTABLE SampleTracerGeneratorVTable,
     _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PRANDOM_GENERATOR *RngGenerator
+    _Out_ PSAMPLE_TRACER_GENERATOR *SampleTracerGenerator
     )
 {
-    PRANDOM_GENERATOR AllocatedRngGenerator;
+    PSAMPLE_TRACER_GENERATOR AllocatedSampleTracerGenerator;
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
 
-    if (RandomGeneratorVTable == NULL)
+    if (SampleTracerGeneratorVTable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -90,13 +90,13 @@ RandomGeneratorAllocate(
         }
     }
 
-    if (RngGenerator == NULL)
+    if (SampleTracerGenerator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(RANDOM_GENERATOR),
-                                                      _Alignof(RANDOM_GENERATOR),
+    AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(SAMPLE_TRACER_GENERATOR),
+                                                      _Alignof(SAMPLE_TRACER_GENERATOR),
                                                       &HeaderAllocation,
                                                       DataSizeInBytes,
                                                       DataAlignment,
@@ -108,39 +108,39 @@ RandomGeneratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedRngGenerator = (PRANDOM_GENERATOR) HeaderAllocation;
+    AllocatedSampleTracerGenerator = (PSAMPLE_TRACER_GENERATOR) HeaderAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    AllocatedRngGenerator->VTable = RandomGeneratorVTable;
-    AllocatedRngGenerator->Data = DataAllocation;
+    AllocatedSampleTracerGenerator->VTable = SampleTracerGeneratorVTable;
+    AllocatedSampleTracerGenerator->Data = DataAllocation;
 
-    *RngGenerator = AllocatedRngGenerator;
+    *SampleTracerGenerator = AllocatedSampleTracerGenerator;
 
     return ISTATUS_SUCCESS;
 }
 
 VOID
-RandomGeneratorFree(
-    _In_opt_ _Post_invalid_ PRANDOM_GENERATOR RngGenerator
+SampleTracerGeneratorFree(
+    _In_opt_ _Post_invalid_ PSAMPLE_TRACER_GENERATOR SampleTracerGenerator
     )
 {
     PFREE_ROUTINE FreeRoutine;
 
-    if (RngGenerator == NULL)
+    if (SampleTracerGenerator == NULL)
     {
         return;
     }
     
-    FreeRoutine = RngGenerator->VTable->FreeRoutine;
+    FreeRoutine = SampleTracerGenerator->VTable->FreeRoutine;
 
     if (FreeRoutine != NULL)
     {
-        FreeRoutine(RngGenerator->Data);
+        FreeRoutine(SampleTracerGenerator->Data);
     }
 
-    IrisAlignedFree(RngGenerator);
+    IrisAlignedFree(SampleTracerGenerator);
 }

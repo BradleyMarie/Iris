@@ -25,13 +25,13 @@ typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PRANDOM_GENERATOR_ALLOCATE_RANDOM_ROUTINE)(
+(*PRANDOM_GENERATOR_GENERATE_RANDOM_ROUTINE)(
     _In_ PCVOID Context,
     _Out_ PRANDOM *Rng
     );
 
 typedef struct _RANDOM_GENERATOR_VTABLE {
-    PRANDOM_GENERATOR_ALLOCATE_RANDOM_ROUTINE AllocateRandomRoutine;
+    PRANDOM_GENERATOR_GENERATE_RANDOM_ROUTINE GenerateRandomRoutine;
     PFREE_ROUTINE FreeRoutine;
 } RANDOM_GENERATOR_VTABLE, *PRANDOM_GENERATOR_VTABLE;
 
@@ -54,15 +54,6 @@ RandomGeneratorAllocate(
     _In_ SIZE_T DataSizeInBytes,
     _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
     _Out_ PRANDOM_GENERATOR *RngGenerator
-    );
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
-ISTATUS
-RandomGeneratorAllocateRandom(
-    _In_ PCRANDOM_GENERATOR RngGenerator,
-    _Out_ PRANDOM *Rng 
     );
 
 IRISCAMERAAPI
