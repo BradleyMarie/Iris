@@ -102,7 +102,7 @@ SampleTracerAllocate(
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SampleTracerTraceRay(
+SampleTracerTrace(
     _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ RAY WorldRay,
     _In_ PRANDOM_REFERENCE Rng,
@@ -131,10 +131,10 @@ SampleTracerTraceRay(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    Status = SampleTracer->VTable->TraceRayRoutine(SampleTracer->Data,
-                                                      WorldRay,
-                                                      Rng,
-                                                      Color);
+    Status = SampleTracer->VTable->TraceRoutine(SampleTracer->Data,
+                                                WorldRay,
+                                                Rng,
+                                                Color);
     
     return Status;
 }

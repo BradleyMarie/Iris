@@ -46,15 +46,6 @@ public:
     }
 
     _Ret_
-    PCAMERA
-    AsPCAMERA(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
     PCCAMERA
     AsPCCAMERA(
         void

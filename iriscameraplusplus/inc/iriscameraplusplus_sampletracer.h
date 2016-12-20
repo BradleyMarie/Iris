@@ -46,15 +46,6 @@ public:
     }
 
     _Ret_
-    PSAMPLE_TRACER
-    AsPSAMPLE_TRACER(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
     PCSAMPLE_TRACER
     AsPCSAMPLE_TRACER(
         void

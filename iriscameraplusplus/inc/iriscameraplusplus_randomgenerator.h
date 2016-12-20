@@ -46,15 +46,6 @@ public:
     }
 
     _Ret_
-    PRANDOM_GENERATOR
-    AsPRANDOM_GENERATOR(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
     PCRANDOM_GENERATOR
     AsPCRANDOM_GENERATOR(
         void

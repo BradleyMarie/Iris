@@ -46,15 +46,6 @@ public:
     }
 
     _Ret_
-    PPIXEL_SAMPLER
-    AsPPIXEL_SAMPLER(
-        void
-        )
-    {
-        return Data;
-    }
-
-    _Ret_
     PCPIXEL_SAMPLER
     AsPCPIXEL_SAMPLER(
         void

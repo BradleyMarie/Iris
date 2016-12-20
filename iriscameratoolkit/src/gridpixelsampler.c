@@ -19,8 +19,8 @@ Abstract:
 //
 
 typedef struct _GRID_PIXEL_SAMPLER {
-    UINT32 XSamplesPerPixel;
-    UINT32 YSamplesPerPixel;
+    UINT16 XSamplesPerPixel;
+    UINT16 YSamplesPerPixel;
     FLOAT SampleWeight;
     BOOL Jitter;
 } GRID_PIXEL_SAMPLER, *PGRID_PIXEL_SAMPLER;
@@ -56,8 +56,8 @@ GridPixelSamplerSamplePixel(
     FLOAT PixelVIncrement;
     FLOAT LensUIncrement;
     FLOAT LensVIncrement;
-    UINT32 XSampleIndex;
-    UINT32 YSampleIndex;
+    UINT16 XSampleIndex;
+    UINT16 YSampleIndex;
     COLOR3 SampleColor;
     COLOR3 PixelColor;
     FLOAT PixelUBase;
@@ -166,10 +166,10 @@ GridPixelSamplerSamplePixel(
                                     LensV,
                                     &WorldRay);
 
-            Status = SampleTracerTraceRay(SampleTracer,
-                                          WorldRay,
-                                          Rng,
-                                          &SampleColor);
+            Status = SampleTracerTrace(SampleTracer,
+                                       WorldRay,
+                                       Rng,
+                                       &SampleColor);
 
             if (Status != ISTATUS_SUCCESS)
             {
@@ -209,14 +209,13 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISCAMERATOOLKITAPI
 ISTATUS
 GridPixelSamplerAllocate(
-    _In_ UINT32 XSamplesPerPixel,
-    _In_ UINT32 YSamplesPerPixel,
+    _In_ UINT16 XSamplesPerPixel,
+    _In_ UINT16 YSamplesPerPixel,
     _In_ BOOL Jitter,
     _Out_ PPIXEL_SAMPLER *PixelSampler
     )
 {
     GRID_PIXEL_SAMPLER GridPixelSampler;
-    UINT32 TotalSamplesPerPixel;
     ISTATUS Status;
 
     if (XSamplesPerPixel == 0)
@@ -224,7 +223,7 @@ GridPixelSamplerAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (XSamplesPerPixel == 1)
+    if (YSamplesPerPixel == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -234,19 +233,10 @@ GridPixelSamplerAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    Status = CheckedMultiplyUInt32(XSamplesPerPixel, 
-                                   YSamplesPerPixel,
-                                   &TotalSamplesPerPixel);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-
     GridPixelSampler.XSamplesPerPixel = XSamplesPerPixel;
     GridPixelSampler.YSamplesPerPixel = YSamplesPerPixel;
     GridPixelSampler.Jitter = Jitter;
-    GridPixelSampler.SampleWeight = (FLOAT) 1.0f / (FLOAT) TotalSamplesPerPixel;
+    GridPixelSampler.SampleWeight = (FLOAT) 1.0f / (UINT32) XSamplesPerPixel * (UINT32) YSamplesPerPixel;
 
     Status = PixelSamplerAllocate(&GridPixelSamplerVTable,
                                   &GridPixelSampler,

@@ -35,5 +35,6 @@ extern "C" {
 
 #include "iriscameratoolkitplusplus_mwcgenerator.h"
 #include "iriscameratoolkitplusplus_pinhole.h"
+#include "iriscameratoolkitplusplus_gridpixelsampler.h"
 
 #endif // _IRIS_CAMERA_TOOLKIT_PLUS_PLUS_HEADER_

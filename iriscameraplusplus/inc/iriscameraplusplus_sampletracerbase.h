@@ -1,0 +1,67 @@
+/*++
+
+Copyright (c) 2016 Brad Weinberger
+
+Module Name:
+
+    iriscameraplusplus_sampletracerbase.h
+
+Abstract:
+
+    This file contains the definitions for the 
+    IrisCamera++ SampleTracerBase type.
+
+--*/
+
+#include <iriscameraplusplus.h>
+
+#ifndef _SAMPLE_TRACER_BASE_IRIS_CAMERA_PLUS_PLUS_HEADER_
+#define _SAMPLE_TRACER_BASE_IRIS_CAMERA_PLUS_PLUS_HEADER_
+
+namespace IrisCamera {
+
+//
+// Types
+//
+
+class SampleTracerBase final {
+protected:
+    IRISCAMERAPLUSPLUSAPI
+    static
+    SampleTracer
+    Create(
+        _In_ std::unique_ptr<SampleTracerBase> SampleTracerBasePtr
+        );
+
+public:
+    SampleTracerBase(
+        void
+        )
+    { }
+
+    virtual
+    IrisAdvanced::Color
+    Trace(
+        _In_ const Iris::Ray & WorldRay,
+        _In_ IrisAdvanced::RandomReference & Rng
+        ) const = 0;
+
+    SampleTracerBase(
+        _In_ const SampleTracerBase & ToCopy
+        ) = delete;
+        
+    SampleTracerBase &
+    operator=(
+        _In_ const SampleTracerBase & ToCopy
+        ) = delete;
+
+    virtual
+    ~SampleTracerBase(
+        void
+        )
+    { }
+};
+
+} // namespace IrisCamera
+
+#endif // _SAMPLE_TRACER_BASE_IRIS_CAMERA_PLUS_PLUS_HEADER_

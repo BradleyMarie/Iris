@@ -24,7 +24,7 @@ Abstract:
 typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-(*PSAMPLE_TRACER_TRACE_RAY_ROUTINE)(
+(*PSAMPLE_TRACER_TRACE_ROUTINE)(
     _In_ PCVOID Context,
     _In_ RAY WorldRay,
     _In_ PRANDOM_REFERENCE Rng,
@@ -32,7 +32,7 @@ ISTATUS
     );
 
 typedef struct _SAMPLE_TRACER_VTABLE {
-    PSAMPLE_TRACER_TRACE_RAY_ROUTINE TraceRayRoutine;
+    PSAMPLE_TRACER_TRACE_ROUTINE TraceRoutine;
     PFREE_ROUTINE FreeRoutine;
 } SAMPLE_TRACER_VTABLE, *PSAMPLE_TRACER_VTABLE;
 
@@ -58,8 +58,9 @@ SampleTracerAllocate(
     );
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISCAMERAAPI
 ISTATUS
-SampleTracerTraceRay(
+SampleTracerTrace(
     _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ RAY WorldRay,
     _In_ PRANDOM_REFERENCE Rng,

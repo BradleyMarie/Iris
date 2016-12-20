@@ -26,8 +26,8 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISCAMERATOOLKITAPI
 ISTATUS
 GridPixelSamplerAllocate(
-    _In_ UINT32 XSamplesPerPixel,
-    _In_ UINT32 YSamplesPerPixel,
+    _In_ UINT16 XSamplesPerPixel,
+    _In_ UINT16 YSamplesPerPixel,
     _In_ BOOL Jitter,
     _Out_ PPIXEL_SAMPLER *PixelSampler
     );
