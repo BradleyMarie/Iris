@@ -116,7 +116,7 @@ public:
     Matrix
     Identity(
         void
-        )
+        ) noexcept
     {
         return Matrix(nullptr);
     }
@@ -124,7 +124,7 @@ public:
     PMATRIX
     AsPMATRIX(
         void
-        )
+        ) noexcept
     {
         return Data;
     }
@@ -132,7 +132,7 @@ public:
     PCMATRIX
     AsPCMATRIX(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -140,7 +140,7 @@ public:
     Matrix
     Inverse(
         void
-        ) const
+        ) const noexcept
     {
         PMATRIX IrisMatrix;
 
@@ -165,24 +165,16 @@ public:
 
     Matrix(
         _In_ const Matrix & ToCopy
-        )
+        ) noexcept
     : Data(ToCopy.Data)
     {
         MatrixRetain(Data);
     }
 
-    Matrix(
-        _In_ Matrix && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
-
     Matrix & 
     operator=(
         _In_ const Matrix & ToCopy
-        )
+        ) noexcept
     {
         if (this != &ToCopy)
         {
@@ -214,7 +206,7 @@ private:
 
     Matrix(
         _In_opt_ PMATRIX IrisMatrix
-        )
+        ) noexcept
     : Data(IrisMatrix)
     { }
 };

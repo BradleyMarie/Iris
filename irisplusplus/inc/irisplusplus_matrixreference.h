@@ -28,14 +28,14 @@ class MatrixReference final {
 public:
     MatrixReference(
         _In_ PCMATRIX MatrixRef
-        )
+        ) noexcept
     : Data(MatrixRef)
     { }
 
     PCMATRIX
     AsPCMATRIX(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -43,7 +43,7 @@ public:
     MatrixReference
     Inverse(
         void
-        )
+        ) noexcept
     {
         PCMATRIX Inverse;
 

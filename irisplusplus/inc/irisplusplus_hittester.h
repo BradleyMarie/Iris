@@ -41,7 +41,7 @@ public:
     PHIT_TESTER
     AsPHIT_TESTER(
         void
-        )
+        ) noexcept
     {
         return Data;
     }

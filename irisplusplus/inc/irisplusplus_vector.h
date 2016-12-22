@@ -36,18 +36,20 @@ public:
         _In_ FLOAT X, 
         _In_ FLOAT Y, 
         _In_ FLOAT Z
-        )
+        ) noexcept
     : Data(VectorCreate(X, Y, Z))
     { }
 
     Vector(
         _In_ const VECTOR3 & IrisVector
-        )
+        ) noexcept
     : Data(IrisVector)
     { }
 
     Vector 
-    operator-() const
+    operator-(
+        void
+        ) const noexcept
     {
         VECTOR3 Negated;
 
@@ -59,7 +61,7 @@ public:
     VECTOR3 
     AsVECTOR3(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -68,7 +70,7 @@ public:
     PCVECTOR3 
     AsPCVECTOR3(
         void
-        ) const
+        ) const noexcept
     {
         return &Data;
     }
@@ -76,7 +78,7 @@ public:
     FLOAT 
     Length(
         void
-        ) const
+        ) const noexcept
     {
         return VectorLength(Data);
     }
@@ -84,7 +86,7 @@ public:
     VectorAxis 
     DominantAxis(
         void
-        ) const
+        ) const noexcept
     {
         return VectorAxis(VectorDominantAxis(Data));
     }
@@ -92,7 +94,7 @@ public:
     VectorAxis 
     DiminishedAxis(
         void
-        ) const
+        ) const noexcept
     {
         return VectorAxis(VectorDiminishedAxis(Data));
     }
@@ -101,7 +103,7 @@ public:
     Vector 
     Normalize(
         _In_ const Vector & ToNormalize
-        )
+        ) noexcept
     {
         VECTOR3 Normalized;
 
@@ -114,7 +116,7 @@ public:
     std::tuple<Vector, FLOAT, FLOAT> 
     NormalizeWithLength(
         _In_ const Vector & ToNormalize
-        )
+        ) noexcept
     {
         VECTOR3 Normalized;
         FLOAT OldLengthSquared;
@@ -130,7 +132,7 @@ public:
     DotProduct(
         _In_ const Vector & Operand0, 
         _In_ const Vector & Operand1
-        )
+        ) noexcept
     {
         return VectorDotProduct(Operand0.Data, Operand1.Data);
     }
@@ -140,7 +142,7 @@ public:
     CrossProduct(
         _In_ const Vector & Operand0, 
         _In_ const Vector & Operand1
-        )
+        ) noexcept
     {
         VECTOR3 Product;
 
@@ -155,7 +157,7 @@ public:
         _In_ const Vector & Addend0, 
         _In_ const Vector & Addend1, 
         _In_ FLOAT Scalar
-        )
+        ) noexcept
     {
         VECTOR3 Sum;
 
@@ -169,7 +171,7 @@ public:
     Reflect(
         _In_ const Vector & Vec, 
         _In_ const Vector & Normal
-        )
+        ) noexcept
     {
         VECTOR3 Reflected;
 
@@ -183,7 +185,7 @@ public:
     HalfAngle(
         _In_ const Vector & Vector0, 
         _In_ const Vector & Vector1
-        )
+        ) noexcept
     {
         VECTOR3 HalfAngle;
 
@@ -197,7 +199,7 @@ public:
     TransposedMultiply(
         _In_ const Matrix & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -217,7 +219,7 @@ public:
     TransposedMultiply(
         _In_ const MatrixReference & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -237,7 +239,7 @@ public:
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -257,7 +259,7 @@ public:
     InverseMultiply(
         _In_ const MatrixReference & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -277,7 +279,7 @@ public:
     InverseTransposedMultiply(
         _In_ const Matrix & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -297,7 +299,7 @@ public:
     InverseTransposedMultiply(
         _In_ const MatrixReference & Multiplicand0,
         _In_ const Vector & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         VECTOR3 IrisMultiplicand1;
@@ -315,7 +317,7 @@ public:
     FLOAT 
     X(
         void
-        ) const
+        ) const noexcept
     {
         return Data.X;
     }
@@ -323,7 +325,7 @@ public:
     FLOAT 
     Y(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Y;
     }
@@ -331,7 +333,7 @@ public:
     FLOAT 
     Z(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Z;
     }
@@ -339,7 +341,7 @@ public:
     bool 
     Validate(
         void
-        ) const
+        ) const noexcept
     {
         BOOL Valid;
 
@@ -362,7 +364,7 @@ Vector
 operator+(
     _In_ const Vector & Addend0, 
     _In_ const Vector & Addend1
-    )
+    ) noexcept
 {
     VECTOR3 IrisAddend0;
     VECTOR3 IrisAddend1;
@@ -382,7 +384,7 @@ Vector
 operator-(
     _In_ const Vector & Minuend, 
     _In_ const Vector & Subtrahend
-    )
+    ) noexcept
 {
     VECTOR3 IrisDifference;
     VECTOR3 IrisMinuend;
@@ -402,7 +404,7 @@ Vector
 operator*(
     _In_ const Vector & ToScale, 
     _In_ FLOAT Scalar
-    )
+    ) noexcept
 {
     VECTOR3 IrisScaled;
     VECTOR3 IrisToScale;
@@ -420,7 +422,7 @@ Vector
 operator*(
     _In_ const Matrix & Multiplicand0,
     _In_ const Vector & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     VECTOR3 IrisMultiplicand1;
@@ -441,7 +443,7 @@ Vector
 operator*(
     _In_ const MatrixReference & Multiplicand0,
     _In_ const Vector & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     VECTOR3 IrisMultiplicand1;

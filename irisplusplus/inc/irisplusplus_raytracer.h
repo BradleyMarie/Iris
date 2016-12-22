@@ -26,14 +26,6 @@ namespace Iris {
     
 class RayTracer final {
 public:
-    RayTracer(
-        _In_ RayTracer && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
-
     static
     RayTracer
     Create(
@@ -88,19 +80,31 @@ public:
         _In_ const Ray & WorldRay,
         _In_ ProcessHitsWithCoordinatesFunction ProcessHitRoutine
         );
-        
+
     RayTracer(
         _In_ const RayTracer & ToCopy
-        ) = delete;
+        )
+    {
+        ISTATUS Status = RayTracerAllocate(&Data);
         
+        if (Status != ISTATUS_SUCCESS)
+        {
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
+            throw std::bad_alloc();;
+        }
+    }
+    
     RayTracer &
     operator=(
         _In_ const RayTracer & ToCopy
-        ) = delete;
+        ) noexcept
+    {
+        return *this;
+    }
     
     ~RayTracer(
         void
-        )
+        ) noexcept
      {
          RayTracerFree(Data);
      }

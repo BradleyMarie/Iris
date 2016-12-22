@@ -28,7 +28,7 @@ class HitAllocator final {
 public:
     HitAllocator(
         _In_ PHIT_ALLOCATOR HitAllocator
-        )
+        ) noexcept
     : Data(HitAllocator)
     { }
 
@@ -36,7 +36,7 @@ public:
     PHIT_ALLOCATOR
     AsPHIT_ALLOCATOR(
         void
-        )
+        ) noexcept
     {
         return Data;
     }

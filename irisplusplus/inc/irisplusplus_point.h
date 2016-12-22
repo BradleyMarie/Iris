@@ -30,13 +30,13 @@ public:
         _In_ FLOAT X, 
         _In_ FLOAT Y, 
         _In_ FLOAT Z
-        )
+        ) noexcept
     : Data(PointCreate(X, Y, Z))
     { }
 
     Point(
         _In_ const POINT3 & IrisPoint
-        )
+        ) noexcept
     : Data(IrisPoint)
     { }
 
@@ -46,7 +46,7 @@ public:
         _In_ const Point & Addend0, 
         _In_ const Vector & Addend1, 
         _In_ FLOAT Scalar
-        )
+        ) noexcept
     {
         POINT3 IrisAddend0;
         VECTOR3 IrisAddend1;
@@ -68,7 +68,7 @@ public:
         _In_ const Point & Minuend, 
         _In_ const Vector & Subtrahend, 
         _In_ FLOAT Scalar
-        )
+        ) noexcept
     {
         POINT3 IrisMinuend;
         VECTOR3 IrisSubtrahend;
@@ -89,7 +89,7 @@ public:
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
         _In_ const Point & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         POINT3 IrisMultiplicand1;
@@ -109,7 +109,7 @@ public:
     InverseMultiply(
         _In_ const MatrixReference & Multiplicand0,
         _In_ const Point & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         POINT3 IrisMultiplicand1;
@@ -127,7 +127,7 @@ public:
     POINT3
     AsPOINT3(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -136,7 +136,7 @@ public:
     PCPOINT3 
     AsPCPOINT3(
         void
-        ) const
+        ) const noexcept
     {
         return &Data;
     }
@@ -144,7 +144,7 @@ public:
     FLOAT 
     X(
         void
-        ) const
+        ) const noexcept
     {
         return Data.X;
     }
@@ -152,7 +152,7 @@ public:
     FLOAT 
     Y(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Y;
     }
@@ -160,7 +160,7 @@ public:
     FLOAT 
     Z(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Z;
     }
@@ -168,7 +168,7 @@ public:
     bool 
     Validate(
         void
-        ) const
+        ) const noexcept
     {
         BOOL Valid;
 
@@ -191,7 +191,7 @@ Point
 operator+(
     _In_ const Point & Addend0, 
     _In_ const Vector & Addend1
-    )
+    ) noexcept
 {
     POINT3 IrisAddend0;
     VECTOR3 IrisAddend1;
@@ -211,7 +211,7 @@ Vector
 operator-(
     _In_ const Point & Minuend, 
     _In_ const Point & Subtrahend
-    )
+    ) noexcept
 {
     POINT3 IrisMinuend;
     POINT3 IrisSubtrahend;
@@ -231,7 +231,7 @@ Point
 operator-(
     _In_ const Point & Minuend, 
     _In_ const Vector & Subtrahend
-    )
+    ) noexcept
 {
     POINT3 IrisMinuend;
     VECTOR3 IrisSubtrahend;
@@ -251,7 +251,7 @@ Point
 operator*(
     _In_ const Matrix & Multiplicand0,
     _In_ const Point & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     POINT3 IrisMultiplicand1;
@@ -272,7 +272,7 @@ Point
 operator*(
     _In_ const MatrixReference & Multiplicand0,
     _In_ const Point & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     POINT3 IrisMultiplicand1;

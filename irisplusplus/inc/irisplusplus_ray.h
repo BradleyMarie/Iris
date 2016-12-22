@@ -29,20 +29,20 @@ public:
     Ray(
         _In_ const Point & Origin, 
         _In_ const Vector & Direction
-        )
+        ) noexcept
     : Data(RayCreate(Origin.AsPOINT3(), Direction.AsVECTOR3()))
     { }
 
     Ray(
         _In_ const RAY & IrisRay
-        )
+        ) noexcept
     : Data(IrisRay)
     { }
 
     RAY 
     AsRAY(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -50,7 +50,7 @@ public:
     Point
     Origin(
         void
-        ) const
+        ) const noexcept
     {
         return Point(Data.Origin);
     }
@@ -58,7 +58,7 @@ public:
     Vector 
     Direction(
         void
-        ) const
+        ) const noexcept
     {
         return Vector(Data.Direction);
     }
@@ -66,7 +66,7 @@ public:
     bool 
     Validate(
         void
-        ) const
+        ) const noexcept
     {
         BOOL Valid;
 
@@ -80,7 +80,7 @@ public:
     Endpoint(
         _In_ const Ray & R,
         _In_ FLOAT Distance
-        )
+        ) noexcept
     {
         POINT3 IrisEndpoint;
 
@@ -93,7 +93,7 @@ public:
     Ray 
     Normalize(
         _In_ const Ray & ToNormalize
-        )
+        ) noexcept
     {
         RAY IrisResult;
 
@@ -107,7 +107,7 @@ public:
     InverseMultiply(
         _In_ const Matrix & Multiplicand0,
         _In_ const Ray & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         RAY IrisMultiplicand1;
@@ -127,7 +127,7 @@ public:
     InverseMultiply(
         _In_ const MatrixReference & Multiplicand0,
         _In_ const Ray & Multiplicand1
-        )
+        ) noexcept
     {
         PCMATRIX IrisMultiplicand0;
         RAY IrisMultiplicand1;
@@ -152,7 +152,7 @@ Ray
 operator*(
     _In_ const Matrix & Multiplicand0,
     _In_ const Ray & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     RAY IrisMultiplicand1;
@@ -173,7 +173,7 @@ Ray
 operator*(
     _In_ const MatrixReference & Multiplicand0,
     _In_ const Ray & Multiplicand1
-    )
+    ) noexcept
 {
     PCMATRIX IrisMultiplicand0;
     RAY IrisMultiplicand1;
