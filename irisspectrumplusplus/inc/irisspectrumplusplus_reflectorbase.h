@@ -36,8 +36,7 @@ protected:
 public:
     ReflectorBase(
         void
-        )
-    { }
+        ) = default;
     
     _Ret_
     virtual
@@ -59,8 +58,7 @@ public:
     virtual
     ~ReflectorBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisSpectrum

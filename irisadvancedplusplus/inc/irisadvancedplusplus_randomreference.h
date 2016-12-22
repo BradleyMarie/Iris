@@ -85,24 +85,9 @@ public:
     PRANDOM_REFERENCE
     AsPRANDOM_REFERENCE(
         void
-        )
+        ) noexcept
     {
         return Data;
-    }
-
-    RandomReference(
-        _In_ const RandomReference & ToCopy
-        )
-    : Data(ToCopy.Data)
-    { }
-
-    RandomReference & 
-    operator=(
-        _In_ const RandomReference & ToCopy
-        )
-    {
-        Data = ToCopy.Data;
-        return *this;
     }
 
 private:

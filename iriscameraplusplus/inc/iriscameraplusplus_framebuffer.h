@@ -26,14 +26,6 @@ namespace IrisCamera {
 
 class Framebuffer final {
 public:
-    Framebuffer(
-        _In_ Framebuffer && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
-    }
-
     static
     Framebuffer
     Create(
@@ -148,12 +140,20 @@ public:
 
     Framebuffer(
         _In_ const Framebuffer & ToCopy
-        ) = delete;
+        )
+    : Data(ToCopy.Copy())
+    { }
         
     Framebuffer &
     operator=(
         _In_ const Framebuffer & ToCopy
-        ) = delete;
+        )
+    {
+        PFRAMEBUFFER NewFramebuffer = ToCopy.Copy();
+        FramebufferFree(Data);
+        Data = NewFramebuffer;
+        return *this;
+    }
 
     ~Framebuffer(
         void
@@ -194,6 +194,13 @@ private:
                 throw std::bad_alloc();
         }
     }
+
+    _Ret_
+    IRISCAMERAPLUSPLUSAPI
+    PFRAMEBUFFER
+    Copy(
+        void
+        ) const;
 };
 
 } // namespace IrisCamera

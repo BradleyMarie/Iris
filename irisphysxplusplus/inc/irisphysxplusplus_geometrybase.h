@@ -36,8 +36,7 @@ protected:
 public:
     GeometryBase(
          void
-        )
-    { }
+        ) = default;
     
     _Ret_
     virtual
@@ -82,8 +81,7 @@ public:
     virtual
     ~GeometryBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisPhysx

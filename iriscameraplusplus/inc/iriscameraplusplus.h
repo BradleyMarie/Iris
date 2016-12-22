@@ -32,15 +32,16 @@ extern "C" {
 #include <string>
 
 //
-// Include Iris++ Headers
+// Include IrisAdvanced++ Headers
 //
 
-#include <irisplusplus.h>
+#include <irisadvancedplusplus.h>
 
 //
 // Include IrisCamera++ Headers
 //
 
+#include "iriscameraplusplus_api.h"
 #include "iriscameraplusplus_framebuffer.h"
 #include "iriscameraplusplus_randomgenerator.h"
 #include "iriscameraplusplus_camera.h"

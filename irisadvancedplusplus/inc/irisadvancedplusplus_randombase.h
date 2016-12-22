@@ -36,8 +36,7 @@ protected:
 public:
     RandomBase(
         void
-        )
-    { }
+        ) = default;
     
     _Ret_range_(Minimum, Maximum)
     virtual
@@ -67,8 +66,7 @@ public:
     virtual
     ~RandomBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisAdvanced

@@ -29,20 +29,12 @@ public:
     Random(
         _In_ PRANDOM RandomPtr
         )
-    : Data(RandomPtr)
+    : Data(RandomPtr, [](PRANDOM Rng){ RandomFree(Rng); })
     { 
         if (RandomPtr == NULL)
         {
             throw std::invalid_argument("RandomPtr");
         }
-    }
-
-    Random(
-        _In_ Random && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
     }
     
     _Ret_range_(Minimum, Maximum)
@@ -54,7 +46,7 @@ public:
     {
         FLOAT Result;
         
-        ISTATUS Status = RandomGenerateFloat(Data,
+        ISTATUS Status = RandomGenerateFloat(Data.get(),
                                              Minimum,
                                              Maximum,
                                              &Result);
@@ -76,7 +68,7 @@ public:
     {
         SIZE_T Result;
         
-        ISTATUS Status = RandomGenerateIndex(Data,
+        ISTATUS Status = RandomGenerateIndex(Data.get(),
                                              Minimum,
                                              Maximum,
                                              &Result);
@@ -93,46 +85,39 @@ public:
     PRANDOM
     AsPRANDOM(
         void
-        )
+        ) noexcept
     {
-        return Data;
+        return Data.get();
     }
         
     _Ret_
     PRANDOM_REFERENCE
     AsPRANDOM_REFERENCE(
         void
-        )
+        ) noexcept
     {
-        return RandomGetRandomReference(Data);
+        return RandomGetRandomReference(Data.get());
     }
 
     RandomReference
     AsRandomReference(
         void
-        )
+        ) noexcept
     {
         return RandomReference(AsPRANDOM_REFERENCE());
     }
 
     Random(
         _In_ const Random & ToCopy
-        ) = delete;
-
-    Random & 
+        ) = default;
+        
+    Random &
     operator=(
         _In_ const Random & ToCopy
-        ) = delete;
-
-    ~Random(
-        void
-        )
-    { 
-        RandomFree(Data);
-    }
+        ) = default;
 
 private:
-    PRANDOM Data;
+    std::shared_ptr<RANDOM> Data;
 };
 
 } // namespace IrisAdvanced

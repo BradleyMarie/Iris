@@ -36,8 +36,7 @@ protected:
 public:
     SampleTracerBase(
         void
-        )
-    { }
+        ) = default;
 
     virtual
     IrisAdvanced::Color
@@ -58,8 +57,7 @@ public:
     virtual
     ~SampleTracerBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisCamera

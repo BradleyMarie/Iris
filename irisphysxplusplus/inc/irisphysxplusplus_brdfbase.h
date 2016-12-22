@@ -33,7 +33,11 @@ protected:
         _In_ std::unique_ptr<BRDFBase> BRDFBasePtr
         );
 
-public:        
+public:  
+    BRDFBase(
+        void
+        ) = default;
+              
     _Ret_
     virtual
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
@@ -100,8 +104,7 @@ public:
     virtual
     ~BRDFBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisPhysx

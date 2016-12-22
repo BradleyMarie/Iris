@@ -36,8 +36,7 @@ protected:
 public:
     SampleTracerGeneratorBase(
         void
-        )
-    { }
+        ) = default;
 
     virtual
     SampleTracer
@@ -57,8 +56,7 @@ public:
     virtual
     ~SampleTracerGeneratorBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisCamera

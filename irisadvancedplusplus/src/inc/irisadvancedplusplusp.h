@@ -22,12 +22,6 @@ Abstract:
 #include <irisadvancedplusplus.h>
 
 //
-// Include Iris++ Headers
-//
-
-#include <irisplusplus.h>
-
-//
 // Include C++ standard library headers
 //
 

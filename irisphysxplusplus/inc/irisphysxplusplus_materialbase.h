@@ -36,8 +36,7 @@ protected:
 public:
     MaterialBase(
         void
-        )
-    { }
+        ) = default;
     
     virtual
     std::tuple<BRDFReference, Iris::Vector>
@@ -62,8 +61,7 @@ public:
     virtual
     ~MaterialBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisPhysx

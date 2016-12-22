@@ -30,19 +30,19 @@ public:
         _In_ FLOAT R,
         _In_ FLOAT G,
         _In_ FLOAT B
-        )
+        ) noexcept
     : Data(Color3InitializeFromComponents(R, G, B))
     { }
 
     Color3(
         _In_ const Color3 & Color
-        )
+        ) noexcept
     : Data(Color.AsCOLOR3())
     { }
 
     Color3(
         _In_ const COLOR3 & Color
-        )
+        ) noexcept
     : Data(Color)
     { }
 
@@ -50,7 +50,7 @@ public:
     Color3
     CreateBlack(
         void
-        )
+        ) noexcept
     {
         return Color3(Color3InitializeBlack());
     }
@@ -58,7 +58,7 @@ public:
     COLOR3
     AsCOLOR3(
         void
-        ) const
+        ) const noexcept
     {
         return Data;
     }
@@ -66,7 +66,7 @@ public:
     bool
     Validate(
         void
-        )
+        ) noexcept
     {
         BOOL Valid = Color3Validate(Data);
 
@@ -76,7 +76,7 @@ public:
     bool
     IsBlack(
         void
-        ) const
+        ) const noexcept
     {
         BOOL Black = Color3IsBlack(Data);
 
@@ -86,7 +86,7 @@ public:
     FLOAT
     AverageComponents(
         void
-        ) const
+        ) const noexcept
     {
         return Color3AverageComponents(Data);
     }
@@ -97,7 +97,7 @@ public:
         _In_ const Color3 & Addend0,
         _In_ const Color3 & Addend1,
         _In_ FLOAT Scalar
-        )
+        ) noexcept
     {
         COLOR3 Result = Color3AddScaled(Addend0.Data,
                                         Addend1.Data,
@@ -109,7 +109,7 @@ public:
     FLOAT 
     Red(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Red;
     }
@@ -117,7 +117,7 @@ public:
     FLOAT 
     Green(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Green;
     }
@@ -125,7 +125,7 @@ public:
     FLOAT 
     Blue(
         void
-        ) const
+        ) const noexcept
     {
         return Data.Blue;
     }
@@ -140,7 +140,7 @@ Color3
 operator+(
     _In_ const Color3 & Addend0,
     _In_ const Color3 & Addend1
-    )
+    ) noexcept
 {
     COLOR3 Result = Color3Add(Addend0.AsCOLOR3(),
                               Addend1.AsCOLOR3());
@@ -154,7 +154,7 @@ Color3
 operator*(
     _In_ const Color3 & Multiplicand0,
     _In_ const Color3 & Multiplicand1
-    )
+    ) noexcept
 {
     COLOR3 Result = Color3ScaleByColor(Multiplicand0.AsCOLOR3(),
                                        Multiplicand1.AsCOLOR3());
@@ -168,7 +168,7 @@ Color3
 operator*(
     _In_ const Color3 & Multiplicand,
     _In_ FLOAT Scalar
-    )
+    ) noexcept
 {
     COLOR3 Result = Color3ScaleByScalar(Multiplicand.AsCOLOR3(),
                                         Scalar);
@@ -182,7 +182,7 @@ Color3
 operator/(
     _In_ const Color3 & Dividend,
     _In_ const Color3 & Divisor
-    )
+    ) noexcept
 {
     COLOR3 Result = Color3DivideByColor(Dividend.AsCOLOR3(),
                                         Divisor.AsCOLOR3());
@@ -196,7 +196,7 @@ Color3
 operator/(
     _In_ const Color3 & Dividend,
     _In_ FLOAT Divisor
-    )
+    ) noexcept
 {
     COLOR3 Result = Color3DivideByScalar(Dividend.AsCOLOR3(),
                                          Divisor);

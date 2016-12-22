@@ -36,8 +36,7 @@ protected:
 public:
     LightBase(
         void
-        )
-    { }
+        ) = default;
     
     _Ret_
     virtual
@@ -79,8 +78,7 @@ public:
     virtual
     ~LightBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisPhysx

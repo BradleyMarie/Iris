@@ -37,8 +37,7 @@ protected:
 public:
     LightedGeometryBase(
          void
-        )
-    { }
+        ) = default;
 
     virtual
     FLOAT
@@ -65,8 +64,7 @@ public:
     virtual
     ~LightedGeometryBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace IrisPhysx

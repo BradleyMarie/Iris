@@ -101,7 +101,7 @@ public:
     {
         return *this;
     }
-    
+
     ~RayTracer(
         void
         ) noexcept

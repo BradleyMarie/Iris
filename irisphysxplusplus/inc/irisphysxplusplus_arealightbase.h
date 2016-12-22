@@ -36,8 +36,7 @@ class AreaLightBase {
 public:
     AreaLightBase(
         void
-        )
-    { }
+        ) = default;
 
     virtual
     IrisSpectrum::SpectrumReference
@@ -58,8 +57,7 @@ public:
     virtual
     ~AreaLightBase(
         void
-        )
-    { }
+        ) = default;
 };
 
 } // namespace Iris
