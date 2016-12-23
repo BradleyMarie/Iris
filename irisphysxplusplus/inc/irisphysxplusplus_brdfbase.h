@@ -43,7 +43,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     Sample(
         _In_ const Iris::Vector & Incoming,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const = 0;
         
@@ -52,7 +52,7 @@ public:
     std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT>
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const = 0;
     

@@ -20,7 +20,8 @@ Abstract:
 #include "irisadvanced_api.h"
 #include "irisadvanced_boundingbox.h"
 #include "irisadvanced_color3.h"
-#include "irisadvanced_randomreference.h"
 #include "irisadvanced_random.h"
+#include "irisadvanced_randomallocator.h"
+#include "irisadvanced_randomgenerator.h"
 
 #endif // _IRIS_ADVANCED_HEADER_

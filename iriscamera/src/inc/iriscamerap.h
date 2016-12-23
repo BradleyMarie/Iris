@@ -21,7 +21,6 @@ Abstract:
 #include "iriscamera_camera.h"
 #include "iriscamera_pixelsampler.h"
 #include "iriscamera_raygenerator.h"
-#include "iriscamera_randomgenerator.h"
 #include "iriscamera_sampletracergenerator.h"
 
 #endif // _IRIS_CAMERA_INTERNAL_HEADER_

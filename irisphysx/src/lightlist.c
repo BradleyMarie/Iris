@@ -199,7 +199,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 PhysxLightListGetRandomLight(
     _In_ PCPHYSX_LIGHT_LIST LightList,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _Out_ PCPHYSX_LIGHT *Light
     )
 {
@@ -224,10 +224,10 @@ PhysxLightListGetRandomLight(
 
     Size = PointerListGetSize(&LightList->Data);
 
-    Status = RandomReferenceGenerateIndex(Rng,
-                                          0,
-                                          Size,
-                                          &Index);
+    Status = RandomGenerateIndex(Rng,
+                                 0,
+                                 Size,
+                                 &Index);
 
     if (Status != ISTATUS_SUCCESS)
     {

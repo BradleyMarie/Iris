@@ -33,7 +33,6 @@ extern "C" {
 // Include IrisCameraToolkit++ Headers
 //
 
-#include "iriscameratoolkitplusplus_mwcgenerator.h"
 #include "iriscameratoolkitplusplus_pinhole.h"
 #include "iriscameratoolkitplusplus_gridpixelsampler.h"
 

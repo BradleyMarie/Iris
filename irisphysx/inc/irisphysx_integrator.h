@@ -69,7 +69,7 @@ PhysxIntegratorIntegrate(
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ FLOAT Epsilon,
     _In_ RAY WorldRay,
-    _Inout_ PRANDOM_REFERENCE Rng
+    _Inout_ PRANDOM Rng
     );
 
 IRISPHYSXAPI

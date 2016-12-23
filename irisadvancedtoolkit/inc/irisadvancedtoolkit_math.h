@@ -26,7 +26,7 @@ IRISADVANCEDTOOLKITAPI
 ISTATUS
 CosineSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
     );
 
@@ -35,7 +35,7 @@ IRISADVANCEDTOOLKITAPI
 ISTATUS
 UniformSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
     );
 

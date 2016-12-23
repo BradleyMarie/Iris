@@ -18,7 +18,7 @@ Abstract:
 #include <irisadvanced.h>
 
 #include "irisadvancedtoolkit_api.h"
-#include "irisadvancedtoolkit_mwc.h"
+#include "irisadvancedtoolkit_mwcgenerator.h"
 #include "irisadvancedtoolkit_math.h"
 
 #endif // _IRIS_ADVANCED_TOOLKIT_HEADER_

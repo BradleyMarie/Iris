@@ -73,34 +73,98 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 SFORCEINLINE
 ISTATUS
+PointerListPrepareToAddPointers(
+    _Inout_ PPOINTER_LIST PointerList,
+    _In_ SIZE_T NumberOfPointers
+    )
+{
+    SIZE_T NewCapacityInBytes;
+    SIZE_T NewCapacity;
+    SIZE_T RequiredCapacityInBytes;
+    SIZE_T RequiredCapacity;
+    PVOID *ResizedList;
+    SIZE_T Status;
+
+    ASSERT(PointerList != NULL);
+    ASSERT(PointerList->PointerListCapacity != 0);
+
+    Status = CheckedAddSizeT(PointerList->PointerListSize, 
+                             NumberOfPointers,
+                             &RequiredCapacity);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (PointerList->PointerListCapacity <= RequiredCapacity)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    Status = CheckedMultiplySizeT(RequiredCapacity,
+                                  sizeof(PVOID),
+                                  &RequiredCapacityInBytes);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    Status = CheckedMultiplySizeT(PointerList->PointerListCapacity,
+                                  POINTER_LIST_GROWTH_FACTOR,
+                                  &NewCapacity);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        NewCapacity = RequiredCapacity;
+        NewCapacityInBytes = RequiredCapacityInBytes;
+    }
+    else
+    {
+        Status = CheckedMultiplySizeT(NewCapacity,
+                                      sizeof(PVOID),
+                                      &NewCapacityInBytes);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            NewCapacity = RequiredCapacity;
+            NewCapacityInBytes = RequiredCapacityInBytes;
+        }
+    }        
+    
+    ResizedList = realloc(PointerList->PointerList, NewCapacityInBytes);
+
+    if (ResizedList == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PointerList->PointerList = ResizedList;
+    PointerList->PointerListCapacity = NewCapacity;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+SFORCEINLINE
+ISTATUS
 PointerListAddPointer(
     _Inout_ PPOINTER_LIST PointerList,
     _In_ PVOID Pointer
     )
 {
-    SIZE_T NewCapacityInBytes;
-    SIZE_T NewCapacity;
-    PVOID *ResizedList;
+    ISTATUS Status;
 
     ASSERT(PointerList != NULL);
     ASSERT(PointerList->PointerListCapacity != 0);
 
-    if (PointerList->PointerListSize == PointerList->PointerListCapacity)
+    Status = PointerListPrepareToAddPointers(PointerList, 1);
+
+    if (Status != ISTATUS_SUCCESS)
     {
-        NewCapacity = POINTER_LIST_GROWTH_FACTOR * 
-                      PointerList->PointerListCapacity;
-
-        NewCapacityInBytes = NewCapacity * sizeof(PVOID);
-
-        ResizedList = realloc(PointerList->PointerList, NewCapacityInBytes);
-
-        if (ResizedList == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        PointerList->PointerList = ResizedList;
-        PointerList->PointerListCapacity = NewCapacity;
+        return Status;
     }
 
     PointerList->PointerList[PointerList->PointerListSize++] = Pointer;

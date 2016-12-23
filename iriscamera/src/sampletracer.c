@@ -103,9 +103,9 @@ SampleTracerAllocate(
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SampleTracerTrace(
-    _In_ PCSAMPLE_TRACER SampleTracer,
+    _In_ PSAMPLE_TRACER SampleTracer,
     _In_ RAY WorldRay,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _Out_ PCOLOR3 Color
     )
 {

@@ -4,7 +4,7 @@ Copyright (c) 2016 Brad Weinberger
 
 Module Name:
 
-    iriscamera_randomgenerator.h
+    irisadvanced_randomgenerator.h
 
 Abstract:
 
@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _RANDOM_GENERATOR_IRIS_CAMERA_
-#define _RANDOM_GENERATOR_IRIS_CAMERA_
+#ifndef _RANDOM_GENERATOR_IRIS_ADVANCED_
+#define _RANDOM_GENERATOR_IRIS_ADVANCED_
 
-#include <iriscamera.h>
+#include <irisadvanced.h>
 
 //
 // Types
@@ -27,7 +27,15 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PRANDOM_GENERATOR_GENERATE_RANDOM_ROUTINE)(
     _In_ PCVOID Context,
+    _Inout_ PRANDOM_ALLOCATOR Allocator,
     _Out_ PRANDOM *Rng
+    );
+
+typedef
+VOID
+(*PRANDOM_GENERATOR_RANDOM_LIFETIME_SCOPE_ROUTINE)(
+    _Inout_opt_ PVOID Context,
+    _In_ PRANDOM Rng
     );
 
 typedef struct _RANDOM_GENERATOR_VTABLE {
@@ -46,7 +54,7 @@ typedef CONST RANDOM_GENERATOR *PCRANDOM_GENERATOR;
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
+IRISADVANCEDAPI
 ISTATUS
 RandomGeneratorAllocate(
     _In_ PCRANDOM_GENERATOR_VTABLE RandomGeneratorVTable,
@@ -56,10 +64,20 @@ RandomGeneratorAllocate(
     _Out_ PRANDOM_GENERATOR *RngGenerator
     );
 
-IRISCAMERAAPI
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISADVANCEDAPI
+ISTATUS
+RandomGeneratorGenerate(
+    _In_ PCRANDOM_GENERATOR RngGenerator,
+    _In_ PRANDOM_GENERATOR_RANDOM_LIFETIME_SCOPE_ROUTINE Callback,
+    _Inout_opt_ PVOID CallbackContext
+    );
+
+IRISADVANCEDAPI
 VOID
 RandomGeneratorFree(
     _In_opt_ _Post_invalid_ PRANDOM_GENERATOR RngGenerator
     );
 
-#endif // _RANDOM_GENERATOR_IRIS_CAMERA_
+#endif // _RANDOM_GENERATOR_IRIS_ADVANCED_

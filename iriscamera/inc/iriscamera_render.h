@@ -27,8 +27,8 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER SampleTracer,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCRANDOM_GENERATOR RngGenerator,
     _Inout_ PFRAMEBUFFER FrameBuffer
     );
 

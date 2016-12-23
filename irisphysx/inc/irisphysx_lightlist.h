@@ -74,7 +74,7 @@ IRISPHYSXAPI
 ISTATUS
 PhysxLightListGetRandomLight(
     _In_ PCPHYSX_LIGHT_LIST LightList,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _Out_ PCPHYSX_LIGHT *Light
     );
 

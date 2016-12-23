@@ -15,22 +15,34 @@ Abstract:
 #include <iriscamerap.h>
 
 //
-// Public Functions
+// Types
 //
 
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-IrisCameraRender(
-    _In_ PCCAMERA Camera,
-    _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER SampleTracer,
-    _Inout_ PRANDOM_REFERENCE Rng,
-    _Inout_ PFRAMEBUFFER Framebuffer
+typedef struct _CALLBACK_CONTEXT {
+    PCPIXEL_SAMPLER PixelSampler;
+    PCSAMPLE_TRACER SampleTracer;
+    PCCAMERA Camera;
+    PFRAMEBUFFER Framebuffer;
+    ISTATUS Status;
+} CALLBACK_CONTEXT, *PCALLBACK_CONTEXT;
+
+//
+// Static Functions
+//
+
+STATIC
+VOID
+RenderWithRandomCallback(
+    _Inout_opt_ PVOID Context,
+    _In_ PRANDOM Rng
     )
 {
+    PCALLBACK_CONTEXT CallbackContext;
     RAY_GENERATOR RayGenerator;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
+    SIZE_T NumberOfPixels;
+    SIZE_T PixelIndex;
     SIZE_T PixelColumn;
     SIZE_T PixelRow; 
     COLOR3 PixelColor; 
@@ -46,36 +58,18 @@ IrisCameraRender(
     FLOAT MaxLensV;
     ISTATUS Status;
 
-    if (Camera == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
+    ASSERT(Context != NULL);
+    ASSERT(Rng != NULL);
 
-    if (PixelSampler == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
+    CallbackContext = (PCALLBACK_CONTEXT) Context;
 
-    if (SampleTracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (Rng == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (Framebuffer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    FramebufferGetDimensions(Framebuffer, 
+    FramebufferGetDimensions(CallbackContext->Framebuffer, 
                              &FramebufferRows,
                              &FramebufferColumns);
 
-    CameraGetParameters(Camera,
+    NumberOfPixels = FramebufferRows * FramebufferColumns;
+
+    CameraGetParameters(CallbackContext->Camera,
                         &SamplePixel,
                         &SampleLens,
                         &MinPixelU,
@@ -87,50 +81,58 @@ IrisCameraRender(
                         &MinLensV,
                         &MaxLensV);
 
-    for (PixelRow = 0; PixelRow < FramebufferRows; PixelRow += 1)
+#ifdef _OPENMP
+    #pragma omp for schedule(dynamic, 16)
+#endif // OPENMP
+    for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex += 1)
     {
-        for (PixelColumn = 0; PixelColumn < FramebufferColumns; PixelColumn += 1)
+        PixelRow = PixelIndex / FramebufferColumns;
+        PixelColumn = PixelIndex % FramebufferColumns;
+
+        RayGenerator = RayGeneratorCreate(CallbackContext->Camera,
+                                          PixelRow,
+                                          FramebufferRows,
+                                          PixelColumn,
+                                          FramebufferColumns);
+        
+        Status = PixelSamplerSamplePixel(CallbackContext->PixelSampler,
+                                         &RayGenerator,
+                                         CallbackContext->SampleTracer,
+                                         Rng,
+                                         SamplePixel,
+                                         SampleLens,
+                                         MinPixelU,
+                                         MaxPixelU,
+                                         MinPixelV,
+                                         MaxPixelV,
+                                         MinLensU,
+                                         MaxLensU,
+                                         MinLensV,
+                                         MaxLensV,
+                                         &PixelColor);
+
+        if (Status != ISTATUS_SUCCESS)
         {
-            RayGenerator = RayGeneratorCreate(Camera,
-                                              PixelRow,
-                                              FramebufferRows,
-                                              PixelColumn,
-                                              FramebufferColumns);
-            
-            Status = PixelSamplerSamplePixel(PixelSampler,
-                                             &RayGenerator,
-                                             SampleTracer,
-                                             Rng,
-                                             SamplePixel,
-                                             SampleLens,
-                                             MinPixelU,
-                                             MaxPixelU,
-                                             MinPixelV,
-                                             MaxPixelV,
-                                             MinLensU,
-                                             MaxLensU,
-                                             MinLensV,
-                                             MaxLensV,
-                                             &PixelColor);
-
-            if (Status != ISTATUS_SUCCESS)
-            {
-                return Status;
-            }
-
-            FramebufferSetPixel(Framebuffer,
-                                PixelColor,
-                                PixelRow,
-                                PixelColumn);
+            CallbackContext->Status = Status;
+            return;
         }
+
+        FramebufferSetPixel(CallbackContext->Framebuffer,
+                            PixelColor,
+                            PixelRow,
+                            PixelColumn);
     }
 
-    return Status;
+    CallbackContext->Status = ISTATUS_SUCCESS;
 }
+
+//
+// Public Functions
+//
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-IrisCameraRenderParallel(
+IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
@@ -138,10 +140,7 @@ IrisCameraRenderParallel(
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
-    SIZE_T FramebufferColumns;
-    SIZE_T FramebufferRows;
-    SIZE_T NumberOfPixels;
-    SIZE_T PixelIndex;
+    CALLBACK_CONTEXT CallbackContext;
     ISTATUS Status;
 
     if (Camera == NULL)
@@ -169,96 +168,76 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    FramebufferGetDimensions(Framebuffer, 
-                             &FramebufferRows,
-                             &FramebufferColumns);
+    Status = SampleTracerGeneratorGenerateSampleTracer(SampleTracerGenerator,
+                                                       &CallbackContext.SampleTracer);
 
-    NumberOfPixels = FramebufferRows * FramebufferColumns;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    CallbackContext.Camera = Camera;
+    CallbackContext.PixelSampler = PixelSampler;
+    CallbackContext.Framebuffer = Framebuffer;
+
+    Status = RandomGeneratorGenerate(RandomGenerator,
+                                     RenderWithRandomCallback,
+                                     &CallbackContext);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    return CallbackContext.Status;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+IrisCameraRenderParallel(
+    _In_ PCCAMERA Camera,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCRANDOM_GENERATOR RandomGenerator,
+    _Inout_ PFRAMEBUFFER Framebuffer
+    )
+{
+    ISTATUS Status;
+
+    if (Camera == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (PixelSampler == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (SampleTracerGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (RandomGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (Framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
 
 #ifdef _OPENMP
     #pragma omp parallel default(shared) reduction(+: Status) num_threads(NumberOfThreads)
 #endif // OPENMP
     {
-        BOOL SamplePixel;
-        BOOL SampleLens;
-        FLOAT MinPixelU;
-        FLOAT MaxPixelU;
-        FLOAT MinPixelV;
-        FLOAT MaxPixelV;
-        FLOAT MinLensU;
-        FLOAT MaxLensU;
-        FLOAT MinLensV;
-        FLOAT MaxLensV;
-        CameraGetParameters(Camera,
-                            &SamplePixel,
-                            &SampleLens,
-                            &MinPixelU,
-                            &MaxPixelU,
-                            &MinPixelV,
-                            &MaxPixelV,
-                            &MinLensU,
-                            &MaxLensU,
-                            &MinLensV,
-                            &MaxLensV);
-
-        PRANDOM Rng;
-        Status = RandomGeneratorGenerateRandom(RandomGenerator, &Rng);
-
-        if (Status == ISTATUS_SUCCESS)
-        {
-            PRANDOM_REFERENCE RngReference = RandomGetRandomReference(Rng);
-
-            PSAMPLE_TRACER SampleTracer;
-            Status = SampleTracerGeneratorGenerateSampleTracer(SampleTracerGenerator,
-                                                               &SampleTracer);
-
-            if (Status == ISTATUS_SUCCESS)
-            {
-                #pragma omp for schedule(dynamic, 16)
-                for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex++)
-                {
-                    SIZE_T PixelRow = PixelIndex / FramebufferColumns;
-                    SIZE_T PixelColumn = PixelIndex % FramebufferColumns;
-
-                    RAY_GENERATOR RayGenerator = RayGeneratorCreate(Camera,
-                                                                    PixelRow,
-                                                                    FramebufferRows,
-                                                                    PixelColumn,
-                                                                    FramebufferColumns);
-                    
-                    COLOR3 PixelColor;
-                    Status = PixelSamplerSamplePixel(PixelSampler,
-                                                    &RayGenerator,
-                                                    SampleTracer,
-                                                    RngReference,
-                                                    SamplePixel,
-                                                    SampleLens,
-                                                    MinPixelU,
-                                                    MaxPixelU,
-                                                    MinPixelV,
-                                                    MaxPixelV,
-                                                    MinLensU,
-                                                    MaxLensU,
-                                                    MinLensV,
-                                                    MaxLensV,
-                                                    &PixelColor);
-
-                    if (Status != ISTATUS_SUCCESS)
-                    {
-                        break;
-                    }
-
-                    FramebufferSetPixel(Framebuffer,
-                                        PixelColor,
-                                        PixelRow,
-                                        PixelColumn);
-                }
-
-                SampleTracerFree(SampleTracer);
-            }
-            
-            RandomFree(Rng);
-        }
+        Status = IrisCameraRender(Camera,
+                                    PixelSampler,
+                                    SampleTracerGenerator,
+                                    RandomGenerator,
+                                    Framebuffer);
     }
 
     return Status;

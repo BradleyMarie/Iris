@@ -26,7 +26,6 @@ Abstract:
 #include "irisphysxtoolkit_pointlight.h"
 #include "irisphysxtoolkit_triangle.h"
 #include "irisphysxtoolkit_sphere.h"
-#include "irisphysxtoolkit_pinhole.h"
 #include "irisphysxtoolkit_infiniteplane.h"
 #include "irisphysxtoolkit_constantarealight.h"
 

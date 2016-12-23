@@ -24,7 +24,7 @@ namespace IrisCamera {
 // Types
 //
 
-class SampleTracerGeneratorBase final {
+class SampleTracerGeneratorBase {
 protected:
     IRISCAMERAPLUSPLUSAPI
     static

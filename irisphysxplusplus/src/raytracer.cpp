@@ -40,7 +40,7 @@ ProcessHitAdapter(
     _Inout_ PPHYSX_BRDF_ALLOCATOR AllocatorPtr,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorReferencePtr,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositorReferencePtr,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Outptr_result_maybenull_ PCSPECTRUM *SpectrumPtr
     )
 {
@@ -87,7 +87,7 @@ ProcessHitAdapter(
                                                                   BRDFAllocator(AllocatorPtr),
                                                                   IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorReferencePtr),
                                                                   IrisSpectrum::ReflectorCompositorReference(ReflectorCompositorReferencePtr),
-                                                                  IrisAdvanced::RandomReference(Rng));
+                                                                  IrisAdvanced::Random(Rng));
 
     *SpectrumPtr = Result.AsPCSPECTRUM();
 

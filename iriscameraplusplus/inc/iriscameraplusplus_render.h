@@ -30,15 +30,15 @@ void
 Render(
     _In_ const Camera & CameraRef,
     _In_ const PixelSampler & PixelSamplerRef,
-    _In_ const SampleTracer & SampleTracerRef,
-    _Inout_ IrisAdvanced::RandomReference & RandomReferenceRef,
+    _In_ const SampleTracerGenerator & SampleTracerGeneratorRef,
+    _Inout_ const IrisAdvanced::RandomGenerator & RandomGeneratorRef,
     _Inout_ Framebuffer & FramebufferRef
     )
 {
     ISTATUS Status = IrisCameraRender(CameraRef.AsPCCAMERA(),
                                       PixelSamplerRef.AsPCPIXEL_SAMPLER(),
-                                      SampleTracerRef.AsPCSAMPLE_TRACER(),
-                                      RandomReferenceRef.AsPRANDOM_REFERENCE(),
+                                      SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
+                                      RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
                                       FramebufferRef.AsPFRAMEBUFFER());
 
     if (Status != ISTATUS_SUCCESS)
@@ -54,7 +54,7 @@ RenderParallel(
     _In_ const Camera & CameraRef,
     _In_ const PixelSampler & PixelSamplerRef,
     _In_ const SampleTracerGenerator & SampleTracerGeneratorRef,
-    _In_ const RandomGenerator & RandomGeneratorRef,
+    _In_ const IrisAdvanced::RandomGenerator & RandomGeneratorRef,
     _Inout_ Framebuffer & FramebufferRef
     )
 {

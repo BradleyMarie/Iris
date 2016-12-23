@@ -51,7 +51,7 @@ public:
     Sample(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
     {
@@ -63,7 +63,7 @@ public:
         Status = PhysxBrdfSample(Data,
                                  Incoming.AsVECTOR3(),
                                  SurfaceNormal.AsVECTOR3(),
-                                 Rng.AsPRANDOM_REFERENCE(),
+                                 Rng.AsPRANDOM(),
                                  Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                  &Reflector,
                                  &Outgoing,
@@ -82,7 +82,7 @@ public:
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const
     {
@@ -94,7 +94,7 @@ public:
         Status = PhysxBrdfSampleWithLambertianFalloff(Data,
                                                       Incoming.AsVECTOR3(),
                                                       SurfaceNormal.AsVECTOR3(),
-                                                      Rng.AsPRANDOM_REFERENCE(),
+                                                      Rng.AsPRANDOM(),
                                                       Compositor.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
                                                       &Reflector,
                                                       &Outgoing,

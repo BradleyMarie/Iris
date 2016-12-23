@@ -30,6 +30,7 @@ protected:
     static
     Random
     Create(
+        _Inout_ RandomAllocator & Allocator,
         _In_ std::unique_ptr<RandomBase> RandomBasePtr
         );
 

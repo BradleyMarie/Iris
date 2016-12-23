@@ -806,7 +806,7 @@ ISTATUS
 PhysxLightedTriangleSampleSurface(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 Face,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PPOINT3 Sample
     )
 {
@@ -835,17 +835,17 @@ PhysxLightedTriangleSampleSurface(
 
     Triangle = (PCPHYSX_LIGHTED_TRIANGLE) Context;
 
-    RandomReferenceGenerateFloat(Rng, 
-                                 (FLOAT) 0.0f, 
-                                 (FLOAT) 1.0f,
-                                 &Random0);
+    RandomGenerateFloat(Rng, 
+                        (FLOAT) 0.0f, 
+                        (FLOAT) 1.0f,
+                        &Random0);
 
     SqrtRandom0 = SqrtFloat(Random0);
 
-    RandomReferenceGenerateFloat(Rng, 
-                                 (FLOAT) 0.0f, 
-                                 (FLOAT) 1.0f,
-                                 &Random1);
+    RandomGenerateFloat(Rng, 
+                        (FLOAT) 0.0f, 
+                        (FLOAT) 1.0f,
+                        &Random1);
 
     Vertex0 = Triangle->Data.Vertex0;
     Vertex1 = PointVectorAdd(Vertex0, Triangle->Data.B);

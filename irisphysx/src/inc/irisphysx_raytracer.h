@@ -35,7 +35,7 @@ PhysxRayTracerConfigure(
     _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _In_ FLOAT Epsilon
     );
 

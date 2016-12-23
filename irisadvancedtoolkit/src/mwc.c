@@ -17,7 +17,7 @@ Abstract:
 #include <math.h>
 
 //
-// Constants
+// MWC Constants
 //
 
 #define RANDOM_STATE_SIZE 4096
@@ -26,7 +26,7 @@ Abstract:
 #define PHI 0x9e3779b9
 
 //
-// Types
+// MWC Types
 //
 
 typedef struct _MWC_RNG {
@@ -38,7 +38,7 @@ typedef struct _MWC_RNG {
 typedef CONST MWC_RNG *PCMWC_RNG;
 
 //
-// Static functions
+// MWC Static functions
 //
 
 SFORCEINLINE
@@ -132,7 +132,7 @@ MultiplyWithCarryRngFree(
 }
 
 //
-// Static variables
+// MWC Static variables
 //
 
 CONST STATIC RANDOM_VTABLE MwcVTable = {
@@ -142,14 +142,17 @@ CONST STATIC RANDOM_VTABLE MwcVTable = {
 };
 
 //
-// Public Functions
+// Generator Functions
 //
 
 _Check_return_
-_Ret_maybenull_
+_Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS
-MultiplyWithCarryRngAllocate(
-    _Out_ PRANDOM *Random
+MultiplyWithCarryGeneratorGenerate(
+    _In_ PCVOID Context,
+    _Inout_ PRANDOM_ALLOCATOR Allocator,
+    _Out_ PRANDOM *Output
     )
 {
     SIZE_T Index;
@@ -160,6 +163,10 @@ MultiplyWithCarryRngAllocate(
     ISTATUS Status;
     time_t Timer;
     struct tm YearTwoThousand;
+
+    ASSERT(Context == NULL);
+    ASSERT(Allocator != NULL);
+    ASSERT(Output != NULL);
 
     RngState = (PUINT32) malloc(sizeof(UINT32) * RANDOM_STATE_SIZE);
 
@@ -196,16 +203,53 @@ MultiplyWithCarryRngAllocate(
     Rng.C = INITIAL_C_VALUE;
     Rng.I = INITIAL_I_VALUE;
 
-    Status = RandomAllocate(&MwcVTable,
-                            &Rng,
-                            sizeof(MWC_RNG),
-                            sizeof(PVOID),
-                            Random);
+    Status = RandomAllocatorAllocateRandom(Allocator,
+                                           &MwcVTable,
+                                           &Rng,
+                                           sizeof(MWC_RNG),
+                                           _Alignof(MWC_RNG),
+                                           Output);
 
     if (Status != ISTATUS_SUCCESS)
     {
-        MultiplyWithCarryRngFree(&Rng);
+        free(RngState);
     }
+
+    return Status;
+}
+
+//
+// Generator Static Variables
+//
+
+CONST STATIC RANDOM_GENERATOR_VTABLE GeneratorVTable = {
+    MultiplyWithCarryGeneratorGenerate,
+    NULL
+};
+
+//
+// Generator Public Functions
+//
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+MultiplyWithCarryRandomGeneratorAllocate(
+    _Out_ PRANDOM_GENERATOR *RandomGenerator
+    )
+{
+    ISTATUS Status;
+
+    if (RandomGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    Status = RandomGeneratorAllocate(&GeneratorVTable,
+                                     NULL,
+                                     0,
+                                     0,
+                                     RandomGenerator);
 
     return Status;
 }

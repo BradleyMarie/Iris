@@ -211,7 +211,7 @@ PhysxAreaLightAdapterSample(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
@@ -246,10 +246,10 @@ PhysxAreaLightAdapterSample(
     
     TotalArea = AreaLightAdapter->Geometry[AreaLightAdapter->NumberOfGeometry - 1].EndArea;
 
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0f,
-                                          TotalArea,
-                                          &Key.StartArea);
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0f,
+                                 TotalArea,
+                                 &Key.StartArea);
 
     if (Status != ISTATUS_SUCCESS)
     {

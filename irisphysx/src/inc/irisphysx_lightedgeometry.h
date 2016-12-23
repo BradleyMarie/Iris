@@ -208,7 +208,7 @@ ISTATUS
 PhysxLightedGeometrySampleSurface(
     _In_ PCPHYSX_LIGHTED_GEOMETRY LightedGeometry,
     _In_ UINT32 Face,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PPOINT3 Sample
     )
 {

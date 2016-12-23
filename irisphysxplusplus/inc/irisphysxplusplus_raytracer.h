@@ -44,7 +44,7 @@ typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
                                                       BRDFAllocator,
                                                       IrisSpectrum::SpectrumCompositorReference,
                                                       IrisSpectrum::ReflectorCompositorReference,
-                                                      IrisAdvanced::RandomReference)> ProcessHitRoutine;
+                                                      IrisAdvanced::Random)> ProcessHitRoutine;
 
 class RayTracer final {
 public:

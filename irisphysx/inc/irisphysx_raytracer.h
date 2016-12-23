@@ -44,7 +44,7 @@ ISTATUS
     _Inout_ PPHYSX_BRDF_ALLOCATOR Allocator,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Outptr_result_maybenull_ PCSPECTRUM *Spectrum
     );
 

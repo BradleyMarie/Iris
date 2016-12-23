@@ -89,6 +89,7 @@ const static RANDOM_VTABLE InteropVTable = {
 
 Random
 RandomBase::Create(
+    _Inout_ RandomAllocator & Allocator,
     _In_ std::unique_ptr<RandomBase> RandomBasePtr
     )
 {
@@ -100,11 +101,12 @@ RandomBase::Create(
     RandomBase *UnmanagedRandomBasePtr = RandomBasePtr.release();
     PRANDOM RandomPtr;
 
-    ISTATUS Success = RandomAllocate(&InteropVTable,
-                                     &UnmanagedRandomBasePtr,
-                                     sizeof(RandomBase*),
-                                     alignof(RandomBase*),
-                                     &RandomPtr);
+    ISTATUS Success = RandomAllocatorAllocateRandom(Allocator.AsPRANDOM_ALLOCATOR(),
+                                                    &InteropVTable,
+                                                    &UnmanagedRandomBasePtr,
+                                                    sizeof(RandomBase*),
+                                                    alignof(RandomBase*),
+                                                    &RandomPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

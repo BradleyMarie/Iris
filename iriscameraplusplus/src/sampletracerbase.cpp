@@ -24,20 +24,21 @@ _Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 SampleTracerTraceAdapter(
-    _In_ PCVOID Context,
+    _In_ PVOID Context,
     _In_ RAY WorldRay,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM RngPtr,
     _Out_ PCOLOR3 Color
     )
 {
     assert(Context != NULL);
     assert(RayValidate(WorldRay) != FALSE);
-    assert(Rng != NULL);
+    assert(RngPtr != NULL);
     assert(Color != NULL);
 
-    const SampleTracerGeneratorBase **SampleTracerGeneratorBasePtr = (const SampleTracerGeneratorBase**) Context;
-    IrisAdvanced::Color Result = SampleTracerGeneratorBasePtr->Trace(Iris::Ray(WorldRay),
-                                                                     IrisAdvanced::RandomReference(Rng));
+    SampleTracerBase **SampleTracerBasePtr = (SampleTracerBase**) Context;
+    IrisAdvanced::Random Rng(RngPtr);
+    IrisAdvanced::Color3 Result = (*SampleTracerBasePtr)->Trace(Iris::Ray(WorldRay),
+                                                                Rng);
 
     *Color = Result.AsCOLOR3();
 

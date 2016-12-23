@@ -49,7 +49,7 @@ public:
     Iris::Point
     SampleSurface(
         _In_ UINT32 Face,
-        _In_ IrisAdvanced::RandomReference Rng
+        _In_ IrisAdvanced::Random Rng
         ) const = 0;
 
     LightedGeometryBase(

@@ -42,8 +42,9 @@ extern "C" {
 
 #include "irisadvancedplusplus_api.h"
 #include "irisadvancedplusplus_color3.h"
-#include "irisadvancedplusplus_randomreference.h"
 #include "irisadvancedplusplus_random.h"
+#include "irisadvancedplusplus_randomallocator.h"
+#include "irisadvancedplusplus_randomgenerator.h"
 #include "irisadvancedplusplus_randombase.h"
 
 #endif // _IRIS_ADVANCED_PLUS_PLUS_HEADER_

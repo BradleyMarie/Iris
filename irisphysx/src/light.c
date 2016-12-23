@@ -188,7 +188,7 @@ PhysxLightSample(
     _In_ PCPHYSX_LIGHT Light,
     _In_ POINT3 HitPoint,
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,

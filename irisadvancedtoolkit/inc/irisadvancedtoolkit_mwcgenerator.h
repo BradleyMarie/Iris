@@ -25,8 +25,8 @@ _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 IRISADVANCEDTOOLKITAPI
 ISTATUS
-MultiplyWithCarryRngAllocate(
-    _Out_ PRANDOM *Rng
+MultiplyWithCarryRandomGeneratorAllocate(
+    _Out_ PRANDOM_GENERATOR *RandomGenerator
     );
 
 #endif // _MULTIPLY_WITH_CARRY_IRIS_ADVANCED_TOOLKIT_

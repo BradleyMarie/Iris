@@ -19,11 +19,12 @@ Abstract:
 //
 
 struct _RANDOM {
-    RANDOM_REFERENCE RandomReference;
+    PCRANDOM_VTABLE VTable;
+    PVOID Data;
 };
 
 //
-// Functions
+// Private Functions
 //
 
 _Check_return_
@@ -42,34 +43,12 @@ RandomAllocate(
     PVOID DataAllocation;
     PRANDOM AllocatedRng;
 
-    if (RandomVTable == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (DataSizeInBytes != 0)
-    {
-        if (Data == NULL)
-        {
-            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-        }
-
-        if (DataAlignment == 0 ||
-            DataAlignment & DataAlignment - 1)
-        {
-            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
-        }
-
-        if (DataSizeInBytes % DataAlignment != 0)
-        {
-            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
-        }
-    }
-
-    if (Rng == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
+    ASSERT(RandomVTable != NULL);
+    ASSERT(DataSizeInBytes == 0 || 
+           (Data != NULL && DataAlignment != 0 && 
+           (DataAlignment & DataAlignment - 1) == 0 &&
+           DataSizeInBytes % DataAlignment == 0));
+    ASSERT(Rng != NULL);
 
     AllocationSuccessful = IrisAlignedAllocWithHeader(sizeof(RANDOM),
                                                       _Alignof(RANDOM),
@@ -91,28 +70,36 @@ RandomAllocate(
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    RandomReferenceInitialize(RandomVTable,
-                              DataAllocation,
-                              &AllocatedRng->RandomReference);
+    AllocatedRng->VTable = RandomVTable;
+    AllocatedRng->Data = DataAllocation;
 
     *Rng = AllocatedRng;
 
     return ISTATUS_SUCCESS;
 }
 
-_Ret_
-PRANDOM_REFERENCE
-RandomGetRandomReference(
-    _In_ PRANDOM Rng
+VOID
+RandomFree(
+    _In_opt_ _Post_invalid_ PRANDOM Rng
     )
 {
-    if (Rng == NULL)
-    {
-        return NULL;
-    }    
+    PFREE_ROUTINE FreeRoutine;
     
-    return &Rng->RandomReference;
+    ASSERT(Rng != NULL);
+    
+    FreeRoutine = Rng->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(Rng->Data);
+    }
+
+    IrisAlignedFree(Rng);
 }
+
+//
+// Public Functions
+//
 
 ISTATUS
 RandomGenerateFloat(
@@ -123,17 +110,37 @@ RandomGenerateFloat(
     )
 {
     ISTATUS Status;
-    
-    //
-    // &Rng->RandomReference should be safe to do even if
-    // Rng == NULL.
-    //
-    
-    Status = RandomReferenceGenerateFloat(&Rng->RandomReference,
-                                          Minimum,
-                                          Maximum,
-                                          RandomValue);
-                                          
+
+    if (Rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (IsFiniteFloat(Minimum) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (IsFiniteFloat(Maximum) == FALSE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (Minimum > Maximum)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    Status = Rng->VTable->GenerateFloatRoutine(Rng->Data,
+                                               Minimum,
+                                               Maximum,
+                                               RandomValue);
+
     return Status;
 }
 
@@ -146,30 +153,26 @@ RandomGenerateIndex(
     )
 {
     ISTATUS Status;
-    
-    //
-    // &Rng->RandomReference should be safe to do even if
-    // Rng == NULL.
-    //
-    
-    Status = RandomReferenceGenerateIndex(&Rng->RandomReference,
-                                          Minimum,
-                                          Maximum,
-                                          RandomValue);
 
-    return Status;
-}
-
-VOID
-RandomFree(
-    _In_opt_ _Post_invalid_ PRANDOM Rng
-    )
-{
     if (Rng == NULL)
     {
-        return;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    RandomReferenceDestroy(&Rng->RandomReference);
-    IrisAlignedFree(Rng);
+    if (Minimum > Maximum)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (RandomValue == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    Status = Rng->VTable->GenerateIndexRoutine(Rng->Data,
+                                               Minimum,
+                                               Maximum,
+                                               RandomValue);
+
+    return Status;
 }

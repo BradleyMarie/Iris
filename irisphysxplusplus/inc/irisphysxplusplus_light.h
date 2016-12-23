@@ -73,7 +73,7 @@ public:
     Sample(
         _In_ const Iris::Point & HitPoint,
         _In_ VisibilityTester Tester,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const
     {
@@ -84,7 +84,7 @@ public:
         ISTATUS Status = PhysxLightSample(Data,
                                           HitPoint.AsPOINT3(),
                                           Tester.AsPPHYSX_VISIBILITY_TESTER(),
-                                          Rng.AsPRANDOM_REFERENCE(),
+                                          Rng.AsPRANDOM(),
                                           Compositor.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
                                           &ResultSpectrum,
                                           &ResultToLight,

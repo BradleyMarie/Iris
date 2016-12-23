@@ -24,7 +24,7 @@ namespace IrisCamera {
 // Types
 //
 
-class SampleTracerBase final {
+class SampleTracerBase {
 protected:
     IRISCAMERAPLUSPLUSAPI
     static
@@ -39,11 +39,11 @@ public:
         ) = default;
 
     virtual
-    IrisAdvanced::Color
+    IrisAdvanced::Color3
     Trace(
         _In_ const Iris::Ray & WorldRay,
-        _In_ IrisAdvanced::RandomReference & Rng
-        ) const = 0;
+        _In_ IrisAdvanced::Random & Rng
+        ) = 0;
 
     SampleTracerBase(
         _In_ const SampleTracerBase & ToCopy

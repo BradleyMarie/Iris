@@ -71,6 +71,6 @@ target_link_libraries(iris-test
     irisphysxtoolkit
     irisplusplus
     irisadvancedplusplus
+    iriscameraplusplus
     irisspectrumplusplus
-    irisphysxplusplus
-    irisphysxtoolkitplusplus)
+    irisphysxplusplus)

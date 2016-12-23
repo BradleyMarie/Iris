@@ -556,7 +556,7 @@ ISTATUS
 PhysxLightedSphereSampleSurface(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 Face,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PPOINT3 Sample
     )
 {
@@ -580,15 +580,15 @@ PhysxLightedSphereSampleSurface(
 
     Sphere = (PCPHYSX_LIGHTED_SPHERE) Context;
 
-    RandomReferenceGenerateFloat(Rng, 
-                                 (FLOAT) 0.0f, 
-                                 (FLOAT) 1.0f,
-                                 &Random0);
+    RandomGenerateFloat(Rng, 
+                        (FLOAT) 0.0f, 
+                        (FLOAT) 1.0f,
+                        &Random0);
 
-    RandomReferenceGenerateFloat(Rng, 
-                                 (FLOAT) 0.0f, 
-                                 (FLOAT) 1.0f,
-                                 &Random1);
+    RandomGenerateFloat(Rng, 
+                        (FLOAT) 0.0f, 
+                        (FLOAT) 1.0f,
+                        &Random1);
 
     Theta = (FLOAT) 2.0 * IRIS_PI * Random0;
     Phi = ArccosineFloat((FLOAT) 1.0f * (FLOAT) 2.0f * Random1);

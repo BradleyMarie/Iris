@@ -28,7 +28,7 @@ BRDFSampleAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
     _Out_ PVECTOR3 Outgoing,
@@ -47,7 +47,7 @@ BRDFSampleAdapter(
     const BRDFBase **BRDFBasePtr = (const BRDFBase**) Context;
 
     auto Result = (*BRDFBasePtr)->Sample(Iris::Vector(Incoming),
-                                         IrisAdvanced::RandomReference(Rng),
+                                         IrisAdvanced::Random(Rng),
                                          IrisSpectrum::ReflectorCompositorReference(Compositor));
 
     *ReflectorPtr = std::get<0>(Result).AsPCREFLECTOR();
@@ -65,7 +65,7 @@ BRDFSampleWithLambertianFalloffAdapter(
     _In_ PCVOID Context,
     _In_ VECTOR3 Incoming,
     _In_ VECTOR3 SurfaceNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCREFLECTOR *ReflectorPtr,
     _Out_ PVECTOR3 Outgoing,
@@ -84,7 +84,7 @@ BRDFSampleWithLambertianFalloffAdapter(
     const BRDFBase **BRDFBasePtr = (const BRDFBase**) Context;
 
     auto Result = (*BRDFBasePtr)->SampleWithLambertianFalloff(Iris::Vector(Incoming),
-                                                              IrisAdvanced::RandomReference(Rng),
+                                                              IrisAdvanced::Random(Rng),
                                                               IrisSpectrum::ReflectorCompositorReference(Compositor));
 
     *ReflectorPtr = std::get<0>(Result).AsPCREFLECTOR();

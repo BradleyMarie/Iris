@@ -63,7 +63,7 @@ public:
         _In_ LightListReference Lights,
         _In_ FLOAT Epsilon,
         _In_ const Iris::Ray & WorldRay,
-        _Inout_ IrisAdvanced::RandomReference Rng
+        _Inout_ IrisAdvanced::Random Rng
         );
 
     IRISPHYSXPLUSPLUSAPI
@@ -74,7 +74,7 @@ public:
         _In_ const LightList & Lights,
         _In_ FLOAT Epsilon,
         _In_ const Iris::Ray & WorldRay,
-        _Inout_ IrisAdvanced::RandomReference Rng
+        _Inout_ IrisAdvanced::Random Rng
         );
 
     IRISPHYSXPLUSPLUSAPI
@@ -84,7 +84,7 @@ public:
         _In_ IntegrateRoutine IntegrateFunction,
         _In_ FLOAT Epsilon,
         _In_ const Iris::Ray & WorldRay,
-        _Inout_ IrisAdvanced::RandomReference Rng
+        _Inout_ IrisAdvanced::Random Rng
         );
 
     Integrator(

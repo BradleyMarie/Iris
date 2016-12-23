@@ -36,8 +36,8 @@ ISTATUS
 GridPixelSamplerSamplePixel(
     _In_ PCVOID Context,
     _In_ PCRAY_GENERATOR RayGenerator,
-    _In_ PCSAMPLE_TRACER SampleTracer,
-    _In_ PRANDOM_REFERENCE Rng,
+    _Inout_ PSAMPLE_TRACER SampleTracer,
+    _In_ PRANDOM Rng,
     _In_ BOOL SamplePixel,
     _In_ BOOL SampleLens,
     _In_ FLOAT MinPixelU,
@@ -131,25 +131,25 @@ GridPixelSamplerSamplePixel(
         {
             if (GridPixelSampler->Jitter != FALSE)
             {
-                RandomReferenceGenerateFloat(Rng,
-                                             PixelUBase,
-                                             PixelUBase + PixelUIncrement,
-                                             &PixelU);
+                RandomGenerateFloat(Rng,
+                                    PixelUBase,
+                                    PixelUBase + PixelUIncrement,
+                                    &PixelU);
 
-                RandomReferenceGenerateFloat(Rng,
-                                             PixelVBase,
-                                             PixelVBase + PixelVIncrement,
-                                             &PixelV);
+                RandomGenerateFloat(Rng,
+                                    PixelVBase,
+                                    PixelVBase + PixelVIncrement,
+                                    &PixelV);
 
-                RandomReferenceGenerateFloat(Rng,
-                                             LensUBase,
-                                             LensUBase + LensUIncrement,
-                                             &LensU);
+                RandomGenerateFloat(Rng,
+                                    LensUBase,
+                                    LensUBase + LensUIncrement,
+                                    &LensU);
 
-                RandomReferenceGenerateFloat(Rng,
-                                             LensVBase,
-                                             LensVBase + LensVIncrement,
-                                             &LensV);
+                RandomGenerateFloat(Rng,
+                                    LensVBase,
+                                    LensVBase + LensVIncrement,
+                                    &LensV);
             }
             else
             {

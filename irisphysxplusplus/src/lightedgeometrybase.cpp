@@ -158,7 +158,7 @@ ISTATUS
 LightedGeometrySampleSurfaceAdapter(
     _In_opt_ PCVOID Context, 
     _In_ UINT32 Face,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PPOINT3 Sample
     )
 {
@@ -169,7 +169,7 @@ LightedGeometrySampleSurfaceAdapter(
     const LightedGeometryBase **LightedGeometryBasePtr = (const LightedGeometryBase**) Context;
 
     Iris::Point Result = (*LightedGeometryBasePtr)->SampleSurface(Face,
-                                                                  IrisAdvanced::RandomReference(Rng));
+                                                                  IrisAdvanced::Random(Rng));
 
     *Sample = Result.AsPOINT3();
 

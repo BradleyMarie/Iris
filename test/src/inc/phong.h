@@ -132,7 +132,7 @@ public:
     Sample(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
         
@@ -140,7 +140,7 @@ public:
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
     
@@ -251,7 +251,7 @@ public:
     Sample(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
         
@@ -259,7 +259,7 @@ public:
     SampleWithLambertianFalloff(
         _In_ const Iris::Vector & Incoming,
         _In_ const Iris::Vector & SurfaceNormal,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::ReflectorCompositorReference Compositor
         ) const;
     
@@ -454,7 +454,7 @@ public:
     Sample(
         _In_ const Iris::Point & HitPoint,
         _In_ IrisPhysx::VisibilityTester Tester,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const;
 

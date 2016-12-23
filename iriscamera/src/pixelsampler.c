@@ -32,8 +32,8 @@ ISTATUS
 PixelSamplerSamplePixel(
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCRAY_GENERATOR RayGenerator,
-    _In_ PCSAMPLE_TRACER SampleTracer,
-    _In_ PRANDOM_REFERENCE Rng,
+    _Inout_ PSAMPLE_TRACER SampleTracer,
+    _In_ PRANDOM Rng,
     _In_ BOOL SamplePixel,
     _In_ BOOL SampleLens,
     _In_ FLOAT MinPixelU,

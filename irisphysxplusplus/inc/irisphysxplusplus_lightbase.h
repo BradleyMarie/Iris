@@ -44,7 +44,7 @@ public:
     Sample(
         _In_ const Iris::Point & HitPoint,
         _In_ VisibilityTester Tester,
-        _In_ IrisAdvanced::RandomReference Rng,
+        _In_ IrisAdvanced::Random Rng,
         _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const = 0;
 

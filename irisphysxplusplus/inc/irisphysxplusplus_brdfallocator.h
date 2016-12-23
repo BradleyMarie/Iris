@@ -100,7 +100,7 @@ private:
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
         _In_ VECTOR3 SurfaceNormal,
-        _Inout_ PRANDOM_REFERENCE Rng,
+        _Inout_ PRANDOM Rng,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
         _Out_ PVECTOR3 Outgoing,
@@ -121,7 +121,7 @@ private:
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->Sample(Iris::Vector(Incoming),
                          Iris::Vector(SurfaceNormal),
-                         IrisAdvanced::RandomReference(Rng),
+                         IrisAdvanced::Random(Rng),
                          IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = std::get<0>(Result).AsPCREFLECTOR();
@@ -140,7 +140,7 @@ private:
         _In_ PCVOID Context,
         _In_ VECTOR3 Incoming,
         _In_ VECTOR3 SurfaceNormal,
-        _Inout_ PRANDOM_REFERENCE Rng,
+        _Inout_ PRANDOM Rng,
         _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE Compositor,
         _Out_ PCREFLECTOR *Reflector,
         _Out_ PVECTOR3 Outgoing,
@@ -161,7 +161,7 @@ private:
         std::tuple<IrisSpectrum::ReflectorReference, Iris::Vector, FLOAT> Result = 
             Brdf->SampleWithLambertianFalloff(Iris::Vector(Incoming),
                                               Iris::Vector(SurfaceNormal),
-                                              IrisAdvanced::RandomReference(Rng),
+                                              IrisAdvanced::Random(Rng),
                                               IrisSpectrum::ReflectorCompositorReference(Compositor));
     
         *Reflector = std::get<0>(Result).AsPCREFLECTOR();

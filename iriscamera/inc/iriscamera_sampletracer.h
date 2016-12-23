@@ -25,9 +25,9 @@ typedef
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
-    _In_ PCVOID Context,
+    _In_ PVOID Context,
     _In_ RAY WorldRay,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _Out_ PCOLOR3 Color
     );
 
@@ -61,9 +61,9 @@ _Success_(return == ISTATUS_SUCCESS)
 IRISCAMERAAPI
 ISTATUS
 SampleTracerTrace(
-    _In_ PCSAMPLE_TRACER SampleTracer,
+    _In_ PSAMPLE_TRACER SampleTracer,
     _In_ RAY WorldRay,
-    _In_ PRANDOM_REFERENCE Rng,
+    _In_ PRANDOM Rng,
     _Out_ PCOLOR3 Color
     );
 

@@ -19,7 +19,6 @@ Abstract:
 
 #include "iriscameratoolkit_api.h"
 #include "iriscameratoolkit_pinhole.h"
-#include "iriscameratoolkit_mwcgenerator.h"
 #include "iriscameratoolkit_gridpixelsampler.h"
 
 #endif // _IRIS_CAMERA_TOOLKIT_HEADER_

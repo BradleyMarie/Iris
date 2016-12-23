@@ -29,10 +29,12 @@ SampleTracerGeneratorGenerateAdapter(
     )
 {
     assert(Context != NULL);
-    assert(SampleTracer != NULL);
+    assert(SampleTracerPtr != NULL);
 
     const SampleTracerGeneratorBase **SampleTracerGeneratorBasePtr = (const SampleTracerGeneratorBase**) Context;
-    *SampleTracerPtr = SampleTracerGeneratorBasePtr->Generate();
+    SampleTracer Tracer = (*SampleTracerGeneratorBasePtr)->Generate();
+
+    *SampleTracerPtr = Tracer.Release();
 
     return ISTATUS_SUCCESS;
 }
@@ -69,7 +71,7 @@ SampleTracerGeneratorBase::Create(
     }
 
     SampleTracerGeneratorBase *UnmanagedSampleTracerGeneratorBasePtr = SampleTracerGeneratorBasePtr.release();
-    PSAMPLE_TRACER SampleTracerGeneratorPtr;
+    PSAMPLE_TRACER_GENERATOR SampleTracerGeneratorPtr;
 
     ISTATUS Success = SampleTracerGeneratorAllocate(&InteropVTable,
                                                     &UnmanagedSampleTracerGeneratorBasePtr,

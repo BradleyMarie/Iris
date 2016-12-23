@@ -37,14 +37,6 @@ public:
         }
     }
 
-    SampleTracer(
-        _In_ SampleTracer && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
-    }
-
     _Ret_
     PCSAMPLE_TRACER
     AsPCSAMPLE_TRACER(
@@ -54,14 +46,16 @@ public:
         return Data;
     }
 
-    SampleTracer(
-        _In_ const SampleTracer & ToCopy
-        ) = delete;
-        
-    SampleTracer &
-    operator=(
-        _In_ const SampleTracer & ToCopy
-        ) = delete;
+    _Ret_
+    PSAMPLE_TRACER
+    Release(
+        void
+        )
+    {
+        PSAMPLE_TRACER Result = Data;
+        Data = nullptr;
+        return Result;
+    }
 
     ~SampleTracer(
         void

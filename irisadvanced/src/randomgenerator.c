@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include <iriscamerap.h>
+#include <irisadvancedp.h>
 
 //
 // Types
@@ -24,30 +24,7 @@ struct _RANDOM_GENERATOR {
 };
 
 //
-// Private Functions
-//
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-RandomGeneratorGenerateRandom(
-    _In_ PCRANDOM_GENERATOR RngGenerator,
-    _Out_ PRANDOM *Rng 
-    )
-{
-    ISTATUS Status;
-
-    ASSERT(RngGenerator != NULL);
-    ASSERT(Rng != NULL);
-    
-    Status = RngGenerator->VTable->GenerateRandomRoutine(RngGenerator->Data,
-                                                         Rng);
-
-    return Status;
-}
-
-//
-// Public Functions
+// Functions
 //
 
 _Check_return_
@@ -61,10 +38,10 @@ RandomGeneratorAllocate(
     _Out_ PRANDOM_GENERATOR *RngGenerator
     )
 {
-    PRANDOM_GENERATOR AllocatedRngGenerator;
     BOOL AllocationSuccessful;
     PVOID HeaderAllocation;
     PVOID DataAllocation;
+    PRANDOM_GENERATOR AllocatedGenerator;
 
     if (RandomGeneratorVTable == NULL)
     {
@@ -108,17 +85,63 @@ RandomGeneratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    AllocatedRngGenerator = (PRANDOM_GENERATOR) HeaderAllocation;
+    AllocatedGenerator = (PRANDOM_GENERATOR) HeaderAllocation;
 
     if (DataSizeInBytes != 0)
     {
         memcpy(DataAllocation, Data, DataSizeInBytes);
     }
 
-    AllocatedRngGenerator->VTable = RandomGeneratorVTable;
-    AllocatedRngGenerator->Data = DataAllocation;
+    AllocatedGenerator->VTable = RandomGeneratorVTable;
+    AllocatedGenerator->Data = DataAllocation;
 
-    *RngGenerator = AllocatedRngGenerator;
+    *RngGenerator = AllocatedGenerator;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+RandomGeneratorGenerate(
+    _In_ PCRANDOM_GENERATOR RngGenerator,
+    _In_ PRANDOM_GENERATOR_RANDOM_LIFETIME_SCOPE_ROUTINE Callback,
+    _Inout_opt_ PVOID CallbackContext
+    )
+{
+    PRANDOM_ALLOCATOR RandomAllocator;
+    PRANDOM Rng;
+    ISTATUS Status;
+    
+    if (RngGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Callback == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    Status = RandomAllocatorAllocate(&RandomAllocator);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    Status = RngGenerator->VTable->GenerateRandomRoutine(RngGenerator->Data,
+                                                         RandomAllocator,
+                                                         &Rng);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        RandomAllocatorFree(RandomAllocator);
+        return Status;
+    }
+
+    Callback(CallbackContext, Rng);
+    RandomAllocatorFree(RandomAllocator);
 
     return ISTATUS_SUCCESS;
 }
@@ -129,7 +152,7 @@ RandomGeneratorFree(
     )
 {
     PFREE_ROUTINE FreeRoutine;
-
+    
     if (RngGenerator == NULL)
     {
         return;

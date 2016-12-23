@@ -103,7 +103,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 CosineSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
     )
 {
@@ -121,20 +121,20 @@ CosineSampleHemisphere(
     ASSERT(Rng != NULL);
     ASSERT(RandomVector != NULL);
 
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0,
-                                          (FLOAT) 1.0,
-                                          &RandomNumber0);
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0,
-                                          (FLOAT) 1.0,
-                                          &RandomNumber1);
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber1);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -164,7 +164,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 UniformSampleHemisphere(
     _In_ VECTOR3 NormalizedNormal,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Out_ PVECTOR3 RandomVector
     )
 {
@@ -182,20 +182,20 @@ UniformSampleHemisphere(
     ASSERT(Rng != NULL);
     ASSERT(RandomVector != NULL);
 
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0,
-                                          (FLOAT) 1.0,
-                                          &RandomNumber0);
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber0);
 
     if (Status != ISTATUS_SUCCESS)
     {
         return Status;
     }
 
-    Status = RandomReferenceGenerateFloat(Rng,
-                                          (FLOAT) 0.0,
-                                          (FLOAT) 1.0,
-                                          &RandomNumber1);
+    Status = RandomGenerateFloat(Rng,
+                                 (FLOAT) 0.0,
+                                 (FLOAT) 1.0,
+                                 &RandomNumber1);
 
     if (Status != ISTATUS_SUCCESS)
     {

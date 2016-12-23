@@ -9,7 +9,6 @@ include_directories(../iris/inc
     ../iriscommon)
 
 add_library(iriscamera SHARED
-    src/randomgenerator.c
     src/framebuffer.c
     src/sampletracer.c
     src/render.c

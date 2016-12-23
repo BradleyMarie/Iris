@@ -19,6 +19,7 @@ using namespace IrisCamera;
 using namespace IrisPhysx;
 using namespace IrisSpectrum;
 using namespace IrisAdvancedToolkit;
+using namespace IrisCameraToolkit;
 using namespace IrisPhysxToolkit;
 
 #define R_WAVELENGTH ((FLOAT) 1.0f)
@@ -218,6 +219,170 @@ private:
     FLOAT R, G, B;
 };
 
+class TestSampleTracer : public IrisCamera::SampleTracerBase {
+public:
+    static
+    SampleTracer
+    Create(
+        _In_ const TestGeometryRoutine TestGeometryFunc,
+        _In_ const LightList & LightsRef,
+        _In_ SIZE_T MaximumDepth,
+        _In_ FLOAT Epsil
+        )
+    {
+        std::unique_ptr<SampleTracerBase> Ptr(
+            new TestSampleTracer(TestGeometryFunc, LightsRef, MaximumDepth, Epsil));
+        return IrisCamera::SampleTracerBase::Create(std::move(Ptr));
+    }
+
+    IrisAdvanced::Color3
+    Trace(
+        _In_ const Iris::Ray & WorldRay,
+        _In_ IrisAdvanced::Random & Rng
+        )
+    {
+        IrisAdvanced::Color3 Result = Color3::CreateBlack();
+        IntegrateRoutine IntegrateFunc = [&](const Iris::Ray & WorldRay, IrisPhysx::RayTracer Rt) {
+            ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
+                                                UINT32 FaceHit,
+                                                Iris::MatrixReference ModelToWorld,
+                                                PCVOID AdditionalData,
+                                                const Iris::Vector & ModelViewer,
+                                                const Iris::Point & ModelHitPoint,
+                                                const Iris::Point & WorldHitPoint,
+                                                const Iris::Ray & WorldRay,
+                                                std::optional<LightListReference> Lights,
+                                                std::optional<IrisPhysx::RayTracer> RayTracerPtr,
+                                                VisibilityTester Tester,
+                                                BRDFAllocator Allocator,
+                                                IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
+                                                IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
+                                                IrisAdvanced::Random Rng) -> SpectrumReference
+            {
+                Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+                Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
+
+                SpectrumReference ReflectedLight(nullptr);
+
+                auto OptionalLight = Geom.GetLight(FaceHit);
+
+                if (OptionalLight)
+                {
+                    ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
+                }
+
+                auto OptionalMaterial = Geom.GetMaterial(FaceHit);
+
+                if (!OptionalMaterial)
+                {
+                    return ReflectedLight;
+                }
+
+                MaterialReference Mat = *OptionalMaterial;
+                BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
+                
+                for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
+                {
+                    LightReference Light = Lights->Get(Index);
+                    
+                    auto Result = Light.Sample(WorldHitPoint,
+                                               Tester,
+                                               Rng,
+                                               SpectrumCompositor);
+                    
+                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
+                }
+                
+                auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
+                
+                if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
+                {
+                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+                }
+                else
+                {
+                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+                }
+                
+                return ReflectedLight;
+            };
+            
+            SpectrumReference ResultSpectrum = Rt.TraceClosestHit(WorldRay, ProcessHitFunc);
+            Result = PhongToRGB(ResultSpectrum);
+        };
+
+        PhysxIntegrator.Integrate(TestGeometryFunction,
+                                  IntegrateFunc,
+                                  Lights.AsLightListReference(),
+                                  Epsilon,
+                                  WorldRay,
+                                  Rng);
+
+        return Result;
+    }
+
+private:
+    TestSampleTracer(
+        _In_ const TestGeometryRoutine TestGeometryFunc,
+        _In_ const LightList & LightsRef,
+        _In_ SIZE_T MaximumDepth,
+        _In_ FLOAT Epsil
+        )
+    : TestGeometryFunction(TestGeometryFunc), 
+      Lights(LightsRef),
+      Epsilon(Epsil),
+      PhysxIntegrator(Integrator::Create(MaximumDepth))
+    { }
+
+    const TestGeometryRoutine TestGeometryFunction;
+    const LightList & Lights;
+    const FLOAT Epsilon;
+    IrisPhysx::Integrator PhysxIntegrator;
+};
+
+class TestSampleTracerGenerator : public IrisCamera::SampleTracerGeneratorBase {
+public:
+    static
+    SampleTracerGenerator
+    Create(
+        _In_ const TestGeometryRoutine TestGeometryFunc,
+        _In_ const LightList & LightsRef,
+        _In_ SIZE_T MaximumDepth,
+        _In_ FLOAT Epsil
+        )
+    {
+        std::unique_ptr<SampleTracerGeneratorBase> Ptr(
+            new TestSampleTracerGenerator(TestGeometryFunc, LightsRef, MaximumDepth, Epsil));
+        return IrisCamera::SampleTracerGeneratorBase::Create(std::move(Ptr));
+    }
+
+    SampleTracer
+    Generate(
+        void
+        ) const
+    {
+        return TestSampleTracer::Create(TestGeometryFunction, Lights, Depth, Epsilon);
+    }
+
+private:
+    TestSampleTracerGenerator(
+        _In_ const TestGeometryRoutine TestGeometryFunc,
+        _In_ const LightList & LightsRef,
+        _In_ SIZE_T MaximumDepth,
+        _In_ FLOAT Epsil
+        )
+    : TestGeometryFunction(TestGeometryFunc), 
+      Lights(LightsRef),
+      Epsilon(Epsil),
+      Depth(MaximumDepth)
+    { }
+
+    const TestGeometryRoutine TestGeometryFunction;
+    const LightList & Lights;
+    const FLOAT Epsilon;
+    SIZE_T Depth;
+};
+
 TEST(PhysxRenderConstantRedWorldSphere)
 {
     Material ConstantMaterial = PhongMaterial::Create(Color3(1.0f, 0.0f, 0.0f),
@@ -233,68 +398,32 @@ TEST(PhysxRenderConstantRedWorldSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne);
-
-    ProcessHitRoutine ProcessHitFunc = [](GeometryReference Geom,
-                                          UINT32 FaceHit,
-                                          Iris::MatrixReference ModelToWorld,
-                                          PCVOID AdditionalData,
-                                          const Iris::Vector & ModelViewer,
-                                          const Iris::Point & ModelHitPoint,
-                                          const Iris::Point & WorldHitPoint,
-                                          const Iris::Ray & WorldRay,
-                                          std::optional<LightListReference> Lights,
-                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                          VisibilityTester Tester,
-                                          BRDFAllocator Allocator,
-                                          IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                          IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                          IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
     
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          0,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderConstantRedWorldSpherePlusPlus.pfm");
 }
@@ -314,68 +443,32 @@ TEST(PhysxRenderConstantRedModelSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(0.5f, 0.5f, 0.5f));
-
-    ProcessHitRoutine ProcessHitFunc = [](GeometryReference Geom,
-                                          UINT32 FaceHit,
-                                          Iris::MatrixReference ModelToWorld,
-                                          PCVOID AdditionalData,
-                                          const Iris::Vector & ModelViewer,
-                                          const Iris::Point & ModelHitPoint,
-                                          const Iris::Point & WorldHitPoint,
-                                          const Iris::Ray & WorldRay,
-                                          std::optional<LightListReference> Lights,
-                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                          VisibilityTester Tester,
-                                          BRDFAllocator Allocator,
-                                          IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                          IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                          IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          0,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderConstantRedModelSpherePlusPlus.pfm");
 }
@@ -395,68 +488,32 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(1.0f, 1.0f, 1.0f), true);
-
-    ProcessHitRoutine ProcessHitFunc = [](GeometryReference Geom,
-                                          UINT32 FaceHit,
-                                          Iris::MatrixReference ModelToWorld,
-                                          PCVOID AdditionalData,
-                                          const Iris::Vector & ModelViewer,
-                                          const Iris::Point & ModelHitPoint,
-                                          const Iris::Point & WorldHitPoint,
-                                          const Iris::Ray & WorldRay,
-                                          std::optional<LightListReference> Lights,
-                                          std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                          VisibilityTester Tester,
-                                          BRDFAllocator Allocator,
-                                          IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                          IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                          IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        return SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref));
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          0,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderConstantRedPremultipliedSpherePlusPlus.pfm");
 }
@@ -490,85 +547,32 @@ TEST(PhysxRenderPerfectSpecularSphere)
                                         RefletiveMaterial);
 
     Scene.AddGeometry(SphereTwo);
-
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        
-        SpectrumReference ReflectedLight(nullptr);
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
-        }
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-
-        return ReflectedLight;
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          1,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderPerfectSpecularWorldSpherePlusPlus.pfm");
 }
@@ -590,85 +594,32 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                                           ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
-
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        
-        SpectrumReference ReflectedLight(nullptr);
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
-        }
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-
-        return ReflectedLight;
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          1,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderConstantRedWorldTrianglePlusPlus.pfm");
 }
@@ -700,85 +651,32 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                                           ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
-
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        auto MaterialResult = Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator);
-        auto Ref = std::get<0>(MaterialResult).Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        
-        SpectrumReference ReflectedLight(nullptr);
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc);
-        }
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-
-        return ReflectedLight;
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          1,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    LightList Lights = LightList::Create();
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
 }
@@ -803,94 +701,30 @@ TEST(PhysxRenderPhongWorldSphere)
     Lights.Add(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
                                        Color3::CreateBlack(),
                                        Point(0.0f, 0.0f, 1000.0f)));
-
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-
-        SpectrumReference ReflectedLight(nullptr);
-
-        for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
-        {
-            LightReference Light = Lights->Get(Index);
-
-            auto Result = Light.Sample(WorldHitPoint,
-                                       Tester,
-                                       Rng,
-                                       SpectrumCompositor);
-
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
-        }
-
-        auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-
-        return ReflectedLight;
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-
+    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(0.0f, 0.0f, 4.0f),
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          Vector(0.0f, 0.0f, -1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.0001f,
-                          0,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          Lights,
-                          CreateState,
-                          Fb);
+
+    Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
+                                              Vector(0.0f, 0.0f, -1.0f),
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderPhongWorldSpherePlusPlus.pfm");
 }
@@ -954,98 +788,34 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
     Lights.Add(PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
                                        Color3(0.21f, 0.21f, 0.35f),
                                        Point(0.0f,3.5f, 0.0f)));
-
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
-        MaterialReference Mat = *(Geom.GetMaterial(FaceHit));
-        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-
-        SpectrumReference ReflectedLight(nullptr);
-
-        for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
-        {
-            LightReference Light = Lights->Get(Index);
-
-            auto Result = Light.Sample(WorldHitPoint,
-                                       Tester,
-                                       Rng,
-                                       SpectrumCompositor);
-
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
-        }
-
-        auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-
-        return ReflectedLight;
-    };
-
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return PhongToRGB(Spectra);
-    };
-
-    std::vector<Random> StrongRngReferences;
-
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
+    
+    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Point PinholeLocation(3.0f, 2.0f, 4.0f);
     Point LookAt(-1.0f, 0.45f, 0.0f);
     Vector CameraDirection = LookAt - PinholeLocation;
 
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(PinholeLocation,
-                          1.0f,
-                          1.0f,
-                          1.0f,
-                          CameraDirection,
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.01f,
-                          5,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          Lights,
-                          CreateState,
-                          Fb);
+    Camera PinholeCam = PinholeCamera::Create(PinholeLocation,
+                                              CameraDirection,
+                                              Vector(0.0f, 1.0f, 0.0f),
+                                              1.0f,
+                                              1.0f,
+                                              1.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.0001f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
 
     Fb.SaveAsPFM("RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
 }
@@ -1278,109 +1048,33 @@ TEST(PhysxRenderCornellBox)
     //
     // Render
     //
-    
-    ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                           UINT32 FaceHit,
-                                           Iris::MatrixReference ModelToWorld,
-                                           PCVOID AdditionalData,
-                                           const Iris::Vector & ModelViewer,
-                                           const Iris::Point & ModelHitPoint,
-                                           const Iris::Point & WorldHitPoint,
-                                           const Iris::Ray & WorldRay,
-                                           std::optional<LightListReference> Lights,
-                                           std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                           VisibilityTester Tester,
-                                           BRDFAllocator Allocator,
-                                           IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                           IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                           IrisAdvanced::RandomReference Rng) -> SpectrumReference
-    {
-        Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-        Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
 
-        SpectrumReference ReflectedLight(nullptr);
-
-        auto OptionalLight = Geom.GetLight(FaceHit);
-
-        if (OptionalLight)
-        {
-            ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
-        }
-
-        auto OptionalMaterial = Geom.GetMaterial(FaceHit);
-
-        if (!OptionalMaterial)
-        {
-            return ReflectedLight;
-        }
-
-        MaterialReference Mat = *OptionalMaterial;
-        BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-        
-        for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
-        {
-            LightReference Light = Lights->Get(Index);
-            
-            auto Result = Light.Sample(WorldHitPoint,
-                                       Tester,
-                                       Rng,
-                                       SpectrumCompositor);
-            
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
-        }
-        
-        auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-        
-        if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-        }
-        else
-        {
-            ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-        }
-        
-        return ReflectedLight;
-    };
-    
-    ToneMappingRoutine ToneMappingFunc = [](SpectrumReference Spectra) -> Color3
-    {
-        return Color3(Spectra.Sample(R_WAVELENGTH), Spectra.Sample(G_WAVELENGTH), Spectra.Sample(B_WAVELENGTH));
-    };
-    
-    std::vector<Random> StrongRngReferences;
-    
-    CreateStateRoutine CreateState = [&](std::vector<RandomReference> & Rngs,
-                                         std::vector<ProcessHitRoutine> & ProcessHits,
-                                         std::vector<ToneMappingRoutine> & ToneMap,
-                                         SIZE_T NumberOfThreads)
-    {
-        for (SIZE_T Index = 0; Index < NumberOfThreads; Index++)
-        {
-            StrongRngReferences.push_back(MultiplyWithCarry::Create());
-            Rngs.push_back(StrongRngReferences[Index].AsRandomReference());
-            ProcessHits.push_back(ProcessHitFunc);
-            ToneMap.push_back(ToneMappingFunc);
-        }
-    };
-    
     Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-    PinholeCamera::Render(Point(278.0f, 273.0f, -500.0f),
-                          500.0f,
-                          546.0f,
-                          546.0f,
-                          Vector(0.0f, 0.0f, 1.0f),
-                          Vector(0.0f, 1.0f, 0.0f),
-                          0,
-                          0,
-                          0.01f,
-                          5,
-                          false,
-                          false,
-                          Scene.GetTestRoutine(),
-                          Lights,
-                          CreateState,
-                          Fb);
+
+    Point PinholeLocation(278.0f, 273.0f, -500.0f);
+    Vector CameraDirection(0.0f, 0.0f, 1.0f);
+
+    Camera PinholeCam = PinholeCamera::Create(PinholeLocation,
+                                              CameraDirection,
+                                              Vector(0.0f, 1.0f, 0.0f),     
+                                              500.0f,
+                                              546.0f,
+                                              546.0f);
+
+    PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
+
+    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
+                                                                        Lights,
+                                                                        5,
+                                                                        0.01f);
+
+    RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
+
+    IrisCamera::Render(PinholeCam,
+                       Sampler,
+                       Generator,
+                       RngGenerator,
+                       Fb);
     
     Fb.SaveAsPFM("RenderCornellBoxPlusPlus.pfm");
 }

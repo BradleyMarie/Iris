@@ -80,13 +80,13 @@ public:
 
     LightReference
     GetRandom(
-        _In_ IrisAdvanced::RandomReference Rng
+        _In_ IrisAdvanced::Random Rng
         ) const
     {
         PCPHYSX_LIGHT LightPtr;
 
         ISTATUS Status = PhysxLightListGetRandomLight(Data,
-                                                      Rng.AsPRANDOM_REFERENCE(),
+                                                      Rng.AsPRANDOM(),
                                                       &LightPtr);
 
         if (Status != ISTATUS_SUCCESS)

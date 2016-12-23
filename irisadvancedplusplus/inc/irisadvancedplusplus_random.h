@@ -29,9 +29,9 @@ public:
     Random(
         _In_ PRANDOM RandomPtr
         )
-    : Data(RandomPtr, [](PRANDOM Rng){ RandomFree(Rng); })
+    : Data(RandomPtr)
     { 
-        if (RandomPtr == NULL)
+        if (RandomPtr == nullptr)
         {
             throw std::invalid_argument("RandomPtr");
         }
@@ -46,7 +46,7 @@ public:
     {
         FLOAT Result;
         
-        ISTATUS Status = RandomGenerateFloat(Data.get(),
+        ISTATUS Status = RandomGenerateFloat(Data,
                                              Minimum,
                                              Maximum,
                                              &Result);
@@ -68,7 +68,7 @@ public:
     {
         SIZE_T Result;
         
-        ISTATUS Status = RandomGenerateIndex(Data.get(),
+        ISTATUS Status = RandomGenerateIndex(Data,
                                              Minimum,
                                              Maximum,
                                              &Result);
@@ -87,37 +87,11 @@ public:
         void
         ) noexcept
     {
-        return Data.get();
+        return Data;
     }
-        
-    _Ret_
-    PRANDOM_REFERENCE
-    AsPRANDOM_REFERENCE(
-        void
-        ) noexcept
-    {
-        return RandomGetRandomReference(Data.get());
-    }
-
-    RandomReference
-    AsRandomReference(
-        void
-        ) noexcept
-    {
-        return RandomReference(AsPRANDOM_REFERENCE());
-    }
-
-    Random(
-        _In_ const Random & ToCopy
-        ) = default;
-        
-    Random &
-    operator=(
-        _In_ const Random & ToCopy
-        ) = default;
 
 private:
-    std::shared_ptr<RANDOM> Data;
+    PRANDOM Data;
 };
 
 } // namespace IrisAdvanced

@@ -7,7 +7,8 @@ include_directories(../iris/inc
     ../iriscommon)
 
 add_library(irisadvanced SHARED
-    src/randomreference.c
+    src/randomallocator.c
+    src/randomgenerator.c
     src/random.c)
 
 target_link_libraries(irisadvanced 

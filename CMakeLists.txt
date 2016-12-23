@@ -25,6 +25,4 @@ add_subdirectory(iriscameraplusplus)
 add_subdirectory(irisspectrumplusplus)
 add_subdirectory(irisphysxplusplus)
 
-add_subdirectory(irisphysxtoolkitplusplus)
-
 add_subdirectory(test)

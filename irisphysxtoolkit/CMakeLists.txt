@@ -19,7 +19,6 @@ add_library(irisphysxtoolkit SHARED
     src/pointlight.c
     src/triangle.c
     src/sphere.c
-    src/pinhole.c
     src/infiniteplane.c
     src/constantarealight.c)
 

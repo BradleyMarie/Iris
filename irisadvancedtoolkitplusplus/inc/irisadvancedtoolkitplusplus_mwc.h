@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     This file contains the definitions for the 
-    IrisAdvancedToolkit++ MultiplyWithCarry type.
+    IrisAdvancedToolkit++ MultiplyWithCarryGenerator type.
 
 --*/
 
@@ -19,18 +19,18 @@ Abstract:
 #define _MWC_IRIS_ADVANCED_TOOLKIT_PLUS_PLUS_HEADER_
 
 namespace IrisAdvancedToolkit {
-namespace MultiplyWithCarry {
+namespace MultiplyWithCarryGenerator {
 
 static
 inline
-IrisAdvanced::Random
+IrisAdvanced::RandomGenerator
 Create(
     void
     )
 {
-    PRANDOM Rng;
+    PRANDOM_GENERATOR Generator;
 
-    ISTATUS Status = MultiplyWithCarryRngAllocate(&Rng);
+    ISTATUS Status = MultiplyWithCarryRandomGeneratorAllocate(&Generator);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -38,7 +38,7 @@ Create(
         throw std::bad_alloc();
     }
 
-    return IrisAdvanced::Random(Rng);
+    return IrisAdvanced::RandomGenerator(Generator);
 }
 
 } // namespace MultiplyWithCarry

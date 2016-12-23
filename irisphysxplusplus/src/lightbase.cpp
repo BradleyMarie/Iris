@@ -28,7 +28,7 @@ LightSampleAdapter(
     _In_ PCVOID Context,
     _In_ POINT3 HitPoint,
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTesterPtr,
-    _Inout_ PRANDOM_REFERENCE Rng,
+    _Inout_ PRANDOM Rng,
     _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE Compositor,
     _Out_ PCSPECTRUM *Spectrum,
     _Out_ PVECTOR3 ToLight,
@@ -48,7 +48,7 @@ LightSampleAdapter(
 
     auto Result = (*LightBasePtr)->Sample(Iris::Point(HitPoint),
                                           VisibilityTester(VisibilityTesterPtr),
-                                          IrisAdvanced::RandomReference(Rng),
+                                          IrisAdvanced::Random(Rng),
                                           IrisSpectrum::SpectrumCompositorReference(Compositor));
 
     *Spectrum = std::get<0>(Result).AsPCSPECTRUM();

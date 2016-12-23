@@ -74,7 +74,7 @@ Integrator::Integrate(
     _In_ LightListReference Lights,
     _In_ FLOAT Epsilon,
     _In_ const Iris::Ray & WorldRay,
-    _Inout_ IrisAdvanced::RandomReference Rng
+    _Inout_ IrisAdvanced::Random Rng
     )
 {
     ISTATUS Status = PhysxIntegratorIntegrate(Data,
@@ -85,7 +85,7 @@ Integrator::Integrate(
                                               Lights.AsPCPHYSX_LIGHT_LIST(),
                                               Epsilon,
                                               WorldRay.AsRAY(),
-                                              Rng.AsPRANDOM_REFERENCE());
+                                              Rng.AsPRANDOM());
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -100,7 +100,7 @@ Integrator::Integrate(
     _In_ const LightList & Lights,
     _In_ FLOAT Epsilon,
     _In_ const Iris::Ray & WorldRay,
-    _Inout_ IrisAdvanced::RandomReference Rng
+    _Inout_ IrisAdvanced::Random Rng
     )
 {
     ISTATUS Status = PhysxIntegratorIntegrate(Data,
@@ -111,7 +111,7 @@ Integrator::Integrate(
                                               Lights.AsPCPHYSX_LIGHT_LIST(),
                                               Epsilon,
                                               WorldRay.AsRAY(),
-                                              Rng.AsPRANDOM_REFERENCE());
+                                              Rng.AsPRANDOM());
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -126,7 +126,7 @@ Integrator::Integrate(
     _In_ IntegrateRoutine IntegrateFunction,
     _In_ FLOAT Epsilon,
     _In_ const Iris::Ray & WorldRay,
-    _Inout_ IrisAdvanced::RandomReference Rng
+    _Inout_ IrisAdvanced::Random Rng
     )
 {
     ISTATUS Status = PhysxIntegratorIntegrate(Data,
@@ -137,7 +137,7 @@ Integrator::Integrate(
                                               nullptr,
                                               Epsilon,
                                               WorldRay.AsRAY(),
-                                              Rng.AsPRANDOM_REFERENCE());
+                                              Rng.AsPRANDOM());
 
     if (Status != ISTATUS_SUCCESS)
     {
