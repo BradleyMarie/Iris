@@ -97,7 +97,7 @@ PointerListPrepareToAddPointers(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (PointerList->PointerListCapacity <= RequiredCapacity)
+    if (RequiredCapacity <= PointerList->PointerListCapacity)
     {
         return ISTATUS_SUCCESS;
     }

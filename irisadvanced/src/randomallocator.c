@@ -38,7 +38,7 @@ RandomAllocatorAllocate(
     PRANDOM_ALLOCATOR AllocatedRandomAllocator;
     ISTATUS Status;
 
-    if (RandomAllocator != NULL)
+    if (RandomAllocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -58,6 +58,8 @@ RandomAllocatorAllocate(
         free(AllocatedRandomAllocator);
         return Status;
     }
+
+    *RandomAllocator = AllocatedRandomAllocator;
 
     return ISTATUS_SUCCESS;
 }

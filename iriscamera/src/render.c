@@ -20,7 +20,7 @@ Abstract:
 
 typedef struct _CALLBACK_CONTEXT {
     PCPIXEL_SAMPLER PixelSampler;
-    PCSAMPLE_TRACER SampleTracer;
+    PSAMPLE_TRACER SampleTracer;
     PCCAMERA Camera;
     PFRAMEBUFFER Framebuffer;
     ISTATUS Status;

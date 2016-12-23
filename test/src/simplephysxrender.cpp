@@ -160,7 +160,7 @@ public:
             return B * IncomingIntensity;
         }
         
-        throw std::runtime_error("Wavelength");
+        return 0.0;
     }
     
 private:
@@ -212,7 +212,7 @@ public:
             return B;
         }
 
-        throw std::runtime_error("Wavelength");
+        return 0.0;
     }
 
 private:
@@ -244,20 +244,20 @@ public:
         IrisAdvanced::Color3 Result = Color3::CreateBlack();
         IntegrateRoutine IntegrateFunc = [&](const Iris::Ray & WorldRay, IrisPhysx::RayTracer Rt) {
             ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                                UINT32 FaceHit,
-                                                Iris::MatrixReference ModelToWorld,
-                                                PCVOID AdditionalData,
-                                                const Iris::Vector & ModelViewer,
-                                                const Iris::Point & ModelHitPoint,
-                                                const Iris::Point & WorldHitPoint,
-                                                const Iris::Ray & WorldRay,
-                                                std::optional<LightListReference> Lights,
-                                                std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                                VisibilityTester Tester,
-                                                BRDFAllocator Allocator,
-                                                IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                                IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                                IrisAdvanced::Random Rng) -> SpectrumReference
+                                                   UINT32 FaceHit,
+                                                   Iris::MatrixReference ModelToWorld,
+                                                   PCVOID AdditionalData,
+                                                   const Iris::Vector & ModelViewer,
+                                                   const Iris::Point & ModelHitPoint,
+                                                   const Iris::Point & WorldHitPoint,
+                                                   const Iris::Ray & WorldRay,
+                                                   std::optional<LightListReference> Lights,
+                                                   std::optional<IrisPhysx::RayTracer> RayTracerPtr,
+                                                   VisibilityTester Tester,
+                                                   BRDFAllocator Allocator,
+                                                   IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
+                                                   IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
+                                                   IrisAdvanced::Random Rng) -> SpectrumReference
             {
                 Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
                 Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);

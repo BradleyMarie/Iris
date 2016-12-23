@@ -87,11 +87,11 @@ PinholeComputeRay(
     PinholeCamera = (PCPINHOLE_CAMERA) Context;
 
     Origin = PointVectorAddScaled(PinholeCamera->ImagePlaneCorner, 
-                                  PinholeCamera->ImagePlaneHeightVector, 
+                                  PinholeCamera->ImagePlaneWidthVector, 
                                   ((FLOAT) Column + PixelU) / (FLOAT) NumberOfColumns);
 
     Origin = PointVectorAddScaled(Origin, 
-                                  PinholeCamera->ImagePlaneWidthVector, 
+                                  PinholeCamera->ImagePlaneHeightVector, 
                                   ((FLOAT) Row + PixelV) / (FLOAT) NumberOfRows);
 
     Direction = PointSubtract(Origin, 

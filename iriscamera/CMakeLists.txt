@@ -28,6 +28,6 @@ generate_export_header(iriscamera
     STATIC_DEFINE IRISCAMERA_BUILT_AS_STATIC)
 
 if (OPENMP_FOUND)
-	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${C_FLAGS} ${OpenMP_C_FLAGS}”)
-	set_property(TARGET irisphysxtoolkit PROPERTY C_FLAGS “${CXX_FLAGS} ${OpenMP_CXX_FLAGS}”)
+	set_property(TARGET iriscamera PROPERTY C_FLAGS “${C_FLAGS} ${OpenMP_C_FLAGS}”)
+	set_property(TARGET iriscamera PROPERTY C_FLAGS “${CXX_FLAGS} ${OpenMP_CXX_FLAGS}”)
 endif()

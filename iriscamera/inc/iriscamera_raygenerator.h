@@ -29,6 +29,7 @@ typedef CONST RAY_GENERATOR *PCRAY_GENERATOR;
 //
 
 _Success_(return == ISTATUS_SUCCESS)
+IRISCAMERAAPI
 ISTATUS
 RayGeneratorGenerateRay(
     _In_ PCRAY_GENERATOR RayGenerator,
