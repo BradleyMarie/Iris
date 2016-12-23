@@ -173,7 +173,7 @@ private:
                 
         if (Status != ISTATUS_SUCCESS)
         {
-            assert(Status == ISTATUS_SUCCESS);
+            assert(Status == ISTATUS_ALLOCATION_FAILED);
             throw std::bad_alloc(); 
         }
 
