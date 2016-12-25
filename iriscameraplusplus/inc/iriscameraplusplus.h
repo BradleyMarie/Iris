@@ -46,6 +46,7 @@ extern "C" {
 #include "iriscameraplusplus_camera.h"
 #include "iriscameraplusplus_pixelsampler.h"
 #include "iriscameraplusplus_sampletracer.h"
+#include "iriscameraplusplus_sampletracerallocator.h"
 #include "iriscameraplusplus_sampletracerbase.h"
 #include "iriscameraplusplus_sampletracergenerator.h"
 #include "iriscameraplusplus_sampletracergeneratorbase.h"

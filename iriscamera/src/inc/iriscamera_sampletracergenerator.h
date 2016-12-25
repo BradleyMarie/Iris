@@ -26,6 +26,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SampleTracerGeneratorGenerateSampleTracer(
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PSAMPLE_TRACER_ALLOCATOR SampleTracerAllocator,
     _Out_ PSAMPLE_TRACER *SampleTracer 
     );
 

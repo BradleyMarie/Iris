@@ -15,7 +15,8 @@ add_library(iriscamera SHARED
     src/pixelsampler.c
     src/camera.c
     src/raygenerator.c
-    src/sampletracergenerator.c)
+    src/sampletracergenerator.c
+    src/sampletracerallocator.c)
 
 target_link_libraries(iriscamera 
     iris

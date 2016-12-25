@@ -41,7 +41,7 @@ public:
     virtual
     SampleTracer
     Generate(
-        void
+        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef
         ) const = 0;
 
     SampleTracerGeneratorBase(

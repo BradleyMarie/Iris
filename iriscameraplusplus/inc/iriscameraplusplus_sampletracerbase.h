@@ -30,6 +30,7 @@ protected:
     static
     SampleTracer
     Create(
+        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
         _In_ std::unique_ptr<SampleTracerBase> SampleTracerBasePtr
         );
 
@@ -42,7 +43,7 @@ public:
     IrisAdvanced::Color3
     Trace(
         _In_ const Iris::Ray & WorldRay,
-        _In_ IrisAdvanced::Random & Rng
+        _In_ IrisAdvanced::Random Rng
         ) = 0;
 
     SampleTracerBase(

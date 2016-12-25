@@ -26,6 +26,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 (*PSAMPLE_TRACER_GENERATOR_GENERATOR_SAMPLE_TRACER_ROUTINE)(
     _In_ PCVOID Context,
+    _In_ PSAMPLE_TRACER_ALLOCATOR SampleTracerAllocator,
     _Out_ PSAMPLE_TRACER *SampleTracer
     );
 

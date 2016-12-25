@@ -29,20 +29,12 @@ public:
     Camera(
         _In_ PCAMERA CameraPtr
         )
-    : Data(CameraPtr)
+    : Data(CameraPtr, [](PCAMERA ToFree){ CameraFree(ToFree); })
     { 
         if (CameraPtr == nullptr)
         {
             throw std::invalid_argument("CameraPtr");
         }
-    }
-
-    Camera(
-        _In_ Camera && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
     }
 
     _Ret_
@@ -51,27 +43,11 @@ public:
         void
         ) const
     {
-        return Data;
-    }
-
-    Camera(
-        _In_ const Camera & ToCopy
-        ) = delete;
-        
-    Camera &
-    operator=(
-        _In_ const Camera & ToCopy
-        ) = delete;
-
-    ~Camera(
-        void
-        )
-    {
-        CameraFree(Data);
+        return Data.get();
     }
 
 private:
-    PCAMERA Data;
+    std::shared_ptr<CAMERA> Data;
 };
 
 } // namespace IrisCamera

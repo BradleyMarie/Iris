@@ -140,6 +140,7 @@ IrisCameraRender(
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
+    PSAMPLE_TRACER_ALLOCATOR SampleTracerAllocator;
     CALLBACK_CONTEXT CallbackContext;
     ISTATUS Status;
 
@@ -168,11 +169,21 @@ IrisCameraRender(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    Status = SampleTracerAllocatorCreate(&SampleTracerAllocator);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
     Status = SampleTracerGeneratorGenerateSampleTracer(SampleTracerGenerator,
+                                                       SampleTracerAllocator,
                                                        &CallbackContext.SampleTracer);
 
     if (Status != ISTATUS_SUCCESS)
     {
+        SampleTracerAllocatorFree(SampleTracerAllocator);
         return Status;
     }
 
@@ -183,6 +194,8 @@ IrisCameraRender(
     Status = RandomGeneratorGenerate(RandomGenerator,
                                      RenderWithRandomCallback,
                                      &CallbackContext);
+
+    SampleTracerAllocatorFree(SampleTracerAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -230,14 +243,14 @@ IrisCameraRenderParallel(
     }
 
 #ifdef _OPENMP
-    #pragma omp parallel default(shared) reduction(+: Status) num_threads(NumberOfThreads)
+    #pragma omp parallel default(shared) reduction(+: Status)
 #endif // OPENMP
     {
         Status = IrisCameraRender(Camera,
-                                    PixelSampler,
-                                    SampleTracerGenerator,
-                                    RandomGenerator,
-                                    Framebuffer);
+                                  PixelSampler,
+                                  SampleTracerGenerator,
+                                  RandomGenerator,
+                                  Framebuffer);
     }
 
     return Status;

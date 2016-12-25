@@ -8,8 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the RANDOM_ALLOCATOR and 
-    RANDOM_ALLOCATOR_REFERENCE types.
+    This file contains the definitions for the RANDOM_ALLOCATOR type.
 
 --*/
 

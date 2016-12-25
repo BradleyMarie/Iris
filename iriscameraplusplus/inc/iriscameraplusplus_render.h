@@ -28,10 +28,10 @@ static
 inline
 void
 Render(
-    _In_ const Camera & CameraRef,
-    _In_ const PixelSampler & PixelSamplerRef,
-    _In_ const SampleTracerGenerator & SampleTracerGeneratorRef,
-    _Inout_ const IrisAdvanced::RandomGenerator & RandomGeneratorRef,
+    _In_ Camera CameraRef,
+    _In_ PixelSampler PixelSamplerRef,
+    _In_ SampleTracerGenerator SampleTracerGeneratorRef,
+    _Inout_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
     _Inout_ Framebuffer & FramebufferRef
     )
 {
@@ -51,10 +51,10 @@ static
 inline
 void
 RenderParallel(
-    _In_ const Camera & CameraRef,
-    _In_ const PixelSampler & PixelSamplerRef,
-    _In_ const SampleTracerGenerator & SampleTracerGeneratorRef,
-    _In_ const IrisAdvanced::RandomGenerator & RandomGeneratorRef,
+    _In_ Camera CameraRef,
+    _In_ PixelSampler PixelSamplerRef,
+    _In_ SampleTracerGenerator SampleTracerGeneratorRef,
+    _In_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
     _Inout_ Framebuffer & FramebufferRef
     )
 {

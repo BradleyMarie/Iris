@@ -224,6 +224,7 @@ public:
     static
     SampleTracer
     Create(
+        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
         _In_ const TestGeometryRoutine TestGeometryFunc,
         _In_ const LightList & LightsRef,
         _In_ SIZE_T MaximumDepth,
@@ -232,13 +233,13 @@ public:
     {
         std::unique_ptr<SampleTracerBase> Ptr(
             new TestSampleTracer(TestGeometryFunc, LightsRef, MaximumDepth, Epsil));
-        return IrisCamera::SampleTracerBase::Create(std::move(Ptr));
+        return IrisCamera::SampleTracerBase::Create(SampleTracerAllocatorRef, std::move(Ptr));
     }
 
     IrisAdvanced::Color3
     Trace(
         _In_ const Iris::Ray & WorldRay,
-        _In_ IrisAdvanced::Random & Rng
+        _In_ IrisAdvanced::Random Rng
         )
     {
         IrisAdvanced::Color3 Result = Color3::CreateBlack();
@@ -358,10 +359,10 @@ public:
 
     SampleTracer
     Generate(
-        void
+        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef
         ) const
     {
-        return TestSampleTracer::Create(TestGeometryFunction, Lights, Depth, Epsilon);
+        return TestSampleTracer::Create(SampleTracerAllocatorRef, TestGeometryFunction, Lights, Depth, Epsilon);
     }
 
 private:

@@ -38,30 +38,12 @@ public:
     }
 
     _Ret_
-    PCSAMPLE_TRACER
-    AsPCSAMPLE_TRACER(
+    PSAMPLE_TRACER
+    AsPSAMPLE_TRACER(
         void
-        ) const
+        )
     {
         return Data;
-    }
-
-    _Ret_
-    PSAMPLE_TRACER
-    Release(
-        void
-        )
-    {
-        PSAMPLE_TRACER Result = Data;
-        Data = nullptr;
-        return Result;
-    }
-
-    ~SampleTracer(
-        void
-        )
-    {
-        SampleTracerFree(Data);
     }
 
 private:

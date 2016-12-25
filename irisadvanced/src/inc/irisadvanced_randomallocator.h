@@ -23,19 +23,16 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
-IRISADVANCEDAPI
 ISTATUS
 RandomAllocatorAllocate(
     _Out_ PRANDOM_ALLOCATOR *RandomAllocator
     );
 
-IRISADVANCEDAPI
 VOID
 RandomAllocatorClear(
     _Inout_ PRANDOM_ALLOCATOR RandomAllocator
     );
 
-IRISADVANCEDAPI
 VOID
 RandomAllocatorFree(
     _In_opt_ _Post_invalid_ PRANDOM_ALLOCATOR RandomAllocator

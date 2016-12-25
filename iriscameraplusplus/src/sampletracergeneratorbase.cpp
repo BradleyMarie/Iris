@@ -25,16 +25,18 @@ static
 ISTATUS
 SampleTracerGeneratorGenerateAdapter(
     _In_ PCVOID Context,
+    _In_ PSAMPLE_TRACER_ALLOCATOR SampleTracerAllocatorPtr,
     _Out_ PSAMPLE_TRACER *SampleTracerPtr
     )
 {
     assert(Context != NULL);
+    assert(SampleTracerAllocatorPtr != NULL);
     assert(SampleTracerPtr != NULL);
 
     const SampleTracerGeneratorBase **SampleTracerGeneratorBasePtr = (const SampleTracerGeneratorBase**) Context;
-    SampleTracer Tracer = (*SampleTracerGeneratorBasePtr)->Generate();
+    SampleTracer Tracer = (*SampleTracerGeneratorBasePtr)->Generate(SampleTracerAllocator(SampleTracerAllocatorPtr));
 
-    *SampleTracerPtr = Tracer.Release();
+    *SampleTracerPtr = Tracer.AsPSAMPLE_TRACER();
 
     return ISTATUS_SUCCESS;
 }

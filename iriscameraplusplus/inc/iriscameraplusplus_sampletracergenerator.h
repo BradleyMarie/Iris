@@ -29,20 +29,12 @@ public:
     SampleTracerGenerator(
         _In_ PSAMPLE_TRACER_GENERATOR SampleTracerGeneratorPtr
         )
-    : Data(SampleTracerGeneratorPtr)
+    : Data(SampleTracerGeneratorPtr, [](PSAMPLE_TRACER_GENERATOR ToFree){ SampleTracerGeneratorFree(ToFree); })
     { 
         if (SampleTracerGeneratorPtr == nullptr)
         {
             throw std::invalid_argument("SampleTracerGeneratorPtr");
         }
-    }
-
-    SampleTracerGenerator(
-        _In_ SampleTracerGenerator && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
     }
 
     _Ret_
@@ -51,27 +43,11 @@ public:
         void
         ) const
     {
-        return Data;
-    }
-
-    SampleTracerGenerator(
-        _In_ const SampleTracerGenerator & ToCopy
-        ) = delete;
-        
-    SampleTracerGenerator &
-    operator=(
-        _In_ const SampleTracerGenerator & ToCopy
-        ) = delete;
-
-    ~SampleTracerGenerator(
-        void
-        )
-    {
-        SampleTracerGeneratorFree(Data);
+        return Data.get();
     }
 
 private:
-    PSAMPLE_TRACER_GENERATOR Data;
+    std::shared_ptr<SAMPLE_TRACER_GENERATOR> Data;
 };
 
 } // namespace IrisCamera

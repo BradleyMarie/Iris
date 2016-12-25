@@ -24,7 +24,7 @@ struct _SAMPLE_TRACER {
 };
 
 //
-// Public Functions
+// Private Functions
 //
 
 _Check_return_
@@ -100,6 +100,32 @@ SampleTracerAllocate(
     return ISTATUS_SUCCESS;
 }
 
+VOID
+SampleTracerFree(
+    _In_opt_ _Post_invalid_ PSAMPLE_TRACER SampleTracer
+    )
+{
+    PFREE_ROUTINE FreeRoutine;
+
+    if (SampleTracer == NULL)
+    {
+        return;
+    }
+    
+    FreeRoutine = SampleTracer->VTable->FreeRoutine;
+
+    if (FreeRoutine != NULL)
+    {
+        FreeRoutine(SampleTracer->Data);
+    }
+
+    IrisAlignedFree(SampleTracer);
+}
+
+//
+// Public Functions
+//
+
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SampleTracerTrace(
@@ -137,26 +163,4 @@ SampleTracerTrace(
                                                 Color);
     
     return Status;
-}
-
-VOID
-SampleTracerFree(
-    _In_opt_ _Post_invalid_ PSAMPLE_TRACER SampleTracer
-    )
-{
-    PFREE_ROUTINE FreeRoutine;
-
-    if (SampleTracer == NULL)
-    {
-        return;
-    }
-    
-    FreeRoutine = SampleTracer->VTable->FreeRoutine;
-
-    if (FreeRoutine != NULL)
-    {
-        FreeRoutine(SampleTracer->Data);
-    }
-
-    IrisAlignedFree(SampleTracer);
 }

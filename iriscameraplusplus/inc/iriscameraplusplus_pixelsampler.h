@@ -29,20 +29,12 @@ public:
     PixelSampler(
         _In_ PPIXEL_SAMPLER PixelSamplerPtr
         )
-    : Data(PixelSamplerPtr)
+    : Data(PixelSamplerPtr, [](PPIXEL_SAMPLER ToFree){ PixelSamplerFree(ToFree); })
     { 
         if (PixelSamplerPtr == nullptr)
         {
             throw std::invalid_argument("PixelSamplerPtr");
         }
-    }
-
-    PixelSampler(
-        _In_ PixelSampler && ToMove
-        )
-    : Data(ToMove.Data)
-    { 
-        ToMove.Data = nullptr;
     }
 
     _Ret_
@@ -51,27 +43,11 @@ public:
         void
         ) const
     {
-        return Data;
-    }
-
-    PixelSampler(
-        _In_ const PixelSampler & ToCopy
-        ) = delete;
-        
-    PixelSampler &
-    operator=(
-        _In_ const PixelSampler & ToCopy
-        ) = delete;
-
-    ~PixelSampler(
-        void
-        )
-    {
-        PixelSamplerFree(Data);
+        return Data.get();
     }
 
 private:
-    PPIXEL_SAMPLER Data;
+    std::shared_ptr<PIXEL_SAMPLER> Data;
 };
 
 } // namespace IrisCamera

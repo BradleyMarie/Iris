@@ -68,6 +68,7 @@ const static SAMPLE_TRACER_VTABLE InteropVTable {
 
 SampleTracer
 SampleTracerBase::Create(
+    _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
     _In_ std::unique_ptr<SampleTracerBase> SampleTracerBasePtr
     )
 {
@@ -79,11 +80,12 @@ SampleTracerBase::Create(
     SampleTracerBase *UnmanagedSampleTracerBasePtr = SampleTracerBasePtr.release();
     PSAMPLE_TRACER SampleTracerPtr;
 
-    ISTATUS Success = SampleTracerAllocate(&InteropVTable,
-                                           &UnmanagedSampleTracerBasePtr,
-                                           sizeof(SampleTracerBase*),
-                                           alignof(SampleTracerBase*),
-                                           &SampleTracerPtr);
+    ISTATUS Success = SampleTracerAllocatorAllocate(SampleTracerAllocatorRef.AsPSAMPLE_TRACER_ALLOCATOR(),
+                                                    &InteropVTable,
+                                                    &UnmanagedSampleTracerBasePtr,
+                                                    sizeof(SampleTracerBase*),
+                                                    alignof(SampleTracerBase*),
+                                                    &SampleTracerPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {
