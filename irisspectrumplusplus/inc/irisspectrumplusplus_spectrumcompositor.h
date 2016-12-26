@@ -69,7 +69,7 @@ public:
     SpectrumReference
     Add(
         _In_ const Spectrum & Spectrum0Ref,
-        _In_ const SpectrumReference & Spectrum1Ref
+        _In_ SpectrumReference Spectrum1Ref
         )
     {
         SpectrumReference Result = Add(Spectrum0Ref.AsPCSPECTRUM(),
@@ -81,7 +81,7 @@ public:
     _Ret_
     SpectrumReference
     Add(
-        _In_ const SpectrumReference & Spectrum0Ref,
+        _In_ SpectrumReference Spectrum0Ref,
         _In_ const Spectrum & Spectrum1Ref
         )
     {
@@ -94,8 +94,8 @@ public:
     _Ret_
     SpectrumReference
     Add(
-        _In_ const SpectrumReference & Spectrum0Ref,
-        _In_ const SpectrumReference & Spectrum1Ref
+        _In_ SpectrumReference Spectrum0Ref,
+        _In_ SpectrumReference Spectrum1Ref
         )
     {
         SpectrumReference Result = Add(Spectrum0Ref.AsPCSPECTRUM(),
@@ -120,7 +120,7 @@ public:
     _Ret_
     SpectrumReference
     Attenuate(
-        _In_ const SpectrumReference & SpectrumRef,
+        _In_ SpectrumReference SpectrumRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -146,7 +146,7 @@ public:
     _Ret_
     SpectrumReference
     Reflect(
-        _In_ const SpectrumReference & SpectrumRef,
+        _In_ SpectrumReference SpectrumRef,
         _In_ const Reflector & ReflectorRef
         )
     {
@@ -160,7 +160,7 @@ public:
     SpectrumReference
     Reflect(
         _In_ const Spectrum & SpectrumRef,
-        _In_ const ReflectorReference & ReflectorRef
+        _In_ ReflectorReference ReflectorRef
         )
     {
         SpectrumReference Result = Reflect(SpectrumRef.AsPCSPECTRUM(),
@@ -172,8 +172,8 @@ public:
     _Ret_
     SpectrumReference
     Reflect(
-        _In_ const SpectrumReference & SpectrumRef,
-        _In_ const ReflectorReference & ReflectorRef
+        _In_ SpectrumReference SpectrumRef,
+        _In_ ReflectorReference ReflectorRef
         )
     {
         SpectrumReference Result = Reflect(SpectrumRef.AsPCSPECTRUM(),
@@ -200,7 +200,7 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedReflect(
-        _In_ const SpectrumReference & SpectrumRef,
+        _In_ SpectrumReference SpectrumRef,
         _In_ const Reflector & ReflectorRef,
         _In_ FLOAT Attenuation
         )
@@ -216,7 +216,7 @@ public:
     SpectrumReference
     AttenuatedReflect(
         _In_ const Spectrum & SpectrumRef,
-        _In_ const ReflectorReference & ReflectorRef,
+        _In_ ReflectorReference ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {
@@ -230,8 +230,8 @@ public:
     _Ret_
     SpectrumReference
     AttenuatedReflect(
-        _In_ const SpectrumReference & SpectrumRef,
-        _In_ const ReflectorReference & ReflectorRef,
+        _In_ SpectrumReference SpectrumRef,
+        _In_ ReflectorReference ReflectorRef,
         _In_ FLOAT Attenuation
         )
     {

@@ -32,7 +32,7 @@ RandomGeneratorGenerateAdapter(
     assert(Context != nullptr);
     assert(RngPtr != nullptr);
 
-    auto Callback = static_cast<std::function<void(Random &)> *>(Context);
+    auto Callback = static_cast<std::function<void(Random)> *>(Context);
     Random Rng(RngPtr);
     (*Callback)(Rng);
 }
@@ -43,7 +43,7 @@ RandomGeneratorGenerateAdapter(
 
 void
 RandomGenerator::Generate(
-    _In_ std::function<void(Random &)> & Callback
+    _In_ std::function<void(Random)> & Callback
     ) const
 {
     ISTATUS Status = RandomGeneratorGenerate(Data.get(),

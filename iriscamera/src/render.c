@@ -41,8 +41,6 @@ RenderWithRandomCallback(
     RAY_GENERATOR RayGenerator;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
-    SIZE_T NumberOfPixels;
-    SIZE_T PixelIndex;
     SIZE_T PixelColumn;
     SIZE_T PixelRow; 
     COLOR3 PixelColor; 
@@ -57,6 +55,14 @@ RenderWithRandomCallback(
     FLOAT MinLensV;
     FLOAT MaxLensV;
     ISTATUS Status;
+
+#ifndef _MSC_VER
+    SIZE_T NumberOfPixels;
+    SIZE_T PixelIndex;
+#else
+    INT64 NumberOfPixels;
+    INT64 PixelIndex;
+#endif
 
     ASSERT(Context != NULL);
     ASSERT(Rng != NULL);
@@ -86,8 +92,8 @@ RenderWithRandomCallback(
 #endif // OPENMP
     for (PixelIndex = 0; PixelIndex < NumberOfPixels; PixelIndex += 1)
     {
-        PixelRow = PixelIndex / FramebufferColumns;
-        PixelColumn = PixelIndex % FramebufferColumns;
+        PixelRow = (SIZE_T) PixelIndex / FramebufferColumns;
+        PixelColumn = (SIZE_T) PixelIndex % FramebufferColumns;
 
         RayGenerator = RayGeneratorCreate(CallbackContext->Camera,
                                           PixelRow,
@@ -241,6 +247,8 @@ IrisCameraRenderParallel(
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
+
+    Status = ISTATUS_SUCCESS;
 
 #ifdef _OPENMP
     #pragma omp parallel default(shared) reduction(+: Status)

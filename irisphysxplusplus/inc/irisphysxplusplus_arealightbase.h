@@ -42,7 +42,7 @@ public:
     IrisSpectrum::SpectrumReference
     ComputeEmissive(
         _In_ const Iris::Point & HitPoint,
-        _In_ const IrisSpectrum::SpectrumCompositorReference Compositor
+        _In_ IrisSpectrum::SpectrumCompositorReference Compositor
         ) const = 0;
 
     AreaLightBase(

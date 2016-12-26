@@ -107,7 +107,7 @@ public:
     static
     Point
     InverseMultiply(
-        _In_ const MatrixReference & Multiplicand0,
+        _In_ MatrixReference Multiplicand0,
         _In_ const Point & Multiplicand1
         ) noexcept
     {
@@ -270,7 +270,7 @@ static
 inline
 Point
 operator*(
-    _In_ const MatrixReference & Multiplicand0,
+    _In_ MatrixReference Multiplicand0,
     _In_ const Point & Multiplicand1
     ) noexcept
 {

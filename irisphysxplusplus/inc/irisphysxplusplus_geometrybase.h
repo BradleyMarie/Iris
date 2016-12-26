@@ -59,14 +59,14 @@ public:
     Iris::Vector
     ComputeNormal(
         _In_ const Iris::Point & HitPoint,
-        _In_ const UINT32 FaceHit
+        _In_ UINT32 FaceHit
         ) const = 0;
     
     _Ret_ 
     virtual
     std::optional<MaterialReference>
     GetMaterial(
-        _In_ const UINT32 FaceHit
+        _In_ UINT32 FaceHit
         ) const = 0;
 
     GeometryBase(
