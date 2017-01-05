@@ -28,27 +28,6 @@ typedef CONST FRAMEBUFFER *PCFRAMEBUFFER;
 // Prototypes
 //
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
-ISTATUS
-FramebufferAllocate(
-    _In_ COLOR3 InitialColor,
-    _In_ SIZE_T Rows,
-    _In_ SIZE_T Columns,
-    _Out_ PFRAMEBUFFER *FrameBuffer
-    );
-
-_Success_(return == ISTATUS_SUCCESS)
-IRISCAMERAAPI
-ISTATUS
-FramebufferSetPixel(
-    _Inout_ PFRAMEBUFFER Framebuffer,
-    _In_ COLOR3 Color,
-    _In_ SIZE_T Row,
-    _In_ SIZE_T Column
-    );
-
 _Success_(return == ISTATUS_SUCCESS)
 IRISCAMERAAPI
 ISTATUS
@@ -77,7 +56,13 @@ FramebufferSaveAsPFM(
 
 IRISCAMERAAPI
 VOID
-FramebufferFree(
+FramebufferRetain(
+    _In_opt_ PFRAMEBUFFER Framebuffer
+    );
+
+IRISCAMERAAPI
+VOID
+FramebufferRelease(
     _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     );
 

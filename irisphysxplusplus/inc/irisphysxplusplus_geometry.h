@@ -182,14 +182,6 @@ public:
     {
         PhysxGeometryRetain(Data);
     }
-    
-    Geometry(
-        _In_ Geometry && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
 
     Geometry &
     operator=(

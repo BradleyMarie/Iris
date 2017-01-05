@@ -24,5 +24,6 @@ Abstract:
 #include "iriscamera_sampletracer.h"
 #include "iriscamera_sampletracerallocator.h"
 #include "iriscamera_sampletracergenerator.h"
+#include "iriscamera_framebuffer.h"
 
 #endif // _IRIS_CAMERA_INTERNAL_HEADER_

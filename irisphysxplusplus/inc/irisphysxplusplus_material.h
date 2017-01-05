@@ -42,14 +42,6 @@ public:
             PhysxMaterialRetain(MaterialPtr);
         }
     }
-
-    Material(
-        _In_ Material && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
     
     _Ret_
     PPHYSX_MATERIAL

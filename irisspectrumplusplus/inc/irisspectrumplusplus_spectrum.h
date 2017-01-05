@@ -92,14 +92,6 @@ public:
         SpectrumRetain(Data);
     }
 
-    Spectrum(
-        _In_ Spectrum && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
-
     Spectrum & 
     operator=(
         _In_ const Spectrum & ToCopy

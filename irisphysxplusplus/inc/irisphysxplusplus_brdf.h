@@ -42,14 +42,6 @@ public:
             PhysxBrdfRetain(Data);
         }
     }
-    
-    BRDF(
-        _In_ BRDF && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
      
     _Ret_
     PPHYSX_BRDF

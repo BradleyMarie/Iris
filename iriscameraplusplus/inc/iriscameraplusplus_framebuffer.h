@@ -26,15 +26,21 @@ namespace IrisCamera {
 
 class Framebuffer final {
 public:
-    static
-    Framebuffer
-    Create(
-        _In_ const IrisAdvanced::Color3 & InitialColor,
-        _In_ SIZE_T Rows,
-        _In_ SIZE_T Columns
+    Framebuffer(
+        _In_ PFRAMEBUFFER FramebufferPtr,
+        _In_ bool Retain
         )
-    {
-        return Framebuffer(InitialColor, Rows, Columns);
+    : Data(FramebufferPtr)
+    { 
+        if (FramebufferPtr == nullptr)
+        {
+            throw std::invalid_argument("FramebufferPtr");
+        }
+        
+        if (Retain)
+        {
+            FramebufferRetain(Data);
+        }
     }
 
     _Ret_
@@ -53,33 +59,6 @@ public:
         ) const
     {
         return Data;
-    }
-
-    void
-    SetPixel(
-        _In_ const IrisAdvanced::Color3 & Color,
-        _In_ SIZE_T Row,
-        _In_ SIZE_T Column
-        )
-    {
-        ISTATUS Status = FramebufferSetPixel(Data,
-                                             Color.AsCOLOR3(),
-                                             Row,
-                                             Column);
-
-        switch (Status)
-        {
-            case ISTATUS_SUCCESS:
-                return;
-            case ISTATUS_INVALID_ARGUMENT_01:
-                throw std::invalid_argument("Color");;
-            case ISTATUS_INVALID_ARGUMENT_02:
-                throw std::out_of_range("Row");
-            case ISTATUS_INVALID_ARGUMENT_03:
-                throw std::out_of_range("Column");
-        }
-
-        assert(false);
     }
         
     IrisAdvanced::Color3
@@ -141,17 +120,23 @@ public:
     Framebuffer(
         _In_ const Framebuffer & ToCopy
         )
-    : Data(ToCopy.Copy())
-    { }
+    : Data(ToCopy.Data)
+    { 
+        FramebufferRetain(Data);
+    }
         
     Framebuffer &
     operator=(
         _In_ const Framebuffer & ToCopy
         )
     {
-        PFRAMEBUFFER NewFramebuffer = ToCopy.Copy();
-        FramebufferFree(Data);
-        Data = NewFramebuffer;
+        if (this != &ToCopy)
+        {
+            FramebufferRelease(Data);
+            Data = ToCopy.Data;
+            FramebufferRetain(Data);
+        }
+
         return *this;
     }
 
@@ -159,48 +144,11 @@ public:
         void
         )
     {
-        FramebufferFree(Data);
+        FramebufferRelease(Data);
     }
 
 private:
     PFRAMEBUFFER Data;
-
-    Framebuffer(
-        _In_ const IrisAdvanced::Color3 & InitialColor,
-        _In_ SIZE_T Rows,
-        _In_ SIZE_T Columns
-        )
-    {
-        ISTATUS Status = FramebufferAllocate(InitialColor.AsCOLOR3(),
-                                             Rows,
-                                             Columns,
-                                             &Data);
-
-        if (Status == ISTATUS_SUCCESS)
-        {
-            return;
-        }
-        
-        switch (Status)
-        {
-            case ISTATUS_INVALID_ARGUMENT_00:
-                throw std::invalid_argument("InitialColor");;
-            case ISTATUS_INVALID_ARGUMENT_01:
-                throw std::invalid_argument("Rows");
-            case ISTATUS_INVALID_ARGUMENT_02:
-                throw std::invalid_argument("Columns");
-            default:
-                assert(Status == ISTATUS_ALLOCATION_FAILED);
-                throw std::bad_alloc();
-        }
-    }
-
-    _Ret_
-    IRISCAMERAPLUSPLUSAPI
-    PFRAMEBUFFER
-    Copy(
-        void
-        ) const;
 };
 
 } // namespace IrisCamera

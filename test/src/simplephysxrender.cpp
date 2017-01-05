@@ -399,8 +399,6 @@ TEST(PhysxRenderConstantRedWorldSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne);
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -420,11 +418,12 @@ TEST(PhysxRenderConstantRedWorldSphere)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderConstantRedWorldSpherePlusPlus.pfm");
 }
@@ -444,8 +443,6 @@ TEST(PhysxRenderConstantRedModelSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(0.5f, 0.5f, 0.5f));
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -465,11 +462,12 @@ TEST(PhysxRenderConstantRedModelSphere)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderConstantRedModelSpherePlusPlus.pfm");
 }
@@ -489,8 +487,6 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
 
     TestListScene Scene;
     Scene.AddGeometry(SphereRadiusOne, Matrix::Scalar(1.0f, 1.0f, 1.0f), true);
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -510,11 +506,12 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderConstantRedPremultipliedSpherePlusPlus.pfm");
 }
@@ -548,8 +545,6 @@ TEST(PhysxRenderPerfectSpecularSphere)
                                         RefletiveMaterial);
 
     Scene.AddGeometry(SphereTwo);
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -569,11 +564,12 @@ TEST(PhysxRenderPerfectSpecularSphere)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderPerfectSpecularWorldSpherePlusPlus.pfm");
 }
@@ -595,8 +591,6 @@ TEST(PhysxRenderConstantRedWorldTriangle)
                                           ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -616,11 +610,12 @@ TEST(PhysxRenderConstantRedWorldTriangle)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderConstantRedWorldTrianglePlusPlus.pfm");
 }
@@ -652,8 +647,6 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
                                           ConstantMaterial);
 
     Scene.AddGeometry(SphereOne);
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -673,11 +666,12 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
 }
@@ -702,8 +696,6 @@ TEST(PhysxRenderPhongWorldSphere)
     Lights.Add(PhongPointLight::Create(Color3(1.0f, 1.0f, 1.0f),
                                        Color3::CreateBlack(),
                                        Point(0.0f, 0.0f, 1000.0f)));
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Camera PinholeCam = PinholeCamera::Create(Point(0.0f, 0.0f, 4.0f),
                                               Vector(0.0f, 0.0f, -1.0f),
@@ -721,11 +713,12 @@ TEST(PhysxRenderPhongWorldSphere)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderPhongWorldSpherePlusPlus.pfm");
 }
@@ -789,8 +782,6 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
     Lights.Add(PhongPointLight::Create(Color3(0.21f, 0.21f, 0.35f),
                                        Color3(0.21f, 0.21f, 0.35f),
                                        Point(0.0f,3.5f, 0.0f)));
-    
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
 
     Point PinholeLocation(3.0f, 2.0f, 4.0f);
     Point LookAt(-1.0f, 0.45f, 0.0f);
@@ -812,11 +803,12 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
 
     Fb.SaveAsPFM("RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
 }
@@ -1050,8 +1042,6 @@ TEST(PhysxRenderCornellBox)
     // Render
     //
 
-    Framebuffer Fb = Framebuffer::Create(Color3(0.0f, 0.0f, 0.0f), 500, 500);
-
     Point PinholeLocation(278.0f, 273.0f, -500.0f);
     Vector CameraDirection(0.0f, 0.0f, 1.0f);
 
@@ -1071,11 +1061,12 @@ TEST(PhysxRenderCornellBox)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    IrisCamera::Render(PinholeCam,
-                       Sampler,
-                       Generator,
-                       RngGenerator,
-                       Fb);
+    Framebuffer Fb = IrisCamera::Render(PinholeCam,
+                                        Sampler,
+                                        Generator,
+                                        RngGenerator,
+                                        500,
+                                        500);
     
     Fb.SaveAsPFM("RenderCornellBoxPlusPlus.pfm");
 }

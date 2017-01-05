@@ -126,13 +126,10 @@ RenderWithRandomCallback(
     CallbackContext->Status = ISTATUS_SUCCESS;
 }
 
-//
-// Public Functions
-//
-
 _Success_(return == ISTATUS_SUCCESS)
+STATIC
 ISTATUS
-IrisCameraRender(
+IrisCameraRenderInternal(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
@@ -144,30 +141,11 @@ IrisCameraRender(
     CALLBACK_CONTEXT CallbackContext;
     ISTATUS Status;
 
-    if (Camera == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (PixelSampler == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (SampleTracerGenerator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (RandomGenerator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (Framebuffer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
+    ASSERT(Camera != NULL);
+    ASSERT(PixelSampler != NULL);
+    ASSERT(SampleTracerGenerator != NULL);
+    ASSERT(RandomGenerator != NULL);
+    ASSERT(Framebuffer != NULL);
 
     Status = SampleTracerAllocatorCreate(&SampleTracerAllocator);
 
@@ -205,16 +183,23 @@ IrisCameraRender(
     return CallbackContext.Status;
 }
 
+//
+// Public Functions
+//
+
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-IrisCameraRenderParallel(
+IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
-    _Inout_ PFRAMEBUFFER Framebuffer
+    _In_ SIZE_T FramebufferRows,
+    _In_ SIZE_T FramebufferColumns,
+    _Out_ PFRAMEBUFFER *Framebuffer
     )
 {
+    PFRAMEBUFFER AllocatedFramebuffer;
     ISTATUS Status;
 
     if (Camera == NULL)
@@ -237,21 +222,126 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (Framebuffer == NULL)
+    if (FramebufferRows == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (FramebufferColumns == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (Framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    Status = FramebufferAllocate(FramebufferRows,
+                                 FramebufferColumns,
+                                 &AllocatedFramebuffer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
+    }
+
+    Status = IrisCameraRenderInternal(Camera,
+                                      PixelSampler,
+                                      SampleTracerGenerator,
+                                      RandomGenerator,
+                                      AllocatedFramebuffer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        FramebufferRelease(AllocatedFramebuffer);
+        return Status;
+    }
+
+    *Framebuffer = AllocatedFramebuffer;
+
+    return ISTATUS_SUCCESS;
+}
+
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+IrisCameraRenderParallel(
+    _In_ PCCAMERA Camera,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCRANDOM_GENERATOR RandomGenerator,
+    _In_ SIZE_T FramebufferRows,
+    _In_ SIZE_T FramebufferColumns,
+    _Out_ PFRAMEBUFFER *Framebuffer
+    )
+{
+    PFRAMEBUFFER AllocatedFramebuffer;
+    ISTATUS Status;
+
+    if (Camera == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (PixelSampler == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (SampleTracerGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (RandomGenerator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (FramebufferRows == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (FramebufferColumns == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (Framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    Status = FramebufferAllocate(FramebufferRows,
+                                 FramebufferColumns,
+                                 &AllocatedFramebuffer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
+        return Status;
     }
 
 #ifdef _OPENMP
     #pragma omp parallel default(shared) reduction(+: Status)
 #endif // OPENMP
     {
-        Status = IrisCameraRender(Camera,
-                                  PixelSampler,
-                                  SampleTracerGenerator,
-                                  RandomGenerator,
-                                  Framebuffer);
+        Status = IrisCameraRenderInternal(Camera,
+                                          PixelSampler,
+                                          SampleTracerGenerator,
+                                          RandomGenerator,
+                                          Framebuffer);
     }
 
-    return Status;
+    if (Status != ISTATUS_SUCCESS)
+    {
+        FramebufferRelease(AllocatedFramebuffer);
+        return Status;
+    }
+
+    *Framebuffer = AllocatedFramebuffer;
+
+    return ISTATUS_SUCCESS;
 }

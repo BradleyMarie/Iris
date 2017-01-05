@@ -29,7 +29,9 @@ IrisCameraRender(
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RngGenerator,
-    _Inout_ PFRAMEBUFFER FrameBuffer
+    _In_ SIZE_T FrameBufferRows,
+    _In_ SIZE_T FrameBufferColumns,
+    _Out_ PFRAMEBUFFER *FrameBuffer
     );
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -40,7 +42,9 @@ IrisCameraRenderParallel(
     _In_ PCPIXEL_SAMPLER PixelSampler,
     _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
-    _Inout_ PFRAMEBUFFER FrameBuffer
+    _In_ SIZE_T FrameBufferRows,
+    _In_ SIZE_T FrameBufferColumns,
+    _Out_ PFRAMEBUFFER *FrameBuffer
     );
 
 #endif // _RENDER_IRIS_CAMERA_

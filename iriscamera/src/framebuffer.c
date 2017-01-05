@@ -22,6 +22,7 @@ Abstract:
 struct _FRAMEBUFFER {
     SIZE_T Rows;
     SIZE_T Columns;
+    SIZE_T ReferenceCount;
     _Field_size_full_(Rows * Columns) PCOLOR3 Pixels;
 };
 
@@ -48,14 +49,13 @@ FrambufferIsLittleEndian(
 }
 
 //
-// Public Functions
+// Private Functions
 //
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 FramebufferAllocate(
-    _In_ COLOR3 InitialColor,
     _In_ SIZE_T Rows,
     _In_ SIZE_T Columns,
     _Out_ PFRAMEBUFFER *Framebuffer
@@ -68,26 +68,10 @@ FramebufferAllocate(
     PVOID HeaderAllocation;
     SIZE_T Index;
     ISTATUS Status;
-
-    if (Color3Validate(InitialColor) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
     
-    if (Rows == 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-    
-    if (Columns == 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (Framebuffer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
+    ASSERT(Rows != 0);
+    ASSERT(Columns != 0);
+    ASSERT(Framebuffer != NULL);
 
     Status = CheckedMultiplySizeT(Rows, Columns, &ArrayLength);
 
@@ -113,19 +97,14 @@ FramebufferAllocate(
     AllocatedFrameBuffer->Pixels = (PCOLOR3) DataAllocation;
     AllocatedFrameBuffer->Columns = Columns;
     AllocatedFrameBuffer->Rows = Rows;
-
-    for (Index = 0; Index < ArrayLength; Index++)
-    {
-        AllocatedFrameBuffer->Pixels[Index] = InitialColor;
-    }
+    AllocatedFrameBuffer->ReferenceCount = 1;
 
     *Framebuffer = AllocatedFrameBuffer;
 
     return ISTATUS_SUCCESS;
 }
 
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
+VOID
 FramebufferSetPixel(
     _Inout_ PFRAMEBUFFER Framebuffer,
     _In_ COLOR3 Color,
@@ -133,34 +112,17 @@ FramebufferSetPixel(
     _In_ SIZE_T Column
     )
 {
-    SIZE_T RowSize;
+    ASSERT(Framebuffer != NULL);
+    ASSERT(Color3Validate(Color) != FALSE);
+    ASSERT(Row < Framebuffer->Rows);
+    ASSERT(Column < Framebuffer->Columns);
 
-    if (Framebuffer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    RowSize = Framebuffer->Rows;
-
-    if (RowSize <= Row)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-    
-    if (Color3Validate(Color) == FALSE)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (Framebuffer->Columns <= Column)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    Framebuffer->Pixels[Row * RowSize + Column] = Color;
-
-    return ISTATUS_SUCCESS;
+    Framebuffer->Pixels[Row * Framebuffer->Rows + Column] = Color;
 }
+
+//
+// Public Functions
+//
 
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
@@ -309,9 +271,32 @@ FramebufferSaveAsPFM(
 }
 
 VOID
-FramebufferFree(
+FramebufferRetain(
+    _In_opt_ PFRAMEBUFFER Framebuffer
+    )
+{
+    if (Framebuffer == NULL)
+    {
+        return;
+    }
+
+    Framebuffer->ReferenceCount += 1;
+}
+
+VOID
+FramebufferRelease(
     _In_opt_ _Post_invalid_ PFRAMEBUFFER Framebuffer
     )
 {
-    IrisAlignedFree(Framebuffer);
+    if (Framebuffer == NULL)
+    {
+        return;
+    }
+
+    Framebuffer->ReferenceCount -= 1;
+
+    if (Framebuffer->ReferenceCount == 0)
+    {
+        IrisAlignedFree(Framebuffer);
+    }
 }

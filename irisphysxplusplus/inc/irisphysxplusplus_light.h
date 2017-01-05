@@ -42,14 +42,6 @@ public:
             PhysxLightRetain(LightPtr);
         }
     }
-
-    Light(
-        _In_ Light && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
     
     _Ret_
     PPHYSX_LIGHT

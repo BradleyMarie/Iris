@@ -26,48 +26,62 @@ namespace IrisCamera {
 
 static
 inline
-void
+Framebuffer
 Render(
     _In_ Camera CameraRef,
     _In_ PixelSampler PixelSamplerRef,
     _In_ SampleTracerGenerator SampleTracerGeneratorRef,
     _Inout_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
-    _Inout_ Framebuffer & FramebufferRef
+    _In_ SIZE_T FramebufferRows,
+    _In_ SIZE_T FramebufferColumns
     )
 {
+    PFRAMEBUFFER Output;
+
     ISTATUS Status = IrisCameraRender(CameraRef.AsPCCAMERA(),
                                       PixelSamplerRef.AsPCPIXEL_SAMPLER(),
                                       SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
                                       RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
-                                      FramebufferRef.AsPFRAMEBUFFER());
+                                      FramebufferRows,
+                                      FramebufferColumns,
+                                      &Output);
 
     if (Status != ISTATUS_SUCCESS)
     {
         throw std::runtime_error(Iris::ISTATUSToCString(Status));
     }
+
+    return Framebuffer(Output, false);
 }
 
 static
 inline
-void
+Framebuffer
 RenderParallel(
     _In_ Camera CameraRef,
     _In_ PixelSampler PixelSamplerRef,
     _In_ SampleTracerGenerator SampleTracerGeneratorRef,
     _In_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
-    _Inout_ Framebuffer & FramebufferRef
+    _In_ SIZE_T FramebufferRows,
+    _In_ SIZE_T FramebufferColumns
     )
 {
+    PFRAMEBUFFER Output;
+
     ISTATUS Status = IrisCameraRenderParallel(CameraRef.AsPCCAMERA(),
                                               PixelSamplerRef.AsPCPIXEL_SAMPLER(),
                                               SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
                                               RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
-                                              FramebufferRef.AsPFRAMEBUFFER());
+                                              FramebufferRows,
+                                              FramebufferColumns,
+                                              &Output);
 
     if (Status != ISTATUS_SUCCESS)
     {
         throw std::runtime_error(Iris::ISTATUSToCString(Status));
     }
+    
+    return Framebuffer(Output, false);
 }
 
 } // namespace IrisCamera

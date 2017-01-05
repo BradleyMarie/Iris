@@ -94,14 +94,6 @@ public:
         ReflectorRetain(Data);
     }
 
-    Reflector(
-        _In_ Reflector && ToMove
-        )
-    : Data(ToMove.Data)
-    {
-        ToMove.Data = nullptr;
-    }
-
     Reflector & 
     operator=(
         _In_ const Reflector & ToCopy
