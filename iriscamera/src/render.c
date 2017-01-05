@@ -340,7 +340,7 @@ IrisCameraRenderParallel(
                                           PixelSampler,
                                           SampleTracerGenerator,
                                           RandomGenerator,
-                                          Framebuffer);
+                                          AllocatedFramebuffer);
     }
 
     if (Status != ISTATUS_SUCCESS)
