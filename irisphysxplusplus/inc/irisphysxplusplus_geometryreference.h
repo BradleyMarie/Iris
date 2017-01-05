@@ -92,7 +92,7 @@ public:
     Iris::Vector
     ComputeNormal(
         _In_ const Iris::Point & HitPoint,
-        _In_ const UINT32 FaceHit
+        _In_ UINT32 FaceHit
         ) const
     {
         VECTOR3 Result;
@@ -113,7 +113,7 @@ public:
 	_Ret_
 	std::optional<MaterialReference>
     GetMaterial(
-        _In_ const UINT32 FaceHit
+        _In_ UINT32 FaceHit
         ) const
     {
         PCPHYSX_MATERIAL Result;
@@ -138,7 +138,7 @@ public:
 	_Ret_
     std::optional<LightReference>
     GetLight(
-        _In_ const UINT32 FaceHit
+        _In_ UINT32 FaceHit
         ) const
     {
         PCPHYSX_LIGHT Result;

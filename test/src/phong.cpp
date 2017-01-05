@@ -376,7 +376,7 @@ PhongMaterial::Sample(
     _In_ const Iris::Vector & WorldSurfaceNormal,
     _In_ const Iris::Vector & ModelSurfaceNormal,
     _In_ PCVOID AdditionalData,
-    _In_ const Iris::MatrixReference & ModelToWorld,
+    _In_ Iris::MatrixReference ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
     ) const
 {
@@ -601,7 +601,7 @@ TriangleInterpolatedPhongMaterial::Sample(
     _In_ const Iris::Vector & WorldSurfaceNormal,
     _In_ const Iris::Vector & ModelSurfaceNormal,
     _In_ PCVOID AdditionalData,
-    _In_ const Iris::MatrixReference & ModelToWorld,
+    _In_ Iris::MatrixReference ModelToWorld,
     _In_ IrisPhysx::BRDFAllocator Allocator
     ) const
 {

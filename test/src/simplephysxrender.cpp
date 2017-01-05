@@ -89,7 +89,7 @@ public:
         _In_ const Iris::Vector & ModelShadingNormal,
         _In_ const Iris::Vector & WorldShadingNormal,
         _In_ PCVOID AdditionalData,
-        _In_ const Iris::MatrixReference & ModelToWorld,
+        _In_ Iris::MatrixReference ModelToWorld,
         _In_ IrisPhysx::BRDFAllocator Allocator
         ) const
     {
@@ -620,7 +620,7 @@ TEST(PhysxRenderConstantRedWorldTriangle)
     Fb.SaveAsPFM("RenderConstantRedWorldTrianglePlusPlus.pfm");
 }
 
-TEST(PhysxRenderInterpolatedRedWorldTriangle)
+TEST(PhysxRenderInterpolatedWorldTriangle)
 {
     TestListScene Scene;
 
@@ -666,14 +666,14 @@ TEST(PhysxRenderInterpolatedRedWorldTriangle)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    Framebuffer Fb = IrisCamera::Render(PinholeCam,
-                                        Sampler,
-                                        Generator,
-                                        RngGenerator,
-                                        500,
-                                        500);
+    Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
+                                                Sampler,
+                                                Generator,
+                                                RngGenerator,
+                                                500,
+                                                500);
 
-    Fb.SaveAsPFM("RenderInterpolatedRedWorldTrianglePlusPlus.pfm");
+    Fb.SaveAsPFM("RenderInterpolatedWorldTrianglePlusPlus.pfm");
 }
 
 TEST(PhysxRenderPhongWorldSphere)
@@ -803,12 +803,12 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    Framebuffer Fb = IrisCamera::Render(PinholeCam,
-                                        Sampler,
-                                        Generator,
-                                        RngGenerator,
-                                        500,
-                                        500);
+    Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
+                                                Sampler,
+                                                Generator,
+                                                RngGenerator,
+                                                500,
+                                                500);
 
     Fb.SaveAsPFM("RenderMirrorPhongCheckerboardSpheresPlusPlus.pfm");
 }
@@ -1061,12 +1061,12 @@ TEST(PhysxRenderCornellBox)
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
-    Framebuffer Fb = IrisCamera::Render(PinholeCam,
-                                        Sampler,
-                                        Generator,
-                                        RngGenerator,
-                                        500,
-                                        500);
+    Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
+                                                Sampler,
+                                                Generator,
+                                                RngGenerator,
+                                                500,
+                                                500);
     
     Fb.SaveAsPFM("RenderCornellBoxPlusPlus.pfm");
 }

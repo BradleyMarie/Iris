@@ -39,7 +39,7 @@ public:
     
     void
     Generate(
-        _In_ std::function<void(Random &)> & Callback
+        _In_ std::function<void(Random)> & Callback
         ) const;
 
     _Ret_
