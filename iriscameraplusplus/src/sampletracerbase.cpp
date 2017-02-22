@@ -20,11 +20,41 @@ namespace IrisCamera {
 // Adapter Functions
 //
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS
+SampleTracerGenerateThreadStateAndCallbackAdapter(
+    _In_ PCVOID Context,
+    _In_ PCSAMPLE_TRACER_CALLBACK Callback
+    )
+{
+    ASSERT(Context != NULL);
+    ASSERT(Callback != NULL);
+
+    SampleTracerBase **SampleTracerBasePtr = (SampleTracerBase**) Context;
+
+    std::function<void(PVOID)> Func = [=](PVOID ThreadState) -> void {
+        ISTATUS Status = SampleTracerCallback(Callback, ThreadState);
+
+        if (Status != ISTATUS_SUCCESS)
+        {
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+        }
+    };
+
+    (*SampleTracerBasePtr)->GenerateThreadStateAndCallback(Func);
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 SampleTracerTraceAdapter(
-    _In_ PVOID Context,
+    _In_ PCVOID Context,
+    _In_ PVOID ThreadState,
     _In_ RAY WorldRay,
     _In_ PRANDOM RngPtr,
     _Out_ PCOLOR3 Color
@@ -37,7 +67,8 @@ SampleTracerTraceAdapter(
 
     SampleTracerBase **SampleTracerBasePtr = (SampleTracerBase**) Context;
     IrisAdvanced::Random Rng(RngPtr);
-    IrisAdvanced::Color3 Result = (*SampleTracerBasePtr)->Trace(Iris::Ray(WorldRay),
+    IrisAdvanced::Color3 Result = (*SampleTracerBasePtr)->Trace(ThreadState,
+                                                                Iris::Ray(WorldRay),
                                                                 Rng);
 
     *Color = Result.AsCOLOR3();
@@ -58,6 +89,7 @@ SampleTracerFreeAdapter(
 }
 
 const static SAMPLE_TRACER_VTABLE InteropVTable {
+    SampleTracerGenerateThreadStateAndCallbackAdapter,
     SampleTracerTraceAdapter,
     SampleTracerFreeAdapter
 };
@@ -68,7 +100,6 @@ const static SAMPLE_TRACER_VTABLE InteropVTable {
 
 SampleTracer
 SampleTracerBase::Create(
-    _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
     _In_ std::unique_ptr<SampleTracerBase> SampleTracerBasePtr
     )
 {
@@ -80,12 +111,11 @@ SampleTracerBase::Create(
     SampleTracerBase *UnmanagedSampleTracerBasePtr = SampleTracerBasePtr.release();
     PSAMPLE_TRACER SampleTracerPtr;
 
-    ISTATUS Success = SampleTracerAllocatorAllocate(SampleTracerAllocatorRef.AsPSAMPLE_TRACER_ALLOCATOR(),
-                                                    &InteropVTable,
-                                                    &UnmanagedSampleTracerBasePtr,
-                                                    sizeof(SampleTracerBase*),
-                                                    alignof(SampleTracerBase*),
-                                                    &SampleTracerPtr);
+    ISTATUS Success = SampleTracerAllocate(&InteropVTable,
+                                           &UnmanagedSampleTracerBasePtr,
+                                           sizeof(SampleTracerBase*),
+                                           alignof(SampleTracerBase*),
+                                           &SampleTracerPtr);
 
     if (Success != ISTATUS_SUCCESS)
     {

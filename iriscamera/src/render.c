@@ -20,30 +20,35 @@ Abstract:
 
 typedef struct _CALLBACK_CONTEXT {
     PCPIXEL_SAMPLER PixelSampler;
-    PSAMPLE_TRACER SampleTracer;
+    PCSAMPLE_TRACER SampleTracer;
     PCCAMERA Camera;
     PFRAMEBUFFER Framebuffer;
     ISTATUS Status;
 } CALLBACK_CONTEXT, *PCALLBACK_CONTEXT;
 
 //
-// Static Functions
+// Private Functions
 //
 
-STATIC
-VOID
-RenderWithRandomCallback(
-    _Inout_opt_ PVOID Context,
-    _In_ PRANDOM Rng
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+IrisRenderCallback(
+    _In_opt_ PVOID ThreadState,
+    _In_ PCPIXEL_SAMPLER PixelSampler,
+    _In_ PCSAMPLE_TRACER SampleTracer,
+    _In_ PCCAMERA Camera,
+    _In_ PRANDOM Rng,
+    _In_ PFRAMEBUFFER Framebuffer
     )
 {
-    PCALLBACK_CONTEXT CallbackContext;
+    SAMPLE_RAYTRACER SampleRayTracer;
     RAY_GENERATOR RayGenerator;
     SIZE_T FramebufferColumns;
     SIZE_T FramebufferRows;
     SIZE_T PixelColumn;
-    SIZE_T PixelRow; 
-    COLOR3 PixelColor; 
+    SIZE_T PixelRow;
+    COLOR3 PixelColor;
     BOOL SamplePixel;
     BOOL SampleLens;
     FLOAT MinPixelU;
@@ -64,18 +69,19 @@ RenderWithRandomCallback(
     INT64 PixelIndex;
 #endif
 
-    ASSERT(Context != NULL);
+    ASSERT(PixelSampler != NULL);
+    ASSERT(SampleTracer != NULL);
+    ASSERT(Camera != NULL);
     ASSERT(Rng != NULL);
+    ASSERT(Framebuffer != NULL);
 
-    CallbackContext = (PCALLBACK_CONTEXT) Context;
-
-    FramebufferGetDimensions(CallbackContext->Framebuffer, 
+    FramebufferGetDimensions(Framebuffer,
                              &FramebufferRows,
                              &FramebufferColumns);
 
     NumberOfPixels = FramebufferRows * FramebufferColumns;
 
-    CameraGetParameters(CallbackContext->Camera,
+    CameraGetParameters(Camera,
                         &SamplePixel,
                         &SampleLens,
                         &MinPixelU,
@@ -87,6 +93,8 @@ RenderWithRandomCallback(
                         &MinLensV,
                         &MaxLensV);
 
+    SampleRayTracer = SamplerRayTracerCreate(SampleTracer, ThreadState, Rng);
+
 #ifdef _OPENMP
     #pragma omp for schedule(dynamic, 16)
 #endif // OPENMP
@@ -95,15 +103,15 @@ RenderWithRandomCallback(
         PixelRow = (SIZE_T) PixelIndex / FramebufferColumns;
         PixelColumn = (SIZE_T) PixelIndex % FramebufferColumns;
 
-        RayGenerator = RayGeneratorCreate(CallbackContext->Camera,
+        RayGenerator = RayGeneratorCreate(Camera,
                                           PixelRow,
                                           FramebufferRows,
                                           PixelColumn,
                                           FramebufferColumns);
-        
-        Status = PixelSamplerSamplePixel(CallbackContext->PixelSampler,
+
+        Status = PixelSamplerSamplePixel(PixelSampler,
                                          &RayGenerator,
-                                         CallbackContext->SampleTracer,
+                                         &SampleRayTracer,
                                          Rng,
                                          SamplePixel,
                                          SampleLens,
@@ -119,17 +127,45 @@ RenderWithRandomCallback(
 
         if (Status != ISTATUS_SUCCESS)
         {
-            CallbackContext->Status = Status;
-            return;
+            return Status;
         }
 
-        FramebufferSetPixel(CallbackContext->Framebuffer,
+        FramebufferSetPixel(Framebuffer,
                             PixelColor,
                             PixelRow,
                             PixelColumn);
     }
 
-    CallbackContext->Status = ISTATUS_SUCCESS;
+    return ISTATUS_SUCCESS;
+}
+
+
+//
+// Static Functions
+//
+
+STATIC
+VOID
+RenderWithRandomCallback(
+    _Inout_opt_ PVOID Context,
+    _In_ PRANDOM Rng
+    )
+{
+    PCALLBACK_CONTEXT CallbackContext;
+    ISTATUS Status;
+
+    ASSERT(Context != NULL);
+    ASSERT(Rng != NULL);
+
+    CallbackContext = (PCALLBACK_CONTEXT) Context;
+
+    Status = SampleTracerCallbackCreateAndTrace(CallbackContext->PixelSampler,
+                                                CallbackContext->SampleTracer,
+                                                CallbackContext->Camera,
+                                                Rng,
+                                                CallbackContext->Framebuffer);
+
+    CallbackContext->Status = Status;
 }
 
 _Success_(return == ISTATUS_SUCCESS)
@@ -137,49 +173,28 @@ STATIC
 ISTATUS
 IrisCameraRenderInternal(
     _In_ PCCAMERA Camera,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _Inout_ PFRAMEBUFFER Framebuffer
     )
 {
-    PSAMPLE_TRACER_ALLOCATOR SampleTracerAllocator;
     CALLBACK_CONTEXT CallbackContext;
     ISTATUS Status;
 
     ASSERT(Camera != NULL);
     ASSERT(PixelSampler != NULL);
-    ASSERT(SampleTracerGenerator != NULL);
     ASSERT(RandomGenerator != NULL);
     ASSERT(Framebuffer != NULL);
 
-    Status = SampleTracerAllocatorCreate(&SampleTracerAllocator);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        ASSERT(Status == ISTATUS_ALLOCATION_FAILED);
-        return Status;
-    }
-
-    Status = SampleTracerGeneratorGenerateSampleTracer(SampleTracerGenerator,
-                                                       SampleTracerAllocator,
-                                                       &CallbackContext.SampleTracer);
-
-    if (Status != ISTATUS_SUCCESS)
-    {
-        SampleTracerAllocatorFree(SampleTracerAllocator);
-        return Status;
-    }
-
     CallbackContext.Camera = Camera;
+    CallbackContext.SampleTracer = SampleTracer;
     CallbackContext.PixelSampler = PixelSampler;
     CallbackContext.Framebuffer = Framebuffer;
 
     Status = RandomGeneratorGenerate(RandomGenerator,
                                      RenderWithRandomCallback,
                                      &CallbackContext);
-
-    SampleTracerAllocatorFree(SampleTracerAllocator);
 
     if (Status != ISTATUS_SUCCESS)
     {
@@ -198,7 +213,7 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _In_ SIZE_T FramebufferRows,
     _In_ SIZE_T FramebufferColumns,
@@ -218,7 +233,7 @@ IrisCameraRender(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (SampleTracerGenerator == NULL)
+    if (SampleTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -254,8 +269,8 @@ IrisCameraRender(
     }
 
     Status = IrisCameraRenderInternal(Camera,
+                                      SampleTracer,
                                       PixelSampler,
-                                      SampleTracerGenerator,
                                       RandomGenerator,
                                       AllocatedFramebuffer);
 
@@ -275,7 +290,7 @@ ISTATUS
 IrisCameraRenderParallel(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _In_ SIZE_T FramebufferRows,
     _In_ SIZE_T FramebufferColumns,
@@ -295,7 +310,7 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (SampleTracerGenerator == NULL)
+    if (SampleTracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -337,8 +352,8 @@ IrisCameraRenderParallel(
 #endif // OPENMP
     {
         Status = IrisCameraRenderInternal(Camera,
+                                          SampleTracer,
                                           PixelSampler,
-                                          SampleTracerGenerator,
                                           RandomGenerator,
                                           AllocatedFramebuffer);
     }

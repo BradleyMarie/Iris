@@ -10,13 +10,13 @@ include_directories(../iris/inc
 
 add_library(iriscamera SHARED
     src/framebuffer.c
+    src/sampletracercallback.c
     src/sampletracer.c
     src/render.c
     src/pixelsampler.c
     src/camera.c
     src/raygenerator.c
-    src/sampletracergenerator.c
-    src/sampletracerallocator.c)
+    src/raytracer.c)
 
 target_link_libraries(iriscamera 
     iris

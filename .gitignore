@@ -65,6 +65,7 @@ CMakeFiles/
 CMakeScripts/
 iris.xcodeproj/
 .vscode/
+.vs/
 
 # Generated files
 *_api.h

@@ -36,7 +36,7 @@ ISTATUS
 GridPixelSamplerSamplePixel(
     _In_ PCVOID Context,
     _In_ PCRAY_GENERATOR RayGenerator,
-    _Inout_ PSAMPLE_TRACER SampleTracer,
+    _Inout_ PCSAMPLE_RAYTRACER RayTracer,
     _In_ PRANDOM Rng,
     _In_ BOOL SamplePixel,
     _In_ BOOL SampleLens,
@@ -73,7 +73,7 @@ GridPixelSamplerSamplePixel(
 
     ASSERT(Context != NULL);
     ASSERT(RayGenerator != NULL);
-    ASSERT(SampleTracer != NULL);
+    ASSERT(RayTracer != NULL);
     ASSERT(Rng != NULL);
     ASSERT(Color != NULL);
 
@@ -166,10 +166,9 @@ GridPixelSamplerSamplePixel(
                                     LensV,
                                     &WorldRay);
 
-            Status = SampleTracerTrace(SampleTracer,
-                                       WorldRay,
-                                       Rng,
-                                       &SampleColor);
+            Status = SampleRayTracerTrace(RayTracer,
+                                          WorldRay,
+                                          &SampleColor);
 
             if (Status != ISTATUS_SUCCESS)
             {

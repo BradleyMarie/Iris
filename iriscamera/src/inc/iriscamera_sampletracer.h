@@ -24,17 +24,20 @@ Abstract:
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
-SampleTracerAllocate(
-    _In_ PCSAMPLE_TRACER_VTABLE SampleTracerVTable,
-    _When_(DataSizeInBytes != 0, _In_reads_bytes_opt_(DataSizeInBytes)) PCVOID Data,
-    _In_ SIZE_T DataSizeInBytes,
-    _When_(DataSizeInBytes != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && DataSizeInBytes % _Curr_ == 0)) SIZE_T DataAlignment,
-    _Out_ PSAMPLE_TRACER *SampleTracer
+SampleTracerGenerateThreadStateAndCallback(
+    _In_ PCSAMPLE_TRACER SampleTracer,
+    _Inout_ PSAMPLE_TRACER_CALLBACK Callback
     );
 
-VOID
-SampleTracerFree(
-    _In_opt_ _Post_invalid_ PSAMPLE_TRACER SampleTracer
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+SampleTracerTrace(
+    _In_ PCSAMPLE_TRACER SampleTracer,
+    _In_opt_ PCVOID ThreadState,
+    _In_ RAY WorldRay,
+    _In_ PRANDOM Rng,
+    _Out_ PCOLOR3 Color
     );
 
 #endif // _SAMPLE_TRACER_IRIS_CAMERA_INTERNAL_

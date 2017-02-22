@@ -224,7 +224,6 @@ public:
     static
     SampleTracer
     Create(
-        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
         _In_ const TestGeometryRoutine TestGeometryFunc,
         _In_ const LightList & LightsRef,
         _In_ SIZE_T MaximumDepth,
@@ -233,16 +232,28 @@ public:
     {
         std::unique_ptr<SampleTracerBase> Ptr(
             new TestSampleTracer(TestGeometryFunc, LightsRef, MaximumDepth, Epsil));
-        return IrisCamera::SampleTracerBase::Create(SampleTracerAllocatorRef, std::move(Ptr));
+        return IrisCamera::SampleTracerBase::Create(std::move(Ptr));
+    }
+
+    void
+    GenerateThreadStateAndCallback(
+        _In_ std::function<void(PVOID)> Callback
+        )
+    {
+        IrisPhysx::Integrator PhysxIntegrator(Integrator::Create(Depth));
+        Callback(&PhysxIntegrator);
     }
 
     IrisAdvanced::Color3
     Trace(
+        _In_opt_ PVOID ThreadState,
         _In_ const Iris::Ray & WorldRay,
         _In_ IrisAdvanced::Random Rng
         )
     {
+        IrisPhysx::Integrator * PhysxIntegrator = static_cast<IrisPhysx::Integrator *>(ThreadState);
         IrisAdvanced::Color3 Result = Color3::CreateBlack();
+
         IntegrateRoutine IntegrateFunc = [&](const Iris::Ray & WorldRay, IrisPhysx::RayTracer Rt) {
             ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
                                                    UINT32 FaceHit,
@@ -312,12 +323,12 @@ public:
             Result = PhongToRGB(ResultSpectrum);
         };
 
-        PhysxIntegrator.Integrate(TestGeometryFunction,
-                                  IntegrateFunc,
-                                  Lights.AsLightListReference(),
-                                  Epsilon,
-                                  WorldRay,
-                                  Rng);
+        PhysxIntegrator->Integrate(TestGeometryFunction,
+                                   IntegrateFunc,
+                                   Lights.AsLightListReference(),
+                                   Epsilon,
+                                   WorldRay,
+                                   Rng);
 
         return Result;
     }
@@ -332,56 +343,13 @@ private:
     : TestGeometryFunction(TestGeometryFunc), 
       Lights(LightsRef),
       Epsilon(Epsil),
-      PhysxIntegrator(Integrator::Create(MaximumDepth))
-    { }
-
-    const TestGeometryRoutine TestGeometryFunction;
-    const LightList & Lights;
-    const FLOAT Epsilon;
-    IrisPhysx::Integrator PhysxIntegrator;
-};
-
-class TestSampleTracerGenerator : public IrisCamera::SampleTracerGeneratorBase {
-public:
-    static
-    SampleTracerGenerator
-    Create(
-        _In_ const TestGeometryRoutine TestGeometryFunc,
-        _In_ const LightList & LightsRef,
-        _In_ SIZE_T MaximumDepth,
-        _In_ FLOAT Epsil
-        )
-    {
-        std::unique_ptr<SampleTracerGeneratorBase> Ptr(
-            new TestSampleTracerGenerator(TestGeometryFunc, LightsRef, MaximumDepth, Epsil));
-        return IrisCamera::SampleTracerGeneratorBase::Create(std::move(Ptr));
-    }
-
-    SampleTracer
-    Generate(
-        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef
-        ) const
-    {
-        return TestSampleTracer::Create(SampleTracerAllocatorRef, TestGeometryFunction, Lights, Depth, Epsilon);
-    }
-
-private:
-    TestSampleTracerGenerator(
-        _In_ const TestGeometryRoutine TestGeometryFunc,
-        _In_ const LightList & LightsRef,
-        _In_ SIZE_T MaximumDepth,
-        _In_ FLOAT Epsil
-        )
-    : TestGeometryFunction(TestGeometryFunc), 
-      Lights(LightsRef),
-      Epsilon(Epsil),
       Depth(MaximumDepth)
     { }
 
     const TestGeometryRoutine TestGeometryFunction;
     const LightList & Lights;
     const FLOAT Epsilon;
-    SIZE_T Depth;
+    const SIZE_T Depth;
 };
 
 TEST(PhysxRenderConstantRedWorldSphere)
@@ -411,16 +379,16 @@ TEST(PhysxRenderConstantRedWorldSphere)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -455,16 +423,16 @@ TEST(PhysxRenderConstantRedModelSphere)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -499,16 +467,16 @@ TEST(PhysxRenderConstantRedPremultipliedSphere)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -557,16 +525,16 @@ TEST(PhysxRenderPerfectSpecularSphere)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -603,16 +571,16 @@ TEST(PhysxRenderConstantRedWorldTriangle)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -659,16 +627,16 @@ TEST(PhysxRenderInterpolatedWorldTriangle)
 
     LightList Lights = LightList::Create();
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
                                                 Sampler,
-                                                Generator,
+                                                Tracer,
                                                 RngGenerator,
                                                 500,
                                                 500);
@@ -706,16 +674,16 @@ TEST(PhysxRenderPhongWorldSphere)
 
     PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::Render(PinholeCam,
                                         Sampler,
-                                        Generator,
+                                        Tracer,
                                         RngGenerator,
                                         500,
                                         500);
@@ -796,16 +764,16 @@ TEST(PhysxRenderMirrorPhongCheckerboardSpheres)
 
     PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.0001f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
                                                 Sampler,
-                                                Generator,
+                                                Tracer,
                                                 RngGenerator,
                                                 500,
                                                 500);
@@ -1054,16 +1022,16 @@ TEST(PhysxRenderCornellBox)
 
     PixelSampler Sampler = GridPixelSampler::Create(1, 1, false);
 
-    SampleTracerGenerator Generator = TestSampleTracerGenerator::Create(Scene.GetTestRoutine(),
-                                                                        Lights,
-                                                                        5,
-                                                                        0.01f);
+    SampleTracer Tracer = TestSampleTracer::Create(Scene.GetTestRoutine(),
+                                                   Lights,
+                                                   5,
+                                                   0.0001f);
 
     RandomGenerator RngGenerator = MultiplyWithCarryGenerator::Create();
 
     Framebuffer Fb = IrisCamera::RenderParallel(PinholeCam,
                                                 Sampler,
-                                                Generator,
+                                                Tracer,
                                                 RngGenerator,
                                                 500,
                                                 500);

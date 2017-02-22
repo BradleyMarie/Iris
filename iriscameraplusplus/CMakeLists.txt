@@ -11,8 +11,7 @@ include_directories(../iris/inc
     ../iriscommon)
 
 add_library(iriscameraplusplus SHARED
-    src/sampletracerbase.cpp
-    src/sampletracergeneratorbase.cpp)
+    src/sampletracerbase.cpp)
 
 target_link_libraries(iriscameraplusplus 
     iris

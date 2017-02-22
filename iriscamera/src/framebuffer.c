@@ -66,7 +66,6 @@ FramebufferAllocate(
     SIZE_T ArrayLength;
     PVOID DataAllocation;
     PVOID HeaderAllocation;
-    SIZE_T Index;
     ISTATUS Status;
     
     ASSERT(Rows != 0);

@@ -30,7 +30,7 @@ Framebuffer
 Render(
     _In_ Camera CameraRef,
     _In_ PixelSampler PixelSamplerRef,
-    _In_ SampleTracerGenerator SampleTracerGeneratorRef,
+    _In_ SampleTracer SampleTracerRef,
     _Inout_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
     _In_ SIZE_T FramebufferRows,
     _In_ SIZE_T FramebufferColumns
@@ -40,7 +40,7 @@ Render(
 
     ISTATUS Status = IrisCameraRender(CameraRef.AsPCCAMERA(),
                                       PixelSamplerRef.AsPCPIXEL_SAMPLER(),
-                                      SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
+                                      SampleTracerRef.AsPCSAMPLE_TRACER(),
                                       RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
                                       FramebufferRows,
                                       FramebufferColumns,
@@ -60,7 +60,7 @@ Framebuffer
 RenderParallel(
     _In_ Camera CameraRef,
     _In_ PixelSampler PixelSamplerRef,
-    _In_ SampleTracerGenerator SampleTracerGeneratorRef,
+    _In_ SampleTracer SampleTracerRef,
     _In_ IrisAdvanced::RandomGenerator RandomGeneratorRef,
     _In_ SIZE_T FramebufferRows,
     _In_ SIZE_T FramebufferColumns
@@ -70,7 +70,7 @@ RenderParallel(
 
     ISTATUS Status = IrisCameraRenderParallel(CameraRef.AsPCCAMERA(),
                                               PixelSamplerRef.AsPCPIXEL_SAMPLER(),
-                                              SampleTracerGeneratorRef.AsPCSAMPLE_TRACER_GENERATOR(),
+                                              SampleTracerRef.AsPCSAMPLE_TRACER(),
                                               RandomGeneratorRef.AsPCRANDOM_GENERATOR(),
                                               FramebufferRows,
                                               FramebufferColumns,

@@ -27,7 +27,7 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PCRANDOM_GENERATOR RngGenerator,
     _In_ SIZE_T FrameBufferRows,
     _In_ SIZE_T FrameBufferColumns,
@@ -40,7 +40,7 @@ ISTATUS
 IrisCameraRenderParallel(
     _In_ PCCAMERA Camera,
     _In_ PCPIXEL_SAMPLER PixelSampler,
-    _In_ PCSAMPLE_TRACER_GENERATOR SampleTracerGenerator,
+    _In_ PCSAMPLE_TRACER SampleTracer,
     _In_ PCRANDOM_GENERATOR RandomGenerator,
     _In_ SIZE_T FrameBufferRows,
     _In_ SIZE_T FrameBufferColumns,

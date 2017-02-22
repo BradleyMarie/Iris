@@ -49,7 +49,6 @@ extern "C" {
 // Include IrisPhysx++ Headers
 //
 
-#include "irisphysxtoolkitplusplus_api.h"
 #include "irisphysxtoolkitplusplus_sphere.h"
 #include "irisphysxtoolkitplusplus_triangle.h"
 #include "irisphysxtoolkitplusplus_infiniteplane.h"

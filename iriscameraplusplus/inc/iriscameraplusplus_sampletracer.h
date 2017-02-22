@@ -27,7 +27,7 @@ namespace IrisCamera {
 class SampleTracer final {
 public:
     SampleTracer(
-        _In_ PSAMPLE_TRACER SampleTracerPtr
+        _In_ PCSAMPLE_TRACER SampleTracerPtr
         )
     : Data(SampleTracerPtr)
     { 
@@ -38,8 +38,8 @@ public:
     }
 
     _Ret_
-    PSAMPLE_TRACER
-    AsPSAMPLE_TRACER(
+    PCSAMPLE_TRACER
+    AsPCSAMPLE_TRACER(
         void
         )
     {
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    PSAMPLE_TRACER Data;
+    PCSAMPLE_TRACER Data;
 };
 
 } // namespace IrisCamera

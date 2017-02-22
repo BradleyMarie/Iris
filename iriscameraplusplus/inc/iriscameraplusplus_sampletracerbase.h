@@ -30,7 +30,6 @@ protected:
     static
     SampleTracer
     Create(
-        _Inout_ SampleTracerAllocator SampleTracerAllocatorRef,
         _In_ std::unique_ptr<SampleTracerBase> SampleTracerBasePtr
         );
 
@@ -40,8 +39,15 @@ public:
         ) = default;
 
     virtual
+    void
+    GenerateThreadStateAndCallback(
+        _In_ std::function<void(PVOID)> Callback
+        ) = 0;
+
+    virtual
     IrisAdvanced::Color3
     Trace(
+        _In_opt_ PVOID ThreadState,
         _In_ const Iris::Ray & WorldRay,
         _In_ IrisAdvanced::Random Rng
         ) = 0;

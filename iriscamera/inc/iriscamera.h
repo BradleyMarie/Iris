@@ -21,10 +21,10 @@ Abstract:
 #include "iriscamera_framebuffer.h"
 #include "iriscamera_camera.h"
 #include "iriscamera_raygenerator.h"
+#include "iriscamera_raytracer.h"
+#include "iriscamera_sampletracercallback.h"
 #include "iriscamera_sampletracer.h"
 #include "iriscamera_pixelsampler.h"
-#include "iriscamera_sampletracerallocator.h"
-#include "iriscamera_sampletracergenerator.h"
 #include "iriscamera_render.h"
 
 #endif // _IRIS_CAMERA_HEADER_
