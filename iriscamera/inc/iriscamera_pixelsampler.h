@@ -27,6 +27,7 @@ ISTATUS
 (*PPIXEL_SAMPLER_SAMPLE_PIXEL)(
     _In_ PCVOID Context,
     _In_ PCRAY_GENERATOR RayGenerator,
+    _In_ PCSAMPLE_RAYTRACER RayTracer,
     _In_ PRANDOM Rng,
     _In_ BOOL SamplePixel,
     _In_ BOOL SampleLens,
