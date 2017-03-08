@@ -237,11 +237,28 @@ public:
 
     void
     GenerateThreadStateAndCallback(
-        _In_ std::function<void(PVOID)> Callback
+        _In_ std::function<void(PVOID)> Callback,
+        _In_ IrisAdvanced::Random Rng
         )
     {
-        IrisPhysx::Integrator PhysxIntegrator(Integrator::Create(Depth));
-        Callback(&PhysxIntegrator);
+        IrisSpectrum::SpectrumCompositor SpecCompositor = IrisSpectrum::SpectrumCompositor::Create();
+        IrisSpectrum::ReflectorCompositor RefCompositor = IrisSpectrum::ReflectorCompositor::Create();
+        
+        RayTracerCallback LifetimeCallback = [&](IrisPhysx::RayTracer Rt, IrisSpectrum::SpectrumCompositorReference SpecComp) {
+            Callback(&Rt);
+        };
+
+        PSPECTRUM_COMPOSITOR_REFERENCE SpecCompRef = SpectrumCompositorGetSpectrumCompositorReference(SpecCompositor.AsPSPECTRUM_COMPOSITOR());
+        PREFLECTOR_COMPOSITOR_REFERENCE RefCompRef = ReflectorCompositorGetReflectorCompositorReference(RefCompositor.AsPREFLECTOR_COMPOSITOR());
+
+        IrisPhysx::RayTracer::Create(TestGeometryFunction,
+                                     LifetimeCallback,
+                                     IrisSpectrum::SpectrumCompositorReference(SpecCompRef),
+                                     IrisSpectrum::ReflectorCompositorReference(RefCompRef),
+                                     Lights.AsLightListReference(),
+                                     Rng,
+                                     Depth,
+                                     Epsilon);
     }
 
     IrisAdvanced::Color3
@@ -251,86 +268,73 @@ public:
         _In_ IrisAdvanced::Random Rng
         )
     {
-        IrisPhysx::Integrator * PhysxIntegrator = static_cast<IrisPhysx::Integrator *>(ThreadState);
-        IrisAdvanced::Color3 Result = Color3::CreateBlack();
+        IrisPhysx::RayTracer * Rt = static_cast<IrisPhysx::RayTracer *>(ThreadState);
 
-        IntegrateRoutine IntegrateFunc = [&](const Iris::Ray & WorldRay, IrisPhysx::RayTracer Rt) {
-            ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
-                                                   UINT32 FaceHit,
-                                                   Iris::MatrixReference ModelToWorld,
-                                                   PCVOID AdditionalData,
-                                                   const Iris::Vector & ModelViewer,
-                                                   const Iris::Point & ModelHitPoint,
-                                                   const Iris::Point & WorldHitPoint,
-                                                   const Iris::Ray & WorldRay,
-                                                   std::optional<LightListReference> Lights,
-                                                   std::optional<IrisPhysx::RayTracer> RayTracerPtr,
-                                                   VisibilityTester Tester,
-                                                   BRDFAllocator Allocator,
-                                                   IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
-                                                   IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
-                                                   IrisAdvanced::Random Rng) -> SpectrumReference
+        ProcessHitRoutine ProcessHitFunc = [&](GeometryReference Geom,
+                                                UINT32 FaceHit,
+                                                Iris::MatrixReference ModelToWorld,
+                                                PCVOID AdditionalData,
+                                                const Iris::Vector & ModelViewer,
+                                                const Iris::Point & ModelHitPoint,
+                                                const Iris::Point & WorldHitPoint,
+                                                const Iris::Ray & WorldRay,
+                                                std::optional<LightListReference> Lights,
+                                                std::optional<IrisPhysx::RayTracer> RayTracerPtr,
+                                                VisibilityTester Tester,
+                                                BRDFAllocator Allocator,
+                                                IrisSpectrum::SpectrumCompositorReference SpectrumCompositor,
+                                                IrisSpectrum::ReflectorCompositorReference ReflectorCompositor,
+                                                IrisAdvanced::Random Rng) -> SpectrumReference
+        {
+            Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
+            Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
+
+            SpectrumReference ReflectedLight(nullptr);
+
+            auto OptionalLight = Geom.GetLight(FaceHit);
+
+            if (OptionalLight)
             {
-                Vector ModelSurfaceNormal = Geom.ComputeNormal(ModelHitPoint, FaceHit);
-                Vector WorldSurfaceNormal = Vector::InverseTransposedMultiply(ModelToWorld, ModelSurfaceNormal);
+                ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
+            }
 
-                SpectrumReference ReflectedLight(nullptr);
+            auto OptionalMaterial = Geom.GetMaterial(FaceHit);
 
-                auto OptionalLight = Geom.GetLight(FaceHit);
-
-                if (OptionalLight)
-                {
-                    ReflectedLight = OptionalLight->ComputeEmissive(WorldRay, Tester, SpectrumCompositor);
-                }
-
-                auto OptionalMaterial = Geom.GetMaterial(FaceHit);
-
-                if (!OptionalMaterial)
-                {
-                    return ReflectedLight;
-                }
-
-                MaterialReference Mat = *OptionalMaterial;
-                BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
-                
-                for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
-                {
-                    LightReference Light = Lights->Get(Index);
-                    
-                    auto Result = Light.Sample(WorldHitPoint,
-                                               Tester,
-                                               Rng,
-                                               SpectrumCompositor);
-                    
-                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
-                }
-                
-                auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
-                
-                if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
-                {
-                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
-                }
-                else
-                {
-                    ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
-                }
-                
+            if (!OptionalMaterial)
+            {
                 return ReflectedLight;
-            };
-            
-            SpectrumReference ResultSpectrum = Rt.TraceClosestHit(WorldRay, ProcessHitFunc);
-            Result = PhongToRGB(ResultSpectrum);
+            }
+
+            MaterialReference Mat = *OptionalMaterial;
+            BRDFReference Brdf = std::get<0>(Mat.Sample(ModelHitPoint, ModelSurfaceNormal, WorldSurfaceNormal, AdditionalData, ModelToWorld, Allocator));
+                
+            for (SIZE_T Index = 0; Index < Lights->Size(); Index++)
+            {
+                LightReference Light = Lights->Get(Index);
+                    
+                auto Result = Light.Sample(WorldHitPoint,
+                                            Tester,
+                                            Rng,
+                                            SpectrumCompositor);
+                    
+                ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(std::get<0>(Result), Brdf.ComputeReflectance(WorldRay.Direction(), WorldSurfaceNormal, std::get<1>(Result), ReflectorCompositor)));
+            }
+                
+            auto Ref = Brdf.Sample(WorldRay.Direction(), WorldSurfaceNormal, Rng, ReflectorCompositor);
+                
+            if (std::get<2>(Ref) > 0.0 && RayTracerPtr)
+            {
+                ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(RayTracerPtr->TraceClosestHit(Ray(WorldHitPoint, std::get<1>(Ref)), ProcessHitFunc), std::get<0>(Ref)));
+            }
+            else
+            {
+                ReflectedLight = SpectrumCompositor.Add(ReflectedLight, SpectrumCompositor.Reflect(SpectrumReference(nullptr), std::get<0>(Ref)));
+            }
+                
+            return ReflectedLight;
         };
 
-        PhysxIntegrator->Integrate(TestGeometryFunction,
-                                   IntegrateFunc,
-                                   Lights.AsLightListReference(),
-                                   Epsilon,
-                                   WorldRay,
-                                   Rng);
-
-        return Result;
+        return PhongToRGB(Rt->TraceClosestHit(WorldRay, ProcessHitFunc));
     }
 
 private:

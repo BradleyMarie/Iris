@@ -26,10 +26,12 @@ static
 ISTATUS
 SampleTracerGenerateThreadStateAndCallbackAdapter(
     _In_ PCVOID Context,
+    _In_ PRANDOM RngPtr,
     _In_ PCSAMPLE_TRACER_CALLBACK Callback
     )
 {
     ASSERT(Context != NULL);
+    ASSERT(RngPtr != NULL);
     ASSERT(Callback != NULL);
 
     SampleTracerBase **SampleTracerBasePtr = (SampleTracerBase**) Context;
@@ -43,7 +45,9 @@ SampleTracerGenerateThreadStateAndCallbackAdapter(
         }
     };
 
-    (*SampleTracerBasePtr)->GenerateThreadStateAndCallback(Func);
+    IrisAdvanced::Random Rng(RngPtr);
+
+    (*SampleTracerBasePtr)->GenerateThreadStateAndCallback(Func, Rng);
 
     return ISTATUS_SUCCESS;
 }

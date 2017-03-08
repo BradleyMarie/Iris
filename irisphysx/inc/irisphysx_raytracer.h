@@ -27,6 +27,26 @@ typedef CONST PHYSX_RAYTRACER *PCPHYSX_RAYTRACER;
 typedef
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE)(
+    _In_opt_ PCVOID Context,
+    _Inout_ PPHYSX_HIT_TESTER HitTester,
+    _In_ RAY Ray
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+ISTATUS
+(*PPHYSX_RAYTRACER_LIFETIME_CALLBACK_ROUTINE)(
+    _Inout_opt_ PVOID Context,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
+    _Inout_ PPHYSX_RAYTRACER RayTracer
+    );
+
+typedef
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PPHYSX_RAYTRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ PVOID Context, 
@@ -51,6 +71,23 @@ ISTATUS
 //
 // Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+PhysxRayTracerAllocate(
+    _In_ PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
+    _In_ PPHYSX_RAYTRACER_LIFETIME_CALLBACK_ROUTINE Callback,
+    _Inout_opt_ PVOID CallbackContext,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
+    _Inout_ PRANDOM Rng,
+    _In_ SIZE_T MaximumDepth,
+    _In_ FLOAT Epsilon
+    );
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)

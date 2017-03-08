@@ -16,7 +16,6 @@ add_library(irisphysxplusplus SHARED
     src/arealightbuilder.cpp
     src/lightedgeometrybase.cpp
     src/raytracer.cpp
-    src/integrator.cpp
     src/materialbase.cpp
     src/lightbase.cpp
     src/brdfbase.cpp)

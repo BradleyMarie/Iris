@@ -19,7 +19,6 @@ add_library(irisphysx SHARED
     src/hittester.c
     src/visibilitytester.c
     src/raytracer.c
-    src/integrator.c
     src/arealightbuilder.c
     src/arealightadapter.c
     src/lightedgeometryadapter.c

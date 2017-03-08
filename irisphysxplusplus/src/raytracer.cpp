@@ -94,9 +94,86 @@ ProcessHitAdapter(
     return ISTATUS_SUCCESS;
 }
 
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS
+TestGeometryAdapter(
+    _In_opt_ PCVOID Context,
+    _Inout_ PPHYSX_HIT_TESTER HitTesterPtr,
+    _In_ RAY Ray
+    )
+{
+    assert(Context != nullptr);
+    assert(HitTesterPtr != nullptr);
+    assert(RayValidate(Ray) != FALSE);
+
+    auto TestGeometryFunction = static_cast<const TestGeometryRoutine *>(Context);
+
+    (*TestGeometryFunction)(Iris::Ray(Ray), HitTester(HitTesterPtr));
+
+    return ISTATUS_SUCCESS;
+}
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+static
+ISTATUS
+LifetimeCallbackAdapter(
+    _Inout_opt_ PVOID Context,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositorPtr,
+    _Inout_ PPHYSX_RAYTRACER RayTracerPtr
+    )
+{
+    assert(Context != nullptr);
+    assert(SpectrumCompositorPtr != nullptr);
+    assert(RayTracerPtr != nullptr);
+
+    auto LifetimeCallback = static_cast<RayTracerCallback *>(Context);
+
+    (*LifetimeCallback)(RayTracer(RayTracerPtr),
+                        IrisSpectrum::SpectrumCompositorReference(SpectrumCompositorPtr));
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Functions
 //
+
+void
+RayTracer::Create(
+    _In_ const TestGeometryRoutine TestGeometryFunction,
+    _In_ RayTracerCallback LifetimeCallback,
+    _In_ IrisSpectrum::SpectrumCompositorReference SpectrumCompositorRef,
+    _In_ IrisSpectrum::ReflectorCompositorReference ReflectorCompositorRef,
+    _In_ LightListReference Lights,
+    _Inout_ IrisAdvanced::Random Rng,
+    _In_ SIZE_T MaximumDepth,
+    _In_ FLOAT Epsilon
+    )
+{
+    ISTATUS Status = PhysxRayTracerAllocate(TestGeometryAdapter,
+                                            &TestGeometryFunction,
+                                            LifetimeCallbackAdapter,
+                                            &LifetimeCallback,
+                                            SpectrumCompositorRef.AsPSPECTRUM_COMPOSITOR_REFERENCE(),
+                                            ReflectorCompositorRef.AsPREFLECTOR_COMPOSITOR_REFERENCE(),
+                                            Lights.AsPCPHYSX_LIGHT_LIST(),
+                                            Rng.AsPRANDOM(),
+                                            MaximumDepth,
+                                            Epsilon);
+
+    switch (Status)
+    {
+        case ISTATUS_SUCCESS:
+            break;
+        case ISTATUS_ALLOCATION_FAILED:
+            throw std::bad_alloc();
+        default:
+            throw std::runtime_error(Iris::ISTATUSToCString(Status));
+    }
+}
 
 IrisSpectrum::SpectrumReference
 RayTracer::TraceClosestHit(

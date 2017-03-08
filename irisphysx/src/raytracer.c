@@ -23,7 +23,7 @@ typedef struct _PHYSX_RAYTRACER_SHARED_CONTEXT {
     PPHYSX_BRDF_ALLOCATOR BrdfAllocator;
     PSPECTRUM_COMPOSITOR SpectrumCompositor;
     PREFLECTOR_COMPOSITOR ReflectorCompositor;
-    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
     PCPHYSX_LIGHT_LIST LightList;
     PRANDOM Rng;
@@ -37,7 +37,7 @@ struct _PHYSX_RAYTRACER {
 };
 
 typedef struct _PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT {
-    PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
+    PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine;
     PCVOID TestGeometryRoutineContext;
 } PHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT, *PPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT;
 
@@ -60,7 +60,7 @@ SFORCEINLINE
 VOID
 PhysxRayTracerTestGeometryContextInitialize(
     _Out_ PPHYSX_RAYTRACER_TEST_GEOMETRY_CONTEXT Context,
-    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_ PCVOID TestGeometryRoutineContext
     )
 {
@@ -271,7 +271,7 @@ SFORCEINLINE
 VOID
 PhysxRayTracerSharedContextSet(
     _Inout_ PPHYSX_RAYTRACER_SHARED_CONTEXT Context,
-    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_opt_ PCVOID TestGeometryRoutineContext,
     _In_opt_ PCPHYSX_LIGHT_LIST LightList,
     _In_ PRANDOM Rng,
@@ -386,53 +386,7 @@ PhysxRayTracerAllocateInternal(
     return ISTATUS_SUCCESS;
 }
 
-//
-// Internal Functions
-//
-
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
-ISTATUS
-PhysxRayTracerAllocate(
-    _In_ SIZE_T MaximumDepth,
-    _Out_ PPHYSX_RAYTRACER *RayTracer
-    )
-{
-    ISTATUS Status;
-    
-    ASSERT(RayTracer != NULL);
-    
-    Status = PhysxRayTracerAllocateInternal(MaximumDepth,
-                                            NULL,
-                                            RayTracer);
-
-    return Status;
-}
-
-VOID
-PhysxRayTracerConfigure(
-    _Inout_ PPHYSX_RAYTRACER RayTracer,
-    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
-    _In_opt_ PCVOID TestGeometryRoutineContext,
-    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
-    _In_ PRANDOM Rng,
-    _In_ FLOAT Epsilon
-    )
-{
-    ASSERT(RayTracer != NULL);
-    ASSERT(TestGeometryRoutine != NULL);
-    ASSERT(Rng != NULL);
-    ASSERT(IsFiniteFloat(Epsilon));
-    ASSERT(IsGreaterThanOrEqualToZeroFloat(Epsilon));
-
-    PhysxRayTracerSharedContextSet(RayTracer->SharedContext,
-                                   TestGeometryRoutine,
-                                   TestGeometryRoutineContext,
-                                   LightList,
-                                   Rng,
-                                   Epsilon);
-}
-
+STATIC
 VOID
 PhysxRayTracerFree(
     _In_opt_ _Post_invalid_ PPHYSX_RAYTRACER RayTracer
@@ -459,6 +413,81 @@ PhysxRayTracerFree(
 //
 // Public Functions
 //
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+IRISPHYSXAPI
+ISTATUS
+PhysxRayTracerAllocate(
+    _In_ PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_opt_ PCVOID TestGeometryRoutineContext,
+    _In_ PPHYSX_RAYTRACER_LIFETIME_CALLBACK_ROUTINE Callback,
+    _Inout_opt_ PVOID CallbackContext,
+    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE SpectrumCompositor,
+    _Inout_ PREFLECTOR_COMPOSITOR_REFERENCE ReflectorCompositor,
+    _In_opt_ PCPHYSX_LIGHT_LIST LightList,
+    _Inout_ PRANDOM Rng,
+    _In_ SIZE_T MaximumDepth,
+    _In_ FLOAT Epsilon
+    )
+{
+    PPHYSX_RAYTRACER RayTracer;
+    ISTATUS Status;
+
+    if (TestGeometryRoutine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (Callback == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (SpectrumCompositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (ReflectorCompositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (Rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (IsLessThanZeroFloat(Epsilon))
+    {
+        return ISTATUS_INVALID_ARGUMENT_09;
+    }
+
+    Status = PhysxRayTracerAllocateInternal(MaximumDepth,
+                                            NULL,
+                                            &RayTracer);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    PhysxRayTracerSharedContextSet(RayTracer->SharedContext,
+                                   TestGeometryRoutine,
+                                   TestGeometryRoutineContext,
+                                   LightList,
+                                   Rng,
+                                   Epsilon);
+
+    Status = Callback(CallbackContext, 
+                      SpectrumCompositor,
+                      RayTracer);
+
+    PhysxRayTracerFree(RayTracer);
+
+    return Status;
+}
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)

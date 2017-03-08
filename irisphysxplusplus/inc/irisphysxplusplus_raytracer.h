@@ -30,6 +30,8 @@ class RayTracer;
 // Types
 //
 
+typedef std::function<void(const Iris::Ray &, HitTester)> TestGeometryRoutine;
+typedef std::function<void(RayTracer, IrisSpectrum::SpectrumCompositorReference)> RayTracerCallback;
 typedef std::function<IrisSpectrum::SpectrumReference(GeometryReference,
                                                       UINT32,
                                                       Iris::MatrixReference,
@@ -58,7 +60,7 @@ public:
             throw std::invalid_argument("RayTracerPtr");
         }
     }
-    
+
     _Ret_
     PPHYSX_RAYTRACER
     AsPPHYSX_RAYTRACER(
@@ -67,6 +69,20 @@ public:
     {
         return Data;
     }
+
+    IRISPHYSXPLUSPLUSAPI
+    static
+    void
+    Create(
+        _In_ const TestGeometryRoutine TestGeometryFunction,
+        _In_ RayTracerCallback LifetimeCallback,
+        _In_ IrisSpectrum::SpectrumCompositorReference SpectrumCompositorRef,
+        _In_ IrisSpectrum::ReflectorCompositorReference ReflectorCompositorRef,
+        _In_ LightListReference Lights,
+        _Inout_ IrisAdvanced::Random Rng,
+        _In_ SIZE_T MaximumDepth,
+        _In_ FLOAT Epsilon
+        );
 
     IRISPHYSXPLUSPLUSAPI
     IrisSpectrum::SpectrumReference

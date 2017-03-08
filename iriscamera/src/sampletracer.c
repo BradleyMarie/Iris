@@ -33,6 +33,7 @@ _Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 SampleTracerGenerateThreadStateAndCallback(
     _In_ PCSAMPLE_TRACER SampleTracer,
+    _In_ PRANDOM Rng,
     _Inout_ PSAMPLE_TRACER_CALLBACK Callback
     )
 {
@@ -42,6 +43,7 @@ SampleTracerGenerateThreadStateAndCallback(
     ASSERT(Callback != NULL);
 
     Status = SampleTracer->VTable->GenerateThreadStateAndCallbackRoutine(SampleTracer->Data, 
+                                                                         Rng,
                                                                          Callback);
 
     return Status;

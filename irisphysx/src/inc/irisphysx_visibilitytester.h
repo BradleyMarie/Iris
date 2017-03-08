@@ -32,7 +32,7 @@ PhysxVisibilityTesterAllocate(
 VOID
 PhysxVisibilityTesterSetSceneAndEpsilon(
     _Inout_ PPHYSX_VISIBILITY_TESTER VisibilityTester,
-    _In_ PPHYSX_INTEGRATOR_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
+    _In_ PPHYSX_RAYTRACER_TEST_GEOMETRY_ROUTINE TestGeometryRoutine,
     _In_ PCVOID TestGeometryRoutineContext,
     _In_ FLOAT Epsilon
     );

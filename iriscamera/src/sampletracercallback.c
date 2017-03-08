@@ -88,6 +88,7 @@ SampleTracerCallbackCreateAndTrace(
                                                      Framebuffer);
 
     Status = SampleTracerGenerateThreadStateAndCallback(SampleTracer,
+                                                        Rng,
                                                         &ThreadStateCallback);
 
     if (Status != ISTATUS_SUCCESS)

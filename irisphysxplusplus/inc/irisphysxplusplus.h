@@ -75,6 +75,5 @@ extern "C" {
 #include "irisphysxplusplus_arealightbase.h"
 #include "irisphysxplusplus_hittester.h"
 #include "irisphysxplusplus_raytracer.h"
-#include "irisphysxplusplus_integrator.h"
 
 #endif // _IRIS_PHYSX_PLUS_PLUS_HEADER_

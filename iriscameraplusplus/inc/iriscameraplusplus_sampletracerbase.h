@@ -41,7 +41,8 @@ public:
     virtual
     void
     GenerateThreadStateAndCallback(
-        _In_ std::function<void(PVOID)> Callback
+        _In_ std::function<void(PVOID)> Callback,
+        _In_ IrisAdvanced::Random Rng
         ) = 0;
 
     virtual
