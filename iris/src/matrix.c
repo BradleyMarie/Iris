@@ -400,7 +400,7 @@ MatrixAllocateRotationFromVector(
 
     M10 = NormalizedAxis.Y * NormalizedAxis.X * Ic + NormalizedAxis.Z * Sin;
     M11 = NormalizedAxis.Y * NormalizedAxis.Y * Ic + Cos;
-    M12 = NormalizedAxis.Y * NormalizedAxis.X * Ic - NormalizedAxis.X * Sin;
+    M12 = NormalizedAxis.Y * NormalizedAxis.Z * Ic - NormalizedAxis.X * Sin;
     
     M20 = NormalizedAxis.Z * NormalizedAxis.X * Ic - NormalizedAxis.Y * Sin;
     M21 = NormalizedAxis.Z * NormalizedAxis.Y * Ic + NormalizedAxis.X * Sin;
