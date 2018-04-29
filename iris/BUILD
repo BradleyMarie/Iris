@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "matrix",
     hdrs = ["matrix.h"],
@@ -46,6 +48,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "point_test",
+    srcs = ["point_test.cc"],
+    deps = [
+        ":point",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "sal",
     hdrs = ["sal.h"],
@@ -62,4 +74,7 @@ cc_library(
 cc_library(
     name = "vector",
     hdrs = ["vector.h"],
+    deps = [
+        ":sal",
+    ],
 )

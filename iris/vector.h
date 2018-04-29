@@ -15,11 +15,18 @@ Abstract:
 #ifndef _IRIS_VECTOR_
 #define _IRIS_VECTOR_
 
+#include "iris/sal.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#if __cplusplus 
+#include <math.h>
+#else
 #include <tgmath.h>
+#endif // __cplusplus
 
 //
 // Types
