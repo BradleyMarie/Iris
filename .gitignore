@@ -17,6 +17,20 @@
 # Symbols
 *.pdb
 
+# Build artifacts
+bazel-bin/
+bazel-genfiles/
+bazel-Iris/
+bazel-out/
+bazel-testlogs/
+
+# Build artifacts as files
+bazel-bin
+bazel-genfiles
+bazel-Iris
+bazel-out
+bazel-testlogs
+
 # Executables
 bin/
 *.exe
