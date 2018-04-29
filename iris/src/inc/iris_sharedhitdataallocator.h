@@ -73,21 +73,6 @@ SharedHitDataAllocatorAllocate(
 
 SFORCEINLINE
 VOID
-SharedHitDataAllocatorFreeLastAllocation(
-    _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
-    )
-{
-    PSTATIC_MEMORY_ALLOCATOR SharedHitDataAllocator;
-
-    ASSERT(Allocator != NULL);
-
-    SharedHitDataAllocator = &Allocator->SharedHitDataAllocator;
-
-    StaticMemoryAllocatorFreeLastAllocation(SharedHitDataAllocator);
-}
-
-SFORCEINLINE
-VOID
 SharedHitDataAllocatorFreeAll(
     _Inout_ PSHARED_HIT_DATA_ALLOCATOR Allocator
     )

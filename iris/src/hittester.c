@@ -74,17 +74,6 @@ HitTesterTestGeometry(
     HitAllocator = &HitTester->HitAllocator;
     PointerList = &HitTester->HitList;
 
-    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
-
-    if (SharedHitData == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    SharedHitData->ModelToWorld = NULL;
-    SharedHitData->Premultiplied = TRUE;
-    SharedHitData->ModelRay = HitTester->CurrentRay;
-
     Status = TestGeometryRoutine(Data,
                                  HitTester->CurrentRay,
                                  HitAllocator,
@@ -97,10 +86,17 @@ HitTesterTestGeometry(
 
     if (HitList == NULL)
     {
-        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
-        SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
+
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = NULL;
 
     while (HitList != NULL)
     {
@@ -156,28 +152,14 @@ HitTesterTestGeometryWithTransform(
     HitAllocator = &HitTester->HitAllocator;
     PointerList = &HitTester->HitList;
 
-    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
-
-    if (SharedHitData == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    SharedHitData->ModelToWorld = ModelToWorld;
-
     if (Premultiplied != FALSE)
     {   
-        SharedHitData->Premultiplied = TRUE;
         TraceRay = HitTester->CurrentRay;
     }
     else
     {
-        SharedHitData->Premultiplied = FALSE;
-
-        SharedHitData->ModelRay = RayMatrixInverseMultiply(ModelToWorld,
-                                                           HitTester->CurrentRay);
-
-        TraceRay = SharedHitData->ModelRay;
+        TraceRay = RayMatrixInverseMultiply(ModelToWorld,
+                                            HitTester->CurrentRay);
     }
 
     Status = TestGeometryRoutine(Data,
@@ -192,10 +174,19 @@ HitTesterTestGeometryWithTransform(
 
     if (HitList == NULL)
     {
-        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
-        SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
+
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = ModelToWorld;
+    SharedHitData->Premultiplied = Premultiplied;
+    SharedHitData->ModelRay = TraceRay;
 
     while (HitList != NULL)
     {
@@ -249,16 +240,6 @@ HitTesterTestPremultipliedGeometryWithTransform(
     HitAllocator = &HitTester->HitAllocator;
     PointerList = &HitTester->HitList;
 
-    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
-
-    if (SharedHitData == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-    
-    SharedHitData->ModelToWorld = ModelToWorld;
-    SharedHitData->Premultiplied = TRUE;
-
     Status = TestGeometryRoutine(Data,
                                  HitTester->CurrentRay,
                                  HitAllocator,
@@ -271,10 +252,18 @@ HitTesterTestPremultipliedGeometryWithTransform(
 
     if (HitList == NULL)
     {
-        SharedHitDataAllocatorFreeLastAllocation(SharedHitDataAllocator);
-        SharedHitData = NULL;
         return ISTATUS_SUCCESS;
     }
+
+    SharedHitData = SharedHitDataAllocatorAllocate(SharedHitDataAllocator);
+
+    if (SharedHitData == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    SharedHitData->ModelToWorld = ModelToWorld;
+    SharedHitData->Premultiplied = TRUE;
 
     while (HitList != NULL)
     {

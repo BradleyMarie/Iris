@@ -168,7 +168,7 @@ HitTesterComputeHitData(
     _Out_ PVECTOR3 ModelViewer,
     _Out_ PPOINT3 ModelHit,
     _Out_ PPOINT3 WorldHit
-    )
+)
 {
     PCSHARED_HIT_DATA SharedHitData;
 
@@ -182,8 +182,23 @@ HitTesterComputeHitData(
     SharedHitData = Hit->SharedHitData;
 
     *ModelToWorld = SharedHitData->ModelToWorld;
-    
-    if (SharedHitData->Premultiplied != FALSE)
+
+    if (SharedHitData->ModelToWorld == NULL)
+    {
+        if (Hit->ModelHitPointValid != FALSE)
+        {
+            *WorldHit = Hit->ModelHitPoint;
+        }
+        else
+        {
+            *WorldHit = RayEndpoint(HitTester->CurrentRay,
+                                    Hit->Hit.Distance);
+        }
+
+        *ModelHit = *WorldHit;
+        *ModelViewer = HitTester->CurrentRay.Direction;
+    }
+    else if (SharedHitData->Premultiplied != FALSE)
     {
         if (Hit->ModelHitPointValid != FALSE)
         {
