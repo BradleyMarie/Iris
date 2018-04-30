@@ -42,9 +42,9 @@ PointCreate(
     _In_ float_t z
     )
 {
-    assert(isfinite(x) != 0);
-    assert(isfinite(y) != 0);
-    assert(isfinite(z) != 0);
+    assert(isfinite(x));
+    assert(isfinite(y));
+    assert(isfinite(z));
 
     POINT3 point;
     point.x = x;
@@ -127,7 +127,7 @@ PointVectorSubtractScaled(
     _In_ float_t scalar
     )
 {
-    assert(isfinite(scalar) != 0);
+    assert(isfinite(scalar));
     
     float_t negated_scalar = -scalar;
 

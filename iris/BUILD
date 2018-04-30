@@ -78,3 +78,13 @@ cc_library(
         ":sal",
     ],
 )
+
+cc_test(
+    name = "vector_test",
+    srcs = ["vector_test.cc"],
+    deps = [
+        ":vector",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
