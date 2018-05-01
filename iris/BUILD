@@ -65,6 +65,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ray_test",
+    srcs = ["ray_test.cc"],
+    deps = [
+        ":ray",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "sal",
     hdrs = ["sal.h"],
