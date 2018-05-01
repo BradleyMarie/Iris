@@ -227,8 +227,6 @@ VectorNormalize(
     _Out_opt_ float_t *old_length
     )
 {
-    assert(VectorValidate(vector));
-
     float_t length_squared = VectorDotProduct(vector, vector);
 
     if (old_length_squared != NULL)
@@ -253,8 +251,6 @@ VectorDominantAxis(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-
     float_t abs_x = fabs(vector.x);
     float_t abs_y = fabs(vector.y);
     float_t abs_z = fabs(vector.z);
@@ -280,8 +276,6 @@ VectorDiminishedAxis(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-
     float_t abs_x = fabs(vector.x);
     float_t abs_y = fabs(vector.y);
     float_t abs_z = fabs(vector.z);
@@ -308,9 +302,6 @@ VectorReflect(
     _In_ VECTOR3 normal
     )
 {
-    assert(VectorValidate(incident));
-    assert(VectorValidate(normal));
-
     float_t scalar = (float_t) 2.0 * VectorDotProduct(normal, incident);
 
     VECTOR3 scaled_normal = VectorScale(normal, scalar);

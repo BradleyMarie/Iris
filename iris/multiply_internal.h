@@ -16,8 +16,7 @@ Abstract:
 #define _IRIS_MULTIPLY_INTERNAL_
 
 #include "iris/matrix_internal.h"
-#include "iris/point.h"
-#include "iris/vector.h"
+#include "iris/ray.h"
 
 static
 inline
@@ -28,7 +27,6 @@ VectorMatrixMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(VectorValidate(vector));
 
     float_t x = matrix->m[0][0] * vector.x + 
                 matrix->m[0][1] * vector.y + 
@@ -54,7 +52,6 @@ VectorMatrixTransposedMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(VectorValidate(vector));
 
     float_t x = matrix->m[0][0] * vector.x + 
                 matrix->m[1][0] * vector.y + 
@@ -80,7 +77,6 @@ VectorMatrixInverseMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(VectorValidate(vector));
 
     return VectorMatrixMultiplyInline(matrix->inverse, vector);
 }
@@ -94,7 +90,6 @@ VectorMatrixInverseTransposedMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(VectorValidate(vector));
 
     return VectorMatrixTransposedMultiplyInline(matrix->inverse, vector);
 }
@@ -132,7 +127,6 @@ PointMatrixMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(PointValidate(point));
 
     float_t x = matrix->m[0][0] * point.x +
                 matrix->m[0][1] * point.y +
@@ -166,9 +160,34 @@ PointMatrixInverseMultiplyInline(
     )
 {
     assert(matrix != NULL);
-    assert(PointValidate(point));
 
     return PointMatrixMultiplyInline(matrix->inverse, point);
+}
+
+RAY
+RayMatrixMultiplyInline(
+    _In_ PCMATRIX matrix,
+    _In_ RAY ray
+    )
+{
+    assert(matrix != NULL);
+
+    POINT3 transformed_origin = PointMatrixMultiplyInline(matrix, ray.origin);
+    VECTOR3 transformed_direction = VectorMatrixMultiplyInline(matrix, 
+                                                               ray.direction);
+    
+    return RayCreate(transformed_origin, transformed_direction);
+}
+
+RAY
+RayMatrixInverseMultiplyInline(
+    _In_ PCMATRIX matrix,
+    _In_ RAY ray
+    )
+{
+    assert(matrix != NULL);
+
+    return RayMatrixMultiplyInline(matrix->inverse, ray);
 }
 
 #endif // _IRIS_MULTIPLY_INTERNAL_

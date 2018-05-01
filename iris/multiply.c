@@ -22,8 +22,6 @@ VectorMatrixMultiply(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-    
     if (matrix == NULL) 
     {
         return vector;
@@ -39,8 +37,6 @@ VectorMatrixTransposedMultiply(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-    
     if (matrix == NULL) 
     {
         return vector;
@@ -56,8 +52,6 @@ VectorMatrixInverseMultiply(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-    
     if (matrix == NULL) 
     {
         return vector;
@@ -73,8 +67,6 @@ VectorMatrixInverseTransposedMultiply(
     _In_ VECTOR3 vector
     )
 {
-    assert(VectorValidate(vector));
-    
     if (matrix == NULL) 
     {
         return vector;
@@ -90,8 +82,6 @@ PointMatrixMultiply(
     _In_ POINT3 point
     )
 {
-    assert(PointValidate(point));
-    
     if (matrix == NULL) 
     {
         return point;
@@ -107,12 +97,40 @@ PointMatrixInverseMultiply(
     _In_ POINT3 point
     )
 {
-    assert(PointValidate(point));
-
     if (matrix == NULL) 
     {
         return point;
     }
 
     return PointMatrixInverseMultiplyInline(matrix, point);
+}
+
+//IRISAPI
+RAY
+RayMatrixMultiply(
+    _In_opt_ PCMATRIX matrix,
+    _In_ RAY ray
+    )
+{
+    if (matrix == NULL) 
+    {
+        return ray;
+    }
+
+    return RayMatrixMultiplyInline(matrix, ray);
+}
+
+//IRISAPI
+RAY
+RayMatrixInverseMultiply(
+    _In_opt_ PCMATRIX matrix,
+    _In_ RAY ray
+    )
+{
+    if (matrix == NULL) 
+    {
+        return ray;
+    }
+
+    return RayMatrixInverseMultiplyInline(matrix, ray);
 }

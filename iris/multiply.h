@@ -16,8 +16,7 @@ Abstract:
 #define _IRIS_MULTIPLY_
 
 #include "iris/matrix.h"
-#include "iris/point.h"
-#include "iris/vector.h"
+#include "iris/ray.h"
 
 //IRISAPI
 VECTOR3
@@ -59,6 +58,20 @@ POINT3
 PointMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ POINT3 point
+    );
+
+//IRISAPI
+RAY
+RayMatrixMultiply(
+    _In_opt_ PCMATRIX matrix,
+    _In_ RAY ray
+    );
+
+//IRISAPI
+RAY
+RayMatrixInverseMultiply(
+    _In_opt_ PCMATRIX matrix,
+    _In_ RAY ray
     );
 
 #endif // _IRIS_MULTIPLY_

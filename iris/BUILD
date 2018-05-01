@@ -23,9 +23,8 @@ cc_library(
     srcs = ["multiply.c"],
     deps = [
         ":matrix",
-        ":point",
         ":multiply_internal",
-        ":vector",
+        ":ray",
     ],
 )
 
@@ -34,8 +33,7 @@ cc_library(
     hdrs = ["multiply_internal.h"],
     deps = [
         ":matrix_internal",
-        ":point",
-        ":vector",
+        ":ray",
     ],
     visibility = ["//iris:__pkg__"],
 )
@@ -55,6 +53,15 @@ cc_test(
         ":point",
         "//test:test_util",
         "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "ray",
+    hdrs = ["ray.h"],
+    deps = [
+        ":point",
+        ":vector",
     ],
 )
 
