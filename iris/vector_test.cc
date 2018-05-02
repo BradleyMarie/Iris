@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-   Unit tests for vector.c
+    Unit tests for vector.c
 
 --*/
 
@@ -18,6 +18,8 @@ extern "C" {
 
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
+
+#include <limits>
 
 TEST(VectorTest, VectorCreate)
 {
@@ -135,13 +137,31 @@ TEST(VectorTest, VectorValidate)
 
     vector.x = (float_t) INFINITY;
     EXPECT_FALSE(VectorValidate(vector));
+
+    vector.x = (float_t) -INFINITY;
+    EXPECT_FALSE(VectorValidate(vector));
+
+    vector.x = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(VectorValidate(vector));
     vector.x = (float_t) 0.0;
 
     vector.y = (float_t) INFINITY;
     EXPECT_FALSE(VectorValidate(vector));
+
+    vector.y = (float_t) -INFINITY;
+    EXPECT_FALSE(VectorValidate(vector));
+
+    vector.y = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(VectorValidate(vector));
     vector.y = (float_t) 0.0;
     
     vector.z = (float_t) INFINITY;
+    EXPECT_FALSE(VectorValidate(vector));
+
+    vector.z = (float_t) -INFINITY;
+    EXPECT_FALSE(VectorValidate(vector));
+
+    vector.z = std::numeric_limits<float_t>::quiet_NaN();
     EXPECT_FALSE(VectorValidate(vector));
 }
 

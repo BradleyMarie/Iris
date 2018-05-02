@@ -717,17 +717,17 @@ MatrixAllocateScalar(
     _Out_ PMATRIX *matrix
     )
 {
-    if (!isfinite(x))
+    if (!isfinite(x) || x == (float_t) 0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!isfinite(y))
+    if (!isfinite(y) || y == (float_t) 0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!isfinite(z))
+    if (!isfinite(z) || z == (float_t) 0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -795,7 +795,7 @@ MatrixAllocateRotation(
 
     float_t sin_theta = sin(theta);
     float_t cos_theta = cos(theta);
-    float_t ic = 1.0f - cos_theta;
+    float_t ic = (float_t) 1.0 - cos_theta;
 
     float_t m00 = normalized.x * normalized.x * ic + cos_theta;
     float_t m01 = normalized.x * normalized.y * ic - normalized.z * sin_theta;

@@ -15,7 +15,11 @@ Abstract:
 #ifndef _TEST_TEST_UTIL_
 #define _TEST_TEST_UTIL_
 
+#include "iris/matrix.h"
 #include "iris/ray.h"
+#include "googlemock/include/gmock/gmock.h"
+
+#include <cmath>
 
 bool 
 operator==(
@@ -42,6 +46,94 @@ operator==(
     )
 {
     return r0.origin == r1.origin && r0.direction == r1.direction;
+}
+
+MATCHER_P(EqualsMatrix, value, "")
+{
+    if (value == arg)
+    {
+        return true;
+    }
+
+    float_t value_contents[4][4];
+    MatrixReadContents(value, value_contents);
+
+    float_t arg_contents[4][4];
+    MatrixReadContents(arg, arg_contents);
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (value_contents[i][j] != arg_contents[i][j])
+            {
+                return false;
+            }
+        }
+    }
+
+    auto value_inverse = MatrixGetConstantInverse(value);
+    MatrixReadContents(value_inverse, value_contents);
+
+    auto arg_inverse = MatrixGetConstantInverse(arg);
+    MatrixReadContents(arg_inverse, arg_contents);
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (value_contents[i][j] != arg_contents[i][j])
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+MATCHER_P2(ApproximatelyEqualsMatrix, value, epsilon, "")
+{
+    if (value == arg)
+    {
+        return true;
+    }
+
+    float_t value_contents[4][4];
+    MatrixReadContents(value, value_contents);
+
+    float_t arg_contents[4][4];
+    MatrixReadContents(arg, arg_contents);
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (std::abs(value_contents[i][j] - arg_contents[i][j]) > epsilon)
+            {
+                return false;
+            }
+        }
+    }
+
+    auto value_inverse = MatrixGetConstantInverse(value);
+    MatrixReadContents(value_inverse, value_contents);
+
+    auto arg_inverse = MatrixGetConstantInverse(arg);
+    MatrixReadContents(arg_inverse, arg_contents);
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (std::abs(value_contents[i][j] - arg_contents[i][j]) > epsilon)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 #endif // _TEST_TEST_UTIL_

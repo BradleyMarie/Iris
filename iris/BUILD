@@ -17,6 +17,16 @@ cc_library(
     visibility = ["//iris:__pkg__"],
 )
 
+cc_test(
+    name = "matrix_test",
+    srcs = ["matrix_test.cc"],
+    deps = [
+        ":matrix",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "multiply",
     hdrs = ["multiply.h"],

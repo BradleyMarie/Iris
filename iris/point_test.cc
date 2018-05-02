@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-   Unit tests for point.c
+    Unit tests for point.c
 
 --*/
 
@@ -18,6 +18,8 @@ extern "C" {
 
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
+
+#include <limits>
 
 TEST(PointTest, PointCreate)
 {
@@ -95,12 +97,31 @@ TEST(PointTest, PointValidate)
 
     point.x = (float_t) INFINITY;
     EXPECT_FALSE(PointValidate(point));
+
+    point.x = (float_t) -INFINITY;
+    EXPECT_FALSE(PointValidate(point));
+
+    point.x = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(PointValidate(point));
     point.x = (float_t) 0.0;
 
     point.y = (float_t) INFINITY;
+    EXPECT_FALSE(PointValidate(point));
+
+    point.y = (float_t) -INFINITY;
+    EXPECT_FALSE(PointValidate(point));
+
+    point.y = std::numeric_limits<float_t>::quiet_NaN();
     EXPECT_FALSE(PointValidate(point));
     point.y = (float_t) 0.0;
     
     point.z = (float_t) INFINITY;
     EXPECT_FALSE(PointValidate(point));
+
+    point.z = (float_t) -INFINITY;
+    EXPECT_FALSE(PointValidate(point));
+
+    point.z = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(PointValidate(point));
+    point.z = (float_t) 0.0;
 }

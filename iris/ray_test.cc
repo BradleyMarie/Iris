@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-   Unit tests for ray.c
+    Unit tests for ray.c
 
 --*/
 
@@ -18,6 +18,8 @@ extern "C" {
 
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
+
+#include <limits>
 
 TEST(RayTest, RayCreate)
 {
