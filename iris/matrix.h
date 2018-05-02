@@ -67,7 +67,7 @@ MatrixAllocateScalar(
     _In_ float_t x,
     _In_ float_t y,
     _In_ float_t z,
-    _Out_ PMATRIX *Matrix
+    _Out_ PMATRIX *matrix
     );
 
 //IRISAPI
