@@ -22,7 +22,7 @@ static
 inline
 VECTOR3
 VectorMatrixMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ VECTOR3 vector
     )
 {
@@ -47,7 +47,7 @@ static
 inline
 VECTOR3
 VectorMatrixTransposedMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ VECTOR3 vector
     )
 {
@@ -72,7 +72,7 @@ static
 inline
 VECTOR3
 VectorMatrixInverseMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ VECTOR3 vector
     )
 {
@@ -85,7 +85,7 @@ static
 inline
 VECTOR3
 VectorMatrixInverseTransposedMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ VECTOR3 vector
     )
 {
@@ -122,7 +122,7 @@ static
 inline
 POINT3
 PointMatrixMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ POINT3 point
     )
 {
@@ -155,7 +155,7 @@ static
 inline
 POINT3
 PointMatrixInverseMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ POINT3 point
     )
 {
@@ -166,7 +166,7 @@ PointMatrixInverseMultiplyInline(
 
 RAY
 RayMatrixMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ RAY ray
     )
 {
@@ -181,7 +181,7 @@ RayMatrixMultiplyInline(
 
 RAY
 RayMatrixInverseMultiplyInline(
-    _In_ PCMATRIX matrix,
+    _In_ const struct _MATRIX *matrix,
     _In_ RAY ray
     )
 {

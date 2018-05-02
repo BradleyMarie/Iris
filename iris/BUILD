@@ -48,6 +48,27 @@ cc_library(
     visibility = ["//iris:__pkg__"],
 )
 
+cc_test(
+    name = "multiply_internal_test",
+    srcs = ["multiply_internal_test.cc"],
+    deps = [
+        ":matrix",
+        ":multiply_internal",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_test(
+    name = "multiply_test",
+    srcs = ["multiply_test.cc"],
+    deps = [
+        ":multiply",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "point",
     hdrs = ["point.h"],
