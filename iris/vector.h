@@ -41,15 +41,14 @@ typedef struct _VECTOR3 {
 typedef const VECTOR3 *PCVECTOR3;
 
 //
-// Defines
+// Enums
 //
 
-#define VECTOR_X_AXIS 0
-#define VECTOR_Y_AXIS 1
-#define VECTOR_Z_AXIS 2
-
-typedef uint8_t VECTOR_AXIS;
-typedef VECTOR_AXIS *PVECTOR_AXIS;
+typedef enum _VECTOR_AXIS {
+    VECTOR_X_AXIS = 0,
+    VECTOR_Y_AXIS = 1,
+    VECTOR_Z_AXIS = 2
+} VECTOR_AXIS;
 
 //
 // Functions
