@@ -16,6 +16,7 @@ Abstract:
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifndef _COMMON_SAFE_MATH_
@@ -27,7 +28,28 @@ Abstract:
 
 static
 inline
-ISTATUS
+bool
+CheckedAddSizeT(
+    _In_ size_t addend0,
+    _In_ size_t addend1,
+    _Out_ size_t *sum
+    )
+{
+    assert(sum != NULL);
+
+    if (SIZE_MAX - addend0 < addend1)
+    {
+        return false;
+    }
+
+    *sum = addend0 + addend1;
+
+    return true;
+}
+
+static
+inline
+bool
 CheckedMultiplySizeT(
     _In_ size_t multiplicand0,
     _In_ size_t multiplicand1,
@@ -45,27 +67,6 @@ CheckedMultiplySizeT(
     }
 
     *product = unchecked_product;
-
-    return true;
-}
-
-static
-inline
-ISTATUS
-CheckedAddSizeT(
-    _In_ size_t addend0,
-    _In_ size_t addend1,
-    _Out_ size_t *sum
-    )
-{
-    assert(sum != NULL);
-
-    if (SIZE_MAX - addend0 < addend1)
-    {
-        return false;
-    }
-
-    *sum = addend0 + addend1;
 
     return true;
 }
