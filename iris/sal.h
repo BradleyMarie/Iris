@@ -37,7 +37,7 @@ Abstract:
 #define _Inout_opt_
 #define _Inout_updates_(size)
 
-#define _Pre_opt_bytecount_(size)
+#define _Pre_bytecount_(size)
 #define _Pre_invalid_
 #define _Pre_maybenull_
 #define _Post_valid_

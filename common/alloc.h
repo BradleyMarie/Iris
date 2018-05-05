@@ -17,8 +17,7 @@ Abstract:
 
 #include "common/safe_math.h"
 
-#include <assert.h>
-#include <stdint.h>
+#include <stdlib.h>
 
 //
 // Functions
@@ -44,7 +43,7 @@ LayoutNewAllocation(
 
     assert(element_alignments[0] != 0);
     assert(element_sizes[0] % element_alignments[0] == 0);
-    assert(element_alignments[0] & (element_alignments[0] - 1) == 0);
+    assert((element_alignments[0] & (element_alignments[0] - 1)) == 0);
 
     element_placements[0] = 0;
     *size = element_sizes[0];
@@ -59,7 +58,7 @@ LayoutNewAllocation(
 
         assert(element_alignments[i] != 0);
         assert(element_sizes[i] % element_alignments[i] == 0);
-        assert(element_alignments[i] & (element_alignments[i] - 1) == 0);
+        assert((element_alignments[i] & (element_alignments[i] - 1)) == 0);
 
         bool success = CheckedAddSizeT(*size,
                                        element_sizes[i],
@@ -113,7 +112,7 @@ LayoutAllocation(
     _In_ size_t number_of_elements,
     _In_reads_(number_of_members) size_t element_sizes[],
     _In_reads_(number_of_elements) size_t element_alignments[],
-    _Out_writes_(number_of_elements) size_t element_placements[])
+    _Out_writes_(number_of_elements) uintptr_t element_placements[])
 {
     assert(base_address != (uintptr_t)NULL);
     assert(allocation_size != 0);
@@ -124,9 +123,9 @@ LayoutAllocation(
 
     assert(element_alignments[0] != 0);
     assert(element_sizes[0] % element_alignments[0] == 0);
-    assert(element_alignments[0] & (element_alignments[0] - 1) == 0);
+    assert((element_alignments[0] & (element_alignments[0] - 1)) == 0);
 
-    if (base_address & (element_alignments[0] - 1) != 0 ||
+    if ((base_address & (element_alignments[0] - 1)) != 0 ||
         allocation_size < element_sizes[0])
     {
         return false;
@@ -144,7 +143,7 @@ LayoutAllocation(
 
         assert(element_alignments[i] != 0);
         assert(element_sizes[i] % element_alignments[i] == 0);
-        assert(element_alignments[i] & (element_alignments[i] - 1) == 0);
+        assert((element_alignments[i] & (element_alignments[i] - 1)) == 0);
 
         bool success = CheckedAddSizeT(size,
                                        element_sizes[i],
@@ -196,7 +195,7 @@ LayoutAllocation(
 
 static
 inline
-ISTATUS
+bool
 AlignedAllocWithHeader(
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && header_size % _Curr_ == 0) size_t header_alignment,
@@ -216,8 +215,8 @@ AlignedAllocWithHeader(
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
 
-    size_t sizes = {header_size, data_size};
-    size_t alignments = {header_alignment, data_alignment};
+    size_t sizes[] = {header_size, data_size};
+    size_t alignments[] = {header_alignment, data_alignment};
     size_t placements[2];
     size_t alignment, size;
 
@@ -230,21 +229,21 @@ AlignedAllocWithHeader(
 
     if (!success)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return false;
     }
 
     void *allocation = aligned_alloc(alignment, size);
 
     if (allocation == NULL)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return false;
     }
 
     *header = allocation;
 
     if (data_size != 0)
     {
-        *data = (void *)((char *)header + placements[1]);
+        *data = (void *)((char *)allocation + placements[1]);
     }
     else
     {
@@ -257,14 +256,14 @@ AlignedAllocWithHeader(
     if (actual_allocation_size)
     {
         *actual_allocation_size = size;
-    }
+    }    
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 static
 inline
-ISTATUS
+bool
 AlignedResizeWithHeader(
     _In_ _Pre_bytecount_(original_allocation_size) _Post_invalid_ void *original_header,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t original_allocation_size,
@@ -288,11 +287,13 @@ AlignedResizeWithHeader(
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
 
-    size_t sizes = {header_size, data_size};
-    size_t alignments = {header_alignment, data_alignment};
-    uintptr_t existing_placements[2];
+    size_t sizes[] = {header_size, data_size};
+    size_t alignments[] = {header_alignment, data_alignment};
+    uintptr_t placements[2];
 
-    bool success = LayoutAllocation((uintptr_t)original_header 2,
+    bool success = LayoutAllocation((uintptr_t)original_header,
+                                    original_allocation_size,
+                                    2,
                                     sizes,
                                     alignments,
                                     placements);
@@ -318,30 +319,29 @@ AlignedResizeWithHeader(
             *actual_allocation_size = original_allocation_size;
         }
 
-        return ISTATUS_SUCCESS;
+        return true;
     }
 
-    ISTATUS result = AlignedAllocWithHeader(header_size,
-                                            header_alignment,
-                                            header,
-                                            data_size,
-                                            data_alignment,
-                                            data,
-                                            actual_allocation_size);
+    bool result = AlignedAllocWithHeader(header_size,
+                                         header_alignment,
+                                         header,
+                                         data_size,
+                                         data_alignment,
+                                         data,
+                                         actual_allocation_size);
 
-    if (result != ISTATUS_SUCCESS)
+    if (!result)
     {
-        assert(result == ISTATUS_ALLOCATION_FAILED);
-        return result;
+        return false;
     }
 
     free(original_header);
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 static
 inline
-ISTATUS
+bool
 AlignedAllocWithTwoHeaders(
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t first_header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && first_header_size % _Curr_ == 0) size_t first_header_alignment,
@@ -369,8 +369,8 @@ AlignedAllocWithTwoHeaders(
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
 
-    size_t sizes = {first_header_size, second_header_size, data_size};
-    size_t alignments =
+    size_t sizes[] = {first_header_size, second_header_size, data_size};
+    size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
     size_t placements[3];
     size_t alignment, size;
@@ -384,22 +384,22 @@ AlignedAllocWithTwoHeaders(
 
     if (!success)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return false;
     }
 
     void *allocation = aligned_alloc(alignment, size);
 
     if (allocation == NULL)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        return false;
     }
 
     *first_header = allocation;
-    *second_header = (void *)((char *)header + placements[1]);
+    *second_header = (void *)((char *)allocation + placements[1]);
 
     if (data_size != 0)
     {
-        *data = (void *)((char *)header + placements[2]);
+        *data = (void *)((char *)allocation + placements[2]);
     }
     else
     {
@@ -414,18 +414,18 @@ AlignedAllocWithTwoHeaders(
         *actual_allocation_size = size;
     }
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 static
 inline
-ISTATUS
-AlignedResizeWithTwoHeader(
-    _In_ _Pre_opt_bytecount_(original_size) _Post_invalid_ void *original_header,
+bool
+AlignedResizeWithTwoHeaders(
+    _In_ _Pre_bytecount_(original_size) _Post_invalid_ void *original_header,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t original_allocation_size,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t first_header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && first_header_size % _Curr_ == 0) size_t first_header_alignment,
-    _Outptr_result_bytebuffer_(first_header_size) oid **first_header,
+    _Outptr_result_bytebuffer_(first_header_size) void **first_header,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t second_header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && second_header_size % _Curr_ == 0) size_t second_header_alignment,
     _Outptr_result_bytebuffer_(second_header_size) void **second_header,
@@ -451,12 +451,13 @@ AlignedResizeWithTwoHeader(
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
 
-    size_t sizes = {first_header_size, second_header_size, data_size};
-    size_t alignments =
+    size_t sizes[] = {first_header_size, second_header_size, data_size};
+    size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
-    uintptr_t existing_placements[3];
+    uintptr_t placements[3];
 
     bool success = LayoutAllocation((uintptr_t)original_header,
+                                    original_allocation_size,
                                     3,
                                     sizes,
                                     alignments,
@@ -484,28 +485,27 @@ AlignedResizeWithTwoHeader(
             *actual_allocation_size = original_allocation_size;
         }
 
-        return ISTATUS_SUCCESS;
+        return true;
     }
 
-    ISTATUS result = AlignedAllocWithTwoHeaders(first_header_size,
-                                                first_header_alignment,
-                                                first_header,
-                                                second_header_size,
-                                                second_header_alignment,
-                                                second_header,
-                                                data_size,
-                                                data_alignment,
-                                                data,
-                                                actual_allocation_size);
+    bool result = AlignedAllocWithTwoHeaders(first_header_size,
+                                             first_header_alignment,
+                                             first_header,
+                                             second_header_size,
+                                             second_header_alignment,
+                                             second_header,
+                                             data_size,
+                                             data_alignment,
+                                             data,
+                                             actual_allocation_size);
 
-    if (result != ISTATUS_SUCCESS)
+    if (!result)
     {
-        assert(result == ISTATUS_ALLOCATION_FAILED);
-        return result;
+        return false;
     }
 
     free(original_header);
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 #endif // _IRIS_ALLOC_
