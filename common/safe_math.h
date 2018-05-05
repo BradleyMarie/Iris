@@ -27,27 +27,6 @@ Abstract:
 
 static
 inline
-bool
-CheckedAddUIntPtrAndSizeT(
-    _In_ uintptr_t addend0,
-    _In_ size_t addend1,
-    _Out_ uintptr_t *sum
-    )
-{
-    assert(sum != NULL);
-
-    if (UINTPTR_MAX - addend0 < addend1)
-    {
-        return false;
-    }
-
-    *sum = addend0 + addend1;
-
-    return true;
-}
-
-static
-inline
 ISTATUS
 CheckedMultiplySizeT(
     _In_ size_t multiplicand0,
