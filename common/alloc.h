@@ -23,6 +23,8 @@ Abstract:
 // Functions
 //
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -103,6 +105,8 @@ LayoutNewAllocation(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -193,6 +197,8 @@ LayoutAllocation(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -261,6 +267,8 @@ AlignedAllocWithHeader(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -339,6 +347,8 @@ AlignedResizeWithHeader(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -417,6 +427,8 @@ AlignedAllocWithTwoHeaders(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool

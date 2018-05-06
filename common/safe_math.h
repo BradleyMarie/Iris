@@ -26,6 +26,8 @@ Abstract:
 // Functions
 //
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
@@ -47,6 +49,8 @@ CheckedAddSizeT(
     return true;
 }
 
+_Check_return_
+_Success_(return != 0)
 static
 inline
 bool
