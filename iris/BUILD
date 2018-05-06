@@ -126,6 +126,15 @@ cc_library(
 )
 
 cc_library(
+    name = "shared_hit_context",
+    hdrs = ["shared_hit_context.h"],
+    deps = [
+        ":matrix",
+        ":ray",
+    ],
+)
+
+cc_library(
     name = "status",
     hdrs = ["status.h"],
     deps = [
