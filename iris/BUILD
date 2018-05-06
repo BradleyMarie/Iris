@@ -9,6 +9,23 @@ cc_library(
 )
 
 cc_library(
+    name = "hit_allocator_internal",
+    hdrs = ["hit_allocator_internal.h"],
+    deps = [
+        "//common:dynamic_allocator",
+    ],
+)
+
+cc_library(
+    name = "hit_internal",
+    hdrs = ["hit_internal.h"],
+    deps = [
+        ":hit",
+        ":shared_hit_context",
+    ],
+)
+
+cc_library(
     name = "iris",
     hdrs = ["iris.h"],
     deps = [
