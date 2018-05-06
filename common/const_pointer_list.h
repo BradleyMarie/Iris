@@ -17,11 +17,13 @@ Abstract:
 
 #include "common/safe_math.h"
 
+#include <stdlib.h>
+
 //
 // Defines
 //
 
-#define CONSTANT_POINTER_LIST_INITIAL_SIZE 16
+#define CONSTANT_POINTER_LIST_INITIAL_CAPACITY 16
 #define CONSTANT_POINTER_LIST_GROWTH_FACTOR 2
 
 //
@@ -51,7 +53,7 @@ ConstantPointerListInitialize(
 {
 	assert(list != NULL);
 
-    void *allocation = calloc(CONSTANT_POINTER_LIST_INITIAL_SIZE,
+    void *allocation = calloc(CONSTANT_POINTER_LIST_INITIAL_CAPACITY,
                               sizeof(const void *));
 
     if (allocation == NULL)
@@ -60,7 +62,7 @@ ConstantPointerListInitialize(
     }
 
     list->list = (const void **) allocation;
-    list->capacity = CONSTANT_POINTER_LIST_INITIAL_SIZE;
+    list->capacity = CONSTANT_POINTER_LIST_INITIAL_CAPACITY;
     list->size = 0;
 
     return true;
@@ -70,6 +72,7 @@ _Check_return_
 _Success_(return != 0)
 static
 inline
+bool
 ConstantPointerListAddPointer(
     _Inout_ PCONSTANT_POINTER_LIST list,
     _In_ const void *pointer
@@ -91,14 +94,24 @@ ConstantPointerListAddPointer(
             return false;
         }
 
-        void *new_list = realloc((void *)list->list, new_capacity);
+        size_t new_capacity_in_bytes;
+        success = CheckedMultiplySizeT(new_capacity,
+                                       sizeof(const void*),
+                                       &new_capacity_in_bytes);
+        
+        if (!success)
+        {
+            return false;
+        }
+
+        void *new_list = realloc((void *)list->list, new_capacity_in_bytes);
 
         if (new_list == NULL)
         {
             return false;
         }
 
-        list->list = new_list;
+        list->list = (const void **)new_list;
         list->capacity = new_capacity;
     }
 
@@ -113,7 +126,7 @@ inline
 const void *
 ConstantPointerListRetrieveAtIndex(
     _In_ PCCONSTANT_POINTER_LIST list,
-    _In_ _Satisfies_(_Curr_ >= 0 && _Curr_ < list->size) size_t index
+    _Satisfies_(_Curr_ >= 0 && _Curr_ < list->size) size_t index
     )
 {
     assert(list != NULL);
@@ -175,7 +188,7 @@ ConstantPointerListSort(
     qsort((void *)list->list,
           list->size,
           sizeof(const void *),
-          SortRoutine);
+          compar);
 }
 
 #undef CONSTANT_POINTER_LIST_INITIAL_SIZE

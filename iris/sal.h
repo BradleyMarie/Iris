@@ -69,6 +69,7 @@ Abstract:
 #define _Ret_maybenull_
 
 #define _When_(expr0,expr1)
+#define _Satisfies_(exor0)
 #define _Pre_satisfies_(exor0)
 
 #endif // #ifndef _In_

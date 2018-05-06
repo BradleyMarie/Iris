@@ -17,11 +17,13 @@ Abstract:
 
 #include "common/safe_math.h"
 
+#include <stdlib.h>
+
 //
 // Defines
 //
 
-#define POINTER_LIST_INITIAL_SIZE 16
+#define POINTER_LIST_INITIAL_CAPACITY 16
 #define POINTER_LIST_GROWTH_FACTOR 2
 
 //
@@ -29,7 +31,7 @@ Abstract:
 //
 
 typedef struct _POINTER_LIST {
-    _Field_size_(capacity) const void **list;
+    _Field_size_(capacity) void **list;
     size_t capacity;
     size_t size;
 } POINTER_LIST, *PPOINTER_LIST;
@@ -51,16 +53,15 @@ PointerListInitialize(
 {
 	assert(list != NULL);
 
-    void *allocation = calloc(POINTER_LIST_INITIAL_SIZE,
-                              sizeof(const void *));
+    void *allocation = calloc(POINTER_LIST_INITIAL_CAPACITY, sizeof(void *));
 
     if (allocation == NULL)
     {
         return false;
     }
 
-    list->list = (void **) allocation;
-    list->capacity = POINTER_LIST_INITIAL_SIZE;
+    list->list = (void **)allocation;
+    list->capacity = POINTER_LIST_INITIAL_CAPACITY;
     list->size = 0;
 
     return true;
@@ -73,7 +74,7 @@ inline
 bool
 PointerListAddPointer(
     _Inout_ PPOINTER_LIST list,
-    _In_ const void *pointer
+    _In_ void *pointer
     )
 {
     assert(list != NULL);
@@ -84,7 +85,7 @@ PointerListAddPointer(
     {
         size_t new_capacity;
         bool success = CheckedMultiplySizeT(list->capacity,
-                                            CONSTANT_POINTER_LIST_GROWTH_FACTOR,
+                                            POINTER_LIST_GROWTH_FACTOR,
                                             &new_capacity);
         
         if (!success)
@@ -92,14 +93,24 @@ PointerListAddPointer(
             return false;
         }
 
-        void *new_list = realloc((void *)list->list, new_capacity);
+        size_t new_capacity_in_bytes;
+        success = CheckedMultiplySizeT(new_capacity,
+                                       sizeof(void*),
+                                       &new_capacity_in_bytes);
+        
+        if (!success)
+        {
+            return false;
+        }
+
+        void *new_list = realloc((void *)list->list, new_capacity_in_bytes);
 
         if (new_list == NULL)
         {
             return false;
         }
 
-        list->list = new_list;
+        list->list = (void **)new_list;
         list->capacity = new_capacity;
     }
 
@@ -119,6 +130,21 @@ PointerListPrepareToAddPointers(
     )
 {
     assert(list != NULL);
+    
+    size_t required_capacity;
+    bool success = CheckedAddSizeT(list->size,
+                                   number_of_pointers,
+                                   &required_capacity);
+    
+    if (!success)
+    {
+        return false;
+    }
+
+    if (required_capacity < list->capacity)
+    {
+        return true;
+    }
 
     size_t original_size = list->size;
 
@@ -140,10 +166,10 @@ PointerListPrepareToAddPointers(
 _Ret_
 static
 inline
-const void *
+void *
 PointerListRetrieveAtIndex(
     _In_ PCPOINTER_LIST list,
-    _In_ _Satisfies_(_Curr_ >= 0 && _Curr_ < list->size) size_t index
+    _Satisfies_(_Curr_ >= 0 && _Curr_ < list->size) size_t index
     )
 {
     assert(list != NULL);
@@ -193,7 +219,7 @@ PointerListDestroy(
 
 static
 inline
-VOID
+void
 PointerListSort(
     _Inout_ PPOINTER_LIST list,
     _In_ int (*compar)(const void*,const void*)
@@ -205,7 +231,7 @@ PointerListSort(
     qsort((void *)list->list,
           list->size,
           sizeof(void *),
-          SortRoutine);
+          compar);
 }
 
 #undef POINTER_LIST_INITIAL_SIZE
