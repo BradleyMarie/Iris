@@ -1,4 +1,19 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
+
+cc_library(
+    name = "iris",
+    hdrs = ["iris.h"],
+    deps = [
+        ":matrix",
+        ":multiply",
+        ":point",
+        ":ray",
+        ":sal",
+        ":status",
+        ":vector",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "matrix",
@@ -14,7 +29,6 @@ cc_library(
 cc_library(
     name = "matrix_internal",
     hdrs = ["matrix_internal.h"],
-    visibility = ["//iris:__pkg__"],
 )
 
 cc_test(
@@ -45,7 +59,6 @@ cc_library(
         ":matrix_internal",
         ":ray",
     ],
-    visibility = ["//iris:__pkg__"],
 )
 
 cc_test(
@@ -109,6 +122,7 @@ cc_test(
 cc_library(
     name = "sal",
     hdrs = ["sal.h"],
+    visibility = ["//common:__pkg__"],
 )
 
 cc_library(
