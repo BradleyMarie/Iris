@@ -44,7 +44,7 @@ inline
 bool
 StaticMemoryAllocatorInitialize(
     _Out_ PSTATIC_MEMORY_ALLOCATOR allocator,
-    _In_ SIZE_T allocation_size
+    _In_ size_t allocation_size
     )
 {
     assert(allocator != NULL);
@@ -80,22 +80,21 @@ StaticMemoryAllocatorAllocate(
     void *tmp_allocation;
     if (allocator->current_size == num_chunks)
     {
-        ISTATUS status = PointerListPrepareToAddPointers(&allocator->chunks, 1);
+        bool success = PointerListPrepareToAddPointers(&allocator->chunks, 1);
 
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-
-        tmp_allocation = malloc(allocator->allocation_size);
-
-        if (Allocation == NULL)
+        if (!success)
         {
             return false;
         }
 
-        Status = PointerListAddPointer(&allocator->chunks,
-                                       tmp_allocation);
+        tmp_allocation = malloc(allocator->allocation_size);
+
+        if (tmp_allocation == NULL)
+        {
+            return false;
+        }
+
+         PointerListAddPointer(&allocator->chunks, tmp_allocation);
     }
     else
     {
@@ -107,19 +106,6 @@ StaticMemoryAllocatorAllocate(
     allocator->current_size++;
 
     return true;
-}
-
-static
-inline
-void
-StaticMemoryAllocatorFreeLastAllocation(
-    _Inout_ PSTATIC_MEMORY_ALLOCATOR allocator
-    )
-{
-    assert(allocator != NULL);
-    assert(allocator->current_size != 0);
-
-    allocator->current_size--;
 }
 
 static
@@ -147,8 +133,8 @@ StaticMemoryAllocatorDestroy(
 
     for (size_t i = 0; i < num_chunks; i++)
     {
-        void * allocation = PointerListRetrieveAtIndex(&allocator->chunks, i);
-        free(Allocation);
+        void *allocation = PointerListRetrieveAtIndex(&allocator->chunks, i);
+        free(allocation);
     }
 
     PointerListDestroy(&allocator->chunks);

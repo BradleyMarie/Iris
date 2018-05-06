@@ -35,6 +35,23 @@ cc_test(
 )
 
 cc_library(
+    name = "dynamic_allocator",
+    hdrs = ["dynamic_allocator.h"],
+    deps = [
+        ":alloc",
+    ],
+)
+
+cc_test(
+    name = "dynamic_allocator_test",
+    srcs = ["dynamic_allocator_test.cc"],
+    deps = [
+        ":dynamic_allocator",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
     name = "pointer_list",
     hdrs = ["pointer_list.h"],
     deps = [
@@ -64,6 +81,23 @@ cc_test(
     srcs = ["safe_math_test.cc"],
     deps = [
         ":safe_math",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "static_allocator",
+    hdrs = ["static_allocator.h"],
+    deps = [
+        ":pointer_list",
+    ],
+)
+
+cc_test(
+    name = "static_allocator_test",
+    srcs = ["static_allocator_test.cc"],
+    deps = [
+        ":static_allocator",
         "@com_google_googletest//:gtest_main"
     ],
 )

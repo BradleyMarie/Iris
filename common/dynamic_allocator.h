@@ -66,7 +66,7 @@ _Success_(return != 0)
 static
 inline
 bool
-DynamicMemoryAllocatorAllocateWithHeader(
+DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR allocator,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && header_size % _Curr_ == 0) size_t header_alignment,
@@ -89,7 +89,10 @@ DynamicMemoryAllocatorAllocateWithHeader(
 
     if (allocator->next_allocation != NULL)
     {
-        void *allocation_header, *header, *data;
+        PDYNAMIC_ALLOCATION older = allocator->next_allocation->older;
+        PDYNAMIC_ALLOCATION newer = allocator->next_allocation->newer;
+
+        void *allocation_header;
         size_t allocation_size;
         bool ok = AlignedResizeWithTwoHeaders(allocator->next_allocation,
                                               allocator->next_allocation->size,
@@ -98,10 +101,10 @@ DynamicMemoryAllocatorAllocateWithHeader(
                                               &allocation_header,
                                               header_size,
                                               header_alignment,
-                                              &header,
+                                              header,
                                               data_size,
                                               data_alignment,
-                                              &data,
+                                              data,
                                               &allocation_size);
 
         if (!ok)
@@ -110,13 +113,10 @@ DynamicMemoryAllocatorAllocateWithHeader(
         }
 
         PDYNAMIC_ALLOCATION next_allocation = 
-            (PDYNAMIC_MEMORY_ALLOCATION) allocation_header;
+            (PDYNAMIC_ALLOCATION) allocation_header;
 
         if (allocator->next_allocation != next_allocation)
         {
-            PDYNAMIC_ALLOCATION older = next_allocation->older;
-            PDYNAMIC_ALLOCATION newer = next_allocation->newer;
-
             if (older != NULL)
             {
                 older->newer = next_allocation;
@@ -127,24 +127,26 @@ DynamicMemoryAllocatorAllocateWithHeader(
                 newer->older = next_allocation;
             }
 
-            next->size = allocation_size;
+            next_allocation->size = allocation_size;
+            next_allocation->older = older;
+            next_allocation->newer = newer;
         }
 
         allocator->next_allocation = next_allocation->older;
     }
     else
     {
-        void *allocation_header, *header, *data;
+        void *allocation_header;
         size_t allocation_size;
         bool ok = AlignedAllocWithTwoHeaders(sizeof(DYNAMIC_ALLOCATION),
                                              alignof(DYNAMIC_ALLOCATION),
                                              &allocation_header,
                                              header_size,
                                              header_alignment,
-                                             &header,
+                                             header,
                                              data_size,
                                              data_alignment,
-                                             &data,
+                                             data,
                                              &allocation_size);
 
         if (!ok)
@@ -153,7 +155,7 @@ DynamicMemoryAllocatorAllocateWithHeader(
         }
 
         PDYNAMIC_ALLOCATION next_allocation = 
-            (PDYNAMIC_MEMORY_ALLOCATION) allocation_header;
+            (PDYNAMIC_ALLOCATION) allocation_header;
 
         PDYNAMIC_ALLOCATION last_allocation = allocator->last_allocation;
 
@@ -200,7 +202,7 @@ DynamicMemoryAllocatorDestroy(
 
     while (next_allocation != NULL)
     {
-        PDYNAMIC_ALLOCATION temp = next_allocation->previous;
+        PDYNAMIC_ALLOCATION temp = next_allocation->older;
         free(next_allocation);
         next_allocation = temp;
     }

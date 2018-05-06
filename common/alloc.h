@@ -9,6 +9,10 @@ Module Name:
 Abstract:
 
     Aligned memory allocation routines.
+    
+    Note, unlike C's realloc function, AlignedResizeWithTwoHeaders does not 
+    copy the old contents if a reallocation is required. It is up to the caller
+    to preserve any contents that must survive the resize operation.
 
 --*/
 
@@ -264,86 +268,6 @@ AlignedAllocWithHeader(
         *actual_allocation_size = size;
     }    
 
-    return true;
-}
-
-_Check_return_
-_Success_(return != 0)
-static
-inline
-bool
-AlignedResizeWithHeader(
-    _In_ _Pre_bytecount_(original_allocation_size) _Post_invalid_ void *original_header,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t original_allocation_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && header_size % _Curr_ == 0) size_t header_alignment,
-    _Outptr_result_bytebuffer_(header_size) void **header,
-    _In_ size_t data_size,
-    _When_(data_size != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
-    _When_(data_size != 0, _Out_ _Deref_post_bytecap_(data_size)) _When_(data_size == 0, _Out_opt_ _When_(data != NULL, _Deref_post_null_)) void **data,
-    _Out_opt_ size_t *actual_allocation_size)
-{
-    assert(original_header != NULL);
-    assert(original_allocation_size != 0);
-    assert(header_size != 0);
-    assert(header_alignment != 0);
-    assert(header != NULL);
-    assert((header_alignment & (header_alignment - 1)) == 0);
-    assert(header_size % header_alignment == 0);
-    assert(data_size == 0 || data_alignment != 0);
-    assert(data_size == 0 || data != NULL);
-    assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
-    assert(data_size == 0 || data_size % data_alignment == 0);
-
-    size_t sizes[] = {header_size, data_size};
-    size_t alignments[] = {header_alignment, data_alignment};
-    uintptr_t placements[2];
-
-    bool success = LayoutAllocation((uintptr_t)original_header,
-                                    original_allocation_size,
-                                    2,
-                                    sizes,
-                                    alignments,
-                                    placements);
-
-    if (success)
-    {
-        *header = (void *)placements[0];
-
-        if (data_size != 0)
-        {
-            *data = (void *)placements[1];
-        }
-        else
-        {
-            if (data)
-            {
-                *data = NULL;
-            }
-        }
-
-        if (actual_allocation_size)
-        {
-            *actual_allocation_size = original_allocation_size;
-        }
-
-        return true;
-    }
-
-    bool result = AlignedAllocWithHeader(header_size,
-                                         header_alignment,
-                                         header,
-                                         data_size,
-                                         data_alignment,
-                                         data,
-                                         actual_allocation_size);
-
-    if (!result)
-    {
-        return false;
-    }
-
-    free(original_header);
     return true;
 }
 
