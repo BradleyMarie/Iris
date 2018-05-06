@@ -1,8 +1,17 @@
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
-    name = "hit",
-    hdrs = ["hit.h"],
+    name = "hit_allocator",
+    hdrs = ["hit_allocator.h"],
+    deps = [
+        ":point",
+        ":sal",
+    ],
+)
+
+cc_library(
+    name = "hit_context",
+    hdrs = ["hit_context.h"],
     deps = [
         ":sal",
     ],
@@ -20,7 +29,7 @@ cc_library(
     name = "hit_internal",
     hdrs = ["hit_internal.h"],
     deps = [
-        ":hit",
+        ":hit_context",
         ":shared_hit_context",
     ],
 )
@@ -29,7 +38,8 @@ cc_library(
     name = "iris",
     hdrs = ["iris.h"],
     deps = [
-        ":hit",
+        ":hit_allocator",
+        ":hit_context",
         ":matrix",
         ":multiply",
         ":point",

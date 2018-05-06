@@ -4,16 +4,16 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    hit.h
+    hit_context.h
 
 Abstract:
 
-    Hit data generated during a successful intersection.
+    Full context of a hit generated during a successful intersection.
 
 --*/
 
-#ifndef _IRIS_HIT_
-#define _IRIS_HIT_
+#ifndef _IRIS_HIT_CONTEXT_
+#define _IRIS_HIT_CONTEXT_
 
 #include "iris/sal.h"
 
@@ -24,22 +24,15 @@ Abstract:
 // Types
 //
 
-typedef struct _HIT {
+typedef struct _HIT_CONTEXT {
     const void *data;
     float_t distance;
     uint32_t front_face;
     uint32_t back_face;
     _Field_size_bytes_opt_(additional_data_size) const void *additional_data;
     size_t additional_data_size;
-} HIT, *PHIT;
+} HIT_CONTEXT, *PHIT_CONTEXT;
 
-typedef CONST HIT *PCHIT;
+typedef const HIT_CONTEXT *PCHIT_CONTEXT;
 
-typedef struct _HIT_LIST {
-    struct _HIT_LIST *next_hit;
-    PCHIT hit;
-} HIT_LIST, *PHIT_LIST;
-
-typedef CONST HIT_LIST *PCHIT_LIST;
-
-#endif // _IRIS_HIT_
+#endif // _IRIS_HIT_CONTEXT_

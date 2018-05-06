@@ -15,7 +15,8 @@ Abstract:
 #ifndef _IRIS_
 #define _IRIS_
 
-#include "iris/hit.h"
+#include "iris/hit_allocator.h"
+#include "iris/hit_context.h"
 #include "iris/matrix.h"
 #include "iris/multiply.h"
 #include "iris/point.h"
