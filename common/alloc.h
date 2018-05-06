@@ -16,8 +16,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_ALLOC_
-#define _IRIS_ALLOC_
+#ifndef _COMMON_ALLOC_
+#define _COMMON_ALLOC_
 
 #include "common/safe_math.h"
 
@@ -444,4 +444,4 @@ AlignedResizeWithTwoHeaders(
     return true;
 }
 
-#endif // _IRIS_ALLOC_
+#endif // _COMMON_ALLOC_

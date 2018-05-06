@@ -18,8 +18,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_COMMON_STATIC_MEMORY_ALLOCATOR_
-#define _IRIS_COMMON_STATIC_MEMORY_ALLOCATOR_
+#ifndef _COMMON_STATIC_ALLOCATOR_
+#define _COMMON_STATIC_ALLOCATOR_
 
 #include "common/pointer_list.h"
 
@@ -142,4 +142,4 @@ StaticMemoryAllocatorDestroy(
     allocator->current_size = 0;
 }
 
-#endif // _IRIS_COMMON_STATIC_MEMORY_ALLOCATOR_
+#endif // _COMMON_STATIC_ALLOCATOR_
