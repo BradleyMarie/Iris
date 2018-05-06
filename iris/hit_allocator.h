@@ -34,22 +34,15 @@ Abstract:
 #ifndef _IRIS_HIT_ALLOCATOR_
 #define _IRIS_HIT_ALLOCATOR_
 
+#include "iris/hit.h"
 #include "iris/point.h"
 #include "iris/sal.h"
 
-#include <float.h>
 #include <stdint.h>
 
 //
 // Types
 //
-
-typedef struct _HIT {
-    struct _HIT *next;
-    const float_t *distance;
-} HIT, *PHIT;
-
-typedef const HIT *PCHIT;
 
 typedef struct _HIT_ALLOCATOR HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 typedef const HIT_ALLOCATOR *PCHIT_ALLOCATOR;

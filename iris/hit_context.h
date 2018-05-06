@@ -17,8 +17,14 @@ Abstract:
 
 #include "iris/sal.h"
 
-#include <float.h>
 #include <stdint.h>
+#include <stddef.h>
+
+#if __cplusplus 
+#include <math.h>
+#else
+#include <tgmath.h>
+#endif // __cplusplus
 
 //
 // Types

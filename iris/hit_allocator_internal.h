@@ -29,28 +29,26 @@ typedef struct _HIT_ALLOCATOR {
 // Functions
 //
 
-_Check_return_
-_Success_(return != 0)
 static
 inline
-bool
+void
 HitAllocatorInitialize(
-    _Out_ PHIT_ALLOCATOR allocator
+    _Out_ struct _HIT_ALLOCATOR *allocator
     )
 {
-    ASSERT(allocator != NULL);
+    assert(allocator != NULL);
 
-    return DynamicMemoryAllocatorInitialize(&allocator->allocator);
+    DynamicMemoryAllocatorInitialize(&allocator->allocator);
 }
 
 static
 inline
 void
 HitAllocatorDestroy(
-    _Inout_ PHIT_ALLOCATOR allocator
+    _Inout_ struct _HIT_ALLOCATOR *allocator
     )
 {
-    ASSERT(allocator != NULL);
+    assert(allocator != NULL);
 
     DynamicMemoryAllocatorDestroy(&allocator->allocator);
 }
@@ -59,10 +57,10 @@ static
 inline
 void
 HitAllocatorFreeAll(
-    _Inout_ PHIT_ALLOCATOR allocator
+    _Inout_ struct _HIT_ALLOCATOR *allocator
     )
 {
-    ASSERT(allocator != NULL);
+    assert(allocator != NULL);
 
     DynamicMemoryAllocatorFreeAll(&allocator->allocator);
 }

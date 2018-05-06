@@ -17,8 +17,6 @@ Abstract:
 
 #include "iris/sal.h"
 
-#include <stdint.h>
-
 typedef _Return_type_success_(return == 0) enum _ISTATUS {
     ISTATUS_SUCCESS           = 0x00,
     ISTATUS_ALLOCATION_FAILED = 0x01,

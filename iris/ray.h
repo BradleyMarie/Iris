@@ -12,11 +12,11 @@ Abstract:
 
 --*/
 
-#include "iris/point.h"
-#include "iris/vector.h"
-
 #ifndef _IRIS_RAY_
 #define _IRIS_RAY_
+
+#include "iris/point.h"
+#include "iris/vector.h"
 
 //
 // Types

@@ -17,7 +17,6 @@ Abstract:
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #ifndef _COMMON_SAFE_MATH_
 #define _COMMON_SAFE_MATH_

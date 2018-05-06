@@ -17,7 +17,11 @@ Abstract:
 
 #include "iris/status.h"
 
+#if __cplusplus 
+#include <math.h>
+#else
 #include <tgmath.h>
+#endif // __cplusplus
 
 //
 // Types
