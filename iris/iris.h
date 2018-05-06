@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_
 #define _IRIS_
 
+#include "iris/hit.h"
 #include "iris/matrix.h"
 #include "iris/multiply.h"
 #include "iris/point.h"
@@ -23,4 +24,4 @@ Abstract:
 #include "iris/status.h"
 #include "iris/vector.h"
 
-#endif _IRIS_
+#endif // _IRIS_

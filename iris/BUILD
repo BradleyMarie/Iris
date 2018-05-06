@@ -1,9 +1,18 @@
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "hit",
+    hdrs = ["hit.h"],
+    deps = [
+        ":sal",
+    ],
+)
+
+cc_library(
     name = "iris",
     hdrs = ["iris.h"],
     deps = [
+        ":hit",
         ":matrix",
         ":multiply",
         ":point",
