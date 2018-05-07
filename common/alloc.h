@@ -227,7 +227,7 @@ AlignedAllocWithHeader(
 
     size_t sizes[] = {header_size, data_size};
     size_t alignments[] = {header_alignment, data_alignment};
-    size_t placements[2];
+    size_t placements[2] = { 0, 0 };
     size_t alignment, size;
 
     bool success = LayoutNewAllocation(2,
@@ -306,7 +306,7 @@ AlignedAllocWithTwoHeaders(
     size_t sizes[] = {first_header_size, second_header_size, data_size};
     size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
-    size_t placements[3];
+    size_t placements[3] = { 0, 0, 0 };
     size_t alignment, size;
 
     bool success = LayoutNewAllocation(3,
@@ -390,7 +390,7 @@ AlignedResizeWithTwoHeaders(
     size_t sizes[] = {first_header_size, second_header_size, data_size};
     size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
-    uintptr_t placements[3];
+    uintptr_t placements[3] = { 0, 0, 0 };
 
     bool success = LayoutAllocation((uintptr_t)original_header,
                                     original_allocation_size,

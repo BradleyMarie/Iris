@@ -25,7 +25,7 @@ TEST(AllocTest, LayoutNewAllocationOneElement)
     size_t placements[] = { 100 };
     size_t size, alignment;
 
-    EXPECT_TRUE(LayoutNewAllocation(2, 
+    EXPECT_TRUE(LayoutNewAllocation(1, 
                                     sizes,
                                     alignments,
                                     placements,
