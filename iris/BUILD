@@ -86,6 +86,7 @@ cc_library(
     deps = [
         ":hit",
         ":hit_allocator",
+        ":hit_tester",
         ":hit_context",
         ":matrix",
         ":multiply",
@@ -223,6 +224,16 @@ cc_library(
     deps = [
         ":shared_hit_context",
         "//common:static_allocator",
+    ],
+)
+
+cc_test(
+    name = "shared_hit_context_allocator_test",
+    srcs = ["shared_hit_context_allocator_test.cc"],
+    deps = [
+        ":shared_hit_context_allocator",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
     ],
 )
 
