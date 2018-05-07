@@ -25,7 +25,7 @@ Abstract:
        which must have its intersection test done in its model coordinate space.
        for these objects use HitTesterTestGeometry.
     
-    Note, the right thing will happen if transformation passed into them is the 
+    Note, the right thing will happen if the transformation passed in is the 
     identity matrix.
 
     These routines also allow the data associated with the hits to be different
