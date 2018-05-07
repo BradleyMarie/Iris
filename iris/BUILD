@@ -25,6 +25,17 @@ cc_library(
         ":hit_allocator_internal",
         ":point",
         ":sal",
+        ":status",
+    ],
+)
+
+cc_test(
+    name = "hit_allocator_test",
+    srcs = ["hit_allocator_test.cc"],
+    deps = [
+        ":hit_allocator",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
     ],
 )
 

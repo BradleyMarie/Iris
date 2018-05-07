@@ -38,7 +38,7 @@ HitAllocatorAllocateInternal(
     )
 {
     assert(hit != NULL);
-    assert(hit_point != NULL || PointValidate(*hit_point));
+    assert(hit_point == NULL || PointValidate(*hit_point));
 
     if (allocator == NULL)
     {

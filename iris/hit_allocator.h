@@ -37,6 +37,7 @@ Abstract:
 #include "iris/hit.h"
 #include "iris/point.h"
 #include "iris/sal.h"
+#include "iris/status.h"
 
 #include <stdint.h>
 

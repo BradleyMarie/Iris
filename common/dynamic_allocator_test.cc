@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Unit tests for dynamic_allocator_test.h
+    Unit tests for dynamic_allocator.h
 
 --*/
 
@@ -240,6 +240,8 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         }
     }
 
+    EXPECT_EQ(1000u, header_values.size());
+
     for (const auto& entry : header_values)
     {
         EXPECT_STREQ(entry.second.c_str(), entry.first);
@@ -295,6 +297,8 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
             data_values[datum] = datum_value;
         }
     }
+
+    EXPECT_EQ(2000u, header_values.size());
 
     for (const auto& entry : header_values)
     {
