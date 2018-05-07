@@ -24,6 +24,7 @@ Abstract:
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
 HitTesterCollectHitsAndUpdateSharedHit(
     _Inout_ PHIT_TESTER hit_tester,
@@ -99,6 +100,7 @@ HitTesterTestWorldInternal(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
 HitTesterTestPremultipliedInternal(
     _Inout_ PHIT_TESTER hit_tester,
@@ -150,6 +152,7 @@ HitTesterTestPremultipliedInternal(
 
 _Check_return_
 _Success_(return == ISTATUS_SUCCESS)
+static
 ISTATUS
 HitTesterTestTransformedInternal(
     _Inout_ PHIT_TESTER hit_tester,
