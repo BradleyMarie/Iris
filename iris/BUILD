@@ -48,6 +48,31 @@ cc_library(
 )
 
 cc_library(
+    name = "hit_tester_internal",
+    hdrs = ["hit_tester_internal.h"],
+    deps = [
+        ":hit_allocator_internal",
+        ":shared_hit_context_allocator",
+        "//common:const_pointer_list"
+    ],
+)
+
+cc_library(
+    name = "hit_tester",
+    hdrs = ["hit_tester.h"],
+    srcs = ["hit_tester.c"],
+    deps = [
+        ":full_hit_context",
+        ":hit_allocator",
+        ":hit_allocator_internal",
+        ":hit_tester_internal",
+        ":matrix",
+        ":multiply_internal",
+        ":ray",
+    ],
+)
+
+cc_library(
     name = "hit_allocator_internal",
     hdrs = ["hit_allocator_internal.h"],
     deps = [
@@ -189,6 +214,15 @@ cc_library(
     deps = [
         ":matrix",
         ":ray",
+    ],
+)
+
+cc_library(
+    name = "shared_hit_context_allocator",
+    hdrs = ["shared_hit_context_allocator.h"],
+    deps = [
+        ":shared_hit_context",
+        "//common:static_allocator",
     ],
 )
 

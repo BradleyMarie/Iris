@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include "iris/matrix.h"
+
 #include "iris/matrix_internal.h"
 #include "iris/vector.h"
 
