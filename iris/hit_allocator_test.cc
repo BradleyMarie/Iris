@@ -537,12 +537,13 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
     std::set<PHIT> no_hit_points;
     std::map<PHIT, std::string> data;
     std::map<PHIT, size_t> data_sizes;
+    std::vector<PHIT> hits_in_order;
 
     HIT_ALLOCATOR allocator;
     HitAllocatorInitialize(&allocator);
 
     PHIT last = nullptr;
-    for (int i = 0; i < 1000; i++)
+    for (uintptr_t i = 0; i < 1000; i++)
     {
         size_t datum_size = 0;
         if (should_do_action(rng) != 1)
@@ -569,6 +570,8 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         {
             additional_data = random_string.c_str();
         }
+
+        HitAllocatorSetData(&allocator, (const void *)i);
 
         PHIT hit;
         if (should_do_action(rng) < 8) {
@@ -603,6 +606,7 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
             no_hit_points.insert(hit);
         }
 
+        hits_in_order.push_back(hit);
         nexts[hit] = next;
         distances[hit] = distance;
         front_faces[hit] = front_face;
@@ -617,7 +621,7 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         last = hit;
     }
 
-    EXPECT_EQ(1000u, distances.size());
+    EXPECT_EQ(1000u, hits_in_order.size());
 
     for (const auto& entry : nexts)
     {
@@ -627,6 +631,12 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
     for (const auto& entry : distances)
     {
         EXPECT_EQ(entry.second, entry.first->distance);
+    }
+
+    for (uintptr_t i = 0; i < hits_in_order.size(); i++)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)hits_in_order[i];
+        EXPECT_EQ(i, (uintptr_t)full_hit->context.data);
     }
 
     for (const auto& entry : front_faces)
@@ -680,10 +690,11 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
     no_hit_points.clear();
     data.clear();
     data_sizes.clear();
+    hits_in_order.clear();
     HitAllocatorFreeAll(&allocator);
 
     last = nullptr;
-    for (int i = 0; i < 2000; i++)
+    for (uintptr_t i = 0; i < 2000; i++)
     {
         size_t datum_size = 0;
         if (should_do_action(rng) != 1)
@@ -710,6 +721,8 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         {
             additional_data = random_string.c_str();
         }
+
+        HitAllocatorSetData(&allocator, (const void *)i);
 
         PHIT hit;
         if (should_do_action(rng) < 8) {
@@ -744,6 +757,7 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
             no_hit_points.insert(hit);
         }
 
+        hits_in_order.push_back(hit);
         nexts[hit] = next;
         distances[hit] = distance;
         front_faces[hit] = front_face;
@@ -758,7 +772,7 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         last = hit;
     }
 
-    EXPECT_EQ(2000u, distances.size());
+    EXPECT_EQ(2000u, hits_in_order.size());
 
     for (const auto& entry : nexts)
     {
@@ -768,6 +782,12 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
     for (const auto& entry : distances)
     {
         EXPECT_EQ(entry.second, entry.first->distance);
+    }
+
+    for (uintptr_t i = 0; i < hits_in_order.size(); i++)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)hits_in_order[i];
+        EXPECT_EQ(i, (uintptr_t)full_hit->context.data);
     }
 
     for (const auto& entry : front_faces)

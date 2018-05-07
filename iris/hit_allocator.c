@@ -86,7 +86,7 @@ HitAllocatorAllocateInternal(
 
     hit_context->hit.next = next;
     hit_context->hit.distance = distance;
-    hit_context->context.data = NULL;
+    hit_context->context.data = allocator->data;
     hit_context->context.distance = distance;
     hit_context->context.front_face = front_face;
     hit_context->context.back_face = back_face;

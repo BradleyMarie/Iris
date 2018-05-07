@@ -23,6 +23,7 @@ Abstract:
 
 typedef struct _HIT_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR allocator;
+    const void *data;
 } HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 
 //
@@ -39,18 +40,20 @@ HitAllocatorInitialize(
     assert(allocator != NULL);
 
     DynamicMemoryAllocatorInitialize(&allocator->allocator);
+    allocator->data = NULL;
 }
 
 static
-inline
+inline 
 void
-HitAllocatorDestroy(
-    _Inout_ struct _HIT_ALLOCATOR *allocator
+HitAllocatorSetData(
+    _Inout_ struct _HIT_ALLOCATOR *allocator,
+    _In_ const void *data
     )
 {
     assert(allocator != NULL);
 
-    DynamicMemoryAllocatorDestroy(&allocator->allocator);
+    allocator->data = data;
 }
 
 static
@@ -63,6 +66,18 @@ HitAllocatorFreeAll(
     assert(allocator != NULL);
 
     DynamicMemoryAllocatorFreeAll(&allocator->allocator);
+}
+
+static
+inline
+void
+HitAllocatorDestroy(
+    _Inout_ struct _HIT_ALLOCATOR *allocator
+    )
+{
+    assert(allocator != NULL);
+
+    DynamicMemoryAllocatorDestroy(&allocator->allocator);
 }
 
 #endif // _IRIS_HIT_ALLOCATOR_INTERNAL_
