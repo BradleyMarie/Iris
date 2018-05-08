@@ -29,6 +29,30 @@ extern "C" {
 #include <string>
 #include <vector>
 
+TEST(HitAllocatorTest, HitAllocatorSetRayGetRay)
+{
+    HIT_ALLOCATOR allocator;
+    HitAllocatorInitialize(&allocator);
+
+    RAY model_ray;
+    HitAllocatorSetRay(&allocator, &model_ray);
+    EXPECT_EQ(&model_ray, HitAllocatorGetRay(&allocator));
+
+    HitAllocatorDestroy(&allocator);
+}
+
+TEST(HitAllocatorTest, HitAllocatorSetDataGetData)
+{
+    HIT_ALLOCATOR allocator;
+    HitAllocatorInitialize(&allocator);
+
+    POINT3 data;
+    HitAllocatorSetData(&allocator, &data);
+    EXPECT_EQ(&data, HitAllocatorGetData(&allocator));
+
+    HitAllocatorDestroy(&allocator);
+}
+
 TEST(HitAllocatorTest, HitAllocatorAllocateErrors)
 {
     HIT_ALLOCATOR allocator;

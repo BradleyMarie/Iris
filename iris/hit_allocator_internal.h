@@ -23,6 +23,7 @@ Abstract:
 
 typedef struct _HIT_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR allocator;
+    const RAY *model_ray;
     const void *data;
 } HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 
@@ -40,7 +41,36 @@ HitAllocatorInitialize(
     assert(allocator != NULL);
 
     DynamicMemoryAllocatorInitialize(&allocator->allocator);
+    allocator->model_ray = NULL;
     allocator->data = NULL;
+}
+
+static
+inline 
+void
+HitAllocatorSetRay(
+    _Inout_ struct _HIT_ALLOCATOR *allocator,
+    _In_ PCRAY model_ray
+    )
+{
+    assert(allocator != NULL);
+    assert(model_ray != NULL);
+    assert(RayValidate(*model_ray));
+
+    allocator->model_ray = model_ray;
+}
+
+_Ret_
+static
+inline 
+PCRAY
+HitAllocatorGetRay(
+    _In_ const struct _HIT_ALLOCATOR *allocator
+    )
+{
+    assert(allocator != NULL);
+
+    return allocator->model_ray;
 }
 
 static
@@ -54,6 +84,19 @@ HitAllocatorSetData(
     assert(allocator != NULL);
 
     allocator->data = data;
+}
+
+_Ret_
+static
+inline 
+const void *
+HitAllocatorGetData(
+    _In_ const struct _HIT_ALLOCATOR *allocator
+    )
+{
+    assert(allocator != NULL);
+
+    return allocator->data;
 }
 
 static

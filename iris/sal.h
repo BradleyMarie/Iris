@@ -39,6 +39,7 @@ Abstract:
 
 #define _Pre_bytecount_(size)
 #define _Pre_invalid_
+#define _Pre_null_
 #define _Pre_maybenull_
 #define _Post_valid_
 #define _Post_invalid_

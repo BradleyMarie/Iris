@@ -28,6 +28,14 @@ Abstract:
     Note, the right thing will happen if the transformation passed in is the 
     identity matrix.
 
+    There is also one other, related form of hit testing. If an object is nested
+    within another object, HitTesterTestNestedGeometry allows for intersection
+    testing against the second level object. Iris only supports nested objects
+    which reside in the same coordinate space as the top level object. Unlike
+    the other hit test routines here, HitTesterTestNestedGeometry returns back
+    the list of hits immediately, so it is the responsibility of its caller to
+    propigate those hits back up the call stack.
+
     These routines also allow the data associated with the hits to be different
     than the data used during intersection testing. This may be useful if the 
     data needed to complete an intersection test is nested within some auxiliary
@@ -57,7 +65,7 @@ ISTATUS
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
     );
 
 //
@@ -98,6 +106,18 @@ HitTesterTestGeometry(
     _In_opt_ const void *hit_data,
     _In_opt_ PCMATRIX model_to_world,
     _In_ bool premultiplied
+    );
+
+_Check_return_
+_Success_(return == ISTATUS_SUCCESS)
+//IRISAPI
+ISTATUS
+HitTesterTestNestedGeometry(
+    _Inout_ PHIT_ALLOCATOR hit_allocator,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _Outptr_result_maybenull_ PHIT *hits
     );
 
 #endif // _IRIS_HIT_TESTER_
