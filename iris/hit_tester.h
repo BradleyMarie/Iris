@@ -58,8 +58,6 @@ typedef struct _HIT_TESTER HIT_TESTER, *PHIT_TESTER;
 typedef const HIT_TESTER *PCHIT_TESTER;
 
 typedef
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS 
 (*PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(
     _In_opt_ const void *data, 
@@ -72,8 +70,6 @@ ISTATUS
 // Functions
 //
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 //IRISAPI
 ISTATUS
 HitTesterTestWorldGeometry(
@@ -83,8 +79,6 @@ HitTesterTestWorldGeometry(
     _In_opt_ const void *hit_data
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 //IRISAPI
 ISTATUS
 HitTesterTestPremultipliedGeometry(
@@ -95,8 +89,6 @@ HitTesterTestPremultipliedGeometry(
     _In_opt_ PCMATRIX model_to_world
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 //IRISAPI
 ISTATUS
 HitTesterTestGeometry(
@@ -108,8 +100,6 @@ HitTesterTestGeometry(
     _In_ bool premultiplied
     );
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 //IRISAPI
 ISTATUS
 HitTesterTestNestedGeometry(

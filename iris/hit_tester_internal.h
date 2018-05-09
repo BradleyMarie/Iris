@@ -28,6 +28,7 @@ struct _HIT_TESTER {
     SHARED_HIT_CONTEXT_ALLOCATOR context_allocator;
     CONSTANT_POINTER_LIST hit_list;
     RAY world_ray;
+    float_t minimum_distance;
 };
 
 //
@@ -63,6 +64,8 @@ HitTesterInitialize(
 
     HitAllocatorInitialize(&hit_tester->hit_allocator);
 
+    hit_tester->minimum_distance = (float_t)0.0;
+
     return true;
 }
 
@@ -71,17 +74,21 @@ inline
 void
 HitTesterReset(
     _Inout_ struct _HIT_TESTER *hit_tester,
-    _In_ RAY world_ray
+    _In_ RAY world_ray,
+    _In_ float_t minimum_distance
     )
 {
     assert(hit_tester != NULL);
     assert(RayValidate(world_ray));
+    assert(isfinite(minimum_distance));
+    assert((float_t)0.0 <= minimum_distance);
 
     HitAllocatorFreeAll(&hit_tester->hit_allocator);
     SharedHitContextAllocatorFreeAll(&hit_tester->context_allocator);
     ConstantPointerListClear(&hit_tester->hit_list);
 
     hit_tester->world_ray = world_ray;
+    hit_tester->minimum_distance = minimum_distance;
 }
 
 static

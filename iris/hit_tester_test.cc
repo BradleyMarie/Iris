@@ -202,7 +202,7 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray);
+    HitTesterReset(&tester, ray, (float_t)0.0);
     ISTATUS status = HitTesterTestWorldGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -269,7 +269,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray);
+    HitTesterReset(&tester, ray, (float_t)0.0);
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -362,7 +362,7 @@ TEST(HitTesterTest, HitTesterTestGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray);
+    HitTesterReset(&tester, ray, (float_t)0.0);
     status = HitTesterTestGeometry(&tester,
                                    CheckGeometryContext,
                                    &params,

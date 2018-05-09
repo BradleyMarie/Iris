@@ -22,8 +22,6 @@ Abstract:
 // Static Functions
 //
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 HitTesterCollectHitsAndUpdateSharedHit(
@@ -38,16 +36,19 @@ HitTesterCollectHitsAndUpdateSharedHit(
 
     do
     {
-        bool success = 
-            ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
-
-        if (!success)
+        if (hit_tester->minimum_distance <= hit->distance)
         {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
+            bool success = 
+                ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
 
-        PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
-        full_hit_context->shared_context = shared_context;
+            if (!success)
+            {
+                return ISTATUS_ALLOCATION_FAILED;
+            }
+
+            PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
+            full_hit_context->shared_context = shared_context;
+        }
 
         hit = hit->next;
     } while (hit != NULL);
@@ -55,8 +56,6 @@ HitTesterCollectHitsAndUpdateSharedHit(
     return ISTATUS_SUCCESS;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 HitTesterTestWorldInternal(
@@ -85,12 +84,15 @@ HitTesterTestWorldInternal(
 
     while (hit != NULL)
     {
-        bool success = 
-            ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
-
-        if (!success)
+        if (hit_tester->minimum_distance <= hit->distance)
         {
-            return ISTATUS_ALLOCATION_FAILED;
+            bool success = 
+                ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
+
+            if (!success)
+            {
+                return ISTATUS_ALLOCATION_FAILED;
+            }
         }
 
         hit = hit->next;
@@ -99,8 +101,6 @@ HitTesterTestWorldInternal(
     return ISTATUS_SUCCESS;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 HitTesterTestPremultipliedInternal(
@@ -152,8 +152,6 @@ HitTesterTestPremultipliedInternal(
     return status;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 static
 ISTATUS
 HitTesterTestTransformedInternal(
@@ -213,8 +211,6 @@ HitTesterTestTransformedInternal(
 // Functions
 //
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -241,8 +237,6 @@ HitTesterTestWorldGeometry(
     return status;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 HitTesterTestPremultipliedGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -281,8 +275,6 @@ HitTesterTestPremultipliedGeometry(
     return status;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 HitTesterTestGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -333,8 +325,6 @@ HitTesterTestGeometry(
     return status;
 }
 
-_Check_return_
-_Success_(return == ISTATUS_SUCCESS)
 ISTATUS
 HitTesterTestNestedGeometry(
     _Inout_ PHIT_ALLOCATOR hit_allocator,

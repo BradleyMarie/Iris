@@ -104,6 +104,7 @@ cc_library(
         ":multiply",
         ":point",
         ":ray",
+        ":ray_tracer",
         ":sal",
         ":status",
         ":vector",
@@ -212,6 +213,13 @@ cc_test(
         ":ray",
         "//test:test_util",
         "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "ray_tracer",
+    hdrs = ["ray_tracer.h"],
+    deps = [
     ],
 )
 

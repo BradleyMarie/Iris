@@ -25,6 +25,7 @@ typedef struct _HIT_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR allocator;
     const RAY *model_ray;
     const void *data;
+    float_t minimum_distance;
 } HIT_ALLOCATOR, *PHIT_ALLOCATOR;
 
 //
