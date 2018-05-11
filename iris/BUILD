@@ -52,7 +52,6 @@ cc_library(
     hdrs = ["hit_tester.h"],
     srcs = ["hit_tester.c"],
     deps = [
-        ":full_hit_context",
         ":hit_allocator",
         ":hit_allocator_internal",
         ":hit_tester_internal",
@@ -66,6 +65,7 @@ cc_library(
     name = "hit_tester_internal",
     hdrs = ["hit_tester_internal.h"],
     deps = [
+        ":full_hit_context",
         ":hit_allocator_internal",
         ":shared_hit_context_allocator",
         "//common:const_pointer_list"
@@ -219,7 +219,13 @@ cc_test(
 cc_library(
     name = "ray_tracer",
     hdrs = ["ray_tracer.h"],
+    srcs = ["ray_tracer.c"],
     deps = [
+        ":hit_context",
+        ":hit_tester",
+        ":hit_tester_internal",
+        ":multiply_internal",
+        ":ray"
     ],
 )
 

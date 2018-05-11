@@ -456,3 +456,68 @@ TEST(HitTesterTest, HitTesterTestGeometry)
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
 }
+
+ISTATUS 
+AllocateHitAtDistance(
+    _In_opt_ const void *data, 
+    _In_ PCRAY ray,
+    _Inout_ PHIT_ALLOCATOR hit_allocator,
+    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    )
+{
+    const float_t* distance = (const float_t*)data;
+    ISTATUS status = HitAllocatorAllocate(hit_allocator,
+                                          NULL,
+                                          *distance,
+                                          1,
+                                          2,
+                                          nullptr,
+                                          0,
+                                          0,
+                                          hits);
+    return status;
+}
+
+TEST(HitTesterTest, HitTesterSortHits)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    VECTOR3 direction = VectorCreate((float_t) 4.0,
+                                     (float_t) 5.0, 
+                                     (float_t) 6.0);
+    RAY ray = RayCreate(origin, direction);
+
+    HitTesterReset(&tester, ray, (float_t)0.0);
+
+    int hit_data = 0;
+    for (int i = 1; i <= 1000; i++)
+    {
+        float_t distance = (float_t)(1001 - i);
+        ISTATUS status = HitTesterTestWorldGeometry(&tester,
+                                                    AllocateHitAtDistance,
+                                                    &distance,
+                                                    &hit_data);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+    }
+
+    size_t size;
+    PCFULL_HIT_CONTEXT* hits;
+    HitTesterGetHits(&tester, &hits, &size);
+    ASSERT_EQ(1000u, size);
+
+    for (int i = 0; i < 1000; i++)
+    {
+        EXPECT_EQ((float_t)(1000 - i), hits[i]->context.distance);
+    }
+
+    HitTesterSortHits(&tester);
+
+    for (int i = 0; i < 1000; i++)
+    {
+        EXPECT_EQ((float_t)(i + 1), hits[i]->context.distance);
+    }
+
+    HitTesterDestroy(&tester);
+}

@@ -72,6 +72,26 @@ TEST(ConstPointerListTest, ConstantPointerListClear)
     ConstantPointerListDestroy(&list);
 }
 
+TEST(ConstPointerListTest, ConstantPointerListGetData)
+{
+    CONSTANT_POINTER_LIST list;
+    ASSERT_TRUE(ConstantPointerListInitialize(&list));
+
+    for (size_t i = 0; i < 1000; i++) {
+        ASSERT_TRUE(ConstantPointerListAddPointer(&list, (void *)(uintptr_t)i));
+    }
+
+    ASSERT_EQ(1000u, ConstantPointerListGetSize(&list));
+
+    const void** data;
+    size_t size;
+    ConstantPointerListGetData(&list, &data, &size);
+    ASSERT_EQ(1000u, size);
+    ASSERT_EQ(list.list, data);
+
+    ConstantPointerListDestroy(&list);
+}
+
 int Reverse(const void* left, const void* right) {
     const void **left_entry = (const void **)left;
     const void **right_entry = (const void **)right;

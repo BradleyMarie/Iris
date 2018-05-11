@@ -14,7 +14,6 @@ Abstract:
 
 #include "iris/hit_tester.h"
 
-#include "iris/full_hit_context.h"
 #include "iris/hit_tester_internal.h"
 #include "iris/multiply_internal.h"
 

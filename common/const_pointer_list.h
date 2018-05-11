@@ -150,6 +150,23 @@ ConstantPointerListGetSize(
 static
 inline
 void
+ConstantPointerListGetData(
+    _In_ PCCONSTANT_POINTER_LIST list,
+    _Outptr_result_buffer_(*size) const void ***entries,
+    _Out_ size_t *size
+    )
+{
+    assert(list != NULL);
+    assert(entries != NULL);
+    assert(size != NULL);
+
+    *entries = list->list;
+    *size = list->size;
+}
+
+static
+inline
+void
 ConstantPointerListClear(
     _Inout_ PCONSTANT_POINTER_LIST list
     )
