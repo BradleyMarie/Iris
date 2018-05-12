@@ -229,6 +229,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ray_tracer_test",
+    srcs = ["ray_tracer_test.cc"],
+    deps = [
+        ":ray_tracer",
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "sal",
     hdrs = ["sal.h"],
