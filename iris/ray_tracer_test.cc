@@ -119,14 +119,14 @@ AllocateGeometryData(
     data.hit_data.set_model_hit = true;
     data.hit_data.model_hit = PointCreate(200.0, 200.0, 200.0);
     EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateTranslation(1.0, 2.0, 3.0, &data.matrix));
+              MatrixAllocateScalar(1.0, 2.0, 4.0, &data.matrix));
     data.premultiplied = false;
     result.push_back(data);
 
     data.hit_data.distance = (float_t)1.0;
     data.hit_data.set_model_hit = false;
     EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateScalar(1.0, 2.0, 3.0, &data.matrix));
+              MatrixAllocateScalar(1.0, 2.0, 4.0, &data.matrix));
     data.premultiplied = false;
     result.push_back(data);
 
@@ -205,7 +205,10 @@ struct ProcessHitData {
     size_t hits_processed;
     bool sorted;
     float_t distance;
-    GeometryDataList *geometry_data;
+    PCMATRIX translation_dist_5;
+    PCMATRIX translation_dist_6;
+    PCMATRIX scalar_dist_1;
+    PCMATRIX scalar_dist_2;
 };
 
 static
@@ -275,96 +278,52 @@ ProcessHitWithCoordinatesRoutine(
 
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->front_face);
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->back_face);
-    
-    size_t index = (size_t)((float_t)6.0 - hit_context->distance);
-    PCMATRIX e_m2w = (*process_data->geometry_data)[index].matrix;
-    EXPECT_EQ(e_m2w, model_to_world);
-    bool premultiplied = (*process_data->geometry_data)[index].premultiplied;
 
     if (hit_context->distance == (float_t)1.0)
     {
-
+        EXPECT_EQ(process_data->scalar_dist_1, model_to_world);
+        EXPECT_EQ(PointCreate(8.0, 3.0, 1.0), model_hit_point);
+        EXPECT_EQ(PointCreate(8.0, 6.0, 4.0), world_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 1.5, 0.5), model_viewer);
     }
     else if (hit_context->distance == (float_t)2.0)
     {
-
+        EXPECT_EQ(process_data->scalar_dist_2, model_to_world);
+        EXPECT_EQ(PointCreate(200.0, 200.0, 200.0), model_hit_point);
+        EXPECT_EQ(PointCreate(12.0, 9.0, 6.0), world_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 1.5, 0.5), model_viewer);
     }
     else if (hit_context->distance == (float_t)3.0)
     {
-
+        EXPECT_TRUE(model_to_world == nullptr);
+        EXPECT_EQ(PointCreate(16.0, 12.0, 8.0), model_hit_point);
+        EXPECT_EQ(world_hit_point, model_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)4.0)
     {
-
+        EXPECT_TRUE(model_to_world == nullptr);
+        EXPECT_EQ(PointCreate(400.0, 400.0, 400.0), model_hit_point);
+        EXPECT_EQ(world_hit_point, model_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)5.0)
     {
-
+        EXPECT_EQ(process_data->translation_dist_5, model_to_world);
+        EXPECT_EQ(PointCreate(22.0, 15.0, 8.0), model_hit_point);
+        EXPECT_EQ(PointCreate(24.0, 18.0, 12.0), world_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)6.0)
     {
-
+        EXPECT_EQ(process_data->translation_dist_6, model_to_world);
+        EXPECT_EQ(PointCreate(600.0, 600.0, 600.0), world_hit_point);
+        EXPECT_EQ(PointCreate(597.0, 596.0, 595.0), model_hit_point);
+        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else
     {
         ADD_FAILURE();
-    }
-    
-    if (e_m2w == nullptr)
-    {
-        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
-        {
-            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
-                      world_hit_point);
-        }
-        else
-        {
-            EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
-                      world_hit_point);
-        }
-        
-        EXPECT_EQ(CreateWorldRay().direction, model_viewer);
-        EXPECT_EQ(model_hit_point, world_hit_point);
-    }
-    else if (premultiplied)
-    {
-        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
-        {
-            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
-                      world_hit_point);
-        }
-        else
-        {
-            EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
-                      world_hit_point);
-        }
-        
-        EXPECT_EQ(PointMatrixInverseMultiply(e_m2w, world_hit_point),
-                  model_hit_point);
-
-        EXPECT_EQ(
-            VectorMatrixInverseMultiply(e_m2w, CreateWorldRay().direction),
-            model_viewer);
-    }
-    else
-    {
-        EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
-                world_hit_point);
-
-        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
-        {
-            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
-                      model_hit_point);
-        }
-        else
-        {
-            EXPECT_EQ(PointMatrixInverseMultiply(e_m2w, world_hit_point),
-                      model_hit_point);
-        }
-        
-        EXPECT_EQ(
-            VectorMatrixInverseMultiply(e_m2w, CreateWorldRay().direction),
-            model_viewer);
     }
     
     if (process_data->last_hit_to_process < process_data->hits_processed)
@@ -510,7 +469,10 @@ TEST(RayTracerTest, RayTracerTraceClosestHit)
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
-    process_data.geometry_data = &geometry_data;
+    process_data.scalar_dist_1 = geometry_data[5].matrix;
+    process_data.scalar_dist_2 = geometry_data[4].matrix;
+    process_data.translation_dist_5 = geometry_data[1].matrix;
+    process_data.translation_dist_6 = geometry_data[0].matrix;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
@@ -665,7 +627,10 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinates)
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
-    process_data.geometry_data = &geometry_data;
+    process_data.scalar_dist_1 = geometry_data[5].matrix;
+    process_data.scalar_dist_2 = geometry_data[4].matrix;
+    process_data.translation_dist_5 = geometry_data[1].matrix;
+    process_data.translation_dist_6 = geometry_data[0].matrix;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
@@ -820,7 +785,10 @@ TEST(RayTracerTest, RayTracerTraceAllHits)
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
-    process_data.geometry_data = &geometry_data;
+    process_data.scalar_dist_1 = geometry_data[5].matrix;
+    process_data.scalar_dist_2 = geometry_data[4].matrix;
+    process_data.translation_dist_5 = geometry_data[1].matrix;
+    process_data.translation_dist_6 = geometry_data[0].matrix;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
