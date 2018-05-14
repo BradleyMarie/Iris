@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 extern "C" {
+#include "iris/multiply.h"
 #include "iris/ray_tracer.h"
 }
 
@@ -40,19 +41,6 @@ AllocateHitRoutine(
     
     if (hit_data->set_model_hit)
     {
-        ISTATUS status = HitAllocatorAllocate(hit_allocator,
-                                              nullptr,
-                                              hit_data->distance,
-                                              (uint32_t)hit_data->distance,
-                                              (uint32_t)hit_data->distance,
-                                              nullptr,
-                                              0,
-                                              0,
-                                              hits);
-        EXPECT_EQ(ISTATUS_SUCCESS, status);
-    }
-    else
-    {
         ISTATUS status = HitAllocatorAllocateWithHitPoint(hit_allocator,
                                                           nullptr,
                                                           hit_data->distance,
@@ -63,6 +51,19 @@ AllocateHitRoutine(
                                                           0,
                                                           hit_data->model_hit,
                                                           hits);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+    }
+    else
+    {
+        ISTATUS status = HitAllocatorAllocate(hit_allocator,
+                                              nullptr,
+                                              hit_data->distance,
+                                              (uint32_t)hit_data->distance,
+                                              (uint32_t)hit_data->distance,
+                                              nullptr,
+                                              0,
+                                              0,
+                                              hits);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
     }
 
@@ -86,35 +87,35 @@ AllocateGeometryData(
 
     GeometryData data;
 
-    // First Hit
+    // Third Hit
     data.hit_data.distance = (float_t)1.0;
+    data.hit_data.set_model_hit = false;
+    EXPECT_EQ(ISTATUS_SUCCESS, 
+              MatrixAllocateScalar(1.0, 2.0, 3.0, &data.matrix));
+    data.premultiplied = false;
+    result.push_back(data);
+
+    // Fourth Hit
+    data.hit_data.distance = (float_t)2.0;
+    data.hit_data.set_model_hit = true;
+    data.hit_data.model_hit = PointCreate(200.0, 200.0, 200.0);
+    EXPECT_EQ(ISTATUS_SUCCESS, 
+              MatrixAllocateTranslation(1.0, 2.0, 3.0, &data.matrix));
+    data.premultiplied = false;
+    result.push_back(data);
+
+    // First Hit
+    data.hit_data.distance = (float_t)3.0;
     data.hit_data.set_model_hit = false;
     data.matrix = nullptr;
     data.premultiplied = false;
     result.push_back(data);
 
     // Second Hit
-    data.hit_data.distance = (float_t)2.0;
-    data.hit_data.set_model_hit = true;
-    data.hit_data.model_hit = PointCreate(200.0, 200.0, 200.0);
-    data.matrix = nullptr;
-    data.premultiplied = false;
-    result.push_back(data);
-
-    // Third Hit
-    data.hit_data.distance = (float_t)3.0;
-    data.hit_data.set_model_hit = false;
-    EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateTranslation(0.0, 1.0, 2.0, &data.matrix));
-    data.premultiplied = false;
-    result.push_back(data);
-
-    // Fourth Hit
     data.hit_data.distance = (float_t)4.0;
     data.hit_data.set_model_hit = true;
     data.hit_data.model_hit = PointCreate(400.0, 400.0, 400.0);
-    EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateTranslation(1.0, 2.0, 3.0, &data.matrix));
+    data.matrix = nullptr;
     data.premultiplied = false;
     result.push_back(data);
 
@@ -149,6 +150,16 @@ FreeGeometryData(
     }
 
     data->clear();
+}
+
+RAY
+CreateWorldRay(
+    void
+    )
+{
+    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
+    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
+    return RayCreate(p0, v0);
 }
 
 static
@@ -200,6 +211,7 @@ struct ProcessHitData {
     size_t hits_processed;
     bool sorted;
     float_t distance;
+    GeometryDataList *geometry_data;
 };
 
 static
@@ -220,6 +232,9 @@ ProcessHitRoutine(
         EXPECT_EQ(process_data->distance, hit_context->distance);
         process_data->distance += (float_t)1.0;
     }
+
+    EXPECT_EQ((uint32_t)hit_context->distance, hit_context->front_face);
+    EXPECT_EQ((uint32_t)hit_context->distance, hit_context->back_face);
 
     if (process_data->last_hit_to_process < process_data->hits_processed)
     {
@@ -263,6 +278,72 @@ ProcessHitWithCoordinatesRoutine(
         EXPECT_EQ(process_data->distance, hit_context->distance);
         process_data->distance += (float_t)1.0;
     }
+
+    EXPECT_EQ((uint32_t)hit_context->distance, hit_context->front_face);
+    EXPECT_EQ((uint32_t)hit_context->distance, hit_context->back_face);
+    
+    size_t index = (size_t)(hit_context->distance - (float_t)1.0);
+    PCMATRIX e_m2w = (*process_data->geometry_data)[index].matrix;
+    EXPECT_EQ(e_m2w, model_to_world);
+    bool premultiplied = (*process_data->geometry_data)[index].premultiplied;
+
+    // TODO: Hard code these checks
+    if (e_m2w == nullptr)
+    {
+        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
+        {
+            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
+                      world_hit_point);
+        }
+        else
+        {
+            EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
+                      world_hit_point);
+        }
+        
+        EXPECT_EQ(CreateWorldRay().direction, model_viewer);
+        EXPECT_EQ(model_hit_point, world_hit_point);
+    }
+    else if (premultiplied)
+    {
+        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
+        {
+            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
+                      world_hit_point);
+        }
+        else
+        {
+            EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
+                      world_hit_point);
+        }
+        
+        EXPECT_EQ(PointMatrixInverseMultiply(e_m2w, world_hit_point),
+                  model_hit_point);
+
+        EXPECT_EQ(
+            VectorMatrixInverseMultiply(e_m2w, CreateWorldRay().direction),
+            model_viewer);
+    }
+    else
+    {
+        EXPECT_EQ(RayEndpoint(CreateWorldRay(), hit_context->distance),
+                world_hit_point);
+
+        if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
+        {
+            EXPECT_EQ((*process_data->geometry_data)[index].hit_data.model_hit,
+                      model_hit_point);
+        }
+        else
+        {
+            EXPECT_EQ(PointMatrixInverseMultiply(e_m2w, world_hit_point),
+                      model_hit_point);
+        }
+        
+        EXPECT_EQ(
+            VectorMatrixInverseMultiply(e_m2w, CreateWorldRay().direction),
+            model_viewer);
+    }
     
     if (process_data->last_hit_to_process < process_data->hits_processed)
     {
@@ -294,9 +375,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitErrors)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
 
@@ -383,9 +462,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitEmpty)
     PRAY_TRACER ray_tracer;
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     
@@ -407,12 +484,11 @@ TEST(RayTracerTest, RayTracerTraceClosestHit)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
+    process_data.geometry_data = &geometry_data;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
@@ -454,9 +530,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
 
@@ -543,9 +617,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesEmpty)
     PRAY_TRACER ray_tracer;
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     
@@ -567,12 +639,11 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinates)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
+    process_data.geometry_data = &geometry_data;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
@@ -614,9 +685,7 @@ TEST(RayTracerTest, RayTracerTraceAllHitsErrors)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
 
@@ -703,9 +772,7 @@ TEST(RayTracerTest, RayTracerTraceAllHitsEmpty)
     PRAY_TRACER ray_tracer;
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     
@@ -727,12 +794,11 @@ TEST(RayTracerTest, RayTracerTraceAllHits)
     EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
     auto geometry_data = AllocateGeometryData();
 
-    VECTOR3 v0 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    POINT3 p0 = PointCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
-    RAY ray = RayCreate(p0, v0);
+    RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
     ProcessHitData process_data;
+    process_data.geometry_data = &geometry_data;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;

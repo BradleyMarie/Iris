@@ -131,9 +131,10 @@ RayTracerProcessHitWithContext(
         return status;
     }
 
-    PCMATRIX model_to_world = hit->shared_context->model_to_world;
+    PCSHARED_HIT_CONTEXT shared_context = hit->shared_context;
+    PCMATRIX model_to_world = shared_context->model_to_world;
 
-    if (hit->shared_context->premultiplied)
+    if (shared_context->premultiplied)
     {
         POINT3 world_hit_point;
         if (hit->model_hit_point_valid)
@@ -148,10 +149,13 @@ RayTracerProcessHitWithContext(
         POINT3 model_hit_point = 
             PointMatrixInverseMultiplyInline(model_to_world, world_hit_point);
 
+        VECTOR3 model_viewer = 
+            VectorMatrixInverseMultiplyInline(model_to_world, ray.direction);
+
         ISTATUS status = process_hit_routine(process_hit_context,
                                              &hit->context,
                                              model_to_world,
-                                             ray.direction,
+                                             model_viewer,
                                              model_hit_point,
                                              world_hit_point);
         return status;
@@ -173,7 +177,7 @@ RayTracerProcessHitWithContext(
     ISTATUS status = process_hit_routine(process_hit_context,
                                          &hit->context,
                                          model_to_world,
-                                         ray.direction,
+                                         shared_context->model_ray.direction,
                                          model_hit_point,
                                          world_hit_point);
     return status;
