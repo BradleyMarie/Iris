@@ -87,15 +87,34 @@ AllocateGeometryData(
 
     GeometryData data;
 
-    // Third Hit
-    data.hit_data.distance = (float_t)1.0;
+    data.hit_data.distance = (float_t)6.0;
+    data.hit_data.set_model_hit = true;
+    data.hit_data.model_hit = PointCreate(600.0, 600.0, 600.0);
+    EXPECT_EQ(ISTATUS_SUCCESS, 
+              MatrixAllocateTranslation(3.0, 4.0, 5.0, &data.matrix));
+    data.premultiplied = true;
+    result.push_back(data);
+
+    data.hit_data.distance = (float_t)5.0;
     data.hit_data.set_model_hit = false;
     EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateScalar(1.0, 2.0, 3.0, &data.matrix));
+              MatrixAllocateTranslation(2.0, 3.0, 4.0, &data.matrix));
+    data.premultiplied = true;
+    result.push_back(data);
+
+    data.hit_data.distance = (float_t)4.0;
+    data.hit_data.set_model_hit = true;
+    data.hit_data.model_hit = PointCreate(400.0, 400.0, 400.0);
+    data.matrix = nullptr;
     data.premultiplied = false;
     result.push_back(data);
 
-    // Fourth Hit
+    data.hit_data.distance = (float_t)3.0;
+    data.hit_data.set_model_hit = false;
+    data.matrix = nullptr;
+    data.premultiplied = false;
+    result.push_back(data);
+
     data.hit_data.distance = (float_t)2.0;
     data.hit_data.set_model_hit = true;
     data.hit_data.model_hit = PointCreate(200.0, 200.0, 200.0);
@@ -104,36 +123,11 @@ AllocateGeometryData(
     data.premultiplied = false;
     result.push_back(data);
 
-    // First Hit
-    data.hit_data.distance = (float_t)3.0;
-    data.hit_data.set_model_hit = false;
-    data.matrix = nullptr;
-    data.premultiplied = false;
-    result.push_back(data);
-
-    // Second Hit
-    data.hit_data.distance = (float_t)4.0;
-    data.hit_data.set_model_hit = true;
-    data.hit_data.model_hit = PointCreate(400.0, 400.0, 400.0);
-    data.matrix = nullptr;
-    data.premultiplied = false;
-    result.push_back(data);
-
-    // Fifth Hit
-    data.hit_data.distance = (float_t)5.0;
+    data.hit_data.distance = (float_t)1.0;
     data.hit_data.set_model_hit = false;
     EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateTranslation(2.0, 3.0, 4.0, &data.matrix));
-    data.premultiplied = true;
-    result.push_back(data);
-
-    // Sixth Hit
-    data.hit_data.distance = (float_t)6.0;
-    data.hit_data.set_model_hit = true;
-    data.hit_data.model_hit = PointCreate(600.0, 600.0, 600.0);
-    EXPECT_EQ(ISTATUS_SUCCESS, 
-              MatrixAllocateTranslation(3.0, 4.0, 5.0, &data.matrix));
-    data.premultiplied = true;
+              MatrixAllocateScalar(1.0, 2.0, 3.0, &data.matrix));
+    data.premultiplied = false;
     result.push_back(data);
 
     return result;
@@ -282,12 +276,40 @@ ProcessHitWithCoordinatesRoutine(
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->front_face);
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->back_face);
     
-    size_t index = (size_t)(hit_context->distance - (float_t)1.0);
+    size_t index = (size_t)((float_t)6.0 - hit_context->distance);
     PCMATRIX e_m2w = (*process_data->geometry_data)[index].matrix;
     EXPECT_EQ(e_m2w, model_to_world);
     bool premultiplied = (*process_data->geometry_data)[index].premultiplied;
 
-    // TODO: Hard code these checks
+    if (hit_context->distance == (float_t)1.0)
+    {
+
+    }
+    else if (hit_context->distance == (float_t)2.0)
+    {
+
+    }
+    else if (hit_context->distance == (float_t)3.0)
+    {
+
+    }
+    else if (hit_context->distance == (float_t)4.0)
+    {
+
+    }
+    else if (hit_context->distance == (float_t)5.0)
+    {
+
+    }
+    else if (hit_context->distance == (float_t)6.0)
+    {
+
+    }
+    else
+    {
+        ADD_FAILURE();
+    }
+    
     if (e_m2w == nullptr)
     {
         if ((*process_data->geometry_data)[index].hit_data.set_model_hit)
