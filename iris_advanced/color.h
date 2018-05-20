@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2016 Brad Weinberger
+Copyright (c) 2015 Brad Weinberger
 
 Module Name:
 
@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the definitions for the COLOR3 type.
+    A color represented as an RGB tuple.
 
 --*/
 
@@ -27,7 +27,7 @@ typedef struct _COLOR3 {
     float_t blue;
 } COLOR3, *PCOLOR3;
 
-typedef CONST COLOR3 *PCCOLOR3;
+typedef const COLOR3 *PCCOLOR3;
 
 //
 // Functions

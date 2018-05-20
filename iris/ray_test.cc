@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Unit tests for ray.c
+    Unit tests for ray.h
 
 --*/
 

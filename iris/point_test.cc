@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Unit tests for point.c
+    Unit tests for point.h
 
 --*/
 

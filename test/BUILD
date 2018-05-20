@@ -1,4 +1,9 @@
-package(default_visibility = ["//iris:__pkg__"])
+package(
+    default_visibility = [
+        "//iris:__pkg__",
+        "//iris_advanced:__pkg__",
+    ],
+)
 
 cc_library(
     name = "test_util",

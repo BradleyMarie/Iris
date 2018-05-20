@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Unit tests for vector.c
+    Unit tests for vector.h
 
 --*/
 
