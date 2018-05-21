@@ -10,7 +10,8 @@ cc_library(
     hdrs = ["test_util.h"],
     deps = [
         "//iris:iris",
-        "@com_google_googletest//:gtest_main"
+        "//iris_advanced:iris_advanced",
+        "@com_google_googletest//:gtest_main",
     ],
     testonly = 1,
 )

@@ -43,8 +43,11 @@ ColorCreate(
     )
 {
     assert(isfinite(red));
+    assert((float_t)0.0 <= red);
     assert(isfinite(green));
+    assert((float_t)0.0 <= green);
     assert(isfinite(blue));
+    assert((float_t)0.0 <= blue);
 
     COLOR3 color;
     color.red = red;
@@ -61,7 +64,9 @@ ColorValidate(
     _In_ COLOR3 color
     )
 {
-    if (!isfinite(color.red) || !isfinite(color.green) || !isfinite(color.blue))
+    if (!isfinite(color.red) || color.red < (float_t)0.0 ||
+        !isfinite(color.green) || color.green < (float_t)0.0 ||
+        !isfinite(color.blue) || color.blue < (float_t)0.0)
     {
         return false;
     }
@@ -94,25 +99,11 @@ ColorAddScaled(
     )
 {
     assert(isfinite(scalar));
+    assert((float_t)0.0 <= scalar);
 
     float_t red = fma(scalar, addend1.red, addend0.red);
     float_t green = fma(scalar, addend1.green, addend0.green);
     float_t blue = fma(scalar, addend1.blue, addend0.blue);
-
-    return ColorCreate(red, green, blue);
-}
-
-static
-inline
-COLOR3
-ColorSubtract(
-    _In_ COLOR3 minuend,
-    _In_ COLOR3 subtrahend
-    )
-{
-    float_t red = minuend.red - subtrahend.red;
-    float_t green = minuend.green - subtrahend.green;
-    float_t blue = minuend.blue - subtrahend.blue;
 
     return ColorCreate(red, green, blue);
 }
@@ -141,48 +132,11 @@ ColorScaleByScalar(
     )
 {
     assert(isfinite(scalar));
+    assert((float_t)0.0 <= scalar);
 
     float_t red = color.red * scalar;
     float_t green = color.green * scalar;
     float_t blue = color.blue * scalar;
-
-    return ColorCreate(red, green, blue);
-}
-
-static
-inline
-COLOR3
-ColorDivideByColor(
-    _In_ COLOR3 dividend,
-    _In_ COLOR3 divisor
-    )
-{
-    assert(divisor.red != (float_t)0.0);
-    assert(divisor.green != (float_t)0.0);
-    assert(divisor.blue != (float_t)0.0);
-
-    float_t red = dividend.red / divisor.red;
-    float_t green = dividend.green / divisor.green;
-    float_t blue = dividend.blue / divisor.blue;
-
-    return ColorCreate(red, green, blue);
-}
-
-static
-inline
-COLOR3
-ColorDivideByScalar(
-    _In_ COLOR3 dividend,
-    _In_ float_t divisor
-    )
-{
-    assert(isfinite(divisor));
-    assert(divisor != (float_t)0.0);
-
-    float_t inverse = (float_t)1.0 / divisor;
-    float_t red = dividend.red * inverse;
-    float_t green = dividend.green * inverse;
-    float_t blue = dividend.blue * inverse;
 
     return ColorCreate(red, green, blue);
 }
@@ -195,6 +149,16 @@ ColorAverageComponents(
     )
 {
     return (color.red + color.green + color.blue) / (float_t)3.0;
+}
+
+static
+inline
+COLOR3
+ColorCreateBlack(
+    void
+    )
+{
+    return ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
 }
 
 static
@@ -212,16 +176,6 @@ ColorIsBlack(
     }
 
     return false;
-}
-
-static
-inline
-COLOR3
-ColorCreateBlack(
-    void
-    )
-{
-    return ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
 }
 
 #endif // _IRIS_ADVANCED_COLOR_

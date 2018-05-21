@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_
-#define _IRIS_
+#ifndef _IRIS_IRIS_
+#define _IRIS_IRIS_
 
 #include "iris/hit.h"
 #include "iris/hit_allocator.h"
@@ -27,4 +27,4 @@ Abstract:
 #include "iris/status.h"
 #include "iris/vector.h"
 
-#endif // _IRIS_
+#endif // _IRIS_IRIS_
