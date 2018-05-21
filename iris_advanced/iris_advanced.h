@@ -17,5 +17,6 @@ Abstract:
 
 #include "iris/bounding_box.h"
 #include "iris/color.h"
+#include "iris/random.h"
 
 #endif // _IRIS_ADVANCED_IRIS_ADVANCED_

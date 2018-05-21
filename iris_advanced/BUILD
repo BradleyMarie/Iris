@@ -42,6 +42,16 @@ cc_library(
     deps = [
         ":bounding_box",
         ":color",
+        ":random",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "random",
+    hdrs = ["random.h"],
+    srcs = ["random.c"],
+    deps = [
+        "//iris:iris",
+    ],
 )
