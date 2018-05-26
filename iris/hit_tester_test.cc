@@ -18,12 +18,12 @@ extern "C" {
 #include "iris/multiply.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-#include "test/test_util.h"
-
 #include <random>
 #include <map>
 #include <set>
+
+#include "googletest/include/gtest/gtest.h"
+#include "test/test_util.h"
 
 struct NestedParams {
     const void *data;

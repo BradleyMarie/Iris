@@ -15,8 +15,6 @@ Abstract:
 #ifndef _IRIS_HIT_CONTEXT_
 #define _IRIS_HIT_CONTEXT_
 
-#include "common/sal.h"
-
 #include <stdint.h>
 #include <stddef.h>
 
@@ -25,6 +23,8 @@ Abstract:
 #else
 #include <tgmath.h>
 #endif // __cplusplus
+
+#include "common/sal.h"
 
 //
 // Types

@@ -17,10 +17,10 @@ extern "C" {
 #include "iris/ray_tracer.h"
 }
 
+#include <vector>
+
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
-
-#include <vector>
 
 struct HitData {
     float_t distance;

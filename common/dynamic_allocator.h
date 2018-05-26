@@ -22,9 +22,9 @@ Abstract:
 #ifndef _COMMON_DYNAMIC_ALLOCATOR_
 #define _COMMON_DYNAMIC_ALLOCATOR_
 
-#include "common/alloc.h"
-
 #include <stdalign.h>
+
+#include "common/alloc.h"
 
 //
 // Types

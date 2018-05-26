@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
+#include <stdalign.h>
+#include <stdatomic.h>
+
 #include "common/alloc.h"
 #include "iris_spectrum/spectrum.h"
 #include "iris_spectrum/spectrum_internal.h"
-
-#include <stdalign.h>
-#include <stdatomic.h>
 
 //
 // Functions

@@ -18,9 +18,6 @@ extern "C" {
 #include "iris/hit_allocator_internal.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-#include "test/test_util.h"
-
 #include <cstring>
 #include <limits>
 #include <map>
@@ -28,6 +25,9 @@ extern "C" {
 #include <set>
 #include <string>
 #include <vector>
+
+#include "googletest/include/gtest/gtest.h"
+#include "test/test_util.h"
 
 TEST(HitAllocatorTest, HitAllocatorSetRayGetRay)
 {

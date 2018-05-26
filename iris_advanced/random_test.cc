@@ -16,9 +16,9 @@ extern "C" {
 #include "iris_advanced/random.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-
 #include <limits>
+
+#include "googletest/include/gtest/gtest.h"
 
 struct FloatContext {
     ISTATUS return_status;

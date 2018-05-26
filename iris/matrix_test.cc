@@ -16,11 +16,11 @@ extern "C" {
 #include "iris/matrix.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-#include "test/test_util.h"
-
 #include <functional>
 #include <limits>
+
+#include "googletest/include/gtest/gtest.h"
+#include "test/test_util.h"
 
 TEST(MatrixTest, MatrixAllocateArgumentErrors)
 {

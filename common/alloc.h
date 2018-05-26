@@ -19,9 +19,9 @@ Abstract:
 #ifndef _COMMON_ALLOC_
 #define _COMMON_ALLOC_
 
-#include "common/safe_math.h"
-
 #include <stdlib.h>
+
+#include "common/safe_math.h"
 
 //
 // Functions

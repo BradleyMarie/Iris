@@ -16,10 +16,10 @@ extern "C" {
 #include "iris_advanced/bounding_box.h"
 }
 
+#include <limits>
+
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
-
-#include <limits>
 
 TEST(BoundingBoxTest, BoundingBoxCreate)
 {

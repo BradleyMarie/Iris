@@ -16,14 +16,14 @@ extern "C" {
 #include "common/dynamic_allocator.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-
 #include <cstring>
 #include <map>
 #include <random>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "googletest/include/gtest/gtest.h"
 
 TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorInitialize)
 {

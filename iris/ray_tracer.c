@@ -12,11 +12,11 @@ Abstract:
 
 --*/
 
+#include <stdlib.h>
+
 #include "iris/ray_tracer.h"
 #include "iris/hit_tester_internal.h"
 #include "iris/multiply_internal.h"
-
-#include <stdlib.h>
 
 //
 // Types

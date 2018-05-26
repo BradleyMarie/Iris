@@ -16,10 +16,10 @@ extern "C" {
 #include "iris/point.h"
 }
 
+#include <limits>
+
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
-
-#include <limits>
 
 TEST(PointTest, PointCreate)
 {

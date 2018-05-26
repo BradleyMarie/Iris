@@ -16,10 +16,10 @@ extern "C" {
 #include "iris_advanced/color.h"
 }
 
+#include <limits>
+
 #include "googletest/include/gtest/gtest.h"
 #include "test/test_util.h"
-
-#include <limits>
 
 TEST(ColorTest, ColorTestCreate)
 {

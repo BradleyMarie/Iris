@@ -15,9 +15,9 @@ Abstract:
 #ifndef _COMMON_POINTER_LIST_
 #define _COMMON_POINTER_LIST_
 
-#include "common/safe_math.h"
-
 #include <stdlib.h>
+
+#include "common/safe_math.h"
 
 //
 // Defines

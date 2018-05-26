@@ -16,10 +16,10 @@ extern "C" {
 #include "common/static_allocator.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-
 #include <set>
 #include <vector>
+
+#include "googletest/include/gtest/gtest.h"
 
 TEST(StaticMemoryAllocatorTest, StaticMemoryAllocatorInitialize)
 {

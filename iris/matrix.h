@@ -15,13 +15,13 @@ Abstract:
 #ifndef _IRIS_MATRIX_
 #define _IRIS_MATRIX_
 
-#include "common/status.h"
-
 #if __cplusplus 
 #include <math.h>
 #else
 #include <tgmath.h>
 #endif // __cplusplus
+
+#include "common/status.h"
 
 //
 // Types

@@ -14,10 +14,10 @@ Abstract:
 
 #include "iris/hit_allocator.h"
 
+#include <string.h>
+
 #include "iris/full_hit_context.h"
 #include "iris/hit_allocator_internal.h"
-
-#include <string.h>
 
 //
 // Static Functions

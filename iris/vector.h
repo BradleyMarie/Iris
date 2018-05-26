@@ -15,8 +15,6 @@ Abstract:
 #ifndef _IRIS_VECTOR_
 #define _IRIS_VECTOR_
 
-#include "common/sal.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -26,6 +24,8 @@ Abstract:
 #else
 #include <tgmath.h>
 #endif // __cplusplus
+
+#include "common/sal.h"
 
 //
 // Types

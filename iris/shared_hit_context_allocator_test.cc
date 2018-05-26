@@ -16,12 +16,12 @@ extern "C" {
 #include "iris/shared_hit_context_allocator.h"
 }
 
-#include "googletest/include/gtest/gtest.h"
-#include "test/test_util.h"
-
 #include <random>
 #include <map>
 #include <set>
+
+#include "googletest/include/gtest/gtest.h"
+#include "test/test_util.h"
 
 TEST(SharedHitContextAllocatorTest, TestPremultiplied)
 {

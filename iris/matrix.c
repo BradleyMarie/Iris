@@ -14,13 +14,13 @@ Abstract:
 
 #include "iris/matrix.h"
 
-#include "iris/matrix_internal.h"
-#include "iris/vector.h"
-
 #include <assert.h>
 #include <stdatomic.h>
 #include <stddef.h>
 #include <stdlib.h>
+
+#include "iris/matrix_internal.h"
+#include "iris/vector.h"
 
 //
 // Types
