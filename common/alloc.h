@@ -207,23 +207,22 @@ static
 inline
 bool
 AlignedAllocWithHeader(
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && header_size % _Curr_ == 0) size_t header_alignment,
-    _Outptr_result_bytebuffer_(header_size) void **header,
+    _In_range_(>, 0) size_t header_size,
+    _In_ size_t header_alignment,
+    _Outptr_result_bytebuffer_to_(header_size, 0) void **header,
     _In_ size_t data_size,
-    _When_(data_size != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
-    _When_(data_size != 0, _Out_ _Deref_post_bytecap_(data_size)) _When_(data_size == 0, _Out_opt_ _When_(data != NULL, _Deref_post_null_)) void **data,
-    _Out_opt_ size_t *actual_allocation_size)
+    _In_ size_t data_alignment,
+    _Outptr_result_bytebuffer_to_(data_size, 0) void **data)
 {
     assert(header_size != 0);
     assert(header_alignment != 0);
-    assert(header != NULL);
     assert((header_alignment & (header_alignment - 1)) == 0);
     assert(header_size % header_alignment == 0);
+    assert(header != NULL);
     assert(data_size == 0 || data_alignment != 0);
-    assert(data_size == 0 || data != NULL);
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
+    assert(data != NULL);
 
     size_t sizes[] = {header_size, data_size};
     size_t alignments[] = {header_alignment, data_alignment};
@@ -257,16 +256,8 @@ AlignedAllocWithHeader(
     }
     else
     {
-        if (data)
-        {
-            *data = NULL;
-        }
+        *data = NULL;
     }
-
-    if (actual_allocation_size)
-    {
-        *actual_allocation_size = size;
-    }    
 
     return true;
 }
@@ -277,31 +268,32 @@ static
 inline
 bool
 AlignedAllocWithTwoHeaders(
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t first_header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && first_header_size % _Curr_ == 0) size_t first_header_alignment,
-    _Outptr_result_bytebuffer_(first_header_size) void **first_header,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t second_header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && second_header_size % _Curr_ == 0) size_t second_header_alignment,
-    _Outptr_result_bytebuffer_(second_header_size) void **second_header,
+    _In_range_(>, 0) size_t first_header_size,
+    _In_ size_t first_header_alignment,
+    _Outptr_result_bytebuffer_to_(first_header_size, 0) void **first_header,
+    _In_range_(>, 0) size_t second_header_size,
+    _In_ size_t second_header_alignment,
+    _Outptr_result_bytebuffer_to_(second_header_size, 0) void **second_header,
     _In_ size_t data_size,
-    _When_(data_size != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
-    _When_(data_size != 0, _Out_ _Deref_post_bytecap_(data_size)) _When_(data_size == 0, _Out_opt_ _When_(data != NULL, _Deref_post_null_)) void **data,
-    _Out_opt_ size_t *actual_allocation_size)
+    _In_ size_t data_alignment,
+    _Outptr_result_bytebuffer_to_(data_size, 0) void **data,
+    _Out_ size_t *actual_allocation_size)
 {
     assert(first_header_size != 0);
     assert(first_header_alignment != 0);
-    assert(first_header != NULL);
     assert((first_header_alignment & (first_header_alignment - 1)) == 0);
     assert(first_header_size % first_header_alignment == 0);
+    assert(first_header != NULL);
     assert(second_header_size != 0);
     assert(second_header_alignment != 0);
-    assert(second_header != NULL);
     assert((second_header_alignment & (second_header_alignment - 1)) == 0);
     assert(second_header_size % second_header_alignment == 0);
+    assert(second_header != NULL);
     assert(data_size == 0 || data_alignment != 0);
-    assert(data_size == 0 || data != NULL);
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
+    assert(data != NULL);
+    assert(actual_allocation_size != NULL);
 
     size_t sizes[] = {first_header_size, second_header_size, data_size};
     size_t alignments[] =
@@ -337,16 +329,10 @@ AlignedAllocWithTwoHeaders(
     }
     else
     {
-        if (data)
-        {
-            *data = NULL;
-        }
+        *data = NULL;
     }
 
-    if (actual_allocation_size)
-    {
-        *actual_allocation_size = size;
-    }
+    *actual_allocation_size = size;
 
     return true;
 }
@@ -357,21 +343,21 @@ static
 inline
 bool
 AlignedResizeWithTwoHeaders(
-    _In_ _Pre_bytecount_(original_size) _Post_invalid_ void *original_header,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t original_allocation_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t first_header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && first_header_size % _Curr_ == 0) size_t first_header_alignment,
+    _Pre_writable_byte_size_(original_size) _Post_invalid_ void *original,
+    _In_range_(>, 0) size_t original_size,
+    _In_range_(>, 0) size_t first_header_size,
+    _In_ size_t first_header_alignment,
     _Outptr_result_bytebuffer_(first_header_size) void **first_header,
-    _In_ _Pre_satisfies_(_Curr_ != 0) size_t second_header_size,
-    _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && second_header_size % _Curr_ == 0) size_t second_header_alignment,
+    _In_range_(>, 0) size_t second_header_size,
+    _In_ size_t second_header_alignment,
     _Outptr_result_bytebuffer_(second_header_size) void **second_header,
     _In_ size_t data_size,
-    _When_(data_size != 0, _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
-    _When_(data_size != 0, _Out_ _Deref_post_bytecap_(data_size)) _When_(data_size == 0, _Out_opt_ _When_(data != NULL, _Deref_post_null_)) void **data,
-    _Out_opt_ size_t *actual_allocation_size)
+    _In_ size_t data_alignment,
+    _Outptr_result_bytebuffer_to_(data_size, 0) void **data,
+    _Out_ size_t *actual_allocation_size)
 {
-    assert(original_header != NULL);
-    assert(original_allocation_size != 0);
+    assert(original != NULL);
+    assert(original_size != 0);
     assert(first_header_size != 0);
     assert(first_header_alignment != 0);
     assert(first_header != NULL);
@@ -383,17 +369,18 @@ AlignedResizeWithTwoHeaders(
     assert((second_header_alignment & (second_header_alignment - 1)) == 0);
     assert(second_header_size % second_header_alignment == 0);
     assert(data_size == 0 || data_alignment != 0);
-    assert(data_size == 0 || data != NULL);
+    assert(data != NULL);
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
+    assert(actual_allocation_size != NULL);
 
     size_t sizes[] = {first_header_size, second_header_size, data_size};
     size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
     uintptr_t placements[3] = { 0, 0, 0 };
 
-    bool success = LayoutAllocation((uintptr_t)original_header,
-                                    original_allocation_size,
+    bool success = LayoutAllocation((uintptr_t)original,
+                                    original_size,
                                     3,
                                     sizes,
                                     alignments,
@@ -410,16 +397,10 @@ AlignedResizeWithTwoHeaders(
         }
         else
         {
-            if (data)
-            {
-                *data = NULL;
-            }
+            *data = NULL;
         }
 
-        if (actual_allocation_size)
-        {
-            *actual_allocation_size = original_allocation_size;
-        }
+        *actual_allocation_size = original_size;
 
         return true;
     }
@@ -440,7 +421,7 @@ AlignedResizeWithTwoHeaders(
         return false;
     }
 
-    free(original_header);
+    free(original);
     return true;
 }
 

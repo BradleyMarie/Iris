@@ -44,6 +44,7 @@ Abstract:
 #define _Post_valid_
 #define _Post_invalid_
 
+#define _Pre_writable_byte_size_(size)
 #define _Post_writable_byte_size_(size)
 
 #define _Out_
@@ -54,6 +55,7 @@ Abstract:
 #define _Outptr_
 #define _Outptr_result_buffer_(size)
 #define _Outptr_result_bytebuffer_(size)
+#define _Outptr_result_bytebuffer_to_(s,c)
 #define _Outptr_result_maybenull_
 #define _Outptr_opt_result_bytebuffer_(size)
 #define _Outptr_opt_result_bytebuffer_maybenull_(size)

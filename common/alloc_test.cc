@@ -291,54 +291,13 @@ TEST(AllocTest, AlignedAllocWithHeaderNoData)
     size_t data_size = 0;
     size_t data_alignment = 0;
     void *data;
-    size_t actual_allocation_size;
 
     ASSERT_TRUE(AlignedAllocWithHeader(header_size,
                                        header_alignment,
                                        &header,
                                        data_size,
                                        data_alignment,
-                                       &data,
-                                       &actual_allocation_size));
-    EXPECT_TRUE(header != NULL);
-    EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
-    EXPECT_TRUE(data == NULL);
-    EXPECT_LE(16u, actual_allocation_size);
-
-    free(header);
-    
-    ASSERT_TRUE(AlignedAllocWithHeader(header_size,
-                                       header_alignment,
-                                       &header,
-                                       data_size,
-                                       data_alignment,
-                                       NULL,
-                                       NULL));
-    EXPECT_TRUE(header != NULL);
-    EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
-
-    free(header);
-
-    ASSERT_TRUE(AlignedAllocWithHeader(header_size,
-                                       header_alignment,
-                                       &header,
-                                       data_size,
-                                       data_alignment,
-                                       NULL,
-                                       &actual_allocation_size));
-    EXPECT_TRUE(header != NULL);
-    EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
-    EXPECT_LE(16u, actual_allocation_size);
-
-    free(header);
-
-    ASSERT_TRUE(AlignedAllocWithHeader(header_size,
-                                       header_alignment,
-                                       &header,
-                                       data_size,
-                                       data_alignment,
-                                       &data,
-                                       NULL));
+                                       &data));
     EXPECT_TRUE(header != NULL);
     EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
     EXPECT_TRUE(data == NULL);
@@ -354,21 +313,18 @@ TEST(AllocTest, AlignedAllocWithHeaderWithData)
     size_t data_size = 128;
     size_t data_alignment = 16;
     void *data;
-    size_t actual_allocation_size;
 
     ASSERT_TRUE(AlignedAllocWithHeader(header_size,
                                        header_alignment,
                                        &header,
                                        data_size,
                                        data_alignment,
-                                       &data,
-                                       &actual_allocation_size));
+                                       &data));
     EXPECT_TRUE(header != NULL);
     EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
     EXPECT_TRUE(data != NULL);
     EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
     EXPECT_LE(header_size, (uintptr_t)data - (uintptr_t)header);
-    EXPECT_LE(144u, actual_allocation_size);
 
     free(header);
 
@@ -377,8 +333,7 @@ TEST(AllocTest, AlignedAllocWithHeaderWithData)
                                        &header,
                                        data_size,
                                        data_alignment,
-                                       &data,
-                                       NULL));
+                                       &data));
     EXPECT_TRUE(header != NULL);
     EXPECT_TRUE((uintptr_t)header % header_alignment == 0);
     EXPECT_TRUE(data != NULL);
@@ -396,23 +351,20 @@ TEST(AllocTest, AlignedAllocWithHeaderWithDataFails)
     size_t data_size = SIZE_MAX;
     size_t data_alignment = 1;
     void *data;
-    size_t actual_allocation_size;
 
     ASSERT_FALSE(AlignedAllocWithHeader(header_size,
                                         header_alignment,
                                         &header,
                                         data_size,
                                         data_alignment,
-                                        &data,
-                                        &actual_allocation_size));
+                                        &data));
 
     ASSERT_FALSE(AlignedAllocWithHeader(data_size,
                                         data_alignment,
                                         &data,
                                         header_size,
                                         header_alignment,
-                                        &header,
-                                        &actual_allocation_size));
+                                        &header));
 }
 
 TEST(AllocTest, AlignedAllocWithTwoHeadersNoData)
@@ -446,65 +398,6 @@ TEST(AllocTest, AlignedAllocWithTwoHeadersNoData)
     EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
     EXPECT_TRUE(data == NULL);
     EXPECT_LE(48u, actual_allocation_size);
-
-    free(first_header);
-    
-    ASSERT_TRUE(AlignedAllocWithTwoHeaders(first_header_size,
-                                           first_header_alignment,
-                                           &first_header,
-                                           second_header_size,
-                                           second_header_alignment,
-                                           &second_header,
-                                           data_size,
-                                           data_alignment,
-                                           NULL,
-                                           NULL));
-    EXPECT_TRUE(first_header != NULL);
-    EXPECT_TRUE((uintptr_t)first_header % first_header_alignment == 0);
-    EXPECT_LE(first_header_size, 
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-
-    free(first_header);
-
-    ASSERT_TRUE(AlignedAllocWithTwoHeaders(first_header_size,
-                                           first_header_alignment,
-                                           &first_header,
-                                           second_header_size,
-                                           second_header_alignment,
-                                           &second_header,
-                                           data_size,
-                                           data_alignment,
-                                           NULL,
-                                           &actual_allocation_size));
-    EXPECT_TRUE(first_header != NULL);
-    EXPECT_TRUE((uintptr_t)first_header % first_header_alignment == 0);
-    EXPECT_LE(first_header_size, 
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_LE(48u, actual_allocation_size);
-
-    free(first_header);
-
-    ASSERT_TRUE(AlignedAllocWithTwoHeaders(first_header_size,
-                                           first_header_alignment,
-                                           &first_header,
-                                           second_header_size,
-                                           second_header_alignment,
-                                           &second_header,
-                                           data_size,
-                                           data_alignment,
-                                           &data,
-                                           NULL));
-    EXPECT_TRUE(first_header != NULL);
-    EXPECT_TRUE((uintptr_t)first_header % first_header_alignment == 0);
-    EXPECT_LE(first_header_size, 
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data == NULL);
 
     free(first_header);
 }
@@ -542,28 +435,6 @@ TEST(AllocTest, AlignedAllocWithTwoHeadersWithData)
     EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
     EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
     EXPECT_LE(176u, actual_allocation_size);
-
-    free(first_header);
-
-    ASSERT_TRUE(AlignedAllocWithTwoHeaders(first_header_size,
-                                           first_header_alignment,
-                                           &first_header,
-                                           second_header_size,
-                                           second_header_alignment,
-                                           &second_header,
-                                           data_size,
-                                           data_alignment,
-                                           &data,
-                                           NULL));
-    EXPECT_TRUE(first_header != NULL);
-    EXPECT_TRUE((uintptr_t)first_header % first_header_alignment == 0);
-    EXPECT_LE(first_header_size, 
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data != NULL);
-    EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
-    EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
 
     free(first_header);
 }
@@ -696,62 +567,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersNoData)
     EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
     EXPECT_TRUE(data == NULL);
     EXPECT_EQ(original_allocation_size, actual_allocation_size);
-    
-    ASSERT_TRUE(AlignedResizeWithTwoHeaders(original_first_header,
-                                            original_allocation_size,
-                                            first_header_size,
-                                            first_header_alignment,
-                                            &first_header,
-                                            second_header_size,
-                                            second_header_alignment,
-                                            &second_header,
-                                            data_size,
-                                            data_alignment,
-                                            NULL,
-                                            NULL));
-    EXPECT_EQ(original_first_header, first_header);
-    EXPECT_LE(first_header_size,
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-
-    ASSERT_TRUE(AlignedResizeWithTwoHeaders(original_first_header,
-                                            original_allocation_size,
-                                            first_header_size,
-                                            first_header_alignment,
-                                            &first_header,
-                                            second_header_size,
-                                            second_header_alignment,
-                                            &second_header,
-                                            data_size,
-                                            data_alignment,
-                                            NULL,
-                                            &actual_allocation_size));
-    EXPECT_EQ(original_first_header, first_header);
-    EXPECT_LE(first_header_size,
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_EQ(original_allocation_size, actual_allocation_size);
-
-    ASSERT_TRUE(AlignedResizeWithTwoHeaders(original_first_header,
-                                            original_allocation_size,
-                                            first_header_size,
-                                            first_header_alignment,
-                                            &first_header,
-                                            second_header_size,
-                                            second_header_alignment,
-                                            &second_header,
-                                            data_size,
-                                            data_alignment,
-                                            &data,
-                                            NULL));
-    EXPECT_EQ(original_first_header, first_header);
-    EXPECT_LE(first_header_size,
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data == NULL);
 
     free(original_first_header);
 }
@@ -803,27 +618,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithData)
     EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
     EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
     EXPECT_EQ(original_allocation_size, actual_allocation_size);
-
-    ASSERT_TRUE(AlignedResizeWithTwoHeaders(original_first_header,
-                                            original_allocation_size,
-                                            first_header_size,
-                                            first_header_alignment,
-                                            &first_header,
-                                            second_header_size,
-                                            second_header_alignment,
-                                            &second_header,
-                                            data_size,
-                                            data_alignment,
-                                            &data,
-                                            NULL));
-    EXPECT_EQ(original_first_header, first_header);
-    EXPECT_LE(first_header_size,
-              (uintptr_t)second_header - (uintptr_t)first_header);
-    EXPECT_TRUE(second_header != NULL);
-    EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data != NULL);
-    EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
-    EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
 
     free(original_first_header);
 }
