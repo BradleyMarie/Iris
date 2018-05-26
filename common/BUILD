@@ -52,6 +52,14 @@ cc_test(
 )
 
 cc_library(
+    name = "free_routine",
+    hdrs = ["free_routine.h"],
+    deps = [
+        ":sal",
+    ],
+)
+
+cc_library(
     name = "pointer_list",
     hdrs = ["pointer_list.h"],
     deps = [
