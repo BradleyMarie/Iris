@@ -24,8 +24,8 @@ cc_library(
         ":hit",
         ":hit_allocator_internal",
         ":point",
-        ":sal",
-        ":status",
+        "//common:sal",
+        "//common:status",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
     name = "hit_context",
     hdrs = ["hit_context.h"],
     deps = [
-        ":sal",
+        "//common:sal",
     ],
 )
 
@@ -105,8 +105,6 @@ cc_library(
         ":point",
         ":ray",
         ":ray_tracer",
-        ":sal",
-        ":status",
         ":vector",
     ],
     visibility = ["//visibility:public"],
@@ -118,8 +116,8 @@ cc_library(
     srcs = ["matrix.c"],
     deps = [
         ":matrix_internal",
-        ":status",
         ":vector",
+        "//common:status",
     ],
 )
 
@@ -241,12 +239,6 @@ cc_test(
 )
 
 cc_library(
-    name = "sal",
-    hdrs = ["sal.h"],
-    visibility = ["//common:__pkg__"],
-)
-
-cc_library(
     name = "shared_hit_context",
     hdrs = ["shared_hit_context.h"],
     deps = [
@@ -275,18 +267,10 @@ cc_test(
 )
 
 cc_library(
-    name = "status",
-    hdrs = ["status.h"],
-    deps = [
-        ":sal",
-    ],
-)
-
-cc_library(
     name = "vector",
     hdrs = ["vector.h"],
     deps = [
-        ":sal",
+        "//common:sal",
     ],
 )
 

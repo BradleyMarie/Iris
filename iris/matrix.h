@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_MATRIX_
 #define _IRIS_MATRIX_
 
-#include "iris/status.h"
+#include "common/status.h"
 
 #if __cplusplus 
 #include <math.h>

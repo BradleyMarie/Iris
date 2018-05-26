@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include "iris/sal.h"
+#include "common/sal.h"
 
 #include <assert.h>
 #include <stdbool.h>

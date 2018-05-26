@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_VECTOR_
 #define _IRIS_VECTOR_
 
-#include "iris/sal.h"
+#include "common/sal.h"
 
 #include <assert.h>
 #include <stdbool.h>

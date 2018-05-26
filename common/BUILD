@@ -72,7 +72,7 @@ cc_library(
     name = "safe_math",
     hdrs = ["safe_math.h"],
     deps = [
-        "//iris:sal",
+        ":sal",
     ],
 )
 
@@ -82,6 +82,24 @@ cc_test(
     deps = [
         ":safe_math",
         "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "sal",
+    hdrs = ["sal.h"],
+    visibility = [
+        "//iris:__pkg__",
+        "//iris_advanced:__pkg__",
+        "//iris_spectrum:__pkg__"
+    ],
+)
+
+cc_library(
+    name = "status",
+    hdrs = ["status.h"],
+    deps = [
+        ":sal",
     ],
 )
 

@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_HIT_CONTEXT_
 #define _IRIS_HIT_CONTEXT_
 
-#include "iris/sal.h"
+#include "common/sal.h"
 
 #include <stdint.h>
 #include <stddef.h>

@@ -34,10 +34,10 @@ Abstract:
 #ifndef _IRIS_HIT_ALLOCATOR_
 #define _IRIS_HIT_ALLOCATOR_
 
+#include "common/sal.h"
+#include "common/status.h"
 #include "iris/hit.h"
 #include "iris/point.h"
-#include "iris/sal.h"
-#include "iris/status.h"
 
 #include <stdint.h>
 
