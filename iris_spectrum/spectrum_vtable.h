@@ -15,7 +15,11 @@ Abstract:
 #ifndef _IRIS_SPECTRUM_SPECTRUM_VTABLE_
 #define _IRIS_SPECTRUM_SPECTRUM_VTABLE_
 
-#include "iris/iris.h"
+#include <tgmath.h>
+
+#include "common/free_routine.h"
+#include "common/sal.h"
+#include "common/status.h"
 
 //
 // Types

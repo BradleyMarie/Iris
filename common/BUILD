@@ -1,4 +1,10 @@
-package(default_visibility = ["//iris:__pkg__"])
+package(
+    default_visibility = [
+        "//iris:__pkg__",
+        "//iris_advanced:__pkg__",
+        "//iris_spectrum:__pkg__"
+    ],
+)
 
 cc_library(
     name = "alloc",
@@ -96,11 +102,6 @@ cc_test(
 cc_library(
     name = "sal",
     hdrs = ["sal.h"],
-    visibility = [
-        "//iris:__pkg__",
-        "//iris_advanced:__pkg__",
-        "//iris_spectrum:__pkg__"
-    ],
 )
 
 cc_library(

@@ -14,6 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 #include <stdatomic.h>
+#include <string.h>
 
 #include "common/alloc.h"
 #include "iris_spectrum/spectrum.h"
@@ -67,8 +68,7 @@ SpectrumAllocate(
                                           (void **)spectrum,
                                           data_size,
                                           data_alignment,
-                                          &data_allocation,
-                                          NULL);
+                                          &data_allocation);
 
     if (!success)
     {
@@ -132,12 +132,10 @@ SpectrumRetain(
 
 void
 SpectrumRelease(
-    _In_opt_ _Post_invalid_ PSPECTRUM Spectrum
+    _In_opt_ _Post_invalid_ PSPECTRUM spectrum
     )
 {
-    PFREE_ROUTINE FreeRoutine;
-    
-    if (Spectrum == NULL)
+    if (spectrum == NULL)
     {
         return;
     }

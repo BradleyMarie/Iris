@@ -15,7 +15,6 @@ Abstract:
 #ifndef _IRIS_SPECTRUM_SPECTRUM_
 #define _IRIS_SPECTRUM_SPECTRUM_
 
-#include "iris/iris.h"
 #include "iris_spectrum/spectrum_vtable.h"
 
 //
