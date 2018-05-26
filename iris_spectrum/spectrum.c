@@ -27,9 +27,9 @@ Abstract:
 ISTATUS
 SpectrumAllocate(
     _In_ PCSPECTRUM_VTABLE vtable,
-    _When_(data_size != 0, _In_reads_bytes_opt_(data_size)) const void *data,
+    _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
-    _When_(data_size != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
+    _In_ size_t data_alignment,
     _Out_ PSPECTRUM *spectrum
     )
 {
@@ -94,11 +94,6 @@ SpectrumSample(
     _Out_ float_t *intensity
     )
 {
-    if (spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (!isfinite(wavelength) || 
         wavelength <= (float_t)0.0)
     {
@@ -108,6 +103,12 @@ SpectrumSample(
     if (intensity == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (spectrum == NULL)
+    {
+        *intensity = (float_t)0.0;
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = SpectrumSampleInline(spectrum,

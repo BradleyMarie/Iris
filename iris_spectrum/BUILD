@@ -27,3 +27,31 @@ cc_library(
         "//common:status",
     ],
 )
+
+cc_library(
+    name = "reflector",
+    hdrs = ["reflector.h"],
+    srcs = ["reflector.c"],
+    deps = [
+        ":reflector_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "reflector_internal",
+    hdrs = ["reflector_internal.h"],
+    deps = [
+        ":reflector_vtable",
+    ],
+)
+
+cc_library(
+    name = "reflector_vtable",
+    hdrs = ["reflector_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//common:sal",
+        "//common:status",
+    ],
+)

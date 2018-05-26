@@ -32,9 +32,9 @@ typedef const SPECTRUM *PCSPECTRUM;
 ISTATUS
 SpectrumAllocate(
     _In_ PCSPECTRUM_VTABLE vtable,
-    _When_(data_size != 0, _In_reads_bytes_opt_(data_size)) const void *data,
+    _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
-    _When_(data_size != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && data_size % _Curr_ == 0)) size_t data_alignment,
+    _In_ size_t data_alignment,
     _Out_ PSPECTRUM *spectrum
     );
 
