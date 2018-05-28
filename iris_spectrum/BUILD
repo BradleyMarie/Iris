@@ -11,6 +11,36 @@ cc_library(
 )
 
 cc_library(
+    name = "spectrum_compositor",
+    hdrs = ["spectrum_compositor.h"],
+    deps = [
+        ":reflector",
+        ":spectrum",
+    ],
+)
+
+cc_library(
+    name = "spectrum_compositor_context",
+    hdrs = ["spectrum_compositor_context.h"],
+    srcs = ["spectrum_compositor_context.c"],
+    deps = [
+        ":spectrum_compositor",
+        ":spectrum_compositor_internal",
+        ":spectrum_internal",
+    ],
+)
+
+cc_library(
+    name = "spectrum_compositor_internal",
+    hdrs = ["spectrum_compositor_internal.h"],
+    deps = [
+        ":reflector",
+        ":spectrum_internal",
+        "//common:static_allocator",
+    ],
+)
+
+cc_library(
     name = "spectrum_internal",
     hdrs = ["spectrum_internal.h"],
     deps = [

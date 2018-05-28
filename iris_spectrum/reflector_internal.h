@@ -15,6 +15,8 @@ Abstract:
 #ifndef _IRIS_SPECTRUM_REFLECTOR_INTERNAL_
 #define _IRIS_SPECTRUM_REFLECTOR_INTERNAL_
 
+#include <stdatomic.h>
+
 #include "iris_spectrum/reflector_vtable.h"
 
 //

@@ -15,7 +15,11 @@ Abstract:
 #ifndef _IRIS_SPECTRUM_SPECTRUM_VTABLE_
 #define _IRIS_SPECTRUM_SPECTRUM_VTABLE_
 
+#if __cplusplus 
+#include <math.h>
+#else
 #include <tgmath.h>
+#endif // __cplusplus
 
 #include "common/free_routine.h"
 #include "common/sal.h"

@@ -13,7 +13,6 @@ Abstract:
 --*/
 
 #include <stdalign.h>
-#include <stdatomic.h>
 #include <string.h>
 
 #include "common/alloc.h"
