@@ -24,34 +24,34 @@ Abstract:
 //
 
 typedef struct _ATTENUATED_SPECTRUM {
-    struct _SPECTRUM SpectrumHeader;
-    const struct _SPECTRUM *Spectrum;
-    float_t Attenuation;
+    struct _SPECTRUM header;
+    const struct _SPECTRUM *spectrum;
+    float_t attenuation;
 } ATTENUATED_SPECTRUM, *PATTENUATED_SPECTRUM;
 
 typedef const ATTENUATED_SPECTRUM *PCATTENUATED_SPECTRUM;
 
 typedef struct _SUM_SPECTRUM {
-    struct _SPECTRUM SpectrumHeader;
-    const struct _SPECTRUM *Spectrum0;
-    const struct _SPECTRUM *Spectrum1;
+    struct _SPECTRUM header;
+    const struct _SPECTRUM *spectrum0;
+    const struct _SPECTRUM *spectrum1;
 } SUM_SPECTRUM, *PSUM_SPECTRUM;
 
 typedef const SUM_SPECTRUM *PCSUM_SPECTRUM;
 
 typedef struct _REFLECTION_SPECTRUM {
-    struct _SPECTRUM SpectrumHeader;
-    const struct _SPECTRUM *Spectrum;
-    PCREFLECTOR Reflector;
+    struct _SPECTRUM header;
+    const struct _SPECTRUM *spectrum;
+    PCREFLECTOR reflector;
 } REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
 
 typedef const REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
 
 typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
-    struct _SPECTRUM SpectrumHeader;
-    const struct _SPECTRUM *Spectrum;
-    PCREFLECTOR Reflector;
-    float_t Attenuation;
+    struct _SPECTRUM header;
+    const struct _SPECTRUM *spectrum;
+    PCREFLECTOR reflector;
+    float_t attenuation;
 } ATTENUATED_REFLECTION_SPECTRUM, *PATTENUATED_REFLECTION_SPECTRUM;
 
 typedef const ATTENUATED_REFLECTION_SPECTRUM *PCATTENUATED_REFLECTION_SPECTRUM;

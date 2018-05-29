@@ -15,7 +15,10 @@ cc_library(
     hdrs = ["spectrum_compositor.h"],
     deps = [
         ":reflector",
+        ":reflector_internal",
         ":spectrum",
+        ":spectrum_compositor_internal",
+        ":spectrum_internal",
     ],
 )
 
