@@ -88,6 +88,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "reflector_test",
+    srcs = ["reflector_test.cc"],
+    deps = [
+        ":reflector",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "reflector_vtable",
     hdrs = ["reflector_vtable.h"],

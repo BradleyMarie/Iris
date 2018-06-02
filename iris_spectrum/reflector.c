@@ -87,7 +87,7 @@ ReflectorAllocate(
 }
 
 ISTATUS
-ReflectorSample(
+ReflectorReflect(
     _In_opt_ PCREFLECTOR reflector,
     _In_ float_t wavelength,
     _In_ float_t incoming_intensity,
@@ -100,7 +100,16 @@ ReflectorSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    // Should these be made into something stronger than assertions?
+    assert(isfinite(incoming_intensity));
+    assert((float_t)0.0 <= incoming_intensity);
+
     if (outgoing_intensity == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (reflector == NULL)
     {
         *outgoing_intensity = (float_t)0.0;
         return ISTATUS_SUCCESS;
@@ -110,6 +119,10 @@ ReflectorSample(
                                             wavelength,
                                             incoming_intensity,
                                             outgoing_intensity);
+
+    // Should these be made into something stronger than assertions?
+    assert(isfinite(*outgoing_intensity));
+    assert((float_t)0.0 <= *outgoing_intensity);
 
     return status;
 }
@@ -128,7 +141,7 @@ ReflectorRetain(
 }
 
 void
-SpectrumRelease(
+ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR reflector
     )
 {

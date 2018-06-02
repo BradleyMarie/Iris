@@ -73,6 +73,7 @@ TEST(SpectrumTest, SpectrumSampleNull)
 
 struct TestContext {
     ISTATUS return_status;
+    float_t wavelength;
     float_t intensity;
     bool *encountered;
 };
@@ -87,6 +88,7 @@ SampleRoutine(
     const TestContext *context = static_cast<const TestContext*>(data);
     EXPECT_FALSE(*context->encountered);
     *context->encountered = true;
+    EXPECT_EQ(context->wavelength, wavelength);
     *intensity = context->intensity;
     return context->return_status;
 }
@@ -94,7 +96,13 @@ SampleRoutine(
 TEST(SpectrumTest, SpectrumSampleErrors)
 {
     bool encountered = false;
-    TestContext context = { ISTATUS_INTEGER_OVERFLOW, INFINITY, &encountered };
+    TestContext context = { 
+        ISTATUS_INTEGER_OVERFLOW,
+        INFINITY,
+        INFINITY,
+        &encountered
+    };
+
     SPECTRUM_VTABLE vtable = { SampleRoutine, NULL };
     PSPECTRUM spectrum;
 
@@ -137,7 +145,13 @@ TEST(SpectrumTest, SpectrumSampleErrors)
 TEST(SpectrumTest, SpectrumSample)
 {
     bool encountered = false;
-    TestContext context = { ISTATUS_INTEGER_OVERFLOW, INFINITY, &encountered };
+    TestContext context = { 
+        ISTATUS_INTEGER_OVERFLOW,
+        (float_t)1.0,
+        (float_t)10.0,
+        &encountered
+    };
+    
     SPECTRUM_VTABLE vtable = { SampleRoutine, NULL };
     PSPECTRUM spectrum;
 
@@ -151,13 +165,18 @@ TEST(SpectrumTest, SpectrumSample)
     float_t intensity;
     status = SpectrumSample(spectrum, (float_t)1.0, &intensity);
     EXPECT_EQ(ISTATUS_INTEGER_OVERFLOW, status);
-    EXPECT_EQ(INFINITY, intensity);
+    EXPECT_EQ((float_t)10.0, intensity);
     EXPECT_TRUE(encountered);
 
     SpectrumRelease(spectrum);
 
     encountered = false;
-    context = { ISTATUS_SUCCESS, (float_t)2.0, &encountered };
+    context = { 
+        ISTATUS_SUCCESS,
+        (float_t)1.0,
+        (float_t)2.0,
+        &encountered
+    };
 
     status = SpectrumAllocate(&vtable,
                               &context,
@@ -214,6 +233,12 @@ TEST(SpectrumTest, SpectrumFree)
                               alignof(context),
                               &spectrum);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    SpectrumRetain(spectrum);
+    EXPECT_FALSE(freed);
+    
+    SpectrumRelease(spectrum);
+    EXPECT_FALSE(freed);
 
     SpectrumRelease(spectrum);
     EXPECT_TRUE(freed);

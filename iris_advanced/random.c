@@ -97,6 +97,10 @@ RandomGenerateFloat(
                                          maximum,
                                          result);
 
+    // Should these be made into something stronger than assertions?
+    assert(minimum <= *result);
+    assert(*result <= maximum);
+
     return status;
 }
 
@@ -127,6 +131,10 @@ RandomGenerateIndex(
                                          minimum,
                                          maximum,
                                          result);
+
+    // Should these be made into something stronger than assertions?
+    assert(minimum <= *result);
+    assert(*result <= maximum);
 
     return status;
 }

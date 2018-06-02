@@ -114,6 +114,10 @@ SpectrumSample(
                                           wavelength,
                                           intensity);
 
+    // Should these be made into something stronger than assertions?
+    assert(isfinite(*intensity));
+    assert((float_t)0.0 <= *intensity);
+
     return status;
 }
 
