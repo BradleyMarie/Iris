@@ -36,38 +36,38 @@ typedef const SPECTRUM_COMPOSITOR *PCSPECTRUM_COMPOSITOR;
 //IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddSpectra(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum0,
-    _In_opt_ PCSPECTRUM Spectrum1,
-    _Out_ PCSPECTRUM *Sum
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_opt_ PCSPECTRUM spectrum0,
+    _In_opt_ PCSPECTRUM spectrum1,
+    _Out_ PCSPECTRUM *sum_spectrum
     );
 
 //IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_ float_t Attenuation,
-    _Out_ PCSPECTRUM *AttenuatedSpectrum
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_opt_ PCSPECTRUM spectrum,
+    _In_ float_t attenuation,
+    _Out_ PCSPECTRUM *attenuated_spectrum
     );
 
 //IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddReflection(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_opt_ PCSPECTRUM spectrum,
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ PCSPECTRUM *reflected_spectrum
     );
 
 //IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddReflection(
-    _Inout_ PSPECTRUM_COMPOSITOR Compositor,
-    _In_opt_ PCSPECTRUM Spectrum,
-    _In_opt_ PCREFLECTOR Reflector,
-    _In_ float_t Attenuation,
-    _Out_ PCSPECTRUM *ReflectedSpectrum
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_opt_ PCSPECTRUM spectrum,
+    _In_opt_ PCREFLECTOR reflector,
+    _In_ float_t attenuation,
+    _Out_ PCSPECTRUM *reflected_spectrum
     );
     
 #endif // _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_

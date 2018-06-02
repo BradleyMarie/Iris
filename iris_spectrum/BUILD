@@ -13,6 +13,7 @@ cc_library(
 cc_library(
     name = "spectrum_compositor",
     hdrs = ["spectrum_compositor.h"],
+    srcs = ["spectrum_compositor.c"],
     deps = [
         ":reflector",
         ":reflector_internal",

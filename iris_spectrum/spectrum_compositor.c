@@ -14,6 +14,8 @@ Abstract:
 
 #include "iris_spectrum/spectrum_compositor.h"
 
+#include <assert.h>
+
 #include "iris_spectrum/reflector_internal.h"
 #include "iris_spectrum/spectrum_compositor_internal.h"
 
@@ -60,7 +62,7 @@ AttenuatedSpectrumSample(
     PCATTENUATED_SPECTRUM attenuated_spectrum = (PCATTENUATED_SPECTRUM) context;
 
     float_t output_intensity;
-    ISTATUS Status = SpectrumSampleInline(&attenuated_spectrum->header,
+    ISTATUS Status = SpectrumSampleInline(attenuated_spectrum->spectrum,
                                           wavelength,
                                           &output_intensity);
 
@@ -89,7 +91,7 @@ SumSpectrumSample(
     PCSUM_SPECTRUM sum_spectrum = (PCSUM_SPECTRUM) context;
 
     float_t intensity0;
-    ISTATUS status = SpectrumSampleInline(&sum_spectrum->spectrum0,
+    ISTATUS status = SpectrumSampleInline(sum_spectrum->spectrum0,
                                           wavelength,
                                           &intensity0);
 
@@ -99,7 +101,7 @@ SumSpectrumSample(
     }
 
     float_t intensity1;
-    status = SpectrumSampleInline(&sum_spectrum->spectrum1,
+    status = SpectrumSampleInline(sum_spectrum->spectrum1,
                                   wavelength,
                                   &intensity1);
 
@@ -316,7 +318,7 @@ SpectrumCompositorAddAttenuatedAndAttenuatedReflectionSpectra(
 
     if (attenuated_spectrum->attenuation == attenuated_reflection_spectrum->attenuation)
     {
-        PSPECTRUM intermediate_spectrum;
+        PCSPECTRUM intermediate_spectrum;
         ISTATUS status = SpectrumCompositorAddReflection(compositor,
                                                          attenuated_reflection_spectrum->spectrum,
                                                          attenuated_reflection_spectrum->reflector,
@@ -423,7 +425,7 @@ SpectrumCompositorAddTwoAttenuatedReflectionSpectra(
 
     if (attenuated_reflection_spectrum0->attenuation == attenuated_reflection_spectrum1->attenuation)
     {
-        PSPECTRUM intermediate_spectrum0;
+        PCSPECTRUM intermediate_spectrum0;
         ISTATUS status = SpectrumCompositorAddReflection(compositor,
                                                          attenuated_reflection_spectrum0->spectrum,
                                                          attenuated_reflection_spectrum0->reflector,
@@ -434,7 +436,7 @@ SpectrumCompositorAddTwoAttenuatedReflectionSpectra(
             return status;
         }
 
-        PSPECTRUM intermediate_spectrum1;
+        PCSPECTRUM intermediate_spectrum1;
         status = SpectrumCompositorAddReflection(compositor,
                                                  attenuated_reflection_spectrum1->spectrum,
                                                  attenuated_reflection_spectrum1->reflector,
@@ -516,7 +518,7 @@ SpectrumCompositorAddTwoReflectionSpectra(
     bool success = StaticMemoryAllocatorAllocate(
         &compositor->sum_spectrum_allocator, &allocation);
 
-    if (!allocation)
+    if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -563,7 +565,7 @@ SpectrumCompositorAddTwoAttenuatedSpectra(
 
     if (attenuated_spectrum0->attenuation == attenuated_spectrum1->attenuation)
     {
-        PSPECTRUM intermediate_spectrum;
+        PCSPECTRUM intermediate_spectrum;
         ISTATUS status = SpectrumCompositorAddSpectra(compositor,
                                                       attenuated_spectrum0->spectrum,
                                                       attenuated_spectrum1->spectrum,
@@ -631,7 +633,7 @@ SpectrumCompositorAddTwoSumSpectra(
         }
         else
         {
-            PSPECTRUM intermediate_spectrum0;
+            PCSPECTRUM intermediate_spectrum0;
             ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                                  sum_spectrum0->spectrum0,
                                                                  (float_t)2.0,
@@ -642,7 +644,7 @@ SpectrumCompositorAddTwoSumSpectra(
                 return status;
             }
 
-            PSPECTRUM intermediate_spectrum1;
+            PCSPECTRUM intermediate_spectrum1;
             status = SpectrumCompositorAddSpectra(compositor,
                                                   sum_spectrum0->spectrum1,
                                                   sum_spectrum1->spectrum1,
@@ -672,7 +674,7 @@ SpectrumCompositorAddTwoSumSpectra(
         }
         else
         {
-            PSPECTRUM intermediate_spectrum0;
+            PCSPECTRUM intermediate_spectrum0;
             ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                                  sum_spectrum0->spectrum1,
                                                                  (float_t)2.0,
@@ -683,11 +685,11 @@ SpectrumCompositorAddTwoSumSpectra(
                 return status;
             }
 
-            PSPECTRUM intermediate_spectrum1;
+            PCSPECTRUM intermediate_spectrum1;
             status = SpectrumCompositorAddSpectra(compositor,
                                                   sum_spectrum0->spectrum0,
                                                   sum_spectrum1->spectrum1,
-                                                  &intermediate_spectrum0);
+                                                  &intermediate_spectrum1);
 
             if (status != ISTATUS_SUCCESS)
             {
@@ -703,7 +705,7 @@ SpectrumCompositorAddTwoSumSpectra(
     }
     else if (sum_spectrum0->spectrum1 == sum_spectrum1->spectrum1)
     {
-        PSPECTRUM intermediate_spectrum0;
+        PCSPECTRUM intermediate_spectrum0;
         ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                              sum_spectrum0->spectrum1,
                                                              (float_t)2.0,
@@ -714,7 +716,7 @@ SpectrumCompositorAddTwoSumSpectra(
             return status;
         }
 
-        PSPECTRUM intermediate_spectrum1;
+        PCSPECTRUM intermediate_spectrum1;
         status = SpectrumCompositorAddSpectra(compositor,
                                               sum_spectrum0->spectrum0,
                                               sum_spectrum1->spectrum0,
@@ -733,7 +735,7 @@ SpectrumCompositorAddTwoSumSpectra(
     }
     else if (sum_spectrum0->spectrum0 == sum_spectrum1->spectrum1)
     {
-        PSPECTRUM intermediate_spectrum0;
+        PCSPECTRUM intermediate_spectrum0;
         ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                              sum_spectrum0->spectrum0,
                                                              (float_t)2.0,
@@ -744,7 +746,7 @@ SpectrumCompositorAddTwoSumSpectra(
             return status;
         }
 
-        PSPECTRUM intermediate_spectrum1;
+        PCSPECTRUM intermediate_spectrum1;
         status = SpectrumCompositorAddSpectra(compositor,
                                               sum_spectrum0->spectrum1,
                                               sum_spectrum1->spectrum0,
@@ -855,7 +857,7 @@ SpectrumCompositorAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
     _In_opt_ PCSPECTRUM spectrum0,
     _In_opt_ PCSPECTRUM spectrum1,
-    _Out_ PCSPECTRUM *sum
+    _Out_ PCSPECTRUM *sum_spectrum
     )
 {
     if (compositor == NULL)
@@ -863,20 +865,20 @@ SpectrumCompositorAddSpectra(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (sum == NULL)
+    if (sum_spectrum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (spectrum0 == NULL)
     {
-        *sum = spectrum1;
+        *sum_spectrum = spectrum1;
         return ISTATUS_SUCCESS;
     }
 
     if (spectrum1 == NULL)
     {
-        *sum = spectrum0;
+        *sum_spectrum = spectrum0;
         return ISTATUS_SUCCESS;
     }
 
@@ -885,7 +887,7 @@ SpectrumCompositorAddSpectra(
         ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                              spectrum0,
                                                              (float_t)2.0, 
-                                                             sum);
+                                                             sum_spectrum);
 
         return status;
     }
@@ -915,7 +917,7 @@ SpectrumCompositorAddSpectra(
     ISTATUS status = AddSpectrumRoutines[type0][type1](compositor,
                                                        spectrum0,
                                                        spectrum1,
-                                                       sum);
+                                                       sum_spectrum);
 
     return status;
 }
@@ -957,7 +959,8 @@ SpectrumCompositorAttenuateSpectrum(
 
     if (spectrum->vtable == &vtables[SPECTRUM_TYPE_ATTENUATED])
     {
-        PCATTENUATED_SPECTRUM attenuated_spectrum0;
+        PCATTENUATED_SPECTRUM attenuated_spectrum0 = 
+            (PCATTENUATED_SPECTRUM) spectrum;
 
         ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                              attenuated_spectrum0->spectrum,
@@ -981,10 +984,11 @@ SpectrumCompositorAttenuateSpectrum(
         return status;
     }
 
-    void *allocation = 
-        StaticMemoryAllocatorAllocate(&compositor->attenuated_spectrum_allocator);
+    void *allocation;
+    bool success = StaticMemoryAllocatorAllocate(
+        &compositor->attenuated_spectrum_allocator, &allocation);
 
-    if (allocation == NULL)
+    if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -1022,7 +1026,7 @@ SpectrumCompositorAddReflection(
     bool success = StaticMemoryAllocatorAllocate(
         &compositor->reflection_spectrum_allocator, &allocation);
 
-    if (allocation == NULL)
+    if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -1076,7 +1080,7 @@ SpectrumCompositorAttenuatedAddReflection(
     bool success = StaticMemoryAllocatorAllocate(
         &compositor->attenuated_reflection_spectrum_allocator, &allocation);
 
-    if (allocation == NULL)
+    if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
