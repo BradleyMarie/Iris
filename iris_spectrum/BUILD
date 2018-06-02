@@ -1,6 +1,43 @@
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "reflector",
+    hdrs = ["reflector.h"],
+    srcs = ["reflector.c"],
+    deps = [
+        ":reflector_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "reflector_internal",
+    hdrs = ["reflector_internal.h"],
+    deps = [
+        ":reflector_vtable",
+    ],
+)
+
+cc_test(
+    name = "reflector_test",
+    srcs = ["reflector_test.cc"],
+    deps = [
+        ":reflector",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "reflector_vtable",
+    hdrs = ["reflector_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//common:sal",
+        "//common:status",
+    ],
+)
+
+cc_library(
     name = "spectrum",
     hdrs = ["spectrum.h"],
     srcs = ["spectrum.c"],
@@ -44,6 +81,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spectrum_compositor_test",
+    srcs = ["spectrum_compositor_test.cc"],
+    deps = [
+        ":spectrum_compositor",
+        ":test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "spectrum_internal",
     hdrs = ["spectrum_internal.h"],
@@ -72,38 +119,12 @@ cc_library(
 )
 
 cc_library(
-    name = "reflector",
-    hdrs = ["reflector.h"],
-    srcs = ["reflector.c"],
+    name = "test_util",
+    hdrs = ["test_util.h"],
+    srcs = ["test_util.c"],
+    testonly = 1,
     deps = [
-        ":reflector_internal",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "reflector_internal",
-    hdrs = ["reflector_internal.h"],
-    deps = [
-        ":reflector_vtable",
-    ],
-)
-
-cc_test(
-    name = "reflector_test",
-    srcs = ["reflector_test.cc"],
-    deps = [
-        ":reflector",
-        "@com_google_googletest//:gtest_main"
-    ],
-)
-
-cc_library(
-    name = "reflector_vtable",
-    hdrs = ["reflector_vtable.h"],
-    deps = [
-        "//common:free_routine",
-        "//common:sal",
-        "//common:status",
+        ":spectrum_compositor",
+        ":spectrum_compositor_internal",
     ],
 )

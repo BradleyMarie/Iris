@@ -1016,6 +1016,11 @@ SpectrumCompositorAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
+    if (reflected_spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
     if (reflector == NULL)
     {
         *reflected_spectrum = NULL;
@@ -1055,9 +1060,14 @@ SpectrumCompositorAttenuatedAddReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if(isfinite(attenuation))
+    if(!isfinite(attenuation) || (float_t)0.0 > attenuation)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (reflected_spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (reflector == NULL || (float_t)0.0 == attenuation)
