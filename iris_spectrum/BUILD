@@ -51,6 +51,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spectrum_test",
+    srcs = ["spectrum_test.cc"],
+    deps = [
+        ":spectrum",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "spectrum_vtable",
     hdrs = ["spectrum_vtable.h"],
