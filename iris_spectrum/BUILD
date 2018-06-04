@@ -82,6 +82,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spectrum_compositor_context_test",
+    srcs = ["spectrum_compositor_context_test.cc"],
+    deps = [
+        ":spectrum_compositor_context",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "spectrum_compositor_internal",
     hdrs = ["spectrum_compositor_internal.h"],
