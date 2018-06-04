@@ -1,6 +1,17 @@
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "iris_spectrum",
+    hdrs = ["iris_spectrum.h"],
+    deps = [
+        ":reflector",
+        ":spectrum",
+        ":spectrum_compositor",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "reflector",
     hdrs = ["reflector.h"],
     srcs = ["reflector.c"],

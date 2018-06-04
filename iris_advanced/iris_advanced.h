@@ -15,8 +15,18 @@ Abstract:
 #ifndef _IRIS_ADVANCED_IRIS_ADVANCED_
 #define _IRIS_ADVANCED_IRIS_ADVANCED_
 
-#include "iris/bounding_box.h"
-#include "iris/color.h"
-#include "iris/random.h"
+#include "iris/iris.h"
+
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
+#include "iris_advanced/bounding_box.h"
+#include "iris_advanced/color.h"
+#include "iris_advanced/random.h"
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_ADVANCED_IRIS_ADVANCED_

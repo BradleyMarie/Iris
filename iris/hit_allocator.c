@@ -31,9 +31,9 @@ HitAllocatorAllocateInternal(
     _In_ float_t distance,
     _In_ uint32_t front_face,
     _In_ uint32_t back_face,
-    _When_(additional_data_size != 0, _In_reads_bytes_opt_(additional_data_size)) const void *additional_data,
+    _In_reads_bytes_opt_(additional_data_size) const void *additional_data,
     _In_ size_t additional_data_size,
-    _When_(additional_data_size != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && additional_data_size % _Curr_ == 0)) size_t additional_data_alignment,
+    _In_ size_t additional_data_alignment,
     _In_opt_ PPOINT3 hit_point,
     _Out_ PHIT *hit
     )
@@ -131,9 +131,9 @@ HitAllocatorAllocate(
     _In_ float_t distance,
     _In_ uint32_t front_face,
     _In_ uint32_t back_face,
-    _When_(additional_data_size != 0, _In_reads_bytes_opt_(additional_data_size)) const void *additional_data,
+    _In_reads_bytes_opt_(additional_data_size) const void *additional_data,
     _In_ size_t additional_data_size,
-    _When_(additional_data_size != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && additional_data_size % _Curr_ == 0)) size_t additional_data_alignment,
+    _In_ size_t additional_data_alignment,
     _Out_ PHIT *hit
     )
 {
@@ -163,9 +163,9 @@ HitAllocatorAllocateWithHitPoint(
     _In_ float_t distance,
     _In_ uint32_t front_face,
     _In_ uint32_t back_face,
-    _When_(additional_data_size != 0, _In_reads_bytes_opt_(additional_data_size)) const void *additional_data,
+    _In_reads_bytes_opt_(additional_data_size) const void *additional_data,
     _In_ size_t additional_data_size,
-    _When_(additional_data_size != 0, _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && additional_data_size % _Curr_ == 0)) size_t additional_data_alignment,
+    _In_ size_t additional_data_alignment,
     _In_ POINT3 hit_point,
     _Out_ PHIT *hit
     )

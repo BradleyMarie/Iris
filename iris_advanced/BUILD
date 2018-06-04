@@ -43,6 +43,7 @@ cc_library(
         ":bounding_box",
         ":color",
         ":random",
+        "//iris:iris"
     ],
     visibility = ["//visibility:public"],
 )

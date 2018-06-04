@@ -27,6 +27,10 @@ cc_library(
         "//common:sal",
         "//common:status",
     ],
+    visibility = [
+        "//iris:__pkg__",
+        "//iris_physx:__pkg__"
+    ],
 )
 
 cc_test(

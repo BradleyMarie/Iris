@@ -15,6 +15,10 @@ Abstract:
 #ifndef _IRIS_IRIS_
 #define _IRIS_IRIS_
 
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
 #include "iris/hit.h"
 #include "iris/hit_allocator.h"
 #include "iris/hit_context.h"
@@ -24,5 +28,9 @@ Abstract:
 #include "iris/point.h"
 #include "iris/ray.h"
 #include "iris/vector.h"
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_IRIS_
