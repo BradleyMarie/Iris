@@ -238,23 +238,235 @@ ConstantReflectorCreate(
     return result;
 }
 
-TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
+TEST(SpectrumCompositor, SpectrumCompositorAddReflection)
 {
-    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)1.0, 
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
                                                     (float_t)1.5);
     ASSERT_TRUE(NULL != root_spectrum0);
 
-    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)2.0, 
+    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
+    ASSERT_TRUE(NULL != root_reflector0);
+
+    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
+    ASSERT_TRUE(NULL != root_reflector1);
+
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
+                                            root_reflector1,
+                                            nullptr };
+
+    std::vector<float_t> reflector_answer = { (float_t)1.0, 
+                                              (float_t)2.0,
+                                              (float_t)0.0 };
+
+    std::vector<PCSPECTRUM> spectra = { root_spectrum0 };
+
+    std::vector<float_t> answer_wavelength_one = { (float_t)4.0 };
+
+    std::vector<float_t> answer_wavelength_two = { (float_t)0.0 };
+    
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAddReflection(compositor,
+                                                         root_spectrum0,
+                                                         reflectors[i],
+                                                         &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i]);
+        answer_wavelength_two.push_back(reflector_answer[i]);
+    }
+    
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAddReflection(compositor,
+                                                         nullptr,
+                                                         reflectors[i],
+                                                         &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back((float_t)0.0);
+        answer_wavelength_two.push_back((float_t)0.0);
+    }
+
+    for (size_t i = 0; i < spectra.size(); i++)
+    {
+        float_t value;
+        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_one[i], value);
+        
+        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_two[i], value);
+    }
+
+    SpectrumCompositorFree(compositor);
+
+    SpectrumRelease(root_spectrum0);
+    ReflectorRelease(root_reflector0);
+    ReflectorRelease(root_reflector1);
+}
+
+TEST(SpectrumCompositor, SpectrumCompositorAttenuatedAddReflection)
+{
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
+    ASSERT_TRUE(NULL != root_reflector0);
+
+    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
+    ASSERT_TRUE(NULL != root_reflector1);
+
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
+                                            root_reflector1,
+                                            nullptr };
+
+    std::vector<float_t> reflector_answer = { (float_t)1.0, 
+                                              (float_t)2.0,
+                                              (float_t)0.0 };
+
+    std::vector<PCSPECTRUM> spectra = { root_spectrum0 };
+
+    std::vector<float_t> answer_wavelength_one = { (float_t)4.0 };
+
+    std::vector<float_t> answer_wavelength_two = { (float_t)0.0 };
+    
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                                   root_spectrum0,
+                                                                   reflectors[i],
+                                                                   (float_t)0.0,
+                                                                   &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           root_spectrum0,
+                                                           reflectors[i],
+                                                           (float_t)0.5,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.5);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.5);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           root_spectrum0,
+                                                           reflectors[i],
+                                                           (float_t)1.0,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)1.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)1.0);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           root_spectrum0,
+                                                           reflectors[i],
+                                                           (float_t)2.0,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)2.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)2.0);
+    }
+    
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                                   nullptr,
+                                                                   reflectors[i],
+                                                                   (float_t)0.0,
+                                                                   &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           nullptr,
+                                                           reflectors[i],
+                                                           (float_t)0.5,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           nullptr,
+                                                           reflectors[i],
+                                                           (float_t)1.0,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           nullptr,
+                                                           reflectors[i],
+                                                           (float_t)2.0,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
+    }
+
+    for (size_t i = 0; i < spectra.size(); i++)
+    {
+        float_t value;
+        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_one[i], value);
+        
+        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_two[i], value);
+    }
+
+    SpectrumCompositorFree(compositor);
+
+    SpectrumRelease(root_spectrum0);
+    ReflectorRelease(root_reflector0);
+    ReflectorRelease(root_reflector1);
+}
+
+TEST(SpectrumCompositor, SpectrumCompositorAttenuateSpectrum)
+{
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)8.0,
                                                     (float_t)1.5);
     ASSERT_TRUE(NULL != root_spectrum1);
-
-    PSPECTRUM root_spectrum2 = CutoffSpectrumCreate((float_t)4.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum2);
-
-    PSPECTRUM root_spectrum3 = CutoffSpectrumCreate((float_t)8.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum3);
 
     PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
     ASSERT_TRUE(NULL != root_reflector0);
@@ -275,35 +487,15 @@ TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
 
     std::vector<PCSPECTRUM> spectra = { nullptr,
                                         root_spectrum0,
-                                        root_spectrum1,
-                                        root_spectrum2,
-                                        root_spectrum3 };
+                                        root_spectrum1 };
 
     std::vector<float_t> answer_wavelength_one = { (float_t)0.0,
-                                                   (float_t)1.0,
-                                                   (float_t)2.0,
                                                    (float_t)4.0,
                                                    (float_t)8.0 };
 
     std::vector<float_t> answer_wavelength_two = { (float_t)0.0,
                                                    (float_t)0.0,
-                                                   (float_t)0.0,
-                                                   (float_t)0.0,
                                                    (float_t)0.0 };
-
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAddReflection(compositor,
-                                                         root_spectrum0,
-                                                         reflectors[i],
-                                                         &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i]);
-        answer_wavelength_two.push_back(reflector_answer[i]);
-    }
 
     for (size_t i = 0; i < reflectors.size(); i++)
     {
@@ -403,6 +595,193 @@ TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
 
     for (size_t i = 0; i < stop_value; i++)
     {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                             spectra[i],
+                                                             (float_t)0.0,
+                                                             &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.0);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.0);
+
+        status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                     spectra[i],
+                                                     (float_t)0.5,
+                                                     &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.5);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.5);
+
+        status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                     spectra[i],
+                                                     (float_t)1.0,
+                                                     &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)1.0);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)1.0);
+
+        status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                     spectra[i],
+                                                     (float_t)2.0,
+                                                     &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)2.0);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)2.0);
+    }
+
+    for (size_t i = 0; i < spectra.size(); i++)
+    {
+        float_t value;
+        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_one[i], value);
+        
+        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(answer_wavelength_two[i], value);
+    }
+
+    SpectrumCompositorFree(compositor);
+
+    SpectrumRelease(root_spectrum0);
+    SpectrumRelease(root_spectrum1);
+    ReflectorRelease(root_reflector0);
+    ReflectorRelease(root_reflector1);
+}
+
+TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
+{
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)8.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum1);
+
+    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
+    ASSERT_TRUE(NULL != root_reflector0);
+
+    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
+    ASSERT_TRUE(NULL != root_reflector1);
+
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
+                                            root_reflector1 };
+
+    std::vector<float_t> reflector_answer = { (float_t)1.0, 
+                                              (float_t)2.0,
+                                              (float_t)0.0 };
+
+    std::vector<PCSPECTRUM> spectra = { nullptr,
+                                        root_spectrum0,
+                                        root_spectrum1 };
+
+    std::vector<float_t> answer_wavelength_one = { (float_t)0.0,
+                                                   (float_t)4.0,
+                                                   (float_t)8.0 };
+
+    std::vector<float_t> answer_wavelength_two = { (float_t)0.0,
+                                                   (float_t)0.0,
+                                                   (float_t)0.0 };
+
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAddReflection(compositor,
+                                                         root_spectrum0,
+                                                         reflectors[i],
+                                                         &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i]);
+        answer_wavelength_two.push_back(reflector_answer[i]);
+    }
+
+    for (size_t i = 0; i < reflectors.size(); i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                                   root_spectrum0,
+                                                                   reflectors[i],
+                                                                   (float_t)0.5,
+                                                                   &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.5);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.5);
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           root_spectrum0,
+                                                           reflectors[i],
+                                                           (float_t)2.0,
+                                                           &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)2.0);
+        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)2.0);
+    }
+
+    size_t stop_value = spectra.size();
+
+    for (size_t i = 0; i < stop_value; i++)
+    {
+        PCSPECTRUM result;
+        ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                             spectra[i],
+                                                             (float_t)0.5,
+                                                             &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.5);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.5);
+
+        status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                     spectra[i],
+                                                     (float_t)2.0,
+                                                     &result);
+        ASSERT_EQ(ISTATUS_SUCCESS, status);
+        spectra.push_back(result);
+
+        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)2.0);
+        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)2.0);
+    }
+
+    stop_value = spectra.size();
+
+    for (size_t i = 0; i < stop_value; i++)
+    {
+        for (size_t j = 0; j < stop_value; j++)
+        {
+            PCSPECTRUM result;
+            ISTATUS status = SpectrumCompositorAddSpectra(compositor,
+                                                          spectra[i],
+                                                          spectra[j],
+                                                          &result);
+            ASSERT_EQ(ISTATUS_SUCCESS, status);
+            spectra.push_back(result);
+
+            answer_wavelength_one.push_back(answer_wavelength_one[i] + answer_wavelength_one[j]);
+            answer_wavelength_two.push_back(answer_wavelength_two[i] + answer_wavelength_two[j]);
+        }
+    }
+
+    for (size_t i = 0; i < stop_value; i++)
+    {
         for (size_t j = 0; j < stop_value; j++)
         {
             PCSPECTRUM result;
@@ -434,8 +813,6 @@ TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
 
     SpectrumRelease(root_spectrum0);
     SpectrumRelease(root_spectrum1);
-    SpectrumRelease(root_spectrum2);
-    SpectrumRelease(root_spectrum3);
     ReflectorRelease(root_reflector0);
     ReflectorRelease(root_reflector1);
 }
