@@ -55,7 +55,6 @@ SpectrumCompositorContextCreate(
     _Inout_opt_ void *callback_context
     );
 
-
 //IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorCreate(

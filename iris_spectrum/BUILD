@@ -5,8 +5,9 @@ cc_library(
     hdrs = ["iris_spectrum.h"],
     deps = [
         ":reflector",
+        ":reflector_allocator_context",
         ":spectrum",
-        ":spectrum_compositor",
+        ":spectrum_compositor_context",
     ],
     visibility = ["//visibility:public"],
 )
@@ -18,6 +19,36 @@ cc_library(
     deps = [
         ":reflector_internal",
         "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator",
+    hdrs = ["reflector_allocator.h"],
+    srcs = ["reflector_allocator.c"],
+    deps = [
+        ":reflector",
+        ":reflector_allocator_internal",
+        "//common:dynamic_allocator",
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator_context",
+    hdrs = ["reflector_allocator_context.h"],
+    srcs = ["reflector_allocator_context.c"],
+    deps = [
+        ":reflector_allocator",
+        ":reflector_allocator_internal",
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator_internal",
+    hdrs = ["reflector_allocator_internal.h"],
+    deps = [
+        ":reflector_internal",
+        "//common:dynamic_allocator",
     ],
 )
 

@@ -74,4 +74,3 @@ SpectrumCompositorCreate(
     SpectrumCompositorClear(&compositor_context->compositor);
     return status;
 }
-

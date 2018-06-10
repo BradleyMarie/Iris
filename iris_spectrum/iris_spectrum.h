@@ -20,8 +20,9 @@ extern "C" {
 #endif // __cplusplus
 
 #include "iris_spectrum/reflector.h"
+#include "iris_spectrum/reflector_allocator_context.h"
 #include "iris_spectrum/spectrum.h"
-#include "iris_spectrum/spectrum_compositor.h"
+#include "iris_spectrum/spectrum_compositor_context.h"
 
 #if __cplusplus 
 }
