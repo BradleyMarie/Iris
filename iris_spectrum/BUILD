@@ -43,6 +43,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "reflector_allocator_context_test",
+    srcs = ["reflector_allocator_context_test.cc"],
+    deps = [
+        ":reflector_allocator_context",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "reflector_allocator_internal",
     hdrs = ["reflector_allocator_internal.h"],
