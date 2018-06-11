@@ -52,6 +52,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "reflector_allocator_test",
+    srcs = ["reflector_allocator_test.cc"],
+    deps = [
+        ":reflector_allocator",
+        ":test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "reflector_internal",
     hdrs = ["reflector_internal.h"],
@@ -175,6 +185,8 @@ cc_library(
     srcs = ["test_util.c"],
     testonly = 1,
     deps = [
+        ":reflector_allocator",
+        ":reflector_allocator_internal",
         ":spectrum_compositor",
         ":spectrum_compositor_internal",
     ],
