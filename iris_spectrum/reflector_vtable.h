@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    reflector_type_vtable.h
+    reflector_vtable.h
 
 Abstract:
 
