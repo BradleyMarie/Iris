@@ -85,7 +85,24 @@ cc_library(
     hdrs = ["material.h"],
     srcs = ["material.c"],
     deps = [
-        ":brdf_allocator",
+        ":material_internal",
+        ":material_vtable",
         "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "material_internal",
+    hdrs = ["material_internal.h"],
+    deps = [
+        ":material_vtable",
+    ],
+)
+
+cc_library(
+    name = "material_vtable",
+    hdrs = ["material_vtable.h"],
+    deps = [
+        ":brdf_allocator",
     ],
 )

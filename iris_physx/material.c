@@ -18,16 +18,7 @@ Abstract:
 
 #include "common/alloc.h"
 #include "iris_physx/material.h"
-
-//
-// Types
-//
-
-struct _MATERIAL {
-    PCMATERIAL_VTABLE vtable;
-    void *data;
-    atomic_uintmax_t reference_count;
-};
+#include "iris_physx/material_internal.h"
 
 //
 // Functions
@@ -94,58 +85,6 @@ MaterialAllocate(
     }
 
     return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-MaterialSample(
-    _In_ PCMATERIAL material,
-    _In_ POINT3 model_hit_point,
-    _In_ VECTOR3 world_surface_normal,
-    _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR allocator,
-    _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
-    )
-{
-    if (material == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (!PointValidate(model_hit_point))
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (!VectorValidate(world_surface_normal))
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (allocator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (world_shading_normal == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
-
-    if (brdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_06;
-    }
-
-    ISTATUS status = material->vtable->sample_routine(material->data,
-                                                      model_hit_point,
-                                                      world_surface_normal,
-                                                      additional_data,
-                                                      allocator,
-                                                      world_shading_normal,
-                                                      brdf);
-
-    return status;
 }
 
 void
