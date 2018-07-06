@@ -28,6 +28,7 @@ cc_library(
         "//common:dynamic_allocator",
     ],
 )
+
 cc_library(
     name = "brdf_allocator_context",
     hdrs = ["brdf_allocator_context.h"],
@@ -72,8 +73,19 @@ cc_library(
         ":brdf_allocator",
         ":brdf_allocator_context",
         ":hit_allocator",
+        ":material",
         "//iris_advanced:iris_advanced",
         "//iris_spectrum:iris_spectrum",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "material",
+    hdrs = ["material.h"],
+    srcs = ["material.c"],
+    deps = [
+        ":brdf_allocator",
+        "//common:alloc",
+    ],
 )

@@ -26,6 +26,7 @@ extern "C" {
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/brdf_allocator_context.h"
 #include "iris_physx/hit_allocator.h"
+#include "iris_physx/material.h"
 
 #if __cplusplus 
 }
