@@ -53,7 +53,6 @@ ISTATUS
 // Functions
 //
 
-//IRISADVANCEDAPI
 ISTATUS
 RandomCreate(
     _In_ PGENERATE_FLOAT_ROUTINE generate_float_routine,
@@ -63,7 +62,6 @@ RandomCreate(
     _Inout_opt_ void *callback_context
     );
 
-//IRISADVANCEDAPI
 ISTATUS
 RandomGenerateFloat(
     _In_ PRANDOM rng,
@@ -72,7 +70,6 @@ RandomGenerateFloat(
     _Out_range_(minimum, maximum) float_t *result
     );
 
-//IRISADVANCEDAPI
 ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM rng,

@@ -28,7 +28,6 @@ typedef const BRDF *PCBRDF;
 // Functions
 //
 
-//IRISPHYSXAPI
 ISTATUS
 BrdfAllocate(
     _In_ PCBRDF_VTABLE vtable,
@@ -38,7 +37,6 @@ BrdfAllocate(
     _Out_ PBRDF *brdf
     );
 
-//IRISPHYSXAPI
 ISTATUS
 BrdfSample(
     _In_ PCBRDF brdf,
@@ -51,7 +49,6 @@ BrdfSample(
     _Out_ float_t *pdf
     );
 
-//IRISPHYSXAPI
 ISTATUS
 BrdfComputeReflectance(
     _In_ PCBRDF brdf,
@@ -62,7 +59,6 @@ BrdfComputeReflectance(
     _Out_ PCREFLECTOR *reflector
     );
 
-//IRISPHYSXAPI
 ISTATUS
 BrdfComputeReflectanceWithPdf(
     _In_ PCBRDF brdf,
@@ -74,13 +70,11 @@ BrdfComputeReflectanceWithPdf(
     _Out_ float_t *pdf
     );
 
-//IRISPHYSXAPI
 void
 BrdfRetain(
     _In_opt_ PBRDF brdf
     );
 
-//IRISPHYSXAPI
 void
 BrdfRelease(
     _In_opt_ _Post_invalid_ PBRDF brdf

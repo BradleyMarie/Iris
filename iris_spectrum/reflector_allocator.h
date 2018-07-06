@@ -37,7 +37,6 @@ typedef const REFLECTOR_ALLOCATOR *PCREFLECTOR_ALLOCATOR;
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 ReflectorAllocatorAllocate(
     _Inout_ PREFLECTOR_ALLOCATOR allocator,

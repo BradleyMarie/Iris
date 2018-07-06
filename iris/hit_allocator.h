@@ -52,7 +52,6 @@ typedef const HIT_ALLOCATOR *PCHIT_ALLOCATOR;
 // Functions
 //
 
-//IRISAPI
 ISTATUS
 HitAllocatorAllocate(
     _Inout_ PHIT_ALLOCATOR allocator,
@@ -66,7 +65,6 @@ HitAllocatorAllocate(
     _Out_ PHIT *hit
     );
 
-//IRISAPI
 ISTATUS
 HitAllocatorAllocateWithHitPoint(
     _Inout_ PHIT_ALLOCATOR allocator,

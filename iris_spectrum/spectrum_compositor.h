@@ -33,7 +33,6 @@ typedef const SPECTRUM_COMPOSITOR *PCSPECTRUM_COMPOSITOR;
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddSpectra(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -42,7 +41,6 @@ SpectrumCompositorAddSpectra(
     _Out_ PCSPECTRUM *sum_spectrum
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -51,7 +49,6 @@ SpectrumCompositorAttenuateSpectrum(
     _Out_ PCSPECTRUM *attenuated_spectrum
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -60,7 +57,6 @@ SpectrumCompositorAddReflection(
     _Out_ PCSPECTRUM *reflected_spectrum
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorAttenuatedAddReflection(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,

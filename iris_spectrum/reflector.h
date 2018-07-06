@@ -30,7 +30,6 @@ typedef const REFLECTOR *PCREFLECTOR;
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 ReflectorAllocate(
     _In_ PCREFLECTOR_VTABLE vtable,
@@ -40,7 +39,6 @@ ReflectorAllocate(
     _Out_ PREFLECTOR *reflector
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 ReflectorReflect(
     _In_opt_ PCREFLECTOR reflector,
@@ -49,13 +47,11 @@ ReflectorReflect(
     _Out_ float_t *outgoing_intensity
     );
 
-//IRISSPECTRUMAPI
 void
 ReflectorRetain(
     _In_opt_ PREFLECTOR reflector
     );
 
-//IRISSPECTRUMAPI
 void
 ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR reflector

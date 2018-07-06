@@ -30,7 +30,6 @@ typedef const SPECTRUM *PCSPECTRUM;
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumAllocate(
     _In_ PCSPECTRUM_VTABLE vtable,
@@ -40,7 +39,6 @@ SpectrumAllocate(
     _Out_ PSPECTRUM *spectrum
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumSample(
     _In_opt_ PCSPECTRUM spectrum,
@@ -48,13 +46,11 @@ SpectrumSample(
     _Out_ float_t *intensity
     );
 
-//IRISSPECTRUMAPI
 void
 SpectrumRetain(
     _In_opt_ PSPECTRUM spectrum
     );
 
-//IRISSPECTRUMAPI
 void
 SpectrumRelease(
     _In_opt_ _Post_invalid_ PSPECTRUM spectrum

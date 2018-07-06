@@ -18,56 +18,48 @@ Abstract:
 #include "iris/matrix.h"
 #include "iris/ray.h"
 
-//IRISAPI
 VECTOR3
 VectorMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ VECTOR3 vector
     );
 
-//IRISAPI
 VECTOR3
 VectorMatrixTransposedMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ VECTOR3 vector
     );
 
-//IRISAPI
 VECTOR3
 VectorMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ VECTOR3 vector
     );
 
-//IRISAPI
 VECTOR3
 VectorMatrixInverseTransposedMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ VECTOR3 vector
     );
 
-//IRISAPI
 POINT3
 PointMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ POINT3 point
     );
 
-//IRISAPI
 POINT3
 PointMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ POINT3 point
     );
 
-//IRISAPI
 RAY
 RayMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
     _In_ RAY ray
     );
 
-//IRISAPI
 RAY
 RayMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,

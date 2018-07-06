@@ -48,14 +48,12 @@ ISTATUS
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorContextCreate(
     _In_ PSPECTRUM_COMPOSITOR_CONTEXT_LIFETIME_ROUTINE callback,
     _Inout_opt_ void *callback_context
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 SpectrumCompositorCreate(
     _Inout_ PSPECTRUM_COMPOSITOR_CONTEXT compositor_context,

@@ -70,7 +70,6 @@ ISTATUS
 // Functions
 //
 
-//IRISAPI
 ISTATUS
 HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -79,7 +78,6 @@ HitTesterTestWorldGeometry(
     _In_opt_ const void *hit_data
     );
 
-//IRISAPI
 ISTATUS
 HitTesterTestPremultipliedGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -89,7 +87,6 @@ HitTesterTestPremultipliedGeometry(
     _In_opt_ PCMATRIX model_to_world
     );
 
-//IRISAPI
 ISTATUS
 HitTesterTestGeometry(
     _Inout_ PHIT_TESTER hit_tester,
@@ -100,7 +97,6 @@ HitTesterTestGeometry(
     _In_ bool premultiplied
     );
 
-//IRISAPI
 ISTATUS
 HitTesterTestNestedGeometry(
     _Inout_ PHIT_ALLOCATOR hit_allocator,

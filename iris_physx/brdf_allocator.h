@@ -37,7 +37,6 @@ typedef const BRDF_ALLOCATOR *PCBRDF_ALLOCATOR;
 // Functions
 //
 
-//IRISPHYSXAPI
 ISTATUS
 BrdfAllocatorAllocate(
     _Inout_ PBRDF_ALLOCATOR allocator,

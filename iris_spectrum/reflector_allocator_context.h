@@ -48,14 +48,12 @@ ISTATUS
 // Functions
 //
 
-//IRISSPECTRUMAPI
 ISTATUS
 ReflectorAllocatorContextCreate(
     _In_ PREFLECTOR_ALLOCATOR_CONTEXT_LIFETIME_ROUTINE callback,
     _Inout_opt_ void *callback_context
     );
 
-//IRISSPECTRUMAPI
 ISTATUS
 ReflectorAllocatorCreate(
     _Inout_ PREFLECTOR_ALLOCATOR_CONTEXT compositor_context,

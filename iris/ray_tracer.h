@@ -61,13 +61,11 @@ typedef const RAY_TRACER *PCRAY_TRACER;
 // Functions
 //
 
-//IRISAPI
 ISTATUS
 RayTracerAllocate(
     _Out_ PRAY_TRACER *ray_tracer
     );
 
-//IRISAPI
 ISTATUS
 RayTracerTraceClosestHit(
     _Inout_ PRAY_TRACER ray_tracer,
@@ -79,7 +77,6 @@ RayTracerTraceClosestHit(
     _Inout_opt_ void *process_hit_context
     );
 
-//IRISAPI
 ISTATUS
 RayTracerTraceClosestHitWithCoordinates(
     _Inout_ PRAY_TRACER ray_tracer,
@@ -91,7 +88,6 @@ RayTracerTraceClosestHitWithCoordinates(
     _Inout_opt_ void *process_hit_context
     );
 
-//IRISAPI
 ISTATUS
 RayTracerTraceAllHits(
     _Inout_ PRAY_TRACER ray_tracer,
@@ -103,7 +99,6 @@ RayTracerTraceAllHits(
     _Inout_opt_ void *process_hit_context
     );
 
-//IRISAPI
 void
 RayTracerFree(
     _In_opt_ _Post_invalid_ PRAY_TRACER ray_tracer

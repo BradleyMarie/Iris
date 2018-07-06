@@ -34,7 +34,6 @@ typedef const MATRIX *PCMATRIX;
 // Function definitions
 //
 
-//IRISAPI
 ISTATUS
 MatrixAllocate(
     _In_ float_t m00,
@@ -56,7 +55,6 @@ MatrixAllocate(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateTranslation(
     _In_ float_t x,
@@ -65,7 +63,6 @@ MatrixAllocateTranslation(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateScalar(
     _In_ float_t x,
@@ -74,7 +71,6 @@ MatrixAllocateScalar(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateRotation(
     _In_ float_t theta,
@@ -84,7 +80,6 @@ MatrixAllocateRotation(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateOrthographic(
     _In_ float_t left,
@@ -96,7 +91,6 @@ MatrixAllocateOrthographic(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateFrustum(
     _In_ float_t left,
@@ -108,7 +102,6 @@ MatrixAllocateFrustum(
     _Out_ PMATRIX *matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixAllocateProduct(
     _In_opt_ PMATRIX multiplicand0,
@@ -117,33 +110,28 @@ MatrixAllocateProduct(
     );
 
 _Ret_opt_
-//IRISAPI
 PMATRIX
 MatrixGetInverse(
     _In_opt_ PMATRIX matrix
     );
 
 _Ret_opt_
-//IRISAPI
 PCMATRIX
 MatrixGetConstantInverse(
     _In_opt_ PCMATRIX matrix
     );
 
-//IRISAPI
 ISTATUS
 MatrixReadContents(
     _In_ PCMATRIX matrix,
     _Out_writes_(4) float_t contents[4][4]
     );
 
-//IRISAPI
 void
 MatrixRetain(
     _In_opt_ PMATRIX matrix
     );
 
-//IRISAPI
 void
 MatrixRelease(
     _In_opt_ _Post_invalid_ PMATRIX matrix
