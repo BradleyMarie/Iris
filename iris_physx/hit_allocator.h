@@ -22,8 +22,8 @@ Abstract:
 // Types
 //
 
-typedef struct _HIT_ALLOCATOR PHYSX_HIT_ALLOCATOR, *PPHYSX_HIT_ALLOCATOR;
-typedef const PHYSX_HIT_ALLOCATOR *PCPHYSX_HIT_ALLOCATOR;
+typedef struct _HIT_ALLOCATOR SHAPE_HIT_ALLOCATOR, *PSHAPE_HIT_ALLOCATOR;
+typedef const SHAPE_HIT_ALLOCATOR *PCSHAPE_HIT_ALLOCATOR;
 
 //
 // Functions
@@ -32,8 +32,8 @@ typedef const PHYSX_HIT_ALLOCATOR *PCPHYSX_HIT_ALLOCATOR;
 static
 inline
 ISTATUS
-PhysxHitAllocatorAllocate(
-    _Inout_ PPHYSX_HIT_ALLOCATOR allocator,
+ShapeHitAllocatorAllocate(
+    _Inout_ PSHAPE_HIT_ALLOCATOR allocator,
     _In_opt_ PHIT next,
     _In_ float_t distance,
     _In_ uint32_t front_face,
@@ -60,8 +60,8 @@ PhysxHitAllocatorAllocate(
 static
 inline
 ISTATUS
-PhysxHitAllocatorAllocateWithHitPoint(
-    _Inout_ PPHYSX_HIT_ALLOCATOR allocator,
+ShapeHitAllocatorAllocateWithHitPoint(
+    _Inout_ PSHAPE_HIT_ALLOCATOR allocator,
     _In_opt_ PHIT next,
     _In_ float_t distance,
     _In_ uint32_t front_face,
