@@ -15,9 +15,9 @@ Abstract:
 #ifndef _IRIS_PHYSX_BRDF_VTABLE_
 #define _IRIS_PHYSX_BRDF_VTABLE_
 
-#include "iris/vector.h"
-#include "iris_advanced/random.h"
-#include "iris_spectrum/reflector_allocator.h"
+#include "iris/iris.h"
+#include "iris_advanced/iris_advanced.h"
+#include "iris_spectrum/iris_spectrum.h"
 
 //
 // Types

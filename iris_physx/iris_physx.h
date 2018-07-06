@@ -22,6 +22,9 @@ Abstract:
 extern "C" {
 #endif // __cplusplus
 
+#include "iris_physx/brdf.h"
+#include "iris_physx/brdf_allocator.h"
+#include "iris_physx/brdf_allocator_context.h"
 #include "iris_physx/hit_allocator.h"
 
 #if __cplusplus 
