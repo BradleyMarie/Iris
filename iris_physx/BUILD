@@ -74,6 +74,7 @@ cc_library(
         ":brdf_allocator_context",
         ":hit_allocator",
         ":material",
+        ":shape",
         "//iris_advanced:iris_advanced",
         "//iris_spectrum:iris_spectrum",
     ],
