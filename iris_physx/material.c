@@ -107,12 +107,35 @@ MaterialSample(
     _Out_ PCBRDF *brdf
     )
 {
-    assert(material != NULL);
-    assert(PointValidate(model_hit_point));
-    assert(VectorValidate(world_surface_normal));
-    assert(allocator != NULL);
-    assert(world_shading_normal != NULL);
-    assert(brdf != NULL);
+    if (material == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!PointValidate(model_hit_point))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!VectorValidate(world_surface_normal))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (world_shading_normal == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
 
     ISTATUS status = material->vtable->sample_routine(material->data,
                                                       model_hit_point,
