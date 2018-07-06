@@ -106,3 +106,31 @@ cc_library(
         ":brdf_allocator",
     ],
 )
+
+cc_library(
+    name = "shape",
+    hdrs = ["shape.h"],
+    srcs = ["shape.c"],
+    deps = [
+        ":shape_internal",
+        ":shape_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "shape_internal",
+    hdrs = ["shape_internal.h"],
+    deps = [
+        ":shape_vtable",
+    ],
+)
+
+cc_library(
+    name = "shape_vtable",
+    hdrs = ["shape_vtable.h"],
+    deps = [
+        ":hit_allocator",
+        ":material",
+    ],
+)

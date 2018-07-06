@@ -81,7 +81,7 @@ ShapeHitAllocatorAllocateWithHitPoint(
                                                       additional_data,
                                                       additional_data_size,
                                                       additional_data_alignment,
-                                                      hit_point
+                                                      hit_point,
                                                       hit);
 
     return status;
