@@ -61,7 +61,15 @@ cc_library(
     name = "hit_allocator",
     hdrs = ["hit_allocator.h"],
     deps = [
-        "//iris:hit_allocator",
+        "//iris:iris",
+    ],
+)
+
+cc_library(
+    name = "hit_tester",
+    hdrs = ["hit_tester.h"],
+    deps = [
+        ":hit_allocator",
     ],
 )
 
@@ -73,6 +81,7 @@ cc_library(
         ":brdf_allocator",
         ":brdf_allocator_context",
         ":hit_allocator",
+        ":hit_tester",
         ":material",
         ":shape",
         "//iris_advanced:iris_advanced",

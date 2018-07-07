@@ -16,7 +16,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_HIT_ALLOCATOR_
 #define _IRIS_PHYSX_HIT_ALLOCATOR_
 
-#include "iris/hit_allocator.h"
+#include "iris/iris.h"
 
 //
 // Types
