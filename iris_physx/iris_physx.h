@@ -29,6 +29,7 @@ extern "C" {
 #include "iris_physx/hit_tester.h"
 #include "iris_physx/material.h"
 #include "iris_physx/shape.h"
+#include "iris_physx/visibility_tester.h"
 
 #if __cplusplus 
 }

@@ -84,10 +84,21 @@ cc_library(
         ":hit_tester",
         ":material",
         ":shape",
+        ":visibility_tester",
         "//iris_advanced:iris_advanced",
         "//iris_spectrum:iris_spectrum",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "light_vtable",
+    hdrs = ["light_vtable.h"],
+    deps = [
+        ":visibility_tester",
+        "//iris_advanced:iris_advanced",
+        "//iris_spectrum:iris_spectrum",
+    ],
 )
 
 cc_library(
@@ -142,5 +153,13 @@ cc_library(
     deps = [
         ":hit_allocator",
         ":material",
+    ],
+)
+
+cc_library(
+    name = "visibility_tester",
+    hdrs = ["visibility_tester.h"],
+    deps = [
+        "//iris:iris",
     ],
 )

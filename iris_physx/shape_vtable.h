@@ -37,7 +37,7 @@ ISTATUS
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
     _In_ BOUNDING_BOX world_aligned_bounding_box,
-    _Out_ bool *is_inside
+    _Out_ bool *contains
     );
 
 typedef
