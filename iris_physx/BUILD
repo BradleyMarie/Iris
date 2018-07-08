@@ -137,6 +137,15 @@ cc_library(
 )
 
 cc_library(
+    name = "ray_tracer",
+    hdrs = ["ray_tracer.h"],
+    deps = [
+        ":brdf",
+        ":light",
+    ],
+)
+
+cc_library(
     name = "shape",
     hdrs = ["shape.h"],
     srcs = ["shape.c"],
