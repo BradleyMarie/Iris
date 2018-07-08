@@ -92,6 +92,14 @@ cc_library(
 )
 
 cc_library(
+    name = "light",
+    hdrs = ["light.h"],
+    deps = [
+        ":light_vtable",
+    ],
+)
+
+cc_library(
     name = "light_vtable",
     hdrs = ["light_vtable.h"],
     deps = [

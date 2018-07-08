@@ -8,9 +8,9 @@ Module Name:
 
 Abstract:
 
-    Allows testing the visibility of one point from another. A point is 
-    considered not visible if there is a successful hit test anywhere between
-    the two points.
+    Allows testing for visibility along a ray. A visibility test is considered
+    successful if there are no successful hit tests along the ray inside the
+    distance tested.
 
 --*/
 
