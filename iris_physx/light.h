@@ -43,7 +43,7 @@ LightSample(
     _In_ POINT3 hit_point,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
-    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE compositor,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
     _Out_ PCSPECTRUM *spectrum,
     _Out_ PVECTOR3 to_light,
     _Out_ float_t *pdf
@@ -54,8 +54,8 @@ LightComputeEmissive(
     _In_ PCLIGHT light,
     _In_ RAY to_light,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
-    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE compositor,
-    _Out_ PCSPECTRUM *Spectrum
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
     );
 
 ISTATUS
@@ -63,7 +63,7 @@ LightComputeEmissiveWithPdf(
     _In_ PCLIGHT light,
     _In_ RAY to_light,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
-    _Inout_ PSPECTRUM_COMPOSITOR_REFERENCE compositor,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
     _Out_ PCSPECTRUM *spectrum,
     _Out_ float_t *pdf
     );

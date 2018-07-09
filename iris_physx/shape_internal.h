@@ -18,6 +18,7 @@ Abstract:
 #include <assert.h>
 #include <stdatomic.h>
 
+#include "iris_physx/light.h"
 #include "iris_physx/shape_vtable.h"
 
 //
@@ -98,13 +99,19 @@ ShapeGetMaterial(
     return status;
 }
 
-/*
 ISTATUS
 ShapeGetLight(
     _In_ PCSHAPE shape,
     _In_ uint32_t face_hit,
     _Outptr_result_maybenull_ PCLIGHT *light
-    );
-*/
+    )
+{
+    assert(shape != NULL);
+    assert(light != NULL);
+
+    *light = NULL;
+
+    return ISTATUS_SUCCESS;
+}
 
 #endif // _IRIS_PHYSX_SHAPE_INTERNAL_

@@ -82,6 +82,7 @@ cc_library(
         ":brdf_allocator_context",
         ":hit_allocator",
         ":hit_tester",
+        ":light",
         ":material",
         ":shape",
         ":visibility_tester",
@@ -94,6 +95,16 @@ cc_library(
 cc_library(
     name = "light",
     hdrs = ["light.h"],
+    srcs = ["light.c"],
+    deps = [
+        ":light_internal",
+        ":light_vtable",
+    ],
+)
+
+cc_library(
+    name = "light_internal",
+    hdrs = ["light_internal.h"],
     deps = [
         ":light_vtable",
     ],
@@ -150,6 +161,7 @@ cc_library(
     hdrs = ["shape.h"],
     srcs = ["shape.c"],
     deps = [
+        ":light",
         ":shape_internal",
         ":shape_vtable",
         "//common:alloc",
