@@ -27,6 +27,7 @@ extern "C" {
 #include "iris/multiply.h"
 #include "iris/point.h"
 #include "iris/ray.h"
+#include "iris/ray_tracer.h"
 #include "iris/vector.h"
 
 #if __cplusplus 

@@ -150,8 +150,22 @@ cc_library(
 cc_library(
     name = "ray_tracer",
     hdrs = ["ray_tracer.h"],
+    srcs = ["ray_tracer.c"],
     deps = [
         ":brdf",
+        ":light",
+        ":material_internal",
+        ":ray_tracer_internal",
+        ":shape",
+        ":shape_internal",
+    ],
+)
+
+cc_library(
+    name = "ray_tracer_internal",
+    hdrs = ["ray_tracer_internal.h"],
+    deps = [
+        ":brdf_allocator",
         ":light",
     ],
 )

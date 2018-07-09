@@ -36,7 +36,7 @@ RayTracerValidateArugumentsAndTrace(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
-    _In_ PRAYTRACER_TRACE_ROUTINE trace_routine,
+    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ const void *process_hit_routine,
     _Inout_opt_ void *process_hit_context
@@ -103,7 +103,7 @@ ISTATUS
 RayTracerProcessHitWithContext(
     _In_ RAY ray,
     _In_ PCFULL_HIT_CONTEXT hit,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
+    _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
     _Inout_opt_ void *process_hit_context
     )
 {
@@ -222,9 +222,9 @@ RayTracerTraceClosestHit(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
-    _In_ PRAYTRACER_TRACE_ROUTINE trace_routine,
+    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_ PRAYTRACER_PROCESS_HIT_ROUTINE process_hit_routine,
+    _In_ PRAY_TRACER_PROCESS_HIT_ROUTINE process_hit_routine,
     _Inout_opt_ void *process_hit_context
     )
 {
@@ -267,9 +267,9 @@ RayTracerTraceClosestHitWithCoordinates(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
-    _In_ PRAYTRACER_TRACE_ROUTINE trace_routine,
+    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
+    _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
     _Inout_opt_ void *process_hit_context
     )
 {
@@ -315,9 +315,9 @@ RayTracerTraceAllHits(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
-    _In_ PRAYTRACER_TRACE_ROUTINE trace_routine,
+    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_ PRAYTRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
+    _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
     _Inout_opt_ void *process_hit_context
     )
 {

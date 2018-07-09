@@ -40,8 +40,8 @@ ISTATUS
 ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
     _In_ RAY ray,
-    _Outptr_result_maybenull_ PLIGHT *light,
-    _Outptr_result_maybenull_ PBRDF *brdf,
+    _Outptr_result_maybenull_ PCLIGHT *light,
+    _Outptr_result_maybenull_ PCBRDF *brdf,
     _Out_ PPOINT3 hit_point,
     _Out_ PVECTOR3 surface_normal,
     _Out_ PVECTOR3 shading_normal

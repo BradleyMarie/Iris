@@ -28,7 +28,7 @@ ISTATUS
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR allocator,
+    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
     _Out_ PVECTOR3 world_shading_normal,
     _Out_ PCBRDF *brdf
     );

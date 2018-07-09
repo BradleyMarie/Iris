@@ -42,7 +42,7 @@ MaterialSample(
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR allocator,
+    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
     _Out_ PVECTOR3 world_shading_normal,
     _Out_ PCBRDF *brdf
     )
@@ -50,7 +50,7 @@ MaterialSample(
     assert(material != NULL);
     assert(PointValidate(model_hit_point));
     assert(VectorValidate(world_surface_normal));
-    assert(allocator != NULL);
+    assert(brdf_allocator != NULL);
     assert(world_shading_normal != NULL);
     assert(brdf != NULL);
 
@@ -58,7 +58,7 @@ MaterialSample(
                                                       model_hit_point,
                                                       world_surface_normal,
                                                       additional_data,
-                                                      allocator,
+                                                      brdf_allocator,
                                                       world_shading_normal,
                                                       brdf);
 
