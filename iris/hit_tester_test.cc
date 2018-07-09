@@ -878,7 +878,6 @@ void RunTransformedHitTest(
     _In_ PHIT_TESTER tester,
     _In_ float_t min_distance,
     _In_ PCMATRIX matrix,
-    _In_ RAY model_ray,
     _In_ bool premultiplied
     )
 {
@@ -1019,33 +1018,28 @@ void RunTransformedHitTest(
         EXPECT_EQ(&first_hit_data, hits[0 + offset]->context.data);
         EXPECT_FALSE(hits[0 + offset]->shared_context->premultiplied);
         EXPECT_EQ(matrix, hits[0 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[0 + offset]->shared_context->model_ray);
         EXPECT_EQ(first_distance, hits[0 + offset]->context.distance);
 
         EXPECT_EQ(&first_hit_data, hits[1 + offset]->context.data);
         EXPECT_FALSE(hits[1 + offset]->shared_context->premultiplied);
         EXPECT_EQ(matrix, hits[1 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[1 + offset]->shared_context->model_ray);
         EXPECT_EQ(first_distance + 1.0, hits[1 + offset]->context.distance);
 
         // Second
         EXPECT_EQ(&second_hit_data, hits[2 + offset]->context.data);
         EXPECT_FALSE(hits[2 + offset]->shared_context->premultiplied);
         EXPECT_EQ(matrix, hits[2 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[2 + offset]->shared_context->model_ray);
         EXPECT_EQ(second_distance, hits[2 + offset]->context.distance);
 
         EXPECT_EQ(&second_hit_data, hits[3 + offset]->context.data);
         EXPECT_FALSE(hits[3 + offset]->shared_context->premultiplied);
         EXPECT_EQ(matrix, hits[3 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[3 + offset]->shared_context->model_ray);
         EXPECT_EQ(second_distance + 1.0, hits[3 + offset]->context.distance);
 
         // Third
         EXPECT_EQ(&third_hit_data, hits[4 + offset]->context.data);
         EXPECT_FALSE(hits[4 + offset]->shared_context->premultiplied);
         EXPECT_EQ(matrix, hits[4 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[4 + offset]->shared_context->model_ray);
         EXPECT_EQ(third_distance + 1.0, hits[4 + offset]->context.distance);
 
         // Fourth
@@ -1053,7 +1047,6 @@ void RunTransformedHitTest(
         EXPECT_FALSE(hits[5 + offset]->shared_context->premultiplied);
         EXPECT_EQ(fourth_distance, hits[5 + offset]->context.distance);
         EXPECT_EQ(matrix, hits[5 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(model_ray, hits[5 + offset]->shared_context->model_ray);
     }
 }
 
@@ -1084,37 +1077,29 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
 
     HitTesterReset(&tester, ray, (float_t)0.0);
 
-    POINT3 model_origin = PointCreate((float_t) 0.0, 
-                                      (float_t) 0.0, 
-                                      (float_t) 0.0);
-    VECTOR3 model_direction = VectorCreate((float_t) 4.0,
-                                           (float_t) 5.0, 
-                                           (float_t) 6.0);
-    RAY model_ray = RayCreate(model_origin, model_direction);
-
     PCFULL_HIT_CONTEXT *hits;
     size_t num_hits;
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, ray, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
+    RunTransformedHitTest(&tester, 0.0, nullptr, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
+    RunTransformedHitTest(&tester, 0.0, nullptr, false);
 
     HitTesterReset(&tester, ray, 0.0);
 
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, ray, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
+    RunTransformedHitTest(&tester, 0.0, nullptr, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
+    RunTransformedHitTest(&tester, 0.0, nullptr, false);
     
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
@@ -1148,25 +1133,17 @@ TEST(HitTesterTest, HitTesterCheckAllHits)
 
     HitTesterReset(&tester, ray, (float_t)0.0);
 
-    POINT3 model_origin = PointCreate((float_t) 0.0, 
-                                      (float_t) 0.0, 
-                                      (float_t) 0.0);
-    VECTOR3 model_direction = VectorCreate((float_t) 4.0,
-                                           (float_t) 5.0, 
-                                           (float_t) 6.0);
-    RAY model_ray = RayCreate(model_origin, model_direction);
-
     PCFULL_HIT_CONTEXT *hits;
     size_t num_hits;
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, ray, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
+    RunTransformedHitTest(&tester, 0.0, nullptr, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
+    RunTransformedHitTest(&tester, 0.0, nullptr, false);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world_2);
     RunPremultipliedHitTest(&tester, 0.0, nullptr);
@@ -1177,12 +1154,12 @@ TEST(HitTesterTest, HitTesterCheckAllHits)
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, ray, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, model_ray, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, ray, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
+    RunTransformedHitTest(&tester, 0.0, nullptr, true);
+    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
+    RunTransformedHitTest(&tester, 0.0, nullptr, false);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world_2);
     RunPremultipliedHitTest(&tester, 0.0, nullptr);

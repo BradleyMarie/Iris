@@ -125,7 +125,6 @@ RayTracerProcessHitWithContext(
         ISTATUS status = process_hit_routine(process_hit_context,
                                              &hit->context,
                                              NULL,
-                                             ray.direction,
                                              world_hit_point,
                                              world_hit_point);
         return status;
@@ -149,13 +148,9 @@ RayTracerProcessHitWithContext(
         POINT3 model_hit_point = 
             PointMatrixInverseMultiplyInline(model_to_world, world_hit_point);
 
-        VECTOR3 model_viewer = 
-            VectorMatrixInverseMultiplyInline(model_to_world, ray.direction);
-
         ISTATUS status = process_hit_routine(process_hit_context,
                                              &hit->context,
                                              model_to_world,
-                                             model_viewer,
                                              model_hit_point,
                                              world_hit_point);
         return status;
@@ -177,7 +172,6 @@ RayTracerProcessHitWithContext(
     ISTATUS status = process_hit_routine(process_hit_context,
                                          &hit->context,
                                          model_to_world,
-                                         shared_context->model_ray.direction,
                                          model_hit_point,
                                          world_hit_point);
     return status;

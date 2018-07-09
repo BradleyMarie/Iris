@@ -25,7 +25,6 @@ Abstract:
 typedef struct _SHARED_HIT_CONTEXT {
     PCMATRIX model_to_world;
     bool premultiplied;
-    RAY model_ray;
 } SHARED_HIT_CONTEXT, *PSHARED_HIT_CONTEXT;
 
 typedef const SHARED_HIT_CONTEXT *PCSHARED_HIT_CONTEXT;

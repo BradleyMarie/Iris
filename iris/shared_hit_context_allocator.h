@@ -48,9 +48,10 @@ SharedHitContextAllocatorInitialize(
 static
 inline
 bool
-SharedHitContextAllocatorAllocatePremultiplied(
+SharedHitContextAllocatorAllocate(
     _Inout_ PSHARED_HIT_CONTEXT_ALLOCATOR allocator,
     _In_ PCMATRIX model_to_world,
+    _In_ bool premultiplied,
     _Out_ PSHARED_HIT_CONTEXT *context
     )
 {
@@ -67,37 +68,7 @@ SharedHitContextAllocatorAllocatePremultiplied(
     }
 
     (*context)->model_to_world = model_to_world;
-    (*context)->premultiplied = true;
-
-    return true;
-}
-
-static
-inline
-bool
-SharedHitContextAllocatorAllocateTransformed(
-    _Inout_ PSHARED_HIT_CONTEXT_ALLOCATOR allocator,
-    _In_ PCMATRIX model_to_world,
-    _In_ RAY model_ray,
-    _Out_ PSHARED_HIT_CONTEXT *context
-    )
-{
-    assert(allocator != NULL);
-    assert(model_to_world != NULL);
-    assert(RayValidate(model_ray));
-    assert(context != NULL);
-
-    bool success = StaticMemoryAllocatorAllocate(&allocator->allocator,
-                                                 (void **)context);
-
-    if (!success)
-    {
-        return false;
-    }
-
-    (*context)->model_to_world = model_to_world;
-    (*context)->premultiplied = false;
-    (*context)->model_ray = model_ray;
+    (*context)->premultiplied = premultiplied;
 
     return true;
 }

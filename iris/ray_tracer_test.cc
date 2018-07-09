@@ -261,7 +261,6 @@ ProcessHitWithCoordinatesRoutine(
     _Inout_opt_ void *context, 
     _In_ PCHIT_CONTEXT hit_context,
     _In_ PCMATRIX model_to_world,
-    _In_ VECTOR3 model_viewer,
     _In_ POINT3 model_hit_point,
     _In_ POINT3 world_hit_point
     )
@@ -284,42 +283,36 @@ ProcessHitWithCoordinatesRoutine(
         EXPECT_EQ(process_data->scalar_dist_1, model_to_world);
         EXPECT_EQ(PointCreate(8.0, 3.0, 1.0), model_hit_point);
         EXPECT_EQ(PointCreate(8.0, 6.0, 4.0), world_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 1.5, 0.5), model_viewer);
     }
     else if (hit_context->distance == (float_t)2.0)
     {
         EXPECT_EQ(process_data->scalar_dist_2, model_to_world);
         EXPECT_EQ(PointCreate(200.0, 200.0, 200.0), model_hit_point);
         EXPECT_EQ(PointCreate(12.0, 9.0, 6.0), world_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 1.5, 0.5), model_viewer);
     }
     else if (hit_context->distance == (float_t)3.0)
     {
         EXPECT_TRUE(model_to_world == nullptr);
         EXPECT_EQ(PointCreate(16.0, 12.0, 8.0), model_hit_point);
         EXPECT_EQ(world_hit_point, model_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)4.0)
     {
         EXPECT_TRUE(model_to_world == nullptr);
         EXPECT_EQ(PointCreate(400.0, 400.0, 400.0), model_hit_point);
         EXPECT_EQ(world_hit_point, model_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)5.0)
     {
         EXPECT_EQ(process_data->translation_dist_5, model_to_world);
         EXPECT_EQ(PointCreate(22.0, 15.0, 8.0), model_hit_point);
         EXPECT_EQ(PointCreate(24.0, 18.0, 12.0), world_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else if (hit_context->distance == (float_t)6.0)
     {
         EXPECT_EQ(process_data->translation_dist_6, model_to_world);
         EXPECT_EQ(PointCreate(600.0, 600.0, 600.0), world_hit_point);
         EXPECT_EQ(PointCreate(597.0, 596.0, 595.0), model_hit_point);
-        EXPECT_EQ(VectorCreate(4.0, 3.0, 2.0), model_viewer);
     }
     else
     {
@@ -342,7 +335,6 @@ ProcessHitWithCoordinatesRoutineReturnError(
     _Inout_opt_ void *context, 
     _In_ PCHIT_CONTEXT hit_context,
     _In_ PCMATRIX model_to_world,
-    _In_ VECTOR3 model_viewer,
     _In_ POINT3 model_hit_point,
     _In_ POINT3 world_hit_point
     )

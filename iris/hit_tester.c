@@ -135,9 +135,10 @@ HitTesterTestPremultipliedInternal(
 
     PSHARED_HIT_CONTEXT context;
     PSHARED_HIT_CONTEXT_ALLOCATOR allocator = &hit_tester->context_allocator;
-    bool ok = SharedHitContextAllocatorAllocatePremultiplied(allocator,
-                                                             model_to_world,
-                                                             &context);
+    bool ok = SharedHitContextAllocatorAllocate(allocator,
+                                                model_to_world,
+                                                true,
+                                                &context);
     
     if (!ok)
     {
@@ -189,10 +190,10 @@ HitTesterTestTransformedInternal(
 
     PSHARED_HIT_CONTEXT context;
     PSHARED_HIT_CONTEXT_ALLOCATOR allocator = &hit_tester->context_allocator;
-    bool ok = SharedHitContextAllocatorAllocateTransformed(allocator,
-                                                           model_to_world,
-                                                           trace_ray,
-                                                           &context);
+    bool ok = SharedHitContextAllocatorAllocate(allocator,
+                                                model_to_world,
+                                                false,
+                                                &context);
     
     if (!ok)
     {

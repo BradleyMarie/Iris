@@ -40,7 +40,6 @@ ShapeRayTracerProcessHit(
     _Inout_opt_ void *context, 
     _In_ PCHIT_CONTEXT hit_context,
     _In_ PCMATRIX model_to_world,
-    _In_ VECTOR3 model_viewer,
     _In_ POINT3 model_hit_point,
     _In_ POINT3 world_hit_point
     )
@@ -58,6 +57,8 @@ ShapeRayTracerProcessHit(
     {
         return status;
     }
+
+    process_context->hit_point = world_hit_point;
 
     PCMATERIAL material;
     status = ShapeGetMaterial(shape, hit_context->front_face, &material);
