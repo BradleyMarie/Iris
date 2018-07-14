@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_BRDF_INTERNAL_
-#define _IRIS_PHYSX_BRDF_INTERNAL_
+#ifndef _IRIS_PHYSX_RAY_TRACER_INTERNAL_
+#define _IRIS_PHYSX_RAY_TRACER_INTERNAL_
 
 #include "iris_physx/brdf_allocator.h"
 
@@ -58,4 +58,4 @@ ShapeRayTracerInitialize(
     shape_ray_tracer->brdf_allocator = brdf_allocator;
 }
 
-#endif // _IRIS_PHYSX_BRDF_INTERNAL_
+#endif // _IRIS_PHYSX_RAY_TRACER_INTERNAL_

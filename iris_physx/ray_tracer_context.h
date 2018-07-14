@@ -18,6 +18,7 @@ Abstract:
 
 #include "iris_advanced/iris_advanced.h"
 #include "iris_spectrum/iris_spectrum.h"
+#include "iris_physx/hit_tester.h"
 #include "iris_physx/ray_tracer.h"
 
 //
@@ -52,7 +53,7 @@ typedef
 ISTATUS
 (*PSHAPE_RAY_TRACER_TONE_MAP_ROUTINE)(
     _Inout_opt_ void *context,
-    _In_ PCSPECTRUM *spectrum
+    _In_ PCSPECTRUM spectrum
     );
 
 typedef
@@ -75,7 +76,8 @@ ShapeRayTracerContextCreate(
     _In_opt_ const void *trace_context,
     _In_ PSHAPE_RAY_TRACER_TONE_MAP_ROUTINE tone_map_routine,
     _Inout_opt_ void *tone_map_context,
-    _In_ PRANDOM rng
+    _In_ PRANDOM rng,
+    _In_ float_t minimum_distance
     );
 
 ISTATUS

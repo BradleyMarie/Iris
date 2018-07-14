@@ -17,6 +17,7 @@ Abstract:
 #define _IRIS_PHYSX_HIT_TESTER_
 
 #include "iris_physx/hit_allocator.h"
+#include "iris_physx/shape.h"
 
 //
 // Types
@@ -43,8 +44,8 @@ ShapeHitTesterTestWorldShape(
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
-        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(const void ***)shape[0][0];
-    const void *context = (const void **)shape[1];
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = ((const void **)shape)[1];
     ISTATUS status = HitTesterTestWorldGeometry(hit_tester,
                                                 test_routine,
                                                 context,
@@ -57,7 +58,7 @@ static
 inline
 ISTATUS
 ShapeHitTesterTestPremultipliedShape(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,=
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
     _In_ PCSHAPE shape,
     _In_opt_ PCMATRIX model_to_world
     )
@@ -68,8 +69,8 @@ ShapeHitTesterTestPremultipliedShape(
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
-        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(const void ***)shape[0][0];
-    const void *context = (const void **)shape[1];
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = ((const void **)shape)[1];
     ISTATUS status = HitTesterTestPremultipliedGeometry(hit_tester,
                                                         test_routine,
                                                         context,
@@ -85,6 +86,7 @@ ISTATUS
 ShapeHitTesterTestShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
     _In_ PCSHAPE shape,
+    _In_opt_ PCMATRIX model_to_world,
     _In_ bool premultiplied
     )
 {
@@ -94,8 +96,8 @@ ShapeHitTesterTestShape(
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
-        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(const void ***)shape[0][0];
-    const void *context = (const void **)shape[1];
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = ((const void **)shape)[1];
     ISTATUS status = HitTesterTestGeometry(hit_tester,
                                            test_routine,
                                            context,
@@ -121,12 +123,13 @@ ShapeHitTesterTestNestedShape(
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
-        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(const void ***)shape[0][0];
-    const void *context = (const void **)shape[1];
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = ((const void **)shape)[1];
     ISTATUS status = HitTesterTestNestedGeometry(hit_allocator,
                                                  test_routine,
                                                  context,
-                                                 shape);
+                                                 shape,
+                                                 hits);
 
     return status;
 }

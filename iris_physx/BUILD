@@ -30,16 +30,6 @@ cc_library(
 )
 
 cc_library(
-    name = "brdf_allocator_context",
-    hdrs = ["brdf_allocator_context.h"],
-    srcs = ["brdf_allocator_context.c"],
-    deps = [
-        ":brdf_allocator",
-        ":brdf_allocator_internal",
-    ],
-)
-
-cc_library(
     name = "brdf_internal",
     hdrs = ["brdf_internal.h"],
     deps = [
@@ -70,6 +60,7 @@ cc_library(
     hdrs = ["hit_tester.h"],
     deps = [
         ":hit_allocator",
+        ":shape",
     ],
 )
 
@@ -79,11 +70,12 @@ cc_library(
     deps = [
         ":brdf",
         ":brdf_allocator",
-        ":brdf_allocator_context",
         ":hit_allocator",
         ":hit_tester",
         ":light",
         ":material",
+        ":ray_tracer",
+        ":ray_tracer_context",
         ":shape",
         ":visibility_tester",
         "//iris_advanced:iris_advanced",
@@ -158,6 +150,19 @@ cc_library(
         ":ray_tracer_internal",
         ":shape",
         ":shape_internal",
+    ],
+)
+
+cc_library(
+    name = "ray_tracer_context",
+    hdrs = ["ray_tracer_context.h"],
+    srcs = ["ray_tracer_context.c"],
+    deps = [
+        ":brdf",
+        ":brdf_internal",
+        ":hit_tester",
+        ":ray_tracer",
+        ":ray_tracer_internal",
     ],
 )
 
