@@ -13,11 +13,11 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_TEST_UTIL_
-#define _IRIS_SPECTRUM_TEST_UTIL_
+#ifndef _IRIS_PHYSX_TEST_UTIL_
+#define _IRIS_PHYSX_TEST_UTIL_
 
-#include "iris_spectrum/reflector_allocator.h"
-#include "iris_spectrum/spectrum_compositor.h"
+#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/spectrum_compositor.h"
 
 _Ret_maybenull_
 PREFLECTOR_ALLOCATOR
@@ -41,4 +41,4 @@ SpectrumCompositorFree(
     _In_opt_ _Post_invalid_ PSPECTRUM_COMPOSITOR compositor
     );
 
-#endif // _IRIS_SPECTRUM_TEST_UTIL_
+#endif // _IRIS_PHYSX_TEST_UTIL_

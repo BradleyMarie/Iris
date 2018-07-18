@@ -17,7 +17,7 @@ Abstract:
 
 #include "iris/iris.h"
 #include "iris_advanced/iris_advanced.h"
-#include "iris_spectrum/iris_spectrum.h"
+#include "iris_physx/reflector_allocator.h"
 
 //
 // Types

@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_REFLECTOR_VTABLE_
-#define _IRIS_SPECTRUM_REFLECTOR_VTABLE_
+#ifndef _IRIS_PHYSX_REFLECTOR_VTABLE_
+#define _IRIS_PHYSX_REFLECTOR_VTABLE_
 
 #if __cplusplus 
 #include <math.h>
@@ -45,4 +45,4 @@ typedef struct _REFLECTOR_VTABLE {
 
 typedef const REFLECTOR_VTABLE *PCREFLECTOR_VTABLE;
 
-#endif // _IRIS_SPECTRUM_REFLECTOR_VTABLE_
+#endif // _IRIS_PHYSX_REFLECTOR_VTABLE_

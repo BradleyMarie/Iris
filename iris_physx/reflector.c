@@ -16,8 +16,8 @@ Abstract:
 #include <string.h>
 
 #include "common/alloc.h"
-#include "iris_spectrum/reflector.h"
-#include "iris_spectrum/reflector_internal.h"
+#include "iris_physx/reflector.h"
+#include "iris_physx/reflector_internal.h"
 
 //
 // Functions

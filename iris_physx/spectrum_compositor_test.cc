@@ -13,8 +13,8 @@ Abstract:
 --*/
 
 extern "C" {
-#include "iris_spectrum/spectrum_compositor.h"
-#include "iris_spectrum/test_util.h"
+#include "iris_physx/spectrum_compositor.h"
+#include "iris_physx/test_util.h"
 }
 
 #include <limits>

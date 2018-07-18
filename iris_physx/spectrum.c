@@ -16,8 +16,8 @@ Abstract:
 #include <string.h>
 
 #include "common/alloc.h"
-#include "iris_spectrum/spectrum.h"
-#include "iris_spectrum/spectrum_internal.h"
+#include "iris_physx/spectrum.h"
+#include "iris_physx/spectrum_internal.h"
 
 //
 // Functions

@@ -13,10 +13,10 @@ Abstract:
 
 --*/
 
-#include "iris_spectrum/test_util.h"
+#include "iris_physx/test_util.h"
 
-#include "iris_spectrum/reflector_allocator_internal.h"
-#include "iris_spectrum/spectrum_compositor_internal.h"
+#include "iris_physx/reflector_allocator_internal.h"
+#include "iris_physx/spectrum_compositor_internal.h"
 
 _Ret_maybenull_
 PREFLECTOR_ALLOCATOR

@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_INTERNAL_
-#define _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_INTERNAL_
+#ifndef _IRIS_PHYSX_SPECTRUM_COMPOSITOR_INTERNAL_
+#define _IRIS_PHYSX_SPECTRUM_COMPOSITOR_INTERNAL_
 
 #include "common/static_allocator.h"
-#include "iris_spectrum/reflector.h"
-#include "iris_spectrum/spectrum_internal.h"
+#include "iris_physx/reflector.h"
+#include "iris_physx/spectrum_internal.h"
 
 //
 // Types
@@ -157,4 +157,4 @@ SpectrumCompositorDestroy(
     StaticMemoryAllocatorDestroy(&compositor->sum_spectrum_allocator);
 }
 
-#endif // _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_INTERNAL_
+#endif // _IRIS_PHYSX_SPECTRUM_COMPOSITOR_INTERNAL_

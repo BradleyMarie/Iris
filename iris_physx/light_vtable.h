@@ -16,7 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_LIGHT_VTABLE_
 
 #include "iris_advanced/iris_advanced.h"
-#include "iris_spectrum/iris_spectrum.h"
+#include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/visibility_tester.h"
 
 //

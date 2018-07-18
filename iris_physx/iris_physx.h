@@ -16,7 +16,6 @@ Abstract:
 #define _IRIS_PHYSX_IRIS_PHYSX_
 
 #include "iris_advanced/iris_advanced.h"
-#include "iris_spectrum/iris_spectrum.h"
 
 #if __cplusplus 
 extern "C" {
@@ -29,8 +28,12 @@ extern "C" {
 #include "iris_physx/light.h"
 #include "iris_physx/material.h"
 #include "iris_physx/shape.h"
+#include "iris_physx/spectrum.h"
+#include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_context.h"
+#include "iris_physx/reflector.h"
+#include "iris_physx/reflector_allocator.h"
 #include "iris_physx/visibility_tester.h"
 
 #if __cplusplus 

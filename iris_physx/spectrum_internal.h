@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_SPECTRUM_INTERNAL_
-#define _IRIS_SPECTRUM_SPECTRUM_INTERNAL_
+#ifndef _IRIS_PHYSX_SPECTRUM_INTERNAL_
+#define _IRIS_PHYSX_SPECTRUM_INTERNAL_
 
 #include <stdatomic.h>
 
-#include "iris_spectrum/spectrum_vtable.h"
+#include "iris_physx/spectrum_vtable.h"
 
 //
 // Types
@@ -71,4 +71,4 @@ SpectrumSampleInline(
     return status;
 }
 
-#endif // _IRIS_SPECTRUM_SPECTRUM_INTERNAL_
+#endif // _IRIS_PHYSX_SPECTRUM_INTERNAL_

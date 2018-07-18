@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_SPECTRUM_
-#define _IRIS_SPECTRUM_SPECTRUM_
+#ifndef _IRIS_PHYSX_SPECTRUM_
+#define _IRIS_PHYSX_SPECTRUM_
 
 #include <stddef.h>
 
-#include "iris_spectrum/spectrum_vtable.h"
+#include "iris_physx/spectrum_vtable.h"
 
 //
 // Types
@@ -56,4 +56,4 @@ SpectrumRelease(
     _In_opt_ _Post_invalid_ PSPECTRUM spectrum
     );
 
-#endif // _IRIS_SPECTRUM_SPECTRUM_
+#endif // _IRIS_PHYSX_SPECTRUM_

@@ -16,11 +16,11 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_
-#define _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_
+#ifndef _IRIS_PHYSX_SPECTRUM_COMPOSITOR_
+#define _IRIS_PHYSX_SPECTRUM_COMPOSITOR_
 
-#include "iris_spectrum/reflector.h"
-#include "iris_spectrum/spectrum.h"
+#include "iris_physx/reflector.h"
+#include "iris_physx/spectrum.h"
 
 //
 // Types
@@ -66,4 +66,4 @@ SpectrumCompositorAttenuatedAddReflection(
     _Out_ PCSPECTRUM *reflected_spectrum
     );
     
-#endif // _IRIS_SPECTRUM_SPECTRUM_COMPOSITOR_
+#endif // _IRIS_PHYSX_SPECTRUM_COMPOSITOR_

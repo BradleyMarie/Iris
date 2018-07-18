@@ -12,11 +12,11 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_INTERNAL_
-#define _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_INTERNAL_
+#ifndef _IRIS_PHYSX_REFLECTOR_ALLOCATOR_INTERNAL_
+#define _IRIS_PHYSX_REFLECTOR_ALLOCATOR_INTERNAL_
 
 #include "common/dynamic_allocator.h"
-#include "iris_spectrum/reflector_internal.h"
+#include "iris_physx/reflector_internal.h"
 
 //
 // Types
@@ -66,4 +66,4 @@ ReflectorAllocatorDestroy(
     DynamicMemoryAllocatorDestroy(&allocator->allocator);
 }
 
-#endif // _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_INTERNAL_
+#endif // _IRIS_PHYSX_REFLECTOR_ALLOCATOR_INTERNAL_

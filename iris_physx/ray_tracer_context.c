@@ -16,136 +16,26 @@ Abstract:
 
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/brdf_allocator_internal.h"
+#include "iris_physx/spectrum_compositor.h"
+#include "iris_physx/spectrum_compositor_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_context.h"
 #include "iris_physx/ray_tracer_internal.h"
+#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/reflector_allocator_internal.h"
 
 //
 // Types
 //
 
 struct _SHAPE_RAY_TRACER_CONTEXT {
-    PSHAPE_RAY_TRACER_CONTEXT_LIFETIME_ROUTINE callback;
-    void *callback_context;
-    PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine;
-    const void *trace_context;
+    SHAPE_RAY_TRACER shape_ray_tracer;
     PSHAPE_RAY_TRACER_TONE_MAP_ROUTINE tone_map_routine;
     void *tone_map_context;
     PRANDOM rng;
-    float_t minimum_distance;
-    PSPECTRUM_COMPOSITOR_CONTEXT spectrum_compositor_context;
-    PREFLECTOR_ALLOCATOR_CONTEXT reflector_allocator_context;
-    PRAY_TRACER ray_tracer;
-    BRDF_ALLOCATOR brdf_allocator;
-    PSHAPE_RAY_TRACER_LIFETIME_ROUTINE ray_tracer_callback;
-    const void *ray_tracer_callback_context;
-    RAY ray;
-    PSPECTRUM_COMPOSITOR spectrum_compositor;
+    SPECTRUM_COMPOSITOR spectrum_compositor;
+    REFLECTOR_ALLOCATOR reflector_allocator;
 };
-
-//
-// Static Functions
-//
-
-static
-ISTATUS
-ShapeRayTracerContextReflectorAllocatorContextLifetime(
-    _Inout_ void *context,
-    _In_ PREFLECTOR_ALLOCATOR_CONTEXT allocator_context
-    )
-{
-    PSHAPE_RAY_TRACER_CONTEXT data = (PSHAPE_RAY_TRACER_CONTEXT)context;
-
-    data->reflector_allocator_context = allocator_context;
-
-    ISTATUS status = RayTracerAllocate(&data->ray_tracer);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    BrdfAllocatorInitialize(&data->brdf_allocator);
-
-    status = data->callback(data->callback_context, data, data->rng);
-
-    RayTracerFree(data->ray_tracer);
-    BrdfAllocatorDestroy(&data->brdf_allocator);
-
-    return status;
-}
-
-static
-ISTATUS
-ShapeRayTracerContextSpectrumCompositorContextLifetime(
-    _Inout_ void *context,
-    _In_ PSPECTRUM_COMPOSITOR_CONTEXT compositor_context
-    )
-{
-    PSHAPE_RAY_TRACER_CONTEXT data = (PSHAPE_RAY_TRACER_CONTEXT)context;
-
-    data->spectrum_compositor_context = compositor_context;
-
-    ISTATUS status = ReflectorAllocatorContextCreate(
-        ShapeRayTracerContextReflectorAllocatorContextLifetime, context);
-
-    return status;
-}
-
-static
-ISTATUS
-ShapeRayTracerContextReflectorAllocatorLifetime(
-    _Inout_ void *context,
-    _In_ PREFLECTOR_ALLOCATOR allocator
-    )
-{
-    PSHAPE_RAY_TRACER_CONTEXT data = (PSHAPE_RAY_TRACER_CONTEXT)context;
-
-    SHAPE_RAY_TRACER ray_tracer;
-    ray_tracer.ray_tracer = data->ray_tracer;
-    ray_tracer.minimum_distance = data->minimum_distance;
-    ray_tracer.trace_routine = data->trace_routine;
-    ray_tracer.trace_context = data->trace_context;
-    ray_tracer.brdf_allocator = &data->brdf_allocator;
-
-    PCSPECTRUM spectrum;
-    ISTATUS status = 
-        data->ray_tracer_callback(data->ray_tracer_callback_context,
-                                  &ray_tracer,
-                                  data->ray,
-                                  data->spectrum_compositor,
-                                  allocator,
-                                  data->rng,
-                                  &spectrum);
-    
-    if (status == ISTATUS_SUCCESS)
-    {
-        status = data->tone_map_routine(data->tone_map_context, spectrum);
-    }
-
-    BrdfAllocatorClear(&data->brdf_allocator);
-
-    return status;
-}
-
-static
-ISTATUS
-ShapeRayTracerContextSpectrumCompositorLifetime(
-    _Inout_ void *context,
-    _In_ PSPECTRUM_COMPOSITOR compositor
-    )
-{
-    PSHAPE_RAY_TRACER_CONTEXT data = (PSHAPE_RAY_TRACER_CONTEXT)context;
-
-    data->spectrum_compositor = compositor;
-
-    ISTATUS status = ReflectorAllocatorCreate(
-        data->reflector_allocator_context, 
-        ShapeRayTracerContextReflectorAllocatorLifetime,
-        context);
-
-    return status;
-}
 
 //
 // Functions
@@ -189,24 +79,37 @@ ShapeRayTracerContextCreate(
     }
 
     SHAPE_RAY_TRACER_CONTEXT shape_ray_tracer_context;
-    shape_ray_tracer_context.callback = callback;
-    shape_ray_tracer_context.callback_context = callback_context;
-    shape_ray_tracer_context.trace_routine = trace_routine;
-    shape_ray_tracer_context.trace_context = trace_context;
     shape_ray_tracer_context.tone_map_routine = tone_map_routine;
     shape_ray_tracer_context.tone_map_context = tone_map_context;
     shape_ray_tracer_context.rng = rng;
-    shape_ray_tracer_context.minimum_distance = minimum_distance;
-    shape_ray_tracer_context.spectrum_compositor_context = NULL;
-    shape_ray_tracer_context.reflector_allocator_context = NULL;
-    shape_ray_tracer_context.ray_tracer = NULL;
-    shape_ray_tracer_context.ray_tracer_callback = NULL;
-    shape_ray_tracer_context.ray_tracer_callback_context = NULL;
-    shape_ray_tracer_context.spectrum_compositor = NULL;
 
-    ISTATUS status = SpectrumCompositorContextCreate(
-        ShapeRayTracerContextSpectrumCompositorContextLifetime, 
-        &shape_ray_tracer_context);
+    bool success = ShapeRayTracerInitialize(
+        &shape_ray_tracer_context.shape_ray_tracer,
+        trace_routine,
+        trace_context,
+        minimum_distance);
+    
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    success = SpectrumCompositorInitialize(
+        &shape_ray_tracer_context.spectrum_compositor);
+    
+    if (!success)
+    {
+        ShapeRayTracerDestroy(&shape_ray_tracer_context.shape_ray_tracer);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    ReflectorAllocatorInitialize(&shape_ray_tracer_context.reflector_allocator);
+
+    ISTATUS status = callback(&shape_ray_tracer_context, callback_context, rng);
+
+    ShapeRayTracerDestroy(&shape_ray_tracer_context.shape_ray_tracer);
+    SpectrumCompositorDestroy(&shape_ray_tracer_context.spectrum_compositor);
+    ReflectorAllocatorDestroy(&shape_ray_tracer_context.reflector_allocator);
     
     return status;
 }
@@ -233,15 +136,25 @@ ShapeRayTracerCreate(
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
+    
+    PCSPECTRUM spectrum;
+    ISTATUS status = callback(callback_context,
+                              &ray_tracer_context->shape_ray_tracer,
+                              ray,
+                              &ray_tracer_context->spectrum_compositor,
+                              &ray_tracer_context->reflector_allocator,
+                              ray_tracer_context->rng,
+                              &spectrum);
 
-    ray_tracer_context->ray_tracer_callback = callback;
-    ray_tracer_context->ray_tracer_callback_context = callback_context;
-    ray_tracer_context->ray = ray;
+    if (status == ISTATUS_SUCCESS)
+    {
+        status = ray_tracer_context->tone_map_routine(
+            ray_tracer_context->tone_map_context, spectrum);
+    }
 
-    ISTATUS status = SpectrumCompositorCreate(
-        ray_tracer_context->spectrum_compositor_context,
-        ShapeRayTracerContextSpectrumCompositorLifetime,
-        ray_tracer_context);
+    ShapeRayTracerClear(&ray_tracer_context->shape_ray_tracer);
+    SpectrumCompositorClear(&ray_tracer_context->spectrum_compositor);
+    ReflectorAllocatorClear(&ray_tracer_context->reflector_allocator);
     
     return status;
 }

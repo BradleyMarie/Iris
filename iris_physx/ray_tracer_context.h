@@ -17,9 +17,10 @@ Abstract:
 #define _IRIS_PHYSX_RAY_TRACER_CONTEXT_
 
 #include "iris_advanced/iris_advanced.h"
-#include "iris_spectrum/iris_spectrum.h"
 #include "iris_physx/hit_tester.h"
 #include "iris_physx/ray_tracer.h"
+#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/spectrum_compositor.h"
 
 //
 // Types

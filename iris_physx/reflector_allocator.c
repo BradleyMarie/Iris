@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#include "iris_spectrum/reflector_allocator.h"
+#include "iris_physx/reflector_allocator.h"
 
 #include <assert.h>
 #include <string.h>
 
-#include "iris_spectrum/reflector_allocator_internal.h"
+#include "iris_physx/reflector_allocator_internal.h"
 
 //
 // Functions

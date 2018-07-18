@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#include "iris_spectrum/spectrum_compositor.h"
+#include "iris_physx/spectrum_compositor.h"
 
 #include <assert.h>
 
-#include "iris_spectrum/reflector_internal.h"
-#include "iris_spectrum/spectrum_compositor_internal.h"
+#include "iris_physx/reflector_internal.h"
+#include "iris_physx/spectrum_compositor_internal.h"
 
 //
 // Macros

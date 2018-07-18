@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_REFLECTOR_
-#define _IRIS_SPECTRUM_REFLECTOR_
+#ifndef _IRIS_PHYSX_REFLECTOR_
+#define _IRIS_PHYSX_REFLECTOR_
 
 #include <stddef.h>
 
-#include "iris_spectrum/reflector_vtable.h"
+#include "iris_physx/reflector_vtable.h"
 
 //
 // Types
@@ -57,4 +57,4 @@ ReflectorRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR reflector
     );
 
-#endif // _IRIS_SPECTRUM_REFLECTOR_
+#endif // _IRIS_PHYSX_REFLECTOR_

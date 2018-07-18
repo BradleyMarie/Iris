@@ -12,12 +12,12 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_REFLECTOR_INTERNAL_
-#define _IRIS_SPECTRUM_REFLECTOR_INTERNAL_
+#ifndef _IRIS_PHYSX_REFLECTOR_INTERNAL_
+#define _IRIS_PHYSX_REFLECTOR_INTERNAL_
 
 #include <stdatomic.h>
 
-#include "iris_spectrum/reflector_vtable.h"
+#include "iris_physx/reflector_vtable.h"
 
 //
 // Types
@@ -73,4 +73,4 @@ ReflectorReflectInline(
     return status;
 }
 
-#endif // _IRIS_SPECTRUM_REFLECTOR_INTERNAL_
+#endif // _IRIS_PHYSX_REFLECTOR_INTERNAL_

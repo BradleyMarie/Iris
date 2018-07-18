@@ -41,9 +41,9 @@ cc_library(
     name = "brdf_vtable",
     hdrs = ["brdf_vtable.h"],
     deps = [
+        ":reflector_allocator",
         "//iris:iris",
         "//iris_advanced:iris_advanced",
-        "//iris_spectrum:iris_spectrum",
     ],
 )
 
@@ -76,10 +76,13 @@ cc_library(
         ":material",
         ":ray_tracer",
         ":ray_tracer_context",
+        ":reflector",
+        ":reflector_allocator",
         ":shape",
+        ":spectrum",
+        ":spectrum_compositor",
         ":visibility_tester",
         "//iris_advanced:iris_advanced",
-        "//iris_spectrum:iris_spectrum",
     ],
     visibility = ["//visibility:public"],
 )
@@ -106,9 +109,9 @@ cc_library(
     name = "light_vtable",
     hdrs = ["light_vtable.h"],
     deps = [
+        ":spectrum_compositor",
         ":visibility_tester",
         "//iris_advanced:iris_advanced",
-        "//iris_spectrum:iris_spectrum",
     ],
 )
 
@@ -161,8 +164,10 @@ cc_library(
         ":brdf",
         ":brdf_internal",
         ":hit_tester",
+        ":spectrum_compositor_internal",
         ":ray_tracer",
         ":ray_tracer_internal",
+        ":reflector_allocator_internal",
     ],
 )
 
@@ -172,6 +177,73 @@ cc_library(
     deps = [
         ":brdf_allocator",
         ":light",
+    ],
+)
+
+cc_library(
+    name = "reflector",
+    hdrs = ["reflector.h"],
+    srcs = ["reflector.c"],
+    deps = [
+        ":reflector_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator",
+    hdrs = ["reflector_allocator.h"],
+    srcs = ["reflector_allocator.c"],
+    deps = [
+        ":reflector",
+        ":reflector_allocator_internal",
+        "//common:dynamic_allocator",
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator_internal",
+    hdrs = ["reflector_allocator_internal.h"],
+    deps = [
+        ":reflector_internal",
+        "//common:dynamic_allocator",
+    ],
+)
+
+cc_test(
+    name = "reflector_allocator_test",
+    srcs = ["reflector_allocator_test.cc"],
+    deps = [
+        ":reflector_allocator",
+        ":test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "reflector_internal",
+    hdrs = ["reflector_internal.h"],
+    deps = [
+        ":reflector_vtable",
+    ],
+)
+
+cc_test(
+    name = "reflector_test",
+    srcs = ["reflector_test.cc"],
+    deps = [
+        ":reflector",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "reflector_vtable",
+    hdrs = ["reflector_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//common:sal",
+        "//common:status",
     ],
 )
 
@@ -201,6 +273,89 @@ cc_library(
     deps = [
         ":hit_allocator",
         ":material",
+    ],
+)
+
+cc_library(
+    name = "spectrum",
+    hdrs = ["spectrum.h"],
+    srcs = ["spectrum.c"],
+    deps = [
+        ":spectrum_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "spectrum_compositor",
+    hdrs = ["spectrum_compositor.h"],
+    srcs = ["spectrum_compositor.c"],
+    deps = [
+        ":reflector",
+        ":reflector_internal",
+        ":spectrum",
+        ":spectrum_compositor_internal",
+        ":spectrum_internal",
+    ],
+)
+
+cc_library(
+    name = "spectrum_compositor_internal",
+    hdrs = ["spectrum_compositor_internal.h"],
+    deps = [
+        ":reflector",
+        ":spectrum_internal",
+        "//common:static_allocator",
+    ],
+)
+
+cc_test(
+    name = "spectrum_compositor_test",
+    srcs = ["spectrum_compositor_test.cc"],
+    deps = [
+        ":spectrum_compositor",
+        ":test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "spectrum_internal",
+    hdrs = ["spectrum_internal.h"],
+    deps = [
+        ":spectrum_vtable",
+    ],
+)
+
+cc_test(
+    name = "spectrum_test",
+    srcs = ["spectrum_test.cc"],
+    deps = [
+        ":spectrum",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "spectrum_vtable",
+    hdrs = ["spectrum_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//common:sal",
+        "//common:status",
+    ],
+)
+
+cc_library(
+    name = "test_util",
+    hdrs = ["test_util.h"],
+    srcs = ["test_util.c"],
+    testonly = 1,
+    deps = [
+        ":reflector_allocator",
+        ":reflector_allocator_internal",
+        ":spectrum_compositor",
+        ":spectrum_compositor_internal",
     ],
 )
 

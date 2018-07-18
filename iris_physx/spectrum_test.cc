@@ -13,7 +13,7 @@ Abstract:
 --*/
 
 extern "C" {
-#include "iris_spectrum/spectrum.h"
+#include "iris_physx/spectrum.h"
 }
 
 #include <limits>

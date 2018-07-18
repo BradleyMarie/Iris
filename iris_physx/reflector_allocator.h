@@ -21,10 +21,10 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_
-#define _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_
+#ifndef _IRIS_PHYSX_REFLECTOR_ALLOCATOR_
+#define _IRIS_PHYSX_REFLECTOR_ALLOCATOR_
 
-#include "iris_spectrum/reflector.h"
+#include "iris_physx/reflector.h"
 
 //
 // Types
@@ -47,4 +47,4 @@ ReflectorAllocatorAllocate(
     _Out_ PCREFLECTOR *reflector
     );
 
-#endif // _IRIS_SPECTRUM_REFLECTOR_ALLOCATOR_
+#endif // _IRIS_PHYSX_REFLECTOR_ALLOCATOR_

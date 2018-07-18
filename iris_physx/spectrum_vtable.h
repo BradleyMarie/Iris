@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_SPECTRUM_SPECTRUM_VTABLE_
-#define _IRIS_SPECTRUM_SPECTRUM_VTABLE_
+#ifndef _IRIS_PHYSX_SPECTRUM_VTABLE_
+#define _IRIS_PHYSX_SPECTRUM_VTABLE_
 
 #if __cplusplus 
 #include <math.h>
@@ -44,4 +44,4 @@ typedef struct _SPECTRUM_VTABLE {
 
 typedef const SPECTRUM_VTABLE *PCSPECTRUM_VTABLE;
 
-#endif // _IRIS_SPECTRUM_SPECTRUM_VTABLE_
+#endif // _IRIS_PHYSX_SPECTRUM_VTABLE_

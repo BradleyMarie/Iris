@@ -13,8 +13,8 @@ Abstract:
 --*/
 
 extern "C" {
-#include "iris_spectrum/reflector_allocator.h"
-#include "iris_spectrum/test_util.h"
+#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/test_util.h"
 }
 
 #include "googletest/include/gtest/gtest.h"
