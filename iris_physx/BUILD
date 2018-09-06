@@ -168,6 +168,8 @@ cc_library(
         ":ray_tracer",
         ":ray_tracer_internal",
         ":reflector_allocator_internal",
+        ":visibility_tester",
+        ":visibility_tester_internal",
     ],
 )
 
