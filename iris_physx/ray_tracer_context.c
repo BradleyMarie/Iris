@@ -123,6 +123,7 @@ ShapeRayTracerContextCreate(
     ISTATUS status = callback(&shape_ray_tracer_context, callback_context, rng);
 
     ShapeRayTracerDestroy(&shape_ray_tracer_context.shape_ray_tracer);
+    VisibilityTesterDestroy(&shape_ray_tracer_context.visibility_tester);
     SpectrumCompositorDestroy(&shape_ray_tracer_context.spectrum_compositor);
     ReflectorAllocatorDestroy(&shape_ray_tracer_context.reflector_allocator);
     
