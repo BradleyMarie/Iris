@@ -23,6 +23,7 @@ Abstract:
 #include "iris_physx/ray_tracer_internal.h"
 #include "iris_physx/reflector_allocator.h"
 #include "iris_physx/reflector_allocator_internal.h"
+#include "iris_physx/visibility_tester_internal.h"
 
 //
 // Types
@@ -33,6 +34,7 @@ struct _SHAPE_RAY_TRACER_CONTEXT {
     PSHAPE_RAY_TRACER_TONE_MAP_ROUTINE tone_map_routine;
     void *tone_map_context;
     PRANDOM rng;
+    VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
     REFLECTOR_ALLOCATOR reflector_allocator;
 };
@@ -50,7 +52,7 @@ ShapeRayTracerContextCreate(
     _In_ PSHAPE_RAY_TRACER_TONE_MAP_ROUTINE tone_map_routine,
     _Inout_opt_ void *tone_map_context,
     _In_ PRANDOM rng,
-    _In_ float_t minimum_distance
+    _In_ float_t epsilon
     )
 {
     if (callback == NULL)
@@ -73,7 +75,7 @@ ShapeRayTracerContextCreate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (!isfinite(minimum_distance) || minimum_distance < (float_t)0.0)
+    if (isless(epsilon, (float_t)0.0))
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
@@ -87,10 +89,22 @@ ShapeRayTracerContextCreate(
         &shape_ray_tracer_context.shape_ray_tracer,
         trace_routine,
         trace_context,
-        minimum_distance);
+        epsilon);
     
     if (!success)
     {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    success = VisibilityTesterInitialize(
+        &shape_ray_tracer_context.visibility_tester,
+        trace_routine,
+        trace_context,
+        epsilon);
+
+    if (!success)
+    {
+        ShapeRayTracerDestroy(&shape_ray_tracer_context.shape_ray_tracer);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -100,6 +114,7 @@ ShapeRayTracerContextCreate(
     if (!success)
     {
         ShapeRayTracerDestroy(&shape_ray_tracer_context.shape_ray_tracer);
+        VisibilityTesterDestroy(&shape_ray_tracer_context.visibility_tester);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -141,6 +156,7 @@ ShapeRayTracerCreate(
     ISTATUS status = callback(callback_context,
                               &ray_tracer_context->shape_ray_tracer,
                               ray,
+                              &ray_tracer_context->visibility_tester,
                               &ray_tracer_context->spectrum_compositor,
                               &ray_tracer_context->reflector_allocator,
                               ray_tracer_context->rng,

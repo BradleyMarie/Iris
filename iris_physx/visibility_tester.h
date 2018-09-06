@@ -32,7 +32,7 @@ typedef const VISIBILITY_TESTER *PCVISIBILITY_TESTER;
 
 ISTATUS
 VisibilityTesterTest(
-    _In_ PVISIBILITY_TESTER visibility_tester,
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
     _In_ RAY ray,
     _In_ float_t distance_to_object,
     _Out_ bool *visible
@@ -40,7 +40,7 @@ VisibilityTesterTest(
 
 ISTATUS
 VisibilityTesterTestAnyDistance(
-    _In_ PVISIBILITY_TESTER visibility_tester,
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
     _In_ RAY ray,
     _Out_ bool *visible
     );

@@ -360,9 +360,18 @@ cc_library(
 )
 
 cc_library(
-    name = "visibility_tester",
-    hdrs = ["visibility_tester.h"],
+    name = "visibility_tester_internal",
+    hdrs = ["visibility_tester_internal.h"],
     deps = [
         "//iris:iris",
+    ],
+)
+
+cc_library(
+    name = "visibility_tester",
+    hdrs = ["visibility_tester.h"],
+    srcs = ["visibility_tester.c"],
+    deps = [
+        ":visibility_tester_internal",
     ],
 )
