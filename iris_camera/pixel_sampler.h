@@ -25,7 +25,6 @@ ISTATUS
 (*PPIXEL_SAMPLER_GENERATE_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _In_ PRANDOM rng,
-    _In_ uint32_t num_samples,
     _In_ float_t pixel_sample_min_u,
     _In_ float_t pixel_sample_max_u,
     _In_ float_t pixel_sample_min_v,
@@ -34,6 +33,7 @@ ISTATUS
     _In_ float_t lens_sample_max_u,
     _In_ float_t lens_sample_min_v,
     _In_ float_t lens_sample_max_v,
+    _In_ uint32_t num_samples,
     _Out_writes_(num_samples) float_t pixel_samples_u[],
     _Out_writes_(num_samples) float_t pixel_samples_v[],
     _Out_writes_(num_samples) float_t lens_samples_u[],
