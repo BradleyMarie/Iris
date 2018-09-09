@@ -11,7 +11,6 @@ cc_library(
     testonly = 1,
     deps = [
         "//iris:iris",
-        "//iris_advanced:iris_advanced",
         "@com_google_googletest//:gtest_main",
     ],
 )
