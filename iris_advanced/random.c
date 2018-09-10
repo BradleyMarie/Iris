@@ -12,6 +12,10 @@ Abstract:
 
 --*/
 
+#include <stdalign.h>
+#include <stdatomic.h>
+#include <string.h>
+
 #include "iris_advanced/random.h"
 
 //
@@ -19,8 +23,7 @@ Abstract:
 //
 
 struct _RANDOM {
-    PGENERATE_FLOAT_ROUTINE generate_float;
-    PGENERATE_INDEX_ROUTINE generate_index;
+    PCRANDOM_VTABLE vtable;
     void *data;
 };
 
@@ -29,34 +32,65 @@ struct _RANDOM {
 //
 
 ISTATUS
-RandomCreate(
-    _In_ PGENERATE_FLOAT_ROUTINE generate_float_routine,
-    _In_ PGENERATE_INDEX_ROUTINE generate_index_routine,
-    _Inout_opt_ void *rng_context,
-    _In_ PRANDOM_LIFETIME_ROUTINE callback,
-    _Inout_opt_ void *callback_context
+RandomAllocate(
+    _In_ PCRANDOM_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Out_ PRANDOM *rng
     )
 {
-    if (generate_float_routine == NULL)
+    if (vtable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
-    if (generate_index_routine == NULL)
+
+    if (data_size != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        if (data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+        
+        if (data_alignment == 0 ||
+            (data_alignment & (data_alignment - 1)) != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;    
+        }
+        
+        if (data_size % data_alignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
-    if (callback == NULL)
+    if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    RANDOM rng;
-    rng.generate_float = generate_float_routine;
-    rng.generate_index = generate_index_routine;
-    rng.data = rng_context;
+    void *data_allocation;
+    bool success = AlignedAllocWithHeader(sizeof(RANDOM),
+                                          alignof(RANDOM),
+                                          (void **)rng,
+                                          data_size,
+                                          data_alignment,
+                                          &data_allocation);
 
-    return callback(callback_context, &rng);
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    (*rng)->vtable = vtable;
+    (*rng)->data = data_allocation;
+
+    if (data_size != 0)
+    {
+        memcpy(data_allocation, data, data_size);
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS
@@ -92,10 +126,10 @@ RandomGenerateFloat(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    ISTATUS status = rng->generate_float(rng->data,
-                                         minimum,
-                                         maximum,
-                                         result);
+    ISTATUS status = rng->vtable->generate_float_routine(rng->data,
+                                                         minimum,
+                                                         maximum,
+                                                         result);
 
     // Should these be made into something stronger than assertions?
     assert(minimum <= *result);
@@ -127,14 +161,32 @@ RandomGenerateIndex(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    ISTATUS status = rng->generate_index(rng->data,
-                                         minimum,
-                                         maximum,
-                                         result);
+    ISTATUS status = rng->vtable->generate_index_routine(rng->data,
+                                                         minimum,
+                                                         maximum,
+                                                         result);
 
     // Should these be made into something stronger than assertions?
     assert(minimum <= *result);
     assert(*result <= maximum);
 
     return status;
+}
+
+void
+RandomFree(
+    _In_opt_ _Post_invalid_ PRANDOM rng
+    )
+{
+    if (rng == NULL)
+    {
+        return;
+    }
+
+    if (rng->vtable->free_routine)
+    {
+        rng->vtable->free_routine(rng->data);
+    }
+
+    free(rng);
 }

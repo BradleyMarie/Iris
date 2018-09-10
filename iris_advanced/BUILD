@@ -34,6 +34,8 @@ cc_library(
     hdrs = ["random.h"],
     srcs = ["random.c"],
     deps = [
+        "//common:alloc",
+        "//common:free_routine",
         "//iris:iris",
     ],
 )

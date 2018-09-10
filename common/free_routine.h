@@ -24,7 +24,7 @@ Abstract:
 typedef
 void
 (*PFREE_ROUTINE)(
-    _In_ _Post_invalid_ void *pointer
+    _In_opt_ _Post_invalid_ void *pointer
     );
 
 #endif // _COMMON_FREE_ROUTINE_

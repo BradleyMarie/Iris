@@ -15,6 +15,8 @@ Abstract:
 #ifndef _IRIS_ADVANCED_RANDOM_
 #define _IRIS_ADVANCED_RANDOM_
 
+#include "common/alloc.h"
+#include "common/free_routine.h"
 #include "iris/iris.h"
 
 //
@@ -39,27 +41,28 @@ ISTATUS
     _Out_range_(minimum, maximum) size_t *result
     );
 
+typedef struct _RANDOM_VTABLE {
+    PGENERATE_FLOAT_ROUTINE generate_float_routine;
+    PGENERATE_INDEX_ROUTINE generate_index_routine;
+    PFREE_ROUTINE free_routine;
+} RANDOM_VTABLE, *PRANDOM_VTABLE;
+
+typedef const RANDOM_VTABLE *PCRANDOM_VTABLE;
+
 typedef struct _RANDOM RANDOM, *PRANDOM;
 typedef const RANDOM *PCRANDOM;
-
-typedef
-ISTATUS
-(*PRANDOM_LIFETIME_ROUTINE)(
-    _Inout_opt_ void *context,
-    _In_ PRANDOM rng
-    );
 
 //
 // Functions
 //
 
 ISTATUS
-RandomCreate(
-    _In_ PGENERATE_FLOAT_ROUTINE generate_float_routine,
-    _In_ PGENERATE_INDEX_ROUTINE generate_index_routine,
-    _Inout_opt_ void *rng_context,
-    _In_ PRANDOM_LIFETIME_ROUTINE callback,
-    _Inout_opt_ void *callback_context
+RandomAllocate(
+    _In_ PCRANDOM_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Out_ PRANDOM *rng
     );
 
 ISTATUS
@@ -76,6 +79,11 @@ RandomGenerateIndex(
     _In_ size_t minimum,
     _In_ size_t maximum,
     _Out_range_(minimum, maximum) size_t *result
+    );
+
+void
+RandomFree(
+    _In_opt_ _Post_invalid_ PRANDOM rng
     );
 
 #endif // _IRIS_ADVANCED_RANDOM_
