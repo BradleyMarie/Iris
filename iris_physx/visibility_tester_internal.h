@@ -38,7 +38,30 @@ static
 inline
 bool
 VisibilityTesterInitialize(
-    _Out_ struct _VISIBILITY_TESTER *visibility_tester,
+    _Out_ struct _VISIBILITY_TESTER *visibility_tester
+    )
+{
+    assert(visibility_tester != NULL);
+
+    ISTATUS status = RayTracerAllocate(&visibility_tester->ray_tracer);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return false;
+    }
+
+    visibility_tester->trace_routine = NULL;
+    visibility_tester->trace_context = NULL;
+    visibility_tester->epsilon = (float_t)0.0;
+
+    return true;
+}
+
+static
+inline
+void
+VisibilityTesterConfigure(
+    _Inout_ struct _VISIBILITY_TESTER *visibility_tester,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ float_t epsilon
@@ -48,18 +71,9 @@ VisibilityTesterInitialize(
     assert(trace_routine != NULL);
     assert(isfinite(epsilon) && epsilon >= (float_t)0.0);
 
-    ISTATUS status = RayTracerAllocate(&visibility_tester->ray_tracer);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return false;
-    }
-
     visibility_tester->trace_routine = trace_routine;
     visibility_tester->trace_context = trace_context;
     visibility_tester->epsilon = epsilon;
-
-    return true;
 }
 
 static

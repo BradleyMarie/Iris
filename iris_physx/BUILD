@@ -65,6 +65,23 @@ cc_library(
 )
 
 cc_library(
+    name = "integrator",
+    hdrs = ["integrator.h"],
+    srcs = ["integrator.c"],
+    deps = [
+        ":brdf",
+        ":brdf_internal",
+        ":hit_tester",
+        ":spectrum_compositor_internal",
+        ":ray_tracer",
+        ":ray_tracer_internal",
+        ":reflector_allocator_internal",
+        ":visibility_tester",
+        ":visibility_tester_internal",
+    ],
+)
+
+cc_library(
     name = "iris_physx",
     hdrs = ["iris_physx.h"],
     deps = [
@@ -72,10 +89,10 @@ cc_library(
         ":brdf_allocator",
         ":hit_allocator",
         ":hit_tester",
+        ":integrator",
         ":light",
         ":material",
         ":ray_tracer",
-        ":ray_tracer_context",
         ":reflector",
         ":reflector_allocator",
         ":shape",
@@ -153,23 +170,6 @@ cc_library(
         ":ray_tracer_internal",
         ":shape",
         ":shape_internal",
-    ],
-)
-
-cc_library(
-    name = "ray_tracer_context",
-    hdrs = ["ray_tracer_context.h"],
-    srcs = ["ray_tracer_context.c"],
-    deps = [
-        ":brdf",
-        ":brdf_internal",
-        ":hit_tester",
-        ":spectrum_compositor_internal",
-        ":ray_tracer",
-        ":ray_tracer_internal",
-        ":reflector_allocator_internal",
-        ":visibility_tester",
-        ":visibility_tester_internal",
     ],
 )
 

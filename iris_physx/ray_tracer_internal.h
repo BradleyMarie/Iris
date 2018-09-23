@@ -40,7 +40,32 @@ static
 inline
 bool
 ShapeRayTracerInitialize(
-    _Out_ struct _SHAPE_RAY_TRACER *shape_ray_tracer,
+    _Out_ struct _SHAPE_RAY_TRACER *shape_ray_tracer
+    )
+{
+    assert(shape_ray_tracer != NULL);
+
+    ISTATUS status = RayTracerAllocate(&shape_ray_tracer->ray_tracer);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return false;
+    }
+
+    shape_ray_tracer->trace_routine = NULL;
+    shape_ray_tracer->trace_context = NULL;
+    shape_ray_tracer->minimum_distance = (float_t)0.0;
+    
+    BrdfAllocatorInitialize(&shape_ray_tracer->brdf_allocator);
+
+    return true;
+}
+
+static
+inline
+void
+ShapeRayTracerConfigure(
+    _Inout_ struct _SHAPE_RAY_TRACER *shape_ray_tracer,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ float_t minimum_distance
@@ -50,20 +75,9 @@ ShapeRayTracerInitialize(
     assert(trace_routine != NULL);
     assert(isfinite(minimum_distance) && minimum_distance >= (float_t)0.0);
 
-    ISTATUS status = RayTracerAllocate(&shape_ray_tracer->ray_tracer);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return false;
-    }
-
     shape_ray_tracer->trace_routine = trace_routine;
     shape_ray_tracer->trace_context = trace_context;
     shape_ray_tracer->minimum_distance = minimum_distance;
-    
-    BrdfAllocatorInitialize(&shape_ray_tracer->brdf_allocator);
-
-    return true;
 }
 
 static
