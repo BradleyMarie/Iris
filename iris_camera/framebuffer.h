@@ -32,6 +32,7 @@ ISTATUS
 FramebufferAllocate(
     _In_ size_t num_columns,
     _In_ size_t num_rows,
+    _In_ COLOR3 color,
     _Out_ PFRAMEBUFFER *framebuffer
     );
 

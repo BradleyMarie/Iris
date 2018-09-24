@@ -46,11 +46,31 @@ cc_test(
 )
 
 cc_library(
+    name = "framebuffer_internal",
+    hdrs = ["framebuffer_internal.h"],
+    deps = [
+        ":color",
+    ],
+)
+
+cc_library(
+    name = "framebuffer",
+    hdrs = ["framebuffer.h"],
+    srcs = ["framebuffer.c"],
+    deps = [
+        ":framebuffer_internal",
+        "//common:safe_math",
+        "//iris:iris",
+    ],
+)
+
+cc_library(
     name = "iris_camera",
     hdrs = ["iris_camera.h"],
     deps = [
         ":camera",
         ":color",
+        ":framebuffer",
         "//iris_advanced:iris_advanced",
     ],
     visibility = ["//visibility:public"],
