@@ -20,6 +20,10 @@ Abstract:
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/camera.h"
 
+//
+// Functions
+//
+
 ISTATUS
 CameraAllocate(
     _In_ PCCAMERA_VTABLE vtable,
