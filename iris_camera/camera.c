@@ -172,6 +172,10 @@ CameraFree(
         return;
     }
 
-    camera->vtable->free_routine(camera->data);
+    if (camera->vtable->free_routine != NULL)
+    {
+        camera->vtable->free_routine(camera->data);
+    }
+
     free(camera);
 }
