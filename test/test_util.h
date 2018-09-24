@@ -17,6 +17,7 @@ Abstract:
 
 #include "iris/matrix.h"
 #include "iris/ray.h"
+#include "iris_camera/color.h"
 #include "googlemock/include/gmock/gmock.h"
 
 #include <cmath>
@@ -46,6 +47,15 @@ operator==(
     )
 {
     return r0.origin == r1.origin && r0.direction == r1.direction;
+}
+
+bool 
+operator==(
+    const COLOR3& c0, 
+    const COLOR3& c1
+    )
+{
+    return c0.x == c1.x && c0.y == c1.y && c0.z == c1.z;
 }
 
 MATCHER_P(EqualsMatrix, value, "")
