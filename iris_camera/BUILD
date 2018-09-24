@@ -71,6 +71,7 @@ cc_library(
         ":camera",
         ":color",
         ":framebuffer",
+        ":pixel_sampler",
         "//iris_advanced:iris_advanced",
     ],
     visibility = ["//visibility:public"],
