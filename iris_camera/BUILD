@@ -75,3 +75,31 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "pixel_sampler",
+    hdrs = ["pixel_sampler.h"],
+    srcs = ["pixel_sampler.c"],
+    deps = [
+        ":pixel_sampler_internal",
+        ":pixel_sampler_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "pixel_sampler_internal",
+    hdrs = ["pixel_sampler_internal.h"],
+    deps = [
+        ":pixel_sampler_vtable",
+    ],
+)
+
+cc_library(
+    name = "pixel_sampler_vtable",
+    hdrs = ["pixel_sampler_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//iris_advanced:iris_advanced",
+    ],
+)
