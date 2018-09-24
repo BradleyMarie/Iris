@@ -21,6 +21,7 @@ Abstract:
 extern "C" {
 #endif // __cplusplus
 
+#include "iris_camera/camera.h"
 #include "iris_camera/color.h"
 
 #if __cplusplus 

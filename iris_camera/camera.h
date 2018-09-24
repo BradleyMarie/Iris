@@ -16,21 +16,11 @@ Abstract:
 #ifndef _IRIS_CAMERA_CAMERA_
 #define _IRIS_CAMERA_CAMERA_
 
-#include "iris_advanced/iris_advanced.h"
+#include "iris_camera/camera_vtable.h"
 
 //
 // Types
 //
-
-ISTATUS
-(*PCAMERA_GENERATE_RAY_ROUTINE)(
-    _In_ const void *context,
-    _In_ float_t pixel_u,
-    _In_ float_t pixel_v,
-    _In_ float_t lens_u,
-    _In_ float_t lens_v,
-    _Out_ PRAY ray
-    );
 
 typedef struct _CAMERA CAMERA, *PCAMERA;
 typedef const CAMERA *PCCAMERA;
@@ -41,7 +31,7 @@ typedef const CAMERA *PCCAMERA;
 
 ISTATUS
 CameraAllocate(
-    _In_ PCAMERA_GENERATE_RAY_ROUTINE generate_ray_routine,
+    _In_ PCCAMERA_VTABLE vtable,
     _In_ float_t pixel_min_u,
     _In_ float_t pixel_max_u,
     _In_ float_t pixel_min_v,
@@ -53,7 +43,7 @@ CameraAllocate(
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PCAMERA camera
+    _Out_ PCAMERA *camera
     );
 
 void
