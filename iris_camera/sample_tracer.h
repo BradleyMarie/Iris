@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_CAMERA_SAMPLE_TRACER_
 #define _IRIS_CAMERA_SAMPLE_TRACER_
 
-#include "iris_advanced/iris_advanced.h"
+#include "iris_camera/color.h"
 
 //
 // Types
@@ -23,31 +23,36 @@ Abstract:
 
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
-    _In_ const void *context,
-    _In_ RAY ray,
+    _In_ void *context,
+    _In_ RAY ray
+    );
+
+ISTATUS
+(*PSAMPLE_TRACER_TONE_MAP_ROUTINE)(
+    _In_ void *context,
     _Out_ PCOLOR3 color
     );
 
 typedef struct _SAMPLE_TRACER SAMPLE_TRACER, *PSAMPLE_TRACER;
 typedef const SAMPLE_TRACER *PCSAMPLE_TRACER;
 
-typedef
-ISTATUS
-(*PSAMPLE_TRACER_LIFETIME_ROUTINE)(
-    _Inout_opt_ void *context,
-    _In_ PCSAMPLE_TRACER sample_tracer
-    );
-
 //
 // Functions
 //
 
 ISTATUS
-SampleTracerCreate(
+SampleTracerAllocate(
     _In_ PSAMPLE_TRACER_TRACE_ROUTINE trace_routine,
-    _In_ const void *sample_tracer_context,
-    _In_ PSAMPLE_TRACER_LIFETIME_ROUTINE callback,
-    _In_ void *callback_context
+    _In_ PSAMPLE_TRACER_TONE_MAP_ROUTINE tone_map_routine,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Opt_ PSAMPLE_TRACER *sample_tracer
+    );
+
+void
+SampleTracerFree(
+    _In_opt_ _Post_invalid_ PSAMPLE_TRACER sample_tracer
     );
 
 #endif // _IRIS_CAMERA_PIXEL_SAMPLER_

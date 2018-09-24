@@ -35,19 +35,12 @@ ISTATUS
 typedef struct _CAMERA CAMERA, *PCAMERA;
 typedef const CAMERA *PCCAMERA;
 
-typedef
-ISTATUS
-(*PCAMERA_LIFETIME_ROUTINE)(
-    _Inout_opt_ void *context,
-    _In_ PCCAMERA camera
-    );
-
 //
 // Functions
 //
 
 ISTATUS
-CameraCreate(
+CameraAllocate(
     _In_ PCAMERA_GENERATE_RAY_ROUTINE generate_ray_routine,
     _In_ float_t pixel_min_u,
     _In_ float_t pixel_max_u,
@@ -57,9 +50,15 @@ CameraCreate(
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
     _In_ float_t lens_max_v,
-    _In_ const void *camera_context,
-    _In_ PCAMERA_LIFETIME_ROUTINE callback,
-    _In_ void *callback_context
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Out_ PCAMERA camera
+    );
+
+void
+CameraFree(
+    _In_opt_ _Post_invalid_ PCAMERA camera
     );
 
 #endif // _IRIS_CAMERA_CAMERA_

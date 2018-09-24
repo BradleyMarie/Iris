@@ -8,14 +8,14 @@ Module Name:
 
 Abstract:
 
-    A container for holding an RGB image.
+    A container for holding an XYZ image.
 
 --*/
 
 #ifndef _IRIS_CAMERA_FRAMEBUFFER_
 #define _IRIS_CAMERA_FRAMEBUFFER_
 
-#include "iris_advanced/iris_advanced.h"
+#include "iris_camera/color.h"
 
 //
 // Types
@@ -27,6 +27,13 @@ typedef const FRAMEBUFFER *PCFRAMEBUFFER;
 //
 // Functions
 //
+
+ISTATUS
+FramebufferAllocate(
+    _In_ size_t num_columns,
+    _In_ size_t num_rows,
+    _Out_ PFRAMEBUFFER *framebuffer
+    );
 
 ISTATUS
 FramebufferGetSize(
@@ -41,6 +48,11 @@ FramebufferGetPixel(
     _In_ size_t column,
     _In_ size_t row,
     _Out_ PCOLOR3 color
+    );
+
+void
+FramebufferFree(
+    _In_opt_ _Post_invalid_ PFRAMEBUFFER framebuffer
     );
 
 #endif // _IRIS_CAMERA_FRAMEBUFFER_
