@@ -15,20 +15,14 @@ Abstract:
 #ifndef _IRIS_CAMERA_PIXEL_SAMPLER_GENERATOR_
 #define _IRIS_CAMERA_PIXEL_SAMPLER_GENERATOR_
 
-#include "iris_camera/pixel_sampler.h"
+#include "iris_camera/pixel_sampler_generator_vtable.h"
 
 //
 // Types
 //
 
-ISTATUS
-(*PPIXEL_SAMPLER_GENERATE_ROUTINE)(
-    _In_ const void *context,
-    _Out_ PIXEL_SAMPLER *pixel_sampler
-    );
-
 typedef struct _PIXEL_SAMPLER_GENERATOR PIXEL_SAMPLER_GENERATOR;
-typedef struct PIXEL_SAMPLER_GENERATOR *PPIXEL_SAMPLER_GENERATOR;
+typedef PIXEL_SAMPLER_GENERATOR *PPIXEL_SAMPLER_GENERATOR;
 typedef const PIXEL_SAMPLER_GENERATOR *PCPIXEL_SAMPLER_GENERATOR;
 
 //
@@ -37,7 +31,7 @@ typedef const PIXEL_SAMPLER_GENERATOR *PCPIXEL_SAMPLER_GENERATOR;
 
 ISTATUS
 PixelSamplerGeneratorAllocate(
-    _In_ PPIXEL_SAMPLER_GENERATE_ROUTINE generate_routine,
+    _In_ PCPIXEL_SAMPLER_GENERATOR_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
