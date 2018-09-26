@@ -15,6 +15,7 @@ Abstract:
 #include <stdalign.h>
 #include <string.h>
 
+#include "common/alloc.h"
 #include "iris_camera/pixel_sampler_generator.h"
 #include "iris_camera/pixel_sampler_generator_internal.h"
 

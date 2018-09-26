@@ -15,7 +15,6 @@ Abstract:
 #ifndef _IRIS_ADVANCED_RANDOM_
 #define _IRIS_ADVANCED_RANDOM_
 
-#include "common/alloc.h"
 #include "common/free_routine.h"
 #include "iris/iris.h"
 

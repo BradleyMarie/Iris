@@ -15,23 +15,11 @@ Abstract:
 #ifndef _IRIS_CAMERA_SAMPLE_TRACER_
 #define _IRIS_CAMERA_SAMPLE_TRACER_
 
-#include "iris_camera/color.h"
+#include "iris_camera/sample_tracer_vtable.h"
 
 //
 // Types
 //
-
-ISTATUS
-(*PSAMPLE_TRACER_TRACE_ROUTINE)(
-    _In_ void *context,
-    _In_ RAY ray
-    );
-
-ISTATUS
-(*PSAMPLE_TRACER_TONE_MAP_ROUTINE)(
-    _In_ void *context,
-    _Out_ PCOLOR3 color
-    );
 
 typedef struct _SAMPLE_TRACER SAMPLE_TRACER, *PSAMPLE_TRACER;
 typedef const SAMPLE_TRACER *PCSAMPLE_TRACER;
@@ -47,7 +35,7 @@ SampleTracerAllocate(
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Opt_ PSAMPLE_TRACER *sample_tracer
+    _Out_ PSAMPLE_TRACER *sample_tracer
     );
 
 void

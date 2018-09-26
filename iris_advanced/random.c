@@ -15,6 +15,7 @@ Abstract:
 #include <stdalign.h>
 #include <string.h>
 
+#include "common/alloc.h"
 #include "iris_advanced/random.h"
 
 //

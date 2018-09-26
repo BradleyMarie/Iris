@@ -72,6 +72,9 @@ cc_library(
         ":color",
         ":framebuffer",
         ":pixel_sampler",
+        ":random_generator",
+        ":sample_tracer",
+        ":sample_tracer_generator",
         "//iris_advanced:iris_advanced",
     ],
     visibility = ["//visibility:public"],
@@ -151,11 +154,55 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "random_generator_vtable",
     hdrs = ["random_generator_vtable.h"],
     deps = [
         "//iris_advanced:iris_advanced",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer",
+    hdrs = ["sample_tracer.h"],
+    deps = [
+        ":sample_tracer_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer_generator",
+    hdrs = ["sample_tracer_generator.h"],
+    srcs = ["sample_tracer_generator.c"],
+    deps = [
+        ":sample_tracer_generator_internal",
+        ":sample_tracer_generator_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer_generator_internal",
+    hdrs = ["sample_tracer_generator_internal.h"],
+    deps = [
+        ":sample_tracer_generator_vtable",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer_generator_vtable",
+    hdrs = ["sample_tracer_generator_vtable.h"],
+    deps = [
+        ":sample_tracer",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer_vtable",
+    hdrs = ["sample_tracer_vtable.h"],
+    deps = [
+        ":color",
+        "//common:free_routine",
     ],
 )

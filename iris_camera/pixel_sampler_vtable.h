@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_VTABLE_
-#define _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_VTABLE_
+#ifndef _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_
+#define _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_
 
 #include "common/free_routine.h"
 #include "iris_advanced/iris_advanced.h"
@@ -55,4 +55,4 @@ typedef struct _PIXEL_SAMPLER_VTABLE {
 
 typedef const PIXEL_SAMPLER_VTABLE *PCPIXEL_SAMPLER_VTABLE;
 
-#endif // _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_VTABLE_
+#endif // _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_

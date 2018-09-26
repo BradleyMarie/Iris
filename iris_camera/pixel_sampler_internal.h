@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_INTERNAL_
-#define _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_INTERNAL_
+#ifndef _IRIS_CAMERA_PIXEL_SAMPLER_INTERNAL_
+#define _IRIS_CAMERA_PIXEL_SAMPLER_INTERNAL_
 
 #include "iris_camera/pixel_sampler_vtable.h"
 
@@ -107,4 +107,4 @@ PixelSamplerNextSample(
     return status;
 }
 
-#endif // _IRIS_PIXEL_SAMPLER_PIXEL_SAMPLER_INTERNAL_
+#endif // _IRIS_CAMERA_PIXEL_SAMPLER_INTERNAL_
