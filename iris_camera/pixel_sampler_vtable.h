@@ -30,8 +30,7 @@ ISTATUS
     _In_ float_t lens_sample_min_u,
     _In_ float_t lens_sample_max_u,
     _In_ float_t lens_sample_min_v,
-    _In_ float_t lens_sample_max_v,
-    _Out_ size_t *num_samples
+    _In_ float_t lens_sample_max_v
     );
 
 typedef

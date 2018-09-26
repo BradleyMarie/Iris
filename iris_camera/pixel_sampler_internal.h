@@ -41,8 +41,7 @@ PixelSamplerGenerateSample(
     _In_ float_t lens_sample_min_u,
     _In_ float_t lens_sample_max_u,
     _In_ float_t lens_sample_min_v,
-    _In_ float_t lens_sample_max_v,
-    _Out_ size_t *num_samples
+    _In_ float_t lens_sample_max_v
     )
 {
     assert(pixel_sampler != NULL);
@@ -59,7 +58,6 @@ PixelSamplerGenerateSample(
     assert(isfinite(lens_sample_min_v));
     assert(isfinite(lens_sample_max_v));
     assert(lens_sample_min_v < lens_sample_max_v);
-    assert(num_samples != NULL);
 
     ISTATUS status =
         pixel_sampler->vtable->prepare_samples_routine(pixel_sampler->data,
@@ -71,8 +69,7 @@ PixelSamplerGenerateSample(
                                                        lens_sample_min_u,
                                                        lens_sample_max_u,
                                                        lens_sample_min_v,
-                                                       lens_sample_max_v,
-                                                       num_samples);
+                                                       lens_sample_max_v);
 
     return status;
 }

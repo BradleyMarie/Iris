@@ -30,8 +30,7 @@ typedef const SAMPLE_TRACER *PCSAMPLE_TRACER;
 
 ISTATUS
 SampleTracerAllocate(
-    _In_ PSAMPLE_TRACER_TRACE_ROUTINE trace_routine,
-    _In_ PSAMPLE_TRACER_TONE_MAP_ROUTINE tone_map_routine,
+    _In_ PCSAMPLE_TRACER_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,

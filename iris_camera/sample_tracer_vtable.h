@@ -21,14 +21,14 @@ Abstract:
 typedef
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
-    _In_ void *context,
+    _In_opt_ void *context,
     _In_ RAY ray
     );
 
 typedef
 ISTATUS
 (*PSAMPLE_TRACER_TONE_MAP_ROUTINE)(
-    _In_ void *context,
+    _In_opt_ void *context,
     _Out_ PCOLOR3 color
     );
 

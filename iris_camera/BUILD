@@ -165,7 +165,9 @@ cc_library(
 cc_library(
     name = "sample_tracer",
     hdrs = ["sample_tracer.h"],
+    srcs = ["sample_tracer.c"],
     deps = [
+        ":sample_tracer_internal",
         ":sample_tracer_vtable",
         "//common:alloc",
     ],
@@ -187,6 +189,14 @@ cc_library(
     hdrs = ["sample_tracer_generator_internal.h"],
     deps = [
         ":sample_tracer_generator_vtable",
+    ],
+)
+
+cc_library(
+    name = "sample_tracer_internal",
+    hdrs = ["sample_tracer_internal.h"],
+    deps = [
+        ":sample_tracer_vtable",
     ],
 )
 
