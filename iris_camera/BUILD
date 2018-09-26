@@ -73,6 +73,7 @@ cc_library(
         ":framebuffer",
         ":pixel_sampler",
         ":random_generator",
+        ":render",
         ":sample_tracer",
         ":sample_tracer_generator",
         "//iris_advanced:iris_advanced",
@@ -159,6 +160,26 @@ cc_library(
     hdrs = ["random_generator_vtable.h"],
     deps = [
         "//iris_advanced:iris_advanced",
+    ],
+)
+
+cc_library(
+    name = "render",
+    hdrs = ["render.h"],
+    srcs = ["render.c"],
+    deps = [
+        ":camera",
+        ":camera_internal",
+        ":framebuffer",
+        ":framebuffer_internal",
+        ":pixel_sampler_generator",
+        ":pixel_sampler_generator_internal",
+        ":pixel_sampler_internal",
+        ":random_generator",
+        ":random_generator_internal",
+        ":sample_tracer_generator",
+        ":sample_tracer_generator_internal",
+        ":sample_tracer_internal",
     ],
 )
 

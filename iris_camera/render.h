@@ -29,8 +29,8 @@ Abstract:
 ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA camera,
-    _In_ PCPIXEL_SAMPLER pixel_sampler,
-    _In_ PCSAMPLE_TRACER sample_tracer,
+    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer
     );

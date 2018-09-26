@@ -22,8 +22,8 @@ typedef
 ISTATUS
 (*PCAMERA_GENERATE_RAY_ROUTINE)(
     _In_ const void *context,
-    _In_ float_t pixel_u,
-    _In_ float_t pixel_v,
+    _In_ float_t image_u,
+    _In_ float_t image_v,
     _In_ float_t lens_u,
     _In_ float_t lens_v,
     _Out_ PRAY ray

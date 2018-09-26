@@ -35,11 +35,12 @@ static
 ISTATUS
 SampleTracerTrace(
     _In_ struct _SAMPLE_TRACER *tracer,
-    _In_ RAY ray
+    _In_ PCRAY ray
     )
 {
     assert(tracer != NULL);
-    assert(RayValidate(ray));
+    assert(ray != NULL);
+    assert(RayValidate(*ray));
 
     ISTATUS status = tracer->vtable->trace_routine(tracer->data, ray);
 

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Generates the ray to be traced from UV coordinates on the framebuffer and
+    Generates the ray to be traced from UV coordinates on the image and
     lens. The generated ray is not guaranteed to be normalized.
 
 --*/
@@ -32,10 +32,10 @@ typedef const CAMERA *PCCAMERA;
 ISTATUS
 CameraAllocate(
     _In_ PCCAMERA_VTABLE vtable,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
+    _In_ float_t image_min_u,
+    _In_ float_t image_max_u,
+    _In_ float_t image_min_v,
+    _In_ float_t image_max_v,
     _In_ float_t lens_min_u,
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,

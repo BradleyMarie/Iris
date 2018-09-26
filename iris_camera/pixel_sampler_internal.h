@@ -31,7 +31,7 @@ struct _PIXEL_SAMPLER {
 //
 
 ISTATUS
-PixelSamplerGenerateSample(
+PixelSamplerPrepareSamples(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,
     _Inout_ PRANDOM rng,
     _In_ float_t pixel_sample_min_u,
@@ -74,8 +74,6 @@ PixelSamplerGenerateSample(
     return status;
 }
 
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS
 PixelSamplerNextSample(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,

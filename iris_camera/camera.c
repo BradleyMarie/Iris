@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Generates the ray to be traced from UV coordinates on the framebuffer and
+    Generates the ray to be traced from UV coordinates on the image and
     lens. The generated ray is not guaranteed to be normalized.
 
 --*/
@@ -27,10 +27,10 @@ Abstract:
 ISTATUS
 CameraAllocate(
     _In_ PCCAMERA_VTABLE vtable,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
+    _In_ float_t image_min_u,
+    _In_ float_t image_max_u,
+    _In_ float_t image_min_v,
+    _In_ float_t image_max_v,
     _In_ float_t lens_min_u,
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
@@ -46,22 +46,22 @@ CameraAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!isfinite(pixel_min_u))
+    if (!isfinite(image_min_u))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!isfinite(pixel_max_u))
+    if (!isfinite(image_max_u))
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (!isfinite(pixel_min_v))
+    if (!isfinite(image_min_v))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (!isfinite(pixel_max_v))
+    if (!isfinite(image_max_v))
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -86,12 +86,12 @@ CameraAllocate(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
 
-    if (pixel_max_u < pixel_min_u)
+    if (image_max_u < image_min_u)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
 
-    if (pixel_max_v < pixel_min_v)
+    if (image_max_v < image_min_v)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
     }
@@ -145,10 +145,10 @@ CameraAllocate(
 
     (*camera)->vtable = vtable;
     (*camera)->data = data_allocation;
-    (*camera)->pixel_min_u = pixel_min_u;
-    (*camera)->pixel_max_u = pixel_max_u;
-    (*camera)->pixel_min_v = pixel_min_v;
-    (*camera)->pixel_max_v = pixel_max_v;
+    (*camera)->image_min_u = image_min_u;
+    (*camera)->image_max_u = image_max_u;
+    (*camera)->image_min_v = image_min_v;
+    (*camera)->image_max_v = image_max_v;
     (*camera)->lens_min_u = lens_min_u;
     (*camera)->lens_max_u = lens_max_u;
     (*camera)->lens_min_v = lens_min_v;
