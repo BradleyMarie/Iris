@@ -21,7 +21,7 @@ typedef
 ISTATUS
 (*PPIXEL_SAMPLER_GENERATOR_GENERATE_ROUTINE)(
     _In_ const void *context,
-    _Out_ PIXEL_SAMPLER *pixel_sampler
+    _Out_ PPIXEL_SAMPLER *pixel_sampler
     );
 
 typedef struct _PIXEL_SAMPLER_GENERATOR_VTABLE {

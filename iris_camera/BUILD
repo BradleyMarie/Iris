@@ -107,7 +107,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "pixel_sampler_generator_vtable",
     hdrs = ["pixel_sampler_generator_vtable.h"],
@@ -129,6 +128,34 @@ cc_library(
     hdrs = ["pixel_sampler_vtable.h"],
     deps = [
         "//common:free_routine",
+        "//iris_advanced:iris_advanced",
+    ],
+)
+
+cc_library(
+    name = "random_generator",
+    hdrs = ["random_generator.h"],
+    srcs = ["random_generator.c"],
+    deps = [
+        ":random_generator_internal",
+        ":random_generator_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "random_generator_internal",
+    hdrs = ["random_generator_internal.h"],
+    deps = [
+        ":random_generator_vtable",
+    ],
+)
+
+
+cc_library(
+    name = "random_generator_vtable",
+    hdrs = ["random_generator_vtable.h"],
+    deps = [
         "//iris_advanced:iris_advanced",
     ],
 )
