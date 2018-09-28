@@ -84,7 +84,7 @@ IrisCameraAllocateThreadState(
         
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeThreadState(i, result);
+            IrisCameraFreeThreadState(num_threads, result);
             return status;
         }
 
@@ -93,7 +93,7 @@ IrisCameraAllocateThreadState(
         
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeThreadState(i, result);
+            IrisCameraFreeThreadState(num_threads, result);
             return status;
         }
 
@@ -101,7 +101,7 @@ IrisCameraAllocateThreadState(
         
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeThreadState(i, result);
+            IrisCameraFreeThreadState(num_threads, result);
             return status;
         }
 
