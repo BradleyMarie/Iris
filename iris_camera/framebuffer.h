@@ -8,7 +8,10 @@ Module Name:
 
 Abstract:
 
-    A container for holding an XYZ image.
+    A 2D image comprised of XYZ color values for storing the output of the
+    render routines. 
+    
+    On allocation, a framebuffer is initialized to contain only zero values.
 
 --*/
 
@@ -32,7 +35,6 @@ ISTATUS
 FramebufferAllocate(
     _In_ size_t num_columns,
     _In_ size_t num_rows,
-    _In_ COLOR3 color,
     _Out_ PFRAMEBUFFER *framebuffer
     );
 
