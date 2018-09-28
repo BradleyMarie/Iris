@@ -32,17 +32,25 @@ struct _RANDOM_GENERATOR {
 
 ISTATUS
 RandomGeneratorGenerate(
-    _In_ const struct _RANDOM_GENERATOR *random_generator,
+    _In_ struct _RANDOM_GENERATOR *random_generator,
     _Out_ PRANDOM *random
     )
 {
     assert(random_generator != NULL);
     assert(random != NULL);
 
+    PRANDOM result;
     ISTATUS status = random_generator->vtable->generate_routine(
-            random_generator->data, random);
+            random_generator->data, &result);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *random = result;
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_CAMERA_RANDOM_GENERATOR_INTERNAL_

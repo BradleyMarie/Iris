@@ -32,17 +32,25 @@ struct _SAMPLE_TRACER_GENERATOR {
 
 ISTATUS
 SampleTracerGeneratorGenerate(
-    _In_ const struct _SAMPLE_TRACER_GENERATOR *sample_tracer_generator,
+    _In_ struct _SAMPLE_TRACER_GENERATOR *sample_tracer_generator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
     assert(sample_tracer_generator != NULL);
     assert(sample_tracer != NULL);
 
+    PSAMPLE_TRACER result;
     ISTATUS status = sample_tracer_generator->vtable->generate_routine(
-            sample_tracer_generator->data, sample_tracer);
+            sample_tracer_generator->data, &result);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *sample_tracer = result;
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_CAMERA_SAMPLE_TRACER_GENERATOR_INTERNAL_

@@ -20,7 +20,7 @@ Abstract:
 typedef
 ISTATUS
 (*PSAMPLE_TRACER_GENERATOR_GENERATE_ROUTINE)(
-    _In_ const void *context,
+    _In_ void *context,
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 

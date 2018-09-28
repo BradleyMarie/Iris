@@ -32,17 +32,25 @@ struct _PIXEL_SAMPLER_GENERATOR {
 
 ISTATUS
 PixelSamplerGeneratorGenerate(
-    _In_ const struct _PIXEL_SAMPLER_GENERATOR *pixel_sampler_generator,
+    _In_ struct _PIXEL_SAMPLER_GENERATOR *pixel_sampler_generator,
     _Out_ PPIXEL_SAMPLER *pixel_sampler
     )
 {
     assert(pixel_sampler_generator != NULL);
     assert(pixel_sampler != NULL);
 
+    PPIXEL_SAMPLER result;
     ISTATUS status = pixel_sampler_generator->vtable->generate_routine(
-            pixel_sampler_generator->data, pixel_sampler);
+            pixel_sampler_generator->data, &result);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *pixel_sampler = result;
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_CAMERA_PIXEL_SAMPLER_GENERATOR_INTERNAL_

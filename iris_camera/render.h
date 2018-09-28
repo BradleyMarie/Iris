@@ -37,10 +37,11 @@ IrisCameraRender(
 
 ISTATUS
 IrisCameraRenderParallel(
+    _In_ size_t number_of_threads,
     _In_ PCCAMERA camera,
-    _In_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
-    _In_ PCSAMPLE_TRACER_GENERATOR sample_tracer_generator,
-    _In_ PCRANDOM_GENERATOR rng_generator,
+    _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
+    _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
+    _Inout_ PRANDOM_GENERATOR rng_generator,
     _Inout_ PFRAMEBUFFER framebuffer
     );
 

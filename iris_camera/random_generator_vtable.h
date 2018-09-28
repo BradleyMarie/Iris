@@ -20,7 +20,7 @@ Abstract:
 typedef
 ISTATUS
 (*PRANDOM_GENERATOR_GENERATE_ROUTINE)(
-    _In_ const void *context,
+    _In_ void *context,
     _Out_ PRANDOM *random
     );
 
