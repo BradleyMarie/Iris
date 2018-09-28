@@ -23,14 +23,14 @@ ISTATUS
 (*PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE)(
     _In_ void *context,
     _Inout_ PRANDOM rng,
-    _In_ float_t pixel_sample_min_u,
-    _In_ float_t pixel_sample_max_u,
-    _In_ float_t pixel_sample_min_v,
-    _In_ float_t pixel_sample_max_v,
-    _In_ float_t lens_sample_min_u,
-    _In_ float_t lens_sample_max_u,
-    _In_ float_t lens_sample_min_v,
-    _In_ float_t lens_sample_max_v
+    _In_ float_t pixel_min_u,
+    _In_ float_t pixel_max_u,
+    _In_ float_t pixel_min_v,
+    _In_ float_t pixel_max_v,
+    _In_ float_t lens_min_u,
+    _In_ float_t lens_max_u,
+    _In_ float_t lens_min_v,
+    _In_ float_t lens_max_v
     );
 
 typedef

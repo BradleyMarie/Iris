@@ -34,42 +34,42 @@ ISTATUS
 PixelSamplerPrepareSamples(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,
     _Inout_ PRANDOM rng,
-    _In_ float_t pixel_sample_min_u,
-    _In_ float_t pixel_sample_max_u,
-    _In_ float_t pixel_sample_min_v,
-    _In_ float_t pixel_sample_max_v,
-    _In_ float_t lens_sample_min_u,
-    _In_ float_t lens_sample_max_u,
-    _In_ float_t lens_sample_min_v,
-    _In_ float_t lens_sample_max_v
+    _In_ float_t pixel_min_u,
+    _In_ float_t pixel_max_u,
+    _In_ float_t pixel_min_v,
+    _In_ float_t pixel_max_v,
+    _In_ float_t lens_min_u,
+    _In_ float_t lens_max_u,
+    _In_ float_t lens_min_v,
+    _In_ float_t lens_max_v
     )
 {
     assert(pixel_sampler != NULL);
     assert(rng != NULL);
-    assert(isfinite(pixel_sample_min_u));
-    assert(isfinite(pixel_sample_max_u));
-    assert(pixel_sample_min_u < pixel_sample_max_u);
-    assert(isfinite(pixel_sample_min_v));
-    assert(isfinite(pixel_sample_max_v));
-    assert(pixel_sample_min_v < pixel_sample_max_v);
-    assert(isfinite(lens_sample_min_u));
-    assert(isfinite(lens_sample_max_u));
-    assert(lens_sample_min_u < lens_sample_max_u);
-    assert(isfinite(lens_sample_min_v));
-    assert(isfinite(lens_sample_max_v));
-    assert(lens_sample_min_v < lens_sample_max_v);
+    assert(isfinite(pixel_min_u));
+    assert(isfinite(pixel_max_u));
+    assert(pixel_min_u < pixel_max_u);
+    assert(isfinite(pixel_min_v));
+    assert(isfinite(pixel_max_v));
+    assert(pixel_min_v < pixel_max_v);
+    assert(isfinite(lens_min_u));
+    assert(isfinite(lens_max_u));
+    assert(lens_min_u < lens_max_u);
+    assert(isfinite(lens_min_v));
+    assert(isfinite(lens_max_v));
+    assert(lens_min_v < lens_max_v);
 
     ISTATUS status =
         pixel_sampler->vtable->prepare_samples_routine(pixel_sampler->data,
                                                        rng,
-                                                       pixel_sample_min_u,
-                                                       pixel_sample_max_u,
-                                                       pixel_sample_min_v,
-                                                       pixel_sample_max_v,
-                                                       lens_sample_min_u,
-                                                       lens_sample_max_u,
-                                                       lens_sample_min_v,
-                                                       lens_sample_max_v);
+                                                       pixel_min_u,
+                                                       pixel_max_u,
+                                                       pixel_min_v,
+                                                       pixel_max_v,
+                                                       lens_min_u,
+                                                       lens_max_u,
+                                                       lens_min_v,
+                                                       lens_max_v);
 
     return status;
 }
