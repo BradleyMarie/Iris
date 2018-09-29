@@ -35,6 +35,10 @@ typedef struct _GRID_PIXEL_SAMPLER {
     float_t lens_sample_width_v;
     bool jitter_pixel_samples;
     bool jitter_lens_samples;
+    uint16_t current_pixel_samples_u;
+    uint16_t current_pixel_samples_v;
+    uint16_t current_lens_samples_u;
+    uint16_t current_lens_samples_v;
     uint16_t pixel_index_u;
     uint16_t pixel_index_v;
     uint16_t lens_index_u;
@@ -64,6 +68,48 @@ GridPixelSamplerPrepareSamples(
     )
 {
     PGRID_PIXEL_SAMPLER pixel_sampler = (PGRID_PIXEL_SAMPLER)context;
+
+    if (pixel_min_u == pixel_max_u)
+    {
+        pixel_sampler->current_pixel_samples_u = 1;
+    }
+    else
+    {
+        pixel_sampler->current_pixel_samples_u = 
+            pixel_sampler->pixel_samples_u;
+    }
+
+    if (pixel_min_v == pixel_max_v)
+    {
+        pixel_sampler->current_pixel_samples_v = 1;
+    }
+    else
+    {
+        pixel_sampler->current_pixel_samples_v = 
+            pixel_sampler->pixel_samples_v;
+    }
+
+    if (lens_min_u == lens_max_u)
+    {
+        pixel_sampler->current_lens_samples_u = 1;
+    }
+    else
+    {
+        pixel_sampler->current_lens_samples_u = 
+            pixel_sampler->lens_samples_u;
+    }
+
+    if (lens_min_v == lens_max_v)
+    {
+        pixel_sampler->current_lens_samples_v = 1;
+    }
+    else
+    {
+        pixel_sampler->current_lens_samples_v = 
+            pixel_sampler->lens_samples_v;
+    }
+
+
     pixel_sampler->pixel_min_u = pixel_min_u;
     pixel_sampler->pixel_min_v = pixel_min_v;
     pixel_sampler->lens_min_u = lens_min_u;
@@ -102,13 +148,13 @@ GridPixelSamplerNextSample(
 {
     PGRID_PIXEL_SAMPLER pixel_sampler = (PGRID_PIXEL_SAMPLER)context;
 
-    if (pixel_sampler->pixel_index_u == pixel_sampler->pixel_samples_u)
+    if (pixel_sampler->pixel_index_u == pixel_sampler->current_pixel_samples_u)
     {
-        if (pixel_sampler->pixel_index_v == pixel_sampler->pixel_samples_v)
+        if (pixel_sampler->pixel_index_v == pixel_sampler->current_pixel_samples_v)
         {
-            if (pixel_sampler->lens_index_u == pixel_sampler->lens_samples_u)
+            if (pixel_sampler->lens_index_u == pixel_sampler->current_lens_samples_u)
             {
-                if (pixel_sampler->lens_index_v == pixel_sampler->lens_samples_v)
+                if (pixel_sampler->lens_index_v == pixel_sampler->current_lens_samples_v)
                 {
                     return ISTATUS_DONE;
                 }
