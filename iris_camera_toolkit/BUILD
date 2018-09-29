@@ -6,3 +6,12 @@ cc_library(
         "//iris_camera:iris_camera",
     ],
 )
+
+cc_library(
+    name = "pinhole_camera",
+    hdrs = ["pinhole_camera.h"],
+    srcs = ["pinhole_camera.c"],
+    deps = [
+        "//iris_camera:iris_camera",
+    ],
+)
