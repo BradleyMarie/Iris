@@ -15,3 +15,12 @@ cc_library(
         "//iris_camera:iris_camera",
     ],
 )
+
+cc_library(
+    name = "thin_lens_camera",
+    hdrs = ["thin_lens_camera.h"],
+    srcs = ["thin_lens_camera.c"],
+    deps = [
+        "//iris_camera:iris_camera",
+    ],
+)

@@ -4,30 +4,32 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    pinhole_camera.c
+    thin_lens_camera.c
 
 Abstract:
 
-    Implements a pinhole camera.
+    Implements a thin lens camera.
 
 --*/
 
 #include <stdalign.h>
 
-#include "iris_camera_toolkit/pinhole_camera.h"
+#include "iris_camera_toolkit/thin_lens_camera.h"
 
 //
 // Types
 //
 
-typedef struct _PINHOLE_CAMERA {
+typedef struct _THIN_LENS_CAMERA {
     POINT3 location;
+    VECTOR3 lens_radius_u;
+    VECTOR3 lens_radius_v;
     POINT3 frame_corner;
     VECTOR3 frame_width;
     VECTOR3 frame_height;
-} PINHOLE_CAMERA, *PPINHOLE_CAMERA;
+} THIN_LENS_CAMERA, *PTHIN_LENS_CAMERA;
 
-typedef const PINHOLE_CAMERA *PCPINHOLE_CAMERA;
+typedef const THIN_LENS_CAMERA *PCTHIN_LENS_CAMERA;
 
 //
 // Static Functions
@@ -35,31 +37,43 @@ typedef const PINHOLE_CAMERA *PCPINHOLE_CAMERA;
 
 static
 ISTATUS
-PinholeCameraGenerateRay(
+ThinLensCameraGenerateRay(
     _In_ const void *context,
     _In_ float_t image_u,
     _In_ float_t image_v,
-    _In_ float_t lens_u,
-    _In_ float_t lens_v,
+    _In_ float_t radius_squared,
+    _In_ float_t theta,
     _Out_ PRAY ray
     )
 {
-    PCPINHOLE_CAMERA pinhole_camera = (PCPINHOLE_CAMERA)context;
+    PCTHIN_LENS_CAMERA thin_lens_camera = (PCTHIN_LENS_CAMERA)context;
 
-    POINT3 frame_origin = PointVectorAddScaled(pinhole_camera->frame_corner,
-                                               pinhole_camera->frame_width,
+    POINT3 frame_origin = PointVectorAddScaled(thin_lens_camera->frame_corner,
+                                               thin_lens_camera->frame_width,
                                                image_u);
 
-    frame_origin = PointVectorAddScaled(pinhole_camera->frame_corner,
-                                        pinhole_camera->frame_height,
+    frame_origin = PointVectorAddScaled(thin_lens_camera->frame_corner,
+                                        thin_lens_camera->frame_height,
                                         image_v);
 
-    VECTOR3 camera_direction = PointSubtract(pinhole_camera->location,
+    float_t radius = sqrt(radius_squared);
+    float_t lens_u = radius * cos(theta);
+    float_t lens_v = radius * sin(theta);
+
+    POINT3 ray_origin = PointVectorAddScaled(thin_lens_camera->location,
+                                             thin_lens_camera->lens_radius_u,
+                                             lens_u);
+
+    ray_origin = PointVectorAddScaled(ray_origin,
+                                      thin_lens_camera->lens_radius_v,
+                                      lens_v);
+
+    VECTOR3 camera_direction = PointSubtract(ray_origin,
                                              frame_origin);
 
     camera_direction = VectorNormalize(camera_direction, NULL, NULL);
 
-    *ray = RayCreate(pinhole_camera->location, camera_direction);
+    *ray = RayCreate(ray_origin, camera_direction);
 
     return ISTATUS_SUCCESS;
 }
@@ -68,21 +82,24 @@ PinholeCameraGenerateRay(
 // Static Variables
 //
 
-static const CAMERA_VTABLE pinhole_camera_vtable = {
-    PinholeCameraGenerateRay,
+static const CAMERA_VTABLE thin_lens_camera_vtable = {
+    ThinLensCameraGenerateRay,
     NULL
 };
+
+static const float_t two_pi = (float_t)6.28318530717958647692528676655900577;
 
 //
 // Functions
 //
 
 ISTATUS
-PinholeCameraAllocate(
+ThinLensCameraAllocate(
     _In_ POINT3 location,
     _In_ VECTOR3 direction,
     _In_ VECTOR3 up,
     _In_ float_t focal_length,
+    _In_ float_t f_number,
     _In_ float_t frame_width,
     _In_ float_t frame_height,
     _Out_ PCAMERA *camera
@@ -108,19 +125,24 @@ PinholeCameraAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (!isfinite(frame_width) || frame_width <= (float_t)0.0)
+    if (!isfinite(focal_length) || f_number <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (!isfinite(frame_height) || frame_height <= (float_t)0.0)
+    if (!isfinite(frame_width) || frame_width <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (camera == NULL)
+    if (!isfinite(frame_height) || frame_height <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (camera == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     direction = VectorNormalize(direction, NULL, NULL);
@@ -144,24 +166,32 @@ PinholeCameraAllocate(
                                         frame_height_vector,
                                         (float_t)0.5);
 
-    PINHOLE_CAMERA pinhole_camera;
-    pinhole_camera.location = location;
-    pinhole_camera.frame_corner = frame_corner;
-    pinhole_camera.frame_width = frame_width_vector;
-    pinhole_camera.frame_height = frame_height_vector;
+    float_t aperture = focal_length / f_number;
+    float_t aperture_radius = (float_t)0.5 * aperture;
 
-    ISTATUS status = CameraAllocate(&pinhole_camera_vtable,
+    VECTOR3 lens_radius_u = VectorScale(image_plane_u, aperture_radius);
+    VECTOR3 lens_radius_v = VectorScale(image_plane_v, aperture_radius);
+
+    THIN_LENS_CAMERA thin_lens_camera;
+    thin_lens_camera.location = location;
+    thin_lens_camera.lens_radius_u = lens_radius_u;
+    thin_lens_camera.lens_radius_v = lens_radius_v;
+    thin_lens_camera.frame_corner = frame_corner;
+    thin_lens_camera.frame_width = frame_width_vector;
+    thin_lens_camera.frame_height = frame_height_vector;
+
+    ISTATUS status = CameraAllocate(&thin_lens_camera_vtable,
                                     (float_t)0.0,
                                     (float_t)1.0,
                                     (float_t)0.0,
                                     (float_t)1.0,
                                     (float_t)0.0,
+                                    (float_t)1.0,
                                     (float_t)0.0,
-                                    (float_t)0.0,
-                                    (float_t)0.0,
-                                    &pinhole_camera,
-                                    sizeof(PINHOLE_CAMERA),
-                                    alignof(PINHOLE_CAMERA),
+                                    (float_t)two_pi,
+                                    &thin_lens_camera,
+                                    sizeof(THIN_LENS_CAMERA),
+                                    alignof(THIN_LENS_CAMERA),
                                     camera);
 
     return status;
