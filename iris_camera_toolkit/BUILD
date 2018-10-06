@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "grid_pixel_sampler",
     hdrs = ["grid_pixel_sampler.h"],
