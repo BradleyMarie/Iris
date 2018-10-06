@@ -5,5 +5,8 @@ cc_library(
     name = "pcg_basic",
     hdrs = ["pcg_basic.h"],
     srcs = ["pcg_basic.c"],
-    visibility = ["//iris_advanced_toolkit:__pkg__"],
+    visibility = [
+        "//iris_advanced_toolkit:__pkg__",
+        "//iris_camera_toolkit:__pkg__",
+    ],
 )

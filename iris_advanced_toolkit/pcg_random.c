@@ -32,7 +32,7 @@ typedef struct _PCG_RANDOM {
 //
 
 ISTATUS
-PermutedCongruentialGeneratorGenerateFloat(
+PermutedCongruentialRandomGenerateFloat(
     _In_ void *context,
     _In_ float_t minimum,
     _In_ float_t maximum,
@@ -55,7 +55,7 @@ PermutedCongruentialGeneratorGenerateFloat(
 }
 
 ISTATUS
-PermutedCongruentialGeneratorGenerateIndex(
+PermutedCongruentialRandomGenerateIndex(
     _In_ void *context,
     _In_ size_t minimum,
     _In_ size_t maximum,
@@ -90,8 +90,8 @@ PermutedCongruentialGeneratorGenerateIndex(
 //
 
 static const RANDOM_VTABLE pcg_vtable = {
-    PermutedCongruentialGeneratorGenerateFloat,
-    PermutedCongruentialGeneratorGenerateIndex,
+    PermutedCongruentialRandomGenerateFloat,
+    PermutedCongruentialRandomGenerateIndex,
     NULL
 };
 
@@ -100,7 +100,7 @@ static const RANDOM_VTABLE pcg_vtable = {
 //
 
 ISTATUS
-PermutedCongruentialGeneratorAllocate(
+PermutedCongruentialRandomAllocate(
     _In_ uint64_t initial_state,
     _In_ uint64_t initial_output_sequence,
     _Out_ PRANDOM *rng

@@ -22,7 +22,7 @@ Abstract:
 //
 
 ISTATUS
-PermutedCongruentialGeneratorAllocate(
+PermutedCongruentialRandomAllocate(
     _In_ uint64_t initial_state,
     _In_ uint64_t initial_output_sequence,
     _Out_ PRANDOM *rng
