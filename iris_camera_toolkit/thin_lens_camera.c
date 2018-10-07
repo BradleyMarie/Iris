@@ -87,7 +87,7 @@ static const CAMERA_VTABLE thin_lens_camera_vtable = {
     NULL
 };
 
-static const float_t two_pi = (float_t)6.28318530717958647692528676655900577;
+static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
 
 //
 // Functions

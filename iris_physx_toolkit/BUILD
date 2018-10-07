@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "lambertian_brdf",
+    hdrs = ["lambertian_brdf.h"],
+    srcs = ["lambertian_brdf.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "point_light",
     hdrs = ["point_light.h"],
     srcs = ["point_light.c"],
