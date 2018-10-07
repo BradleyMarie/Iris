@@ -44,7 +44,7 @@ ISTATUS
     _In_ PCRAY to_light,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
-    _Out_ PCSPECTRUM *Spectrum
+    _Out_ PCSPECTRUM *spectrum
     );
 
 typedef
