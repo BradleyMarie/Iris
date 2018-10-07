@@ -40,13 +40,13 @@ inline
 ISTATUS
 ShapeTrace(
     _In_ const struct _SHAPE *shape,
-    _In_ RAY ray,
+    _In_ PCRAY ray,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )
 {
     assert(shape != NULL);
-    assert(RayValidate(ray));
+    assert(ray != NULL);
     assert(allocator != NULL);
     assert(hit != NULL);
 

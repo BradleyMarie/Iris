@@ -26,7 +26,7 @@ typedef
 ISTATUS
 (*PSHAPE_TRACE_ROUTINE)(
     _In_ const void *context,
-    _In_ RAY ray,
+    _In_ PCRAY ray,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     );
@@ -36,7 +36,7 @@ ISTATUS
 (*PSHAPE_CHECK_BOUNDS_ROUTINE)(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_aligned_bounding_box,
+    _In_ BOUNDING_BOX world_bounds,
     _Out_ bool *contains
     );
 
