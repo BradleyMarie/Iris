@@ -121,12 +121,12 @@ BoundingBoxOverlaps(
     _In_ BOUNDING_BOX box1
     )
 {
-    bool overlaps = box0.corners[0].x <= box1.corners[1].x &&
-                    box1.corners[0].x <= box0.corners[1].x &&
-                    box0.corners[0].y <= box1.corners[1].y &&
-                    box1.corners[0].y <= box0.corners[1].y &&
-                    box0.corners[0].z <= box1.corners[1].z &&
-                    box1.corners[0].z <= box0.corners[1].z;
+    bool overlaps = box0.corners[0].x < box1.corners[1].x &&
+                    box1.corners[0].x < box0.corners[1].x &&
+                    box0.corners[0].y < box1.corners[1].y &&
+                    box1.corners[0].y < box0.corners[1].y &&
+                    box0.corners[0].z < box1.corners[1].z &&
+                    box1.corners[0].z < box0.corners[1].z;
 
     return overlaps;
 }
