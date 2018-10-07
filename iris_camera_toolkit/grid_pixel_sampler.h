@@ -24,6 +24,10 @@ Abstract:
 
 #include "iris_camera/iris_camera.h"
 
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
 //
 // Functions
 //
@@ -38,5 +42,9 @@ GridPixelSamplerAllocate(
     _In_ bool jitter_lens_samples,
     _Out_ PPIXEL_SAMPLER *pixel_sampler
     );
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_CAMERA_TOOLKIT_GRID_PIXEL_SAMPLER_

@@ -22,6 +22,10 @@ Abstract:
 
 #include "iris_camera/iris_camera.h"
 
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
 //
 // Functions
 //
@@ -32,5 +36,9 @@ PermutedCongruentiaRandomGeneratorAllocate(
     _In_ uint64_t initial_output_sequence,
     _Out_ PRANDOM_GENERATOR *generator
     );
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_CAMERA_TOOLKIT_PCG_RANDOM_GENERATOR_

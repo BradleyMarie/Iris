@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_camera/iris_camera.h"
 
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
 //
 // Functions
 //
@@ -32,5 +36,9 @@ ThinLensCameraAllocate(
     _In_ float_t frame_height,
     _Out_ PCAMERA *camera
     );
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_CAMERA_TOOLKIT_THIN_LENS_CAMERA_

@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_advanced/iris_advanced.h"
 
+#if __cplusplus 
+extern "C" {
+#endif // __cplusplus
+
 //
 // Functions
 //
@@ -27,5 +31,9 @@ PermutedCongruentialRandomAllocate(
     _In_ uint64_t initial_output_sequence,
     _Out_ PRANDOM *rng
     );
+
+#if __cplusplus 
+}
+#endif // __cplusplus
 
 #endif // _IRIS_ADVANCED_TOOLKIT_PCG_RANDOM_
