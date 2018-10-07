@@ -14,7 +14,7 @@ Abstract:
 
 extern "C" {
 #include "iris_physx/reflector_allocator.h"
-#include "iris_physx/test_util.h"
+#include "iris_physx/reflector_allocator_test_util.h"
 }
 
 #include "googletest/include/gtest/gtest.h"

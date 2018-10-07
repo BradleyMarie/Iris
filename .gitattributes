@@ -1,0 +1,9 @@
+common/*.h linguist-language=C
+iris/*.h linguist-language=C
+iris_advanced/*.h linguist-language=C
+iris_avanced_toolkit/*.h linguist-language=C
+iris_camera/*.h linguist-language=C
+iris_camera_toolkit/*.h linguist-language=C
+iris_physx/*.h linguist-language=C
+iris_physx_toolkit/*.h linguist-language=C
+third_party/*.h linguist-language=C

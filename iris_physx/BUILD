@@ -217,8 +217,19 @@ cc_test(
     srcs = ["reflector_allocator_test.cc"],
     deps = [
         ":reflector_allocator",
-        ":test_util",
+        ":reflector_allocator_test_util",
         "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "reflector_allocator_test_util",
+    hdrs = ["reflector_allocator_test_util.h"],
+    srcs = ["reflector_allocator_test_util.c"],
+    testonly = 1,
+    deps = [
+        ":reflector_allocator",
+        ":reflector_allocator_internal",
     ],
 )
 
@@ -316,8 +327,19 @@ cc_test(
     srcs = ["spectrum_compositor_test.cc"],
     deps = [
         ":spectrum_compositor",
-        ":test_util",
+        ":spectrum_compositor_test_util",
         "@com_google_googletest//:gtest_main"
+    ],
+)
+
+cc_library(
+    name = "spectrum_compositor_test_util",
+    hdrs = ["spectrum_compositor_test_util.h"],
+    srcs = ["spectrum_compositor_test_util.c"],
+    testonly = 1,
+    deps = [
+        ":spectrum_compositor",
+        ":spectrum_compositor_internal",
     ],
 )
 
@@ -345,19 +367,6 @@ cc_library(
         "//common:free_routine",
         "//common:sal",
         "//common:status",
-    ],
-)
-
-cc_library(
-    name = "test_util",
-    hdrs = ["test_util.h"],
-    srcs = ["test_util.c"],
-    testonly = 1,
-    deps = [
-        ":reflector_allocator",
-        ":reflector_allocator_internal",
-        ":spectrum_compositor",
-        ":spectrum_compositor_internal",
     ],
 )
 
