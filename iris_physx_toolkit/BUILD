@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "constant_material",
+    hdrs = ["constant_material.h"],
+    srcs = ["constant_material.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "lambertian_brdf",
     hdrs = ["lambertian_brdf.h"],
     srcs = ["lambertian_brdf.c"],
