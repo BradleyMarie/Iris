@@ -30,6 +30,7 @@ typedef struct _PCG_RANDOM_GENERATOR {
 // Static Functions
 //
 
+static
 ISTATUS
 PermutedCongruentialRandomGeneratorGenerate(
     _In_ void *context,

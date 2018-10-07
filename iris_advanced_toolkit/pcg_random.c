@@ -31,6 +31,7 @@ typedef struct _PCG_RANDOM {
 // Static Functions
 //
 
+static
 ISTATUS
 PermutedCongruentialRandomGenerateFloat(
     _In_ void *context,
@@ -54,6 +55,7 @@ PermutedCongruentialRandomGenerateFloat(
     return ISTATUS_SUCCESS;
 }
 
+static
 ISTATUS
 PermutedCongruentialRandomGenerateIndex(
     _In_ void *context,
