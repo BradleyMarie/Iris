@@ -7,3 +7,6 @@ iris_camera_toolkit/*.h linguist-language=C
 iris_physx/*.h linguist-language=C
 iris_physx_toolkit/*.h linguist-language=C
 third_party/*.h linguist-language=C
+
+WORKSPACE linguist-language=Bazel
+**/BUILD linguist-language=Bazel
