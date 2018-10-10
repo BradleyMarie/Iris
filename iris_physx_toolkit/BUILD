@@ -44,3 +44,12 @@ cc_library(
         "//iris_physx:iris_physx",
     ],
 )
+
+cc_library(
+    name = "uniform_reflector",
+    hdrs = ["uniform_reflector.h"],
+    srcs = ["uniform_reflector.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
