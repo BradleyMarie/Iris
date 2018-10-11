@@ -28,7 +28,6 @@ ISTATUS
 (*LIGHT_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _In_ POINT3 hit_point,
-    _In_ VECTOR3 surface_normal,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,

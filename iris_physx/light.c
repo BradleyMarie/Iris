@@ -91,7 +91,6 @@ ISTATUS
 LightSample(
     _In_ PCLIGHT light,
     _In_ POINT3 hit_point,
-    _In_ VECTOR3 surface_normal,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -110,44 +109,38 @@ LightSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!VectorValidate(surface_normal))
+    if (visibility_tester == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (visibility_tester == NULL)
+    if (rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (rng == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (compositor == NULL)
+    if (spectrum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (spectrum == NULL)
+    if (to_light == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (to_light == NULL)
+    if (pdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (pdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_08;
-    }
-
     ISTATUS status = light->vtable->sample_routine(light->data,
                                                    hit_point,
-                                                   surface_normal,
                                                    visibility_tester,
                                                    rng,
                                                    compositor,

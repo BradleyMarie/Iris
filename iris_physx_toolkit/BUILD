@@ -37,6 +37,16 @@ cc_library(
 )
 
 cc_library(
+    name = "sample_direct_lighting",
+    hdrs = ["sample_direct_lighting.h"],
+    srcs = ["sample_direct_lighting.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
     name = "sphere",
     hdrs = ["sphere.h"],
     srcs = ["sphere.c"],
