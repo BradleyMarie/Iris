@@ -12,8 +12,6 @@ Abstract:
 
 --*/
 
-#include <stdalign.h>
-
 #include "iris_physx_toolkit/sample_direct_lighting.h"
 
 //
