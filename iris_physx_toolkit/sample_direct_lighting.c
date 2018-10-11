@@ -249,8 +249,8 @@ SampleDirectLighting(
         float_t light_sample_weight = ComputeSampleWeight(light_sampled_pdf,
                                                           brdf_computed_pdf);
         
-        float_t light_sample_attenuation = light_sample_falloff * 
-                                           light_sample_weight;
+        float_t light_sample_attenuation =
+            (light_sample_falloff * light_sample_weight) / light_sampled_pdf;
 
         status = 
             SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
@@ -294,8 +294,8 @@ SampleDirectLighting(
         float_t brdf_sample_weight = ComputeSampleWeight(brdf_sampled_pdf,
                                                          light_computed_pdf);
         
-        float_t brdf_sample_attenuation = brdf_sample_falloff * 
-                                          brdf_sample_weight;
+        float_t brdf_sample_attenuation = 
+            (brdf_sample_falloff * brdf_sample_weight) / brdf_sampled_pdf;
 
         status =
             SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
