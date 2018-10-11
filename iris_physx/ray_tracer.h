@@ -11,8 +11,8 @@ Abstract:
     Traces through a set of geometry and returns back the light and the brdf
     associated with the nearest intersection.
     
-    If there is no intersection, brdf will hit_point, surface_normal, and 
-    shading_normal will not be initialized and brdf will be set to NULL.
+    If there is no intersection, light and brdf will be set to NULL and 
+    the contents of hit_point, surface_normal, and shading_normal are undefined.
 
     Any returned pointers are guaranteed to live at least as long as the ray
     tracer.
