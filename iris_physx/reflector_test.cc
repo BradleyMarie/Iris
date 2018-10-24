@@ -111,7 +111,7 @@ TEST(ReflectorTest, ReflectorReflectErrors)
         &encountered
     };
 
-    REFLECTOR_VTABLE vtable = { SampleRoutine, NULL };
+    REFLECTOR_VTABLE vtable = { SampleRoutine, NULL, NULL };
     PREFLECTOR reflector;
 
     ISTATUS status = ReflectorAllocate(&vtable,
@@ -162,7 +162,7 @@ TEST(ReflectorTest, ReflectorReflect)
         &encountered
     };
 
-    REFLECTOR_VTABLE vtable = { SampleRoutine, NULL };
+    REFLECTOR_VTABLE vtable = { SampleRoutine, NULL, NULL };
     PREFLECTOR reflector;
 
     ISTATUS status = ReflectorAllocate(&vtable,
@@ -211,6 +211,105 @@ TEST(ReflectorTest, ReflectorReflect)
     ReflectorRelease(reflector);
 }
 
+struct TestGetAlbedoContext {
+    ISTATUS return_status;
+    float_t albedo;
+    bool *encountered;
+};
+
+ISTATUS
+GetAlbedoRoutine(
+    _In_ const void *data,
+    _Out_ float_t *albedo
+    )
+{
+    const TestGetAlbedoContext *context = 
+        static_cast<const TestGetAlbedoContext*>(data);
+    EXPECT_FALSE(*context->encountered);
+    *context->encountered = true;
+    *albedo = context->albedo;
+    return context->return_status;
+}
+
+TEST(ReflectorTest, ReflectorGetAlbedoErrors)
+{
+    bool encountered = false;
+    TestGetAlbedoContext context = {
+        ISTATUS_INTEGER_OVERFLOW,
+        (float_t)1.0,
+        &encountered
+    };
+
+    REFLECTOR_VTABLE vtable = { NULL, GetAlbedoRoutine, NULL };
+    PREFLECTOR reflector;
+
+    ISTATUS status = ReflectorAllocate(&vtable,
+                                       &context,
+                                       sizeof(TestGetAlbedoContext),
+                                       alignof(TestGetAlbedoContext),
+                                       &reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t albedo;
+    status = ReflectorGetAlbedo(NULL, &albedo);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+    EXPECT_FALSE(encountered);
+
+    status = ReflectorGetAlbedo(reflector, NULL);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+    EXPECT_FALSE(encountered);
+
+    ReflectorRelease(reflector);
+}
+
+TEST(ReflectorTest, ReflectorGetAlbedo)
+{
+    bool encountered = false;
+    TestGetAlbedoContext context = {
+        ISTATUS_SUCCESS,
+        (float_t)1.0,
+        &encountered
+    };
+
+    REFLECTOR_VTABLE vtable = { NULL, GetAlbedoRoutine, NULL };
+    PREFLECTOR reflector;
+
+    ISTATUS status = ReflectorAllocate(&vtable,
+                                       &context,
+                                       sizeof(TestGetAlbedoContext),
+                                       alignof(TestGetAlbedoContext),
+                                       &reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t albedo;
+    status = ReflectorGetAlbedo(reflector, &albedo);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, albedo);
+    EXPECT_TRUE(encountered);
+
+    ReflectorRelease(reflector);
+
+    encountered = false;
+    context = {
+        ISTATUS_INVALID_ARGUMENT_COMBINATION_00,
+        (float_t)1.0,
+        &encountered
+    };
+
+    status = ReflectorAllocate(&vtable,
+                               &context,
+                               sizeof(TestGetAlbedoContext),
+                               alignof(TestGetAlbedoContext),
+                               &reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorGetAlbedo(reflector, &albedo);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_00, status);
+    EXPECT_TRUE(encountered);
+
+    ReflectorRelease(reflector);
+}
+
 struct FreeTestContext {
     void *address;
     bool *freed;
@@ -230,7 +329,7 @@ FreeRoutine(
 TEST(ReflectorTest, ReflectorFree)
 {
     bool freed = false;
-    REFLECTOR_VTABLE vtable = { NULL, NULL };
+    REFLECTOR_VTABLE vtable = { NULL, NULL, NULL };
     FreeTestContext context = { &context, &freed };
     PREFLECTOR reflector;
 

@@ -38,8 +38,16 @@ ISTATUS
     _Out_ float_t *outgoing_intensity
     );
 
+typedef
+ISTATUS
+(*PREFLECTOR_GET_ALBEDO_ROUTINE)(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    );
+
 typedef struct _REFLECTOR_VTABLE {
     PREFLECTOR_REFLECT_ROUTINE reflect_routine;
+    PREFLECTOR_GET_ALBEDO_ROUTINE get_albedo_routine;
     PFREE_ROUTINE free_routine;
 } REFLECTOR_VTABLE, *PREFLECTOR_VTABLE;
 

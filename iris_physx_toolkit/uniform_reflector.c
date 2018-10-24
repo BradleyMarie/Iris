@@ -21,7 +21,7 @@ Abstract:
 //
 
 typedef struct _UNIFORM_REFLECTOR {
-    float_t reflectance;
+    float_t albedo;
 } UNIFORM_REFLECTOR, *PUNIFORM_REFLECTOR;
 
 typedef const UNIFORM_REFLECTOR *PCUNIFORM_REFLECTOR;
@@ -41,7 +41,21 @@ UniformReflectorReflect(
 {
     PCUNIFORM_REFLECTOR uniform_reflector = (PCUNIFORM_REFLECTOR)context;
 
-    *outgoing_intensity = uniform_reflector->reflectance * incoming_intensity;
+    *outgoing_intensity = uniform_reflector->albedo * incoming_intensity;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+UniformReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    )
+{
+    PCUNIFORM_REFLECTOR uniform_reflector = (PCUNIFORM_REFLECTOR)context;
+
+    *albedo = uniform_reflector->albedo;
 
     return ISTATUS_SUCCESS;
 }
@@ -52,6 +66,7 @@ UniformReflectorReflect(
 
 static const REFLECTOR_VTABLE uniform_reflector_vtable = {
     UniformReflectorReflect,
+    UniformReflectorGetAlbedo,
     NULL
 };
 
@@ -61,12 +76,12 @@ static const REFLECTOR_VTABLE uniform_reflector_vtable = {
 
 ISTATUS
 UniformReflectorAllocate(
-    _In_ float_t reflectance,
+    _In_ float_t albedo,
     _Out_ PREFLECTOR *reflector
     )
 {
-    if (isless(reflectance, (float_t)0.0) ||
-        isgreater(reflectance, (float_t)1.0))
+    if (isless(albedo, (float_t)0.0) ||
+        isgreater(albedo, (float_t)1.0))
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -77,7 +92,7 @@ UniformReflectorAllocate(
     }
 
     UNIFORM_REFLECTOR uniform_reflector;
-    uniform_reflector.reflectance = reflectance;
+    uniform_reflector.albedo = albedo;
 
     ISTATUS status = ReflectorAllocate(&uniform_reflector_vtable,
                                        &uniform_reflector,

@@ -82,6 +82,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
 
 struct ReflectorContext {
     bool reflect_encountered;
+    bool get_albedo_encountered;
     bool free_encountered;
 };
 
@@ -100,6 +101,19 @@ ReflectorReflectRoutine(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+ReflectorGetAlbedoRoutine(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    )
+{
+    auto data = static_cast<ReflectorContext* const *>(context);
+    EXPECT_FALSE((*data)->get_albedo_encountered);
+    (*data)->get_albedo_encountered = true;
+    *albedo = (float_t) 1.0;
+    return ISTATUS_SUCCESS;
+}
+
 void
 ReflectorFreeRoutine(
     _In_ _Post_invalid_ void *pointer
@@ -115,9 +129,11 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
     ASSERT_TRUE(allocator != NULL);
 
     PCREFLECTOR reflector;
-    REFLECTOR_VTABLE vtable = { ReflectorReflectRoutine, ReflectorFreeRoutine };
+    REFLECTOR_VTABLE vtable = { ReflectorReflectRoutine, 
+                                ReflectorGetAlbedoRoutine,
+                                ReflectorFreeRoutine };
 
-    ReflectorContext context = { false, false };
+    ReflectorContext context = { false, false, false };
     ReflectorContext *data = &context;
     
     ISTATUS status = ReflectorAllocatorAllocate(allocator,
@@ -133,6 +149,12 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, outgoing);
     EXPECT_TRUE(context.reflect_encountered);
+
+    float_t albedo;
+    status = ReflectorGetAlbedo(reflector, &albedo);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, albedo);
+    EXPECT_TRUE(context.get_albedo_encountered);
 
     ReflectorAllocatorFree(allocator);
     EXPECT_FALSE(context.free_encountered);

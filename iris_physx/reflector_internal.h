@@ -73,4 +73,21 @@ ReflectorReflectInline(
     return status;
 }
 
+static
+inline
+ISTATUS
+ReflectorGetAlbedoInline(
+    _In_ const struct _REFLECTOR *reflector,
+    _Out_ float_t *albedo
+    )
+{
+    assert(reflector != NULL);
+    assert(albedo != NULL);
+
+    ISTATUS status = reflector->vtable->get_albedo_routine(reflector->data,
+                                                           albedo);
+
+    return status;
+}
+
 #endif // _IRIS_PHYSX_REFLECTOR_INTERNAL_

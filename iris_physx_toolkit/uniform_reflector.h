@@ -27,7 +27,7 @@ extern "C" {
 
 ISTATUS
 UniformReflectorAllocate(
-    _In_ float_t reflectance,
+    _In_ float_t albedo,
     _Out_ PREFLECTOR *reflector
     );
 

@@ -47,6 +47,12 @@ ReflectorReflect(
     _Out_ float_t *outgoing_intensity
     );
 
+ISTATUS
+ReflectorGetAlbedo(
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ float_t *albedo
+    );
+
 void
 ReflectorRetain(
     _In_opt_ PREFLECTOR reflector

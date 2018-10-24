@@ -127,6 +127,30 @@ ReflectorReflect(
     return status;
 }
 
+ISTATUS
+ReflectorGetAlbedo(
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ float_t *albedo
+    )
+{
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (albedo == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    ISTATUS status = ReflectorGetAlbedoInline(reflector, albedo);
+
+    // Should this be made into something stronger than an assertion?
+    assert((float_t)0.0 <= *albedo && *albedo <= (float_t)1.0);
+
+    return status;
+}
+
 void
 ReflectorRetain(
     _In_opt_ PREFLECTOR reflector
