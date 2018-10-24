@@ -71,13 +71,24 @@ cc_library(
     deps = [
         ":brdf",
         ":brdf_internal",
-        ":hit_tester",
+        ":integrator_vtable",
         ":spectrum_compositor_internal",
-        ":ray_tracer",
         ":ray_tracer_internal",
         ":reflector_allocator_internal",
-        ":visibility_tester",
         ":visibility_tester_internal",
+    ],
+)
+
+cc_library(
+    name = "integrator_vtable",
+    hdrs = ["integrator_vtable.h"],
+    deps = [
+        ":hit_tester",
+        ":spectrum_compositor",
+        ":ray_tracer",
+        ":reflector_allocator",
+        ":visibility_tester",
+        "//iris_advanced:iris_advanced",
     ],
 )
 
