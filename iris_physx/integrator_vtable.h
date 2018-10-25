@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    brdf_vtable.h
+    integrator_vtable.h
 
 Abstract:
 
