@@ -81,10 +81,11 @@ IntegratorAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    PINTEGRATOR result;
     void *data_allocation;
     bool success = AlignedAllocWithHeader(sizeof(INTEGRATOR),
                                           alignof(INTEGRATOR),
-                                          (void **)integrator,
+                                          (void **)&result,
                                           data_size,
                                           data_alignment,
                                           &data_allocation);
@@ -94,19 +95,12 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    (*integrator)->vtable = vtable;
-    (*integrator)->data = data_allocation;
+    result->vtable = vtable;
+    result->data = data_allocation;
 
     if (data_size != 0)
     {
         memcpy(data_allocation, data, data_size);
-    }
-
-    PINTEGRATOR result = (PINTEGRATOR)malloc(sizeof(INTEGRATOR));
-
-    if (result == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
     }
 
     success = ShapeRayTracerInitialize(&result->shape_ray_tracer);
