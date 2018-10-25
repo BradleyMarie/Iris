@@ -160,21 +160,16 @@ IrisCameraRenderPixel(
     for (;;)
     {
         float_t pixel_u, pixel_v, lens_u, lens_v;
-        status = PixelSamplerNextSample(pixel_sampler,
-                                        rng,
-                                        &pixel_u,
-                                        &pixel_v,
-                                        &lens_u,
-                                        &lens_v);
+        ISTATUS sampler_status = PixelSamplerNextSample(pixel_sampler,
+                                                        rng,
+                                                        &pixel_u,
+                                                        &pixel_v,
+                                                        &lens_u,
+                                                        &lens_v);
         
-        if (status == ISTATUS_DONE)
+        if (ISTATUS_DONE < sampler_status)
         {
-            break;
-        }
-        
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
+            return sampler_status;
         }
 
         RAY ray;
@@ -195,6 +190,11 @@ IrisCameraRenderPixel(
         if (status != ISTATUS_SUCCESS)
         {
             return status;
+        }
+
+        if (sampler_status == ISTATUS_SUCCESS)
+        {
+            break;
         }
     }
 

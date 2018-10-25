@@ -74,6 +74,8 @@ PixelSamplerPrepareSamples(
     return status;
 }
 
+_Check_return_
+_Success_(return == 0 || return == 1)
 ISTATUS
 PixelSamplerNextSample(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,

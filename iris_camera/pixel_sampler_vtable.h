@@ -34,6 +34,8 @@ ISTATUS
     );
 
 typedef
+_Check_return_
+_Success_(return == 0 || return == 1)
 ISTATUS
 (*PPIXEL_SAMPLER_NEXT_SAMPLE_ROUTINE)(
     _In_ void *context,

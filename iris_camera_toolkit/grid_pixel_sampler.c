@@ -109,7 +109,6 @@ GridPixelSamplerPrepareSamples(
             pixel_sampler->lens_samples_v;
     }
 
-
     pixel_sampler->pixel_min_u = pixel_min_u;
     pixel_sampler->pixel_min_v = pixel_min_v;
     pixel_sampler->lens_min_u = lens_min_u;
@@ -128,14 +127,16 @@ GridPixelSamplerPrepareSamples(
     pixel_sampler->pixel_index_v = 0;
     pixel_sampler->lens_index_u = 0;
     pixel_sampler->lens_index_v = 0;
-    pixel_sampler->pixel_current_u = (float_t)0.0;
-    pixel_sampler->pixel_current_v = (float_t)0.0;
-    pixel_sampler->lens_current_u = (float_t)0.0;
-    pixel_sampler->lens_current_v = (float_t)0.0;
+    pixel_sampler->pixel_current_u = pixel_min_u;
+    pixel_sampler->pixel_current_v = pixel_min_v;
+    pixel_sampler->lens_current_u = lens_min_u;
+    pixel_sampler->lens_current_v = lens_min_v;
 
     return ISTATUS_SUCCESS;
 }
 
+_Check_return_
+_Success_(return == 0 || return == 1)
 ISTATUS
 GridPixelSamplerNextSample(
     _In_ void *context,
@@ -147,44 +148,6 @@ GridPixelSamplerNextSample(
     )
 {
     PGRID_PIXEL_SAMPLER pixel_sampler = (PGRID_PIXEL_SAMPLER)context;
-
-    if (pixel_sampler->pixel_index_u == pixel_sampler->current_pixel_samples_u)
-    {
-        if (pixel_sampler->pixel_index_v == pixel_sampler->current_pixel_samples_v)
-        {
-            if (pixel_sampler->lens_index_u == pixel_sampler->current_lens_samples_u)
-            {
-                if (pixel_sampler->lens_index_v == pixel_sampler->current_lens_samples_v)
-                {
-                    return ISTATUS_DONE;
-                }
-                else
-                {
-                    pixel_sampler->lens_current_v += pixel_sampler->lens_sample_width_v;
-                    pixel_sampler->lens_index_v += 1;
-                }
-
-                pixel_sampler->lens_current_u = pixel_sampler->lens_min_u;
-                pixel_sampler->lens_index_u = 0;
-            }
-            else
-            {
-                pixel_sampler->lens_current_u += pixel_sampler->lens_sample_width_u;
-                pixel_sampler->lens_index_u += 1;
-            }
-
-            pixel_sampler->lens_current_v = pixel_sampler->lens_min_v;
-            pixel_sampler->pixel_index_v = 0;
-        }
-        else
-        {
-            pixel_sampler->pixel_current_v += pixel_sampler->pixel_sample_width_v;
-            pixel_sampler->pixel_index_v += 1;
-        }
-
-        pixel_sampler->pixel_current_u = pixel_sampler->pixel_min_u;
-        pixel_sampler->pixel_index_u = 0;
-    }
 
     float_t pixel_jitter_u, pixel_jitter_v;
     if (pixel_sampler->jitter_pixel_samples)
@@ -217,11 +180,11 @@ GridPixelSamplerNextSample(
 
     *pixel_sample_u = fma(pixel_jitter_u,
                           pixel_sampler->pixel_sample_width_u,
-                          pixel_sampler->pixel_min_u);
+                          pixel_sampler->pixel_current_u);
 
     *pixel_sample_v = fma(pixel_jitter_v,
                           pixel_sampler->pixel_sample_width_v,
-                          pixel_sampler->pixel_min_v);
+                          pixel_sampler->pixel_current_v);
 
     float_t lens_jitter_u, lens_jitter_v;
     if (pixel_sampler->jitter_pixel_samples)
@@ -254,15 +217,54 @@ GridPixelSamplerNextSample(
 
     *lens_sample_u = fma(lens_jitter_u,
                          pixel_sampler->lens_sample_width_u,
-                         pixel_sampler->lens_min_u);
+                         pixel_sampler->lens_current_u);
 
     *lens_sample_v = fma(lens_jitter_v,
                          pixel_sampler->lens_sample_width_v,
-                         pixel_sampler->lens_min_v);
+                         pixel_sampler->lens_current_v);
 
-    pixel_sampler->pixel_current_u += pixel_sampler->pixel_sample_width_u;
+    pixel_sampler->lens_index_v += 1;
 
-    return ISTATUS_SUCCESS;
+    if (pixel_sampler->lens_index_v < pixel_sampler->current_lens_samples_v)
+    {
+        pixel_sampler->lens_current_v += pixel_sampler->lens_sample_width_v;
+        return ISTATUS_SUCCESS;
+    }
+
+    pixel_sampler->lens_current_v = pixel_sampler->lens_min_v;
+    pixel_sampler->lens_index_v = 0;
+
+    pixel_sampler->lens_index_u += 1;
+
+    if (pixel_sampler->lens_index_u < pixel_sampler->current_lens_samples_u)
+    {
+        pixel_sampler->lens_current_u += pixel_sampler->lens_sample_width_u;
+        return ISTATUS_SUCCESS;
+    }
+
+    pixel_sampler->lens_current_u = pixel_sampler->lens_min_u;
+    pixel_sampler->lens_index_u = 0;
+
+    pixel_sampler->pixel_index_v += 1;
+
+    if (pixel_sampler->pixel_index_v < pixel_sampler->current_pixel_samples_v)
+    {
+        pixel_sampler->pixel_current_v += pixel_sampler->pixel_sample_width_v;
+        return ISTATUS_SUCCESS;
+    }
+
+    pixel_sampler->pixel_current_v = pixel_sampler->pixel_min_v;
+    pixel_sampler->pixel_index_v = 0;
+
+    pixel_sampler->pixel_index_u += 1;
+
+    if (pixel_sampler->pixel_index_u < pixel_sampler->current_pixel_samples_u)
+    {
+        pixel_sampler->pixel_current_u += pixel_sampler->pixel_sample_width_u;
+        return ISTATUS_SUCCESS;
+    }
+
+    return ISTATUS_DONE;
 }
 
 //
