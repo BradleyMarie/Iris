@@ -134,6 +134,24 @@ cc_library(
 )
 
 cc_library(
+    name = "light_sampler_vtable",
+    hdrs = ["light_sampler_vtable.h"],
+    deps = [
+        ":light",
+        "//iris_advanced:iris_advanced",
+    ],
+)
+
+cc_library(
+    name = "light_sampler",
+    hdrs = ["light_sampler.h"],
+    srcs = ["light_sampler.c"],
+    deps = [
+        ":light_sampler_vtable",
+    ],
+)
+
+cc_library(
     name = "light_vtable",
     hdrs = ["light_vtable.h"],
     deps = [
