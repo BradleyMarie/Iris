@@ -1,6 +1,20 @@
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "area_light",
+    hdrs = ["area_light.h"],
+    srcs = ["area_light.c"],
+    deps = [
+        ":emissive_material_internal",
+        ":light",
+        ":shape",
+        ":shape_internal",
+        ":visibility_tester_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
     name = "brdf",
     hdrs = ["brdf.h"],
     srcs = ["brdf.c"],
@@ -124,6 +138,7 @@ cc_library(
     name = "iris_physx",
     hdrs = ["iris_physx.h"],
     deps = [
+        ":area_light",
         ":brdf",
         ":brdf_allocator",
         ":emissive_material",

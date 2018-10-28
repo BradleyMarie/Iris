@@ -21,6 +21,7 @@ Abstract:
 extern "C" {
 #endif // __cplusplus
 
+#include "iris_physx/area_light.h"
 #include "iris_physx/brdf.h"
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/emissive_material.h"

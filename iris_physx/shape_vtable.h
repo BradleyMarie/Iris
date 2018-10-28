@@ -53,19 +53,26 @@ ISTATUS
 typedef
 ISTATUS
 (*PSHAPE_GET_MATERIAL_ROUTINE)(
-    _In_opt_ const void *context, 
+    _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Outptr_result_maybenull_ PCMATERIAL *material
     );
 
 typedef
 ISTATUS
+(*PSHAPE_COMPUTE_FACE_AREA_ROUTINE)(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Out_ float_t *area
+    );
+
+typedef
+ISTATUS
 (*PSHAPE_SAMPLE_FACE_ROUTINE)(
-    _In_opt_ const void *context, 
+    _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 point,
-    _Out_ float_t *pdf
+    _Out_ PPOINT3 point
     );
 
 typedef
@@ -82,6 +89,7 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_COMPUTE_NORMAL_ROUTINE compute_normal_routine;
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
     PSHAPE_SAMPLE_FACE_ROUTINE sample_face_routine;
+    PSHAPE_COMPUTE_FACE_AREA_ROUTINE compute_face_area_routine;
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
