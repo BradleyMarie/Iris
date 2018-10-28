@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_SHAPE_VTABLE_
 #define _IRIS_PHYSX_SHAPE_VTABLE_
 
+#include "iris_physx/emissive_material.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/material.h"
 
@@ -57,11 +58,31 @@ ISTATUS
     _Outptr_result_maybenull_ PCMATERIAL *material
     );
 
+typedef
+ISTATUS
+(*PSHAPE_SAMPLE_FACE_ROUTINE)(
+    _In_opt_ const void *context, 
+    _In_ uint32_t face_hit,
+    _Inout_ PRANDOM rng,
+    _Out_ PPOINT3 point,
+    _Out_ float_t *pdf
+    );
+
+typedef
+ISTATUS
+(*PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE)(
+    _In_opt_ const void *context, 
+    _In_ uint32_t face_hit,
+    _Outptr_result_maybenull_ PCEMISSIVE_MATERIAL *emissive_material
+    );
+
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE trace_routine;
     PSHAPE_CHECK_BOUNDS_ROUTINE check_bounds_routine;
     PSHAPE_COMPUTE_NORMAL_ROUTINE compute_normal_routine;
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
+    PSHAPE_SAMPLE_FACE_ROUTINE sample_face_routine;
+    PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 

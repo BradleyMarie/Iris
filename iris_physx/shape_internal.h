@@ -99,6 +99,59 @@ ShapeGetMaterial(
     return status;
 }
 
+static
+inline
+ISTATUS
+ShapeSampleFace(
+    _In_ PCSHAPE shape,
+    _In_ uint32_t face_hit,
+    _Inout_ PRANDOM rng,
+    _Out_ PPOINT3 point,
+    _Out_ float_t *pdf
+    )
+{
+    assert(shape != NULL);
+    assert(rng != NULL);
+    assert(point != NULL);
+    assert(pdf != NULL);
+
+    ISTATUS status = shape->vtable->sample_face_routine(shape->data,
+                                                        face_hit,
+                                                        rng,
+                                                        point,
+                                                        pdf);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeGetEmissiveMaterial(
+    _In_ PCSHAPE shape,
+    _In_ uint32_t face_hit,
+    _Outptr_result_maybenull_ PCEMISSIVE_MATERIAL *emissive_material
+    )
+{
+    assert(shape != NULL);
+    assert(emissive_material != NULL);
+
+    if (shape->vtable->get_emissive_material_routine == NULL)
+    {
+        *emissive_material = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status = 
+        shape->vtable->get_emissive_material_routine(shape->data,
+                                                     face_hit,
+                                                     emissive_material);
+
+    return status;
+}
+
+static
+inline
 ISTATUS
 ShapeGetLight(
     _In_ PCSHAPE shape,

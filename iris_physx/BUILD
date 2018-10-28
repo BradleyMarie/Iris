@@ -48,6 +48,34 @@ cc_library(
 )
 
 cc_library(
+    name = "emissive_material",
+    hdrs = ["emissive_material.h"],
+    srcs = ["emissive_material.c"],
+    deps = [
+        ":emissive_material_internal",
+        ":emissive_material_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "emissive_material_internal",
+    hdrs = ["emissive_material_internal.h"],
+    deps = [
+        ":emissive_material_vtable",
+    ],
+)
+
+cc_library(
+    name = "emissive_material_vtable",
+    hdrs = ["emissive_material_vtable.h"],
+    deps = [
+        ":spectrum",
+        "//iris:iris",
+    ],
+)
+
+cc_library(
     name = "hit_allocator",
     hdrs = ["hit_allocator.h"],
     deps = [
@@ -98,6 +126,7 @@ cc_library(
     deps = [
         ":brdf",
         ":brdf_allocator",
+        ":emissive_material",
         ":hit_allocator",
         ":hit_tester",
         ":integrator",
@@ -313,6 +342,7 @@ cc_library(
     name = "shape_vtable",
     hdrs = ["shape_vtable.h"],
     deps = [
+        ":emissive_material",
         ":hit_allocator",
         ":material",
     ],

@@ -23,6 +23,7 @@ extern "C" {
 
 #include "iris_physx/brdf.h"
 #include "iris_physx/brdf_allocator.h"
+#include "iris_physx/emissive_material.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/hit_tester.h"
 #include "iris_physx/integrator.h"

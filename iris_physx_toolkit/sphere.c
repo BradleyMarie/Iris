@@ -247,6 +247,8 @@ static const SHAPE_VTABLE sphere_vtable = {
     SphereCheckBounds,
     SphereComputeNormal,
     SphereGetMaterial,
+    NULL,
+    NULL,
     SphereFree
 };
 
