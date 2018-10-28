@@ -28,6 +28,16 @@ cc_library(
 )
 
 cc_library(
+    name = "path_tracer",
+    hdrs = ["path_tracer.h"],
+    srcs = ["path_tracer.c"],
+    deps = [
+        ":sample_direct_lighting",
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "point_light",
     hdrs = ["point_light.h"],
     srcs = ["point_light.c"],

@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <stdalign.h>
+#include <stdlib.h>
 
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_direct_lighting.h"
@@ -54,7 +55,6 @@ PathTracerIntegrate(
 
     float_t path_throughput = (float_t)1.0;
     bool add_light_emissions = true;
-    PCSPECTRUM result = NULL;
     RAY trace_ray = *ray;
     uint8_t bounces = 0;
 
@@ -79,7 +79,6 @@ PathTracerIntegrate(
 
         if (add_light_emissions && light != NULL)
         {
-            PCSPECTRUM spectrum0;
             status = LightComputeEmissive(light,
                                           *ray,
                                           visibility_tester,
@@ -93,13 +92,80 @@ PathTracerIntegrate(
 
             add_light_emissions = false;
         }
+        else
+        {
+            path_tracer->spectra[bounces] = NULL;
+        }
 
         if (brdf == NULL)
         {
             break;
         }
 
-        // TODO: Compute direct lighting
+        status = LightSamplerPrepareSamples(light_sampler, rng, hit_point);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        for (;;)
+        {
+            PCLIGHT light;
+            float_t pdf;
+            ISTATUS sampler_status = LightSamplerNextSample(light_sampler,
+                                                            rng,
+                                                            &light,
+                                                            &pdf);
+
+            if (ISTATUS_DONE < status)
+            {
+                return sampler_status;
+            }
+
+            PCSPECTRUM direct_lighting;
+            status = SampleDirectLighting(light,
+                                          brdf,
+                                          hit_point,
+                                          trace_ray.direction,
+                                          surface_normal,
+                                          shading_normal,
+                                          rng,
+                                          visibility_tester,
+                                          compositor,
+                                          allocator,
+                                          &direct_lighting);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                         direct_lighting,
+                                                         (float_t)1.0 / pdf,
+                                                         &direct_lighting);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            status = SpectrumCompositorAddSpectra(compositor,
+                                                  path_tracer->spectra[bounces],
+                                                  direct_lighting,
+                                                  path_tracer->spectra + bounces);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            if (sampler_status == ISTATUS_DONE)
+            {
+                break;
+            }
+        }
 
         if (bounces == path_tracer->max_bounces)
         {
@@ -130,7 +196,10 @@ PathTracerIntegrate(
             return status;
         }
 
-        path_throughput *= albedo;
+        float_t cosine_falloff = VectorDotProduct(shading_normal,
+                                                  trace_ray.direction);
+
+        path_throughput *= albedo * cosine_falloff;
 
         if (path_tracer->min_bounces < bounces)
         {
@@ -138,15 +207,15 @@ PathTracerIntegrate(
             status = RandomGenerateFloat(rng,
                                          (float_t)0.0,
                                          (float_t)1.0,
-                                         random_value);
+                                         &random_value);
 
             if (status != ISTATUS_SUCCESS)
             {
                 return status;
             }
 
-            float_t cutoff = max(path_tracer->min_termination_probability,
-                                 (float_t)1.0 - path_throughput);
+            float_t cutoff = fmax(path_tracer->min_termination_probability,
+                                  (float_t)1.0 - path_throughput);
 
             if (random_value < cutoff)
             {
@@ -158,6 +227,7 @@ PathTracerIntegrate(
 
         if (isinf(pdf))
         {
+            path_tracer->attenuations[bounces] = (float_t)1.0;
             add_light_emissions = true;
         }
         else
@@ -169,11 +239,38 @@ PathTracerIntegrate(
         bounces += 1;
     }
 
-    // TODO: Aggregate output spectrum
+    PCSPECTRUM result = NULL;
 
-    *spectrum = result;
+    for (; bounces != 0; bounces--)
+    {
+       ISTATUS status = SpectrumCompositorAddSpectra(compositor,
+                                                     result,
+                                                     path_tracer->spectra[bounces],
+                                                     &result);
 
-    return ISTATUS_SUCCESS;
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+                                                           result,
+                                                           path_tracer->reflectors[bounces - 1],
+                                                           path_tracer->attenuations[bounces - 1],
+                                                           &result);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    ISTATUS status = SpectrumCompositorAddSpectra(compositor,
+                                                  result,
+                                                  path_tracer->spectra[0],
+                                                  spectrum);
+
+    return status;
 }
 
 static
