@@ -57,7 +57,7 @@ IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
+    _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
     _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
     _Inout_opt_ void* light_sampler_context,
     _In_ PINTEGRATOR_TONE_MAP_ROUTINE tone_map_routine,

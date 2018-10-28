@@ -41,6 +41,12 @@ LightSamplerPrepareSamples(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
+    if (light_sampler->prepare_samples_routine == NULL)
+    {
+        light_sampler->prepared = true;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status = light_sampler->prepare_samples_routine(light_sampler->data,
                                                             rng,
                                                             point);
