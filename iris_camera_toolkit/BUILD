@@ -21,6 +21,15 @@ cc_library(
 )
 
 cc_library(
+    name = "pfm_writer",
+    hdrs = ["pfm_writer.h"],
+    srcs = ["pfm_writer.c"],
+    deps = [
+        "//iris_camera:iris_camera",
+    ],
+)
+
+cc_library(
     name = "pinhole_camera",
     hdrs = ["pinhole_camera.h"],
     srcs = ["pinhole_camera.c"],
