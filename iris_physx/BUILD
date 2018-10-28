@@ -114,6 +114,7 @@ cc_library(
         ":brdf",
         ":brdf_internal",
         ":integrator_vtable",
+        ":light_sampler_internal",
         ":spectrum_compositor_internal",
         ":ray_tracer_internal",
         ":reflector_allocator_internal",
@@ -126,6 +127,7 @@ cc_library(
     hdrs = ["integrator_vtable.h"],
     deps = [
         ":hit_tester",
+        ":light_sampler",
         ":spectrum_compositor",
         ":ray_tracer",
         ":reflector_allocator",
@@ -146,6 +148,7 @@ cc_library(
         ":hit_tester",
         ":integrator",
         ":light",
+        ":light_sampler",
         ":material",
         ":ray_tracer",
         ":reflector",
@@ -178,20 +181,27 @@ cc_library(
 )
 
 cc_library(
-    name = "light_sampler_vtable",
-    hdrs = ["light_sampler_vtable.h"],
-    deps = [
-        ":light",
-        "//iris_advanced:iris_advanced",
-    ],
-)
-
-cc_library(
     name = "light_sampler",
     hdrs = ["light_sampler.h"],
     srcs = ["light_sampler.c"],
     deps = [
+        ":light_sampler_internal",
+    ],
+)
+
+cc_library(
+    name = "light_sampler_internal",
+    hdrs = ["light_sampler_internal.h"],
+    deps = [
         ":light_sampler_vtable",
+    ],
+)
+
+cc_library(
+    name = "light_sampler_vtable",
+    hdrs = ["light_sampler_vtable.h"],
+    deps = [
+        ":light",
     ],
 )
 

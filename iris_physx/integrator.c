@@ -18,6 +18,7 @@ Abstract:
 #include "iris_physx/brdf_allocator_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"
+#include "iris_physx/light_sampler_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
 #include "iris_physx/reflector_allocator.h"
@@ -33,6 +34,7 @@ Abstract:
 struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE vtable;
     SHAPE_RAY_TRACER shape_ray_tracer;
+    LIGHT_SAMPLER light_sampler;
     VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
     REFLECTOR_ALLOCATOR reflector_allocator;
@@ -142,6 +144,9 @@ IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
+    _In_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
+    _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
+    _Inout_opt_ void* light_sampler_context,
     _In_ PINTEGRATOR_TONE_MAP_ROUTINE tone_map_routine,
     _Inout_opt_ void *tone_map_context,
     _In_ RAY ray,
@@ -159,41 +164,57 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (tone_map_routine == NULL)
+    if (prepare_samples_routine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (!RayValidate(ray))
+    if (next_sample_routine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    if (tone_map_routine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (!RayValidate(ray))
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
     if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_10;
     }
 
     ShapeRayTracerConfigure(&integrator->shape_ray_tracer,
                             trace_routine,
                             trace_context,
                             epsilon);
-    
+
+    LightSamplerInitialize(&integrator->light_sampler,
+                           prepare_samples_routine,
+                           next_sample_routine,
+                           light_sampler_context);
+
     VisibilityTesterConfigure(&integrator->visibility_tester,
                               trace_routine,
                               trace_context,
                               epsilon);
-    
+
     PCSPECTRUM spectrum;
     ISTATUS status = 
         integrator->vtable->integrate_routine(integrator->data,
                                               &ray,
                                               &integrator->shape_ray_tracer,
+                                              &integrator->light_sampler,
                                               &integrator->visibility_tester,
                                               &integrator->spectrum_compositor,
                                               &integrator->reflector_allocator,

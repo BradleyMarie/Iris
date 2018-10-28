@@ -30,17 +30,9 @@ typedef const LIGHT_SAMPLER *PCLIGHT_SAMPLER;
 //
 
 ISTATUS
-LightSamplerAllocate(
-    _In_ PCLIGHT_SAMPLER_VTABLE vtable,
-    _In_reads_bytes_opt_(data_size) const void *data,
-    _In_ size_t data_size,
-    _In_ size_t data_alignment,
-    _Out_ PLIGHT_SAMPLER *light_sampler
-    );
-
-ISTATUS
 LightSamplerPrepareSamples(
     _Inout_ PLIGHT_SAMPLER light_sampler,
+    _Inout_ PRANDOM rng,
     _In_ POINT3 point
     );
 
@@ -49,13 +41,9 @@ _Success_(return == 0 || return == 1)
 ISTATUS
 LightSamplerNextSample(
     _Inout_ PLIGHT_SAMPLER light_sampler,
+    _Inout_ PRANDOM rng,
     _Out_ PCLIGHT *light,
     _Out_ float_t *pdf
-    );
-
-void
-LightSamplerFree(
-    _In_opt_ _Post_invalid_ PLIGHT_SAMPLER light_sampler
     );
     
 #endif // _IRIS_PHYSX_LIGHT_SAMPLER_
