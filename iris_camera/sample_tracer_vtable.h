@@ -22,7 +22,9 @@ typedef
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
     _In_opt_ void *context,
-    _In_ PCRAY ray
+    _In_ PCRAY ray,
+    _In_ PRANDOM rng,
+    _In_ float_t epsilon
     );
 
 typedef

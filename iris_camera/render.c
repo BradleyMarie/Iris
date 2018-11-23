@@ -45,7 +45,8 @@ static
 void
 IrisCameraFreeThreadState(
     _In_ size_t num_threads,
-    _Inout_updates_(num_threads) _Post_invalid_ PRENDER_THREAD_STATE thread_state)
+    _Inout_updates_(num_threads) _Post_invalid_ PRENDER_THREAD_STATE thread_state
+    )
 {
     for (size_t i = 0; i < num_threads; i++)
     {
@@ -116,6 +117,7 @@ IrisCameraAllocateThreadState(
 static
 ISTATUS
 IrisCameraRenderPixel(
+    _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
@@ -129,6 +131,7 @@ IrisCameraRenderPixel(
     _In_ size_t pixel_row
     )
 {
+    assert(isfinite(epsilon) && (float_t)0.0 <= epsilon);
     assert(camera != NULL);
     assert(pixel_sampler != NULL);
     assert(sample_tracer != NULL);
@@ -185,7 +188,7 @@ IrisCameraRenderPixel(
             return status;
         }
 
-        status = SampleTracerTrace(sample_tracer, &ray);
+        status = SampleTracerTrace(sample_tracer, &ray, rng, epsilon);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -217,6 +220,7 @@ IrisCameraRenderPixel(
 
 ISTATUS
 IrisCameraRender(
+    _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
@@ -224,29 +228,34 @@ IrisCameraRender(
     _Inout_ PFRAMEBUFFER framebuffer
     )
 {
-    if (camera == NULL)
+    if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (pixel_sampler == NULL)
+    if (camera == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (sample_tracer == NULL)
+    if (pixel_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (rng == NULL)
+    if (sample_tracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (framebuffer == NULL)
+    if (rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     size_t num_columns, num_rows;
@@ -268,7 +277,8 @@ IrisCameraRender(
 
         for (size_t row = 0; row < num_rows; row++)
         {
-            ISTATUS status = IrisCameraRenderPixel(camera,
+            ISTATUS status = IrisCameraRenderPixel(epsilon,
+                                                   camera,
                                                    pixel_sampler,
                                                    sample_tracer,
                                                    rng,
@@ -299,6 +309,7 @@ IrisCameraRender(
 ISTATUS
 IrisCameraRenderParallel(
     _In_ size_t number_of_threads,
+    _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
     _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
@@ -311,29 +322,34 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (camera == NULL)
+    if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (pixel_sampler_generator == NULL)
+    if (camera == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (sample_tracer_generator == NULL)
+    if (pixel_sampler_generator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (rng_generator == NULL)
+    if (sample_tracer_generator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (framebuffer == NULL)
+    if (rng_generator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (framebuffer == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     PRENDER_THREAD_STATE thread_state;
@@ -377,7 +393,8 @@ IrisCameraRenderParallel(
         float_t pixel_v_min = pixel_v_max - pixel_v_width;
 
         size_t thread_num = (size_t)omp_get_thread_num();
-        status = IrisCameraRenderPixel(camera,
+        status = IrisCameraRenderPixel(epsilon,
+                                       camera,
                                        thread_state[thread_num].pixel_sampler,
                                        thread_state[thread_num].sample_tracer,
                                        thread_state[thread_num].rng,

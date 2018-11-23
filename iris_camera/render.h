@@ -28,6 +28,7 @@ Abstract:
 
 ISTATUS
 IrisCameraRender(
+    _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
@@ -38,6 +39,7 @@ IrisCameraRender(
 ISTATUS
 IrisCameraRenderParallel(
     _In_ size_t number_of_threads,
+    _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
     _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
