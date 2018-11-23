@@ -7,6 +7,16 @@ package(
 )
 
 cc_library(
+    name = "spectra",
+    hdrs = ["spectra.h"],
+    srcs = ["spectra.c"],
+    testonly = 1,
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "test_util",
     hdrs = ["test_util.h"],
     testonly = 1,
