@@ -31,12 +31,13 @@ extern "C" {
 #include "iris_physx/light.h"
 #include "iris_physx/light_sampler.h"
 #include "iris_physx/material.h"
-#include "iris_physx/shape.h"
-#include "iris_physx/spectrum.h"
-#include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/reflector.h"
 #include "iris_physx/reflector_allocator.h"
+#include "iris_physx/shape.h"
+#include "iris_physx/spectrum.h"
+#include "iris_physx/spectrum_compositor.h"
+#include "iris_physx/tone_mapper.h"
 #include "iris_physx/visibility_tester.h"
 
 #if __cplusplus 

@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_INTEGRATOR_
 
 #include "iris_physx/integrator_vtable.h"
+#include "iris_physx/tone_mapper.h"
 
 //
 // Types
@@ -27,13 +28,6 @@ ISTATUS
     _In_opt_ const void *context, 
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
     _In_ RAY ray
-    );
-
-typedef
-ISTATUS
-(*PINTEGRATOR_TONE_MAP_ROUTINE)(
-    _Inout_opt_ void *context,
-    _In_ PCSPECTRUM spectrum
     );
 
 typedef struct _INTEGRATOR INTEGRATOR, *PINTEGRATOR;
@@ -60,11 +54,10 @@ IntegratorIntegrate(
     _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
     _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
     _Inout_opt_ void* light_sampler_context,
-    _In_ PINTEGRATOR_TONE_MAP_ROUTINE tone_map_routine,
-    _Inout_opt_ void *tone_map_context,
     _In_ RAY ray,
     _In_ PRANDOM rng,
-    _In_ float_t epsilon
+    _In_ float_t epsilon,
+    _Inout_ PTONE_MAPPER tone_mapper
     );
 
 void

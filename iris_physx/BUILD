@@ -115,9 +115,11 @@ cc_library(
         ":brdf_internal",
         ":integrator_vtable",
         ":light_sampler_internal",
-        ":spectrum_compositor_internal",
         ":ray_tracer_internal",
         ":reflector_allocator_internal",
+        ":spectrum_compositor_internal",
+        ":tone_mapper",
+        ":tone_mapper_internal",
         ":visibility_tester_internal",
     ],
 )
@@ -156,6 +158,7 @@ cc_library(
         ":shape",
         ":spectrum",
         ":spectrum_compositor",
+        ":tone_mapper",
         ":visibility_tester",
         "//iris_advanced:iris_advanced",
     ],
@@ -451,6 +454,34 @@ cc_library(
         "//common:free_routine",
         "//common:sal",
         "//common:status",
+    ],
+)
+
+cc_library(
+    name = "tone_mapper",
+    hdrs = ["tone_mapper.h"],
+    srcs = ["tone_mapper.c"],
+    deps = [
+        ":tone_mapper_internal",
+        ":tone_mapper_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "tone_mapper_internal",
+    hdrs = ["tone_mapper_internal.h"],
+    deps = [
+        ":tone_mapper_vtable",
+    ],
+)
+
+cc_library(
+    name = "tone_mapper_vtable",
+    hdrs = ["tone_mapper_vtable.h"],
+    deps = [
+        ":spectrum",
+        "//iris_advanced:iris_advanced",
     ],
 )
 

@@ -25,6 +25,7 @@ Abstract:
 #include "iris_physx/reflector_allocator_internal.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/spectrum_compositor_internal.h"
+#include "iris_physx/tone_mapper_internal.h"
 #include "iris_physx/visibility_tester_internal.h"
 
 //
@@ -147,11 +148,10 @@ IntegratorIntegrate(
     _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
     _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
     _Inout_opt_ void* light_sampler_context,
-    _In_ PINTEGRATOR_TONE_MAP_ROUTINE tone_map_routine,
-    _Inout_opt_ void *tone_map_context,
     _In_ RAY ray,
     _In_ PRANDOM rng,
-    _In_ float_t epsilon
+    _In_ float_t epsilon,
+    _Inout_ PTONE_MAPPER tone_mapper
     )
 {
     if (integrator == NULL)
@@ -169,24 +169,24 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (tone_map_routine == NULL)
+    if (!RayValidate(ray))
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (!RayValidate(ray))
-    {
-        return ISTATUS_INVALID_ARGUMENT_08;
-    }
-
     if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_09;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_10;
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (tone_mapper == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     ShapeRayTracerConfigure(&integrator->shape_ray_tracer,
@@ -218,7 +218,7 @@ IntegratorIntegrate(
 
     if (status == ISTATUS_SUCCESS)
     {
-        status = tone_map_routine(tone_map_context, spectrum);
+        status = ToneMapperAddSample(tone_mapper, spectrum);
     }
 
     ShapeRayTracerClear(&integrator->shape_ray_tracer);
