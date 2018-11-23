@@ -13,7 +13,7 @@ Abstract:
 --*/
 
 extern "C" {
-#include "iris_camera/color.h"
+#include "iris_advanced/color.h"
 }
 
 #include <limits>

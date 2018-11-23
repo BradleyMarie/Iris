@@ -16,7 +16,7 @@ Abstract:
 #define _IRIS_CAMERA_SAMPLE_TRACER_VTABLE_
 
 #include "common/free_routine.h"
-#include "iris_camera/color.h"
+#include "iris_advanced/iris_advanced.h"
 
 typedef
 ISTATUS

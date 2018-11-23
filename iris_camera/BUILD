@@ -29,27 +29,10 @@ cc_library(
 )
 
 cc_library(
-    name = "color",
-    hdrs = ["color.h"],
-    deps = [
-        "//iris:iris",
-    ],
-)
-
-cc_test(
-    name = "color_test",
-    srcs = ["color_test.cc"],
-    deps = [
-        "//test:test_util",
-        "@com_google_googletest//:gtest_main"
-    ],
-)
-
-cc_library(
     name = "framebuffer_internal",
     hdrs = ["framebuffer_internal.h"],
     deps = [
-        ":color",
+        "//iris_advanced:iris_advanced",
     ],
 )
 
@@ -69,7 +52,6 @@ cc_library(
     hdrs = ["iris_camera.h"],
     deps = [
         ":camera",
-        ":color",
         ":framebuffer",
         ":pixel_sampler",
         ":random_generator",
@@ -235,7 +217,7 @@ cc_library(
     name = "sample_tracer_vtable",
     hdrs = ["sample_tracer_vtable.h"],
     deps = [
-        ":color",
+        "//iris_advanced:iris_advanced",
         "//common:free_routine",
     ],
 )

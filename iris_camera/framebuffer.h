@@ -18,7 +18,7 @@ Abstract:
 #ifndef _IRIS_CAMERA_FRAMEBUFFER_
 #define _IRIS_CAMERA_FRAMEBUFFER_
 
-#include "iris_camera/color.h"
+#include "iris_advanced/iris_advanced.h"
 
 //
 // Types

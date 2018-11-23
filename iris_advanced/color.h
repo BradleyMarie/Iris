@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_CAMERA_COLOR_
-#define _IRIS_CAMERA_COLOR_
+#ifndef _IRIS_ADVANCED_COLOR_
+#define _IRIS_ADVANCED_COLOR_
 
 #include "iris/iris.h"
 
@@ -141,4 +141,4 @@ ColorScaleByScalar(
     return ColorCreate(x, y, z);
 }
 
-#endif // _IRIS_CAMERA_COLOR_
+#endif // _IRIS_ADVANCED_COLOR_

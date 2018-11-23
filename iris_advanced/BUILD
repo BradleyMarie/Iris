@@ -8,6 +8,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "color",
+    hdrs = ["color.h"],
+    deps = [
+        "//iris:iris",
+    ],
+)
+
+cc_test(
+    name = "color_test",
+    srcs = ["color_test.cc"],
+    deps = [
+        "//test:test_util",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_test(
     name = "bounding_box_test",
     srcs = ["bounding_box_test.cc"],
@@ -23,6 +40,7 @@ cc_library(
     hdrs = ["iris_advanced.h"],
     deps = [
         ":bounding_box",
+        ":color",
         ":random",
         "//iris:iris"
     ],

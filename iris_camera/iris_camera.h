@@ -22,7 +22,6 @@ extern "C" {
 #endif // __cplusplus
 
 #include "iris_camera/camera.h"
-#include "iris_camera/color.h"
 #include "iris_camera/framebuffer.h"
 #include "iris_camera/pixel_sampler.h"
 #include "iris_camera/pixel_sampler_generator.h"

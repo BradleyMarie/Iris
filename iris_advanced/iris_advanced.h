@@ -22,6 +22,7 @@ extern "C" {
 #endif // __cplusplus
 
 #include "iris_advanced/bounding_box.h"
+#include "iris_advanced/color.h"
 #include "iris_advanced/random.h"
 
 #if __cplusplus 

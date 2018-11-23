@@ -17,7 +17,7 @@ Abstract:
 
 #include "iris/matrix.h"
 #include "iris/ray.h"
-#include "iris_camera/color.h"
+#include "iris_advanced/color.h"
 #include "googlemock/include/gmock/gmock.h"
 
 #include <cmath>
