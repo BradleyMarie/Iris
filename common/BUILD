@@ -4,6 +4,7 @@ package(
         "//iris_advanced:__pkg__",
         "//iris_camera:__pkg__",
         "//iris_physx:__pkg__",
+        "//iris_physx_toolkit:__pkg__",
         "//iris_spectrum:__pkg__"
     ],
 )
