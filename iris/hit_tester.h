@@ -71,7 +71,7 @@ ISTATUS
 //
 
 ISTATUS
-HitTesterTestWorldGeometry(
+HitTesterTestGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
@@ -88,13 +88,12 @@ HitTesterTestPremultipliedGeometry(
     );
 
 ISTATUS
-HitTesterTestGeometry(
+HitTesterTestTransformedGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
-    _In_opt_ PCMATRIX model_to_world,
-    _In_ bool premultiplied
+    _In_opt_ PCMATRIX model_to_world
     );
 
 ISTATUS

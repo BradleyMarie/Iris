@@ -169,16 +169,16 @@ TEST(HitTesterTest, HitTesterTestWorldGeometryErrors)
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
 
-    ISTATUS status = HitTesterTestWorldGeometry(nullptr,
-                                                CheckGeometryContext,
-                                                nullptr,
-                                                nullptr);
+    ISTATUS status = HitTesterTestGeometry(nullptr,
+                                           CheckGeometryContext,
+                                           nullptr,
+                                           nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = HitTesterTestWorldGeometry(&tester,
-                                        nullptr,
-                                        nullptr,
-                                        nullptr);
+    status = HitTesterTestGeometry(&tester,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
@@ -203,19 +203,19 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     params.triggered = &triggered;
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    ISTATUS status = HitTesterTestWorldGeometry(&tester,
-                                                CheckGeometryContext,
-                                                &params,
-                                                nullptr);
+    ISTATUS status = HitTesterTestGeometry(&tester,
+                                           CheckGeometryContext,
+                                           &params,
+                                           nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
-    status = HitTesterTestWorldGeometry(&tester,
-                                        CheckGeometryContext,
-                                        &params,
-                                        nullptr);
+    status = HitTesterTestGeometry(&tester,
+                                   CheckGeometryContext,
+                                   &params,
+                                   nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
     EXPECT_TRUE(triggered);
 
@@ -313,31 +313,29 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     MatrixRelease(model_to_world);
 }
 
-TEST(HitTesterTest, HitTesterTestGeometryErrors)
+TEST(HitTesterTest, HitTesterTestTransformedGeometryErrors)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
 
-    ISTATUS status = HitTesterTestGeometry(nullptr,
-                                           CheckGeometryContext,
-                                           nullptr,
-                                           nullptr,
-                                           nullptr,
-                                           true);
+    ISTATUS status = HitTesterTestTransformedGeometry(nullptr,
+                                                      CheckGeometryContext,
+                                                      nullptr,
+                                                      nullptr,
+                                                      nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = HitTesterTestGeometry(&tester,
-                                   nullptr,
-                                   nullptr,
-                                   nullptr,
-                                   nullptr,
-                                   true);
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
 }
 
-TEST(HitTesterTest, HitTesterTestGeometry)
+TEST(HitTesterTest, HitTesterTestTransformedGeometry)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
@@ -363,69 +361,22 @@ TEST(HitTesterTest, HitTesterTestGeometry)
     params.triggered = &triggered;
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   model_to_world,
-                                   true);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_TRUE(triggered);
-
-    triggered = false;
-    params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   model_to_world,
-                                   true);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
-    EXPECT_TRUE(triggered);
-
-    triggered = false;
-    params.status_to_return = ISTATUS_SUCCESS;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   nullptr,
-                                   true);
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
 
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   nullptr,
-                                   true);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
-    EXPECT_TRUE(params.triggered);
-
-    triggered = false;
-    params.status_to_return = ISTATUS_SUCCESS;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   nullptr,
-                                   false);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_TRUE(triggered);
-
-    triggered = false;
-    params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
-
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   nullptr,
-                                   false);
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
     EXPECT_TRUE(params.triggered);
 
@@ -439,23 +390,21 @@ TEST(HitTesterTest, HitTesterTestGeometry)
 
     triggered = false;
     params.status_to_return = ISTATUS_SUCCESS;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   model_to_world,
-                                   false);
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              model_to_world);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr,
-                                   model_to_world,
-                                   false);
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              model_to_world);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
     EXPECT_TRUE(triggered);
 
@@ -501,10 +450,10 @@ TEST(HitTesterTest, HitTesterSortHits)
     for (int i = 1; i <= 1000; i++)
     {
         float_t distance = (float_t)(1001 - i);
-        ISTATUS status = HitTesterTestWorldGeometry(&tester,
-                                                    AllocateHitAtDistance,
-                                                    &distance,
-                                                    &hit_data);
+        ISTATUS status = HitTesterTestGeometry(&tester,
+                                               AllocateHitAtDistance,
+                                               &distance,
+                                               &hit_data);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
     }
 
@@ -581,10 +530,10 @@ void RunWorldHitTest(
 
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestWorldGeometry(tester,
-                                                AllocateTwoHitAtDistance,
-                                                &first_distance,
-                                                &first_hit_data);
+    ISTATUS status = HitTesterTestGeometry(tester,
+                                           AllocateTwoHitAtDistance,
+                                           &first_distance,
+                                           &first_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     size_t num_hits;
@@ -593,10 +542,10 @@ void RunWorldHitTest(
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateTwoHitAtDistance,
-                                        &second_distance,
-                                        &second_hit_data);
+    status = HitTesterTestGeometry(tester,
+                                   AllocateTwoHitAtDistance,
+                                   &second_distance,
+                                   &second_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -604,10 +553,10 @@ void RunWorldHitTest(
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateTwoHitAtDistance,
-                                        &third_distance,
-                                        &third_hit_data);
+    status = HitTesterTestGeometry(tester,
+                                   AllocateTwoHitAtDistance,
+                                   &third_distance,
+                                   &third_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -615,19 +564,19 @@ void RunWorldHitTest(
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateHitAtDistance,
-                                        &fourth_distance,
-                                        &fourth_hit_data);
+    status = HitTesterTestGeometry(tester,
+                                   AllocateHitAtDistance,
+                                   &fourth_distance,
+                                   &fourth_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
     EXPECT_EQ(6u + offset, num_hits);
 
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateNoHits,
-                                        nullptr,
-                                        nullptr);
+    status = HitTesterTestGeometry(tester,
+                                   AllocateNoHits,
+                                   nullptr,
+                                   nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -877,8 +826,7 @@ TEST(HitTesterTest, HitTesterCheckPremultipliedHits)
 void RunTransformedHitTest(
     _In_ PHIT_TESTER tester,
     _In_ float_t min_distance,
-    _In_ PCMATRIX matrix,
-    _In_ bool premultiplied
+    _In_ PCMATRIX matrix
     )
 {
     PCFULL_HIT_CONTEXT *hits;
@@ -887,12 +835,11 @@ void RunTransformedHitTest(
 
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestGeometry(tester,
-                                           AllocateTwoHitAtDistance,
-                                           &first_distance,
-                                           &first_hit_data,
-                                           matrix,
-                                           premultiplied);
+    ISTATUS status = HitTesterTestTransformedGeometry(tester,
+                                                      AllocateTwoHitAtDistance,
+                                                      &first_distance,
+                                                      &first_hit_data,
+                                                      matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     size_t num_hits;
@@ -901,12 +848,11 @@ void RunTransformedHitTest(
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &second_distance,
-                                   &second_hit_data,
-                                   matrix,
-                                   premultiplied);
+    status = HitTesterTestTransformedGeometry(tester,
+                                              AllocateTwoHitAtDistance,
+                                              &second_distance,
+                                              &second_hit_data,
+                                              matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -914,12 +860,11 @@ void RunTransformedHitTest(
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &third_distance,
-                                   &third_hit_data,
-                                   matrix,
-                                   premultiplied);
+    status = HitTesterTestTransformedGeometry(tester,
+                                              AllocateTwoHitAtDistance,
+                                              &third_distance,
+                                              &third_hit_data,
+                                              matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -927,23 +872,21 @@ void RunTransformedHitTest(
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateHitAtDistance,
-                                   &fourth_distance,
-                                   &fourth_hit_data,
-                                   matrix,
-                                   premultiplied);
+    status = HitTesterTestTransformedGeometry(tester,
+                                              AllocateHitAtDistance,
+                                              &fourth_distance,
+                                              &fourth_hit_data,
+                                              matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
     EXPECT_EQ(6u + offset, num_hits);
 
-    status = HitTesterTestGeometry(tester,
-                                   AllocateNoHits,
-                                   nullptr,
-                                   nullptr,
-                                   matrix,
-                                   premultiplied);
+    status = HitTesterTestTransformedGeometry(tester,
+                                              AllocateNoHits,
+                                              nullptr,
+                                              nullptr,
+                                              matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterGetHits(tester, &hits, &num_hits);
@@ -975,41 +918,6 @@ void RunTransformedHitTest(
         // Fourth
         EXPECT_EQ(&fourth_hit_data, hits[5 + offset]->context.data);
         EXPECT_EQ(NULL, hits[5 + offset]->shared_context);
-        EXPECT_EQ(fourth_distance, hits[5 + offset]->context.distance);
-    }
-    else if (premultiplied)
-    {
-        // First
-        EXPECT_EQ(&first_hit_data, hits[0 + offset]->context.data);
-        EXPECT_TRUE(hits[0 + offset]->shared_context->premultiplied);
-        EXPECT_EQ(matrix, hits[0 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(first_distance, hits[0 + offset]->context.distance);
-
-        EXPECT_EQ(&first_hit_data, hits[1 + offset]->context.data);
-        EXPECT_TRUE(hits[1 + offset]->shared_context->premultiplied);
-        EXPECT_EQ(matrix, hits[1 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(first_distance + 1.0, hits[1 + offset]->context.distance);
-
-        // Second
-        EXPECT_EQ(&second_hit_data, hits[2 + offset]->context.data);
-        EXPECT_TRUE(hits[2 + offset]->shared_context->premultiplied);
-        EXPECT_EQ(matrix, hits[2 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(second_distance, hits[2 + offset]->context.distance);
-
-        EXPECT_EQ(&second_hit_data, hits[3 + offset]->context.data);
-        EXPECT_TRUE(hits[3 + offset]->shared_context->premultiplied);
-        EXPECT_EQ(matrix, hits[3 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(second_distance + 1.0, hits[3 + offset]->context.distance);
-
-        // Third
-        EXPECT_EQ(&third_hit_data, hits[4 + offset]->context.data);
-        EXPECT_TRUE(hits[4 + offset]->shared_context->premultiplied);
-        EXPECT_EQ(matrix, hits[4 + offset]->shared_context->model_to_world);
-        EXPECT_EQ(third_distance + 1.0, hits[4 + offset]->context.distance);
-
-        // Fourth
-        EXPECT_EQ(&fourth_hit_data, hits[5 + offset]->context.data);
-        EXPECT_TRUE(hits[5 + offset]->shared_context->premultiplied);
         EXPECT_EQ(fourth_distance, hits[5 + offset]->context.distance);
     }
     else
@@ -1082,24 +990,18 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2);
+    RunTransformedHitTest(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, 0.0);
 
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2);
+    RunTransformedHitTest(&tester, 0.0, nullptr);
     
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
@@ -1138,12 +1040,9 @@ TEST(HitTesterTest, HitTesterCheckAllHits)
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2);
+    RunTransformedHitTest(&tester, 0.0, nullptr);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world_2);
     RunPremultipliedHitTest(&tester, 0.0, nullptr);
@@ -1154,12 +1053,9 @@ TEST(HitTesterTest, HitTesterCheckAllHits)
     HitTesterGetHits(&tester, &hits, &num_hits);
     EXPECT_EQ(0u, num_hits);
 
-    RunTransformedHitTest(&tester, 0.0, model_to_world, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, true);
-    RunTransformedHitTest(&tester, 0.0, nullptr, true);
-    RunTransformedHitTest(&tester, 0.0, model_to_world, false);
-    RunTransformedHitTest(&tester, 0.0, model_to_world_2, false);
-    RunTransformedHitTest(&tester, 0.0, nullptr, false);
+    RunTransformedHitTest(&tester, 0.0, model_to_world);
+    RunTransformedHitTest(&tester, 0.0, model_to_world_2);
+    RunTransformedHitTest(&tester, 0.0, nullptr);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world);
     RunPremultipliedHitTest(&tester, 0.0, model_to_world_2);
     RunPremultipliedHitTest(&tester, 0.0, nullptr);

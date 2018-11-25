@@ -167,13 +167,26 @@ TraceSceneRoutine(
     auto geometry_data = static_cast<const GeometryDataList*>(context);
     for (const auto& entry : *geometry_data)
     {
-        ISTATUS status = HitTesterTestGeometry(hit_tester,
-                                               AllocateHitRoutine,
-                                               &entry.hit_data,
-                                               nullptr,
-                                               entry.matrix,
-                                               entry.premultiplied);
-        EXPECT_EQ(ISTATUS_SUCCESS, status);
+        if (entry.premultiplied)
+        {
+            ISTATUS status = 
+                HitTesterTestPremultipliedGeometry(hit_tester,
+                                                   AllocateHitRoutine,
+                                                   &entry.hit_data,
+                                                   nullptr,
+                                                   entry.matrix);
+            EXPECT_EQ(ISTATUS_SUCCESS, status);
+        }
+        else
+        {
+            ISTATUS status = 
+                HitTesterTestTransformedGeometry(hit_tester,
+                                                 AllocateHitRoutine,
+                                                 &entry.hit_data,
+                                                 nullptr,
+                                                 entry.matrix);
+            EXPECT_EQ(ISTATUS_SUCCESS, status);
+        }
     }
     return ISTATUS_SUCCESS;
 }

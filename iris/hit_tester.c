@@ -100,19 +100,64 @@ HitTesterTestWorldInternal(
     return ISTATUS_SUCCESS;
 }
 
-static
+//
+// Functions
+//
+
 ISTATUS
-HitTesterTestPremultipliedInternal(
+HitTesterTestGeometry(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data
+    )
+{
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (test_routine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    ISTATUS status = HitTesterTestWorldInternal(hit_tester,
+                                                test_routine,
+                                                geometry_data,
+                                                hit_data);
+    
+    return status;
+}
+
+ISTATUS
+HitTesterTestPremultipliedGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
-    _In_ PCMATRIX model_to_world
+    _In_opt_ PCMATRIX model_to_world
     )
 {
-    assert(hit_tester != NULL);
-    assert(test_routine != NULL);
-    assert(model_to_world != NULL);
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (test_routine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (model_to_world == NULL)
+    {
+        ISTATUS status = HitTesterTestWorldInternal(hit_tester,
+                                                    test_routine,
+                                                    geometry_data,
+                                                    hit_data);
+
+        return status;
+    }
 
     HitAllocatorSetRay(&hit_tester->hit_allocator, &hit_tester->world_ray);
     HitAllocatorSetData(&hit_tester->hit_allocator, hit_data);
@@ -139,7 +184,7 @@ HitTesterTestPremultipliedInternal(
                                                 model_to_world,
                                                 true,
                                                 &context);
-    
+
     if (!ok)
     {
         return ISTATUS_ALLOCATION_FAILED;
@@ -152,20 +197,35 @@ HitTesterTestPremultipliedInternal(
     return status;
 }
 
-static
 ISTATUS
-HitTesterTestTransformedInternal(
+HitTesterTestTransformedGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
-    _In_ PCMATRIX model_to_world
+    _In_opt_ PCMATRIX model_to_world
     )
 {
-    assert(hit_tester != NULL);
-    assert(test_routine != NULL);
-    assert(model_to_world != NULL);
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
 
+    if (test_routine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (model_to_world == NULL)
+    {
+        ISTATUS status = HitTesterTestWorldInternal(hit_tester,
+                                                    test_routine,
+                                                    geometry_data,
+                                                    hit_data);
+
+        return status;
+    }
+    
     RAY trace_ray = RayMatrixInverseMultiplyInline(model_to_world,
                                                    hit_tester->world_ray);
 
@@ -204,124 +264,6 @@ HitTesterTestTransformedInternal(
                                                     context,
                                                     hit);
 
-    return status;
-}
-
-//
-// Functions
-//
-
-ISTATUS
-HitTesterTestWorldGeometry(
-    _Inout_ PHIT_TESTER hit_tester,
-    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
-    _In_opt_ const void *geometry_data,
-    _In_opt_ const void *hit_data
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (test_routine == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    ISTATUS status = HitTesterTestWorldInternal(hit_tester, 
-                                                test_routine,
-                                                geometry_data,
-                                                hit_data);
-    
-    return status;
-}
-
-ISTATUS
-HitTesterTestPremultipliedGeometry(
-    _Inout_ PHIT_TESTER hit_tester,
-    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
-    _In_opt_ const void *geometry_data,
-    _In_opt_ const void *hit_data,
-    _In_opt_ PCMATRIX model_to_world
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (test_routine == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (model_to_world == NULL)
-    {
-        ISTATUS status = HitTesterTestWorldInternal(hit_tester, 
-                                                    test_routine,
-                                                    geometry_data,
-                                                    hit_data);
-        
-        return status;
-    }
-
-    ISTATUS status = HitTesterTestPremultipliedInternal(hit_tester, 
-                                                        test_routine,
-                                                        geometry_data,
-                                                        hit_data,
-                                                        model_to_world);
-    
-    return status;
-}
-
-ISTATUS
-HitTesterTestGeometry(
-    _Inout_ PHIT_TESTER hit_tester,
-    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
-    _In_opt_ const void *geometry_data,
-    _In_opt_ const void *hit_data,
-    _In_opt_ PCMATRIX model_to_world,
-    _In_ bool premultiplied
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (test_routine == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (model_to_world == NULL)
-    {
-        ISTATUS status = HitTesterTestWorldInternal(hit_tester, 
-                                                    test_routine,
-                                                    geometry_data,
-                                                    hit_data);
-        
-        return status;
-    }
-
-    if (premultiplied)
-    {
-        ISTATUS status = HitTesterTestPremultipliedInternal(hit_tester, 
-                                                            test_routine,
-                                                            geometry_data,
-                                                            hit_data,
-                                                            model_to_world);
-        
-        return status;
-    }
-    
-    ISTATUS status = HitTesterTestTransformedInternal(hit_tester, 
-                                                      test_routine,
-                                                      geometry_data,
-                                                      hit_data,
-                                                      model_to_world);
-    
     return status;
 }
 

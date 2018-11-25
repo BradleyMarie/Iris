@@ -270,7 +270,7 @@ ListSceneTraceCallback(
         PCSHAPE shape = 
             (PCSHAPE)PointerListRetrieveAtIndex(&list_scene->world_geometry, i);
 
-        ISTATUS status = ShapeHitTesterTestWorldShape(hit_tester, shape);
+        ISTATUS status = ShapeHitTesterTestShape(hit_tester, shape);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -303,10 +303,10 @@ ListSceneTraceCallback(
             PointerListRetrieveAtIndex(&list_scene->transformed_geometry, i);
         PCSHAPE_AND_TRANSFORM entry = (PCSHAPE_AND_TRANSFORM)raw_entry;
 
-        ISTATUS status = ShapeHitTesterTestShape(hit_tester,
-                                                 entry->shape,
-                                                 entry->model_to_world,
-                                                 false);
+        ISTATUS status =
+            ShapeHitTesterTestTransformedShape(hit_tester,
+                                               entry->shape,
+                                               entry->model_to_world);
 
         if (status != ISTATUS_SUCCESS)
         {
