@@ -296,7 +296,7 @@ IrisCameraRender(
             }
 
             pixel_u_min = pixel_u_max;
-            pixel_u_min += pixel_u_width;
+            pixel_u_max += pixel_u_width;
         }
         
         pixel_v_max = pixel_v_min;
