@@ -29,6 +29,8 @@ typedef const LIGHT_SAMPLER *PCLIGHT_SAMPLER;
 // Functions
 //
 
+_Check_return_
+_Success_(return == 0 || return == 1)
 ISTATUS
 LightSamplerPrepareSamples(
     _Inout_ PLIGHT_SAMPLER light_sampler,
@@ -45,5 +47,5 @@ LightSamplerNextSample(
     _Out_ PCLIGHT *light,
     _Out_ float_t *pdf
     );
-    
+
 #endif // _IRIS_PHYSX_LIGHT_SAMPLER_

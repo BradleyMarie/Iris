@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "all_light_sampler",
+    hdrs = ["all_light_sampler.h"],
+    srcs = ["all_light_sampler.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     hdrs = ["constant_material.h"],
     srcs = ["constant_material.c"],

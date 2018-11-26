@@ -94,10 +94,10 @@ LightSamplerNextSample(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    ISTATUS status =  light_sampler->next_sample_routine(light_sampler->data,
-                                                         rng,
-                                                         light,
-                                                         pdf);
+    ISTATUS status = light_sampler->next_sample_routine(light_sampler->data,
+                                                        rng,
+                                                        light,
+                                                        pdf);
 
     if (status == ISTATUS_DONE)
     {
