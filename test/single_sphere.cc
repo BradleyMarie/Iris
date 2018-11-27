@@ -166,3 +166,151 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
     MaterialRelease(material);
     ShapeRelease(shape);
 }
+
+TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf;
+    status = LambertianBrdfAllocate(reflector, &brdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = ConstantMaterialAllocate(brdf, &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = SphereAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        (float_t)0.5,
+        material,
+        material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATRIX matrix;
+    status = MatrixAllocateTranslation(
+        (float_t)0.0, (float_t)1.0, (float_t)1.0, &matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddTransformedShape(scene, shape, matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler, 
+                             "TestReflectorRedTransformedUpSphere.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector);
+    LightRelease(light);
+    BrdfRelease(brdf);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    MatrixRelease(matrix);
+}
+
+TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf;
+    status = LambertianBrdfAllocate(reflector, &brdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = ConstantMaterialAllocate(brdf, &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = SphereAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        (float_t)0.5,
+        material,
+        material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATRIX matrix;
+    status = MatrixAllocateTranslation(
+        (float_t)1.0, (float_t)0.0, (float_t)1.0, &matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddTransformedShape(scene, shape, matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler, 
+                             "TestReflectorRedTransformedRightSphere.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector);
+    LightRelease(light);
+    BrdfRelease(brdf);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    MatrixRelease(matrix);
+}

@@ -270,12 +270,12 @@ IrisCameraRender(
     float_t pixel_v_max = camera->image_max_v;
     float_t pixel_v_min = pixel_v_max - pixel_v_width;
 
-    for (size_t column = 0; column < num_columns; column++)
+    for (size_t row = 0; row < num_rows; row++)
     {
         float_t pixel_u_min = camera->image_min_u;
         float_t pixel_u_max = pixel_u_min + pixel_u_width;
 
-        for (size_t row = 0; row < num_rows; row++)
+        for (size_t column = 0; column < num_columns; column++)
         {
             ISTATUS status = IrisCameraRenderPixel(epsilon,
                                                    camera,
