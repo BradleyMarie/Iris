@@ -43,7 +43,7 @@ SphereTrace(
 {
     PCSPHERE sphere = (PCSPHERE)context;
 
-    VECTOR3 to_center = PointSubtract(ray->origin, sphere->center);
+    VECTOR3 to_center = PointSubtract(sphere->center, ray->origin);
     float_t distance_to_chord_midpoint = VectorDotProduct(to_center,
                                                           ray->direction);
 
@@ -66,9 +66,10 @@ SphereTrace(
     }
 #endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
+    float_t distance_to_chord_midpoint_squared =
+        distance_to_chord_midpoint * distance_to_chord_midpoint;
     float_t distance_from_chord_to_center_squared = 
-        distance_to_chord_midpoint * distance_to_chord_midpoint -
-        distance_to_center_squared * distance_to_center_squared;
+        distance_to_center_squared - distance_to_chord_midpoint_squared;
     
     // The ray completely misses the sphere. No intersections are possible.
     if (sphere->radius_squared < distance_from_chord_to_center_squared)

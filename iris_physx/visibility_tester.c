@@ -92,9 +92,10 @@ VisibilityTesterTest(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
+    *visible = true;
+
     if (distance_to_object <= visibility_tester->epsilon)
     {
-        *visible = true;
         return ISTATUS_SUCCESS;
     }
 
@@ -104,7 +105,6 @@ VisibilityTesterTest(
 
     if (distance_and_result.distance <= visibility_tester->epsilon)
     {
-        *visible = true;
         return ISTATUS_SUCCESS;
     }
 

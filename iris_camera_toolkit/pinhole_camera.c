@@ -50,7 +50,7 @@ PinholeCameraGenerateRay(
                                                pinhole_camera->frame_width,
                                                image_u);
 
-    frame_origin = PointVectorAddScaled(pinhole_camera->frame_corner,
+    frame_origin = PointVectorAddScaled(frame_origin,
                                         pinhole_camera->frame_height,
                                         image_v);
 
@@ -126,7 +126,7 @@ PinholeCameraAllocate(
     direction = VectorNormalize(direction, NULL, NULL);
     up = VectorNormalize(up, NULL, NULL);
 
-    VECTOR3 image_plane_u = VectorCrossProduct(direction, up);
+    VECTOR3 image_plane_u = VectorCrossProduct(up, direction);
     image_plane_u = VectorNormalize(image_plane_u, NULL, NULL);
     VECTOR3 frame_width_vector = VectorScale(image_plane_u, frame_width);
 
@@ -139,10 +139,10 @@ PinholeCameraAllocate(
                                                -focal_length);
     frame_corner = PointVectorAddScaled(frame_corner,
                                         frame_width_vector,
-                                        (float_t)0.5);
+                                        (float_t)-0.5);
     frame_corner = PointVectorAddScaled(frame_corner,
                                         frame_height_vector,
-                                        (float_t)0.5);
+                                        (float_t)-0.5);
 
     PINHOLE_CAMERA pinhole_camera;
     pinhole_camera.location = location;

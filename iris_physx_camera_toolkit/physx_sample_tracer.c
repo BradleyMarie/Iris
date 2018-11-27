@@ -74,6 +74,13 @@ PhysxSampleTracerToneMap(
     ISTATUS status = ToneMapperComputeTone(physx_sample_tracer->tone_mapper,
                                            color);
 
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ToneMapperClear(physx_sample_tracer->tone_mapper);
+
     return status;
 }
 

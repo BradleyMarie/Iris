@@ -38,7 +38,7 @@ ComputeSampleWeight(
 static
 ISTATUS
 DeltaLightLighting(
-    _In_ PCSPECTRUM light_spectrum,
+    _In_opt_ PCSPECTRUM light_spectrum,
     _In_ PCBRDF brdf,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 to_hit_point,
@@ -50,7 +50,6 @@ DeltaLightLighting(
     _Out_ PCSPECTRUM *spectrum
     )
 {
-    assert(light_spectrum != NULL);
     assert(brdf != NULL);
     assert(PointValidate(hit_point));
     assert(VectorValidate(to_hit_point));
