@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    physx_sample_tracer.h
+    sample_tracer.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_CAMERA_TOOLKIT_PHYSX_SAMPLE_TRACER_
-#define _IRIS_PHYSX_CAMERA_TOOLKIT_PHYSX_SAMPLE_TRACER_
+#ifndef _IRIS_PHYSX_TOOLKIT_SAMPLE_TRACER_
+#define _IRIS_PHYSX_TOOLKIT_SAMPLE_TRACER_
 
 #include "iris_camera/iris_camera.h"
 #include "iris_physx/iris_physx.h"
@@ -42,4 +42,4 @@ PhysxSampleTracerAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_CAMERA_TOOLKIT_PHYSX_SAMPLE_TRACER_
+#endif // _IRIS_PHYSX_TOOLKIT_SAMPLE_TRACER_

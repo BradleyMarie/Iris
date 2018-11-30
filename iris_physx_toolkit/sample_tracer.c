@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    physx_sample_tracer.c
+    sample_tracer.c
 
 Abstract:
 
@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_camera_toolkit/physx_sample_tracer.h"
+#include "iris_physx_toolkit/sample_tracer.h"
 
 //
 // Types
