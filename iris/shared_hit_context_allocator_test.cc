@@ -21,7 +21,7 @@ extern "C" {
 #include <set>
 
 #include "googletest/include/gtest/gtest.h"
-#include "test/test_util.h"
+#include "test_util/equality.h"
 
 TEST(SharedHitContextAllocatorTest, TestAllocate)
 {

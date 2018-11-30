@@ -4,20 +4,22 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    test_util.h
+    equality.h
 
 Abstract:
 
-    Utility function to aid in unit test writing.
+    Equality tests for use in unit tests.
 
 --*/
 
-#ifndef _TEST_TEST_UTIL_
-#define _TEST_TEST_UTIL_
+#ifndef _TEST_UTIL_EQUALITY_
+#define _TEST_UTIL_EQUALITY_
 
-#include "iris/matrix.h"
-#include "iris/ray.h"
-#include "iris_advanced/color.h"
+extern "C" {
+#include "iris/iris.h"
+#include "iris_advanced/iris_advanced.h"
+}
+
 #include "googlemock/include/gmock/gmock.h"
 
 #include <cmath>
@@ -146,4 +148,4 @@ MATCHER_P2(ApproximatelyEqualsMatrix, value, epsilon, "")
     return true;
 }
 
-#endif // _TEST_TEST_UTIL_
+#endif // _TEST_UTIL_EQUALITY_

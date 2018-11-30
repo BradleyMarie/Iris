@@ -27,7 +27,7 @@ Abstract:
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sphere.h"
 #include "googletest/include/gtest/gtest.h"
-#include "test/spectra.h"
+#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(

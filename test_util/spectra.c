@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "test/spectra.h"
+#include "test_util/spectra.h"
 
 //
 // Constants

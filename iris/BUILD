@@ -34,7 +34,7 @@ cc_test(
     srcs = ["hit_allocator_test.cc"],
     deps = [
         ":hit_allocator",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -79,7 +79,7 @@ cc_test(
         ":hit_tester",
         ":hit_tester_internal",
         ":multiply",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -131,7 +131,7 @@ cc_test(
     srcs = ["matrix_test.cc"],
     deps = [
         ":matrix",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -162,7 +162,7 @@ cc_test(
     deps = [
         ":matrix",
         ":multiply_internal",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -172,7 +172,7 @@ cc_test(
     srcs = ["multiply_test.cc"],
     deps = [
         ":multiply",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -190,7 +190,7 @@ cc_test(
     srcs = ["point_test.cc"],
     deps = [
         ":point",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -209,7 +209,7 @@ cc_test(
     srcs = ["ray_test.cc"],
     deps = [
         ":ray",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -233,7 +233,7 @@ cc_test(
     deps = [
         ":multiply",
         ":ray_tracer",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -261,7 +261,7 @@ cc_test(
     srcs = ["shared_hit_context_allocator_test.cc"],
     deps = [
         ":shared_hit_context_allocator",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -279,7 +279,7 @@ cc_test(
     srcs = ["vector_test.cc"],
     deps = [
         ":vector",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )

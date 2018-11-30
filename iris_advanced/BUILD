@@ -20,7 +20,7 @@ cc_test(
     name = "color_test",
     srcs = ["color_test.cc"],
     deps = [
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
@@ -30,7 +30,7 @@ cc_test(
     srcs = ["bounding_box_test.cc"],
     deps = [
         ":bounding_box",
-        "//test:test_util",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
 )
