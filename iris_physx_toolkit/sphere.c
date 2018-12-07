@@ -277,6 +277,11 @@ SphereAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
     SPHERE sphere;
     sphere.center = center;
     sphere.radius_squared = radius * radius;
