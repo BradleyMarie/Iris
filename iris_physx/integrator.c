@@ -21,8 +21,6 @@ Abstract:
 #include "iris_physx/light_sampler_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
-#include "iris_physx/reflector_allocator.h"
-#include "iris_physx/reflector_allocator_internal.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/spectrum_compositor_internal.h"
 #include "iris_physx/tone_mapper_internal.h"
@@ -38,7 +36,6 @@ struct _INTEGRATOR {
     LIGHT_SAMPLER light_sampler;
     VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
-    REFLECTOR_ALLOCATOR reflector_allocator;
     void *data;
 };
 
@@ -133,8 +130,6 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    ReflectorAllocatorInitialize(&result->reflector_allocator);
-
     *integrator = result;
 
     return ISTATUS_SUCCESS;
@@ -204,6 +199,9 @@ IntegratorIntegrate(
                               trace_context,
                               epsilon);
 
+    PREFLECTOR_ALLOCATOR reflector_allocator =
+        ShapeRayTracerGetReflectorAllocator(&integrator->shape_ray_tracer);
+
     PCSPECTRUM spectrum;
     ISTATUS status = 
         integrator->vtable->integrate_routine(integrator->data,
@@ -212,7 +210,7 @@ IntegratorIntegrate(
                                               &integrator->light_sampler,
                                               &integrator->visibility_tester,
                                               &integrator->spectrum_compositor,
-                                              &integrator->reflector_allocator,
+                                              reflector_allocator,
                                               rng,
                                               &spectrum);
 
@@ -223,7 +221,6 @@ IntegratorIntegrate(
 
     ShapeRayTracerClear(&integrator->shape_ray_tracer);
     SpectrumCompositorClear(&integrator->spectrum_compositor);
-    ReflectorAllocatorClear(&integrator->reflector_allocator);
     
     return status;
 }
@@ -241,7 +238,6 @@ IntegratorFree(
     ShapeRayTracerDestroy(&integrator->shape_ray_tracer);
     VisibilityTesterDestroy(&integrator->visibility_tester);
     SpectrumCompositorDestroy(&integrator->spectrum_compositor);
-    ReflectorAllocatorDestroy(&integrator->reflector_allocator);
 
     if (integrator->vtable->free_routine != NULL)
     {

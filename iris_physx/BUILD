@@ -116,7 +116,6 @@ cc_library(
         ":integrator_vtable",
         ":light_sampler_internal",
         ":ray_tracer_internal",
-        ":reflector_allocator_internal",
         ":spectrum_compositor_internal",
         ":tone_mapper",
         ":tone_mapper_internal",
@@ -242,6 +241,7 @@ cc_library(
     hdrs = ["material_vtable.h"],
     deps = [
         ":brdf_allocator",
+        ":reflector_allocator",
     ],
 )
 
@@ -264,6 +264,8 @@ cc_library(
     hdrs = ["ray_tracer_internal.h"],
     deps = [
         ":brdf_allocator",
+        ":reflector_allocator_internal",
+        ":reflector_allocator",
         ":light",
     ],
 )

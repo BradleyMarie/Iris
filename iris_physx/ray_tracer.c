@@ -111,6 +111,7 @@ ShapeRayTracerProcessHit(
                             process_context->surface_normal,
                             hit_context->additional_data,
                             &process_context->shape_ray_tracer->brdf_allocator,
+                            &process_context->shape_ray_tracer->reflector_allocator,
                             &process_context->shading_normal,
                             &process_context->brdf);
 
