@@ -30,12 +30,12 @@ extern "C" {
 ISTATUS
 AttenuatedReflector3AllocateWithAllocator(
     _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
-    _In_ float_t attenuation0,
     _In_opt_ PREFLECTOR reflector0,
-    _In_ float_t attenuation1,
+    _In_ float_t attenuation0,
     _In_opt_ PREFLECTOR reflector1,
-    _In_ float_t attenuation2,
+    _In_ float_t attenuation1,
     _In_opt_ PREFLECTOR reflector2,
+    _In_ float_t attenuation2,
     _Out_ PCREFLECTOR *reflector
     );
 

@@ -46,6 +46,7 @@ cc_test(
         "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
+        "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:lambertian_brdf",
         "//iris_physx_toolkit:list_scene",

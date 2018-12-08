@@ -105,7 +105,7 @@ TriangleTraceXYDominant(
         return ISTATUS_SUCCESS;
     }
 
-    additional_data.barycentric_coordinates[1] = (float_t)1.0 - coordinate_sum;
+    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
 
     ISTATUS status;
     if (dp < (float_t)0.0)
@@ -201,7 +201,7 @@ TriangleTraceXZDominant(
         return ISTATUS_SUCCESS;
     }
 
-    additional_data.barycentric_coordinates[1] = (float_t)1.0 - coordinate_sum;
+    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
 
     ISTATUS status;
     if (dp < (float_t)0.0)
@@ -297,7 +297,7 @@ TriangleTraceYZDominant(
         return ISTATUS_SUCCESS;
     }
 
-    additional_data.barycentric_coordinates[1] = (float_t)1.0 - coordinate_sum;
+    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
 
     ISTATUS status;
     if (dp < (float_t)0.0)

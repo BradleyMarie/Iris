@@ -153,12 +153,12 @@ static const REFLECTOR_VTABLE attenuated_reflector3_vtable = {
 ISTATUS
 AttenuatedReflector3AllocateWithAllocator(
     _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
-    _In_ float_t attenuation0,
     _In_opt_ PREFLECTOR reflector0,
-    _In_ float_t attenuation1,
+    _In_ float_t attenuation0,
     _In_opt_ PREFLECTOR reflector1,
-    _In_ float_t attenuation2,
+    _In_ float_t attenuation1,
     _In_opt_ PREFLECTOR reflector2,
+    _In_ float_t attenuation2,
     _Out_ PCREFLECTOR *reflector
     )
 {
@@ -170,24 +170,24 @@ AttenuatedReflector3AllocateWithAllocator(
     if (isless(attenuation0, (float_t)0.0) ||
         isgreater(attenuation0, (float_t)1.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (isless(attenuation1, (float_t)0.0) ||
         isgreater(attenuation1, (float_t)1.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (isless(attenuation2, (float_t)0.0) ||
         isgreater(attenuation2, (float_t)1.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     if (reflector == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     float_t attenuation_sum = attenuation0 + attenuation1 + attenuation2;
