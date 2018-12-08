@@ -151,7 +151,7 @@ static const REFLECTOR_VTABLE attenuated_reflector3_vtable = {
 //
 
 ISTATUS
-AttenuatedReflector3Allocate(
+AttenuatedReflector3AllocateWithAllocator(
     _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
     _In_ float_t attenuation0,
     _In_opt_ PREFLECTOR reflector0,

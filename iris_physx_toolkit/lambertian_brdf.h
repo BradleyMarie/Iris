@@ -31,6 +31,13 @@ LambertianBrdfAllocate(
     _Out_ PBRDF *brdf
     );
 
+ISTATUS
+LambertianBrdfAllocateWithAllocator(
+    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCBRDF *brdf
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus

@@ -257,3 +257,38 @@ LambertianBrdfAllocate(
 
     return ISTATUS_SUCCESS;
 }
+
+ISTATUS
+LambertianBrdfAllocateWithAllocator(
+    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCBRDF *brdf
+    )
+{
+    if (brdf_allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (brdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    LAMBERTIAN_BRDF lambertian_brdf;
+    lambertian_brdf.reflector = (PREFLECTOR)reflector;
+
+    ISTATUS status = BrdfAllocatorAllocate(brdf_allocator,
+                                           &lambertian_brdf_vtable,
+                                           &lambertian_brdf,
+                                           sizeof(LAMBERTIAN_BRDF),
+                                           alignof(LAMBERTIAN_BRDF),
+                                           brdf);
+
+    return status;   
+}
