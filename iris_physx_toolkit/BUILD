@@ -10,6 +10,15 @@ cc_library(
 )
 
 cc_library(
+    name = "attenuated_reflector",
+    hdrs = ["attenuated_reflector.h"],
+    srcs = ["attenuated_reflector.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     hdrs = ["constant_material.h"],
     srcs = ["constant_material.c"],
