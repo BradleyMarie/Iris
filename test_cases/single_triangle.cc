@@ -20,10 +20,10 @@ Abstract:
 #include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
+#include "iris_physx_toolkit/directional_light.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
-#include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle.h"
 #include "googletest/include/gtest/gtest.h"
@@ -274,8 +274,8 @@ TEST(SingleTriangleTest, TestXYTriangle)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
-    status = PointLightAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
         spectrum,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
