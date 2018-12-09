@@ -43,8 +43,8 @@ cc_test(
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:orthographic_camera",
         "//iris_camera_toolkit:pfm_writer",
-        "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:constant_material",

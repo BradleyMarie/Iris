@@ -16,8 +16,8 @@ Abstract:
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
+#include "iris_camera_toolkit/orthographic_camera.h"
 #include "iris_camera_toolkit/pfm_writer.h"
-#include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
@@ -167,11 +167,10 @@ TestRenderSingleThreaded(
     )
 {
     PCAMERA camera;
-    ISTATUS status = PinholeCameraAllocate(
+    ISTATUS status = OrthographicCameraAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        (float_t)1.0,
         (float_t)2.0,
         (float_t)2.0,
         &camera);

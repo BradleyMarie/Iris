@@ -10,6 +10,15 @@ cc_library(
 )
 
 cc_library(
+    name = "orthographic_camera",
+    hdrs = ["orthographic_camera.h"],
+    srcs = ["orthographic_camera.c"],
+    deps = [
+        "//iris_camera:iris_camera",
+    ],
+)
+
+cc_library(
     name = "pcg_random_generator",
     hdrs = ["pcg_random_generator.h"],
     srcs = ["pcg_random_generator.c"],
