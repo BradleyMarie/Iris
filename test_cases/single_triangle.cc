@@ -221,7 +221,7 @@ TestRenderSingleThreaded(
     FramebufferFree(framebuffer);
 }
 
-TEST(SingleTriangleTest, TestXYTriangle)
+TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -301,7 +301,7 @@ TEST(SingleTriangleTest, TestXYTriangle)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
                              "test_results/single_triangle_xy_triangle.pfm");
 
     ListSceneFree(scene);
@@ -316,7 +316,7 @@ TEST(SingleTriangleTest, TestXYTriangle)
     CameraFree(camera);
 }
 
-TEST(SingleTriangleTest, TestXYTriangleBlank)
+TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -396,7 +396,7 @@ TEST(SingleTriangleTest, TestXYTriangleBlank)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
                              "test_results/blank.pfm");
 
     ListSceneFree(scene);
@@ -411,7 +411,197 @@ TEST(SingleTriangleTest, TestXYTriangleBlank)
     CameraFree(camera);
 }
 
-TEST(SingleTriangleTest, TestXZTriangle)
+TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        NULL,
+        material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_triangle_xy_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        material,
+        NULL,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -491,7 +681,7 @@ TEST(SingleTriangleTest, TestXZTriangle)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
                              "test_results/single_triangle_xz_triangle.pfm");
 
     ListSceneFree(scene);
@@ -506,7 +696,7 @@ TEST(SingleTriangleTest, TestXZTriangle)
     CameraFree(camera);
 }
 
-TEST(SingleTriangleTest, TestXZTriangleBlank)
+TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -586,7 +776,7 @@ TEST(SingleTriangleTest, TestXZTriangleBlank)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
                              "test_results/blank.pfm");
 
     ListSceneFree(scene);
@@ -601,7 +791,197 @@ TEST(SingleTriangleTest, TestXZTriangleBlank)
     CameraFree(camera);
 }
 
-TEST(SingleTriangleTest, TestYZTriangle)
+TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        NULL,
+        material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_triangle_xz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        material,
+        NULL,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -681,7 +1061,7 @@ TEST(SingleTriangleTest, TestYZTriangle)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
                              "test_results/single_triangle_yz_triangle.pfm");
 
     ListSceneFree(scene);
@@ -696,7 +1076,7 @@ TEST(SingleTriangleTest, TestYZTriangle)
     CameraFree(camera);
 }
 
-TEST(SingleTriangleTest, TestYZTriangleBlank)
+TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -776,7 +1156,197 @@ TEST(SingleTriangleTest, TestYZTriangleBlank)
 
     TestRenderSingleThreaded(camera,
                              scene,
-                             light_sampler, 
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        NULL,
+        material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_triangle_yz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    ReflectorRelease(reflector2);
+    LightRelease(light);
+    MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector2;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    status = TriangleMaterialAllocate(reflector0,
+                                      reflector1,
+                                      reflector2,
+                                      &material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = DirectionalLightAllocate(
+        VectorCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = TriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        material,
+        NULL,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
                              "test_results/blank.pfm");
 
     ListSceneFree(scene);
