@@ -77,7 +77,7 @@ TEST(EmptyPhysx, ListScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
-    status = FramebufferAllocate(500, 500, &framebuffer);
+    status = FramebufferAllocate(501, 501, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRender(
