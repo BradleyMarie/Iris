@@ -17,7 +17,6 @@ Abstract:
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
 #include "iris_camera_toolkit/orthographic_camera.h"
-#include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/directional_light.h"
@@ -27,6 +26,7 @@ Abstract:
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle.h"
 #include "googletest/include/gtest/gtest.h"
+#include "test_util/pfm.h"
 #include "test_util/spectra.h"
 
 //
@@ -207,10 +207,13 @@ TestRenderSingleThreaded(
         (float_t)0.001, camera, pixel_sampler, sample_tracer, rng, framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = WriteToPfmFile(framebuffer,
-                            file_name.c_str(),
-                            PFM_PIXEL_FORMAT_XYZ);
-    EXPECT_EQ(status, ISTATUS_SUCCESS);
+    bool equals;
+    status = ExactlyEqualsPfmFile(framebuffer,
+                                  file_name.c_str(),
+                                  PFM_PIXEL_FORMAT_XYZ,
+                                  &equals);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    EXPECT_TRUE(equals);
 
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
@@ -299,7 +302,7 @@ TEST(SingleTriangleTest, TestXYTriangle)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestXYTriangle.pfm");
+                             "test_results/single_triangle_xy_triangle.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -394,7 +397,7 @@ TEST(SingleTriangleTest, TestXYTriangleBlank)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestXYTriangleBlank.pfm");
+                             "test_results/blank.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -489,7 +492,7 @@ TEST(SingleTriangleTest, TestXZTriangle)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestXZTriangle.pfm");
+                             "test_results/single_triangle_xz_triangle.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -584,7 +587,7 @@ TEST(SingleTriangleTest, TestXZTriangleBlank)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestXZTriangleBlank.pfm");
+                             "test_results/blank.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -679,7 +682,7 @@ TEST(SingleTriangleTest, TestYZTriangle)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestYZTriangle.pfm");
+                             "test_results/single_triangle_yz_triangle.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -774,7 +777,7 @@ TEST(SingleTriangleTest, TestYZTriangleBlank)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler, 
-                             "TestYZTriangleBlank.pfm");
+                             "test_results/blank.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);

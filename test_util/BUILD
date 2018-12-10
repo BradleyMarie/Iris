@@ -19,6 +19,17 @@ cc_library(
 )
 
 cc_library(
+    name = "pfm",
+    hdrs = ["pfm.h"],
+    srcs = ["pfm.c"],
+    testonly = 1,
+    deps = [
+        "//iris_camera:iris_camera",
+        "//iris_camera_toolkit:pfm_writer",
+    ],
+)
+
+cc_library(
     name = "spectra",
     hdrs = ["spectra.h"],
     srcs = ["spectra.c"],

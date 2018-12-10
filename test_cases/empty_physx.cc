@@ -20,6 +20,7 @@ Abstract:
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "googletest/include/gtest/gtest.h"
+#include "test_util/pfm.h"
 #include "test_util/spectra.h"
 
 TEST(EmptyPhysx, ListScene)
@@ -83,18 +84,13 @@ TEST(EmptyPhysx, ListScene)
         (float_t)0.0, camera, pixel_sampler, sample_tracer, rng, framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    for (size_t i = 0; i < 500; i++)
-    {
-        for (size_t j = 0; j < 500; j++)
-        {
-            COLOR3 pixel;
-            status = FramebufferGetPixel(framebuffer, i, j, &pixel);
-            ASSERT_EQ(status, ISTATUS_SUCCESS);
-            EXPECT_EQ((float_t)0.0, pixel.x);
-            EXPECT_EQ((float_t)0.0, pixel.y);
-            EXPECT_EQ((float_t)0.0, pixel.z);
-        }
-    }
+    bool equals;
+    status = ExactlyEqualsPfmFile(framebuffer,
+                                  "test_results/blank.pfm",
+                                  PFM_PIXEL_FORMAT_XYZ,
+                                  &equals);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    EXPECT_TRUE(equals);
 
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
