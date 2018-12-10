@@ -53,6 +53,12 @@ TriangleTraceXYDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
+
+    if (dp == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
@@ -110,27 +116,31 @@ TriangleTraceXYDominant(
     ISTATUS status;
     if (dp < (float_t)0.0)
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_FRONT_FACE,
-                                           TRIANGLE_BACK_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  TRIANGLE_BACK_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
     else
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_BACK_FACE,
-                                           TRIANGLE_FRONT_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_BACK_FACE,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
 
     return status;
@@ -149,6 +159,12 @@ TriangleTraceXZDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
+
+    if (dp == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
@@ -206,27 +222,31 @@ TriangleTraceXZDominant(
     ISTATUS status;
     if (dp < (float_t)0.0)
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_FRONT_FACE,
-                                           TRIANGLE_BACK_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  TRIANGLE_BACK_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
     else
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_BACK_FACE,
-                                           TRIANGLE_FRONT_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_BACK_FACE,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
 
     return status;
@@ -245,6 +265,12 @@ TriangleTraceYZDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
+
+    if (dp == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
@@ -302,27 +328,31 @@ TriangleTraceYZDominant(
     ISTATUS status;
     if (dp < (float_t)0.0)
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_FRONT_FACE,
-                                           TRIANGLE_BACK_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  TRIANGLE_BACK_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
     else
     {
-        status = ShapeHitAllocatorAllocate(allocator,
-                                           NULL,
-                                           distance_to_plane,
-                                           TRIANGLE_BACK_FACE,
-                                           TRIANGLE_FRONT_FACE,
-                                           &additional_data,
-                                           sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                           alignof(TRIANGLE_ADDITIONAL_DATA),
-                                           hit);
+        status =
+            ShapeHitAllocatorAllocateWithHitPoint(allocator,
+                                                  NULL,
+                                                  distance_to_plane,
+                                                  TRIANGLE_BACK_FACE,
+                                                  TRIANGLE_FRONT_FACE,
+                                                  &additional_data,
+                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                                  plane_intersection,
+                                                  hit);
     }
 
     return status;
@@ -493,7 +523,7 @@ TriangleAllocate(
     
     float_t surface_normal_length;
     triangle.surface_normal = 
-        VectorCrossProduct(triangle.v0_to_v2, triangle.v0_to_v1);
+        VectorCrossProduct(triangle.v0_to_v1, triangle.v0_to_v2);
     triangle.surface_normal = 
         VectorNormalize(triangle.surface_normal, NULL, &surface_normal_length);
 
