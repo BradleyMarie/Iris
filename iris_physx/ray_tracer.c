@@ -12,6 +12,7 @@ Abstract:
 
 --*/
 
+#include "iris_physx/emissive_material_internal.h"
 #include "iris_physx/material_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
@@ -24,7 +25,7 @@ Abstract:
 
 typedef struct _SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT {
     PSHAPE_RAY_TRACER shape_ray_tracer;
-    PCLIGHT light;
+    PCSPECTRUM light;
     PCBRDF brdf;
     POINT3 hit_point;
     VECTOR3 surface_normal;
@@ -49,19 +50,40 @@ ShapeRayTracerProcessHit(
 
     PSHAPE shape = (PSHAPE)hit_context->data;
 
-    ISTATUS status = ShapeGetLight(shape,
-                                   hit_context->front_face,
-                                   &process_context->light);
-
-    if (status != ISTATUS_SUCCESS)
+    if (shape->vtable->get_emissive_material_routine != NULL ||
+        shape->vtable->compute_face_area_routine != NULL ||
+        shape->vtable->sample_face_routine != NULL)
     {
-        return status;
+        PCEMISSIVE_MATERIAL emissive_material;
+        ISTATUS status = ShapeGetEmissiveMaterial(shape,
+                                                  hit_context->front_face,
+                                                  &emissive_material);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (emissive_material != NULL)
+        {
+            status = EmissiveMaterialSample(emissive_material,
+                                            model_hit_point,
+                                            hit_context->additional_data,
+                                            &process_context->light);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+        }
     }
 
     process_context->hit_point = world_hit_point;
 
     PCMATERIAL material;
-    status = ShapeGetMaterial(shape, hit_context->front_face, &material);
+    ISTATUS status = ShapeGetMaterial(shape,
+                                      hit_context->front_face,
+                                      &material);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -126,7 +148,7 @@ ISTATUS
 ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
     _In_ RAY ray,
-    _Outptr_result_maybenull_ PCLIGHT *light,
+    _Outptr_result_maybenull_ PCSPECTRUM *light,
     _Outptr_result_maybenull_ PCBRDF *brdf,
     _Out_ PPOINT3 hit_point,
     _Out_ PVECTOR3 surface_normal,

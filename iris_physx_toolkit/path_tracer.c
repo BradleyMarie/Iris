@@ -63,10 +63,10 @@ PathTracerIntegrate(
         VECTOR3 surface_normal, shading_normal;
         POINT3 hit_point;
         PCBRDF brdf;
-        PCLIGHT light;
+        PCSPECTRUM emitted_light;
         ISTATUS status = ShapeRayTracerTrace(ray_tracer,
                                              trace_ray,
-                                             &light,
+                                             &emitted_light,
                                              &brdf,
                                              &hit_point,
                                              &surface_normal,
@@ -77,19 +77,9 @@ PathTracerIntegrate(
             return status;
         }
 
-        if (add_light_emissions && light != NULL)
+        if (add_light_emissions)
         {
-            status = LightComputeEmissive(light,
-                                          *ray,
-                                          visibility_tester,
-                                          compositor,
-                                          path_tracer->spectra + bounces);
-
-            if (status != ISTATUS_SUCCESS)
-            {
-                return status;
-            }
-
+            path_tracer->spectra[bounces] = emitted_light;
             add_light_emissions = false;
         }
         else

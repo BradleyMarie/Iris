@@ -8,8 +8,8 @@ Module Name:
 
 Abstract:
 
-    Traces through a set of geometry and returns back the light and the brdf
-    associated with the nearest intersection.
+    Traces through a set of geometry and returns back the emitted light and the
+    brdf associated with the nearest intersection.
     
     If there is no intersection, light and brdf will be set to NULL and 
     the contents of hit_point, surface_normal, and shading_normal are undefined.
@@ -40,7 +40,7 @@ ISTATUS
 ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
     _In_ RAY ray,
-    _Outptr_result_maybenull_ PCLIGHT *light,
+    _Outptr_result_maybenull_ PCSPECTRUM *light,
     _Outptr_result_maybenull_ PCBRDF *brdf,
     _Out_ PPOINT3 hit_point,
     _Out_ PVECTOR3 surface_normal,

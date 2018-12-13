@@ -164,45 +164,4 @@ ShapeGetEmissiveMaterial(
     return status;
 }
 
-static
-inline
-ISTATUS
-ShapeGetLight(
-    _In_ PCSHAPE shape,
-    _In_ uint32_t face_hit,
-    _Outptr_result_maybenull_ PCLIGHT *light
-    )
-{
-    assert(shape != NULL);
-    assert(light != NULL);
-
-    if (shape->vtable->get_emissive_material_routine == NULL ||
-        shape->vtable->compute_face_area_routine == NULL ||
-        shape->vtable->sample_face_routine == NULL)
-    {
-        *light = NULL;
-        return ISTATUS_SUCCESS; 
-    }
-
-    PCEMISSIVE_MATERIAL emissive_material;
-    ISTATUS status = ShapeGetEmissiveMaterial(shape,
-                                              face_hit,
-                                              &emissive_material);
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (emissive_material == NULL)
-    {
-        *light = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    // TODO: Allocate an area light using a light allocator.
- 
-    assert(false);
-    return ISTATUS_ALLOCATION_FAILED;
-}
-
 #endif // _IRIS_PHYSX_SHAPE_INTERNAL_
