@@ -43,7 +43,7 @@ ConstantMaterialSample(
     _Out_ PCBRDF *brdf
     )
 {
-    PCONSTANT_MATERIAL constant_material = (PCONSTANT_MATERIAL)context;
+    PCCONSTANT_MATERIAL constant_material = (PCCONSTANT_MATERIAL)context;
 
     *world_shading_normal = world_surface_normal;
     *brdf = constant_material->brdf;

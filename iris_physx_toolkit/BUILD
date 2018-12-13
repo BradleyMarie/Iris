@@ -19,6 +19,15 @@ cc_library(
 )
 
 cc_library(
+    name = "constant_emissive_material",
+    hdrs = ["constant_emissive_material.h"],
+    srcs = ["constant_emissive_material.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     hdrs = ["constant_material.h"],
     srcs = ["constant_material.c"],
