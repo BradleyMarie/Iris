@@ -27,8 +27,12 @@ IsLittleEndian(
     void
     )
 {
-    uint8_t byte_array[] = { 255, 0 };
-    return *((uint16_t*)byte_array) == 255;
+    union {
+        uint16_t value;
+        char bytes[2];
+    } value = { 0x0001 };
+
+    return value.bytes[0] == 1;
 }
 
 static
