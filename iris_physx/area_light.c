@@ -55,8 +55,8 @@ VisibilityTesterProcessHitAreaLight(
     PAREA_LIGHT_AND_RESULT area_light_and_result = 
         (PAREA_LIGHT_AND_RESULT)context;
 
-    if (area_light_and_result->area_light->shape == (PSHAPE)hit_context->data ||
-        area_light_and_result->area_light->model_to_world == model_to_world ||
+    if (area_light_and_result->area_light->shape == (PSHAPE)hit_context->data &&
+        area_light_and_result->area_light->model_to_world == model_to_world &&
         area_light_and_result->area_light->face == hit_context->front_face)
     {
         ISTATUS status = 
@@ -66,7 +66,7 @@ VisibilityTesterProcessHitAreaLight(
                                    area_light_and_result->result);
         return status;
     }
-    
+
     return ISTATUS_SUCCESS;
 }
 
