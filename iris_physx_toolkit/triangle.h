@@ -52,6 +52,18 @@ TriangleAllocate(
     _Out_ PSHAPE *shape
     );
 
+ISTATUS
+EmissiveTriangleAllocate(
+    _In_ POINT3 v0,
+    _In_ POINT3 v1,
+    _In_ POINT3 v2,
+    _In_opt_ PMATERIAL front_material,
+    _In_opt_ PMATERIAL back_material,
+    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
+    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
+    _Out_ PSHAPE *shape
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus

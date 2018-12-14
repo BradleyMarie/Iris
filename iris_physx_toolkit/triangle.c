@@ -36,8 +36,15 @@ typedef struct _TRIANGLE {
 
 typedef const TRIANGLE *PCTRIANGLE;
 
+typedef struct _EMISSIVE_TRIANGLE {
+    TRIANGLE triangle;
+    PEMISSIVE_MATERIAL emissive_materials[2];
+} EMISSIVE_TRIANGLE, *PEMISSIVE_TRIANGLE;
+
+typedef const EMISSIVE_TRIANGLE *PCEMISSIVE_TRIANGLE;
+
 //
-// Static Functions
+// Static Triangle Functions
 //
 
 static
@@ -443,6 +450,137 @@ TriangleFree(
     MaterialRelease(triangle->materials[1]);
 }
 
+static
+ISTATUS
+TriangleInitialize(
+    _In_ POINT3 v0,
+    _In_ POINT3 v1,
+    _In_ POINT3 v2,
+    _In_opt_ PMATERIAL front_material,
+    _In_opt_ PMATERIAL back_material,
+    _Out_ PTRIANGLE triangle
+    )
+{
+    assert(PointValidate(v0));
+    assert(PointValidate(v1));
+    assert(PointValidate(v2));
+    assert(triangle != NULL);
+
+    triangle->v0 = v0;
+    triangle->v0_to_v1 = PointSubtract(v1, v0);
+    triangle->v0_to_v2 = PointSubtract(v2, v0);
+    triangle->materials[0] = front_material;
+    triangle->materials[1] = back_material;
+
+    float_t surface_normal_length;
+    triangle->surface_normal =
+        VectorCrossProduct(triangle->v0_to_v1, triangle->v0_to_v2);
+    triangle->surface_normal =
+        VectorNormalize(triangle->surface_normal, NULL, &surface_normal_length);
+
+    if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+//
+// Static Emissive Triangle Functions
+//
+
+static
+ISTATUS
+EmissiveTriangleGetEmissiveMaterial(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_result_maybenull_ PCEMISSIVE_MATERIAL *emissive_material
+    )
+{
+    if (face_hit > TRIANGLE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PCEMISSIVE_TRIANGLE triangle = (PCEMISSIVE_TRIANGLE)context;
+    *emissive_material = triangle->emissive_materials[face_hit];
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+EmissiveTriangleSampleFace(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Inout_ PRANDOM rng,
+    _Out_ PPOINT3 point
+    )
+{
+    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
+
+    float_t u;
+    ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &u);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float_t v;
+    status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &v);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if ((float_t)1.0 < u + v)
+    {
+        u = (float_t)1.0 - u;
+        v = (float_t)1.0 - v;
+    }
+
+    POINT3 sum = PointVectorAddScaled(triangle->triangle.v0,
+                                      triangle->triangle.v0_to_v1,
+                                      u);
+    *point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+EmissiveTriangleComputeFaceAreaRoutine(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Out_ float_t *area
+    )
+{
+    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
+
+    VECTOR3 cp = VectorCrossProduct(triangle->triangle.v0_to_v1,
+                                    triangle->triangle.v0_to_v2);
+    *area = VectorLength(cp) * (float_t)0.5;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+void
+EmissiveTriangleFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
+
+    MaterialRelease(triangle->triangle.materials[0]);
+    MaterialRelease(triangle->triangle.materials[1]);
+    EmissiveMaterialRelease(triangle->emissive_materials[0]);
+    EmissiveMaterialRelease(triangle->emissive_materials[1]);
+}
+
 //
 // Static Variables
 //
@@ -480,6 +618,39 @@ static const SHAPE_VTABLE yz_dominant_triangle_vtable = {
         TriangleFree
 };
 
+static const SHAPE_VTABLE xy_dominant_emissive_triangle_vtable = {
+        TriangleTraceXYDominant,
+        TriangleCheckBounds,
+        TriangleComputeNormal,
+        TriangleGetMaterial,
+        EmissiveTriangleGetEmissiveMaterial,
+        EmissiveTriangleSampleFace,
+        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleFree
+};
+
+static const SHAPE_VTABLE xz_dominant_emissive_triangle_vtable = {
+        TriangleTraceXZDominant,
+        TriangleCheckBounds,
+        TriangleComputeNormal,
+        TriangleGetMaterial,
+        EmissiveTriangleGetEmissiveMaterial,
+        EmissiveTriangleSampleFace,
+        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleFree
+};
+
+static const SHAPE_VTABLE yz_dominant_emissive_triangle_vtable = {
+        TriangleTraceYZDominant,
+        TriangleCheckBounds,
+        TriangleComputeNormal,
+        TriangleGetMaterial,
+        EmissiveTriangleGetEmissiveMaterial,
+        EmissiveTriangleSampleFace,
+        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleFree
+};
+
 //
 // Functions
 //
@@ -515,25 +686,21 @@ TriangleAllocate(
     }
 
     TRIANGLE triangle;
-    triangle.v0 = v0;
-    triangle.v0_to_v1 = PointSubtract(v1, v0);
-    triangle.v0_to_v2 = PointSubtract(v2, v0);
-    triangle.materials[0] = front_material;
-    triangle.materials[1] = back_material;
-    
-    float_t surface_normal_length;
-    triangle.surface_normal = 
-        VectorCrossProduct(triangle.v0_to_v1, triangle.v0_to_v2);
-    triangle.surface_normal = 
-        VectorNormalize(triangle.surface_normal, NULL, &surface_normal_length);
+    ISTATUS status = TriangleInitialize(v0,
+                                        v1,
+                                        v2,
+                                        front_material,
+                                        back_material,
+                                        &triangle);
 
-    if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
+    if (status != ISTATUS_SUCCESS)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return status;
     }
 
-    PCSHAPE_VTABLE triangle_vtable;
     VECTOR_AXIS dominant_axis = VectorDominantAxis(triangle.surface_normal);
+
+    PCSHAPE_VTABLE triangle_vtable;
     switch (dominant_axis)
     {
         case VECTOR_X_AXIS:
@@ -547,11 +714,11 @@ TriangleAllocate(
             break;
     }
 
-    ISTATUS status = ShapeAllocate(triangle_vtable,
-                                   &triangle,
-                                   sizeof(TRIANGLE),
-                                   alignof(TRIANGLE),
-                                   shape);
+    status = ShapeAllocate(triangle_vtable,
+                           &triangle,
+                           sizeof(TRIANGLE),
+                           alignof(TRIANGLE),
+                           shape);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -560,6 +727,90 @@ TriangleAllocate(
 
     MaterialRetain(front_material);
     MaterialRetain(back_material);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+EmissiveTriangleAllocate(
+    _In_ POINT3 v0,
+    _In_ POINT3 v1,
+    _In_ POINT3 v2,
+    _In_opt_ PMATERIAL front_material,
+    _In_opt_ PMATERIAL back_material,
+    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
+    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
+    _Out_ PSHAPE *shape
+    )
+{
+    if (!PointValidate(v0))
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!PointValidate(v1))
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!PointValidate(v2))
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    EMISSIVE_TRIANGLE triangle;
+    ISTATUS status = TriangleInitialize(v0,
+                                        v1,
+                                        v2,
+                                        front_material,
+                                        back_material,
+                                        &triangle.triangle);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    triangle.emissive_materials[0] = front_emissive_material;
+    triangle.emissive_materials[1] = back_emissive_material;
+
+    VECTOR_AXIS dominant_axis =
+        VectorDominantAxis(triangle.triangle.surface_normal);
+
+    PCSHAPE_VTABLE triangle_vtable;
+    switch (dominant_axis)
+    {
+        case VECTOR_X_AXIS:
+            triangle_vtable = &yz_dominant_emissive_triangle_vtable;
+            break;
+        case VECTOR_Y_AXIS:
+            triangle_vtable = &xz_dominant_emissive_triangle_vtable;
+            break;
+        default: // VECTOR_Z_AXIS
+            triangle_vtable = &xy_dominant_emissive_triangle_vtable;
+            break;
+    }
+
+    status = ShapeAllocate(triangle_vtable,
+                           &triangle,
+                           sizeof(EMISSIVE_TRIANGLE),
+                           alignof(EMISSIVE_TRIANGLE),
+                           shape);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    MaterialRetain(front_material);
+    MaterialRetain(back_material);
+    EmissiveMaterialRetain(front_emissive_material);
+    EmissiveMaterialRetain(back_emissive_material);
 
     return ISTATUS_SUCCESS;
 }
