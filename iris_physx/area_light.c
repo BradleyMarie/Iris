@@ -105,6 +105,7 @@ ISTATUS
 AreaLightSample(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 surface_normal,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -125,7 +126,19 @@ AreaLightSample(
                                         sampled_point);
 
     VECTOR3 direction_to_light = PointSubtract(sampled_point, hit_point);
+
+    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
+
+    if (dp < (float_t)0.0)
+    {
+        *spectrum = NULL;
+        *to_light = direction_to_light;
+        *pdf = area_light->pdf;
+        return ISTATUS_SUCCESS;
+    }
+
     direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
+
     RAY ray_to_light = RayCreate(hit_point, direction_to_light);
 
     status = VisibilityTesterTestAreaLight(visibility_tester,
@@ -139,7 +152,7 @@ AreaLightSample(
     }
 
     *to_light = direction_to_light;
-    *pdf = (spectrum != NULL) ? area_light->pdf : (float_t)0.0;
+    *pdf = area_light->pdf;
 
     return ISTATUS_SUCCESS;
 }

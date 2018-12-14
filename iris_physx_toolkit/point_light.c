@@ -36,6 +36,7 @@ ISTATUS
 PointLightSample(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 surface_normal,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -48,6 +49,16 @@ PointLightSample(
 
     VECTOR3 direction_to_light = PointSubtract(point_light->location,
                                                hit_point);
+
+    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
+
+    if (dp <= (float_t)0.0)
+    {
+        *spectrum = NULL;
+        *to_light = direction_to_light;
+        *pdf = (float_t)INFINITY;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t distance_to_light_squared, distance_to_light;
     direction_to_light = VectorNormalize(direction_to_light,

@@ -36,6 +36,7 @@ ISTATUS
 DirectionalLightSample(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 surface_normal,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PRANDOM rng,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
@@ -45,6 +46,17 @@ DirectionalLightSample(
     )
 {
     PCDIRECTIONAL_LIGHT directional_light = (PCDIRECTIONAL_LIGHT)context;
+
+    float_t dp =
+        VectorDotProduct(directional_light->to_light, surface_normal);
+
+    if (dp <= (float_t)0.0)
+    {
+        *spectrum = NULL;
+        *to_light = directional_light->to_light;
+        *pdf = (float_t)INFINITY;
+        return ISTATUS_SUCCESS;
+    }
 
     RAY ray_to_light = RayCreate(hit_point, directional_light->to_light);
 
