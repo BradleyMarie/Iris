@@ -30,6 +30,17 @@ cc_library(
 )
 
 cc_library(
+    name = "quad",
+    hdrs = ["quad.h"],
+    srcs = ["quad.c"],
+    testonly = 1,
+    deps = [
+        "//iris_physx:iris_physx",
+        "//iris_physx_toolkit:triangle",
+    ],
+)
+
+cc_library(
     name = "spectra",
     hdrs = ["spectra.h"],
     srcs = ["spectra.c"],
