@@ -133,6 +133,11 @@ PathTracerIntegrate(
                 return status;
             }
 
+            if (direct_lighting == NULL)
+            {
+                continue;
+            }
+
             status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                          direct_lighting,
                                                          (float_t)1.0 / pdf,
@@ -226,25 +231,26 @@ PathTracerIntegrate(
         bounces += 1;
     }
 
-    PCSPECTRUM result = NULL;
-
     for (; bounces != 0; bounces--)
     {
-       ISTATUS status = SpectrumCompositorAddSpectra(compositor,
-                                                     result,
-                                                     path_tracer->spectra[bounces],
-                                                     &result);
+        PCSPECTRUM sum;
+        ISTATUS status = SpectrumCompositorAddSpectra(
+            compositor, 
+            path_tracer->spectra[bounces],
+            path_tracer->spectra[bounces - 1],
+            &sum);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           result,
-                                                           path_tracer->reflectors[bounces - 1],
-                                                           path_tracer->attenuations[bounces - 1],
-                                                           &result);
+        status = SpectrumCompositorAttenuatedAddReflection(
+            compositor,
+            sum,
+            path_tracer->reflectors[bounces - 1],
+            path_tracer->attenuations[bounces - 1],
+            path_tracer->spectra + bounces - 1);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -252,12 +258,9 @@ PathTracerIntegrate(
         }
     }
 
-    ISTATUS status = SpectrumCompositorAddSpectra(compositor,
-                                                  result,
-                                                  path_tracer->spectra[0],
-                                                  spectrum);
+    *spectrum = path_tracer->spectra[0];
 
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 static
