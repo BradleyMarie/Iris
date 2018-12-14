@@ -46,6 +46,9 @@ cc_test(
     srcs = ["single_triangle.cc"],
     data = [
         "//test_results:blank.pfm",
+        "//test_results:single_emissive_triangle_xy_triangle.pfm",
+        "//test_results:single_emissive_triangle_xz_triangle.pfm",
+        "//test_results:single_emissive_triangle_yz_triangle.pfm",
         "//test_results:single_triangle_xy_triangle.pfm",
         "//test_results:single_triangle_xz_triangle.pfm",
         "//test_results:single_triangle_yz_triangle.pfm",
@@ -56,6 +59,7 @@ cc_test(
         "//iris_camera_toolkit:orthographic_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:attenuated_reflector",
+        "//iris_physx_toolkit:constant_emissive_material",
         "//iris_physx_toolkit:directional_light",
         "//iris_physx_toolkit:lambertian_brdf",
         "//iris_physx_toolkit:list_scene",

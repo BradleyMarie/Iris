@@ -19,6 +19,7 @@ Abstract:
 #include "iris_camera_toolkit/orthographic_camera.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
+#include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/directional_light.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
 #include "iris_physx_toolkit/list_scene.h"
@@ -2131,6 +2132,290 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
     CameraFree(camera);
 }
 
+TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_xy_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_xy_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 {
     PLIST_SCENE scene;
@@ -2515,6 +2800,290 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
     ReflectorRelease(reflector2);
     LightRelease(light);
     MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_xz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_xz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
     ShapeRelease(shape);
     CameraFree(camera);
 }
@@ -3097,6 +3666,290 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
     ReflectorRelease(reflector2);
     LightRelease(light);
     MaterialRelease(material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_yz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        nullptr,
+        nullptr,
+        nullptr,
+        emissive_material,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_BACK_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/single_emissive_triangle_yz_triangle.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
+    ShapeRelease(shape);
+    CameraFree(camera);
+}
+
+TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)1.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PEMISSIVE_MATERIAL emissive_material;
+    status = ConstantEmissiveMaterialAllocate(spectrum, &emissive_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape;
+    status = EmissiveTriangleAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        nullptr,
+        nullptr,
+        emissive_material,
+        nullptr,
+        &shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = AreaLightAllocate(
+        shape,
+        TRIANGLE_FRONT_FACE,
+        nullptr,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCAMERA camera;
+    status = OrthographicCameraAllocate(
+        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        (float_t)2.0,
+        (float_t)2.0,
+        &camera);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(camera,
+                             scene,
+                             light_sampler,
+                             "test_results/blank.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    LightRelease(light);
+    EmissiveMaterialRelease(emissive_material);
     ShapeRelease(shape);
     CameraFree(camera);
 }
