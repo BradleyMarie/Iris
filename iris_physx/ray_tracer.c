@@ -50,8 +50,8 @@ ShapeRayTracerProcessHit(
 
     PSHAPE shape = (PSHAPE)hit_context->data;
 
-    if (shape->vtable->get_emissive_material_routine != NULL ||
-        shape->vtable->compute_face_area_routine != NULL ||
+    if (shape->vtable->get_emissive_material_routine != NULL &&
+        shape->vtable->compute_face_area_routine != NULL &&
         shape->vtable->sample_face_routine != NULL)
     {
         PCEMISSIVE_MATERIAL emissive_material;
