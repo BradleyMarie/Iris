@@ -60,6 +60,7 @@ cc_test(
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:constant_emissive_material",
+        "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:directional_light",
         "//iris_physx_toolkit:lambertian_brdf",
         "//iris_physx_toolkit:list_scene",

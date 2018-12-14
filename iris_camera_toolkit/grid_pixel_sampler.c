@@ -181,10 +181,12 @@ GridPixelSamplerNextSample(
     *pixel_sample_u = fma(pixel_jitter_u,
                           pixel_sampler->pixel_sample_width_u,
                           pixel_sampler->pixel_current_u);
+    *pixel_sample_u = fmin(*pixel_sample_u, (float_t)1.0);
 
     *pixel_sample_v = fma(pixel_jitter_v,
                           pixel_sampler->pixel_sample_width_v,
                           pixel_sampler->pixel_current_v);
+    *pixel_sample_v = fmin(*pixel_sample_v, (float_t)1.0);
 
     float_t lens_jitter_u, lens_jitter_v;
     if (pixel_sampler->jitter_pixel_samples)
@@ -218,10 +220,12 @@ GridPixelSamplerNextSample(
     *lens_sample_u = fma(lens_jitter_u,
                          pixel_sampler->lens_sample_width_u,
                          pixel_sampler->lens_current_u);
+    *lens_sample_u = fmin(*lens_sample_u, (float_t)1.0);
 
     *lens_sample_v = fma(lens_jitter_v,
                          pixel_sampler->lens_sample_width_v,
                          pixel_sampler->lens_current_v);
+    *lens_sample_v = fmin(*lens_sample_v, (float_t)1.0);
 
     pixel_sampler->lens_index_v += 1;
 
@@ -332,6 +336,10 @@ GridPixelSamplerAllocate(
     grid_pixel_sampler.lens_sample_width_v = (float_t)0.0;
     grid_pixel_sampler.jitter_pixel_samples = jitter_pixel_samples;
     grid_pixel_sampler.jitter_lens_samples = jitter_lens_samples;
+    grid_pixel_sampler.current_pixel_samples_u = 1;
+    grid_pixel_sampler.current_pixel_samples_v = 1;
+    grid_pixel_sampler.current_lens_samples_u = 1;
+    grid_pixel_sampler.current_lens_samples_v = 1;
     grid_pixel_sampler.pixel_index_u = 0;
     grid_pixel_sampler.pixel_index_v = 0;
     grid_pixel_sampler.lens_index_u = 0;

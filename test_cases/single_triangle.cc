@@ -170,7 +170,7 @@ TestRenderSingleThreaded(
 {
     PPIXEL_SAMPLER pixel_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(500, 500, false, 1, 1, false, &pixel_sampler);
+        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;

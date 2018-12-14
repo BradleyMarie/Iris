@@ -195,7 +195,7 @@ IrisCameraRenderPixel(
             return status;
         }
 
-        if (sampler_status == ISTATUS_SUCCESS)
+        if (sampler_status == ISTATUS_DONE)
         {
             break;
         }

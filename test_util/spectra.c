@@ -48,6 +48,7 @@ typedef struct _TEST_TONE_MAPPER {
     float_t x;
     float_t y;
     float_t z;
+    uint32_t num_samples;
 } TEST_TONE_MAPPER, *PTEST_TONE_MAPPER;
 
 typedef const TEST_TONE_MAPPER *PCTEST_TONE_MAPPER;
@@ -174,6 +175,8 @@ TestToneMapperAddSample(
 
     test_tone_mapper->z += intensity;
 
+    test_tone_mapper->num_samples += 1;
+
     return ISTATUS_SUCCESS;
 }
 
@@ -185,9 +188,10 @@ TestToneMapperComputeTone(
 {
     PCTEST_TONE_MAPPER test_tone_mapper = (PCTEST_TONE_MAPPER)context;
 
-    *color = ColorCreate(test_tone_mapper->x,
-                         test_tone_mapper->y,
-                         test_tone_mapper->z);
+    *color = ColorCreate(
+        test_tone_mapper->x / (float_t)test_tone_mapper->num_samples,
+        test_tone_mapper->y / (float_t)test_tone_mapper->num_samples,
+        test_tone_mapper->z / (float_t)test_tone_mapper->num_samples);
 
     return ISTATUS_SUCCESS;
 }
@@ -202,6 +206,7 @@ TestToneMapperClear(
     test_tone_mapper->x = (float_t)0.0;
     test_tone_mapper->y = (float_t)0.0;
     test_tone_mapper->z = (float_t)0.0;
+    test_tone_mapper->num_samples = 0;
 
     return ISTATUS_SUCCESS;
 }
@@ -330,6 +335,7 @@ TestToneMapperAllocate(
     test_tone_mapper.x = (float_t)0.0;
     test_tone_mapper.y = (float_t)0.0;
     test_tone_mapper.z = (float_t)0.0;
+    test_tone_mapper.num_samples = 0;
 
     ISTATUS status = ToneMapperAllocate(&test_tone_mapper_vtable,
                                         &test_tone_mapper,
