@@ -8,6 +8,16 @@ package(
 )
 
 cc_library(
+    name = "cornell_box",
+    hdrs = ["cornell_box.h"],
+    srcs = ["cornell_box.c"],
+    testonly = 1,
+    deps = [
+        "//iris:iris",
+    ],
+)
+
+cc_library(
     name = "equality",
     hdrs = ["equality.h"],
     testonly = 1,
