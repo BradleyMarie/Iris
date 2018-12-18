@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Coordinates of the Cornell box vertices.
+    The parameters of the Cornell box scene transformed to be left-handed.
 
 --*/
 

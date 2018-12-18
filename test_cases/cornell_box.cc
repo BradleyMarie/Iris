@@ -213,8 +213,8 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_light[3],
         nullptr,
         nullptr,
-        light_material,
         nullptr,
+        light_material,
         &light_shape0,
         &light_shape1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -227,7 +227,7 @@ TEST(CornellBoxTest, CornellBox)
 
     PLIGHT light0;
     status = AreaLightAllocate(light_shape0,
-                               TRIANGLE_FRONT_FACE,
+                               TRIANGLE_BACK_FACE,
                                nullptr,
                                &light0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -237,7 +237,7 @@ TEST(CornellBoxTest, CornellBox)
 
     PLIGHT light1;
     status = AreaLightAllocate(light_shape1,
-                               TRIANGLE_FRONT_FACE,
+                               TRIANGLE_BACK_FACE,
                                nullptr,
                                &light1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -328,7 +328,7 @@ TEST(CornellBoxTest, CornellBox)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/cornell_box.pfm");
 
     SpectrumRelease(light_spectrum);
     ReflectorRelease(white_reflector);
