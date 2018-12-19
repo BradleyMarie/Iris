@@ -74,6 +74,15 @@ cc_library(
 )
 
 cc_library(
+    name = "one_light_sampler",
+    hdrs = ["one_light_sampler.h"],
+    srcs = ["one_light_sampler.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "path_tracer",
     hdrs = ["path_tracer.h"],
     srcs = ["path_tracer.c"],

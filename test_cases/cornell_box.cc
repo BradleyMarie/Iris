@@ -18,12 +18,12 @@ Abstract:
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
 #include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
-#include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
 #include "iris_physx_toolkit/list_scene.h"
+#include "iris_physx_toolkit/one_light_sampler.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle.h"
@@ -37,7 +37,7 @@ void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_ PCLIST_SCENE scene,
-    _In_ PALL_LIGHT_SAMPLER light_sampler,
+    _In_ PONE_LIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -66,8 +66,8 @@ TestRenderSingleThreaded(
         path_tracer,
         ListSceneTraceCallback,
         scene,
-        AllLightSamplerPrepareSamplesCallback,
-        AllLightSamplerNextSampleCallback,
+        nullptr,
+        OneLightSamplerNextSampleCallback,
         light_sampler,
         tone_mapper,
         &sample_tracer);
@@ -201,8 +201,8 @@ TEST(CornellBoxTest, CornellBox)
     status = ListSceneAllocate(&scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    PONE_LIGHT_SAMPLER light_sampler;
+    status = OneLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE light_shape0, light_shape1;
@@ -232,7 +232,7 @@ TEST(CornellBoxTest, CornellBox)
                                &light0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light0);
+    status = OneLightSamplerAddLight(light_sampler, light0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light1;
@@ -242,7 +242,7 @@ TEST(CornellBoxTest, CornellBox)
                                &light1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light1);
+    status = OneLightSamplerAddLight(light_sampler, light1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     AddQuadToScene(
@@ -345,6 +345,6 @@ TEST(CornellBoxTest, CornellBox)
     LightRelease(light0);
     LightRelease(light1);
     ListSceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    OneLightSamplerFree(light_sampler);
     CameraFree(camera);
 }

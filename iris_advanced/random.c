@@ -141,9 +141,8 @@ RandomGenerateFloat(
 ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM rng,
-    _In_ size_t minimum,
-    _In_ size_t maximum,
-    _Out_range_(minimum, maximum) size_t *result
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
     )
 {
     if (rng == NULL)
@@ -151,24 +150,22 @@ RandomGenerateIndex(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (minimum > maximum)
+    if (upper_bound == 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (result == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     ISTATUS status = rng->vtable->generate_index_routine(rng->data,
-                                                         minimum,
-                                                         maximum,
+                                                         upper_bound,
                                                          result);
 
-    // Should these be made into something stronger than assertions?
-    assert(minimum <= *result);
-    assert(*result <= maximum);
+    // Should this be made into something stronger than assertions?
+    assert(*result < upper_bound);
 
     return status;
 }

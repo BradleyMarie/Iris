@@ -35,9 +35,8 @@ typedef
 ISTATUS
 (*PGENERATE_INDEX_ROUTINE)(
     _In_ void *context,
-    _In_ size_t minimum,
-    _In_ size_t maximum,
-    _Out_range_(minimum, maximum) size_t *result
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
     );
 
 typedef struct _RANDOM_VTABLE {
@@ -75,9 +74,8 @@ RandomGenerateFloat(
 ISTATUS
 RandomGenerateIndex(
     _In_ PRANDOM rng,
-    _In_ size_t minimum,
-    _In_ size_t maximum,
-    _Out_range_(minimum, maximum) size_t *result
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
     );
 
 void

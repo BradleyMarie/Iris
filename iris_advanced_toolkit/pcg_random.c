@@ -59,30 +59,18 @@ static
 ISTATUS
 PermutedCongruentialRandomGenerateIndex(
     _In_ void *context,
-    _In_ size_t minimum,
-    _In_ size_t maximum,
-    _Out_range_(minimum, maximum) size_t *result
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
     )
 {
-    size_t range_size = maximum - minimum;
-
-    if (UINT32_MAX < range_size)
+    if (UINT32_MAX < upper_bound)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PPCG_RANDOM pcg_random = (PPCG_RANDOM)context;
 
-    if (range_size == UINT32_MAX)
-    {
-        *result = minimum + (size_t)pcg32_random_r(&pcg_random->state);
-        return ISTATUS_SUCCESS;
-    }
-
-    uint32_t range_bound = (uint32_t)range_size + 1u;
-    uint32_t random = pcg32_boundedrand_r(&pcg_random->state, range_bound);
-
-    *result = minimum + (size_t)random;
+    *result = pcg32_boundedrand_r(&pcg_random->state, upper_bound);
 
     return ISTATUS_SUCCESS;
 }

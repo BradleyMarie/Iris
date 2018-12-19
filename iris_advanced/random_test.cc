@@ -151,14 +151,14 @@ TEST(RandomTest, RandomGenerateIndexErrors)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     size_t result;
-    status = RandomGenerateIndex(nullptr, 0, 1, &result);
+    status = RandomGenerateIndex(nullptr, 1, &result);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = RandomGenerateIndex(rng, 1, 0, &result);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_00, status);
+    status = RandomGenerateIndex(rng, 0, &result);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
-    status = RandomGenerateIndex(rng, 0, 1, nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+    status = RandomGenerateIndex(rng, 1, nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
 
     RandomFree(rng);
 }
@@ -254,8 +254,7 @@ TEST(RandomTest, RandomGenerateFloat)
 
 struct IndexContext {
     ISTATUS return_status;
-    size_t min;
-    size_t max;
+    size_t upper_bound;
     size_t return_value;
     bool *generate_encountered;
     bool *free_encountered;
@@ -264,19 +263,17 @@ struct IndexContext {
 ISTATUS
 TestGenerateIndexCallback(
     _In_ void *context,
-    _In_ size_t minimum,
-    _In_ size_t maximum,
-    _Out_range_(minimum, maximum) size_t *result
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
     )
 {
-    IndexContext *float_context = static_cast<IndexContext*>(context);
-    EXPECT_EQ(float_context->min, minimum);
-    EXPECT_EQ(float_context->max, maximum);
+    IndexContext *index_context = static_cast<IndexContext*>(context);
+    EXPECT_EQ(index_context->upper_bound, upper_bound);
     EXPECT_TRUE(result != NULL);
-    *result = float_context->return_value;
-    EXPECT_FALSE(*float_context->generate_encountered);
-    *float_context->generate_encountered = true;
-    return float_context->return_status;
+    *result = index_context->return_value;
+    EXPECT_FALSE(*index_context->generate_encountered);
+    *index_context->generate_encountered = true;
+    return index_context->return_status;
 }
 
 void
@@ -284,15 +281,14 @@ TestGenerateIndexFreeCallback(
     _In_opt_ _Post_invalid_ void *context
     )
 {
-    IndexContext *float_context = static_cast<IndexContext*>(context);
-    EXPECT_FALSE(*float_context->free_encountered);
-    *float_context->free_encountered = true;
+    IndexContext *index_context = static_cast<IndexContext*>(context);
+    EXPECT_FALSE(*index_context->free_encountered);
+    *index_context->free_encountered = true;
 }
 
 void
 TestGenerateIndex(
-    _In_ size_t minimum,
-    _In_ size_t maximum,
+    _In_ size_t upper_bound,
     _In_ size_t return_value,
     _In_ ISTATUS return_status
     )
@@ -304,8 +300,7 @@ TestGenerateIndex(
                              TestGenerateIndexCallback,
                              TestGenerateIndexFreeCallback };
     IndexContext context = { return_status,
-                             minimum,
-                             maximum,
+                             upper_bound,
                              return_value,
                              &generate_encountered,
                              &free_encountered };
@@ -320,7 +315,7 @@ TestGenerateIndex(
 
     EXPECT_FALSE(generate_encountered);
     size_t result;
-    status = RandomGenerateIndex(rng, minimum, maximum, &result);
+    status = RandomGenerateIndex(rng, upper_bound, &result);
     EXPECT_TRUE(generate_encountered);
     EXPECT_EQ(return_status, status);
 
@@ -336,7 +331,6 @@ TestGenerateIndex(
 
 TEST(RandomTest, RandomGenerateIndex)
 {
-    TestGenerateIndex(0, 2, 1, ISTATUS_SUCCESS);
-    TestGenerateIndex(1, 3, 2, ISTATUS_SUCCESS);
-    TestGenerateIndex(0, 2, 1, ISTATUS_INVALID_ARGUMENT_31);
+    TestGenerateIndex(2, 1, ISTATUS_SUCCESS);
+    TestGenerateIndex(2, 1, ISTATUS_INVALID_ARGUMENT_31);
 }
