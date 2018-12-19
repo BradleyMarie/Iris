@@ -93,7 +93,7 @@ WriteToPfmFile(
         for (size_t j = 0; j < num_columns; j++)
         {
             COLOR3 pixel_color;
-            FramebufferGetPixel(framebuffer, j, i, &pixel_color);
+            FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
             float x = (float)pixel_color.x;
             float y = (float)pixel_color.y;

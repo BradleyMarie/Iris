@@ -152,7 +152,7 @@ ThinLensCameraAllocate(
     image_plane_u = VectorNormalize(image_plane_u, NULL, NULL);
     VECTOR3 frame_width_vector = VectorScale(image_plane_u, frame_width);
 
-    VECTOR3 image_plane_v = VectorCrossProduct(image_plane_u, direction);
+    VECTOR3 image_plane_v = VectorCrossProduct(direction, image_plane_u);
     image_plane_v = VectorNormalize(image_plane_v, NULL, NULL);
     VECTOR3 frame_height_vector = VectorScale(image_plane_v, frame_height);
 

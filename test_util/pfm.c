@@ -176,7 +176,7 @@ ExactlyEqualsPfmFile(
             }
 
             COLOR3 pixel_color;
-            FramebufferGetPixel(framebuffer, j, i, &pixel_color);
+            FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
             if ((float)pixel_color.x != x ||
                 (float)pixel_color.y != y ||
