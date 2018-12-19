@@ -250,7 +250,6 @@ static const SHAPE_VTABLE sphere_vtable = {
     SphereGetMaterial,
     NULL,
     NULL,
-    NULL,
     SphereFree
 };
 

@@ -39,6 +39,7 @@ typedef const TRIANGLE *PCTRIANGLE;
 typedef struct _EMISSIVE_TRIANGLE {
     TRIANGLE triangle;
     PEMISSIVE_MATERIAL emissive_materials[2];
+    float_t area;
 } EMISSIVE_TRIANGLE, *PEMISSIVE_TRIANGLE;
 
 typedef const EMISSIVE_TRIANGLE *PCEMISSIVE_TRIANGLE;
@@ -511,11 +512,13 @@ EmissiveTriangleGetEmissiveMaterial(
 
 static
 ISTATUS
-EmissiveTriangleSampleFace(
+EmissiveTriangleSampleFaceBySolidAngle(
     _In_opt_ const void *context,
+    _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 point
+    _Out_ PPOINT3 point,
+    _Out_ float_t *pdf
     )
 {
     PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
@@ -547,22 +550,10 @@ EmissiveTriangleSampleFace(
                                       u);
     *point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
 
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
-EmissiveTriangleComputeFaceAreaRoutine(
-    _In_opt_ const void *context,
-    _In_ uint32_t face_hit,
-    _Out_ float_t *area
-    )
-{
-    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
-
-    VECTOR3 cp = VectorCrossProduct(triangle->triangle.v0_to_v1,
-                                    triangle->triangle.v0_to_v2);
-    *area = VectorLength(cp) * (float_t)0.5;
+    VECTOR3 to_triangle = PointSubtract(*point, hit_point);
+    float_t dp =
+        fabs(VectorDotProduct(triangle->triangle.surface_normal, to_triangle));
+    *pdf = VectorDotProduct(to_triangle, to_triangle) / (dp * triangle->area);
 
     return ISTATUS_SUCCESS;
 }
@@ -592,7 +583,6 @@ static const SHAPE_VTABLE xy_dominant_triangle_vtable = {
         TriangleGetMaterial,
         NULL,
         NULL,
-        NULL,
         TriangleFree
 };
 
@@ -601,7 +591,6 @@ static const SHAPE_VTABLE xz_dominant_triangle_vtable = {
         TriangleCheckBounds,
         TriangleComputeNormal,
         TriangleGetMaterial,
-        NULL,
         NULL,
         NULL,
         TriangleFree
@@ -614,7 +603,6 @@ static const SHAPE_VTABLE yz_dominant_triangle_vtable = {
         TriangleGetMaterial,
         NULL,
         NULL,
-        NULL,
         TriangleFree
 };
 
@@ -624,8 +612,7 @@ static const SHAPE_VTABLE xy_dominant_emissive_triangle_vtable = {
         TriangleComputeNormal,
         TriangleGetMaterial,
         EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFace,
-        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleSampleFaceBySolidAngle,
         EmissiveTriangleFree
 };
 
@@ -635,8 +622,7 @@ static const SHAPE_VTABLE xz_dominant_emissive_triangle_vtable = {
         TriangleComputeNormal,
         TriangleGetMaterial,
         EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFace,
-        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleSampleFaceBySolidAngle,
         EmissiveTriangleFree
 };
 
@@ -646,8 +632,7 @@ static const SHAPE_VTABLE yz_dominant_emissive_triangle_vtable = {
         TriangleComputeNormal,
         TriangleGetMaterial,
         EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFace,
-        EmissiveTriangleComputeFaceAreaRoutine,
+        EmissiveTriangleSampleFaceBySolidAngle,
         EmissiveTriangleFree
 };
 
@@ -795,6 +780,10 @@ EmissiveTriangleAllocate(
             triangle_vtable = &xy_dominant_emissive_triangle_vtable;
             break;
     }
+
+    VECTOR3 cp = VectorCrossProduct(triangle.triangle.v0_to_v1,
+                                    triangle.triangle.v0_to_v2);
+    triangle.area = VectorLength(cp) * (float_t)0.5;
 
     status = ShapeAllocate(triangle_vtable,
                            &triangle,

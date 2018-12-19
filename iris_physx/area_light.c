@@ -28,7 +28,6 @@ typedef struct _AREA_LIGHT {
     PMATRIX model_to_world;
     PSHAPE shape;
     uint32_t face;
-    float_t pdf;
 } AREA_LIGHT, *PAREA_LIGHT;
 
 typedef const AREA_LIGHT *PCAREA_LIGHT;
@@ -117,10 +116,12 @@ AreaLightSample(
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
     POINT3 sampled_point;
-    ISTATUS status = ShapeSampleFace(area_light->shape,
-                                     area_light->face,
-                                     rng,
-                                     &sampled_point);
+    ISTATUS status = ShapeSampleFaceBySolidAngle(area_light->shape,
+                                                 hit_point,
+                                                 area_light->face,
+                                                 rng,
+                                                 &sampled_point,
+                                                 pdf);
 
     sampled_point = PointMatrixMultiply(area_light->model_to_world,
                                         sampled_point);
@@ -133,7 +134,6 @@ AreaLightSample(
     {
         *spectrum = NULL;
         *to_light = direction_to_light;
-        *pdf = area_light->pdf;
         return ISTATUS_SUCCESS;
     }
 
@@ -152,7 +152,6 @@ AreaLightSample(
     }
 
     *to_light = direction_to_light;
-    *pdf = area_light->pdf;
 
     return ISTATUS_SUCCESS;
 }
@@ -200,7 +199,8 @@ AreaLightComputeEmissiveWithPdf(
         return status;
     }
 
-    *pdf = (spectrum != NULL) ? area_light->pdf : (float_t)0.0;
+    // TODO: FIX
+    *pdf = (float_t)0.000147;
 
     return ISTATUS_SUCCESS;
 }
@@ -242,8 +242,7 @@ AreaLightAllocate(
 {
     if (shape == NULL ||
         shape->vtable->get_emissive_material_routine == NULL ||
-        shape->vtable->compute_face_area_routine == NULL ||
-        shape->vtable->sample_face_routine == NULL)
+        shape->vtable->sample_face_by_solid_angle_routine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -266,20 +265,11 @@ AreaLightAllocate(
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
 
-    float_t area;
-    status = ShapeComputeFaceArea(shape, face, &area);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
     AREA_LIGHT area_light;
     area_light.emissive_material = emissive_material;
     area_light.model_to_world = model_to_world;
     area_light.shape = shape;
     area_light.face = face;
-    area_light.pdf = (float_t)1.0 / area;
 
     status = LightAllocate(&area_light_vtable,
                            &area_light,

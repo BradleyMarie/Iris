@@ -102,44 +102,32 @@ ShapeGetMaterial(
 static
 inline
 ISTATUS
-ShapeComputeFaceArea(
+ShapeSampleFaceBySolidAngle(
     _In_ PCSHAPE shape,
-    _In_ uint32_t face_hit,
-    _Out_ float_t *area
-    )
-{
-    assert(shape != NULL);
-    assert(area != NULL);
-
-    ISTATUS status = shape->vtable->compute_face_area_routine(shape->data,
-                                                              face_hit,
-                                                              area);
-
-    // Should these be made into something stronger than assertions?
-    assert(isfinite(*area));
-    assert((float_t)0.0 < *area);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-ShapeSampleFace(
-    _In_ PCSHAPE shape,
+    _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 point
+    _Out_ PPOINT3 point,
+    _Out_ float_t *pdf
     )
 {
     assert(shape != NULL);
+    assert(PointValidate(hit_point));
     assert(rng != NULL);
     assert(point != NULL);
+    assert(pdf != NULL);
 
-    ISTATUS status = shape->vtable->sample_face_routine(shape->data,
-                                                        face_hit,
-                                                        rng,
-                                                        point);
+    ISTATUS status =
+        shape->vtable->sample_face_by_solid_angle_routine(shape->data,
+                                                          hit_point,
+                                                          face_hit,
+                                                          rng,
+                                                          point,
+                                                          pdf);
+
+    // Should these be made into something stronger than assertions?
+    assert(isfinite(*pdf));
+    assert((float_t)0.0 < *pdf);
 
     return status;
 }
