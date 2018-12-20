@@ -131,7 +131,7 @@ OneLightSamplerNextSampleCallback(
 
     *light = (PCLIGHT)PointerListRetrieveAtIndex(&one_light_sampler->lights,
                                                  light_index);
-    *pdf = (float_t)1.0 / (float_t)light_index;
+    *pdf = (float_t)1.0 / (float_t)num_lights;
 
     return ISTATUS_DONE;
 }
