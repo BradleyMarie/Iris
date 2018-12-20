@@ -77,6 +77,16 @@ ISTATUS
     _Out_ float_t *pdf
     );
 
+typedef
+ISTATUS
+(*PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE)(
+    _In_opt_ const void *context,
+    _In_ PCRAY to_shape,
+    _In_ float_t distance_squared,
+    _In_ uint32_t face_hit,
+    _Out_ float_t *pdf
+    );
+
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE trace_routine;
     PSHAPE_CHECK_BOUNDS_ROUTINE check_bounds_routine;
@@ -84,6 +94,7 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
     PSHAPE_SAMPLE_FACE_BY_SOLID_ANGLE sample_face_by_solid_angle_routine;
+    PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE compute_pdf_by_solid_angle_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 

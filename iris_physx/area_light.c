@@ -32,10 +32,11 @@ typedef struct _AREA_LIGHT {
 
 typedef const AREA_LIGHT *PCAREA_LIGHT;
 
-typedef struct _AREA_LIGHT_AND_RESULT {
+typedef struct _AREA_LIGHT_AND_RESULTS {
     PCAREA_LIGHT area_light;
-    PCSPECTRUM *result;
-} AREA_LIGHT_AND_RESULT, *PAREA_LIGHT_AND_RESULT;
+    PCSPECTRUM *spectrum;
+    PPOINT3 hit_point;
+} AREA_LIGHT_AND_RESULTS, *PAREA_LIGHT_AND_RESULTS;
 
 //
 // Static Functions
@@ -51,19 +52,25 @@ VisibilityTesterProcessHitAreaLight(
     _In_ POINT3 world_hit_point
     )
 {
-    PAREA_LIGHT_AND_RESULT area_light_and_result = 
-        (PAREA_LIGHT_AND_RESULT)context;
+    PAREA_LIGHT_AND_RESULTS area_light_and_results =
+        (PAREA_LIGHT_AND_RESULTS)context;
 
-    if (area_light_and_result->area_light->shape == (PSHAPE)hit_context->data &&
-        area_light_and_result->area_light->model_to_world == model_to_world &&
-        area_light_and_result->area_light->face == hit_context->front_face)
+    if (area_light_and_results->area_light->shape == (PSHAPE)hit_context->data &&
+        area_light_and_results->area_light->model_to_world == model_to_world &&
+        area_light_and_results->area_light->face == hit_context->front_face)
     {
         ISTATUS status = 
-            EmissiveMaterialSample(area_light_and_result->area_light->emissive_material,
+            EmissiveMaterialSample(area_light_and_results->area_light->emissive_material,
                                    model_hit_point,
                                    hit_context->additional_data,
-                                   area_light_and_result->result);
-        return status;
+                                   area_light_and_results->spectrum);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *(area_light_and_results->hit_point) = world_hit_point;
     }
 
     return ISTATUS_SUCCESS;
@@ -75,16 +82,19 @@ VisibilityTesterTestAreaLight(
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _In_ RAY ray,
     _In_ PCAREA_LIGHT area_light,
-    _Out_ PCSPECTRUM *spectrum
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ PPOINT3 hit_point
     )
 {
     assert(visibility_tester != NULL);
     assert(RayValidate(ray));
     assert(spectrum != NULL);
+    assert(hit_point != NULL);
 
-    AREA_LIGHT_AND_RESULT area_light_and_result;
-    area_light_and_result.area_light = area_light;
-    area_light_and_result.result = spectrum;
+    AREA_LIGHT_AND_RESULTS area_light_and_results;
+    area_light_and_results.area_light = area_light;
+    area_light_and_results.spectrum = spectrum;
+    area_light_and_results.hit_point = hit_point;
 
     *spectrum = NULL;
     ISTATUS status = 
@@ -94,7 +104,7 @@ VisibilityTesterTestAreaLight(
                                                 visibility_tester->trace_routine,
                                                 visibility_tester->trace_context,
                                                 VisibilityTesterProcessHitAreaLight,
-                                                &area_light_and_result);
+                                                &area_light_and_results);
 
     return status;
 }
@@ -141,10 +151,12 @@ AreaLightSample(
 
     RAY ray_to_light = RayCreate(hit_point, direction_to_light);
 
+    POINT3 point_on_light;
     status = VisibilityTesterTestAreaLight(visibility_tester,
                                            ray_to_light,
                                            area_light,
-                                           spectrum);
+                                           spectrum,
+                                           &point_on_light);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -168,10 +180,12 @@ AreaLightComputeEmissive(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
+    POINT3 point_on_light;
     ISTATUS status = VisibilityTesterTestAreaLight(visibility_tester,
                                                    *to_light,
                                                    area_light,
-                                                   spectrum);
+                                                   spectrum,
+                                                   &point_on_light);
 
     return status;
 }
@@ -189,18 +203,27 @@ AreaLightComputeEmissiveWithPdf(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
+    POINT3 point_on_light;
     ISTATUS status = VisibilityTesterTestAreaLight(visibility_tester,
                                                    *to_light,
                                                    area_light,
-                                                   spectrum);
+                                                   spectrum,
+                                                   &point_on_light);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    // TODO: FIX
-    *pdf = (float_t)0.000147;
+    VECTOR3 to_light_vector = PointSubtract(point_on_light, to_light->origin);
+    float_t distance_squared = VectorDotProduct(to_light_vector,
+                                                to_light_vector);
+
+    status = ShapeComputePdfBySolidAngle(area_light->shape,
+                                         to_light,
+                                         distance_squared,
+                                         area_light->face,
+                                         pdf);
 
     return ISTATUS_SUCCESS;
 }
@@ -242,7 +265,8 @@ AreaLightAllocate(
 {
     if (shape == NULL ||
         shape->vtable->get_emissive_material_routine == NULL ||
-        shape->vtable->sample_face_by_solid_angle_routine == NULL)
+        shape->vtable->sample_face_by_solid_angle_routine == NULL ||
+        shape->vtable->compute_pdf_by_solid_angle_routine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }

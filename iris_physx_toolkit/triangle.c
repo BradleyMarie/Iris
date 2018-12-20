@@ -517,7 +517,7 @@ EmissiveTriangleSampleFaceBySolidAngle(
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 point,
+    _Out_ PPOINT3 sampled_point,
     _Out_ float_t *pdf
     )
 {
@@ -548,12 +548,30 @@ EmissiveTriangleSampleFaceBySolidAngle(
     POINT3 sum = PointVectorAddScaled(triangle->triangle.v0,
                                       triangle->triangle.v0_to_v1,
                                       u);
-    *point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
+    *sampled_point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
 
-    VECTOR3 to_triangle = PointSubtract(*point, hit_point);
+    VECTOR3 to_triangle = PointSubtract(*sampled_point, hit_point);
     float_t dp =
         fabs(VectorDotProduct(triangle->triangle.surface_normal, to_triangle));
     *pdf = VectorDotProduct(to_triangle, to_triangle) / (dp * triangle->area);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+EmissiveTriangleComputePdfBySolidArea(
+    _In_opt_ const void *context,
+    _In_ PCRAY to_shape,
+    _In_ float_t distance_squared,
+    _In_ uint32_t face_hit,
+    _Out_ float_t *pdf
+    )
+{
+    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
+
+    float_t dp = VectorDotProduct(triangle->triangle.surface_normal,
+                                  to_shape->direction);
+    *pdf = distance_squared / (fabs(dp) * triangle->area);
 
     return ISTATUS_SUCCESS;
 }
@@ -577,63 +595,69 @@ EmissiveTriangleFree(
 //
 
 static const SHAPE_VTABLE xy_dominant_triangle_vtable = {
-        TriangleTraceXYDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        NULL,
-        NULL,
-        TriangleFree
+    TriangleTraceXYDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    NULL,
+    NULL,
+    NULL,
+    TriangleFree
 };
 
 static const SHAPE_VTABLE xz_dominant_triangle_vtable = {
-        TriangleTraceXZDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        NULL,
-        NULL,
-        TriangleFree
+    TriangleTraceXZDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    NULL,
+    NULL,
+    NULL,
+    TriangleFree
 };
 
 static const SHAPE_VTABLE yz_dominant_triangle_vtable = {
-        TriangleTraceYZDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        NULL,
-        NULL,
-        TriangleFree
+    TriangleTraceYZDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    NULL,
+    NULL,
+    NULL,
+    TriangleFree
 };
 
 static const SHAPE_VTABLE xy_dominant_emissive_triangle_vtable = {
-        TriangleTraceXYDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFaceBySolidAngle,
-        EmissiveTriangleFree
+    TriangleTraceXYDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    EmissiveTriangleGetEmissiveMaterial,
+    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleComputePdfBySolidArea,
+    EmissiveTriangleFree
 };
 
 static const SHAPE_VTABLE xz_dominant_emissive_triangle_vtable = {
-        TriangleTraceXZDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFaceBySolidAngle,
-        EmissiveTriangleFree
+    TriangleTraceXZDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    EmissiveTriangleGetEmissiveMaterial,
+    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleComputePdfBySolidArea,
+    EmissiveTriangleFree
 };
 
 static const SHAPE_VTABLE yz_dominant_emissive_triangle_vtable = {
-        TriangleTraceYZDominant,
-        TriangleCheckBounds,
-        TriangleComputeNormal,
-        TriangleGetMaterial,
-        EmissiveTriangleGetEmissiveMaterial,
-        EmissiveTriangleSampleFaceBySolidAngle,
-        EmissiveTriangleFree
+    TriangleTraceYZDominant,
+    TriangleCheckBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    EmissiveTriangleGetEmissiveMaterial,
+    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleComputePdfBySolidArea,
+    EmissiveTriangleFree
 };
 
 //

@@ -51,7 +51,8 @@ ShapeRayTracerProcessHit(
     PSHAPE shape = (PSHAPE)hit_context->data;
 
     if (shape->vtable->get_emissive_material_routine != NULL &&
-        shape->vtable->sample_face_by_solid_angle_routine != NULL)
+        shape->vtable->sample_face_by_solid_angle_routine != NULL &&
+        shape->vtable->compute_pdf_by_solid_angle_routine != NULL)
     {
         PCEMISSIVE_MATERIAL emissive_material;
         ISTATUS status = ShapeGetEmissiveMaterial(shape,
