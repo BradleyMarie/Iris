@@ -93,7 +93,7 @@ static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
 static const float_t inv_pi = (float_t)0.31830988618379067153776752674503;
 
 ISTATUS
-UniformSampleHemisphere(
+CosineSampleHemisphere(
     _In_ VECTOR3 surface_normal,
     _Inout_ PRANDOM rng,
     _Out_ PVECTOR3 random_vector
@@ -102,29 +102,30 @@ UniformSampleHemisphere(
     assert(rng != NULL);
     assert(random_vector != NULL);
 
-    float_t u;
-    ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &u);
+    float_t radius_squared;
+    ISTATUS status = RandomGenerateFloat(rng,
+                                         (float_t)0.0,
+                                         (float_t)1.0,
+                                         &radius_squared);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t v;
-    status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &v);
+    float_t theta;
+    status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)two_pi, &theta);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t radius = sqrt((float_t)1.0 - u * u);
-    float_t theta = v * two_pi;
-
+    float_t radius = sqrt(radius_squared);
     float_t x = radius * cos(theta);
     float_t y = radius * sin(theta);
 
-    VECTOR3 result = VectorCreate(x, y, u);
+    VECTOR3 result = VectorCreate(x, y, (float_t)1.0 - radius_squared);
     *random_vector = TransformVector(surface_normal, result);
 
     return ISTATUS_SUCCESS;
@@ -145,7 +146,7 @@ LambertianBrdfSample(
 {
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
-    ISTATUS status = UniformSampleHemisphere(normal, rng, outgoing);
+    ISTATUS status = CosineSampleHemisphere(normal, rng, outgoing);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -153,7 +154,7 @@ LambertianBrdfSample(
     }
 
     *reflector = lambertian_brdf->reflector;
-    *pdf = inv_pi;
+    *pdf = fmax((float_t)0.0, VectorDotProduct(*outgoing, normal));
 
     return ISTATUS_SUCCESS;
 }
@@ -191,7 +192,7 @@ LambertianBrdfComputeReflectanceWithPdf(
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
     *reflector = lambertian_brdf->reflector;
-    *pdf = inv_pi;
+    *pdf = fmax((float_t)0.0, VectorDotProduct(outgoing, normal));
 
     return ISTATUS_SUCCESS;
 }

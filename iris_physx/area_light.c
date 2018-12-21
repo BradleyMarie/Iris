@@ -215,6 +215,12 @@ AreaLightComputeEmissiveWithPdf(
         return status;
     }
 
+    if (*spectrum == NULL)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
     VECTOR3 to_light_vector = PointSubtract(point_on_light, to_light->origin);
     float_t distance_squared = VectorDotProduct(to_light_vector,
                                                 to_light_vector);

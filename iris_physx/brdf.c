@@ -146,7 +146,8 @@ BrdfSample(
                                                   pdf);
 
     // Should this be made into something stronger than an assertion?
-    assert(isgreater(*pdf, (float_t)0.0));
+    assert(isfinite(*pdf));
+    assert((float_t)0.0 <= *pdf);
 
     return status;
 }
