@@ -17,7 +17,130 @@ Abstract:
 #include "iris_physx_toolkit/attenuated_reflector.h"
 
 //
-// Types
+// AttenuatedAllocator Types
+//
+
+typedef struct _ATTENUATED_REFLECTOR {
+    PCREFLECTOR reflector;
+    float_t attenuation;
+} ATTENUATED_REFLECTOR, *PATTENUATED_REFLECTOR;
+
+typedef const ATTENUATED_REFLECTOR *PCATTENUATED_REFLECTOR;
+
+//
+// AttenuatedAllocator3 Static Functions
+//
+
+static
+ISTATUS
+AttenuatedReflectorReflect(
+    _In_ const void *context,
+    _In_ float_t wavelength,
+    _In_ float_t incoming_intensity,
+    _Out_ float_t *outgoing_intensity
+    )
+{
+    PCATTENUATED_REFLECTOR attenuated_reflector =
+        (PCATTENUATED_REFLECTOR)context;
+
+    ISTATUS status = ReflectorReflect(attenuated_reflector->reflector,
+                                      wavelength,
+                                      incoming_intensity,
+                                      outgoing_intensity);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *outgoing_intensity *= attenuated_reflector->attenuation;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+AttenuatedReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    )
+{
+    PCATTENUATED_REFLECTOR attenuated_reflector =
+        (PCATTENUATED_REFLECTOR)context;
+
+    ISTATUS status = ReflectorGetAlbedo(attenuated_reflector->reflector,
+                                        albedo);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *albedo *= attenuated_reflector->attenuation;
+
+    return ISTATUS_SUCCESS;
+}
+
+//
+// AttenuatedAllocator3 Static Variables
+//
+
+static const REFLECTOR_VTABLE attenuated_reflector_vtable = {
+    AttenuatedReflectorReflect,
+    AttenuatedReflectorGetAlbedo,
+    NULL
+};
+
+//
+// AttenuatedAllocator3 Functions
+//
+
+ISTATUS
+AttenuatedReflectorAllocateWithAllocator(
+    _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _In_ PCREFLECTOR reflector_to_attenuate,
+    _In_ float_t attenuation,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    if (reflector_allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflector_to_attenuate == NULL)
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (isless(attenuation, (float_t)0.0) || !isfinite(attenuation))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    ATTENUATED_REFLECTOR attenuated_reflector;
+    attenuated_reflector.reflector = reflector_to_attenuate;
+    attenuated_reflector.attenuation = attenuation;
+
+    ISTATUS status =
+        ReflectorAllocatorAllocate(reflector_allocator,
+                                   &attenuated_reflector_vtable,
+                                   &attenuated_reflector,
+                                   sizeof(ATTENUATED_REFLECTOR),
+                                   alignof(ATTENUATED_REFLECTOR),
+                                   reflector);
+
+    return status;
+}
+
+//
+// AttenuatedAllocator3 Types
 //
 
 typedef struct _ATTENUATED_REFLECTOR3 {
@@ -28,7 +151,7 @@ typedef struct _ATTENUATED_REFLECTOR3 {
 typedef const ATTENUATED_REFLECTOR3 *PCATTENUATED_REFLECTOR3;
 
 //
-// Static Functions
+// AttenuatedAllocator3 Static Functions
 //
 
 static
@@ -137,7 +260,7 @@ AttenuatedReflector3GetAlbedo(
 }
 
 //
-// Static Variables
+// AttenuatedAllocator3 Static Variables
 //
 
 static const REFLECTOR_VTABLE attenuated_reflector3_vtable = {
@@ -147,7 +270,7 @@ static const REFLECTOR_VTABLE attenuated_reflector3_vtable = {
 };
 
 //
-// Functions
+// AttenuatedAllocator3 Functions
 //
 
 ISTATUS

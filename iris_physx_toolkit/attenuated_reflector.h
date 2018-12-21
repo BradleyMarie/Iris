@@ -28,6 +28,14 @@ extern "C" {
 //
 
 ISTATUS
+AttenuatedReflectorAllocateWithAllocator(
+    _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _In_ PCREFLECTOR reflector_to_attenuate,
+    _In_ float_t attenuation,
+    _Out_ PCREFLECTOR *reflector
+    );
+
+ISTATUS
 AttenuatedReflector3AllocateWithAllocator(
     _In_ PREFLECTOR_ALLOCATOR reflector_allocator,
     _In_opt_ PREFLECTOR reflector0,
