@@ -165,7 +165,8 @@ TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_ PCLIST_SCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
-    _In_ const std::string& file_name
+    _In_ const std::string& file_name,
+    _In_ float_t epsilon
     )
 {
     PPIXEL_SAMPLER pixel_sampler;
@@ -209,10 +210,11 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;
-    status = ExactlyEqualsPfmFile(framebuffer,
-                                  file_name.c_str(),
-                                  PFM_PIXEL_FORMAT_XYZ,
-                                  &equals);
+    status = ApproximatelyEqualsPfmFile(framebuffer,
+                                        file_name.c_str(),
+                                        PFM_PIXEL_FORMAT_XYZ,
+                                        epsilon,
+                                        &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
     EXPECT_TRUE(equals);
 
@@ -221,6 +223,16 @@ TestRenderSingleThreaded(
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
 }
+
+//
+// Test Data
+//
+
+static const float_t pi = (float_t)3.1415926535897932384626433832;
+
+//
+// Tests
+//
 
 TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 {
@@ -233,10 +245,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -303,7 +312,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm");
+                             "test_results/single_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -328,10 +338,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -398,7 +405,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -423,10 +431,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -493,7 +498,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm");
+                             "test_results/single_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -518,10 +524,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -588,7 +591,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -613,10 +617,7 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -683,7 +684,8 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -708,10 +710,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -778,7 +777,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm");
+                             "test_results/single_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -803,10 +803,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -873,7 +870,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -898,10 +896,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -968,7 +963,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm");
+                             "test_results/single_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -993,10 +989,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1063,7 +1056,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1088,10 +1082,7 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1158,7 +1149,8 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1183,10 +1175,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1253,7 +1242,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm");
+                             "test_results/single_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1278,10 +1268,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1348,7 +1335,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1373,10 +1361,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1443,7 +1428,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm");
+                             "test_results/single_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1468,10 +1454,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1538,7 +1521,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1563,10 +1547,7 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1633,7 +1614,8 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1658,10 +1640,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1730,7 +1709,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm");
+                             "test_results/single_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1755,10 +1735,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1827,7 +1804,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1852,10 +1830,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1924,7 +1899,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm");
+                             "test_results/single_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1949,10 +1925,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2021,7 +1994,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2046,10 +2020,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2118,7 +2089,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2192,7 +2164,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_xy_triangle.pfm");
+                             "test_results/single_emissive_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2214,10 +2187,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2263,7 +2233,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2334,7 +2305,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_xy_triangle.pfm");
+                             "test_results/single_emissive_triangle_xy_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2356,10 +2328,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2405,7 +2374,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2427,10 +2397,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2499,7 +2466,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm");
+                             "test_results/single_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2524,10 +2492,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2596,7 +2561,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2621,10 +2587,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2693,7 +2656,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm");
+                             "test_results/single_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2718,10 +2682,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2790,7 +2751,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2864,7 +2826,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_xz_triangle.pfm");
+                             "test_results/single_emissive_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2886,10 +2849,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2935,7 +2895,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3006,7 +2967,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_xz_triangle.pfm");
+                             "test_results/single_emissive_triangle_xz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3028,10 +2990,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3077,7 +3036,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3099,10 +3059,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3171,7 +3128,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3196,10 +3154,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3268,7 +3223,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm");
+                             "test_results/single_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3293,10 +3249,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3365,7 +3318,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3390,10 +3344,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3462,7 +3413,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm");
+                             "test_results/single_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3487,10 +3439,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3559,7 +3508,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3584,10 +3534,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3656,7 +3603,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3730,7 +3678,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_yz_triangle.pfm");
+                             "test_results/single_emissive_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3752,10 +3701,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3801,7 +3747,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3872,7 +3819,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/single_emissive_triangle_yz_triangle.pfm");
+                             "test_results/single_emissive_triangle_yz_triangle.pfm",
+                             (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3894,10 +3842,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3943,7 +3888,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             "test_results/blank.pfm");
+                             "test_results/blank.pfm",
+                             (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);

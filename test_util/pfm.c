@@ -57,17 +57,22 @@ SwapBytes(
 }
 
 //
-// Functions
+// Static Functions
 //
 
 ISTATUS
-ExactlyEqualsPfmFile(
+CheckEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_ const char* filename,
     _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ float_t epsilon,
     _Out_ bool *result
     )
 {
+    assert(isfinite(epsilon));
+    assert((float_t)0.0 <= epsilon);
+    assert(result != NULL);
+
     if (framebuffer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -178,9 +183,9 @@ ExactlyEqualsPfmFile(
             COLOR3 pixel_color;
             FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
-            if ((float)pixel_color.x != x ||
-                (float)pixel_color.y != y ||
-                (float)pixel_color.z != z)
+            if (fabs((float)pixel_color.x - x) > epsilon ||
+                fabs((float)pixel_color.y - y) > epsilon ||
+                fabs((float)pixel_color.z - z) > epsilon)
             {
                 if (fclose(file) == EOF)
                 {
@@ -200,4 +205,58 @@ ExactlyEqualsPfmFile(
 
     *result = true;
     return ISTATUS_SUCCESS;
+}
+
+//
+// Functions
+//
+
+ISTATUS
+ExactlyEqualsPfmFile(
+    _In_ PCFRAMEBUFFER framebuffer,
+    _In_ const char* filename,
+    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _Out_ bool *result
+    )
+{
+    if (result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    ISTATUS status = CheckEqualsPfmFile(framebuffer,
+                                        filename,
+                                        pixel_format,
+                                        (float_t)0.0,
+                                        result);
+
+    return status;
+}
+
+ISTATUS
+ApproximatelyEqualsPfmFile(
+    _In_ PCFRAMEBUFFER framebuffer,
+    _In_ const char* filename,
+    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ float_t epsilon,
+    _Out_ bool *result
+    )
+{
+    if (!isfinite(epsilon) || (float_t)0.0 > epsilon)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    ISTATUS status = CheckEqualsPfmFile(framebuffer,
+                                        filename,
+                                        pixel_format,
+                                        epsilon,
+                                        result);
+
+    return status;
 }

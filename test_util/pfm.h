@@ -34,6 +34,15 @@ ExactlyEqualsPfmFile(
     _Out_ bool *result
     );
 
+ISTATUS
+ApproximatelyEqualsPfmFile(
+    _In_ PCFRAMEBUFFER framebuffer,
+    _In_ const char* filename,
+    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ float_t epsilon,
+    _Out_ bool *result
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus
