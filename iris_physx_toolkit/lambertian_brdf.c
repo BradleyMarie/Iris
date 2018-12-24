@@ -14,6 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
+#include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
 
 //
@@ -62,7 +63,6 @@ CreateOrthogonalVector(
 
     return VectorNormalize(orthogonal, NULL, NULL);
 }
-
 
 static
 VECTOR3
@@ -153,7 +153,17 @@ LambertianBrdfSample(
         return status;
     }
 
-    *reflector = lambertian_brdf->reflector;
+    status =
+        AttenuatedReflectorAllocateWithAllocator(allocator,
+                                                 lambertian_brdf->reflector,
+                                                 inv_pi,
+                                                 reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     *pdf = fmax((float_t)0.0, VectorDotProduct(*outgoing, normal));
 
     return ISTATUS_SUCCESS;
@@ -172,9 +182,13 @@ LambertianBrdfComputeReflectance(
 {
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
-    *reflector = lambertian_brdf->reflector;
+    ISTATUS status =
+        AttenuatedReflectorAllocateWithAllocator(allocator,
+                                                 lambertian_brdf->reflector,
+                                                 inv_pi,
+                                                 reflector);
 
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
@@ -191,7 +205,17 @@ LambertianBrdfComputeReflectanceWithPdf(
 {
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
-    *reflector = lambertian_brdf->reflector;
+    ISTATUS status =
+        AttenuatedReflectorAllocateWithAllocator(allocator,
+                                                 lambertian_brdf->reflector,
+                                                 inv_pi,
+                                                 reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     *pdf = fmax((float_t)0.0, VectorDotProduct(outgoing, normal));
 
     return ISTATUS_SUCCESS;
