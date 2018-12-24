@@ -133,6 +133,11 @@ AreaLightSample(
                                                  &sampled_point,
                                                  pdf);
 
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     sampled_point = PointMatrixMultiply(area_light->model_to_world,
                                         sampled_point);
 
@@ -231,7 +236,7 @@ AreaLightComputeEmissiveWithPdf(
                                          area_light->face,
                                          pdf);
 
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
