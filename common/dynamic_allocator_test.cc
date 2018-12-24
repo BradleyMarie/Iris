@@ -123,10 +123,7 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorFreeAll)
 
 std::string GenerateRandomString(size_t length, std::minstd_rand* generator)
 {
-    if (length == 0)
-    {
-        return std::string();
-    }
+    assert(length != 0);
 
     std::uniform_int_distribution<char> character_generator(97,122);
 
@@ -196,7 +193,7 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
 
     std::minstd_rand rng(1u);
     std::uniform_int_distribution<size_t> size_generator(2,512);
-    std::uniform_int_distribution<size_t> should_do_data_generator(1,16);
+    std::uniform_int_distribution<size_t> should_do_data_generator(1,2);
     std::map<char *, std::string> header_values;
     std::map<char *, std::string> data_values;
 
@@ -228,13 +225,13 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         EXPECT_EQ(0u, (uintptr_t)datum % GetAlignment(datum_size));
 
         std::string header_value = GenerateRandomString(header_size, &rng);
-        std::string datum_value = GenerateRandomString(datum_size, &rng);
 
         strncpy(header, header_value.c_str(), header_size);
         header_values[header] = header_value;
 
-        if (datum_size)
+        if (datum_size != 0)
         {
+            std::string datum_value = GenerateRandomString(datum_size, &rng);
             strncpy(datum, datum_value.c_str(), datum_size);
             data_values[datum] = datum_value;
         }
@@ -286,13 +283,13 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         EXPECT_EQ(0u, (uintptr_t)datum % GetAlignment(datum_size));
 
         std::string header_value = GenerateRandomString(header_size, &rng);
-        std::string datum_value = GenerateRandomString(datum_size, &rng);
 
         strncpy(header, header_value.c_str(), header_size);
         header_values[header] = header_value;
 
         if (datum_size)
         {
+            std::string datum_value = GenerateRandomString(datum_size, &rng);
             strncpy(datum, datum_value.c_str(), datum_size);
             data_values[datum] = datum_value;
         }

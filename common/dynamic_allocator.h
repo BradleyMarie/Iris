@@ -126,6 +126,10 @@ DynamicMemoryAllocatorAllocate(
             {
                 newer->older = next_allocation;
             }
+            else
+            {
+                allocator->last_allocation = next_allocation;
+            }
 
             next_allocation->size = allocation_size;
             next_allocation->older = older;
