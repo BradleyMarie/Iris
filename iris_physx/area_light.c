@@ -125,9 +125,12 @@ AreaLightSample(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
+    POINT3 model_hit = PointMatrixInverseMultiply(area_light->model_to_world,
+                                                  hit_point);
+
     POINT3 sampled_point;
     ISTATUS status = ShapeSampleFaceBySolidAngle(area_light->shape,
-                                                 hit_point,
+                                                 model_hit,
                                                  area_light->face,
                                                  rng,
                                                  &sampled_point,
@@ -230,8 +233,16 @@ AreaLightComputeEmissiveWithPdf(
     float_t distance_squared = VectorDotProduct(to_light_vector,
                                                 to_light_vector);
 
+    // TODO: Preserve model ray to avoid recomputing this.
+    RAY model_to_light = RayMatrixInverseMultiply(area_light->model_to_world,
+                                                  *to_light);
+
+    model_to_light.direction = VectorNormalize(model_to_light.direction,
+                                               NULL,
+                                               NULL);
+
     status = ShapeComputePdfBySolidAngle(area_light->shape,
-                                         to_light,
+                                         &model_to_light,
                                          distance_squared,
                                          area_light->face,
                                          pdf);

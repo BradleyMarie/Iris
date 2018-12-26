@@ -21,18 +21,20 @@ Abstract:
 static
 inline
 float_t
-ComputeSampleWeight(
+PowerHeuristic(
     _In_ float_t sampled_pdf,
     _In_ float_t computed_pdf
     )
 {
-    assert(isfinite(sampled_pdf) && (float_t)0.0 <= sampled_pdf);
-    assert(isfinite(computed_pdf) && (float_t)0.0 <= computed_pdf);
+    assert(isfinite(sampled_pdf));
+    assert((float_t)0.0 <= sampled_pdf);
+    assert(isfinite(computed_pdf));
+    assert((float_t)0.0 <= computed_pdf);
 
-    float_t sampled_pdf_squared = sampled_pdf * sampled_pdf;
-    float_t computed_pdf_squared = computed_pdf * computed_pdf;
+    sampled_pdf *= sampled_pdf;
+    computed_pdf *= computed_pdf;
 
-    return sampled_pdf_squared / (sampled_pdf_squared + computed_pdf_squared);
+    return sampled_pdf / (sampled_pdf + computed_pdf);
 }
 
 static
@@ -258,8 +260,8 @@ SampleDirectLighting(
         float_t light_sample_falloff = 
             VectorDotProduct(shading_normal, light_sampled_direction);
 
-        float_t light_sample_weight = ComputeSampleWeight(light_sampled_pdf,
-                                                          brdf_computed_pdf);
+        float_t light_sample_weight = PowerHeuristic(light_sampled_pdf,
+                                                     brdf_computed_pdf);
         
         float_t light_sample_attenuation =
             (light_sample_falloff * light_sample_weight) / light_sampled_pdf;
@@ -298,8 +300,8 @@ SampleDirectLighting(
         float_t brdf_sample_falloff =
             VectorDotProduct(shading_normal, brdf_sampled_direction);
 
-        float_t brdf_sample_weight = ComputeSampleWeight(brdf_sampled_pdf,
-                                                         light_computed_pdf);
+        float_t brdf_sample_weight = PowerHeuristic(brdf_sampled_pdf,
+                                                    light_computed_pdf);
         
         float_t brdf_sample_attenuation = 
             (brdf_sample_falloff * brdf_sample_weight) / brdf_sampled_pdf;

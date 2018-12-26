@@ -551,9 +551,13 @@ EmissiveTriangleSampleFaceBySolidAngle(
     *sampled_point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
 
     VECTOR3 to_triangle = PointSubtract(*sampled_point, hit_point);
-    float_t dp =
-        fabs(VectorDotProduct(triangle->triangle.surface_normal, to_triangle));
-    *pdf = VectorDotProduct(to_triangle, to_triangle) / (dp * triangle->area);
+
+    float_t distance_squared;
+    to_triangle = VectorNormalize(to_triangle, &distance_squared, NULL);
+
+    float_t dp = VectorDotProduct(triangle->triangle.surface_normal,
+                                  to_triangle);
+    *pdf = distance_squared / (fabs(dp) * triangle->area);
 
     return ISTATUS_SUCCESS;
 }
