@@ -190,8 +190,14 @@ PathTracerIntegrate(
 
         float_t cosine_falloff = VectorDotProduct(shading_normal,
                                                   trace_ray.direction);
+        cosine_falloff = fmax((float_t)0.0, cosine_falloff);
 
         path_throughput *= albedo * cosine_falloff;
+
+        if (isfinite(pdf))
+        {
+            path_throughput /= pdf;
+        }
 
         if (path_tracer->min_bounces < bounces)
         {
@@ -214,17 +220,22 @@ PathTracerIntegrate(
                 break;
             }
 
-            pdf *= cutoff;
+            float_t roulette_pdf = (float_t)1.0 - cutoff;
+            float_t inv_roulette_pdf = (float_t)1.0 / roulette_pdf;
+
+            pdf *= inv_roulette_pdf;
+            path_throughput *= inv_roulette_pdf;
         }
+
+        path_tracer->attenuations[bounces] = cosine_falloff;
 
         if (isinf(pdf))
         {
-            path_tracer->attenuations[bounces] = (float_t)1.0;
             add_light_emissions = true;
         }
         else
         {
-            path_tracer->attenuations[bounces] = (float_t)1.0 / pdf;
+            path_tracer->attenuations[bounces] /= pdf;
         }
 
         trace_ray.origin = hit_point;
@@ -233,23 +244,22 @@ PathTracerIntegrate(
 
     for (; bounces != 0; bounces--)
     {
-        PCSPECTRUM sum;
-        ISTATUS status = SpectrumCompositorAddSpectra(
+        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(
             compositor, 
             path_tracer->spectra[bounces],
-            path_tracer->spectra[bounces - 1],
-            &sum);
+            path_tracer->reflectors[bounces - 1],
+            path_tracer->attenuations[bounces - 1],
+            path_tracer->spectra + bounces);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
-        status = SpectrumCompositorAttenuatedAddReflection(
+        status = SpectrumCompositorAddSpectra(
             compositor,
-            sum,
-            path_tracer->reflectors[bounces - 1],
-            path_tracer->attenuations[bounces - 1],
+            path_tracer->spectra[bounces],
+            path_tracer->spectra[bounces - 1],
             path_tracer->spectra + bounces - 1);
 
         if (status != ISTATUS_SUCCESS)
