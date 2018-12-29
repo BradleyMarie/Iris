@@ -32,7 +32,7 @@ struct _PIXEL_SAMPLER_GENERATOR {
 
 ISTATUS
 PixelSamplerGeneratorGenerate(
-    _In_ struct _PIXEL_SAMPLER_GENERATOR *pixel_sampler_generator,
+    _In_ const struct _PIXEL_SAMPLER_GENERATOR *pixel_sampler_generator,
     _Out_ PPIXEL_SAMPLER *pixel_sampler
     )
 {

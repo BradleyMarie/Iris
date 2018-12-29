@@ -20,7 +20,7 @@ Abstract:
 typedef
 ISTATUS
 (*PPIXEL_SAMPLER_GENERATOR_GENERATE_ROUTINE)(
-    _In_ void *context,
+    _In_ const void *context,
     _Out_ PPIXEL_SAMPLER *pixel_sampler
     );
 

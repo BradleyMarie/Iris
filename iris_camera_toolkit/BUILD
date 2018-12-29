@@ -10,6 +10,16 @@ cc_library(
 )
 
 cc_library(
+    name = "grid_pixel_sampler_generator",
+    hdrs = ["grid_pixel_sampler_generator.h"],
+    srcs = ["grid_pixel_sampler_generator.c"],
+    deps = [
+        ":grid_pixel_sampler",
+        "//iris_camera:iris_camera",
+    ],
+)
+
+cc_library(
     name = "orthographic_camera",
     hdrs = ["orthographic_camera.h"],
     srcs = ["orthographic_camera.c"],
