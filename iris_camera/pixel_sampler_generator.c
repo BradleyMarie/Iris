@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    pixel_sample_generator.c
+    pixel_sampler_generator.c
 
 Abstract:
 
