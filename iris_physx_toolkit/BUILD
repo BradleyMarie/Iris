@@ -113,16 +113,6 @@ cc_library(
 )
 
 cc_library(
-    name = "sample_tracer",
-    hdrs = ["sample_tracer.h"],
-    srcs = ["sample_tracer.c"],
-    deps = [
-        "//iris_camera:iris_camera",
-        "//iris_physx:iris_physx",
-    ],
-)
-
-cc_library(
     name = "sphere",
     hdrs = ["sphere.h"],
     srcs = ["sphere.c"],

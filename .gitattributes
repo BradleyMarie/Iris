@@ -13,5 +13,7 @@ iris_avanced_toolkit/*.h linguist-language=C
 iris_camera/*.h linguist-language=C
 iris_camera_toolkit/*.h linguist-language=C
 iris_physx/*.h linguist-language=C
+iris_physx_camera_toolkit/*.h linguist-language=C
 iris_physx_toolkit/*.h linguist-language=C
+test_util/*.h linguist-language=C
 third_party/** linguist-vendored

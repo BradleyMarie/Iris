@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/sample_tracer.h"
+#include "iris_physx_camera_toolkit/sample_tracer.h"
 
 //
 // Types
