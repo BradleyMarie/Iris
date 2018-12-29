@@ -8,8 +8,8 @@ Module Name:
 
 Abstract:
 
-    A spectrum, reflector, and tone mapper for use in testing which directly map
-    X, Y, and Z values to the outputs of the integrator.
+    A spectrum, reflector, and color matcher for use in testing which directly
+    map X, Y, and Z values to the outputs of the integrator.
 
 --*/
 
@@ -43,8 +43,8 @@ TestReflectorAllocate(
     );
 
 ISTATUS
-TestToneMapperAllocate(
-    _Out_ PTONE_MAPPER *tone_mapper
+TestColorMatcherAllocate(
+    _Out_ PCOLOR_MATCHER *color_matcher
     );
 
 #if __cplusplus 

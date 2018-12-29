@@ -27,7 +27,7 @@ typedef struct _PHYSX_SAMPLE_TRACER {
     PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine;
     PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine;
     void* light_sampler_context;
-    PTONE_MAPPER tone_mapper;
+    PCOLOR_MATCHER color_matcher;
 } PHYSX_SAMPLE_TRACER, *PPHYSX_SAMPLE_TRACER;
 
 typedef const PHYSX_SAMPLE_TRACER *PCPHYSX_SAMPLE_TRACER;
@@ -57,29 +57,29 @@ PhysxSampleTracerTraceRay(
                             *ray,
                             rng,
                             epsilon,
-                            physx_sample_tracer->tone_mapper);
+                            physx_sample_tracer->color_matcher);
 
     return status;
 }
 
 static
 ISTATUS
-PhysxSampleTracerToneMap(
+PhysxSampleTracerColorMatch(
     _In_opt_ void *context,
     _Out_ PCOLOR3 color
     )
 {
     PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
 
-    ISTATUS status = ToneMapperComputeTone(physx_sample_tracer->tone_mapper,
-                                           color);
+    ISTATUS status =
+        ColorMatcherComputeColor(physx_sample_tracer->color_matcher, color);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    status = ToneMapperClear(physx_sample_tracer->tone_mapper);
+    status = ColorMatcherClear(physx_sample_tracer->color_matcher);
 
     return status;
 }
@@ -93,7 +93,7 @@ PhysxSampleTracerFree(
     PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
 
     IntegratorFree(physx_sample_tracer->integrator);
-    ToneMapperFree(physx_sample_tracer->tone_mapper);
+    ColorMatcherFree(physx_sample_tracer->color_matcher);
 }
 
 //
@@ -102,7 +102,7 @@ PhysxSampleTracerFree(
 
 static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
     PhysxSampleTracerTraceRay,
-    PhysxSampleTracerToneMap,
+    PhysxSampleTracerColorMatch,
     PhysxSampleTracerFree
 };
 
@@ -118,7 +118,7 @@ PhysxSampleTracerAllocate(
     _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
     _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
     _Inout_opt_ void* light_sampler_context,
-    _In_ PTONE_MAPPER tone_mapper,
+    _In_ PCOLOR_MATCHER color_matcher,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
@@ -137,7 +137,7 @@ PhysxSampleTracerAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (tone_mapper == NULL)
+    if (color_matcher == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -154,7 +154,7 @@ PhysxSampleTracerAllocate(
     physx_sample_tracer.prepare_samples_routine = prepare_samples_routine;
     physx_sample_tracer.next_sample_routine = next_sample_routine;
     physx_sample_tracer.light_sampler_context = light_sampler_context;
-    physx_sample_tracer.tone_mapper = tone_mapper;
+    physx_sample_tracer.color_matcher = color_matcher;
 
     ISTATUS status = SampleTracerAllocate(&sample_tracer_vtable,
                                           &physx_sample_tracer,

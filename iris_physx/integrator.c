@@ -16,6 +16,7 @@ Abstract:
 
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/brdf_allocator_internal.h"
+#include "iris_physx/color_matcher_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"
 #include "iris_physx/light_sampler_internal.h"
@@ -23,7 +24,6 @@ Abstract:
 #include "iris_physx/ray_tracer_internal.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/spectrum_compositor_internal.h"
-#include "iris_physx/tone_mapper_internal.h"
 #include "iris_physx/visibility_tester_internal.h"
 
 //
@@ -146,7 +146,7 @@ IntegratorIntegrate(
     _In_ RAY ray,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
-    _Inout_ PTONE_MAPPER tone_mapper
+    _Inout_ PCOLOR_MATCHER color_matcher
     )
 {
     if (integrator == NULL)
@@ -179,7 +179,7 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
 
-    if (tone_mapper == NULL)
+    if (color_matcher == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_09;
     }
@@ -216,7 +216,7 @@ IntegratorIntegrate(
 
     if (status == ISTATUS_SUCCESS)
     {
-        status = ToneMapperAddSample(tone_mapper, spectrum);
+        status = ColorMatcherAddSample(color_matcher, spectrum);
     }
 
     ShapeRayTracerClear(&integrator->shape_ray_tracer);

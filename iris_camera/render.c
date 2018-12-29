@@ -202,7 +202,7 @@ IrisCameraRenderPixel(
     }
 
     COLOR3 color;
-    status = SampleTracerToneMap(sample_tracer, &color);
+    status = SampleTracerColorMatch(sample_tracer, &color);
 
     if (status != ISTATUS_SUCCESS)
     {

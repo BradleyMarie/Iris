@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Implements the test spectrum, reflector, and tone mapper.
+    Implements the test spectrum, reflector, and color matcher.
 
 --*/
 
@@ -44,14 +44,14 @@ typedef struct _TEST_REFLECTOR {
 
 typedef const TEST_REFLECTOR *PCTEST_REFLECTOR;
 
-typedef struct _TEST_TONE_MAPPER {
+typedef struct _TEST_COLOR_MATCHER {
     float_t x;
     float_t y;
     float_t z;
     uint32_t num_samples;
-} TEST_TONE_MAPPER, *PTEST_TONE_MAPPER;
+} TEST_COLOR_MATCHER, *PTEST_COLOR_MATCHER;
 
-typedef const TEST_TONE_MAPPER *PCTEST_TONE_MAPPER;
+typedef const TEST_COLOR_MATCHER *PCTEST_COLOR_MATCHER;
 
 //
 // Static Functions
@@ -134,12 +134,12 @@ TestReflectorGetAlbedo(
 }
 
 ISTATUS
-TestToneMapperAddSample(
+TestColorMatcherAddSample(
     _In_ void *context,
     _In_opt_ PCSPECTRUM spectrum
     )
 {
-    PTEST_TONE_MAPPER test_tone_mapper = (PTEST_TONE_MAPPER)context;
+    PTEST_COLOR_MATCHER test_color_matcher = (PTEST_COLOR_MATCHER)context;
 
     float_t intensity;
     ISTATUS status = SpectrumSample(spectrum,
@@ -151,7 +151,7 @@ TestToneMapperAddSample(
         return status;
     }
 
-    test_tone_mapper->x += intensity;
+    test_color_matcher->x += intensity;
 
     status = SpectrumSample(spectrum,
                             Y_WAVELENGTH,
@@ -162,7 +162,7 @@ TestToneMapperAddSample(
         return status;
     }
 
-    test_tone_mapper->y += intensity;
+    test_color_matcher->y += intensity;
 
     status = SpectrumSample(spectrum,
                             Z_WAVELENGTH,
@@ -173,40 +173,40 @@ TestToneMapperAddSample(
         return status;
     }
 
-    test_tone_mapper->z += intensity;
+    test_color_matcher->z += intensity;
 
-    test_tone_mapper->num_samples += 1;
+    test_color_matcher->num_samples += 1;
 
     return ISTATUS_SUCCESS;
 }
 
 ISTATUS
-TestToneMapperComputeTone(
+TestColorMatcherComputeColor(
     _In_ const void *context,
     _Out_ PCOLOR3 color
     )
 {
-    PCTEST_TONE_MAPPER test_tone_mapper = (PCTEST_TONE_MAPPER)context;
+    PCTEST_COLOR_MATCHER test_color_matcher = (PCTEST_COLOR_MATCHER)context;
 
     *color = ColorCreate(
-        test_tone_mapper->x / (float_t)test_tone_mapper->num_samples,
-        test_tone_mapper->y / (float_t)test_tone_mapper->num_samples,
-        test_tone_mapper->z / (float_t)test_tone_mapper->num_samples);
+        test_color_matcher->x / (float_t)test_color_matcher->num_samples,
+        test_color_matcher->y / (float_t)test_color_matcher->num_samples,
+        test_color_matcher->z / (float_t)test_color_matcher->num_samples);
 
     return ISTATUS_SUCCESS;
 }
 
 ISTATUS
-TestToneMapperClear(
+TestColorMatcherClear(
     _Inout_ void *context
     )
 {
-    PTEST_TONE_MAPPER test_tone_mapper = (PTEST_TONE_MAPPER)context;
+    PTEST_COLOR_MATCHER test_color_matcher = (PTEST_COLOR_MATCHER)context;
 
-    test_tone_mapper->x = (float_t)0.0;
-    test_tone_mapper->y = (float_t)0.0;
-    test_tone_mapper->z = (float_t)0.0;
-    test_tone_mapper->num_samples = 0;
+    test_color_matcher->x = (float_t)0.0;
+    test_color_matcher->y = (float_t)0.0;
+    test_color_matcher->z = (float_t)0.0;
+    test_color_matcher->num_samples = 0;
 
     return ISTATUS_SUCCESS;
 }
@@ -226,10 +226,10 @@ static const REFLECTOR_VTABLE test_reflector_vtable = {
     NULL
 };
 
-static const TONE_MAPPER_VTABLE test_tone_mapper_vtable = {
-    TestToneMapperAddSample,
-    TestToneMapperComputeTone,
-    TestToneMapperClear,
+static const COLOR_MATCHER_VTABLE test_color_matcher_vtable = {
+    TestColorMatcherAddSample,
+    TestColorMatcherComputeColor,
+    TestColorMatcherClear,
     NULL
 };
 
@@ -322,26 +322,26 @@ TestReflectorAllocate(
 }
 
 ISTATUS
-TestToneMapperAllocate(
-    _Out_ PTONE_MAPPER *tone_mapper
+TestColorMatcherAllocate(
+    _Out_ PCOLOR_MATCHER *color_matcher
     )
 {
-    if (tone_mapper == NULL)
+    if (color_matcher == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    TEST_TONE_MAPPER test_tone_mapper;
-    test_tone_mapper.x = (float_t)0.0;
-    test_tone_mapper.y = (float_t)0.0;
-    test_tone_mapper.z = (float_t)0.0;
-    test_tone_mapper.num_samples = 0;
+    TEST_COLOR_MATCHER test_color_matcher;
+    test_color_matcher.x = (float_t)0.0;
+    test_color_matcher.y = (float_t)0.0;
+    test_color_matcher.z = (float_t)0.0;
+    test_color_matcher.num_samples = 0;
 
-    ISTATUS status = ToneMapperAllocate(&test_tone_mapper_vtable,
-                                        &test_tone_mapper,
-                                        sizeof(TEST_TONE_MAPPER),
-                                        alignof(TEST_TONE_MAPPER),
-                                        tone_mapper);
+    ISTATUS status = ColorMatcherAllocate(&test_color_matcher_vtable,
+                                        &test_color_matcher,
+                                        sizeof(TEST_COLOR_MATCHER),
+                                        alignof(TEST_COLOR_MATCHER),
+                                        color_matcher);
 
     return status;
 }

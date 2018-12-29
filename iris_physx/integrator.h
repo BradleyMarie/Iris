@@ -15,8 +15,8 @@ Abstract:
 #ifndef _IRIS_PHYSX_INTEGRATOR_
 #define _IRIS_PHYSX_INTEGRATOR_
 
+#include "iris_physx/color_matcher.h"
 #include "iris_physx/integrator_vtable.h"
-#include "iris_physx/tone_mapper.h"
 
 //
 // Types
@@ -57,7 +57,7 @@ IntegratorIntegrate(
     _In_ RAY ray,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
-    _Inout_ PTONE_MAPPER tone_mapper
+    _Inout_ PCOLOR_MATCHER color_matcher
     );
 
 void

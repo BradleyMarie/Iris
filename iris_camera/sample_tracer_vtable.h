@@ -29,14 +29,14 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PSAMPLE_TRACER_TONE_MAP_ROUTINE)(
+(*PSAMPLE_TRACER_COLOR_MATCH_ROUTINE)(
     _In_opt_ void *context,
     _Out_ PCOLOR3 color
     );
 
 typedef struct _SAMPLE_TRACER_VTABLE {
     PSAMPLE_TRACER_TRACE_ROUTINE trace_routine;
-    PSAMPLE_TRACER_TONE_MAP_ROUTINE tone_map_routine;
+    PSAMPLE_TRACER_COLOR_MATCH_ROUTINE color_match_routine;
     PFREE_ROUTINE free_routine;
 } SAMPLE_TRACER_VTABLE, *PSAMPLE_TRACER_VTABLE;
 

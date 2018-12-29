@@ -34,7 +34,7 @@ PhysxSampleTracerAllocate(
     _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
     _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
     _Inout_opt_ void* light_sampler_context,
-    _In_ PTONE_MAPPER tone_mapper,
+    _In_ PCOLOR_MATCHER color_matcher,
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 

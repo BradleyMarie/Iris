@@ -57,7 +57,7 @@ SampleTracerTrace(
 inline
 static
 ISTATUS
-SampleTracerToneMap(
+SampleTracerColorMatch(
     _In_ struct _SAMPLE_TRACER *tracer,
     _Out_ PCOLOR3 color
     )
@@ -65,7 +65,7 @@ SampleTracerToneMap(
     assert(tracer != NULL);
     assert(color != NULL);
 
-    ISTATUS status = tracer->vtable->tone_map_routine(tracer->data, color);
+    ISTATUS status = tracer->vtable->color_match_routine(tracer->data, color);
 
     return status;
 }

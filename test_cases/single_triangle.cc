@@ -185,8 +185,8 @@ TestRenderSingleThreaded(
     status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PTONE_MAPPER tone_mapper;
-    status = TestToneMapperAllocate(&tone_mapper);
+    PCOLOR_MATCHER color_matcher;
+    status = TestColorMatcherAllocate(&color_matcher);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -197,7 +197,7 @@ TestRenderSingleThreaded(
         AllLightSamplerPrepareSamplesCallback,
         AllLightSamplerNextSampleCallback, 
         light_sampler,
-        tone_mapper,
+        color_matcher,
         &sample_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
