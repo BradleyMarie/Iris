@@ -4,7 +4,7 @@ Copyright (c) 2018 Brad Weinberger
 
 Module Name:
 
-    iris_hittester.h
+    hit_tester_internal.h
 
 Abstract:
 
