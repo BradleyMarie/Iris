@@ -41,7 +41,7 @@ IntegratorGeneratorGenerate(
 
     PINTEGRATOR result;
     ISTATUS status = integrator_generator->vtable->generate_routine(
-            integrator_generator->data, &result);
+        integrator_generator->data, &result);
 
     if (status != ISTATUS_SUCCESS)
     {

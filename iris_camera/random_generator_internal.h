@@ -41,7 +41,7 @@ RandomGeneratorGenerate(
 
     PRANDOM result;
     ISTATUS status = random_generator->vtable->generate_routine(
-            random_generator->data, &result);
+        random_generator->data, &result);
 
     if (status != ISTATUS_SUCCESS)
     {

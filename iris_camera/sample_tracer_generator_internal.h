@@ -41,7 +41,7 @@ SampleTracerGeneratorGenerate(
 
     PSAMPLE_TRACER result;
     ISTATUS status = sample_tracer_generator->vtable->generate_routine(
-            sample_tracer_generator->data, &result);
+        sample_tracer_generator->data, &result);
 
     if (status != ISTATUS_SUCCESS)
     {

@@ -41,7 +41,7 @@ PixelSamplerGeneratorGenerate(
 
     PPIXEL_SAMPLER result;
     ISTATUS status = pixel_sampler_generator->vtable->generate_routine(
-            pixel_sampler_generator->data, &result);
+        pixel_sampler_generator->data, &result);
 
     if (status != ISTATUS_SUCCESS)
     {
