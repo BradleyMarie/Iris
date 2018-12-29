@@ -54,6 +54,7 @@ cc_library(
         ":camera",
         ":framebuffer",
         ":pixel_sampler",
+        ":pixel_sampler_generator",
         ":random_generator",
         ":render",
         ":sample_tracer",
