@@ -92,7 +92,7 @@ PathTracerIntegrate(
             break;
         }
 
-        ISTATUS sampler_status = LightSamplerPrepareSamples(light_sampler,
+        ISTATUS sampler_status = LightSamplerCollectSamples(light_sampler,
                                                             rng,
                                                             hit_point);
 
@@ -106,7 +106,6 @@ PathTracerIntegrate(
             PCLIGHT light;
             float_t pdf;
             sampler_status = LightSamplerNextSample(light_sampler,
-                                                    rng,
                                                     &light,
                                                     &pdf);
 

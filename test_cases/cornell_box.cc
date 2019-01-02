@@ -66,8 +66,7 @@ TestRenderSingleThreaded(
         path_tracer,
         ListSceneTraceCallback,
         scene,
-        nullptr,
-        OneLightSamplerNextSampleCallback,
+        OneLightSamplerSampleLightsCallback,
         light_sampler,
         color_matcher,
         &sample_tracer);

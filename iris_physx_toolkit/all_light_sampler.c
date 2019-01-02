@@ -113,46 +113,29 @@ AllLightSamplerFree(
 //
 
 ISTATUS
-AllLightSamplerPrepareSamplesCallback(
-    _Inout_opt_ void *context,
+AllLightSamplerSampleLightsCallback(
+    _In_opt_ const void* context,
+    _In_ POINT3 hit,
     _Inout_ PRANDOM rng,
-    _In_ POINT3 point
+    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
     )
 {
     PALL_LIGHT_SAMPLER all_light_sampler = (PALL_LIGHT_SAMPLER)context;
-
-    if (PointerListGetSize(&all_light_sampler->lights) == 0)
-    {
-        return ISTATUS_DONE;
-    }
-
-    all_light_sampler->next_light = 0;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-AllLightSamplerNextSampleCallback(
-    _Inout_opt_ void *context,
-    _Inout_ PRANDOM rng,
-    _Out_ PCLIGHT *light,
-    _Out_ float_t *pdf
-    )
-{
-    PALL_LIGHT_SAMPLER all_light_sampler = (PALL_LIGHT_SAMPLER)context;
-
-    *light =
-        (PCLIGHT)PointerListRetrieveAtIndex(&all_light_sampler->lights,
-                                            all_light_sampler->next_light);
-    *pdf = (float_t)1.0;
-
-    all_light_sampler->next_light += 1;
 
     size_t num_lights = PointerListGetSize(&all_light_sampler->lights);
-
-    if (all_light_sampler->next_light == num_lights)
+    for (size_t i = 0; i < num_lights; i++)
     {
-        return ISTATUS_DONE;
+        PCLIGHT light =
+            (PCLIGHT)PointerListRetrieveAtIndex(&all_light_sampler->lights,
+                                                all_light_sampler->next_light);
+
+        ISTATUS status =
+            LightSampleCollectorAddSample(collector, light, (float_t)1.0);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
     }
 
     return ISTATUS_SUCCESS;

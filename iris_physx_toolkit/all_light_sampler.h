@@ -53,18 +53,11 @@ AllLightSamplerFree(
 //
 
 ISTATUS
-AllLightSamplerPrepareSamplesCallback(
-    _Inout_opt_ void *context,
+AllLightSamplerSampleLightsCallback(
+    _In_opt_ const void* context,
+    _In_ POINT3 hit,
     _Inout_ PRANDOM rng,
-    _In_ POINT3 point
-    );
-
-ISTATUS 
-AllLightSamplerNextSampleCallback(
-    _Inout_opt_ void *context,
-    _Inout_ PRANDOM rng,
-    _Out_ PCLIGHT *light,
-    _Out_ float_t *pdf
+    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
     );
 
 #if __cplusplus 

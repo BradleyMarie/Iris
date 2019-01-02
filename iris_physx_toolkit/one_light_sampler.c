@@ -110,11 +110,11 @@ OneLightSamplerFree(
 //
 
 ISTATUS
-OneLightSamplerNextSampleCallback(
-    _Inout_opt_ void *context,
+OneLightSamplerSampleLightsCallback(
+    _In_opt_ const void* context,
+    _In_ POINT3 hit,
     _Inout_ PRANDOM rng,
-    _Out_ PCLIGHT *light,
-    _Out_ float_t *pdf
+    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
     )
 {
     PONE_LIGHT_SAMPLER one_light_sampler = (PONE_LIGHT_SAMPLER)context;
@@ -129,9 +129,18 @@ OneLightSamplerNextSampleCallback(
         return status;
     }
 
-    *light = (PCLIGHT)PointerListRetrieveAtIndex(&one_light_sampler->lights,
-                                                 light_index);
-    *pdf = (float_t)1.0 / (float_t)num_lights;
+    PCLIGHT light =
+        (PCLIGHT)PointerListRetrieveAtIndex(&one_light_sampler->lights,
+                                            light_index);
+
+    float_t pdf = (float_t)1.0 / (float_t)num_lights;
+
+    status = LightSampleCollectorAddSample(collector, light, pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
 
     return ISTATUS_DONE;
 }

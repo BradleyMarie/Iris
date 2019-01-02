@@ -69,8 +69,7 @@ TEST(EmptyPhysx, ListScene)
         path_tracer,
         ListSceneTraceCallback,
         scene,
-        AllLightSamplerPrepareSamplesCallback,
-        AllLightSamplerNextSampleCallback, 
+        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_matcher,
         &sample_tracer);

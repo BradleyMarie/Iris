@@ -111,11 +111,21 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    success = LightSamplerInitialize(&result->light_sampler);
+
+    if (!success)
+    {
+        ShapeRayTracerDestroy(&result->shape_ray_tracer);
+        free(result);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     success = VisibilityTesterInitialize(&result->visibility_tester);
 
     if (!success)
     {
         ShapeRayTracerDestroy(&result->shape_ray_tracer);
+        LightSamplerDestroy(&result->light_sampler);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -125,6 +135,7 @@ IntegratorAllocate(
     if (!success)
     {
         ShapeRayTracerDestroy(&result->shape_ray_tracer);
+        LightSamplerDestroy(&result->light_sampler);
         VisibilityTesterDestroy(&result->visibility_tester);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
@@ -140,9 +151,8 @@ IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_opt_ PLIGHT_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine,
-    _In_ PLIGHT_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine,
-    _Inout_opt_ void* light_sampler_context,
+    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
+    _In_opt_ const void* sample_lights_context,
     _In_ RAY ray,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
@@ -159,29 +169,29 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (next_sample_routine == NULL)
+    if (sample_lights_routine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (!RayValidate(ray))
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_07;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     if (color_matcher == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_09;
+        return ISTATUS_INVALID_ARGUMENT_08;
     }
 
     ShapeRayTracerConfigure(&integrator->shape_ray_tracer,
@@ -189,10 +199,9 @@ IntegratorIntegrate(
                             trace_context,
                             epsilon);
 
-    LightSamplerInitialize(&integrator->light_sampler,
-                           prepare_samples_routine,
-                           next_sample_routine,
-                           light_sampler_context);
+    LightSamplerConfigure(&integrator->light_sampler,
+                          sample_lights_routine,
+                          sample_lights_context);
 
     VisibilityTesterConfigure(&integrator->visibility_tester,
                               trace_routine,
@@ -236,6 +245,7 @@ IntegratorFree(
     }
 
     ShapeRayTracerDestroy(&integrator->shape_ray_tracer);
+    LightSamplerDestroy(&integrator->light_sampler);
     VisibilityTesterDestroy(&integrator->visibility_tester);
     SpectrumCompositorDestroy(&integrator->spectrum_compositor);
 
