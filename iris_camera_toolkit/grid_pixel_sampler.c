@@ -275,7 +275,7 @@ GridPixelSamplerNextSample(
 
 ISTATUS
 GridPixelSamplerDuplicate(
-    _In_ const void *context,
+    _In_opt_ const void *context,
     _Out_ PPIXEL_SAMPLER *duplicate
     )
 {

@@ -48,7 +48,7 @@ ISTATUS
 typedef
 ISTATUS
 (*PCOLOR_MATCHER_REPLICATE_ROUTINE)(
-    _In_ const void *context,
+    _In_opt_ const void *context,
     _Out_ PCOLOR_MATCHER *replica
     );
 

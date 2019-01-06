@@ -77,7 +77,7 @@ PermutedCongruentialRandomGenerateIndex(
 
 ISTATUS
 PermutedCongruentialRandomReplicate(
-    _In_ void *context,
+    _In_opt_ void *context,
     _Out_ PRANDOM *replica
     )
 {
