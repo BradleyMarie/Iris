@@ -18,6 +18,13 @@ Abstract:
 #include "common/free_routine.h"
 #include "iris_advanced/iris_advanced.h"
 
+//
+// Types
+//
+
+typedef struct _SAMPLE_TRACER SAMPLE_TRACER, *PSAMPLE_TRACER;
+typedef const SAMPLE_TRACER *PCSAMPLE_TRACER;
+
 typedef
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
@@ -34,9 +41,17 @@ ISTATUS
     _Out_ PCOLOR3 color
     );
 
+typedef
+ISTATUS
+(*PSAMPLE_TRACER_DUPLICATE)(
+    _In_opt_ const void *context,
+    _Out_ PSAMPLE_TRACER *duplicate
+    );
+
 typedef struct _SAMPLE_TRACER_VTABLE {
     PSAMPLE_TRACER_TRACE_ROUTINE trace_routine;
     PSAMPLE_TRACER_COLOR_MATCH_ROUTINE color_match_routine;
+    PSAMPLE_TRACER_DUPLICATE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } SAMPLE_TRACER_VTABLE, *PSAMPLE_TRACER_VTABLE;
 

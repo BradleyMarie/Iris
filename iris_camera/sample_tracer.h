@@ -18,13 +18,6 @@ Abstract:
 #include "iris_camera/sample_tracer_vtable.h"
 
 //
-// Types
-//
-
-typedef struct _SAMPLE_TRACER SAMPLE_TRACER, *PSAMPLE_TRACER;
-typedef const SAMPLE_TRACER *PCSAMPLE_TRACER;
-
-//
 // Functions
 //
 

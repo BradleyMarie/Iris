@@ -70,4 +70,20 @@ SampleTracerColorMatch(
     return status;
 }
 
+inline
+static
+ISTATUS
+SampleTracerDuplicate(
+    _In_ const struct _SAMPLE_TRACER *tracer,
+    _Out_ struct _SAMPLE_TRACER **duplicate
+    )
+{
+    assert(tracer != NULL);
+    assert(duplicate != NULL);
+
+    ISTATUS status = tracer->vtable->duplicate_routine(tracer->data, duplicate);
+
+    return status;
+}
+
 #endif // _IRIS_CAMERA_SAMPLE_TRACER_INTERNAL_

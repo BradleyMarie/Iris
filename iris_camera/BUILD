@@ -56,7 +56,6 @@ cc_library(
         ":pixel_sampler",
         ":render",
         ":sample_tracer",
-        ":sample_tracer_generator",
         "//iris_advanced:iris_advanced",
     ],
     visibility = ["//visibility:public"],
@@ -103,8 +102,7 @@ cc_library(
         ":framebuffer_internal",
         ":pixel_sampler",
         ":pixel_sampler_internal",
-        ":sample_tracer_generator",
-        ":sample_tracer_generator_internal",
+        ":sample_tracer",
         ":sample_tracer_internal",
     ],
 )
@@ -121,37 +119,10 @@ cc_library(
 )
 
 cc_library(
-    name = "sample_tracer_generator",
-    hdrs = ["sample_tracer_generator.h"],
-    srcs = ["sample_tracer_generator.c"],
-    deps = [
-        ":sample_tracer_generator_internal",
-        ":sample_tracer_generator_vtable",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "sample_tracer_generator_internal",
-    hdrs = ["sample_tracer_generator_internal.h"],
-    deps = [
-        ":sample_tracer_generator_vtable",
-    ],
-)
-
-cc_library(
     name = "sample_tracer_internal",
     hdrs = ["sample_tracer_internal.h"],
     deps = [
         ":sample_tracer_vtable",
-    ],
-)
-
-cc_library(
-    name = "sample_tracer_generator_vtable",
-    hdrs = ["sample_tracer_generator_vtable.h"],
-    deps = [
-        ":sample_tracer",
     ],
 )
 

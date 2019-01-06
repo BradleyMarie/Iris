@@ -26,7 +26,6 @@ extern "C" {
 #include "iris_camera/pixel_sampler.h"
 #include "iris_camera/render.h"
 #include "iris_camera/sample_tracer.h"
-#include "iris_camera/sample_tracer_generator.h"
 
 #if __cplusplus 
 }

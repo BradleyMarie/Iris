@@ -21,7 +21,6 @@ Abstract:
 #include "iris_camera/framebuffer_internal.h"
 #include "iris_camera/pixel_sampler_internal.h"
 #include "iris_camera/render.h"
-#include "iris_camera/sample_tracer_generator_internal.h"
 #include "iris_camera/sample_tracer_internal.h"
 
 //
@@ -64,14 +63,14 @@ ISTATUS
 IrisCameraAllocateThreadState(
     _In_ size_t num_threads,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
-    _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
+    _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Outptr_result_buffer_(num_threads) PRENDER_THREAD_STATE *thread_state
     )
 {
     assert(num_threads != 0);
     assert(pixel_sampler != NULL);
-    assert(sample_tracer_generator != NULL);
+    assert(sample_tracer != NULL);
     assert(rng != NULL);
     assert(thread_state != NULL);
 
@@ -94,8 +93,8 @@ IrisCameraAllocateThreadState(
             return status;
         }
 
-        status = SampleTracerGeneratorGenerate(sample_tracer_generator,
-                                               &result[i].sample_tracer);
+        status = SampleTracerDuplicate(sample_tracer,
+                                       &result[i].sample_tracer);
         
         if (status != ISTATUS_SUCCESS)
         {
@@ -317,7 +316,7 @@ IrisCameraRenderParallel(
     _In_ float_t epsilon,
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
-    _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
+    _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer
     )
@@ -342,7 +341,7 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (sample_tracer_generator == NULL)
+    if (sample_tracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -360,7 +359,7 @@ IrisCameraRenderParallel(
     PRENDER_THREAD_STATE thread_state;
     ISTATUS status = IrisCameraAllocateThreadState(number_of_threads,
                                                    pixel_sampler,
-                                                   sample_tracer_generator,
+                                                   sample_tracer,
                                                    rng,
                                                    &thread_state);
 

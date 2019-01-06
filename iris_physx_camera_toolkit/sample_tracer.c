@@ -101,6 +101,7 @@ PhysxSampleTracerFree(
 static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
     PhysxSampleTracerTraceRay,
     PhysxSampleTracerColorMatch,
+    NULL, // TODO
     PhysxSampleTracerFree
 };
 
