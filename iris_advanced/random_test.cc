@@ -70,7 +70,7 @@ TEST(RandomTest, RandomAllocateErrors)
 
 TEST(RandomTest, RandomGenerateFloatErrors)
 {
-    RANDOM_VTABLE vtable = { nullptr, nullptr, nullptr };
+    RANDOM_VTABLE vtable = { nullptr, nullptr, nullptr, nullptr };
     PRANDOM rng;
 
     ISTATUS status = RandomAllocate(&vtable, 
@@ -140,7 +140,7 @@ TEST(RandomTest, RandomGenerateFloatErrors)
 
 TEST(RandomTest, RandomGenerateIndexErrors)
 {
-    RANDOM_VTABLE vtable = { nullptr, nullptr, nullptr };
+    RANDOM_VTABLE vtable = { nullptr, nullptr, nullptr, nullptr };
     PRANDOM rng;
 
     ISTATUS status = RandomAllocate(&vtable, 
@@ -212,6 +212,7 @@ TestGenerateFloat(
     bool free_encountered = false;
 
     RANDOM_VTABLE vtable = { TestGenerateFloatCallback,
+                             nullptr,
                              nullptr,
                              TestGenerateFloatFreeCallback };
     FloatContext context = { return_status,
@@ -298,6 +299,7 @@ TestGenerateIndex(
 
     RANDOM_VTABLE vtable = { nullptr,
                              TestGenerateIndexCallback,
+                             nullptr,
                              TestGenerateIndexFreeCallback };
     IndexContext context = { return_status,
                              upper_bound,
@@ -333,4 +335,85 @@ TEST(RandomTest, RandomGenerateIndex)
 {
     TestGenerateIndex(2, 1, ISTATUS_SUCCESS);
     TestGenerateIndex(2, 1, ISTATUS_INVALID_ARGUMENT_31);
+}
+
+struct ReplicateContext {
+    ISTATUS return_status;
+    PRANDOM return_value;
+    bool *replicate_encountered;
+    bool *free_encountered;
+};
+
+ISTATUS
+TestReplicateCallback(
+    _In_ void *context,
+    _Out_ PRANDOM *replica
+    )
+{
+    ReplicateContext *index_context = static_cast<ReplicateContext*>(context);
+    EXPECT_TRUE(replica != NULL);
+    *replica = index_context->return_value;
+    EXPECT_FALSE(*index_context->replicate_encountered);
+    *index_context->replicate_encountered = true;
+    return index_context->return_status;
+}
+
+void
+TestReplicateFreeCallback(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    ReplicateContext *index_context = static_cast<ReplicateContext*>(context);
+    EXPECT_FALSE(*index_context->free_encountered);
+    *index_context->free_encountered = true;
+}
+
+void
+TestReplicate(
+    _In_ PRANDOM return_value,
+    _In_ ISTATUS return_status
+    )
+{
+    bool replicate_encountered = false;
+    bool free_encountered = false;
+
+    RANDOM_VTABLE vtable = { nullptr,
+                             nullptr,
+                             TestReplicateCallback,
+                             TestReplicateFreeCallback };
+    ReplicateContext context = { return_status,
+                                 return_value,
+                                 &replicate_encountered,
+                                 &free_encountered };
+    PRANDOM rng;
+
+    ISTATUS status = RandomAllocate(&vtable,
+                                    &context,
+                                    sizeof(context),
+                                    alignof(context),
+                                    &rng);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    EXPECT_FALSE(replicate_encountered);
+    PRANDOM result;
+    status = RandomReplicate(rng, &result);
+    EXPECT_TRUE(replicate_encountered);
+    EXPECT_EQ(return_status, status);
+
+    if (status == ISTATUS_SUCCESS)
+    {
+        EXPECT_EQ(return_value, result);
+    }
+
+    EXPECT_FALSE(free_encountered);
+    RandomFree(rng);
+    EXPECT_TRUE(free_encountered);
+}
+
+TEST(RandomTest, RandomGenerateReplicate)
+{
+    TestReplicate((PRANDOM)(void*)(uintptr_t)1, ISTATUS_INVALID_ARGUMENT_31);
+    TestReplicate((PRANDOM)(void*)(uintptr_t)2, ISTATUS_INVALID_ARGUMENT_31);
+    TestReplicate((PRANDOM)(void*)(uintptr_t)1, ISTATUS_SUCCESS);
+    TestReplicate((PRANDOM)(void*)(uintptr_t)2, ISTATUS_SUCCESS);
 }

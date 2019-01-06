@@ -19,7 +19,6 @@ Abstract:
 #include "iris_camera/camera.h"
 #include "iris_camera/framebuffer.h"
 #include "iris_camera/pixel_sampler_generator.h"
-#include "iris_camera/random_generator.h"
 #include "iris_camera/sample_tracer_generator.h"
 
 //
@@ -43,7 +42,7 @@ IrisCameraRenderParallel(
     _In_ PCCAMERA camera,
     _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
     _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
-    _Inout_ PRANDOM_GENERATOR rng_generator,
+    _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer
     );
 

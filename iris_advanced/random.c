@@ -170,6 +170,27 @@ RandomGenerateIndex(
     return status;
 }
 
+ISTATUS
+RandomReplicate(
+    _In_ PRANDOM rng,
+    _Out_ PRANDOM *replica
+    )
+{
+    if (rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (replica == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    ISTATUS status = rng->vtable->replicate_routine(rng->data, replica);
+
+    return status;
+}
+
 void
 RandomFree(
     _In_opt_ _Post_invalid_ PRANDOM rng

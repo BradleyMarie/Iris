@@ -29,17 +29,6 @@ cc_library(
 )
 
 cc_library(
-    name = "pcg_random_generator",
-    hdrs = ["pcg_random_generator.h"],
-    srcs = ["pcg_random_generator.c"],
-    deps = [
-        "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera:iris_camera",
-        "//third_party/pcg_c_basic:pcg_basic",
-    ],
-)
-
-cc_library(
     name = "pfm_writer",
     hdrs = ["pfm_writer.h"],
     srcs = ["pfm_writer.c"],

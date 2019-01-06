@@ -55,7 +55,6 @@ cc_library(
         ":framebuffer",
         ":pixel_sampler",
         ":pixel_sampler_generator",
-        ":random_generator",
         ":render",
         ":sample_tracer",
         ":sample_tracer_generator",
@@ -120,33 +119,6 @@ cc_library(
 )
 
 cc_library(
-    name = "random_generator",
-    hdrs = ["random_generator.h"],
-    srcs = ["random_generator.c"],
-    deps = [
-        ":random_generator_internal",
-        ":random_generator_vtable",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "random_generator_internal",
-    hdrs = ["random_generator_internal.h"],
-    deps = [
-        ":random_generator_vtable",
-    ],
-)
-
-cc_library(
-    name = "random_generator_vtable",
-    hdrs = ["random_generator_vtable.h"],
-    deps = [
-        "//iris_advanced:iris_advanced",
-    ],
-)
-
-cc_library(
     name = "render",
     hdrs = ["render.h"],
     srcs = ["render.c"],
@@ -160,8 +132,6 @@ cc_library(
         ":pixel_sampler_generator",
         ":pixel_sampler_generator_internal",
         ":pixel_sampler_internal",
-        ":random_generator",
-        ":random_generator_internal",
         ":sample_tracer_generator",
         ":sample_tracer_generator_internal",
         ":sample_tracer_internal",

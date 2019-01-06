@@ -75,6 +75,31 @@ PermutedCongruentialRandomGenerateIndex(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+PermutedCongruentialRandomReplicate(
+    _In_ void *context,
+    _Out_ PRANDOM *replica
+    )
+{
+    PPCG_RANDOM pcg_random = (PPCG_RANDOM)context;
+
+    uint32_t initial_state_l = pcg32_random_r(&pcg_random->state);
+    uint32_t initial_state_h = pcg32_random_r(&pcg_random->state);
+    uint32_t initial_output_sequence_l = pcg32_random_r(&pcg_random->state);
+    uint32_t initial_output_sequence_h = pcg32_random_r(&pcg_random->state);
+
+    uint64_t initial_state =
+        initial_state_l | ((uint64_t)initial_state_h << 32);
+    uint64_t initial_output_sequence =
+        initial_output_sequence_l | ((uint64_t)initial_output_sequence_h << 32);
+
+    ISTATUS status = PermutedCongruentialRandomAllocate(initial_state,
+                                                        initial_output_sequence,
+                                                        replica);
+
+    return status;
+}
+
 //
 // Static Variables
 //
@@ -82,6 +107,7 @@ PermutedCongruentialRandomGenerateIndex(
 static const RANDOM_VTABLE pcg_vtable = {
     PermutedCongruentialRandomGenerateFloat,
     PermutedCongruentialRandomGenerateIndex,
+    PermutedCongruentialRandomReplicate,
     NULL
 };
 

@@ -22,6 +22,9 @@ Abstract:
 // Types
 //
 
+typedef struct _RANDOM RANDOM, *PRANDOM;
+typedef const RANDOM *PCRANDOM;
+
 typedef
 ISTATUS
 (*PGENERATE_FLOAT_ROUTINE)(
@@ -39,16 +42,21 @@ ISTATUS
     _Out_range_(0, upper_bound - 1) size_t *result
     );
 
+typedef
+ISTATUS
+(*PRANDOM_REPLICATE_ROUTINE)(
+    _In_ void *context,
+    _Out_ PRANDOM *replica
+    );
+
 typedef struct _RANDOM_VTABLE {
     PGENERATE_FLOAT_ROUTINE generate_float_routine;
     PGENERATE_INDEX_ROUTINE generate_index_routine;
+    PRANDOM_REPLICATE_ROUTINE replicate_routine;
     PFREE_ROUTINE free_routine;
 } RANDOM_VTABLE, *PRANDOM_VTABLE;
 
 typedef const RANDOM_VTABLE *PCRANDOM_VTABLE;
-
-typedef struct _RANDOM RANDOM, *PRANDOM;
-typedef const RANDOM *PCRANDOM;
 
 //
 // Functions
@@ -76,6 +84,12 @@ RandomGenerateIndex(
     _In_ PRANDOM rng,
     _In_ size_t upper_bound,
     _Out_range_(0, upper_bound - 1) size_t *result
+    );
+
+ISTATUS
+RandomReplicate(
+    _In_ PRANDOM rng,
+    _Out_ PRANDOM *replica
     );
 
 void
