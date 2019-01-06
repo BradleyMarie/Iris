@@ -124,6 +124,29 @@ ColorMatcherClear(
     return status;
 }
 
+ISTATUS
+ColorMatcherReplicate(
+    _In_ PCCOLOR_MATCHER color_matcher,
+    _Out_ PCOLOR_MATCHER *replica
+    )
+{
+    if (color_matcher == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (replica == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    ISTATUS status =
+        color_matcher->vtable->replicate_routine(color_matcher->data,
+                                                 replica);
+
+    return status;
+}
+
 void
 ColorMatcherFree(
     _In_opt_ _Post_invalid_ PCOLOR_MATCHER color_matcher

@@ -211,6 +211,15 @@ TestColorMatcherClear(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+TestColorMatcherReplicate(
+    _In_ const void *context,
+    _Out_ PCOLOR_MATCHER *replica
+    )
+{
+    return TestColorMatcherAllocate(replica);
+}
+
 //
 // Static Variables
 //
@@ -230,6 +239,7 @@ static const COLOR_MATCHER_VTABLE test_color_matcher_vtable = {
     TestColorMatcherAddSample,
     TestColorMatcherComputeColor,
     TestColorMatcherClear,
+    TestColorMatcherReplicate,
     NULL
 };
 

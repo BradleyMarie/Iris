@@ -22,6 +22,9 @@ Abstract:
 // Types
 //
 
+typedef struct _COLOR_MATCHER COLOR_MATCHER, *PCOLOR_MATCHER;
+typedef const COLOR_MATCHER *PCCOLOR_MATCHER;
+
 typedef
 ISTATUS
 (*PCOLOR_MATCHER_ADD_SAMPLE_ROUTINE)(
@@ -42,10 +45,18 @@ ISTATUS
     _Inout_ void *context
     );
 
+typedef
+ISTATUS
+(*PCOLOR_MATCHER_REPLICATE_ROUTINE)(
+    _In_ const void *context,
+    _Out_ PCOLOR_MATCHER *replica
+    );
+
 typedef struct _COLOR_MATCHER_VTABLE {
     PCOLOR_MATCHER_ADD_SAMPLE_ROUTINE add_sample_routine;
     PCOLOR_MATCHER_COMPUTE_COLOR_ROUTINE compute_color_routine;
     PCOLOR_MATCHER_CLEAR_ROUTINE clear_routine;
+    PCOLOR_MATCHER_REPLICATE_ROUTINE replicate_routine;
     PFREE_ROUTINE free_routine;
 } COLOR_MATCHER_VTABLE, *PCOLOR_MATCHER_VTABLE;
 

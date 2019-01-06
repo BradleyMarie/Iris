@@ -20,13 +20,6 @@ Abstract:
 #include "iris_physx/color_matcher_vtable.h"
 
 //
-// Types
-//
-
-typedef struct _COLOR_MATCHER COLOR_MATCHER, *PCOLOR_MATCHER;
-typedef const COLOR_MATCHER *PCCOLOR_MATCHER;
-
-//
 // Functions
 //
 
@@ -48,6 +41,12 @@ ColorMatcherComputeColor(
 ISTATUS
 ColorMatcherClear(
     _In_ PCOLOR_MATCHER color_matcher
+    );
+
+ISTATUS
+ColorMatcherReplicate(
+    _In_ PCCOLOR_MATCHER color_matcher,
+    _Out_ PCOLOR_MATCHER *replica
     );
 
 void
