@@ -83,6 +83,52 @@ PhysxSampleTracerColorMatch(
 }
 
 static
+ISTATUS
+PhysxSampleTracerDuplicate(
+    _In_opt_ const void *context,
+    _Out_ PSAMPLE_TRACER *duplicate
+    )
+{
+    PCPHYSX_SAMPLE_TRACER physx_sample_tracer = (PCPHYSX_SAMPLE_TRACER)context;
+
+    PINTEGRATOR integrator;
+    ISTATUS status = IntegratorDuplicate(physx_sample_tracer->integrator,
+                                         &integrator);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PCOLOR_MATCHER color_matcher;
+    status = ColorMatcherReplicate(physx_sample_tracer->color_matcher,
+                                   &color_matcher);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        IntegratorFree(integrator);
+        return status;
+    }
+
+    status =
+        PhysxSampleTracerAllocate(integrator,
+                                  physx_sample_tracer->trace_routine,
+                                  physx_sample_tracer->trace_context,
+                                  physx_sample_tracer->sample_lights_routine,
+                                  physx_sample_tracer->sample_lights_context,
+                                  color_matcher,
+                                  duplicate);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        IntegratorFree(integrator);
+        ColorMatcherFree(color_matcher);
+    }
+
+    return status;
+}
+
+static
 void
 PhysxSampleTracerFree(
     _In_opt_ _Post_invalid_ void *context
@@ -101,7 +147,7 @@ PhysxSampleTracerFree(
 static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
     PhysxSampleTracerTraceRay,
     PhysxSampleTracerColorMatch,
-    NULL, // TODO
+    PhysxSampleTracerDuplicate,
     PhysxSampleTracerFree
 };
 
