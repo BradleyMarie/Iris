@@ -234,6 +234,28 @@ IntegratorIntegrate(
     return status;
 }
 
+ISTATUS
+IntegratorDuplicate(
+    _In_ PCINTEGRATOR integrator,
+    _Out_ PINTEGRATOR *duplicate
+    )
+{
+    if (integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (duplicate == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    ISTATUS status = integrator->vtable->duplicate_routine(integrator->data,
+                                                           duplicate);
+
+    return status;
+}
+
 void
 IntegratorFree(
     _In_opt_ _Post_invalid_ PINTEGRATOR integrator

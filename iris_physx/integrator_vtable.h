@@ -27,6 +27,9 @@ Abstract:
 // Types
 //
 
+typedef struct _INTEGRATOR INTEGRATOR, *PINTEGRATOR;
+typedef const INTEGRATOR *PCINTEGRATOR;
+
 typedef
 ISTATUS
 (*PINTEGRATOR_INTEGRATE_ROUTINE)(
@@ -41,8 +44,16 @@ ISTATUS
     _Out_ PCSPECTRUM *spectrum
     );
 
+typedef
+ISTATUS
+(*PINTEGRATOR_DUPLICATE_ROUTINE)(
+    _In_opt_ const void *context,
+    _Out_ PINTEGRATOR *duplicate
+    );
+
 typedef struct _INTEGRATOR_VTABLE {
     PINTEGRATOR_INTEGRATE_ROUTINE integrate_routine;
+    PINTEGRATOR_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } INTEGRATOR_VTABLE, *PINTEGRATOR_VTABLE;
 

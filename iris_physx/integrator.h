@@ -31,9 +31,6 @@ ISTATUS
     _In_ RAY ray
     );
 
-typedef struct _INTEGRATOR INTEGRATOR, *PINTEGRATOR;
-typedef const INTEGRATOR *PCINTEGRATOR;
-
 //
 // Functions
 //
@@ -58,6 +55,12 @@ IntegratorIntegrate(
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
     _Inout_ PCOLOR_MATCHER color_matcher
+    );
+
+ISTATUS
+IntegratorDuplicate(
+    _In_ PCINTEGRATOR integrator,
+    _Out_ PINTEGRATOR *duplicate
     );
 
 void

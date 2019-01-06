@@ -273,12 +273,30 @@ PathTracerIntegrate(
 }
 
 static
+ISTATUS
+PathTracerDuplicate(
+    _In_opt_ const void *context,
+    _Out_ PINTEGRATOR *duplicate
+    )
+{
+    PCPATH_TRACER path_tracer = (PCPATH_TRACER)context;
+
+    ISTATUS status =
+        PathTracerAllocate(path_tracer->min_bounces,
+                           path_tracer->max_bounces,
+                           path_tracer->min_termination_probability,
+                           duplicate);
+
+    return status;
+}
+
+static
 void
 PathTracerFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
-    PCPATH_TRACER path_tracer = (PCPATH_TRACER)context;
+    PPATH_TRACER path_tracer = (PPATH_TRACER)context;
 
     free(path_tracer->spectra);
     free(path_tracer->reflectors);
@@ -291,6 +309,7 @@ PathTracerFree(
 
 static const INTEGRATOR_VTABLE path_tracer_vtable = {
     PathTracerIntegrate,
+    PathTracerDuplicate,
     PathTracerFree
 };
 
