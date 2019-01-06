@@ -104,4 +104,20 @@ PixelSamplerNextSample(
     return status;
 }
 
+ISTATUS
+PixelSamplerDuplicate(
+    _In_ const struct _PIXEL_SAMPLER *pixel_sampler,
+    _Out_ struct _PIXEL_SAMPLER **duplicate
+    )
+{
+    assert(pixel_sampler != NULL);
+    assert(duplicate != NULL);
+
+    ISTATUS status =
+        pixel_sampler->vtable->duplicate_routine(pixel_sampler->data,
+                                                 duplicate);
+
+    return status;
+}
+
 #endif // _IRIS_CAMERA_PIXEL_SAMPLER_INTERNAL_

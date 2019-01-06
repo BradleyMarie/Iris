@@ -49,6 +49,8 @@ typedef struct _GRID_PIXEL_SAMPLER {
     float_t lens_current_v;
 } GRID_PIXEL_SAMPLER, *PGRID_PIXEL_SAMPLER;
 
+typedef const GRID_PIXEL_SAMPLER *PCGRID_PIXEL_SAMPLER;
+
 //
 // Static Functions
 //
@@ -269,6 +271,26 @@ GridPixelSamplerNextSample(
     }
 
     return ISTATUS_DONE;
+}
+
+ISTATUS
+GridPixelSamplerDuplicate(
+    _In_ const void *context,
+    _Out_ PPIXEL_SAMPLER *duplicate
+    )
+{
+    PCGRID_PIXEL_SAMPLER grid_pixel_sampler = (PCGRID_PIXEL_SAMPLER)context;
+
+    ISTATUS status =
+        GridPixelSamplerAllocate(grid_pixel_sampler->pixel_samples_u,
+                                 grid_pixel_sampler->pixel_samples_v,
+                                 grid_pixel_sampler->jitter_pixel_samples,
+                                 grid_pixel_sampler->lens_samples_u,
+                                 grid_pixel_sampler->lens_samples_v,
+                                 grid_pixel_sampler->jitter_lens_samples,
+                                 duplicate);
+
+    return status;
 }
 
 //

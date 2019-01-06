@@ -54,7 +54,6 @@ cc_library(
         ":camera",
         ":framebuffer",
         ":pixel_sampler",
-        ":pixel_sampler_generator",
         ":render",
         ":sample_tracer",
         ":sample_tracer_generator",
@@ -71,33 +70,6 @@ cc_library(
         ":pixel_sampler_internal",
         ":pixel_sampler_vtable",
         "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler_generator",
-    hdrs = ["pixel_sampler_generator.h"],
-    srcs = ["pixel_sampler_generator.c"],
-    deps = [
-        ":pixel_sampler_generator_internal",
-        ":pixel_sampler_generator_vtable",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler_generator_internal",
-    hdrs = ["pixel_sampler_generator_internal.h"],
-    deps = [
-        ":pixel_sampler_generator_vtable",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler_generator_vtable",
-    hdrs = ["pixel_sampler_generator_vtable.h"],
-    deps = [
-        ":pixel_sampler",
     ],
 )
 
@@ -129,8 +101,7 @@ cc_library(
         ":camera_internal",
         ":framebuffer",
         ":framebuffer_internal",
-        ":pixel_sampler_generator",
-        ":pixel_sampler_generator_internal",
+        ":pixel_sampler",
         ":pixel_sampler_internal",
         ":sample_tracer_generator",
         ":sample_tracer_generator_internal",

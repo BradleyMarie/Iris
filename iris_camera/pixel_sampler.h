@@ -18,13 +18,6 @@ Abstract:
 #include "iris_camera/pixel_sampler_vtable.h"
 
 //
-// Types
-//
-
-typedef struct _PIXEL_SAMPLER PIXEL_SAMPLER, *PPIXEL_SAMPLER;
-typedef const PIXEL_SAMPLER *PCPIXEL_SAMPLER;
-
-//
 // Functions
 //
 

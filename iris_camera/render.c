@@ -19,7 +19,6 @@ Abstract:
 
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/framebuffer_internal.h"
-#include "iris_camera/pixel_sampler_generator_internal.h"
 #include "iris_camera/pixel_sampler_internal.h"
 #include "iris_camera/render.h"
 #include "iris_camera/sample_tracer_generator_internal.h"
@@ -47,6 +46,9 @@ IrisCameraFreeThreadState(
     _Inout_updates_(num_threads) _Post_invalid_ PRENDER_THREAD_STATE thread_state
     )
 {
+    assert(num_threads != 0);
+    assert(thread_state != NULL);
+
     for (size_t i = 0; i < num_threads; i++)
     {
         PixelSamplerFree(thread_state[i].pixel_sampler);
@@ -61,13 +63,17 @@ static
 ISTATUS
 IrisCameraAllocateThreadState(
     _In_ size_t num_threads,
-    _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
+    _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
     _Inout_ PRANDOM rng,
     _Outptr_result_buffer_(num_threads) PRENDER_THREAD_STATE *thread_state
     )
 {
     assert(num_threads != 0);
+    assert(pixel_sampler != NULL);
+    assert(sample_tracer_generator != NULL);
+    assert(rng != NULL);
+    assert(thread_state != NULL);
 
     PRENDER_THREAD_STATE result = 
         (PRENDER_THREAD_STATE)calloc(num_threads, sizeof(RENDER_THREAD_STATE));
@@ -79,8 +85,8 @@ IrisCameraAllocateThreadState(
 
     for (size_t i = 0; i < num_threads; i++)
     {
-        ISTATUS status = PixelSamplerGeneratorGenerate(
-            pixel_sampler_generator, &result[i].pixel_sampler);
+        ISTATUS status = PixelSamplerDuplicate(pixel_sampler,
+                                               &result[i].pixel_sampler);
         
         if (status != ISTATUS_SUCCESS)
         {
@@ -310,7 +316,7 @@ IrisCameraRenderParallel(
     _In_ size_t number_of_threads,
     _In_ float_t epsilon,
     _In_ PCCAMERA camera,
-    _Inout_ PPIXEL_SAMPLER_GENERATOR pixel_sampler_generator,
+    _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER_GENERATOR sample_tracer_generator,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer
@@ -331,7 +337,7 @@ IrisCameraRenderParallel(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (pixel_sampler_generator == NULL)
+    if (pixel_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -353,7 +359,7 @@ IrisCameraRenderParallel(
 
     PRENDER_THREAD_STATE thread_state;
     ISTATUS status = IrisCameraAllocateThreadState(number_of_threads,
-                                                   pixel_sampler_generator,
+                                                   pixel_sampler,
                                                    sample_tracer_generator,
                                                    rng,
                                                    &thread_state);

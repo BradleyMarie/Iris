@@ -18,6 +18,13 @@ Abstract:
 #include "common/free_routine.h"
 #include "iris_advanced/iris_advanced.h"
 
+//
+// Types
+//
+
+typedef struct _PIXEL_SAMPLER PIXEL_SAMPLER, *PPIXEL_SAMPLER;
+typedef const PIXEL_SAMPLER *PCPIXEL_SAMPLER;
+
 typedef
 ISTATUS
 (*PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE)(
@@ -46,9 +53,17 @@ ISTATUS
     _Out_ float_t *lens_sample_v
     );
 
+typedef
+ISTATUS
+(*PPIXEL_SAMPLER_DUPLICATE_ROUTINE)(
+    _In_ const void *context,
+    _Out_ PPIXEL_SAMPLER *duplicate
+    );
+
 typedef struct _PIXEL_SAMPLER_VTABLE {
     PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine;
     PPIXEL_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine;
+    PPIXEL_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } PIXEL_SAMPLER_VTABLE, *PPIXEL_SAMPLER_VTABLE;
 
