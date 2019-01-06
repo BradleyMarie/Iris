@@ -45,7 +45,7 @@ ISTATUS
 typedef
 ISTATUS
 (*PRANDOM_REPLICATE_ROUTINE)(
-    _In_ void *context,
+    _In_opt_ void *context,
     _Out_ PRANDOM *replica
     );
 
