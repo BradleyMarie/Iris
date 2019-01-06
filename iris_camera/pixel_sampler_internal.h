@@ -104,6 +104,8 @@ PixelSamplerNextSample(
     return status;
 }
 
+inline
+static
 ISTATUS
 PixelSamplerDuplicate(
     _In_ const struct _PIXEL_SAMPLER *pixel_sampler,
