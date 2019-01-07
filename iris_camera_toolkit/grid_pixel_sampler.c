@@ -300,6 +300,7 @@ GridPixelSamplerDuplicate(
 static const PIXEL_SAMPLER_VTABLE grid_pixel_sampler_vtable = {
     GridPixelSamplerPrepareSamples,
     GridPixelSamplerNextSample,
+    GridPixelSamplerDuplicate,
     NULL
 };
 
