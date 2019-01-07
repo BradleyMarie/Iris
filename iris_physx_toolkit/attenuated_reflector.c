@@ -313,14 +313,6 @@ AttenuatedReflector3AllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    float_t attenuation_sum = attenuation0 + attenuation1 + attenuation2;
-
-    if (isless(attenuation_sum, (float_t)0.0) ||
-        isgreater(attenuation_sum, (float_t)1.0))
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-
     ATTENUATED_REFLECTOR3 attenuated_reflector;
     attenuated_reflector.reflectors[0] = reflector0;
     attenuated_reflector.reflectors[1] = reflector1;

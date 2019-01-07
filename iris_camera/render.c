@@ -48,7 +48,7 @@ IrisCameraFreeThreadState(
     assert(num_threads != 0);
     assert(thread_state != NULL);
 
-    for (size_t i = 0; i < num_threads; i++)
+    for (size_t i = 1; i < num_threads; i++)
     {
         PixelSamplerFree(thread_state[i].pixel_sampler);
         SampleTracerFree(thread_state[i].sample_tracer);
@@ -82,7 +82,11 @@ IrisCameraAllocateThreadState(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    for (size_t i = 0; i < num_threads; i++)
+    result[0].pixel_sampler = pixel_sampler;
+    result[0].sample_tracer = sample_tracer;
+    result[0].rng = rng;
+
+    for (size_t i = 1; i < num_threads; i++)
     {
         ISTATUS status = PixelSamplerDuplicate(pixel_sampler,
                                                &result[i].pixel_sampler);
@@ -127,10 +131,8 @@ IrisCameraRenderPixel(
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
-    _In_ float_t image_min_u,
-    _In_ float_t image_max_u,
-    _In_ float_t image_min_v,
-    _In_ float_t image_max_v,
+    _In_ float_t pixel_u_width,
+    _In_ float_t pixel_v_width,
     _In_ size_t pixel_column,
     _In_ size_t pixel_row
     )
@@ -141,19 +143,25 @@ IrisCameraRenderPixel(
     assert(sample_tracer != NULL);
     assert(rng != NULL);
     assert(framebuffer != NULL);
-    assert(isfinite(image_min_u));
-    assert(isfinite(image_max_u));
-    assert(isfinite(image_min_v));
-    assert(isfinite(image_max_v));
-    assert(image_min_u <= image_max_u);
-    assert(image_min_v <= image_max_v);
+    assert(isfinite(pixel_u_width));
+    assert((float_t)0.0 < pixel_u_width);
+    assert(isfinite(pixel_v_width));
+    assert((float_t)0.0 < pixel_v_width);
+
+    float_t pixel_u_min =
+        camera->image_min_u + pixel_u_width * (float_t)pixel_column;
+    float_t pixel_u_max = pixel_u_min + pixel_u_width;
+
+    float_t pixel_v_max =
+        camera->image_max_v - pixel_v_width * (float_t)pixel_row;
+    float_t pixel_v_min = pixel_v_max - pixel_v_width;
 
     ISTATUS status = PixelSamplerPrepareSamples(pixel_sampler,
                                                 rng,
-                                                image_min_u,
-                                                image_max_u,
-                                                image_min_v,
-                                                image_max_v,
+                                                pixel_u_min,
+                                                pixel_u_max,
+                                                pixel_v_min,
+                                                pixel_v_max,
                                                 camera->lens_min_u,
                                                 camera->lens_max_u,
                                                 camera->lens_min_v,
@@ -271,14 +279,8 @@ IrisCameraRender(
     float_t pixel_v_width = 
         (camera->image_max_v - camera->image_min_v) / (float_t)num_rows;
 
-    float_t pixel_v_max = camera->image_max_v;
-    float_t pixel_v_min = pixel_v_max - pixel_v_width;
-
     for (size_t row = 0; row < num_rows; row++)
     {
-        float_t pixel_u_min = camera->image_min_u;
-        float_t pixel_u_max = pixel_u_min + pixel_u_width;
-
         for (size_t column = 0; column < num_columns; column++)
         {
             ISTATUS status = IrisCameraRenderPixel(epsilon,
@@ -287,10 +289,8 @@ IrisCameraRender(
                                                    sample_tracer,
                                                    rng,
                                                    framebuffer,
-                                                   pixel_u_min,
-                                                   pixel_u_max,
-                                                   pixel_v_min,
-                                                   pixel_v_max,
+                                                   pixel_u_width,
+                                                   pixel_v_width,
                                                    column,
                                                    row);
 
@@ -299,12 +299,7 @@ IrisCameraRender(
                 return status;
             }
 
-            pixel_u_min = pixel_u_max;
-            pixel_u_max += pixel_u_width;
         }
-        
-        pixel_v_max = pixel_v_min;
-        pixel_v_min -= pixel_v_width;
     }
 
     return ISTATUS_SUCCESS;
@@ -370,6 +365,7 @@ IrisCameraRenderParallel(
 
     size_t num_columns, num_rows;
     FramebufferGetSize(framebuffer, &num_columns, &num_rows);
+    size_t num_pixels = num_columns * num_rows;
 
     float_t pixel_u_width =
         (camera->image_max_u - camera->image_min_u) / (float_t)num_columns;
@@ -383,18 +379,10 @@ IrisCameraRenderParallel(
     #pragma omp parallel
     {
     #pragma omp for schedule(dynamic, 1) private(status)
-    for (size_t i = 0; i < num_columns * num_rows; i++)
+    for (size_t i = 0; i < num_pixels; i++)
     {
         size_t column = i % num_columns;
-        size_t row = i % num_columns;
-
-        float_t pixel_u_min = 
-            camera->image_min_u + pixel_u_width * (float_t)num_columns;
-        float_t pixel_u_max = pixel_u_min + pixel_u_width;
-
-        float_t pixel_v_max = 
-            camera->image_max_v - pixel_v_width * (float_t)row;
-        float_t pixel_v_min = pixel_v_max - pixel_v_width;
+        size_t row = i / num_columns;
 
         size_t thread_num = (size_t)omp_get_thread_num();
         status = IrisCameraRenderPixel(epsilon,
@@ -403,10 +391,8 @@ IrisCameraRenderParallel(
                                        thread_state[thread_num].sample_tracer,
                                        thread_state[thread_num].rng,
                                        framebuffer,
-                                       pixel_u_min,
-                                       pixel_u_max,
-                                       pixel_v_min,
-                                       pixel_v_max,
+                                       pixel_u_width,
+                                       pixel_v_width,
                                        column,
                                        row);
 

@@ -201,7 +201,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
-    status = FramebufferAllocate(501, 501, &framebuffer);
+    status = FramebufferAllocate(500, 500, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRender(
@@ -285,8 +285,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         material,
         nullptr,
         &shape);
@@ -300,7 +300,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -378,8 +378,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         material,
         &shape);
@@ -393,7 +393,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -471,8 +471,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         nullptr,
         material,
         &shape);
@@ -486,7 +486,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -564,8 +564,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         material,
         nullptr,
         &shape);
@@ -579,7 +579,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -656,9 +656,9 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
 
     PSHAPE shape;
     status = TriangleAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-2.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)-2.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)-2.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-4.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)-4.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)-4.0),
         material,
         material,
         &shape);
@@ -672,7 +672,7 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -750,8 +750,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         material,
         nullptr,
         &shape);
@@ -765,7 +765,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -843,8 +843,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         material,
         &shape);
@@ -858,7 +858,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -936,8 +936,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         material,
         &shape);
@@ -951,7 +951,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -1029,8 +1029,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         material,
         nullptr,
         &shape);
@@ -1044,7 +1044,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -1121,9 +1121,9 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
 
     PSHAPE shape;
     status = TriangleAllocate(
-        PointCreate((float_t)0.0, (float_t)-2.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-2.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)-2.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-4.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-4.0, (float_t)1.0),
+        PointCreate((float_t)-1.0, (float_t)-4.0, (float_t)0.0),
         material,
         material,
         &shape);
@@ -1137,7 +1137,7 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -1215,8 +1215,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         material,
         nullptr,
         &shape);
@@ -1230,7 +1230,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1308,8 +1308,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         material,
         &shape);
@@ -1323,7 +1323,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1401,8 +1401,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
         nullptr,
         material,
         &shape);
@@ -1416,7 +1416,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1494,8 +1494,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
     PSHAPE shape;
     status = TriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
         material,
         nullptr,
         &shape);
@@ -1509,7 +1509,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1586,9 +1586,9 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
 
     PSHAPE shape;
     status = TriangleAllocate(
-        PointCreate((float_t)-2.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-2.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)-2.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-4.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-4.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)-4.0, (float_t)0.0, (float_t)1.0),
         material,
         material,
         &shape);
@@ -1602,7 +1602,7 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1680,8 +1680,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         material,
         nullptr,
         nullptr,
@@ -1697,7 +1697,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1775,8 +1775,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         material,
         nullptr,
@@ -1792,7 +1792,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1870,8 +1870,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         nullptr,
         material,
         nullptr,
@@ -1887,7 +1887,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -1965,8 +1965,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         material,
         nullptr,
         nullptr,
@@ -1982,7 +1982,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2059,9 +2059,9 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-2.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)-2.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)-2.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-4.0),
+        PointCreate((float_t)0.0, (float_t)1.0, (float_t)-4.0),
+        PointCreate((float_t)1.0, (float_t)0.0, (float_t)-4.0),
         material,
         material,
         nullptr,
@@ -2077,7 +2077,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2127,8 +2127,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         nullptr,
         emissive_material,
@@ -2152,7 +2152,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2196,8 +2196,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         nullptr,
         nullptr,
@@ -2221,7 +2221,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2268,8 +2268,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         nullptr,
         nullptr,
         nullptr,
@@ -2293,7 +2293,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2337,8 +2337,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+        PointCreate((float_t)1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)1.001, (float_t)0.0),
         nullptr,
         nullptr,
         emissive_material,
@@ -2362,7 +2362,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-3.0),
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -2437,8 +2437,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         material,
         nullptr,
         nullptr,
@@ -2454,7 +2454,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2532,8 +2532,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         material,
         nullptr,
@@ -2549,7 +2549,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2627,8 +2627,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         material,
         nullptr,
@@ -2644,7 +2644,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2722,8 +2722,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         material,
         nullptr,
         nullptr,
@@ -2739,7 +2739,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2789,8 +2789,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         nullptr,
         emissive_material,
@@ -2814,7 +2814,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2858,8 +2858,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
         nullptr,
         nullptr,
         nullptr,
@@ -2883,7 +2883,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2930,8 +2930,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         nullptr,
         nullptr,
@@ -2955,7 +2955,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -2999,8 +2999,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         nullptr,
         emissive_material,
@@ -3024,7 +3024,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -3098,9 +3098,9 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
-        PointCreate((float_t)0.0, (float_t)-2.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-2.0, (float_t)1.0),
-        PointCreate((float_t)-1.0, (float_t)-2.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-4.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-4.0, (float_t)1.0),
+        PointCreate((float_t)-1.0, (float_t)-4.0, (float_t)0.0),
         material,
         material,
         nullptr,
@@ -3116,7 +3116,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)-3.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         (float_t)2.0,
@@ -3194,8 +3194,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         material,
         nullptr,
         nullptr,
@@ -3211,7 +3211,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3289,8 +3289,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         material,
         nullptr,
@@ -3306,7 +3306,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3384,8 +3384,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
         nullptr,
         material,
         nullptr,
@@ -3401,7 +3401,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3479,8 +3479,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
         material,
         nullptr,
         nullptr,
@@ -3496,7 +3496,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3573,9 +3573,9 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
-        PointCreate((float_t)-2.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-2.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)-2.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-4.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-4.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)-4.0, (float_t)0.0, (float_t)1.0),
         material,
         material,
         nullptr,
@@ -3591,7 +3591,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3641,8 +3641,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         nullptr,
         emissive_material,
@@ -3666,7 +3666,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3710,8 +3710,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         nullptr,
         nullptr,
@@ -3735,7 +3735,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3782,8 +3782,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
-        PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
+        PointCreate((float_t)0.0, (float_t)-1.001, (float_t)0.0),
         nullptr,
         nullptr,
         nullptr,
@@ -3807,7 +3807,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
@@ -3851,8 +3851,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
     PSHAPE shape;
     status = EmissiveTriangleAllocate(
         PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
-        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+        PointCreate((float_t)-1.001, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.001),
         nullptr,
         nullptr,
         emissive_material,
@@ -3876,7 +3876,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
 
     PCAMERA camera;
     status = OrthographicCameraAllocate(
-        PointCreate((float_t)-1.0, (float_t)0.0, (float_t)0.0),
+        PointCreate((float_t)-3.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)2.0,
