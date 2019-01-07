@@ -137,10 +137,5 @@ OneLightSamplerSampleLightsCallback(
 
     status = LightSampleCollectorAddSample(collector, light, pdf);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    return ISTATUS_DONE;
+    return status;
 }
