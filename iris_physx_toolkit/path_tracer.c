@@ -220,10 +220,9 @@ PathTracerIntegrate(
             }
 
             float_t roulette_pdf = (float_t)1.0 - cutoff;
-            float_t inv_roulette_pdf = (float_t)1.0 / roulette_pdf;
 
-            pdf *= inv_roulette_pdf;
-            path_throughput *= inv_roulette_pdf;
+            pdf *= roulette_pdf;
+            path_throughput /= roulette_pdf;
         }
 
         path_tracer->attenuations[bounces] = cosine_falloff;
