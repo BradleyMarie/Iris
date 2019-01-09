@@ -976,7 +976,7 @@ SpectrumCompositorAttenuateSpectrum(
             (PCATTENUATED_REFLECTION_SPECTRUM) spectrum;
 
         ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                                   spectrum,
+                                                                   attenuated_spectrum0->spectrum,
                                                                    attenuated_spectrum0->reflector,
                                                                    attenuation * attenuated_spectrum0->attenuation,
                                                                    attenutated_spectrum);
