@@ -145,8 +145,7 @@ ShapeSampleFaceBySolidAngle(
                                                           sampled_point,
                                                           pdf);
 
-    // Should these be made into something stronger than assertions?
-    assert(isfinite(*pdf));
+    // Should this be made into something stronger than an assertion?
     assert((float_t)0.0 < *pdf);
 
     return status;

@@ -148,7 +148,7 @@ AreaLightSample(
 
     float_t dp = VectorDotProduct(direction_to_light, surface_normal);
 
-    if (dp < (float_t)0.0)
+    if (isinf(*pdf) || dp < (float_t)0.0)
     {
         *spectrum = NULL;
         *to_light = direction_to_light;
