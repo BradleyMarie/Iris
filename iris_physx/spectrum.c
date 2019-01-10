@@ -74,9 +74,9 @@ SpectrumAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    SpectrumInitialize(vtable,
-                       data_allocation,
-                       *spectrum);
+    SpectrumInitialize(*spectrum,
+                       vtable,
+                       data_allocation);
 
     if (data_size != 0)
     {

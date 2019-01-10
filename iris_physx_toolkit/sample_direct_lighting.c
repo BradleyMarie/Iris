@@ -82,11 +82,11 @@ DeltaLightLighting(
 
     float_t falloff = VectorDotProduct(shading_normal, to_light);
 
-    status = SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
-                                                       light_spectrum,
-                                                       reflector,
-                                                       falloff,
-                                                       spectrum);
+    status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
+                                                   light_spectrum,
+                                                   reflector,
+                                                   falloff,
+                                                   spectrum);
 
     return status;
 }
@@ -135,11 +135,11 @@ DeltaBrdfLighting(
 
     float_t falloff = VectorDotProduct(shading_normal, outgoing_direction);
 
-    status = SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
-                                                       light_spectrum,
-                                                       reflector,
-                                                       falloff,
-                                                       spectrum);
+    status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
+                                                   light_spectrum,
+                                                   reflector,
+                                                   falloff,
+                                                   spectrum);
 
     return status;
 }
@@ -266,12 +266,11 @@ SampleDirectLighting(
         float_t light_sample_attenuation =
             (light_sample_falloff * light_sample_weight) / light_sampled_pdf;
 
-        status = 
-            SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
-                                                      light_sampled_spectrum,
-                                                      brdf_computed_reflector,
-                                                      light_sample_attenuation,
-                                                      &light_sampled_spectrum);
+        status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
+                                                       light_sampled_spectrum,
+                                                       brdf_computed_reflector,
+                                                       light_sample_attenuation,
+                                                       &light_sampled_spectrum);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -306,12 +305,11 @@ SampleDirectLighting(
         float_t brdf_sample_attenuation = 
             (brdf_sample_falloff * brdf_sample_weight) / brdf_sampled_pdf;
 
-        status =
-            SpectrumCompositorAttenuatedAddReflection(spectrum_compositor,
-                                                      light_computed_spectrum,
-                                                      brdf_sampled_reflector,
-                                                      brdf_sample_attenuation,
-                                                      &light_computed_spectrum);
+        status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
+                                                       light_computed_spectrum,
+                                                       brdf_sampled_reflector,
+                                                       brdf_sample_attenuation,
+                                                       &light_computed_spectrum);
 
         if (status != ISTATUS_SUCCESS)
         {

@@ -27,121 +27,147 @@ TEST(SpectrumCompositorTest, SpectrumCompositorAddSpectraErrors)
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
     ASSERT_TRUE(compositor != NULL);
 
+    PSPECTRUM spectrum0 = (PSPECTRUM)(void*)(uintptr_t)1;
+    PSPECTRUM spectrum1 = (PSPECTRUM)(void*)(uintptr_t)2;
+
     PCSPECTRUM output;
     ISTATUS status = SpectrumCompositorAddSpectra(NULL,
-                                                  NULL,
-                                                  NULL,
+                                                  spectrum0,
+                                                  spectrum1,
                                                   &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
     status = SpectrumCompositorAddSpectra(compositor,
-                                          NULL,
-                                          NULL,
+                                          spectrum0,
+                                          spectrum1,
                                           NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
     SpectrumCompositorFree(compositor);
 }
 
-TEST(SpectrumCompositorTest, SpectrumCompositorAttenuateSpectrumErrors)
+TEST(SpectrumCompositorTest, SpectrumCompositorAttenateSpectrumErrors)
 {
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
     ASSERT_TRUE(compositor != NULL);
 
+    PSPECTRUM spectrum = (PSPECTRUM)(void*)(uintptr_t)1;
+
     PCSPECTRUM output;
     ISTATUS status = SpectrumCompositorAttenuateSpectrum(NULL,
-                                                         NULL,
-                                                         (float_t)1.0,
+                                                         spectrum,
+                                                         2.0,
                                                          &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
     status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                  NULL,
-                                                 (float_t)-1.0,
+                                                 2.0,
+                                                 &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 spectrum,
+                                                 -1.0,
                                                  &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
 
     status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                 NULL,
-                                                 (float_t)INFINITY,
+                                                 spectrum,
+                                                 0.0,
                                                  &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
 
     status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                 NULL,
+                                                 spectrum,
+                                                 INFINITY,
+                                                 &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 spectrum,
+                                                 -INFINITY,
+                                                 &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 spectrum,
                                                  std::numeric_limits<float_t>::quiet_NaN(),
                                                  &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
 
     status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                 NULL,
-                                                 (float_t)1.0,
+                                                 spectrum,
+                                                 2.0,
                                                  NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
     SpectrumCompositorFree(compositor);
 }
 
-TEST(SpectrumCompositorTest, SpectrumCompositorAddReflectionErrors)
+TEST(SpectrumCompositorTest, SpectrumCompositorAttenuateReflectionErrors)
 {
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
     ASSERT_TRUE(compositor != NULL);
 
-    PCSPECTRUM output;
-    ISTATUS status = SpectrumCompositorAddReflection(NULL,
-                                                     NULL,
-                                                     NULL,
-                                                     &output);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
-
-    status = SpectrumCompositorAddReflection(compositor,
-                                             NULL,
-                                             NULL,
-                                             NULL);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
-
-    SpectrumCompositorFree(compositor);
-}
-
-TEST(SpectrumCompositorTest, SpectrumCompositorAttenuatedAddReflectionErrors)
-{
-    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
-    ASSERT_TRUE(compositor != NULL);
+    PSPECTRUM spectrum = (PSPECTRUM)(void*)(uintptr_t)1;
+    PREFLECTOR reflector = (PREFLECTOR)(void*)(uintptr_t)2;
 
     PCSPECTRUM output;
-    ISTATUS status = SpectrumCompositorAttenuatedAddReflection(NULL,
-                                                               NULL,
-                                                               NULL,
-                                                               (float_t)1.0,
-                                                               &output);
+    ISTATUS status = SpectrumCompositorAttenuateReflection(NULL,
+                                                           spectrum,
+                                                           reflector,
+                                                           2.0,
+                                                           &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                       NULL,
-                                                       NULL,
-                                                       (float_t)-1.0,
-                                                       &output);
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   NULL,
+                                                   reflector,
+                                                   2.0,
+                                                   &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   NULL,
+                                                   -1.0,
+                                                   &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   reflector,
+                                                   0.0,
+                                                   &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
-    status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                       NULL,
-                                                       NULL,
-                                                       (float_t)INFINITY,
-                                                       &output);
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   reflector,
+                                                   INFINITY,
+                                                   &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
-    status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                       NULL,
-                                                       NULL,
-                                                       std::numeric_limits<float_t>::quiet_NaN(),
-                                                       &output);
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   reflector,
+                                                   -INFINITY,
+                                                   &output);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
-    status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                       NULL,
-                                                       NULL,
-                                                       (float_t)1.0,
-                                                       NULL);
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   reflector,
+                                                   std::numeric_limits<float_t>::quiet_NaN(),
+                                                   &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   spectrum,
+                                                   reflector,
+                                                   2.0,
+                                                   NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_04, status);
 
     SpectrumCompositorFree(compositor);
@@ -172,12 +198,15 @@ CutoffSpectrumRoutine(
     return ISTATUS_SUCCESS;
 }
 
-const SPECTRUM_VTABLE cutoff_vtable = { CutoffSpectrumRoutine, NULL };
+const SPECTRUM_VTABLE cutoff_vtable = {
+    CutoffSpectrumRoutine,
+    NULL
+};
 
 PSPECTRUM
 CutoffSpectrumCreate(
-    float_t intensity,
-    float_t cutoff
+    _In_ float_t intensity,
+    _In_ float_t cutoff
     )
 {
     CutoffContext context = { cutoff, intensity };
@@ -197,37 +226,89 @@ CutoffSpectrumCreate(
     return result;
 }
 
-struct ConstantContext {
-    float_t intensity;
+TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
+{
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)8.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)4.0,
+                                                    (float_t)2.5);
+    ASSERT_TRUE(NULL != root_spectrum1);
+
+    PCSPECTRUM result;
+    ISTATUS status = SpectrumCompositorAddSpectra(compositor,
+                                                  root_spectrum0,
+                                                  NULL,
+                                                  &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(root_spectrum0, result);
+    status = SpectrumCompositorAddSpectra(compositor,
+                                          NULL,
+                                          root_spectrum0,
+                                          &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(root_spectrum0, result);
+
+    status = SpectrumCompositorAddSpectra(compositor,
+                                          root_spectrum0,
+                                          root_spectrum1,
+                                          &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t value;
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)12.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)4.0, value);
+
+    SpectrumRelease(root_spectrum0);
+    SpectrumRelease(root_spectrum1);
+
+    SpectrumCompositorFree(compositor);
+}
+
+struct AttenuatingContext {
+    float_t attenuation;
 };
 
 ISTATUS
-ConstantReflectorRoutine(
+AttenuatingReflectorRoutine(
     _In_ const void *data,
     _In_ float_t wavelength,
     _In_ float_t incoming_intensity,
     _Out_ float_t *outgoing_intensity
     )
 {
-    const ConstantContext *context = static_cast<const ConstantContext*>(data);
-    *outgoing_intensity = context->intensity;
+    const AttenuatingContext *context =
+        static_cast<const AttenuatingContext*>(data);
+    *outgoing_intensity *= context->attenuation;
     return ISTATUS_SUCCESS;
 }
 
-const REFLECTOR_VTABLE constant_ref_vtable = { ConstantReflectorRoutine, NULL };
+const REFLECTOR_VTABLE attenuating_ref_vtable = {
+    AttenuatingReflectorRoutine,
+    NULL
+};
 
 PREFLECTOR
-ConstantReflectorCreate(
-    float_t intensity
+AttenuatingReflectorCreate(
+    _In_ float_t attenuation
     )
 {
-    ConstantContext context = { intensity };
+    AttenuatingContext context = { attenuation };
 
     PREFLECTOR result;
-    ISTATUS status = ReflectorAllocate(&constant_ref_vtable,
+    ISTATUS status = ReflectorAllocate(&attenuating_ref_vtable,
                                        &context,
-                                       sizeof(ConstantContext),
-                                       alignof(ConstantContext),
+                                       sizeof(AttenuatingContext),
+                                       alignof(AttenuatingContext),
                                        &result);
 
     if (status != ISTATUS_SUCCESS)
@@ -238,581 +319,113 @@ ConstantReflectorCreate(
     return result;
 }
 
-TEST(SpectrumCompositor, SpectrumCompositorAddReflection)
+TEST(SpectrumCompositor, SpectrumCompositorAttenuateReflection)
 {
-    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum0);
-
-    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
-    ASSERT_TRUE(NULL != root_reflector0);
-
-    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
-    ASSERT_TRUE(NULL != root_reflector1);
-
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
     ASSERT_TRUE(compositor != NULL);
 
-    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
-                                            root_reflector1,
-                                            nullptr };
-
-    std::vector<float_t> reflector_answer = { (float_t)1.0, 
-                                              (float_t)2.0,
-                                              (float_t)0.0 };
-
-    std::vector<PCSPECTRUM> spectra = { root_spectrum0 };
-
-    std::vector<float_t> answer_wavelength_one = { (float_t)4.0 };
-
-    std::vector<float_t> answer_wavelength_two = { (float_t)0.0 };
-    
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAddReflection(compositor,
-                                                         root_spectrum0,
-                                                         reflectors[i],
-                                                         &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i]);
-        answer_wavelength_two.push_back(reflector_answer[i]);
-    }
-    
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAddReflection(compositor,
-                                                         nullptr,
-                                                         reflectors[i],
-                                                         &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back((float_t)0.0);
-        answer_wavelength_two.push_back((float_t)0.0);
-    }
-
-    for (size_t i = 0; i < spectra.size(); i++)
-    {
-        float_t value;
-        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_one[i], value);
-        
-        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_two[i], value);
-    }
-
-    SpectrumCompositorFree(compositor);
-
-    SpectrumRelease(root_spectrum0);
-    ReflectorRelease(root_reflector0);
-    ReflectorRelease(root_reflector1);
-}
-
-TEST(SpectrumCompositor, SpectrumCompositorAttenuatedAddReflection)
-{
-    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)8.0,
                                                     (float_t)1.5);
     ASSERT_TRUE(NULL != root_spectrum0);
 
-    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
+    PREFLECTOR root_reflector0 = AttenuatingReflectorCreate((float_t)0.5);
     ASSERT_TRUE(NULL != root_reflector0);
 
-    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
-    ASSERT_TRUE(NULL != root_reflector1);
-
-    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
-    ASSERT_TRUE(compositor != NULL);
-
-    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
-                                            root_reflector1,
-                                            nullptr };
-
-    std::vector<float_t> reflector_answer = { (float_t)1.0, 
-                                              (float_t)2.0,
-                                              (float_t)0.0 };
-
-    std::vector<PCSPECTRUM> spectra = { root_spectrum0 };
-
-    std::vector<float_t> answer_wavelength_one = { (float_t)4.0 };
-
-    std::vector<float_t> answer_wavelength_two = { (float_t)0.0 };
-    
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                                   root_spectrum0,
-                                                                   reflectors[i],
-                                                                   (float_t)0.0,
-                                                                   &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
+    PCSPECTRUM result;
+    ISTATUS status = SpectrumCompositorAttenuateReflection(compositor,
                                                            root_spectrum0,
-                                                           reflectors[i],
+                                                           root_reflector0,
                                                            (float_t)0.5,
                                                            &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.5);
+    float_t value;
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)2.0, value);
 
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)1.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)1.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)1.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)2.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)2.0);
-    }
-    
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                                   nullptr,
-                                                                   reflectors[i],
-                                                                   (float_t)0.0,
-                                                                   &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           nullptr,
-                                                           reflectors[i],
-                                                           (float_t)0.5,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           nullptr,
-                                                           reflectors[i],
-                                                           (float_t)1.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           nullptr,
-                                                           reflectors[i],
-                                                           (float_t)2.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-    }
-
-    for (size_t i = 0; i < spectra.size(); i++)
-    {
-        float_t value;
-        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_one[i], value);
-        
-        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_two[i], value);
-    }
-
-    SpectrumCompositorFree(compositor);
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
 
     SpectrumRelease(root_spectrum0);
     ReflectorRelease(root_reflector0);
-    ReflectorRelease(root_reflector1);
+
+    SpectrumCompositorFree(compositor);
 }
 
 TEST(SpectrumCompositor, SpectrumCompositorAttenuateSpectrum)
 {
-    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum0);
-
-    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)8.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum1);
-
-    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
-    ASSERT_TRUE(NULL != root_reflector0);
-
-    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
-    ASSERT_TRUE(NULL != root_reflector1);
-
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
     ASSERT_TRUE(compositor != NULL);
 
-    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
-                                            root_reflector1,
-                                            nullptr };
+    PREFLECTOR root_reflector0 = AttenuatingReflectorCreate((float_t)0.5);
+    ASSERT_TRUE(NULL != root_reflector0);
 
-    std::vector<float_t> reflector_answer = { (float_t)1.0, 
-                                              (float_t)2.0,
-                                              (float_t)0.0 };
-
-    std::vector<PCSPECTRUM> spectra = { nullptr,
-                                        root_spectrum0,
-                                        root_spectrum1 };
-
-    std::vector<float_t> answer_wavelength_one = { (float_t)0.0,
-                                                   (float_t)4.0,
-                                                   (float_t)8.0 };
-
-    std::vector<float_t> answer_wavelength_two = { (float_t)0.0,
-                                                   (float_t)0.0,
-                                                   (float_t)0.0 };
-
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                                   root_spectrum0,
-                                                                   reflectors[i],
-                                                                   (float_t)0.0,
-                                                                   &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)0.5,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.5);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)1.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)1.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)1.0);
-
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)2.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)2.0);
-    }
-
-    size_t stop_value = spectra.size();
-
-    for (size_t i = 0; i < stop_value; i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                             spectra[i],
-                                                             (float_t)0.0,
-                                                             &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)0.5,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.5);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)1.0,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)1.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)1.0);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)2.0,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)2.0);
-    }
-
-    stop_value = spectra.size();
-
-    for (size_t i = 0; i < stop_value; i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                             spectra[i],
-                                                             (float_t)0.0,
-                                                             &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.0);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)0.5,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.5);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)1.0,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)1.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)1.0);
-
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)2.0,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
-
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)2.0);
-    }
-
-    for (size_t i = 0; i < spectra.size(); i++)
-    {
-        float_t value;
-        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_one[i], value);
-        
-        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_two[i], value);
-    }
-
-    SpectrumCompositorFree(compositor);
-
-    SpectrumRelease(root_spectrum0);
-    SpectrumRelease(root_spectrum1);
-    ReflectorRelease(root_reflector0);
-    ReflectorRelease(root_reflector1);
-}
-
-TEST(SpectrumCompositor, SpectrumCompositorAddSpectra)
-{
-    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)4.0,
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)16.0,
                                                     (float_t)1.5);
     ASSERT_TRUE(NULL != root_spectrum0);
 
-    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)8.0,
-                                                    (float_t)1.5);
-    ASSERT_TRUE(NULL != root_spectrum1);
-
-    PREFLECTOR root_reflector0 = ConstantReflectorCreate((float_t)1.0);
-    ASSERT_TRUE(NULL != root_reflector0);
-
-    PREFLECTOR root_reflector1 = ConstantReflectorCreate((float_t)2.0);
-    ASSERT_TRUE(NULL != root_reflector1);
-
-    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
-    ASSERT_TRUE(compositor != NULL);
-
-    std::vector<PCREFLECTOR> reflectors = { root_reflector0, 
-                                            root_reflector1 };
-
-    std::vector<float_t> reflector_answer = { (float_t)1.0, 
-                                              (float_t)2.0,
-                                              (float_t)0.0 };
-
-    std::vector<PCSPECTRUM> spectra = { nullptr,
-                                        root_spectrum0,
-                                        root_spectrum1 };
-
-    std::vector<float_t> answer_wavelength_one = { (float_t)0.0,
-                                                   (float_t)4.0,
-                                                   (float_t)8.0 };
-
-    std::vector<float_t> answer_wavelength_two = { (float_t)0.0,
-                                                   (float_t)0.0,
-                                                   (float_t)0.0 };
-
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAddReflection(compositor,
+    PCSPECTRUM result;
+    ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                          root_spectrum0,
-                                                         reflectors[i],
+                                                         (float_t)0.5,
                                                          &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-        answer_wavelength_one.push_back(reflector_answer[i]);
-        answer_wavelength_two.push_back(reflector_answer[i]);
-    }
+    float_t value;
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)8.0, value);
 
-    for (size_t i = 0; i < reflectors.size(); i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                                   root_spectrum0,
-                                                                   reflectors[i],
-                                                                   (float_t)0.5,
-                                                                   &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
 
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)0.5);
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 result,
+                                                 (float_t)0.5,
+                                                 &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-        status = SpectrumCompositorAttenuatedAddReflection(compositor,
-                                                           root_spectrum0,
-                                                           reflectors[i],
-                                                           (float_t)2.0,
-                                                           &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)4.0, value);
 
-        answer_wavelength_one.push_back(reflector_answer[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(reflector_answer[i] * (float_t)2.0);
-    }
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
 
-    size_t stop_value = spectra.size();
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 result,
+                                                 (float_t)4.0,
+                                                 &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(root_spectrum0, result);
 
-    for (size_t i = 0; i < stop_value; i++)
-    {
-        PCSPECTRUM result;
-        ISTATUS status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                             spectra[i],
-                                                             (float_t)0.5,
-                                                             &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   root_spectrum0,
+                                                   root_reflector0,
+                                                   (float_t)0.5,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)0.5);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)0.5);
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 result,
+                                                 (float_t)0.5,
+                                                 &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-        status = SpectrumCompositorAttenuateSpectrum(compositor,
-                                                     spectra[i],
-                                                     (float_t)2.0,
-                                                     &result);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        spectra.push_back(result);
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)2.0, value);
 
-        answer_wavelength_one.push_back(answer_wavelength_one[i] * (float_t)2.0);
-        answer_wavelength_two.push_back(answer_wavelength_two[i] * (float_t)2.0);
-    }
-
-    stop_value = spectra.size();
-
-    for (size_t i = 0; i < stop_value; i++)
-    {
-        for (size_t j = 0; j < stop_value; j++)
-        {
-            PCSPECTRUM result;
-            ISTATUS status = SpectrumCompositorAddSpectra(compositor,
-                                                          spectra[i],
-                                                          spectra[j],
-                                                          &result);
-            ASSERT_EQ(ISTATUS_SUCCESS, status);
-            spectra.push_back(result);
-
-            answer_wavelength_one.push_back(answer_wavelength_one[i] + answer_wavelength_one[j]);
-            answer_wavelength_two.push_back(answer_wavelength_two[i] + answer_wavelength_two[j]);
-        }
-    }
-
-    for (size_t i = 0; i < stop_value; i++)
-    {
-        for (size_t j = 0; j < stop_value; j++)
-        {
-            PCSPECTRUM result;
-            ISTATUS status = SpectrumCompositorAddSpectra(compositor,
-                                                          spectra[i],
-                                                          spectra[j],
-                                                          &result);
-            ASSERT_EQ(ISTATUS_SUCCESS, status);
-            spectra.push_back(result);
-
-            answer_wavelength_one.push_back(answer_wavelength_one[i] + answer_wavelength_one[j]);
-            answer_wavelength_two.push_back(answer_wavelength_two[i] + answer_wavelength_two[j]);
-        }
-    }
-
-    for (size_t i = 0; i < spectra.size(); i++)
-    {
-        float_t value;
-        ISTATUS status = SpectrumSample(spectra[i], (float_t)1.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_one[i], value);
-        
-        status = SpectrumSample(spectra[i], (float_t)2.0, &value);
-        ASSERT_EQ(ISTATUS_SUCCESS, status);
-        EXPECT_EQ(answer_wavelength_two[i], value);
-    }
-    
-    SpectrumCompositorFree(compositor);
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
 
     SpectrumRelease(root_spectrum0);
-    SpectrumRelease(root_spectrum1);
     ReflectorRelease(root_reflector0);
-    ReflectorRelease(root_reflector1);
+
+    SpectrumCompositorFree(compositor);
 }

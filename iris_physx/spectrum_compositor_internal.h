@@ -39,14 +39,6 @@ typedef struct _SUM_SPECTRUM {
 
 typedef const SUM_SPECTRUM *PCSUM_SPECTRUM;
 
-typedef struct _REFLECTION_SPECTRUM {
-    struct _SPECTRUM header;
-    const struct _SPECTRUM *spectrum;
-    PCREFLECTOR reflector;
-} REFLECTION_SPECTRUM, *PREFLECTION_SPECTRUM;
-
-typedef const REFLECTION_SPECTRUM *PCREFLECTION_SPECTRUM;
-
 typedef struct _ATTENUATED_REFLECTION_SPECTRUM {
     struct _SPECTRUM header;
     const struct _SPECTRUM *spectrum;
@@ -58,7 +50,6 @@ typedef const ATTENUATED_REFLECTION_SPECTRUM *PCATTENUATED_REFLECTION_SPECTRUM;
 
 struct _SPECTRUM_COMPOSITOR {
     STATIC_MEMORY_ALLOCATOR attenuated_reflection_spectrum_allocator;
-    STATIC_MEMORY_ALLOCATOR reflection_spectrum_allocator;
     STATIC_MEMORY_ALLOCATOR attenuated_spectrum_allocator;
     STATIC_MEMORY_ALLOCATOR sum_spectrum_allocator;
 };
@@ -87,24 +78,12 @@ SpectrumCompositorInitialize(
     }
 
     success = StaticMemoryAllocatorInitialize(
-        &compositor->reflection_spectrum_allocator,
-        sizeof(REFLECTION_SPECTRUM));
-    if (!success)
-    {
-        StaticMemoryAllocatorDestroy(
-            &compositor->attenuated_reflection_spectrum_allocator);
-        return false;
-    }
-
-    success = StaticMemoryAllocatorInitialize(
         &compositor->attenuated_spectrum_allocator,
         sizeof(ATTENUATED_SPECTRUM));
     if (!success)
     {
         StaticMemoryAllocatorDestroy(
             &compositor->attenuated_reflection_spectrum_allocator);
-        StaticMemoryAllocatorDestroy(
-            &compositor->reflection_spectrum_allocator);
         return false;
     }
 
@@ -115,8 +94,6 @@ SpectrumCompositorInitialize(
     {
         StaticMemoryAllocatorDestroy(
             &compositor->attenuated_reflection_spectrum_allocator);
-        StaticMemoryAllocatorDestroy(
-            &compositor->reflection_spectrum_allocator);
         StaticMemoryAllocatorDestroy(
             &compositor->attenuated_spectrum_allocator);
         return false;
@@ -136,7 +113,6 @@ SpectrumCompositorClear(
 
     StaticMemoryAllocatorFreeAll(
         &compositor->attenuated_reflection_spectrum_allocator);
-    StaticMemoryAllocatorFreeAll(&compositor->reflection_spectrum_allocator);
     StaticMemoryAllocatorFreeAll(&compositor->attenuated_spectrum_allocator);
     StaticMemoryAllocatorFreeAll(&compositor->sum_spectrum_allocator);
 }
@@ -152,7 +128,6 @@ SpectrumCompositorDestroy(
 
     StaticMemoryAllocatorDestroy(
         &compositor->attenuated_reflection_spectrum_allocator);
-    StaticMemoryAllocatorDestroy(&compositor->reflection_spectrum_allocator);
     StaticMemoryAllocatorDestroy(&compositor->attenuated_spectrum_allocator);
     StaticMemoryAllocatorDestroy(&compositor->sum_spectrum_allocator);
 }

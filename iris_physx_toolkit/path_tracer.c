@@ -242,7 +242,7 @@ PathTracerIntegrate(
 
     for (; bounces != 0; bounces--)
     {
-        ISTATUS status = SpectrumCompositorAttenuatedAddReflection(
+        ISTATUS status = SpectrumCompositorAttenuateReflection(
             compositor, 
             path_tracer->spectra[bounces],
             path_tracer->reflectors[bounces - 1],

@@ -37,13 +37,13 @@ static
 inline
 void
 SpectrumInitialize(
+    _Out_ struct _SPECTRUM *spectrum,
     _In_ PCSPECTRUM_VTABLE vtable,
-    _In_opt_ void *data,
-    _Out_ struct _SPECTRUM *spectrum
+    _In_opt_ void *data
     )
 {
-    assert(vtable != NULL);
     assert(spectrum != NULL);
+    assert(vtable != NULL);
     
     spectrum->vtable = vtable;
     spectrum->data = data;
