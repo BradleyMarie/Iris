@@ -379,11 +379,6 @@ SpectrumCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
@@ -397,6 +392,12 @@ SpectrumCompositorAttenuateReflection(
     if (reflected_spectrum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (spectrum == NULL)
+    {
+        *reflected_spectrum = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = AttenuatedReflectionSpectrumAllocate(compositor,

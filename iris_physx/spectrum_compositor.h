@@ -52,7 +52,7 @@ SpectrumCompositorAttenuateSpectrum(
 ISTATUS
 SpectrumCompositorAttenuateReflection(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
-    _In_ PCSPECTRUM spectrum,
+    _In_opt_ PCSPECTRUM spectrum,
     _In_ PCREFLECTOR reflector,
     _In_ float_t attenuation,
     _Out_ PCSPECTRUM *reflected_spectrum
