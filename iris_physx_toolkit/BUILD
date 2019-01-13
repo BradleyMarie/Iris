@@ -46,6 +46,15 @@ cc_library(
 )
 
 cc_library(
+    name = "interpolated_spectrum",
+    hdrs = ["interpolated_spectrum.h"],
+    srcs = ["interpolated_spectrum.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "lambertian_brdf",
     hdrs = ["lambertian_brdf.h"],
     srcs = ["lambertian_brdf.c"],
