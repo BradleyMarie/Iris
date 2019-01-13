@@ -37,6 +37,14 @@ InterpolatedSpectrumAllocate(
     _Out_ PSPECTRUM *spectrum
     );
 
+ISTATUS
+InterpolatedReflectorAllocate(
+    _In_reads_(num_samples) const float_t *wavelengths,
+    _In_reads_(num_samples) const float_t *reflectances,
+    _In_ size_t num_samples,
+    _Out_ PREFLECTOR *reflector
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus

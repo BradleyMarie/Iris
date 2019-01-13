@@ -29,6 +29,15 @@ typedef struct _INTERPOLATED_SPECTRUM {
 
 typedef const INTERPOLATED_SPECTRUM *PCINTERPOLATED_SPECTRUM;
 
+typedef struct _INTERPOLATED_REFLECTOR {
+    _Field_size_(num_samples) float_t *wavelengths;
+    _Field_size_(num_samples) float_t *reflectances;
+    size_t num_samples;
+    float_t albedo;
+} INTERPOLATED_REFLECTOR, *PINTERPOLATED_REFLECTOR;
+
+typedef const INTERPOLATED_REFLECTOR *PCINTERPOLATED_REFLECTOR;
+
 //
 // Static Functions
 //
@@ -128,6 +137,56 @@ InterpolatedSpectrumFree(
     free(interpolated_spectrum->intensities);
 }
 
+static
+ISTATUS
+InterpolatedReflectorSample(
+    _In_ const void *context,
+    _In_ float_t wavelength,
+    _In_ float_t incoming_intensity,
+    _Out_ float_t *outgoing_intensity
+    )
+{
+    PCINTERPOLATED_REFLECTOR interpolated_reflector =
+        (PCINTERPOLATED_REFLECTOR)context;
+
+    float_t reflectance = Interpolate(interpolated_reflector->wavelengths,
+                                      interpolated_reflector->reflectances,
+                                      interpolated_reflector->num_samples,
+                                      wavelength);
+
+    *outgoing_intensity = incoming_intensity * reflectance;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+InterpolatedReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    )
+{
+    PCINTERPOLATED_REFLECTOR interpolated_reflector =
+        (PCINTERPOLATED_REFLECTOR)context;
+
+    *albedo = interpolated_reflector->albedo;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+void
+InterpolatedReflectorFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PINTERPOLATED_REFLECTOR interpolated_reflector =
+        (PINTERPOLATED_REFLECTOR)context;
+
+    free(interpolated_reflector->wavelengths);
+    free(interpolated_reflector->reflectances);
+}
+
 //
 // Static Variables
 //
@@ -135,6 +194,12 @@ InterpolatedSpectrumFree(
 static const SPECTRUM_VTABLE interpolated_spectrum_vtable = {
     InterpolatedSpectrumSample,
     InterpolatedSpectrumFree
+};
+
+static const REFLECTOR_VTABLE interpolated_reflector_vtable = {
+    InterpolatedReflectorSample,
+    InterpolatedReflectorGetAlbedo,
+    InterpolatedReflectorFree
 };
 
 //
@@ -222,6 +287,108 @@ InterpolatedSpectrumAllocate(
     {
         free(interpolated_spectrum.wavelengths);
         free(interpolated_spectrum.intensities);
+    }
+
+    return status;
+}
+
+ISTATUS
+InterpolatedReflectorAllocate(
+    _In_reads_(num_samples) const float_t *wavelengths,
+    _In_reads_(num_samples) const float_t *reflectances,
+    _In_ size_t num_samples,
+    _Out_ PREFLECTOR *reflector
+    )
+{
+    if (wavelengths == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflectances == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (num_samples < 2)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    INTERPOLATED_REFLECTOR interpolated_reflector;
+    interpolated_reflector.wavelengths = calloc(num_samples, sizeof(float_t));
+
+    if (interpolated_reflector.wavelengths == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    interpolated_reflector.reflectances = calloc(num_samples, sizeof(float_t));
+
+    if (interpolated_reflector.reflectances == NULL)
+    {
+        free(interpolated_reflector.wavelengths);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    float_t last_wavelength = (float_t)0.0;
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        if (!isfinite(wavelengths[i]) ||
+            wavelengths[i] <= (float_t)0.0 ||
+            wavelengths[i] < last_wavelength)
+        {
+            free(interpolated_reflector.wavelengths);
+            free(interpolated_reflector.reflectances);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+
+        interpolated_reflector.wavelengths[i] = wavelengths[i];
+        last_wavelength = wavelengths[i];
+
+        if (!isfinite(reflectances[i]) ||
+            reflectances[i] < (float_t)0.0 ||
+            (float_t)1.0 < reflectances[i])
+        {
+            free(interpolated_reflector.wavelengths);
+            free(interpolated_reflector.reflectances);
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        interpolated_reflector.reflectances[i] = reflectances[i];
+    }
+
+    interpolated_reflector.num_samples = num_samples;
+
+    float_t total_area = (float_t)0.0;
+    for (size_t i = 0; i < num_samples - 1; i++)
+    {
+        float_t width = (wavelengths[i + 1] - wavelengths[i]) * (float_t)0.5;
+        total_area = fma(reflectances[i], width, total_area);
+        total_area = fma(reflectances[i + 1], width, total_area);
+    }
+
+    float_t average_reflectance =
+        total_area / (wavelengths[num_samples - 1] - wavelengths[0]);
+
+    interpolated_reflector.albedo =
+        fmax((float_t)0.0, fmin(average_reflectance, (float_t)1.0));
+
+    ISTATUS status = ReflectorAllocate(&interpolated_reflector_vtable,
+                                       &interpolated_reflector,
+                                       sizeof(INTERPOLATED_REFLECTOR),
+                                       alignof(INTERPOLATED_REFLECTOR),
+                                       reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(interpolated_reflector.wavelengths);
+        free(interpolated_reflector.reflectances);
     }
 
     return status;
