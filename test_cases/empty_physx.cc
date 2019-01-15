@@ -98,4 +98,5 @@ TEST(EmptyPhysx, ListScene)
     AllLightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
+    ColorMatcherRelease(color_matcher);
 }

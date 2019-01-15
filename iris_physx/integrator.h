@@ -54,7 +54,8 @@ IntegratorIntegrate(
     _In_ RAY ray,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
-    _Inout_ PCOLOR_MATCHER color_matcher
+    _In_ PCCOLOR_MATCHER color_matcher,
+    _Out_ PCOLOR3 color
     );
 
 ISTATUS

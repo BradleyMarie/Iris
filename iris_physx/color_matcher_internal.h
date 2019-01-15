@@ -17,6 +17,8 @@ Abstract:
 
 #include "iris_physx/color_matcher_vtable.h"
 
+#include <stdatomic.h>
+
 //
 // Types
 //
@@ -24,6 +26,7 @@ Abstract:
 struct _COLOR_MATCHER {
     PCCOLOR_MATCHER_VTABLE vtable;
     void *data;
+    atomic_uintmax_t reference_count;
 };
 
 //
@@ -44,21 +47,25 @@ ColorMatcherInitialize(
     
     color_matcher->vtable = vtable;
     color_matcher->data = data;
+    color_matcher->reference_count = 1;
 }
 
 static
 inline
 ISTATUS
-ColorMatcherAddSample(
-    _In_ struct _COLOR_MATCHER *color_matcher,
-    _In_opt_ PCSPECTRUM spectrum
+ColorMatcherCompute(
+    _In_ const struct _COLOR_MATCHER *color_matcher,
+    _In_opt_ PCSPECTRUM spectrum,
+    _Out_ PCOLOR3 color
     )
 {
     assert(color_matcher != NULL);
+    assert(color != NULL);
 
     ISTATUS status =
-        color_matcher->vtable->add_sample_routine(color_matcher->data,
-                                                  spectrum);
+        color_matcher->vtable->compute_routine(color_matcher->data,
+                                               spectrum,
+                                               color);
 
     return status;
 }

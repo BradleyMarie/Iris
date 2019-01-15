@@ -44,15 +44,6 @@ typedef struct _TEST_REFLECTOR {
 
 typedef const TEST_REFLECTOR *PCTEST_REFLECTOR;
 
-typedef struct _TEST_COLOR_MATCHER {
-    float_t x;
-    float_t y;
-    float_t z;
-    uint32_t num_samples;
-} TEST_COLOR_MATCHER, *PTEST_COLOR_MATCHER;
-
-typedef const TEST_COLOR_MATCHER *PCTEST_COLOR_MATCHER;
-
 //
 // Static Functions
 //
@@ -134,90 +125,40 @@ TestReflectorGetAlbedo(
 }
 
 ISTATUS
-TestColorMatcherAddSample(
-    _In_ void *context,
-    _In_opt_ PCSPECTRUM spectrum
-    )
-{
-    PTEST_COLOR_MATCHER test_color_matcher = (PTEST_COLOR_MATCHER)context;
-
-    float_t intensity;
-    ISTATUS status = SpectrumSample(spectrum,
-                                    X_WAVELENGTH,
-                                    &intensity);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    test_color_matcher->x += intensity;
-
-    status = SpectrumSample(spectrum,
-                            Y_WAVELENGTH,
-                            &intensity);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    test_color_matcher->y += intensity;
-
-    status = SpectrumSample(spectrum,
-                            Z_WAVELENGTH,
-                            &intensity);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    test_color_matcher->z += intensity;
-
-    test_color_matcher->num_samples += 1;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-TestColorMatcherComputeColor(
+TestColorMatcherCompute(
     _In_ const void *context,
+    _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
 {
-    PCTEST_COLOR_MATCHER test_color_matcher = (PCTEST_COLOR_MATCHER)context;
+    ISTATUS status = SpectrumSample(spectrum,
+                                    X_WAVELENGTH,
+                                    &color->x);
 
-    *color = ColorCreate(
-        test_color_matcher->x / (float_t)test_color_matcher->num_samples,
-        test_color_matcher->y / (float_t)test_color_matcher->num_samples,
-        test_color_matcher->z / (float_t)test_color_matcher->num_samples);
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = SpectrumSample(spectrum,
+                            Y_WAVELENGTH,
+                            &color->y);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = SpectrumSample(spectrum,
+                            Z_WAVELENGTH,
+                            &color->z);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
 
     return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-TestColorMatcherClear(
-    _Inout_ void *context
-    )
-{
-    PTEST_COLOR_MATCHER test_color_matcher = (PTEST_COLOR_MATCHER)context;
-
-    test_color_matcher->x = (float_t)0.0;
-    test_color_matcher->y = (float_t)0.0;
-    test_color_matcher->z = (float_t)0.0;
-    test_color_matcher->num_samples = 0;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-TestColorMatcherReplicate(
-    _In_opt_ const void *context,
-    _Out_ PCOLOR_MATCHER *replica
-    )
-{
-    return TestColorMatcherAllocate(replica);
 }
 
 //
@@ -236,10 +177,7 @@ static const REFLECTOR_VTABLE test_reflector_vtable = {
 };
 
 static const COLOR_MATCHER_VTABLE test_color_matcher_vtable = {
-    TestColorMatcherAddSample,
-    TestColorMatcherComputeColor,
-    TestColorMatcherClear,
-    TestColorMatcherReplicate,
+    TestColorMatcherCompute,
     NULL
 };
 
@@ -341,17 +279,11 @@ TestColorMatcherAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    TEST_COLOR_MATCHER test_color_matcher;
-    test_color_matcher.x = (float_t)0.0;
-    test_color_matcher.y = (float_t)0.0;
-    test_color_matcher.z = (float_t)0.0;
-    test_color_matcher.num_samples = 0;
-
     ISTATUS status = ColorMatcherAllocate(&test_color_matcher_vtable,
-                                        &test_color_matcher,
-                                        sizeof(TEST_COLOR_MATCHER),
-                                        alignof(TEST_COLOR_MATCHER),
-                                        color_matcher);
+                                          NULL,
+                                          0,
+                                          0,
+                                          color_matcher);
 
     return status;
 }

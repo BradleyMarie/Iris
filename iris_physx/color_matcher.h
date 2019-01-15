@@ -32,25 +32,13 @@ ColorMatcherAllocate(
     _Out_ PCOLOR_MATCHER *color_matcher
     );
 
-ISTATUS
-ColorMatcherComputeColor(
-    _In_ PCCOLOR_MATCHER color_matcher,
-    _Out_ PCOLOR3 color
-    );
-
-ISTATUS
-ColorMatcherClear(
-    _In_ PCOLOR_MATCHER color_matcher
-    );
-
-ISTATUS
-ColorMatcherReplicate(
-    _In_ PCCOLOR_MATCHER color_matcher,
-    _Out_ PCOLOR_MATCHER *replica
+void
+ColorMatcherRetain(
+    _In_opt_ PCOLOR_MATCHER color_matcher
     );
 
 void
-ColorMatcherFree(
+ColorMatcherRelease(
     _In_opt_ _Post_invalid_ PCOLOR_MATCHER color_matcher
     );
 

@@ -37,35 +37,23 @@ SampleTracerTrace(
     _In_ struct _SAMPLE_TRACER *tracer,
     _In_ PCRAY ray,
     _In_ PRANDOM rng,
-    _In_ float_t epsilon
+    _In_ float_t epsilon,
+    _Out_ PCOLOR3 color
     )
 {
     assert(tracer != NULL);
     assert(ray != NULL);
     assert(RayValidate(*ray));
     assert(rng != NULL);
-    assert(isfinite(epsilon) && (float_t)0.0 <= epsilon);
+    assert(isfinite(epsilon));
+    assert((float_t)0.0 <= epsilon);
+    assert(color != NULL);
 
     ISTATUS status = tracer->vtable->trace_routine(tracer->data,
                                                    ray,
                                                    rng,
-                                                   epsilon);
-
-    return status;
-}
-
-inline
-static
-ISTATUS
-SampleTracerColorMatch(
-    _In_ struct _SAMPLE_TRACER *tracer,
-    _Out_ PCOLOR3 color
-    )
-{
-    assert(tracer != NULL);
-    assert(color != NULL);
-
-    ISTATUS status = tracer->vtable->color_match_routine(tracer->data, color);
+                                                   epsilon,
+                                                   color);
 
     return status;
 }

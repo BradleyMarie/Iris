@@ -96,6 +96,7 @@ TestRenderSingleThreaded(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
+    ColorMatcherRelease(color_matcher);
 }
 
 TEST(SingleSphereTest, TestReflectorRedWorldSphere)

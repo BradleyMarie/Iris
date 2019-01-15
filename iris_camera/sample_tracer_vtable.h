@@ -31,13 +31,7 @@ ISTATUS
     _In_opt_ void *context,
     _In_ PCRAY ray,
     _In_ PRANDOM rng,
-    _In_ float_t epsilon
-    );
-
-typedef
-ISTATUS
-(*PSAMPLE_TRACER_COLOR_MATCH_ROUTINE)(
-    _In_opt_ void *context,
+    _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     );
 
@@ -50,7 +44,6 @@ ISTATUS
 
 typedef struct _SAMPLE_TRACER_VTABLE {
     PSAMPLE_TRACER_TRACE_ROUTINE trace_routine;
-    PSAMPLE_TRACER_COLOR_MATCH_ROUTINE color_match_routine;
     PSAMPLE_TRACER_DUPLICATE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } SAMPLE_TRACER_VTABLE, *PSAMPLE_TRACER_VTABLE;

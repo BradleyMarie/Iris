@@ -172,6 +172,9 @@ IrisCameraRenderPixel(
         return status;
     }
 
+    COLOR3 pixel_color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+    size_t num_samples = 1;
+
     for (;;)
     {
         float_t pixel_u, pixel_v, lens_u, lens_v;
@@ -200,28 +203,32 @@ IrisCameraRenderPixel(
             return status;
         }
 
-        status = SampleTracerTrace(sample_tracer, &ray, rng, epsilon);
+        COLOR3 sample_color;
+        status = SampleTracerTrace(sample_tracer,
+                                   &ray,
+                                   rng,
+                                   epsilon,
+                                   &sample_color);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
+        pixel_color = ColorAdd(pixel_color, sample_color);
+
         if (sampler_status == ISTATUS_DONE)
         {
             break;
         }
+
+        num_samples += 1;
     }
 
-    COLOR3 color;
-    status = SampleTracerColorMatch(sample_tracer, &color);
+    pixel_color = ColorScaleByScalar(pixel_color,
+                                     (float_t)1.0 / (float_t)num_samples);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    FramebufferSetPixel(framebuffer, pixel_column, pixel_row, color);
+    FramebufferSetPixel(framebuffer, pixel_column, pixel_row, pixel_color);
 
     return ISTATUS_SUCCESS;
 }
@@ -298,7 +305,6 @@ IrisCameraRender(
             {
                 return status;
             }
-
         }
     }
 
