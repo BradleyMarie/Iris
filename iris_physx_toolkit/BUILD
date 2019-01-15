@@ -28,6 +28,15 @@ cc_library(
 )
 
 cc_library(
+    name = "cie_color_matcher",
+    hdrs = ["cie_color_matcher.h"],
+    srcs = ["cie_color_matcher.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     hdrs = ["constant_material.h"],
     srcs = ["constant_material.c"],
