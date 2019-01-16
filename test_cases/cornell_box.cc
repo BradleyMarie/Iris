@@ -19,8 +19,10 @@ Abstract:
 #include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
+#include "iris_physx_toolkit/cie_color_matcher.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
+#include "iris_physx_toolkit/interpolated_spectrum.h"
 #include "iris_physx_toolkit/lambertian_brdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/one_light_sampler.h"
@@ -31,7 +33,6 @@ Abstract:
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
-#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(
@@ -58,7 +59,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_MATCHER color_matcher;
-    status = TestColorMatcherAllocate(&color_matcher);
+    status = CieColorMatcherAllocate(&color_matcher);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -142,10 +143,11 @@ AddQuadToScene(
 TEST(CornellBoxTest, CornellBox)
 {
     PREFLECTOR white_reflector;
-    ISTATUS status = TestReflectorAllocate((float_t)0.75,
-                                           (float_t)0.75,
-                                           (float_t)0.75,
-                                           &white_reflector);
+    ISTATUS status =
+        InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
+                                      cornell_box_white_wall_samples,
+                                      CORNELL_BOX_WALL_SAMPLES,
+                                      &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBRDF white_brdf;
@@ -157,10 +159,10 @@ TEST(CornellBoxTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR red_reflector;
-    status = TestReflectorAllocate((float_t)0.75,
-                                   (float_t)0.25,
-                                   (float_t)0.25,
-                                   &red_reflector);
+    status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
+                                           cornell_box_red_wall_samples,
+                                           CORNELL_BOX_WALL_SAMPLES,
+                                           &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBRDF red_brdf;
@@ -171,26 +173,26 @@ TEST(CornellBoxTest, CornellBox)
     status = ConstantMaterialAllocate(red_brdf, &red_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PREFLECTOR blue_reflector;
-    status = TestReflectorAllocate((float_t)0.25,
-                                   (float_t)0.25,
-                                   (float_t)0.75,
-                                   &blue_reflector);
+    PREFLECTOR green_reflector;
+    status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
+                                           cornell_box_green_wall_samples,
+                                           CORNELL_BOX_WALL_SAMPLES,
+                                           &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF blue_brdf;
-    status = LambertianBrdfAllocate(blue_reflector, &blue_brdf);
+    PBRDF green_brdf;
+    status = LambertianBrdfAllocate(green_reflector, &green_brdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PMATERIAL blue_material;
-    status = ConstantMaterialAllocate(blue_brdf, &blue_material);
+    PMATERIAL green_material;
+    status = ConstantMaterialAllocate(green_brdf, &green_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM light_spectrum;
-    status = TestSpectrumAllocate((float_t)12.0,
-                                  (float_t)12.0,
-                                  (float_t)12.0,
-                                  &light_spectrum);
+    status = InterpolatedSpectrumAllocate(cornell_box_light_wavelengths,
+                                          cornell_box_light_samples,
+                                          CORNELL_BOX_LIGHT_SAMPLES,
+                                          &light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL light_material;
@@ -286,8 +288,8 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_right_wall[1],
         cornell_box_right_wall[2],
         cornell_box_right_wall[3],
-        blue_material,
-        blue_material,
+        green_material,
+        green_material,
         scene);
 
     for (size_t i = 0; i < 5; i++)
@@ -333,13 +335,13 @@ TEST(CornellBoxTest, CornellBox)
     SpectrumRelease(light_spectrum);
     ReflectorRelease(white_reflector);
     ReflectorRelease(red_reflector);
-    ReflectorRelease(blue_reflector);
+    ReflectorRelease(green_reflector);
     BrdfRelease(white_brdf);
     BrdfRelease(red_brdf);
-    BrdfRelease(blue_brdf);
+    BrdfRelease(green_brdf);
     MaterialRelease(white_material);
     MaterialRelease(red_material);
-    MaterialRelease(blue_material);
+    MaterialRelease(green_material);
     ShapeRelease(light_shape0);
     ShapeRelease(light_shape1);
     LightRelease(light0);

@@ -55,11 +55,6 @@ WriteToPfmFile(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (pixel_format != PFM_PIXEL_FORMAT_XYZ)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     FILE *file = fopen(filename, "wb");
 
     if (file == NULL)
@@ -95,9 +90,27 @@ WriteToPfmFile(
             COLOR3 pixel_color;
             FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
-            float x = (float)pixel_color.x;
-            float y = (float)pixel_color.y;
-            float z = (float)pixel_color.z;
+            float x, y, z;
+            if (pixel_format == PFM_PIXEL_FORMAT_XYZ)
+            {
+                x = (float)pixel_color.x;
+                y = (float)pixel_color.y;
+                z = (float)pixel_color.z;
+            }
+            else // pixel_format == PFM_PIXEL_FORMAT_SRGB
+            {
+                x = 3.2404542f * (float)pixel_color.x -
+                    1.5371385f * (float)pixel_color.y -
+                    0.4985314f * (float)pixel_color.z;
+
+                y = -0.969266f * (float)pixel_color.x +
+                    1.8760108f * (float)pixel_color.y +
+                    0.0415560f * (float)pixel_color.z;
+
+                z = 0.0556434f * (float)pixel_color.x -
+                    0.2040259f * (float)pixel_color.y +
+                    1.0572252f * (float)pixel_color.z;
+            }
 
             if (fwrite(&x, sizeof(float), 1, file) != 1)
             {

@@ -27,6 +27,7 @@ extern "C" {
 
 typedef enum _PFM_PIXEL_FORMAT {
     PFM_PIXEL_FORMAT_XYZ,
+    PFM_PIXEL_FORMAT_SRGB,
 } PFM_PIXEL_FORMAT;
 
 ISTATUS

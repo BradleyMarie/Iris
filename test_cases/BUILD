@@ -9,8 +9,10 @@ cc_test(
         "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
+        "//iris_physx_toolkit:cie_color_matcher",
         "//iris_physx_toolkit:constant_emissive_material",
         "//iris_physx_toolkit:constant_material",
+        "//iris_physx_toolkit:interpolated_spectrum",
         "//iris_physx_toolkit:lambertian_brdf",
         "//iris_physx_toolkit:list_scene",
         "//iris_physx_toolkit:one_light_sampler",
@@ -20,7 +22,6 @@ cc_test(
         "//test_util:cornell_box",
         "//test_util:pfm",
         "//test_util:quad",
-        "//test_util:spectra",
         "@com_google_googletest//:gtest_main",
     ],
 )

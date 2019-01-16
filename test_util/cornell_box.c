@@ -151,21 +151,21 @@ const POINT3 cornell_box_tall_box[5][4] = {
 // Shading Data
 //
 
-const float_t light_spectrum_wavelengths[4] = {
+const float_t cornell_box_light_wavelengths[CORNELL_BOX_LIGHT_SAMPLES] = {
     (float_t)400.0,
     (float_t)500.0,
     (float_t)600.0,
     (float_t)700.0
 };
 
-const float_t light_spectrum_samples[4] = {
+const float_t cornell_box_light_samples[CORNELL_BOX_LIGHT_SAMPLES] = {
     (float_t)0.0,
     (float_t)8.0,
     (float_t)15.6,
     (float_t)18.4
 };
 
-const float_t wall_reflection_wavelengths[76] = {
+const float_t cornell_box_wall_wavelengths[CORNELL_BOX_WALL_SAMPLES] = {
     (float_t)400.0,
     (float_t)404.0,
     (float_t)408.0,
@@ -244,7 +244,7 @@ const float_t wall_reflection_wavelengths[76] = {
     (float_t)700.0
 };
 
-const float_t red_wall_reflection_samples[76] = {
+const float_t cornell_box_red_wall_samples[CORNELL_BOX_WALL_SAMPLES] = {
     (float_t)0.04,
     (float_t)0.046,
     (float_t)0.048,
@@ -323,7 +323,7 @@ const float_t red_wall_reflection_samples[76] = {
     (float_t)0.642
 };
 
-const float_t green_wall_reflection_samples[76] = {
+const float_t cornell_box_green_wall_samples[CORNELL_BOX_WALL_SAMPLES] = {
     (float_t)0.092,
     (float_t)0.096,
     (float_t)0.098,
@@ -402,7 +402,7 @@ const float_t green_wall_reflection_samples[76] = {
     (float_t)0.159
 };
 
-const float_t white_wall_reflection_samples[76] = {
+const float_t cornell_box_white_wall_samples[CORNELL_BOX_WALL_SAMPLES] = {
     (float_t)0.343,
     (float_t)0.445,
     (float_t)0.551,

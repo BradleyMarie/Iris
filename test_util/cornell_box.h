@@ -49,13 +49,15 @@ extern const POINT3 cornell_box_tall_box[5][4];
 // Shading Data
 //
 
-extern const float_t light_spectrum_wavelengths[4];
-extern const float_t light_spectrum_samples[4];
+#define CORNELL_BOX_LIGHT_SAMPLES 4
+extern const float_t cornell_box_light_wavelengths[CORNELL_BOX_LIGHT_SAMPLES];
+extern const float_t cornell_box_light_samples[CORNELL_BOX_LIGHT_SAMPLES];
 
-extern const float_t wall_reflection_wavelengths[76];
-extern const float_t red_wall_reflection_samples[76];
-extern const float_t green_wall_reflection_samples[76];
-extern const float_t white_wall_reflection_samples[76];
+#define CORNELL_BOX_WALL_SAMPLES 76
+extern const float_t cornell_box_wall_wavelengths[CORNELL_BOX_WALL_SAMPLES];
+extern const float_t cornell_box_red_wall_samples[CORNELL_BOX_WALL_SAMPLES];
+extern const float_t cornell_box_green_wall_samples[CORNELL_BOX_WALL_SAMPLES];
+extern const float_t cornell_box_white_wall_samples[CORNELL_BOX_WALL_SAMPLES];
 
 #if __cplusplus 
 }
