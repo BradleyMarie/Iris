@@ -12,7 +12,7 @@ Abstract:
     spectrum at runtime.
 
     Wavelengths below the minimum or above the maximum wavelength will be 
-    clipped to zero.
+    clipped to the closest available sample.
 
 --*/
 

@@ -80,7 +80,7 @@ Interpolate(
 
     if (result_index == num_samples)
     {
-        return (float_t)0.0;
+        return values[num_samples - 1];
     }
 
     float_t higher_wavelength = *lower_bound;
@@ -92,7 +92,7 @@ Interpolate(
 
     if (result_index == 0)
     {
-        return (float_t)0.0;
+        return values[0];
     }
 
     float_t lower_wavelength = lower_bound[-1];
@@ -224,7 +224,7 @@ InterpolatedSpectrumAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (num_samples < 2)
+    if (num_samples == 1)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -310,7 +310,7 @@ InterpolatedReflectorAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (num_samples < 2)
+    if (num_samples == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
