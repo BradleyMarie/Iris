@@ -45,6 +45,18 @@ extern const POINT3 cornell_box_light[4];
 extern const POINT3 cornell_box_short_box[5][4];
 extern const POINT3 cornell_box_tall_box[5][4];
 
+//
+// Shading Data
+//
+
+extern const float_t light_spectrum_wavelengths[4];
+extern const float_t light_spectrum_samples[4];
+
+extern const float_t wall_reflection_wavelengths[76];
+extern const float_t red_wall_reflection_samples[76];
+extern const float_t green_wall_reflection_samples[76];
+extern const float_t white_wall_reflection_samples[76];
+
 #if __cplusplus 
 }
 #endif // __cplusplus
