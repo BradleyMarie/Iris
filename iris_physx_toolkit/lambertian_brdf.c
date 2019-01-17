@@ -125,7 +125,7 @@ CosineSampleHemisphere(
     float_t x = radius * cos(theta);
     float_t y = radius * sin(theta);
 
-    VECTOR3 result = VectorCreate(x, y, (float_t)1.0 - radius_squared);
+    VECTOR3 result = VectorCreate(x, y, sqrt((float_t)1.0 - radius_squared));
     *random_vector = TransformVector(surface_normal, result);
 
     return ISTATUS_SUCCESS;
