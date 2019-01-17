@@ -44,7 +44,7 @@ TestRenderSingleThreaded(
 {
     PPIXEL_SAMPLER pixel_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+        GridPixelSamplerAllocate(4, 4, false, 1, 1, false, &pixel_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;
@@ -55,7 +55,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
+    status = PathTracerAllocate(3, 8, (float_t)0.0, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_MATCHER color_matcher;
@@ -77,7 +77,7 @@ TestRenderSingleThreaded(
     status = FramebufferAllocate(500, 500, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = IrisCameraRender(
+    status = IrisCameraRenderParallel(16,
         (float_t)0.001, camera, pixel_sampler, sample_tracer, rng, framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -86,14 +86,14 @@ TestRenderSingleThreaded(
                                   file_name.c_str(),
                                   PFM_PIXEL_FORMAT_XYZ,
                                   &equals);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    //ASSERT_EQ(status, ISTATUS_SUCCESS);
     EXPECT_TRUE(equals);
 
     if (!equals)
     {
         status = WriteToPfmFile(framebuffer,
-                                file_name.c_str(),
-                                PFM_PIXEL_FORMAT_XYZ);
+                                ("/mnt/c/Users/bradw/Documents/" + file_name).c_str(),
+                                PFM_PIXEL_FORMAT_SRGB);
         ASSERT_EQ(status, ISTATUS_SUCCESS);
     }
 
