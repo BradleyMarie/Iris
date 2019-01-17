@@ -163,7 +163,7 @@ PathTracerIntegrate(
             break;
         }
 
-        float_t pdf;
+        float_t brdf_pdf;
         status = BrdfSample(brdf,
                             trace_ray.direction,
                             surface_normal,
@@ -171,7 +171,7 @@ PathTracerIntegrate(
                             allocator,
                             path_tracer->reflectors + bounces,
                             &trace_ray.direction,
-                            &pdf);
+                            &brdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -189,13 +189,14 @@ PathTracerIntegrate(
 
         float_t cosine_falloff = VectorDotProduct(shading_normal,
                                                   trace_ray.direction);
-        cosine_falloff = fmax((float_t)0.0, cosine_falloff);
+        float_t attenuation = fmax((float_t)0.0, cosine_falloff);
 
-        path_throughput *= albedo * cosine_falloff;
+        path_throughput *= albedo * attenuation;
 
-        if (isfinite(pdf))
+        if (isfinite(brdf_pdf))
         {
-            path_throughput /= pdf;
+            path_throughput /= brdf_pdf;
+            attenuation /= brdf_pdf;
         }
 
         if (path_tracer->min_bounces < bounces)
@@ -221,19 +222,18 @@ PathTracerIntegrate(
 
             float_t roulette_pdf = (float_t)1.0 - cutoff;
 
-            pdf *= roulette_pdf;
-            path_throughput /= roulette_pdf;
+            if (roulette_pdf != (float_t)0.0)
+            {
+                attenuation /= roulette_pdf;
+                path_throughput /= roulette_pdf;
+            }
         }
 
-        path_tracer->attenuations[bounces] = cosine_falloff;
+        path_tracer->attenuations[bounces] = attenuation;
 
-        if (isinf(pdf))
+        if (isinf(brdf_pdf))
         {
             add_light_emissions = true;
-        }
-        else
-        {
-            path_tracer->attenuations[bounces] /= pdf;
         }
 
         trace_ray.origin = hit_point;
