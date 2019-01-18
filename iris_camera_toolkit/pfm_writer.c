@@ -112,6 +112,10 @@ WriteToPfmFile(
                     1.0572252f * (float)pixel_color.z;
             }
 
+            x = fmaxf(0.0f, x);
+            y = fmaxf(0.0f, y);
+            z = fmaxf(0.0f, z);
+
             if (fwrite(&x, sizeof(float), 1, file) != 1)
             {
                 fclose(file);
