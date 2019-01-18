@@ -404,7 +404,7 @@ IrisCameraRenderParallel(
 
         if (status != ISTATUS_SUCCESS)
         {
-            thread_state[i].status = status;
+            thread_state[thread_num].status = status;
             #pragma omp cancel for 
         }
     }
