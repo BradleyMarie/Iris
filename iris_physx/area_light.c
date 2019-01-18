@@ -77,6 +77,7 @@ VisibilityTesterProcessHitAreaLight(
 }
 
 static
+inline
 ISTATUS
 VisibilityTesterTestAreaLight(
     _Inout_ PVISIBILITY_TESTER visibility_tester,
@@ -145,17 +146,16 @@ AreaLightSample(
                                         sampled_point);
 
     VECTOR3 direction_to_light = PointSubtract(sampled_point, hit_point);
+    direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
 
     float_t dp = VectorDotProduct(direction_to_light, surface_normal);
-
-    if (isinf(*pdf) || dp < (float_t)0.0)
+    if (*pdf == (float_t)0.0 || isinf(*pdf) || dp < (float_t)0.0)
     {
+        *pdf = (float_t)0.0;
         *spectrum = NULL;
         *to_light = direction_to_light;
         return ISTATUS_SUCCESS;
     }
-
-    direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
 
     RAY ray_to_light = RayCreate(hit_point, direction_to_light);
 
@@ -169,6 +169,11 @@ AreaLightSample(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
+    }
+
+    if (*spectrum == NULL)
+    {
+        *pdf = (float_t)0.0;
     }
 
     *to_light = direction_to_light;

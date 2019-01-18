@@ -40,7 +40,7 @@ PowerHeuristic(
 static
 ISTATUS
 DeltaLightLighting(
-    _In_opt_ PCSPECTRUM light_spectrum,
+    _In_ PCSPECTRUM light_spectrum,
     _In_ PCBRDF brdf,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 to_hit_point,
@@ -52,6 +52,7 @@ DeltaLightLighting(
     _Out_ PCSPECTRUM *spectrum
     )
 {
+    assert(light_spectrum != NULL);
     assert(brdf != NULL);
     assert(PointValidate(hit_point));
     assert(VectorValidate(to_hit_point));
@@ -60,12 +61,6 @@ DeltaLightLighting(
     assert(spectrum_compositor != NULL);
     assert(reflector_allocator != NULL);
     assert(spectrum != NULL);
-
-    if (light_spectrum == NULL)
-    {
-        *spectrum = NULL;
-        return ISTATUS_SUCCESS;
-    }
 
     PCREFLECTOR reflector;
     ISTATUS status = BrdfComputeReflectance(brdf,
@@ -125,12 +120,6 @@ DeltaBrdfLighting(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
-    }
-
-    if (light_spectrum == NULL)
-    {
-        *spectrum = NULL;
-        return ISTATUS_SUCCESS;
     }
 
     float_t falloff = VectorDotProduct(shading_normal, outgoing_direction);
@@ -240,23 +229,23 @@ SampleDirectLighting(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR brdf_computed_reflector;
-    float_t brdf_computed_pdf;
-    status = BrdfComputeReflectanceWithPdf(brdf,
-                                           to_hit_point,
-                                           surface_normal,
-                                           light_sampled_direction,
-                                           reflector_allocator,
-                                           &brdf_computed_reflector,
-                                           &brdf_computed_pdf);
-
-    if (status != ISTATUS_SUCCESS)
+    if (light_sampled_pdf != (float_t)0.0)
     {
-        return status;
-    }
+        PCREFLECTOR brdf_computed_reflector;
+        float_t brdf_computed_pdf;
+        status = BrdfComputeReflectanceWithPdf(brdf,
+                                               to_hit_point,
+                                               surface_normal,
+                                               light_sampled_direction,
+                                               reflector_allocator,
+                                               &brdf_computed_reflector,
+                                               &brdf_computed_pdf);
 
-    if (light_sampled_spectrum != NULL)
-    {
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
         float_t light_sample_falloff = 
             VectorDotProduct(shading_normal, light_sampled_direction);
 
@@ -278,6 +267,12 @@ SampleDirectLighting(
         }
     }
 
+    if (brdf_sampled_pdf == (float_t)0.0)
+    {
+        *spectrum = light_sampled_spectrum;
+        return ISTATUS_SUCCESS;
+    }
+
     RAY brdf_sampled_to_light = RayCreate(hit_point, brdf_sampled_direction);
 
     PCSPECTRUM light_computed_spectrum;
@@ -294,27 +289,24 @@ SampleDirectLighting(
         return status;
     }
 
-    if (light_computed_spectrum != NULL)
+    float_t brdf_sample_falloff =
+        VectorDotProduct(shading_normal, brdf_sampled_direction);
+
+    float_t brdf_sample_weight = PowerHeuristic(brdf_sampled_pdf,
+                                                light_computed_pdf);
+
+    float_t brdf_sample_attenuation =
+        (brdf_sample_falloff * brdf_sample_weight) / brdf_sampled_pdf;
+
+    status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
+                                                   light_computed_spectrum,
+                                                   brdf_sampled_reflector,
+                                                   brdf_sample_attenuation,
+                                                   &light_computed_spectrum);
+
+    if (status != ISTATUS_SUCCESS)
     {
-        float_t brdf_sample_falloff =
-            VectorDotProduct(shading_normal, brdf_sampled_direction);
-
-        float_t brdf_sample_weight = PowerHeuristic(brdf_sampled_pdf,
-                                                    light_computed_pdf);
-        
-        float_t brdf_sample_attenuation = 
-            (brdf_sample_falloff * brdf_sample_weight) / brdf_sampled_pdf;
-
-        status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
-                                                       light_computed_spectrum,
-                                                       brdf_sampled_reflector,
-                                                       brdf_sample_attenuation,
-                                                       &light_computed_spectrum);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+        return status;
     }
 
     status = SpectrumCompositorAddSpectra(spectrum_compositor,

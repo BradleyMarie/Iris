@@ -32,6 +32,44 @@ typedef const POINT_LIGHT *PCPOINT_LIGHT;
 //
 
 static
+inline
+ISTATUS
+PointLightCheckVisibility(
+    _In_ PCPOINT_LIGHT point_light,
+    _In_ POINT3 hit_point,
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
+    _Out_ PVECTOR3 direction_to_light,
+    _Out_ float_t *distance_to_light_squared,
+    _Out_ bool *visible
+    )
+{
+    *direction_to_light = PointSubtract(point_light->location, hit_point);
+
+    float_t distance_to_light;
+    *direction_to_light = VectorNormalize(*direction_to_light,
+                                          distance_to_light_squared,
+                                          &distance_to_light);
+
+    float_t dp = VectorDotProduct(*direction_to_light, surface_normal);
+
+    if (dp <= (float_t)0.0)
+    {
+        *visible = false;
+        return ISTATUS_SUCCESS;
+    }
+
+    RAY ray_to_light = RayCreate(hit_point, *direction_to_light);
+
+    ISTATUS status = VisibilityTesterTest(visibility_tester,
+                                          ray_to_light,
+                                          distance_to_light,
+                                          visible);
+
+    return status;
+}
+
+static
 ISTATUS
 PointLightSample(
     _In_ const void *context,
@@ -47,31 +85,15 @@ PointLightSample(
 {
     PCPOINT_LIGHT point_light = (PCPOINT_LIGHT)context;
 
-    VECTOR3 direction_to_light = PointSubtract(point_light->location,
-                                               hit_point);
-
-    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
-
-    if (dp <= (float_t)0.0)
-    {
-        *spectrum = NULL;
-        *to_light = direction_to_light;
-        *pdf = (float_t)INFINITY;
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t distance_to_light_squared, distance_to_light;
-    direction_to_light = VectorNormalize(direction_to_light,
-                                         &distance_to_light_squared,
-                                         &distance_to_light);
-
-    RAY ray_to_light = RayCreate(hit_point, direction_to_light);
-
     bool visible;
-    ISTATUS status = VisibilityTesterTest(visibility_tester,
-                                          ray_to_light,
-                                          distance_to_light,
-                                          &visible);
+    float_t distance_to_light_squared;
+    ISTATUS status = PointLightCheckVisibility(point_light,
+                                               hit_point,
+                                               surface_normal,
+                                               visibility_tester,
+                                               to_light,
+                                               &distance_to_light_squared,
+                                               &visible);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -81,8 +103,7 @@ PointLightSample(
     if (!visible)
     {
         *spectrum = NULL;
-        *to_light = direction_to_light;
-        *pdf = (float_t)INFINITY;
+        *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
@@ -98,7 +119,6 @@ PointLightSample(
         return status;
     }
 
-    *to_light = direction_to_light;
     *pdf = (float_t)INFINITY;
 
     return ISTATUS_SUCCESS;

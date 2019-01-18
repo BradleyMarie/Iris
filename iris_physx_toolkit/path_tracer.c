@@ -114,6 +114,11 @@ PathTracerIntegrate(
                 return sampler_status;
             }
 
+            if (pdf == (float_t)0.0)
+            {
+                continue;
+            }
+
             PCSPECTRUM direct_lighting;
             status = SampleDirectLighting(light,
                                           brdf,
@@ -178,6 +183,11 @@ PathTracerIntegrate(
             return status;
         }
 
+        if (brdf_pdf == (float_t)0.0)
+        {
+            break;
+        }
+
         float_t albedo;
         status = ReflectorGetAlbedo(path_tracer->reflectors[bounces],
                                     &albedo);
@@ -221,12 +231,8 @@ PathTracerIntegrate(
             }
 
             float_t roulette_pdf = (float_t)1.0 - cutoff;
-
-            if (roulette_pdf != (float_t)0.0)
-            {
-                attenuation /= roulette_pdf;
-                path_throughput /= roulette_pdf;
-            }
+            attenuation /= roulette_pdf;
+            path_throughput /= roulette_pdf;
         }
 
         path_tracer->attenuations[bounces] = attenuation;
