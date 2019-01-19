@@ -75,7 +75,7 @@ DeltaLightLighting(
         return status;
     }
 
-    float_t falloff = VectorDotProduct(shading_normal, to_light);
+    float_t falloff = VectorBoundedDotProduct(shading_normal, to_light);
 
     status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
                                                    light_spectrum,
@@ -122,7 +122,8 @@ DeltaBrdfLighting(
         return status;
     }
 
-    float_t falloff = VectorDotProduct(shading_normal, outgoing_direction);
+    float_t falloff = VectorBoundedDotProduct(shading_normal,
+                                              outgoing_direction);
 
     status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
                                                    light_spectrum,
@@ -247,7 +248,7 @@ SampleDirectLighting(
         }
 
         float_t light_sample_falloff = 
-            VectorDotProduct(shading_normal, light_sampled_direction);
+            VectorBoundedDotProduct(shading_normal, light_sampled_direction);
 
         float_t light_sample_weight = PowerHeuristic(light_sampled_pdf,
                                                      brdf_computed_pdf);
@@ -290,7 +291,7 @@ SampleDirectLighting(
     }
 
     float_t brdf_sample_falloff =
-        VectorDotProduct(shading_normal, brdf_sampled_direction);
+        VectorBoundedDotProduct(shading_normal, brdf_sampled_direction);
 
     float_t brdf_sample_weight = PowerHeuristic(brdf_sampled_pdf,
                                                 light_computed_pdf);
