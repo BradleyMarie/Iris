@@ -164,7 +164,7 @@ LambertianBrdfSample(
         return status;
     }
 
-    *pdf = fmax((float_t)0.0, VectorDotProduct(*outgoing, normal) * inv_pi);
+    *pdf = VectorBoundedDotProduct(*outgoing, normal) * inv_pi;
 
     return ISTATUS_SUCCESS;
 }
@@ -216,7 +216,7 @@ LambertianBrdfComputeReflectanceWithPdf(
         return status;
     }
 
-    *pdf = fmax((float_t)0.0, VectorDotProduct(outgoing, normal) * inv_pi);
+    *pdf = VectorBoundedDotProduct(outgoing, normal) * inv_pi;
 
     return ISTATUS_SUCCESS;
 }

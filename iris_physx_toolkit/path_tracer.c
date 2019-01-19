@@ -137,11 +137,6 @@ PathTracerIntegrate(
                 return status;
             }
 
-            if (direct_lighting == NULL)
-            {
-                continue;
-            }
-
             status = SpectrumCompositorAttenuateSpectrum(compositor,
                                                          direct_lighting,
                                                          (float_t)1.0 / pdf,
@@ -197,10 +192,8 @@ PathTracerIntegrate(
             return status;
         }
 
-        float_t cosine_falloff = VectorDotProduct(shading_normal,
-                                                  trace_ray.direction);
-        float_t attenuation = fmax((float_t)0.0, cosine_falloff);
-
+        float_t attenuation = VectorBoundedDotProduct(shading_normal,
+                                                      trace_ray.direction);
         path_throughput *= albedo * attenuation;
 
         if (isfinite(brdf_pdf))

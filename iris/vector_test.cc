@@ -203,3 +203,13 @@ TEST(VectorTest, VectorNormalize)
     EXPECT_EQ((float_t) 14.0, old_length_squared);
     EXPECT_NEAR((float_t) 3.741657, old_length, (float_t) 0.0001);
 }
+
+TEST(VectorTest, VectorBoundedDotProduct)
+{
+    VECTOR3 v0 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) 2.0);
+    VECTOR3 v1 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
+    EXPECT_EQ((float_t) 7.0, VectorBoundedDotProduct(v0, v1));
+
+    VECTOR3 v2 = VectorCreate((float_t) -4.0, (float_t) -3.0, (float_t) -2.0);
+    EXPECT_EQ((float_t) 0.0, VectorBoundedDotProduct(v0, v2));
+}

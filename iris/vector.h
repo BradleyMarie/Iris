@@ -218,6 +218,17 @@ VectorValidate(
 
 static
 inline
+float_t
+VectorBoundedDotProduct(
+    _In_ VECTOR3 operand0,
+    _In_ VECTOR3 operand1
+    )
+{
+    return fmax((float_t)0.0, VectorDotProduct(operand0, operand1));
+}
+
+static
+inline
 VECTOR3
 VectorNormalize(
     _In_ VECTOR3 vector,

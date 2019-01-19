@@ -313,12 +313,7 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if(!isfinite(attenuation) || attenuation <= (float_t)0.0)
+    if(!isfinite(attenuation) || attenuation < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -326,6 +321,12 @@ SpectrumCompositorAttenuateSpectrum(
     if (attenuated_spectrum == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (spectrum == NULL || attenuation == (float_t)0.0)
+    {
+        *attenuated_spectrum = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     if (spectrum->vtable == &attenuated_spectrum_vtable)
@@ -384,7 +385,7 @@ SpectrumCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if(!isfinite(attenuation) || attenuation <= (float_t)0.0)
+    if(!isfinite(attenuation) || attenuation < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -394,7 +395,7 @@ SpectrumCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (spectrum == NULL)
+    if (spectrum == NULL ||attenuation == (float_t)0.0)
     {
         *reflected_spectrum = NULL;
         return ISTATUS_SUCCESS;
