@@ -149,7 +149,7 @@ AreaLightSample(
     direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
 
     float_t dp = VectorDotProduct(direction_to_light, surface_normal);
-    if (*pdf == (float_t)0.0 || isinf(*pdf) || dp < (float_t)0.0)
+    if (*pdf == (float_t)0.0 || isinf(*pdf) || dp <= (float_t)0.0)
     {
         *pdf = (float_t)0.0;
         *spectrum = NULL;
