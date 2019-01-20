@@ -17,7 +17,6 @@ Abstract:
 #include <pthread.h> // TODO: Replace with threads.h once available
 #include <stdatomic.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/framebuffer_internal.h"
@@ -29,7 +28,7 @@ Abstract:
 // Defines
 //
 
-#define MINIMUM_CHUNK_SIZE 32
+#define CHUNK_SIZE 32
 
 //
 // Types
@@ -295,8 +294,6 @@ IrisCameraRenderThread(
                             thread_context->shared->camera->image_max_v;
     float_t pixel_v_width = image_v_width / (float_t)num_rows;
 
-    size_t chunk_size = MINIMUM_CHUNK_SIZE;
-
     size_t chunk_start =
         atomic_load_explicit(&thread_context->shared->pixel,
                              memory_order_relaxed);
@@ -304,11 +301,8 @@ IrisCameraRenderThread(
     while (chunk_start < num_pixels)
     {
         size_t pixels_remaining = num_pixels - chunk_start;
-        if (pixels_remaining < chunk_size)
-        {
-            chunk_size = pixels_remaining;
-        }
-
+        size_t chunk_size =
+            (pixels_remaining < CHUNK_SIZE) ? pixels_remaining : CHUNK_SIZE;
         size_t chunk_end = chunk_start + chunk_size;
 
         bool success =
