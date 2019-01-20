@@ -311,29 +311,31 @@ IrisCameraRenderThread(
 
         size_t chunk_end = chunk_start + chunk_size;
 
-        bool pixels_grabbed =
+        bool success =
             atomic_compare_exchange_weak(&thread_context->shared->pixel,
                                          &chunk_start,
                                          chunk_end);
 
-        if (pixels_grabbed)
+        if (!success)
         {
-            for (size_t i = chunk_start; i < chunk_end; i++)
+            continue;
+        }
+
+        for (size_t i = chunk_start; i < chunk_end; i++)
+        {
+            size_t column = i % num_columns;
+            size_t row = i / num_columns;
+
+            success = IrisCameraRenderPixel(thread_context,
+                                            pixel_u_width,
+                                            pixel_v_width,
+                                            column,
+                                            row);
+
+            if (!success)
             {
-                size_t column = i % num_columns;
-                size_t row = i / num_columns;
-
-                bool success = IrisCameraRenderPixel(thread_context,
-                                                     pixel_u_width,
-                                                     pixel_v_width,
-                                                     column,
-                                                     row);
-
-                if (!success)
-                {
-                    atomic_store(&thread_context->shared->pixel, num_pixels);
-                    return NULL;
-                }
+                atomic_store(&thread_context->shared->pixel, num_pixels);
+                return NULL;
             }
         }
 
