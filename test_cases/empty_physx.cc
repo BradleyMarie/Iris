@@ -79,8 +79,8 @@ TEST(EmptyPhysx, ListScene)
     status = FramebufferAllocate(500, 500, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = IrisCameraRender(
-        (float_t)0.0, camera, pixel_sampler, sample_tracer, rng, framebuffer);
+    status = IrisCameraRenderSingleThreaded(
+        camera, pixel_sampler, sample_tracer, rng, framebuffer, (float_t)0.0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;

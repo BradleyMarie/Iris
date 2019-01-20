@@ -77,8 +77,13 @@ TestRenderSingleThreaded(
     status = FramebufferAllocate(500, 500, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = IrisCameraRender(
-        (float_t)0.01, camera, pixel_sampler, sample_tracer, rng, framebuffer);
+    status = IrisCameraRender(camera,
+                              pixel_sampler,
+                              sample_tracer,
+                              rng,
+                              framebuffer,
+                              (float_t)0.01,
+                              1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;

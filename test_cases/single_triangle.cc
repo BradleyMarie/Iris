@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <string>
+#include <thread>
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
@@ -204,8 +205,13 @@ TestRenderSingleThreaded(
     status = FramebufferAllocate(500, 500, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = IrisCameraRender(
-        (float_t)0.001, camera, pixel_sampler, sample_tracer, rng, framebuffer);
+    status = IrisCameraRender(camera,
+                              pixel_sampler,
+                              sample_tracer,
+                              rng,
+                              framebuffer,
+                              (float_t)0.001,
+                              std::thread::hardware_concurrency());
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;
