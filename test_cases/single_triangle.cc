@@ -162,7 +162,7 @@ TriangleMaterialAllocate(
 //
 
 void
-TestRenderSingleThreaded(
+TestRender(
     _In_ PCCAMERA camera,
     _In_ PCLIST_SCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
@@ -315,11 +315,11 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -408,11 +408,11 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -501,11 +501,11 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -594,11 +594,11 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -687,11 +687,11 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -780,11 +780,11 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -873,11 +873,11 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -966,11 +966,11 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1059,11 +1059,11 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1152,11 +1152,11 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1245,11 +1245,11 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1338,11 +1338,11 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1431,11 +1431,11 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1524,11 +1524,11 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1617,11 +1617,11 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1712,11 +1712,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1807,11 +1807,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1902,11 +1902,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -1997,11 +1997,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2092,11 +2092,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2167,11 +2167,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2236,11 +2236,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2308,11 +2308,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_xy_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_xy_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2377,11 +2377,11 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2469,11 +2469,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2564,11 +2564,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2659,11 +2659,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2754,11 +2754,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2829,11 +2829,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2898,11 +2898,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -2970,11 +2970,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_xz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_xz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3039,11 +3039,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3131,11 +3131,11 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3226,11 +3226,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3321,11 +3321,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3416,11 +3416,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3511,11 +3511,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3606,11 +3606,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3681,11 +3681,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3750,11 +3750,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3822,11 +3822,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/single_emissive_triangle_yz_triangle.pfm",
-                             (float_t)0.01);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/single_emissive_triangle_yz_triangle.pfm",
+               (float_t)0.01);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
@@ -3891,11 +3891,11 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRenderSingleThreaded(camera,
-                             scene,
-                             light_sampler,
-                             "test_results/blank.pfm",
-                             (float_t)0.0);
+    TestRender(camera,
+               scene,
+               light_sampler,
+               "test_results/blank.pfm",
+               (float_t)0.0);
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
