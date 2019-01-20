@@ -93,8 +93,6 @@ cc_library(
     name = "render",
     hdrs = ["render.h"],
     srcs = ["render.c"],
-    copts = ["-fopenmp"],
-    linkopts = ["-lgomp"],
     deps = [
         ":camera",
         ":camera_internal",

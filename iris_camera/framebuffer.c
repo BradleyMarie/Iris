@@ -19,6 +19,12 @@ Abstract:
 #include "iris_camera/framebuffer_internal.h"
 
 //
+// Defines
+//
+
+#define FRAMEBUFFER_DATA_ALIGNMENT 128
+
+//
 // Functions
 //
 
@@ -54,6 +60,16 @@ FramebufferAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    size_t num_bytes;
+    success = CheckedMultiplySizeT(num_pixels,
+                                   sizeof(COLOR3),
+                                   &num_bytes);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     PFRAMEBUFFER result = (PFRAMEBUFFER)malloc(sizeof(FRAMEBUFFER));
 
     if (result == NULL)
@@ -61,7 +77,8 @@ FramebufferAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->data = (PCOLOR3)calloc(num_pixels, sizeof(COLOR3));
+    result->data =
+        (PCOLOR3)aligned_alloc(FRAMEBUFFER_DATA_ALIGNMENT, num_bytes);
 
     if (result->data == NULL)
     {
