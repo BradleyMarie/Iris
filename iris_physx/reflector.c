@@ -90,8 +90,7 @@ ISTATUS
 ReflectorReflect(
     _In_opt_ PCREFLECTOR reflector,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     if (!isfinite(wavelength) || 
@@ -100,29 +99,24 @@ ReflectorReflect(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    // Should these be made into something stronger than assertions?
-    assert(isfinite(incoming_intensity));
-    assert((float_t)0.0 <= incoming_intensity);
-
-    if (outgoing_intensity == NULL)
+    if (reflectance == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (reflector == NULL)
     {
-        *outgoing_intensity = (float_t)0.0;
+        *reflectance = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = ReflectorReflectInline(reflector,
                                             wavelength,
-                                            incoming_intensity,
-                                            outgoing_intensity);
+                                            reflectance);
 
     // Should these be made into something stronger than assertions?
-    assert(isfinite(*outgoing_intensity));
-    assert((float_t)0.0 <= *outgoing_intensity);
+    assert((float_t)0.0 <= *reflectance);
+    assert(*reflectance <= (float_t)1.0);
 
     return status;
 }

@@ -142,19 +142,16 @@ ISTATUS
 InterpolatedReflectorSample(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     PCINTERPOLATED_REFLECTOR interpolated_reflector =
         (PCINTERPOLATED_REFLECTOR)context;
 
-    float_t reflectance = Interpolate(interpolated_reflector->wavelengths,
-                                      interpolated_reflector->reflectances,
-                                      interpolated_reflector->num_samples,
-                                      wavelength);
-
-    *outgoing_intensity = incoming_intensity * reflectance;
+    *reflectance = Interpolate(interpolated_reflector->wavelengths,
+                               interpolated_reflector->reflectances,
+                               interpolated_reflector->num_samples,
+                               wavelength);
 
     return ISTATUS_SUCCESS;
 }

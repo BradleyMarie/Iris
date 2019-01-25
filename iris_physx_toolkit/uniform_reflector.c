@@ -35,13 +35,12 @@ ISTATUS
 UniformReflectorReflect(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     PCUNIFORM_REFLECTOR uniform_reflector = (PCUNIFORM_REFLECTOR)context;
 
-    *outgoing_intensity = uniform_reflector->albedo * incoming_intensity;
+    *reflectance = uniform_reflector->albedo;
 
     return ISTATUS_SUCCESS;
 }

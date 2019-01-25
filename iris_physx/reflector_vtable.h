@@ -34,8 +34,7 @@ ISTATUS
 (*PREFLECTOR_REFLECT_ROUTINE)(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     );
 
 typedef

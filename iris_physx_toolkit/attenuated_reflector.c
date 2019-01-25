@@ -36,8 +36,7 @@ ISTATUS
 AttenuatedReflectorReflect(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     PCATTENUATED_REFLECTOR attenuated_reflector =
@@ -45,15 +44,14 @@ AttenuatedReflectorReflect(
 
     ISTATUS status = ReflectorReflect(attenuated_reflector->reflector,
                                       wavelength,
-                                      incoming_intensity,
-                                      outgoing_intensity);
+                                      reflectance);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    *outgoing_intensity *= attenuated_reflector->attenuation;
+    *reflectance *= attenuated_reflector->attenuation;
 
     return ISTATUS_SUCCESS;
 }
@@ -159,54 +157,50 @@ ISTATUS
 AttenuatedReflector3Reflect(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     PCATTENUATED_REFLECTOR3 attenuated_reflector =
         (PCATTENUATED_REFLECTOR3)context;
 
-    float_t local_outgoing_intensity;
+    float_t local_reflectance;
     ISTATUS status = ReflectorReflect(attenuated_reflector->reflectors[0],
                                       wavelength,
-                                      incoming_intensity,
-                                      &local_outgoing_intensity);
+                                      &local_reflectance);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t result = local_outgoing_intensity *
+    float_t result = local_reflectance *
                      attenuated_reflector->attenuations[0];
 
     status = ReflectorReflect(attenuated_reflector->reflectors[1],
                               wavelength,
-                              incoming_intensity,
-                              &local_outgoing_intensity);
+                              &local_reflectance);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    result = fmaf(local_outgoing_intensity,
+    result = fmaf(local_reflectance,
                   attenuated_reflector->attenuations[1],
                   result);
 
     status = ReflectorReflect(attenuated_reflector->reflectors[2],
                               wavelength,
-                              incoming_intensity,
-                              &local_outgoing_intensity);
+                              &local_reflectance);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    *outgoing_intensity = fmaf(local_outgoing_intensity,
-                               attenuated_reflector->attenuations[2],
-                               result);
+    *reflectance = fmaf(local_reflectance,
+                        attenuated_reflector->attenuations[2],
+                        result);
 
     return ISTATUS_SUCCESS;
 }

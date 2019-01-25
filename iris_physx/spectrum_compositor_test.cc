@@ -256,13 +256,12 @@ ISTATUS
 AttenuatingReflectorRoutine(
     _In_ const void *data,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     const AttenuatingContext *context =
         static_cast<const AttenuatingContext*>(data);
-    *outgoing_intensity *= context->attenuation;
+    *reflectance = context->attenuation;
     return ISTATUS_SUCCESS;
 }
 

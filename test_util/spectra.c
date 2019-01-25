@@ -83,27 +83,26 @@ ISTATUS
 TestReflectorReflect(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     PCTEST_REFLECTOR test_reflector = (PCTEST_REFLECTOR)context;
 
     if (wavelength == X_WAVELENGTH)
     {
-        *outgoing_intensity = incoming_intensity * test_reflector->x;
+        *reflectance = test_reflector->x;
     }
     else if (wavelength == Y_WAVELENGTH)
     {
-        *outgoing_intensity = incoming_intensity * test_reflector->y;
+        *reflectance = test_reflector->y;
     }
     else if (wavelength == Z_WAVELENGTH)
     {
-        *outgoing_intensity = incoming_intensity * test_reflector->z;
+        *reflectance = test_reflector->z;
     }
     else
     {
-        *outgoing_intensity = (float_t)0.0;
+        *reflectance = (float_t)0.0;
     }
 
     return ISTATUS_SUCCESS;

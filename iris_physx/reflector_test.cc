@@ -68,7 +68,6 @@ TEST(ReflectorTest, ReflectorReflectNull)
     float_t intensity = (float_t)1.0;
     ISTATUS status = ReflectorReflect(NULL, 
                                       (float_t)1.0,
-                                      (float_t)1.0,
                                       &intensity);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)0.0, intensity);
@@ -77,8 +76,7 @@ TEST(ReflectorTest, ReflectorReflectNull)
 struct TestContext {
     ISTATUS return_status;
     float_t wavelength;
-    float_t incoming_intensity;
-    float_t outgoing_intensity;
+    float_t reflectance;
     bool *encountered;
 };
 
@@ -86,8 +84,7 @@ ISTATUS
 SampleRoutine(
     _In_ const void *data,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     const TestContext *context = static_cast<const TestContext*>(data);
@@ -95,8 +92,7 @@ SampleRoutine(
     *context->encountered = true;
 
     EXPECT_EQ(context->wavelength, wavelength);
-    EXPECT_EQ(context->incoming_intensity, incoming_intensity);
-    *outgoing_intensity = context->outgoing_intensity;
+    *reflectance = context->reflectance;
     return context->return_status;
 }
 
@@ -106,7 +102,6 @@ TEST(ReflectorTest, ReflectorReflectErrors)
     TestContext context = {
         ISTATUS_INTEGER_OVERFLOW,
         INFINITY,
-        (float_t)1.0,
         INFINITY,
         &encountered
     };
@@ -121,31 +116,30 @@ TEST(ReflectorTest, ReflectorReflectErrors)
                                        &reflector);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    float_t intensity;
-    status = ReflectorReflect(reflector, (float_t)0.0, (float_t)1.0, &intensity);
+    float_t reflectance;
+    status = ReflectorReflect(reflector, (float_t)0.0, &reflectance);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
 
-    status = ReflectorReflect(reflector, (float_t)-1.0,(float_t)1.0, &intensity);
+    status = ReflectorReflect(reflector, (float_t)-1.0, &reflectance);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
 
-    status = ReflectorReflect(reflector, -INFINITY, (float_t)1.0,&intensity);
+    status = ReflectorReflect(reflector, -INFINITY, &reflectance);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
-    status = ReflectorReflect(reflector, INFINITY, (float_t)1.0,&intensity);
+    status = ReflectorReflect(reflector, INFINITY, &reflectance);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
 
     status = ReflectorReflect(reflector,
                               std::numeric_limits<float_t>::quiet_NaN(),
-                              (float_t)1.0,
-                              &intensity);
+                              &reflectance);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
 
-    status = ReflectorReflect(reflector, (float_t)1.0, (float_t)1.0, NULL);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+    status = ReflectorReflect(reflector, (float_t)1.0, NULL);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
     EXPECT_FALSE(encountered);
 
     ReflectorRelease(reflector);
@@ -157,7 +151,6 @@ TEST(ReflectorTest, ReflectorReflect)
     TestContext context = { 
         ISTATUS_INTEGER_OVERFLOW,
         (float_t)5.0,
-        (float_t)10.0,
         (float_t)1.0,
         &encountered
     };
@@ -172,14 +165,13 @@ TEST(ReflectorTest, ReflectorReflect)
                                        &reflector);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    float_t intensity;
+    float_t reflectance;
     status = ReflectorReflect(reflector, 
                               (float_t)5.0,
-                              (float_t)10.0,
-                              &intensity);
+                              &reflectance);
 
     EXPECT_EQ(ISTATUS_INTEGER_OVERFLOW, status);
-    EXPECT_EQ((float_t)1.0, intensity);
+    EXPECT_EQ((float_t)1.0, reflectance);
     EXPECT_TRUE(encountered);
 
     ReflectorRelease(reflector);
@@ -188,8 +180,7 @@ TEST(ReflectorTest, ReflectorReflect)
     context = {
         ISTATUS_SUCCESS,
         (float_t)5.0,
-        (float_t)2.0,
-        (float_t)1.0,
+        (float_t)0.5,
         &encountered
     };
 
@@ -202,10 +193,9 @@ TEST(ReflectorTest, ReflectorReflect)
 
     status = ReflectorReflect(reflector, 
                               (float_t)5.0,
-                              (float_t)2.0,
-                              &intensity);
+                              &reflectance);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_EQ((float_t)1.0, intensity);
+    EXPECT_EQ((float_t)0.5, reflectance);
     EXPECT_TRUE(encountered);
 
     ReflectorRelease(reflector);

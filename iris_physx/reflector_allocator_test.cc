@@ -90,14 +90,13 @@ ISTATUS
 ReflectorReflectRoutine(
     _In_ const void *context,
     _In_ float_t wavelength,
-    _In_ float_t incoming_wavelength,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     )
 {
     auto data = static_cast<ReflectorContext* const *>(context);
     EXPECT_FALSE((*data)->reflect_encountered);
     (*data)->reflect_encountered = true;
-    *outgoing_intensity = (float_t) 1.0;
+    *reflectance = (float_t) 1.0;
     return ISTATUS_SUCCESS;
 }
 
@@ -145,7 +144,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     float_t outgoing;
-    status = ReflectorReflect(reflector, (float_t)1.0, (float_t)1.0, &outgoing);
+    status = ReflectorReflect(reflector, (float_t)1.0, &outgoing);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, outgoing);
     EXPECT_TRUE(context.reflect_encountered);

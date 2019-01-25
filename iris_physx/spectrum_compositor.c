@@ -117,17 +117,17 @@ AttenuatedReflectionSpectrumSample(
         return status;
     }
 
+    float_t reflectance;
     status = ReflectorReflectInline(spectrum->reflector,
                                     wavelength,
-                                    spectrum_intensity,
-                                    &spectrum_intensity);
+                                    &reflectance);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    *intensity = spectrum_intensity * spectrum->attenuation;
+    *intensity = spectrum_intensity * reflectance * spectrum->attenuation;
 
     return ISTATUS_SUCCESS; 
 }

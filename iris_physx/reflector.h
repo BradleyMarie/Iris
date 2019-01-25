@@ -43,8 +43,7 @@ ISTATUS
 ReflectorReflect(
     _In_opt_ PCREFLECTOR reflector,
     _In_ float_t wavelength,
-    _In_ float_t incoming_intensity,
-    _Out_ float_t *outgoing_intensity
+    _Out_ float_t *reflectance
     );
 
 ISTATUS
