@@ -37,13 +37,13 @@ static
 inline
 void
 ReflectorInitialize(
+    _Out_ struct _REFLECTOR *reflector,
     _In_ PCREFLECTOR_VTABLE vtable,
-    _In_opt_ void *data,
-    _Out_ struct _REFLECTOR *reflector
+    _In_opt_ void *data
     )
 {
-    assert(vtable != NULL);
     assert(reflector != NULL);
+    assert(vtable != NULL);
     
     reflector->vtable = vtable;
     reflector->data = data;

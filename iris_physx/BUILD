@@ -55,7 +55,7 @@ cc_library(
     name = "brdf_vtable",
     hdrs = ["brdf_vtable.h"],
     deps = [
-        ":reflector_allocator",
+        ":reflector_compositor",
         "//iris:iris",
         "//iris_advanced:iris_advanced",
     ],
@@ -159,7 +159,7 @@ cc_library(
         ":light_sampler",
         ":spectrum_compositor",
         ":ray_tracer",
-        ":reflector_allocator",
+        ":reflector_compositor",
         ":visibility_tester",
         "//iris_advanced:iris_advanced",
     ],
@@ -182,7 +182,7 @@ cc_library(
         ":material",
         ":ray_tracer",
         ":reflector",
-        ":reflector_allocator",
+        ":reflector_compositor",
         ":shape",
         ":spectrum",
         ":spectrum_compositor",
@@ -291,7 +291,7 @@ cc_library(
     hdrs = ["material_vtable.h"],
     deps = [
         ":brdf_allocator",
-        ":reflector_allocator",
+        ":reflector_compositor",
     ],
 )
 
@@ -314,8 +314,8 @@ cc_library(
     hdrs = ["ray_tracer_internal.h"],
     deps = [
         ":brdf_allocator",
-        ":reflector_allocator_internal",
-        ":reflector_allocator",
+        ":reflector_compositor_internal",
+        ":reflector_compositor",
         ":light",
     ],
 )
@@ -331,43 +331,43 @@ cc_library(
 )
 
 cc_library(
-    name = "reflector_allocator",
-    hdrs = ["reflector_allocator.h"],
-    srcs = ["reflector_allocator.c"],
+    name = "reflector_compositor",
+    hdrs = ["reflector_compositor.h"],
+    srcs = ["reflector_compositor.c"],
     deps = [
         ":reflector",
-        ":reflector_allocator_internal",
-        "//common:dynamic_allocator",
+        ":reflector_compositor_internal",
+        "//common:static_allocator",
     ],
 )
 
 cc_library(
-    name = "reflector_allocator_internal",
-    hdrs = ["reflector_allocator_internal.h"],
+    name = "reflector_compositor_internal",
+    hdrs = ["reflector_compositor_internal.h"],
     deps = [
         ":reflector_internal",
-        "//common:dynamic_allocator",
+        "//common:static_allocator",
     ],
 )
 
 cc_test(
-    name = "reflector_allocator_test",
-    srcs = ["reflector_allocator_test.cc"],
+    name = "reflector_compositor_test",
+    srcs = ["reflector_compositor_test.cc"],
     deps = [
-        ":reflector_allocator",
-        ":reflector_allocator_test_util",
+        ":reflector_compositor",
+        ":reflector_compositor_test_util",
         "@com_google_googletest//:gtest_main"
     ],
 )
 
 cc_library(
-    name = "reflector_allocator_test_util",
-    hdrs = ["reflector_allocator_test_util.h"],
-    srcs = ["reflector_allocator_test_util.c"],
+    name = "reflector_compositor_test_util",
+    hdrs = ["reflector_compositor_test_util.h"],
+    srcs = ["reflector_compositor_test_util.c"],
     testonly = 1,
     deps = [
-        ":reflector_allocator",
-        ":reflector_allocator_internal",
+        ":reflector_compositor",
+        ":reflector_compositor_internal",
     ],
 )
 

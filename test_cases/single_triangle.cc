@@ -49,7 +49,7 @@ TriangleMaterialSample(
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
     _Inout_ PBRDF_ALLOCATOR brdf_allocator,
-    _Inout_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
     _Out_ PCBRDF *brdf
     )
@@ -60,7 +60,7 @@ TriangleMaterialSample(
 
     PCREFLECTOR reflector;
     ISTATUS status =
-        AttenuatedReflector3AllocateWithAllocator(reflector_allocator,
+        AttenuatedReflector3AllocateWithAllocator(reflector_compositor,
                                                   triangle_material->reflectors[0],
                                                   triangle_data->barycentric_coordinates[0],
                                                   triangle_material->reflectors[1],

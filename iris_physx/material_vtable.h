@@ -16,7 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_MATERIAL_VTABLE_
 
 #include "iris_physx/brdf_allocator.h"
-#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/reflector_compositor.h"
 
 //
 // Types
@@ -30,7 +30,7 @@ ISTATUS
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
     _Inout_ PBRDF_ALLOCATOR brdf_allocator,
-    _Inout_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
     _Out_ PCBRDF *brdf
     );

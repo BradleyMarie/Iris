@@ -90,7 +90,7 @@ BrdfSample(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _Inout_ PRANDOM rng,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
@@ -116,7 +116,7 @@ BrdfSample(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (allocator == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -140,7 +140,7 @@ BrdfSample(
                                                   incoming,
                                                   surface_normal,
                                                   rng,
-                                                  allocator,
+                                                  compositor,
                                                   reflector,
                                                   outgoing,
                                                   pdf);
@@ -158,7 +158,7 @@ BrdfComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
     )
 {
@@ -182,7 +182,7 @@ BrdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (allocator == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -196,7 +196,7 @@ BrdfComputeReflectance(
                                                                incoming,
                                                                surface_normal,
                                                                outgoing,
-                                                               allocator,
+                                                               compositor,
                                                                reflector);
 
     return status;
@@ -208,7 +208,7 @@ BrdfComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ float_t *pdf
     )
@@ -233,7 +233,7 @@ BrdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (allocator == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -253,7 +253,7 @@ BrdfComputeReflectanceWithPdf(
                                                            incoming,
                                                            surface_normal,
                                                            outgoing,
-                                                           allocator,
+                                                           compositor,
                                                            reflector,
                                                            pdf);
     

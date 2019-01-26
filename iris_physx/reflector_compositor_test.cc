@@ -4,30 +4,31 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    reflector_allocator_test.cc
+    reflector_compositor_test.cc
 
 Abstract:
 
-    Unit tests for reflector_allocator.c
+    Unit tests for reflector_compositor.c
 
 --*/
 
 extern "C" {
-#include "iris_physx/reflector_allocator.h"
-#include "iris_physx/reflector_allocator_test_util.h"
+#include "iris_physx/reflector_compositor.h"
+#include "iris_physx/reflector_compositor_test_util.h"
 }
 
 #include "googletest/include/gtest/gtest.h"
 
-TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
+/*
+TEST(ReflectorCompositorTest, ReflectorCompositorAllocateErrors)
 {
-    PREFLECTOR_ALLOCATOR allocator = ReflectorAllocatorCreate();
+    PREFLECTOR_COMPOSITOR allocator = ReflectorCompositorCreate();
     ASSERT_TRUE(allocator != NULL);
 
     PCREFLECTOR reflector;
     REFLECTOR_VTABLE vtable;
 
-    ISTATUS status = ReflectorAllocatorAllocate(NULL,
+    ISTATUS status = ReflectorCompositorAllocate(NULL,
                                                 &vtable,
                                                 NULL,
                                                 0,
@@ -35,7 +36,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
                                                 &reflector);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = ReflectorAllocatorAllocate(allocator,
+    status = ReflectorCompositorAllocate(allocator,
                                         NULL,
                                         NULL,
                                         0,
@@ -43,7 +44,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
                                         NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
-    status = ReflectorAllocatorAllocate(allocator,
+    status = ReflectorCompositorAllocate(allocator,
                                         &vtable,
                                         NULL,
                                         0,
@@ -51,7 +52,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
                                         NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_05, status);
 
-    status = ReflectorAllocatorAllocate(allocator,
+    status = ReflectorCompositorAllocate(allocator,
                                         &vtable,
                                         NULL,
                                         16,
@@ -60,7 +61,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_00, status);
 
     int data = 0;
-    status = ReflectorAllocatorAllocate(allocator,
+    status = ReflectorCompositorAllocate(allocator,
                                         &vtable,
                                         &data,
                                         sizeof(int),
@@ -69,7 +70,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_01, status);
 
     int data2[3] = { 0, 0, 0 };
-    status = ReflectorAllocatorAllocate(allocator,
+    status = ReflectorCompositorAllocate(allocator,
                                         &vtable,
                                         &data2,
                                         sizeof(int),
@@ -77,7 +78,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocateErrors)
                                         &reflector);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_02, status);
 
-    ReflectorAllocatorFree(allocator);
+    ReflectorCompositorFree(allocator);
 }
 
 struct ReflectorContext {
@@ -122,9 +123,9 @@ ReflectorFreeRoutine(
     (*context)->free_encountered = true;
 }
 
-TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
+TEST(ReflectorCompositorTest, ReflectorCompositorAllocate)
 {
-    PREFLECTOR_ALLOCATOR allocator = ReflectorAllocatorCreate();
+    PREFLECTOR_COMPOSITOR allocator = ReflectorCompositorCreate();
     ASSERT_TRUE(allocator != NULL);
 
     PCREFLECTOR reflector;
@@ -135,7 +136,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
     ReflectorContext context = { false, false, false };
     ReflectorContext *data = &context;
     
-    ISTATUS status = ReflectorAllocatorAllocate(allocator,
+    ISTATUS status = ReflectorCompositorAllocate(allocator,
                                                 &vtable,
                                                 &data,
                                                 sizeof(ReflectorContext*),
@@ -155,6 +156,7 @@ TEST(ReflectorAllocatorTest, ReflectorAllocatorAllocate)
     EXPECT_EQ((float_t)1.0, albedo);
     EXPECT_TRUE(context.get_albedo_encountered);
 
-    ReflectorAllocatorFree(allocator);
+    ReflectorCompositorFree(allocator);
     EXPECT_FALSE(context.free_encountered);
 }
+*/

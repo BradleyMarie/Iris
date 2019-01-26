@@ -17,7 +17,7 @@ Abstract:
 
 #include "iris/iris.h"
 #include "iris_advanced/iris_advanced.h"
-#include "iris_physx/reflector_allocator.h"
+#include "iris_physx/reflector_compositor.h"
 
 //
 // Types
@@ -30,7 +30,7 @@ ISTATUS
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _Inout_ PRANDOM rng,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
@@ -43,7 +43,7 @@ ISTATUS
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
     );
 
@@ -54,7 +54,7 @@ ISTATUS
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ float_t *pdf
     );

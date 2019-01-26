@@ -32,7 +32,7 @@ SampleDirectLighting(
     _Inout_ PRANDOM rng,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PSPECTRUM_COMPOSITOR spectrum_compositor,
-    _Inout_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PCSPECTRUM *spectrum
     );
 

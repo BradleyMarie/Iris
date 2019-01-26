@@ -214,8 +214,8 @@ IntegratorIntegrate(
                               trace_context,
                               epsilon);
 
-    PREFLECTOR_ALLOCATOR reflector_allocator =
-        ShapeRayTracerGetReflectorAllocator(&integrator->shape_ray_tracer);
+    PREFLECTOR_COMPOSITOR reflector_compositor =
+        ShapeRayTracerGetReflectorCompositor(&integrator->shape_ray_tracer);
 
     PCSPECTRUM spectrum;
     ISTATUS status = 
@@ -225,7 +225,7 @@ IntegratorIntegrate(
                                               &integrator->light_sampler,
                                               &integrator->visibility_tester,
                                               &integrator->spectrum_compositor,
-                                              reflector_allocator,
+                                              reflector_compositor,
                                               rng,
                                               &spectrum);
 

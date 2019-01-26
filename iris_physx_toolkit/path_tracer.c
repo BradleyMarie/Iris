@@ -46,7 +46,7 @@ PathTracerIntegrate(
     _Inout_ PLIGHT_SAMPLER light_sampler,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR allocator,
     _Inout_ PRANDOM rng,
     _Out_ PCSPECTRUM *spectrum
     )

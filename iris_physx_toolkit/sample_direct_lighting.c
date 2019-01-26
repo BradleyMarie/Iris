@@ -48,7 +48,7 @@ DeltaLightLighting(
     _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 to_light,
     _Inout_ PSPECTRUM_COMPOSITOR spectrum_compositor,
-    _Inout_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PCSPECTRUM *spectrum
     )
 {
@@ -59,7 +59,7 @@ DeltaLightLighting(
     assert(VectorValidate(surface_normal));
     assert(VectorValidate(to_light));
     assert(spectrum_compositor != NULL);
-    assert(reflector_allocator != NULL);
+    assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
     PCREFLECTOR reflector;
@@ -67,7 +67,7 @@ DeltaLightLighting(
                                             to_hit_point,
                                             surface_normal,
                                             to_light,
-                                            reflector_allocator,
+                                            reflector_compositor,
                                             &reflector);
 
     if (status != ISTATUS_SUCCESS)
@@ -149,7 +149,7 @@ SampleDirectLighting(
     _Inout_ PRANDOM rng,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PSPECTRUM_COMPOSITOR spectrum_compositor,
-    _Inout_ PREFLECTOR_ALLOCATOR reflector_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PCSPECTRUM *spectrum
     )
 {
@@ -162,7 +162,7 @@ SampleDirectLighting(
     assert(rng != NULL);
     assert(visibility_tester != NULL);
     assert(spectrum_compositor != NULL);
-    assert(reflector_allocator != NULL);
+    assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
     PCSPECTRUM light_sampled_spectrum;
@@ -193,7 +193,7 @@ SampleDirectLighting(
                                     shading_normal,
                                     light_sampled_direction,
                                     spectrum_compositor,
-                                    reflector_allocator,
+                                    reflector_compositor,
                                     spectrum);
 
         return status;
@@ -206,7 +206,7 @@ SampleDirectLighting(
                         to_hit_point,
                         surface_normal,
                         rng,
-                        reflector_allocator,
+                        reflector_compositor,
                         &brdf_sampled_reflector,
                         &brdf_sampled_direction,
                         &brdf_sampled_pdf);
@@ -238,7 +238,7 @@ SampleDirectLighting(
                                                to_hit_point,
                                                surface_normal,
                                                light_sampled_direction,
-                                               reflector_allocator,
+                                               reflector_compositor,
                                                &brdf_computed_reflector,
                                                &brdf_computed_pdf);
 

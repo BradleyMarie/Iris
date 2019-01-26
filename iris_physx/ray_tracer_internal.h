@@ -17,8 +17,8 @@ Abstract:
 
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/brdf_allocator_internal.h"
-#include "iris_physx/reflector_allocator.h"
-#include "iris_physx/reflector_allocator_internal.h"
+#include "iris_physx/reflector_compositor.h"
+#include "iris_physx/reflector_compositor_internal.h"
 
 //
 // Types
@@ -29,7 +29,7 @@ struct _SHAPE_RAY_TRACER {
     PRAY_TRACER_TRACE_ROUTINE trace_routine;
     const void *trace_context;
     float_t minimum_distance;
-    REFLECTOR_ALLOCATOR reflector_allocator;
+    REFLECTOR_COMPOSITOR reflector_compositor;
     BRDF_ALLOCATOR brdf_allocator;
 };
 
@@ -59,7 +59,15 @@ ShapeRayTracerInitialize(
     shape_ray_tracer->trace_context = NULL;
     shape_ray_tracer->minimum_distance = (float_t)0.0;
 
-    ReflectorAllocatorInitialize(&shape_ray_tracer->reflector_allocator);
+    bool success = 
+        ReflectorCompositorInitialize(&shape_ray_tracer->reflector_compositor);
+
+    if (!success)
+    {
+        RayTracerFree(shape_ray_tracer->ray_tracer);
+        return false;
+    }
+
     BrdfAllocatorInitialize(&shape_ray_tracer->brdf_allocator);
 
     return true;
@@ -86,14 +94,14 @@ ShapeRayTracerConfigure(
 
 static
 inline
-PREFLECTOR_ALLOCATOR
-ShapeRayTracerGetReflectorAllocator(
+PREFLECTOR_COMPOSITOR
+ShapeRayTracerGetReflectorCompositor(
     _Inout_ struct _SHAPE_RAY_TRACER *shape_ray_tracer
     )
 {
     assert(shape_ray_tracer != NULL);
 
-    return &shape_ray_tracer->reflector_allocator;
+    return &shape_ray_tracer->reflector_compositor;
 }
 
 static
@@ -105,7 +113,7 @@ ShapeRayTracerClear(
 {
     assert(shape_ray_tracer != NULL);
 
-    ReflectorAllocatorClear(&shape_ray_tracer->reflector_allocator);
+    ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
     BrdfAllocatorClear(&shape_ray_tracer->brdf_allocator);
 }
 
@@ -119,7 +127,7 @@ ShapeRayTracerDestroy(
     assert(shape_ray_tracer != NULL);
 
     RayTracerFree(shape_ray_tracer->ray_tracer);
-    ReflectorAllocatorDestroy(&shape_ray_tracer->reflector_allocator);
+    ReflectorCompositorDestroy(&shape_ray_tracer->reflector_compositor);
     BrdfAllocatorDestroy(&shape_ray_tracer->brdf_allocator);
 }
 

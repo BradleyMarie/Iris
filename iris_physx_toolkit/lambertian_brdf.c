@@ -138,7 +138,7 @@ LambertianBrdfSample(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _Inout_ PRANDOM rng,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
@@ -154,10 +154,10 @@ LambertianBrdfSample(
     }
 
     status =
-        AttenuatedReflectorAllocateWithAllocator(allocator,
-                                                 lambertian_brdf->reflector,
-                                                 inv_pi,
-                                                 reflector);
+        ReflectorCompositorAttenuateReflector(compositor,
+                                              lambertian_brdf->reflector,
+                                              inv_pi,
+                                              reflector);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -176,17 +176,17 @@ LambertianBrdfComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
     )
 {
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
     ISTATUS status =
-        AttenuatedReflectorAllocateWithAllocator(allocator,
-                                                 lambertian_brdf->reflector,
-                                                 inv_pi,
-                                                 reflector);
+        ReflectorCompositorAttenuateReflector(compositor,
+                                              lambertian_brdf->reflector,
+                                              inv_pi,
+                                              reflector);
 
     return status;
 }
@@ -198,7 +198,7 @@ LambertianBrdfComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ float_t *pdf
     )
@@ -206,10 +206,10 @@ LambertianBrdfComputeReflectanceWithPdf(
     PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
 
     ISTATUS status =
-        AttenuatedReflectorAllocateWithAllocator(allocator,
-                                                 lambertian_brdf->reflector,
-                                                 inv_pi,
-                                                 reflector);
+        ReflectorCompositorAttenuateReflector(compositor,
+                                              lambertian_brdf->reflector,
+                                              inv_pi,
+                                              reflector);
 
     if (status != ISTATUS_SUCCESS)
     {

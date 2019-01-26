@@ -43,7 +43,7 @@ BrdfSample(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _Inout_ PRANDOM rng,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
@@ -55,7 +55,7 @@ BrdfComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
     );
 
@@ -65,7 +65,7 @@ BrdfComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
-    _Inout_ PREFLECTOR_ALLOCATOR allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ float_t *pdf
     );

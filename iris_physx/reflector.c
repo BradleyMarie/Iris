@@ -74,9 +74,9 @@ ReflectorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    ReflectorInitialize(vtable,
-                        data_allocation,
-                        *reflector);
+    ReflectorInitialize(*reflector,
+                        vtable,
+                        data_allocation);
 
     if (data_size != 0)
     {
