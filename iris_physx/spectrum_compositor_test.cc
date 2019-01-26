@@ -111,10 +111,10 @@ TEST(SpectrumCompositorTest, SpectrumCompositorAttenuateReflectionErrors)
 
     status = SpectrumCompositorAttenuateReflection(compositor,
                                                    spectrum,
-                                                   NULL,
+                                                   reflector,
                                                    -1.0,
                                                    &output);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
 
     status = SpectrumCompositorAttenuateReflection(compositor,
                                                    spectrum,
@@ -310,6 +310,14 @@ TEST(SpectrumCompositor, SpectrumCompositorAttenuateReflection)
                                                            root_reflector0,
                                                            (float_t)0.5,
                                                            &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   root_spectrum0,
+                                                   NULL,
+                                                   (float_t)0.5,
+                                                   &result);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     ASSERT_EQ(NULL, result);
 

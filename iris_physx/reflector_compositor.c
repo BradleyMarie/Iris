@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Allows allocation of reflectors cheaply during shading.
+    Allows composition of reflectors cheaply during shading.
 
 --*/
 
@@ -127,8 +127,14 @@ AttenuatedReflectorAllocate(
     assert(compositor != NULL);
     assert(reflector != NULL);
     assert(isfinite(attenuation));
-    assert((float_t)0.0 < attenuation);
+    assert((float_t)0.0 <= attenuation);
     assert(attenuated_reflector != NULL);
+
+    if (attenuation == (float_t)0.0)
+    {
+        *attenuated_reflector = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     if (attenuation == (float_t)1.0)
     {
@@ -187,7 +193,7 @@ ReflectorCompositorAttenuateReflector(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (reflector == NULL || attenuation == (float_t)0.0)
+    if (reflector == NULL)
     {
         *attenuated_reflector = NULL;
         return ISTATUS_SUCCESS;
@@ -226,7 +232,7 @@ ReflectorCompositorAttenuatedAddReflectors(
 
     if(!isfinite(attenuation) || attenuation < (float_t)0.0)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (result == NULL)
@@ -236,7 +242,7 @@ ReflectorCompositorAttenuatedAddReflectors(
 
     if (added_reflector == NULL)
     {
-        if (attenuated_reflector == NULL || attenuation == (float_t)0.0)
+        if (attenuated_reflector == NULL)
         {
             *result = NULL;
             return ISTATUS_SUCCESS;
@@ -250,7 +256,7 @@ ReflectorCompositorAttenuatedAddReflectors(
         return status;
     }
 
-    if (attenuated_reflector == NULL || attenuation == (float_t)0.0)
+    if (attenuated_reflector == NULL)
     {
         *result = added_reflector;
         return ISTATUS_SUCCESS;
@@ -263,6 +269,12 @@ ReflectorCompositorAttenuatedAddReflectors(
 
         attenuated_reflector = reflector0->reflector;
         attenuation *= reflector0->attenuation;
+    }
+
+    if (attenuation == (float_t)0.0)
+    {
+        *result = added_reflector;
+        return ISTATUS_SUCCESS;
     }
 
     void *allocation;

@@ -168,8 +168,14 @@ AttenuatedSpectrumAllocate(
     assert(compositor != NULL);
     assert(spectrum != NULL);
     assert(isfinite(attenuation));
-    assert((float_t)0.0 < attenuation);
+    assert((float_t)0.0 <= attenuation);
     assert(attenuated_spectrum != NULL);
+
+    if (attenuation == (float_t)0.0)
+    {
+        *attenuated_spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     if (attenuation == (float_t)1.0)
     {
@@ -215,8 +221,14 @@ AttenuatedReflectionSpectrumAllocate(
     assert(spectrum != NULL);
     assert(reflector != NULL);
     assert(isfinite(attenuation));
-    assert((float_t)0.0 < attenuation);
+    assert((float_t)0.0 <= attenuation);
     assert(attenutated_reflection_spectrum != NULL);
+
+    if (attenuation == (float_t)0.0)
+    {
+        *attenutated_reflection_spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     void *allocation;
     bool success = StaticMemoryAllocatorAllocate(
@@ -303,7 +315,7 @@ SpectrumCompositorAddSpectra(
 ISTATUS
 SpectrumCompositorAttenuateSpectrum(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
-    _In_ PCSPECTRUM spectrum,
+    _In_opt_ PCSPECTRUM spectrum,
     _In_ float_t attenuation,
     _Out_ PCSPECTRUM *attenuated_spectrum
     )
@@ -323,24 +335,10 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (spectrum == NULL || attenuation == (float_t)0.0)
+    if (spectrum == NULL)
     {
         *attenuated_spectrum = NULL;
         return ISTATUS_SUCCESS;
-    }
-
-    if (spectrum->vtable == &attenuated_spectrum_vtable)
-    {
-        PCATTENUATED_SPECTRUM spectrum0 =
-            (PCATTENUATED_SPECTRUM) spectrum;
-
-        ISTATUS status =
-            AttenuatedSpectrumAllocate(compositor,
-                                       spectrum0->spectrum,
-                                       attenuation * spectrum0->attenuation,
-                                       attenuated_spectrum);
-
-        return status;
     }
 
     if (spectrum->vtable == &attenuated_reflection_spectrum_vtable)
@@ -358,6 +356,15 @@ SpectrumCompositorAttenuateSpectrum(
         return status;
     }
 
+    if (spectrum->vtable == &attenuated_spectrum_vtable)
+    {
+        PCATTENUATED_SPECTRUM spectrum0 =
+            (PCATTENUATED_SPECTRUM) spectrum;
+
+        spectrum = spectrum0->spectrum;
+        attenuation *= spectrum0->attenuation;
+    }
+
     ISTATUS status = AttenuatedSpectrumAllocate(compositor,
                                                 spectrum,
                                                 attenuation,
@@ -369,8 +376,8 @@ SpectrumCompositorAttenuateSpectrum(
 ISTATUS
 SpectrumCompositorAttenuateReflection(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
-    _In_ PCSPECTRUM spectrum,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCSPECTRUM spectrum,
+    _In_opt_ PCREFLECTOR reflector,
     _In_ float_t attenuation,
     _Out_ PCSPECTRUM *reflected_spectrum
     )
@@ -378,11 +385,6 @@ SpectrumCompositorAttenuateReflection(
     if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if(!isfinite(attenuation) || attenuation < (float_t)0.0)
@@ -395,7 +397,13 @@ SpectrumCompositorAttenuateReflection(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (spectrum == NULL ||attenuation == (float_t)0.0)
+    if (spectrum == NULL)
+    {
+        *reflected_spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (reflector == NULL)
     {
         *reflected_spectrum = NULL;
         return ISTATUS_SUCCESS;

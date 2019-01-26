@@ -114,9 +114,8 @@ ReflectorReflect(
                                             wavelength,
                                             reflectance);
 
-    // Should these be made into something stronger than assertions?
+    // Should this be made into something stronger than assertions?
     assert((float_t)0.0 <= *reflectance);
-    assert(*reflectance <= (float_t)1.0);
 
     return status;
 }
@@ -140,7 +139,7 @@ ReflectorGetAlbedo(
     ISTATUS status = ReflectorGetAlbedoInline(reflector, albedo);
 
     // Should this be made into something stronger than an assertion?
-    assert((float_t)0.0 <= *albedo && *albedo <= (float_t)1.0);
+    assert((float_t)0.0 <= *albedo);
 
     return status;
 }
