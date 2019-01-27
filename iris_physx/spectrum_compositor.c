@@ -492,6 +492,15 @@ SpectrumCompositorAttenuateReflection(
         return ISTATUS_SUCCESS;
     }
 
+    if (spectrum->vtable == (const void*)&attenuated_spectrum_vtable)
+    {
+        PCATTENUATED_SPECTRUM spectrum0 =
+            (PCATTENUATED_SPECTRUM) spectrum;
+
+        spectrum = spectrum0->spectrum;
+        attenuation *= spectrum0->attenuation;
+    }
+
     ISTATUS status = AttenuatedReflectionSpectrumAllocate(compositor,
                                                           spectrum,
                                                           reflector,

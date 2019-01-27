@@ -345,6 +345,27 @@ TEST(SpectrumCompositor, SpectrumCompositorAttenuateReflection)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)0.0, value);
 
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 root_spectrum0,
+                                                 (float_t)0.5,
+                                                 &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   result,
+                                                   root_reflector0,
+                                                   (float_t)0.5,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
     SpectrumRelease(root_spectrum0);
     ReflectorRelease(root_reflector0);
 
