@@ -167,7 +167,7 @@ ReflectorRelease(
         return;
     }
 
-    if (atomic_fetch_sub(&reflector->reference_count, 1) == 1)
+    if (atomic_fetch_sub(&reflector->reference_count, 1) == EXTERNAL_REFLECTOR_TYPE)
     {
         if (reflector->vtable->free_routine != NULL)
         {

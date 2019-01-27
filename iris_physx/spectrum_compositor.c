@@ -17,8 +17,10 @@ Abstract:
 #include <assert.h>
 
 #include "iris_physx/color_integrator_internal.h"
+#include "iris_physx/reflector_compositor_internal.h"
 #include "iris_physx/reflector_internal.h"
 #include "iris_physx/spectrum_compositor_internal.h"
+#include "iris_physx/spectrum_internal.h"
 
 //
 // Static Functions
@@ -495,10 +497,19 @@ SpectrumCompositorAttenuateReflection(
     if (spectrum->vtable == (const void*)&attenuated_spectrum_vtable)
     {
         PCATTENUATED_SPECTRUM spectrum0 =
-            (PCATTENUATED_SPECTRUM) spectrum;
+            (PCATTENUATED_SPECTRUM)spectrum;
 
         spectrum = spectrum0->spectrum;
         attenuation *= spectrum0->attenuation;
+    }
+
+    if (reflector->reference_count == ATTENUATED_REFLECTOR_TYPE)
+    {
+        PCATTENUATED_REFLECTOR reflector0 =
+            (PCATTENUATED_REFLECTOR)reflector;
+
+        reflector = reflector0->reflector;
+        attenuation *= reflector0->attenuation;
     }
 
     ISTATUS status = AttenuatedReflectionSpectrumAllocate(compositor,

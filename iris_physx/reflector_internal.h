@@ -21,6 +21,14 @@ Abstract:
 #include "iris_physx/reflector_vtable.h"
 
 //
+// Defines
+//
+
+#define ATTENUATED_REFLECTOR_TYPE     0
+#define ATTENUATED_SUM_REFLECTOR_TYPE 1
+#define EXTERNAL_REFLECTOR_TYPE       2
+
+//
 // Forward Declarations
 //
 
@@ -69,7 +77,7 @@ ReflectorInitialize(
     
     reflector->vtable = vtable;
     reflector->data = data;
-    reflector->reference_count = 1;
+    reflector->reference_count = EXTERNAL_REFLECTOR_TYPE;
 }
 
 static
@@ -78,15 +86,17 @@ void
 InternalReflectorInitialize(
     _Out_ struct _REFLECTOR *reflector,
     _In_ PCINTERNAL_REFLECTOR_VTABLE vtable,
-    _In_opt_ void *data
+    _In_opt_ void *data,
+    _In_ size_t type
     )
 {
     assert(reflector != NULL);
     assert(vtable != NULL);
+    assert(type < EXTERNAL_REFLECTOR_TYPE);
 
     reflector->vtable = &vtable->reflector_vtable;
     reflector->data = data;
-    reflector->reference_count = 0;
+    reflector->reference_count = type;
 }
 
 static

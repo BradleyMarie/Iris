@@ -450,6 +450,7 @@ cc_library(
     deps = [
         ":color_integrator",
         ":reflector",
+        ":reflector_compositor_internal",
         ":reflector_internal",
         ":spectrum",
         ":spectrum_compositor_internal",
@@ -471,6 +472,8 @@ cc_test(
     name = "spectrum_compositor_test",
     srcs = ["spectrum_compositor_test.cc"],
     deps = [
+        ":reflector_compositor",
+        ":reflector_compositor_test_util",
         ":spectrum_compositor",
         ":spectrum_compositor_test_util",
         "@com_google_googletest//:gtest_main"

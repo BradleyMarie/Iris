@@ -13,6 +13,8 @@ Abstract:
 --*/
 
 extern "C" {
+#include "iris_physx/reflector_compositor.h"
+#include "iris_physx/reflector_compositor_test_util.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/spectrum_compositor_test_util.h"
 }
@@ -460,4 +462,87 @@ TEST(SpectrumCompositor, SpectrumCompositorAttenuateSpectrum)
     ReflectorRelease(root_reflector0);
 
     SpectrumCompositorFree(compositor);
+}
+
+TEST(SpectrumCompositor, SpectrumCompositorAttenuateCompositedReflectionSpectrum)
+{
+    PREFLECTOR_COMPOSITOR reflector_compositor = ReflectorCompositorCreate();
+    ASSERT_TRUE(reflector_compositor != NULL);
+
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PREFLECTOR root_reflector0 = AttenuatingReflectorCreate((float_t)0.5);
+    ASSERT_TRUE(NULL != root_reflector0);
+
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)16.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PCREFLECTOR attenuated_reflector;
+    ISTATUS status = ReflectorCompositorAttenuateReflector(reflector_compositor,
+                                                           root_reflector0,
+                                                           (float_t)0.5,
+                                                           &attenuated_reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    PCSPECTRUM attrenuated_spectrum;
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 root_spectrum0,
+                                                 (float_t)0.5,
+                                                 &attrenuated_spectrum);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    PCSPECTRUM result;
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   root_spectrum0,
+                                                   attenuated_reflector,
+                                                   (float_t)0.5,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t value;
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)2.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   root_spectrum0,
+                                                   attenuated_reflector,
+                                                   (float_t)1.0,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)4.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    status = SpectrumCompositorAttenuateReflection(compositor,
+                                                   attrenuated_spectrum,
+                                                   attenuated_reflector,
+                                                   (float_t)0.5,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    SpectrumRelease(root_spectrum0);
+    ReflectorRelease(root_reflector0);
+
+    SpectrumCompositorFree(compositor);
+    ReflectorCompositorFree(reflector_compositor);
 }

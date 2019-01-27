@@ -266,7 +266,8 @@ AttenuatedReflectorAllocate(
 
     InternalReflectorInitialize(&allocated_reflector->header,
                                 &attenuated_reflector_vtable,
-                                allocated_reflector);
+                                allocated_reflector,
+                                ATTENUATED_REFLECTOR_TYPE);
 
     allocated_reflector->reflector = reflector;
     allocated_reflector->attenuation = attenuation;
@@ -401,7 +402,8 @@ ReflectorCompositorAttenuatedAddReflectors(
 
     InternalReflectorInitialize(&allocated_reflector->header,
                                 &attenuated_sum_reflector_vtable,
-                                allocated_reflector);
+                                allocated_reflector,
+                                ATTENUATED_SUM_REFLECTOR_TYPE);
 
     allocated_reflector->added_reflector = added_reflector;
     allocated_reflector->attenuated_reflector = attenuated_reflector;
