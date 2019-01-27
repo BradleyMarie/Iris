@@ -83,7 +83,7 @@ CheckEqualsPfmFile(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (pixel_format != PFM_PIXEL_FORMAT_XYZ)
+    if (pixel_format > PFM_PIXEL_FORMAT_SRGB)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

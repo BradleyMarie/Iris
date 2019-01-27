@@ -101,6 +101,7 @@ ColorIntegratorCompareReflectorEntry(
 }
 
 static
+inline
 PCSPECTRUM_LIST_ENTRY
 ColorIntegratorFindSpectrumEntry(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
@@ -123,6 +124,7 @@ ColorIntegratorFindSpectrumEntry(
 }
 
 static
+inline
 PCREFLECTOR_LIST_ENTRY
 ColorIntegratorFindReflectorEntry(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
@@ -144,8 +146,8 @@ ColorIntegratorFindReflectorEntry(
     return (PCREFLECTOR_LIST_ENTRY)result;
 }
 
-inline
 static
+inline
 ISTATUS
 ColorIntegratorComputeSpectrumColor(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
@@ -176,8 +178,8 @@ ColorIntegratorComputeSpectrumColor(
     return status;
 }
 
-inline
 static
+inline
 ISTATUS
 ColorIntegratorComputeReflectorColor(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,

@@ -39,6 +39,7 @@ TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_ PCLIST_SCENE scene,
     _In_ PONE_LIGHT_SAMPLER light_sampler,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
     )
 {
@@ -56,10 +57,6 @@ TestRenderSingleThreaded(
 
     PINTEGRATOR path_tracer;
     status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PCOLOR_INTEGRATOR color_integrator;
-    status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -106,7 +103,6 @@ TestRenderSingleThreaded(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
 }
 
 static
@@ -147,12 +143,19 @@ AddQuadToScene(
 
 TEST(CornellBoxTest, CornellBox)
 {
+    PCOLOR_INTEGRATOR color_integrator;
+    ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
     PREFLECTOR white_reflector;
-    ISTATUS status =
-        InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
-                                      cornell_box_white_wall_samples,
-                                      CORNELL_BOX_WALL_SAMPLES,
-                                      &white_reflector);
+    status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
+                                           cornell_box_white_wall_samples,
+                                           CORNELL_BOX_WALL_SAMPLES,
+                                           &white_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
+                                                     white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBRDF white_brdf;
@@ -170,6 +173,10 @@ TEST(CornellBoxTest, CornellBox)
                                            &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
+                                                     red_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
     PBRDF red_brdf;
     status = LambertianBrdfAllocate(red_reflector, &red_brdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -185,6 +192,10 @@ TEST(CornellBoxTest, CornellBox)
                                            &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
+                                                     green_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
     PBRDF green_brdf;
     status = LambertianBrdfAllocate(green_reflector, &green_brdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -198,6 +209,10 @@ TEST(CornellBoxTest, CornellBox)
                                           cornell_box_light_samples,
                                           CORNELL_BOX_LIGHT_SAMPLES,
                                           &light_spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorPrecomputeSpectrumColor(color_integrator,
+                                                    light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL light_material;
@@ -335,6 +350,7 @@ TEST(CornellBoxTest, CornellBox)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
+                             color_integrator,
                              "test_results/cornell_box.pfm");
 
     SpectrumRelease(light_spectrum);
@@ -354,4 +370,5 @@ TEST(CornellBoxTest, CornellBox)
     ListSceneFree(scene);
     OneLightSamplerFree(light_sampler);
     CameraFree(camera);
+    ColorIntegratorFree(color_integrator);
 }
