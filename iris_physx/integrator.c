@@ -16,7 +16,7 @@ Abstract:
 
 #include "iris_physx/brdf_allocator.h"
 #include "iris_physx/brdf_allocator_internal.h"
-#include "iris_physx/color_matcher_internal.h"
+#include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"
 #include "iris_physx/light_sampler_internal.h"
@@ -153,10 +153,10 @@ IntegratorIntegrate(
     _In_opt_ const void *trace_context,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
+    _In_ PCCOLOR_INTEGRATOR color_integrator,
+    _Inout_ PRANDOM rng,
     _In_ RAY ray,
-    _In_ PRANDOM rng,
     _In_ float_t epsilon,
-    _In_ PCCOLOR_MATCHER color_matcher,
     _Out_ PCOLOR3 color
     )
 {
@@ -175,7 +175,7 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (!RayValidate(ray))
+    if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
@@ -185,12 +185,12 @@ IntegratorIntegrate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
+    if (!RayValidate(ray))
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (color_matcher == NULL)
+    if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
         return ISTATUS_INVALID_ARGUMENT_08;
     }
@@ -231,7 +231,9 @@ IntegratorIntegrate(
 
     if (status == ISTATUS_SUCCESS)
     {
-        status = ColorMatcherCompute(color_matcher, spectrum, color);
+        status = ColorIntegratorComputeSpectrumColor(color_integrator,
+                                                     spectrum,
+                                                     color);
     }
 
     ShapeRayTracerClear(&integrator->shape_ray_tracer);

@@ -4,17 +4,17 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    cie_color_matcher.c
+    cie_color_integrator.c
 
 Abstract:
 
-    Implements a CIE color matcher.
+    Implements a CIE color integrator.
 
 --*/
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/cie_color_matcher.h"
+#include "iris_physx_toolkit/cie_color_integrator.h"
 
 //
 // Defines
@@ -1927,8 +1927,7 @@ static const float_t cie_z_bar[] = {
 //
 
 ISTATUS
-CieColorMatcherCompute(
-    _In_ const void *context,
+CieColorIntegratorComputeSpectrumColor(
     _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
@@ -1961,34 +1960,36 @@ CieColorMatcherCompute(
     return ISTATUS_SUCCESS;
 }
 
-//
-// Static Variables
-//
+ISTATUS
+CieColorIntegratorComputeReflectorColor(
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    )
+{
+    // TODO: IMPLEMENT
+    *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
 
-static const COLOR_MATCHER_VTABLE cie_color_matcher_vtable = {
-    CieColorMatcherCompute,
-    NULL
-};
+    return ISTATUS_SUCCESS;
+}
 
 //
 // Functions
 //
 
 ISTATUS
-CieColorMatcherAllocate(
-    _Out_ PCOLOR_MATCHER *color_matcher
+CieColorIntegratorAllocate(
+    _Out_ PCOLOR_INTEGRATOR *color_integrator
     )
 {
-    if (color_matcher == NULL)
+    if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    ISTATUS status = ColorMatcherAllocate(&cie_color_matcher_vtable,
-                                          NULL,
-                                          0,
-                                          0,
-                                          color_matcher);
+    ISTATUS status =
+        ColorIntegratorAllocate(CieColorIntegratorComputeSpectrumColor,
+                                CieColorIntegratorComputeReflectorColor,
+                                color_integrator);
 
     return status;
 }

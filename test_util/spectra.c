@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Implements the test spectrum, reflector, and color matcher.
+    Implements the test spectrum, reflector, and color integrator.
 
 --*/
 
@@ -124,8 +124,7 @@ TestReflectorGetAlbedo(
 }
 
 ISTATUS
-TestColorMatcherCompute(
-    _In_ const void *context,
+TestColorIntegratorComputeSpectrumColor(
     _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
@@ -160,6 +159,42 @@ TestColorMatcherCompute(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+TestColorIntegratorComputeReflectorColor(
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    )
+{
+    ISTATUS status = ReflectorReflect(reflector,
+                                      X_WAVELENGTH,
+                                      &color->x);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorReflect(reflector,
+                              Y_WAVELENGTH,
+                              &color->y);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorReflect(reflector,
+                              Z_WAVELENGTH,
+                              &color->z);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Static Variables
 //
@@ -172,11 +207,6 @@ static const SPECTRUM_VTABLE test_spectrum_vtable = {
 static const REFLECTOR_VTABLE test_reflector_vtable = {
     TestReflectorReflect,
     TestReflectorGetAlbedo,
-    NULL
-};
-
-static const COLOR_MATCHER_VTABLE test_color_matcher_vtable = {
-    TestColorMatcherCompute,
     NULL
 };
 
@@ -269,20 +299,19 @@ TestReflectorAllocate(
 }
 
 ISTATUS
-TestColorMatcherAllocate(
-    _Out_ PCOLOR_MATCHER *color_matcher
+TestColorIntegratorAllocate(
+    _Out_ PCOLOR_INTEGRATOR *color_integrator
     )
 {
-    if (color_matcher == NULL)
+    if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    ISTATUS status = ColorMatcherAllocate(&test_color_matcher_vtable,
-                                          NULL,
-                                          0,
-                                          0,
-                                          color_matcher);
+    ISTATUS status =
+        ColorIntegratorAllocate(TestColorIntegratorComputeSpectrumColor,
+                                TestColorIntegratorComputeReflectorColor,
+                                color_integrator);
 
     return status;
 }

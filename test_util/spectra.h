@@ -8,8 +8,8 @@ Module Name:
 
 Abstract:
 
-    A spectrum, reflector, and color matcher for use in testing which directly
-    map X, Y, and Z values to the outputs of the integrator.
+    A spectrum, reflector, and color integrator for use in testing which
+    directly map X, Y, and Z values to the outputs of the integrator.
 
 --*/
 
@@ -43,8 +43,8 @@ TestReflectorAllocate(
     );
 
 ISTATUS
-TestColorMatcherAllocate(
-    _Out_ PCOLOR_MATCHER *color_matcher
+TestColorIntegratorAllocate(
+    _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 
 #if __cplusplus 

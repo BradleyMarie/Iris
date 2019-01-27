@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_INTEGRATOR_
 #define _IRIS_PHYSX_INTEGRATOR_
 
-#include "iris_physx/color_matcher.h"
+#include "iris_physx/color_integrator.h"
 #include "iris_physx/light_sampler_vtable.h"
 #include "iris_physx/integrator_vtable.h"
 
@@ -51,10 +51,10 @@ IntegratorIntegrate(
     _In_opt_ const void *trace_context,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
+    _In_ PCCOLOR_INTEGRATOR color_integrator,
+    _Inout_ PRANDOM rng,
     _In_ RAY ray,
-    _In_ PRANDOM rng,
     _In_ float_t epsilon,
-    _In_ PCCOLOR_MATCHER color_matcher,
     _Out_ PCOLOR3 color
     );
 

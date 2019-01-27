@@ -186,8 +186,8 @@ TestRender(
     status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PCOLOR_MATCHER color_matcher;
-    status = TestColorMatcherAllocate(&color_matcher);
+    PCOLOR_INTEGRATOR color_integrator;
+    status = TestColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -197,7 +197,7 @@ TestRender(
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
-        color_matcher,
+        color_integrator,
         &sample_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -227,7 +227,7 @@ TestRender(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorMatcherRelease(color_matcher);
+    ColorIntegratorFree(color_integrator);
 }
 
 //

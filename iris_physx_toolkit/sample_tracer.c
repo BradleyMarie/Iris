@@ -26,7 +26,7 @@ typedef struct _PHYSX_SAMPLE_TRACER {
     const void *trace_context;
     PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine;
     const void* sample_lights_context;
-    PCOLOR_MATCHER color_matcher;
+    PCOLOR_INTEGRATOR color_integrator;
 } PHYSX_SAMPLE_TRACER, *PPHYSX_SAMPLE_TRACER;
 
 typedef const PHYSX_SAMPLE_TRACER *PCPHYSX_SAMPLE_TRACER;
@@ -53,10 +53,10 @@ PhysxSampleTracerTraceRay(
                             physx_sample_tracer->trace_context,
                             physx_sample_tracer->sample_lights_routine,
                             physx_sample_tracer->sample_lights_context,
-                            *ray,
+                            physx_sample_tracer->color_integrator,
                             rng,
+                            *ray,
                             epsilon,
-                            physx_sample_tracer->color_matcher,
                             color);
 
     return status;
@@ -86,7 +86,7 @@ PhysxSampleTracerDuplicate(
                                   physx_sample_tracer->trace_context,
                                   physx_sample_tracer->sample_lights_routine,
                                   physx_sample_tracer->sample_lights_context,
-                                  physx_sample_tracer->color_matcher,
+                                  physx_sample_tracer->color_integrator,
                                   duplicate);
 
     if (status != ISTATUS_SUCCESS)
@@ -106,7 +106,6 @@ PhysxSampleTracerFree(
     PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
 
     IntegratorFree(physx_sample_tracer->integrator);
-    ColorMatcherRelease(physx_sample_tracer->color_matcher);
 }
 
 //
@@ -130,7 +129,7 @@ PhysxSampleTracerAllocate(
     _In_opt_ const void *trace_context,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
-    _In_ PCOLOR_MATCHER color_matcher,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
@@ -149,7 +148,7 @@ PhysxSampleTracerAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (color_matcher == NULL)
+    if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
@@ -165,7 +164,7 @@ PhysxSampleTracerAllocate(
     physx_sample_tracer.trace_context = trace_context;
     physx_sample_tracer.sample_lights_routine = sample_lights_routine;
     physx_sample_tracer.sample_lights_context = sample_lights_context;
-    physx_sample_tracer.color_matcher = color_matcher;
+    physx_sample_tracer.color_integrator = color_integrator;
 
     ISTATUS status = SampleTracerAllocate(&sample_tracer_vtable,
                                           &physx_sample_tracer,
@@ -177,8 +176,6 @@ PhysxSampleTracerAllocate(
     {
         return status;
     }
-
-    ColorMatcherRetain(color_matcher);
 
     return ISTATUS_SUCCESS;
 }

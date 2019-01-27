@@ -24,7 +24,7 @@ extern "C" {
 #include "iris_physx/area_light.h"
 #include "iris_physx/brdf.h"
 #include "iris_physx/brdf_allocator.h"
-#include "iris_physx/color_matcher.h"
+#include "iris_physx/color_integrator.h"
 #include "iris_physx/emissive_material.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/hit_tester.h"

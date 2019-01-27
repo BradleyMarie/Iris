@@ -28,9 +28,9 @@ cc_library(
 )
 
 cc_library(
-    name = "cie_color_matcher",
-    hdrs = ["cie_color_matcher.h"],
-    srcs = ["cie_color_matcher.c"],
+    name = "cie_color_integrator",
+    hdrs = ["cie_color_integrator.h"],
+    srcs = ["cie_color_integrator.c"],
     deps = [
         "//iris_physx:iris_physx",
     ],

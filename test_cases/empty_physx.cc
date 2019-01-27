@@ -60,8 +60,8 @@ TEST(EmptyPhysx, ListScene)
     status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PCOLOR_MATCHER color_matcher;
-    status = TestColorMatcherAllocate(&color_matcher);
+    PCOLOR_INTEGRATOR color_integrator;
+    status = TestColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -71,7 +71,7 @@ TEST(EmptyPhysx, ListScene)
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
-        color_matcher,
+        color_integrator,
         &sample_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -98,5 +98,5 @@ TEST(EmptyPhysx, ListScene)
     AllLightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorMatcherRelease(color_matcher);
+    ColorIntegratorFree(color_integrator);
 }

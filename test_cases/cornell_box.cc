@@ -19,7 +19,7 @@ Abstract:
 #include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
-#include "iris_physx_toolkit/cie_color_matcher.h"
+#include "iris_physx_toolkit/cie_color_integrator.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
@@ -58,8 +58,8 @@ TestRenderSingleThreaded(
     status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PCOLOR_MATCHER color_matcher;
-    status = CieColorMatcherAllocate(&color_matcher);
+    PCOLOR_INTEGRATOR color_integrator;
+    status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -69,7 +69,7 @@ TestRenderSingleThreaded(
         scene,
         OneLightSamplerSampleLightsCallback,
         light_sampler,
-        color_matcher,
+        color_integrator,
         &sample_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -106,7 +106,7 @@ TestRenderSingleThreaded(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorMatcherRelease(color_matcher);
+    ColorIntegratorFree(color_integrator);
 }
 
 static

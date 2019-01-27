@@ -33,7 +33,7 @@ PhysxSampleTracerAllocate(
     _In_opt_ const void *trace_context,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
-    _In_ PCOLOR_MATCHER color_matcher,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 

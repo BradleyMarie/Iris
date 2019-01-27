@@ -9,7 +9,7 @@ cc_test(
         "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
-        "//iris_physx_toolkit:cie_color_matcher",
+        "//iris_physx_toolkit:cie_color_integrator",
         "//iris_physx_toolkit:constant_emissive_material",
         "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:interpolated_spectrum",

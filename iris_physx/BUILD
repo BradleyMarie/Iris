@@ -91,34 +91,6 @@ cc_library(
 )
 
 cc_library(
-    name = "color_matcher",
-    hdrs = ["color_matcher.h"],
-    srcs = ["color_matcher.c"],
-    deps = [
-        ":color_matcher_internal",
-        ":color_matcher_vtable",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "color_matcher_internal",
-    hdrs = ["color_matcher_internal.h"],
-    deps = [
-        ":color_matcher_vtable",
-    ],
-)
-
-cc_library(
-    name = "color_matcher_vtable",
-    hdrs = ["color_matcher_vtable.h"],
-    deps = [
-        ":spectrum",
-        "//iris_advanced:iris_advanced",
-    ],
-)
-
-cc_library(
     name = "emissive_material",
     hdrs = ["emissive_material.h"],
     srcs = ["emissive_material.c"],
@@ -170,8 +142,8 @@ cc_library(
     deps = [
         ":brdf",
         ":brdf_internal",
-        ":color_matcher",
-        ":color_matcher_internal",
+        ":color_integrator",
+        ":color_integrator_internal",
         ":integrator_vtable",
         ":light_sampler_internal",
         ":ray_tracer_internal",
@@ -201,7 +173,7 @@ cc_library(
         ":area_light",
         ":brdf",
         ":brdf_allocator",
-        ":color_matcher",
+        ":color_integrator",
         ":emissive_material",
         ":hit_allocator",
         ":hit_tester",

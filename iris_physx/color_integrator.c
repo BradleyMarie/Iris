@@ -73,6 +73,8 @@ ColorIntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    result->compute_reflector_color_routine = compute_reflector_color_routine;
+    result->compute_spectrum_color_routine = compute_spectrum_color_routine;
     result->reflector_list_capacity = INITIAL_LIST_SIZE;
     result->reflector_list_size = 0;
     result->spectrum_list_capacity = INITIAL_LIST_SIZE;
