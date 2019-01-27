@@ -31,6 +31,7 @@ struct _RAY_TRACER {
 //
 
 static
+inline
 ISTATUS
 RayTracerValidateArugumentsAndTrace(
     _Inout_ PRAY_TRACER ray_tracer,
