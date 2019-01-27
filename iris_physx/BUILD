@@ -62,6 +62,18 @@ cc_library(
 )
 
 cc_library(
+    name = "color_integrator",
+    hdrs = ["color_integrator.h"],
+    srcs = ["color_integrator.c"],
+    deps = [
+        ":reflector",
+        ":spectrum",
+        "//common:safe_math",
+        "//iris_advanced:iris_advanced",
+    ],
+)
+
+cc_library(
     name = "color_matcher",
     hdrs = ["color_matcher.h"],
     srcs = ["color_matcher.c"],
