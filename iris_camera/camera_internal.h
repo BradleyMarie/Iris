@@ -38,6 +38,8 @@ struct _CAMERA {
 // Functions
 //
 
+static
+inline
 ISTATUS
 CameraGenerateRay(
     _In_ const struct _CAMERA *camera,
