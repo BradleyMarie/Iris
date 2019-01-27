@@ -107,6 +107,7 @@ cc_library(
     srcs = ["path_tracer.c"],
     deps = [
         ":sample_direct_lighting",
+        "//common:safe_math",
         "//iris_physx:iris_physx",
     ],
 )
