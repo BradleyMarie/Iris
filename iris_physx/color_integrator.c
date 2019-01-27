@@ -12,10 +12,9 @@ Abstract:
 
 --*/
 
-#include <stdlib.h>
-
 #include "common/safe_math.h"
 #include "iris_physx/color_integrator.h"
+#include "iris_physx/color_integrator_internal.h"
 
 //
 // Defines
@@ -23,85 +22,6 @@ Abstract:
 
 #define INITIAL_LIST_SIZE 16
 #define LIST_GROWTH_FACTOR 2
-
-//
-// Types
-//
-
-typedef struct _REFLECTOR_LIST_ENTRY {
-    PREFLECTOR reflector;
-    COLOR3 color;
-} REFLECTOR_LIST_ENTRY, *PREFLECTOR_LIST_ENTRY;
-
-typedef const REFLECTOR_LIST_ENTRY *PCREFLECTOR_LIST_ENTRY;
-
-typedef struct _SPECTRUM_LIST_ENTRY {
-    PSPECTRUM spectrum;
-    COLOR3 color;
-} SPECTRUM_LIST_ENTRY, *PSPECTRUM_LIST_ENTRY;
-
-typedef const SPECTRUM_LIST_ENTRY *PCSPECTRUM_LIST_ENTRY;
-
-struct _COLOR_INTEGRATOR {
-    PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE compute_spectrum_color_routine;
-    PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE compute_reflector_color_routine;
-    _Field_size_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY reflector_list;
-    _Field_size_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY spectrum_list;
-    size_t reflector_list_capacity;
-    size_t reflector_list_size;
-    size_t spectrum_list_capacity;
-    size_t spectrum_list_size;
-};
-
-//
-// Static Functions
-//
-
-static
-int
-ColorIntegratorCompareSpectrumEntry(
-    _In_ const void* left,
-    _In_ const void* right
-    )
-{
-    PCSPECTRUM_LIST_ENTRY left_entry = (PCSPECTRUM_LIST_ENTRY)left;
-    PCSPECTRUM_LIST_ENTRY right_entry = (PCSPECTRUM_LIST_ENTRY)right;
-
-    if (left_entry->spectrum < right_entry->spectrum)
-    {
-        return -1;
-    }
-
-    if (left_entry->spectrum > right_entry->spectrum)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-static
-int
-ColorIntegratorCompareReflectorEntry(
-    _In_ const void* left,
-    _In_ const void* right
-    )
-{
-    PCREFLECTOR_LIST_ENTRY left_entry = (PCREFLECTOR_LIST_ENTRY)left;
-    PCREFLECTOR_LIST_ENTRY right_entry = (PCREFLECTOR_LIST_ENTRY)right;
-
-    if (left_entry->reflector < right_entry->reflector)
-    {
-        return -1;
-    }
-
-    if (left_entry->reflector > right_entry->reflector)
-    {
-        return 1;
-    }
-
-    return 0;
-}
 
 //
 // Functions
@@ -179,6 +99,13 @@ ColorIntegratorPrecomputeSpectrumColor(
         return ISTATUS_SUCCESS;
     }
 
+    PCSPECTRUM_LIST_ENTRY old_entry =
+        ColorIntegratorFindSpectrumEntry(color_integrator, spectrum);
+    if (old_entry != NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     if (color_integrator->spectrum_list_size == color_integrator->spectrum_list_capacity)
     {
         size_t new_capacity;
@@ -249,6 +176,13 @@ ColorIntegratorPrecomputeReflectorColor(
     }
 
     if (reflector == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    PCREFLECTOR_LIST_ENTRY old_entry =
+        ColorIntegratorFindReflectorEntry(color_integrator, reflector);
+    if (old_entry != NULL)
     {
         return ISTATUS_SUCCESS;
     }
