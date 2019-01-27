@@ -40,14 +40,19 @@ PermutedCongruentialRandomGenerateFloat(
 {
     PPCG_RANDOM pcg_random = (PPCG_RANDOM)context;
 
-    double random_double = ldexp(pcg32_random_r(&pcg_random->state), -32);
-    double minumum_double = minimum;
-    double maximum_double = maximum;
-    double result_double = fma(maximum_double - minumum_double,
-                               random_double,
-                               minimum);
+    union {
+        uint32_t as_int;
+        float as_float;
+    } int_to_float;
 
-    *result = (float_t)result_double;
+    int_to_float.as_int = pcg32_random_r(&pcg_random->state);
+    int_to_float.as_int &= 0x7FFFFF;
+    int_to_float.as_int |= 0x3F800000;
+    int_to_float.as_float -= 1.0f;
+
+    *result = fma(maximum - minimum,
+                  (float_t)int_to_float.as_float,
+                  minimum);
 
     return ISTATUS_SUCCESS;
 }
