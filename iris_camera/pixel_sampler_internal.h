@@ -30,6 +30,8 @@ struct _PIXEL_SAMPLER {
 // Functions
 //
 
+static
+inline
 ISTATUS
 PixelSamplerPrepareSamples(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,
@@ -76,6 +78,8 @@ PixelSamplerPrepareSamples(
 
 _Check_return_
 _Success_(return == 0 || return == 1)
+static
+inline
 ISTATUS
 PixelSamplerNextSample(
     _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,
@@ -104,8 +108,8 @@ PixelSamplerNextSample(
     return status;
 }
 
-inline
 static
+inline
 ISTATUS
 PixelSamplerDuplicate(
     _In_ const struct _PIXEL_SAMPLER *pixel_sampler,

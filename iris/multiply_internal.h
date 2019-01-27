@@ -164,6 +164,8 @@ PointMatrixInverseMultiplyInline(
     return PointMatrixMultiplyInline(matrix->inverse, point);
 }
 
+static
+inline
 RAY
 RayMatrixMultiplyInline(
     _In_ const struct _MATRIX *matrix,
@@ -179,6 +181,8 @@ RayMatrixMultiplyInline(
     return RayCreate(transformed_origin, transformed_direction);
 }
 
+static
+inline
 RAY
 RayMatrixInverseMultiplyInline(
     _In_ const struct _MATRIX *matrix,

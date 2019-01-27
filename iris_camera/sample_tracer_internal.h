@@ -30,8 +30,8 @@ struct _SAMPLE_TRACER {
 // Functions
 //
 
-inline
 static
+inline
 ISTATUS
 SampleTracerTrace(
     _In_ struct _SAMPLE_TRACER *tracer,
@@ -58,8 +58,8 @@ SampleTracerTrace(
     return status;
 }
 
-inline
 static
+inline
 ISTATUS
 SampleTracerDuplicate(
     _In_ const struct _SAMPLE_TRACER *tracer,

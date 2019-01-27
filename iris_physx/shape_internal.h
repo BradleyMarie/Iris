@@ -151,6 +151,8 @@ ShapeSampleFaceBySolidAngle(
     return status;
 }
 
+static
+inline
 ISTATUS
 ShapeComputePdfBySolidAngle(
     _In_ PCSHAPE shape,
