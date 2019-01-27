@@ -90,6 +90,9 @@ ShapeRayTracerConfigure(
     shape_ray_tracer->trace_routine = trace_routine;
     shape_ray_tracer->trace_context = trace_context;
     shape_ray_tracer->minimum_distance = minimum_distance;
+
+    ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
+    BrdfAllocatorClear(&shape_ray_tracer->brdf_allocator);
 }
 
 static
@@ -102,19 +105,6 @@ ShapeRayTracerGetReflectorCompositor(
     assert(shape_ray_tracer != NULL);
 
     return &shape_ray_tracer->reflector_compositor;
-}
-
-static
-inline
-void
-ShapeRayTracerClear(
-    _Inout_ struct _SHAPE_RAY_TRACER *shape_ray_tracer
-    )
-{
-    assert(shape_ray_tracer != NULL);
-
-    ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
-    BrdfAllocatorClear(&shape_ray_tracer->brdf_allocator);
 }
 
 static

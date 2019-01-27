@@ -17,7 +17,14 @@ Abstract:
 
 #include <stdatomic.h>
 
+#include "iris_advanced/iris_advanced.h"
 #include "iris_physx/reflector_vtable.h"
+
+//
+// Forward Declarations
+//
+
+struct _COLOR_INTEGRATOR;
 
 //
 // Types
@@ -28,6 +35,21 @@ struct _REFLECTOR {
     void *data;
     atomic_uintmax_t reference_count;
 };
+
+typedef
+ISTATUS
+(*PREFLECTOR_COMPUTE_COLOR_ROUTINE)(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    );
+
+typedef struct _INTERNAL_REFLECTOR_VTABLE {
+    REFLECTOR_VTABLE reflector_vtable;
+    PREFLECTOR_COMPUTE_COLOR_ROUTINE compute_color_routine;
+} INTERNAL_REFLECTOR_VTABLE, *PINTERNAL_REFLECTOR_VTABLE;
+
+typedef const INTERNAL_REFLECTOR_VTABLE *PCINTERNAL_REFLECTOR_VTABLE;
 
 //
 // Functions
@@ -48,6 +70,23 @@ ReflectorInitialize(
     reflector->vtable = vtable;
     reflector->data = data;
     reflector->reference_count = 1;
+}
+
+static
+inline
+void
+InternalReflectorInitialize(
+    _Out_ struct _REFLECTOR *reflector,
+    _In_ PCINTERNAL_REFLECTOR_VTABLE vtable,
+    _In_opt_ void *data
+    )
+{
+    assert(reflector != NULL);
+    assert(vtable != NULL);
+
+    reflector->vtable = &vtable->reflector_vtable;
+    reflector->data = data;
+    reflector->reference_count = 0;
 }
 
 static

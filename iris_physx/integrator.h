@@ -59,6 +59,20 @@ IntegratorIntegrate(
     );
 
 ISTATUS
+IntegratorIntegrateSpectral(
+    _Inout_ PINTEGRATOR integrator,
+    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
+    _In_opt_ const void *trace_context,
+    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
+    _In_opt_ const void* sample_lights_context,
+    _In_ PCCOLOR_INTEGRATOR color_integrator,
+    _Inout_ PRANDOM rng,
+    _In_ RAY ray,
+    _In_ float_t epsilon,
+    _Out_ PCOLOR3 color
+    );
+
+ISTATUS
 IntegratorDuplicate(
     _In_ PCINTEGRATOR integrator,
     _Out_ PINTEGRATOR *duplicate

@@ -47,7 +47,7 @@ PhysxSampleTracerTraceRay(
 {
     PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
 
-    ISTATUS status = 
+    ISTATUS status =
         IntegratorIntegrate(physx_sample_tracer->integrator,
                             physx_sample_tracer->trace_routine,
                             physx_sample_tracer->trace_context,
@@ -58,6 +58,33 @@ PhysxSampleTracerTraceRay(
                             *ray,
                             epsilon,
                             color);
+
+    return status;
+}
+
+static
+ISTATUS
+PhysxSpectralSampleTracerTraceRay(
+    _In_opt_ void *context,
+    _In_ PCRAY ray,
+    _In_ PRANDOM rng,
+    _In_ float_t epsilon,
+    _Out_ PCOLOR3 color
+    )
+{
+    PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
+
+    ISTATUS status =
+        IntegratorIntegrateSpectral(physx_sample_tracer->integrator,
+                                    physx_sample_tracer->trace_routine,
+                                    physx_sample_tracer->trace_context,
+                                    physx_sample_tracer->sample_lights_routine,
+                                    physx_sample_tracer->sample_lights_context,
+                                    physx_sample_tracer->color_integrator,
+                                    rng,
+                                    *ray,
+                                    epsilon,
+                                    color);
 
     return status;
 }
@@ -98,6 +125,41 @@ PhysxSampleTracerDuplicate(
 }
 
 static
+ISTATUS
+PhysxSpectralSampleTracerDuplicate(
+    _In_opt_ const void *context,
+    _Out_ PSAMPLE_TRACER *duplicate
+    )
+{
+    PCPHYSX_SAMPLE_TRACER physx_sample_tracer = (PCPHYSX_SAMPLE_TRACER)context;
+
+    PINTEGRATOR integrator;
+    ISTATUS status = IntegratorDuplicate(physx_sample_tracer->integrator,
+                                         &integrator);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        PhysxSpectralSampleTracerAllocate(integrator,
+                                          physx_sample_tracer->trace_routine,
+                                          physx_sample_tracer->trace_context,
+                                          physx_sample_tracer->sample_lights_routine,
+                                          physx_sample_tracer->sample_lights_context,
+                                          physx_sample_tracer->color_integrator,
+                                          duplicate);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        IntegratorFree(integrator);
+    }
+
+    return status;
+}
+
+static
 void
 PhysxSampleTracerFree(
     _In_opt_ _Post_invalid_ void *context
@@ -108,22 +170,10 @@ PhysxSampleTracerFree(
     IntegratorFree(physx_sample_tracer->integrator);
 }
 
-//
-// Static Data
-//
-
-static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
-    PhysxSampleTracerTraceRay,
-    PhysxSampleTracerDuplicate,
-    PhysxSampleTracerFree
-};
-
-//
-// Functions
-//
-
+static
 ISTATUS
-PhysxSampleTracerAllocate(
+PhysxSampleTracerAllocateInternal(
+    _In_ PCSAMPLE_TRACER_VTABLE vtable,
     _In_ PINTEGRATOR integrator,
     _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
@@ -166,7 +216,7 @@ PhysxSampleTracerAllocate(
     physx_sample_tracer.sample_lights_context = sample_lights_context;
     physx_sample_tracer.color_integrator = color_integrator;
 
-    ISTATUS status = SampleTracerAllocate(&sample_tracer_vtable,
+    ISTATUS status = SampleTracerAllocate(vtable,
                                           &physx_sample_tracer,
                                           sizeof(PHYSX_SAMPLE_TRACER),
                                           alignof(PHYSX_SAMPLE_TRACER),
@@ -178,4 +228,72 @@ PhysxSampleTracerAllocate(
     }
 
     return ISTATUS_SUCCESS;
+}
+
+//
+// Static Data
+//
+
+static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
+    PhysxSampleTracerTraceRay,
+    PhysxSampleTracerDuplicate,
+    PhysxSampleTracerFree
+};
+
+static const SAMPLE_TRACER_VTABLE spectal_sample_tracer_vtable = {
+    PhysxSpectralSampleTracerTraceRay,
+    PhysxSpectralSampleTracerDuplicate,
+    PhysxSampleTracerFree
+};
+
+//
+// Functions
+//
+
+ISTATUS
+PhysxSampleTracerAllocate(
+    _In_ PINTEGRATOR integrator,
+    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
+    _In_opt_ const void *trace_context,
+    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
+    _In_opt_ const void* sample_lights_context,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
+    _Out_ PSAMPLE_TRACER *sample_tracer
+    )
+{
+    ISTATUS status =
+        PhysxSampleTracerAllocateInternal(&sample_tracer_vtable,
+                                          integrator,
+                                          trace_routine,
+                                          trace_context,
+                                          sample_lights_routine,
+                                          sample_lights_context,
+                                          color_integrator,
+                                          sample_tracer);
+
+    return status;
+}
+
+ISTATUS
+PhysxSpectralSampleTracerAllocate(
+    _In_ PINTEGRATOR integrator,
+    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
+    _In_opt_ const void *trace_context,
+    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
+    _In_opt_ const void* sample_lights_context,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
+    _Out_ PSAMPLE_TRACER *sample_tracer
+    )
+{
+    ISTATUS status =
+        PhysxSampleTracerAllocateInternal(&spectal_sample_tracer_vtable,
+                                          integrator,
+                                          trace_routine,
+                                          trace_context,
+                                          sample_lights_routine,
+                                          sample_lights_context,
+                                          color_integrator,
+                                          sample_tracer);
+
+    return status;
 }

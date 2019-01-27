@@ -56,7 +56,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
+    status = PathTracerAllocate(3, 5, (float_t)0.05, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -353,6 +353,7 @@ TEST(CornellBoxTest, CornellBox)
                              color_integrator,
                              "test_results/cornell_box.pfm");
 
+    EmissiveMaterialRelease(light_material);
     SpectrumRelease(light_spectrum);
     ReflectorRelease(white_reflector);
     ReflectorRelease(red_reflector);

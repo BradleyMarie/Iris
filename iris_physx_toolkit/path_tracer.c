@@ -15,6 +15,7 @@ Abstract:
 #include <stdalign.h>
 #include <stdlib.h>
 
+#include "common/safe_math.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_direct_lighting.h"
 
@@ -339,8 +340,15 @@ PathTracerAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
+    size_t num_spectra;
+    bool success = CheckedAddSizeT(max_bounces, 1, &num_spectra);
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     PCSPECTRUM *spectra = (PCSPECTRUM*)
-        calloc(max_bounces, sizeof(PCSPECTRUM));
+        calloc(num_spectra, sizeof(PCSPECTRUM));
 
     if (spectra == NULL)
     {

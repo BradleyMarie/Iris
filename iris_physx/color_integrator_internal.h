@@ -18,6 +18,8 @@ Abstract:
 #include <stdlib.h>
 
 #include "iris_physx/color_integrator_vtable.h"
+#include "iris_physx/reflector_internal.h"
+#include "iris_physx/spectrum_internal.h"
 
 //
 // Types
@@ -202,6 +204,96 @@ ColorIntegratorComputeReflectorColor(
     {
         *color = old_entry->color;
         return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status =
+        color_integrator->compute_reflector_color_routine(reflector, color);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ColorIntegratorComputeSpectrumColorFast(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_opt_ PCSPECTRUM spectrum,
+    _Out_ PCOLOR3 color
+    )
+{
+    assert(color_integrator != NULL);
+    assert(color != NULL);
+
+    if (spectrum == NULL)
+    {
+        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        return ISTATUS_SUCCESS;
+    }
+
+    PCSPECTRUM_LIST_ENTRY old_entry =
+        ColorIntegratorFindSpectrumEntry(color_integrator, spectrum);
+    if (old_entry != NULL)
+    {
+        *color = old_entry->color;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (spectrum->reference_count == 0)
+    {
+        PCINTERNAL_SPECTRUM_VTABLE internal_vtable =
+            (const void*)spectrum->vtable;
+
+        ISTATUS status =
+            internal_vtable->compute_color_routine(spectrum->data,
+                                                   color_integrator,
+                                                   color);
+
+        return status;
+    }
+
+    ISTATUS status =
+        color_integrator->compute_spectrum_color_routine(spectrum, color);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ColorIntegratorComputeReflectorColorFast(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    )
+{
+    assert(color_integrator != NULL);
+    assert(color != NULL);
+
+    if (reflector == NULL)
+    {
+        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        return ISTATUS_SUCCESS;
+    }
+
+    PCREFLECTOR_LIST_ENTRY old_entry =
+        ColorIntegratorFindReflectorEntry(color_integrator, reflector);
+    if (old_entry != NULL)
+    {
+        *color = old_entry->color;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (reflector->reference_count == 0)
+    {
+        PCINTERNAL_REFLECTOR_VTABLE internal_vtable =
+            (const void*)reflector->vtable;
+
+        ISTATUS status =
+            internal_vtable->compute_color_routine(reflector->data,
+                                                   color_integrator,
+                                                   color);
+
+        return status;
     }
 
     ISTATUS status =

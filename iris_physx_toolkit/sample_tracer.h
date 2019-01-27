@@ -37,6 +37,17 @@ PhysxSampleTracerAllocate(
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 
+ISTATUS
+PhysxSpectralSampleTracerAllocate(
+    _In_ PINTEGRATOR integrator,
+    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
+    _In_opt_ const void *trace_context,
+    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
+    _In_opt_ const void* sample_lights_context,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
+    _Out_ PSAMPLE_TRACER *sample_tracer
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus

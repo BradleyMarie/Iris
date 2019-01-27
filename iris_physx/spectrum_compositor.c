@@ -16,6 +16,7 @@ Abstract:
 
 #include <assert.h>
 
+#include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/reflector_internal.h"
 #include "iris_physx/spectrum_compositor_internal.h"
 
@@ -31,11 +32,6 @@ AttenuatedSpectrumSample(
     _Out_ float_t *intensity
     )
 {
-    assert(context != NULL);
-    assert(isfinite(wavelength));
-    assert((float_t)0.0 < wavelength);
-    assert(intensity != NULL);
-
     PCATTENUATED_SPECTRUM attenuated_spectrum = (PCATTENUATED_SPECTRUM) context;
 
     float_t output_intensity;
@@ -52,6 +48,31 @@ AttenuatedSpectrumSample(
     return ISTATUS_SUCCESS; 
 }
 
+ISTATUS
+AttenuatedSpectrumComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCATTENUATED_SPECTRUM attenuated_spectrum =
+        (PCATTENUATED_SPECTRUM)context;
+
+    ISTATUS status =
+        ColorIntegratorComputeSpectrumColorFast(color_integrator,
+                                                attenuated_spectrum->spectrum,
+                                                color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorScaleByScalar(*color, attenuated_spectrum->attenuation);
+
+    return ISTATUS_SUCCESS;
+}
+
 static
 ISTATUS
 SumSpectrumSample(
@@ -60,11 +81,6 @@ SumSpectrumSample(
     _Out_ float_t *intensity
     )
 {
-    assert(context != NULL);
-    assert(isfinite(wavelength));
-    assert((float_t)0.0 < wavelength);
-    assert(intensity != NULL);
-
     PCSUM_SPECTRUM sum_spectrum = (PCSUM_SPECTRUM) context;
 
     float_t intensity0;
@@ -91,6 +107,41 @@ SumSpectrumSample(
     return ISTATUS_SUCCESS; 
 }
 
+ISTATUS
+SumSpectrumComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCSUM_SPECTRUM sum_spectrum = (PCSUM_SPECTRUM) context;
+
+    COLOR3 result;
+    ISTATUS status =
+        ColorIntegratorComputeSpectrumColorFast(color_integrator,
+                                                sum_spectrum->spectrum0,
+                                                &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        ColorIntegratorComputeSpectrumColorFast(color_integrator,
+                                                sum_spectrum->spectrum1,
+                                                color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorAdd(result, *color);
+
+    return ISTATUS_SUCCESS;
+}
+
 static
 ISTATUS
 AttenuatedReflectionSpectrumSample(
@@ -99,11 +150,6 @@ AttenuatedReflectionSpectrumSample(
     _Out_ float_t *intensity
     )
 {
-    assert(context != NULL);
-    assert(isfinite(wavelength));
-    assert((float_t)0.0 < wavelength);
-    assert(intensity != NULL);
-
     PCATTENUATED_REFLECTION_SPECTRUM spectrum = 
         (PCATTENUATED_REFLECTION_SPECTRUM) context;
 
@@ -132,23 +178,60 @@ AttenuatedReflectionSpectrumSample(
     return ISTATUS_SUCCESS; 
 }
 
+ISTATUS
+AttenuatedReflectionSpectrumComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCATTENUATED_REFLECTION_SPECTRUM spectrum =
+        (PCATTENUATED_REFLECTION_SPECTRUM) context;
+
+    COLOR3 light_color;
+    ISTATUS status =
+        ColorIntegratorComputeSpectrumColorFast(color_integrator,
+                                                spectrum->spectrum,
+                                                &light_color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        ColorIntegratorComputeReflectorColorFast(color_integrator,
+                                                 spectrum->reflector,
+                                                 color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorScaleByColor(*color, light_color);
+    *color = ColorScaleByScalar(*color, spectrum->attenuation);
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Static Variables
 //
 
-const static SPECTRUM_VTABLE sum_spectrum_vtable = {
-    SumSpectrumSample,
-    NULL
+const static INTERNAL_SPECTRUM_VTABLE sum_spectrum_vtable = {
+    { SumSpectrumSample, NULL },
+    SumSpectrumComputeColor
 };
 
-const static SPECTRUM_VTABLE attenuated_spectrum_vtable = {
-    AttenuatedSpectrumSample,
-    NULL
+const static INTERNAL_SPECTRUM_VTABLE attenuated_spectrum_vtable = {
+    { AttenuatedSpectrumSample, NULL },
+    AttenuatedSpectrumComputeColor
 };
 
-const static SPECTRUM_VTABLE attenuated_reflection_spectrum_vtable = {
-    AttenuatedReflectionSpectrumSample,
-    NULL
+const static INTERNAL_SPECTRUM_VTABLE attenuated_reflection_spectrum_vtable = {
+    { AttenuatedReflectionSpectrumSample, NULL },
+    AttenuatedReflectionSpectrumComputeColor
 };
 
 //
@@ -194,9 +277,9 @@ AttenuatedSpectrumAllocate(
 
     PATTENUATED_SPECTRUM allocated_spectrum = (PATTENUATED_SPECTRUM) allocation;
 
-    SpectrumInitialize(&allocated_spectrum->header,
-                       &attenuated_spectrum_vtable,
-                       allocated_spectrum);
+    InternalSpectrumInitialize(&allocated_spectrum->header,
+                               &attenuated_spectrum_vtable,
+                               allocated_spectrum);
 
     allocated_spectrum->spectrum = spectrum;
     allocated_spectrum->attenuation = attenuation;
@@ -242,9 +325,9 @@ AttenuatedReflectionSpectrumAllocate(
     PATTENUATED_REFLECTION_SPECTRUM allocated_spectrum =
         (PATTENUATED_REFLECTION_SPECTRUM) allocation;
 
-    SpectrumInitialize(&allocated_spectrum->header,
-                       &attenuated_reflection_spectrum_vtable,
-                       allocated_spectrum);
+    InternalSpectrumInitialize(&allocated_spectrum->header,
+                               &attenuated_reflection_spectrum_vtable,
+                               allocated_spectrum);
 
     allocated_spectrum->spectrum = spectrum;
     allocated_spectrum->reflector = reflector;
@@ -301,9 +384,9 @@ SpectrumCompositorAddSpectra(
 
     PSUM_SPECTRUM allocated_spectrum = (PSUM_SPECTRUM)allocation;
 
-    SpectrumInitialize(&allocated_spectrum->header,
-                       &sum_spectrum_vtable,
-                       allocated_spectrum);
+    InternalSpectrumInitialize(&allocated_spectrum->header,
+                               &sum_spectrum_vtable,
+                               allocated_spectrum);
     allocated_spectrum->spectrum0 = spectrum0;
     allocated_spectrum->spectrum1 = spectrum1;
 
@@ -341,7 +424,7 @@ SpectrumCompositorAttenuateSpectrum(
         return ISTATUS_SUCCESS;
     }
 
-    if (spectrum->vtable == &attenuated_reflection_spectrum_vtable)
+    if (spectrum->vtable == (const void*)&attenuated_reflection_spectrum_vtable)
     {
         PCATTENUATED_REFLECTION_SPECTRUM spectrum0 =
             (PCATTENUATED_REFLECTION_SPECTRUM) spectrum;
@@ -356,7 +439,7 @@ SpectrumCompositorAttenuateSpectrum(
         return status;
     }
 
-    if (spectrum->vtable == &attenuated_spectrum_vtable)
+    if (spectrum->vtable == (const void*)&attenuated_spectrum_vtable)
     {
         PCATTENUATED_SPECTRUM spectrum0 =
             (PCATTENUATED_SPECTRUM) spectrum;

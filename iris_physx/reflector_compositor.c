@@ -17,6 +17,7 @@ Abstract:
 #include <assert.h>
 #include <string.h>
 
+#include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/reflector_compositor_internal.h"
 
 //
@@ -31,11 +32,6 @@ AttenuatedReflectorReflect(
     _Out_ float_t *reflectance
     )
 {
-    assert(context != NULL);
-    assert(isfinite(wavelength));
-    assert((float_t)0.0 < wavelength);
-    assert(reflectance != NULL);
-
     PCATTENUATED_REFLECTOR attenuated_reflector =
         (PCATTENUATED_REFLECTOR)context;
 
@@ -56,17 +52,60 @@ AttenuatedReflectorReflect(
 
 static
 ISTATUS
-AttenuatedReflectionReflectorReflect(
+AttenuatedReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *reflectance
+    )
+{
+    PCATTENUATED_REFLECTOR attenuated_reflector =
+        (PCATTENUATED_REFLECTOR)context;
+
+    ISTATUS Status = ReflectorGetAlbedoInline(attenuated_reflector->reflector,
+                                              reflectance);
+
+    if (Status != ISTATUS_SUCCESS)
+    {
+        return Status;
+    }
+
+    *reflectance *= attenuated_reflector->attenuation;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+AttenuatedReflectorComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCATTENUATED_REFLECTOR attenuated_reflector =
+        (PCATTENUATED_REFLECTOR)context;
+
+    ISTATUS status =
+        ColorIntegratorComputeReflectorColorFast(color_integrator,
+                                                 attenuated_reflector->reflector,
+                                                 color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorScaleByScalar(*color, attenuated_reflector->attenuation);
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+AttenuatedSumReflectorReflect(
     _In_ const void *context,
     _In_ float_t wavelength,
     _Out_ float_t *reflectance
     )
 {
-    assert(context != NULL);
-    assert(isfinite(wavelength));
-    assert((float_t)0.0 < wavelength);
-    assert(reflectance != NULL);
-
     PCATTENUATED_SUM_REFLECTOR reflector = (PCATTENUATED_SUM_REFLECTOR)context;
 
     float_t added_reflectance;
@@ -96,18 +135,89 @@ AttenuatedReflectionReflectorReflect(
     return ISTATUS_SUCCESS;
 }
 
+static
+ISTATUS
+AttenuatedSumReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *reflectance
+    )
+{
+    PCATTENUATED_SUM_REFLECTOR reflector = (PCATTENUATED_SUM_REFLECTOR)context;
+
+    float_t added_albedo;
+    ISTATUS status = ReflectorGetAlbedoInline(reflector->added_reflector,
+                                              &added_albedo);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorGetAlbedoInline(reflector->attenuated_reflector,
+                                      reflectance);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *reflectance = fma(reflector->attenuation,
+                       *reflectance,
+                       added_albedo);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+AttenuatedSumReflectorComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCATTENUATED_SUM_REFLECTOR attenuated_reflector =
+        (PCATTENUATED_SUM_REFLECTOR)context;
+
+    COLOR3 base;
+    ISTATUS status =
+        ColorIntegratorComputeReflectorColorFast(color_integrator,
+                                                 attenuated_reflector->added_reflector,
+                                                 &base);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        ColorIntegratorComputeReflectorColorFast(color_integrator,
+                                                 attenuated_reflector->attenuated_reflector,
+                                                 color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorAddScaled(base,
+                            *color,
+                            attenuated_reflector->attenuation);
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Static Variables
 //
 
-const static REFLECTOR_VTABLE attenuated_reflector_vtable = {
-    AttenuatedReflectorReflect,
-    NULL
+const static INTERNAL_REFLECTOR_VTABLE attenuated_reflector_vtable = {
+    { AttenuatedReflectorReflect, AttenuatedReflectorGetAlbedo },
+    AttenuatedReflectorComputeColor
 };
 
-const static REFLECTOR_VTABLE attenuated_sum_reflector_vtable = {
-    AttenuatedReflectionReflectorReflect,
-    NULL
+const static INTERNAL_REFLECTOR_VTABLE attenuated_sum_reflector_vtable = {
+    { AttenuatedSumReflectorReflect, AttenuatedSumReflectorGetAlbedo },
+    AttenuatedSumReflectorComputeColor
 };
 
 //
@@ -154,9 +264,9 @@ AttenuatedReflectorAllocate(
     PATTENUATED_REFLECTOR allocated_reflector =
         (PATTENUATED_REFLECTOR)allocation;
 
-    ReflectorInitialize(&allocated_reflector->header,
-                        &attenuated_reflector_vtable,
-                        allocated_reflector);
+    InternalReflectorInitialize(&allocated_reflector->header,
+                                &attenuated_reflector_vtable,
+                                allocated_reflector);
 
     allocated_reflector->reflector = reflector;
     allocated_reflector->attenuation = attenuation;
@@ -199,7 +309,7 @@ ReflectorCompositorAttenuateReflector(
         return ISTATUS_SUCCESS;
     }
 
-    if (reflector->vtable == &attenuated_reflector_vtable)
+    if (reflector->vtable == (const void*)&attenuated_reflector_vtable)
     {
         PCATTENUATED_REFLECTOR reflector0 =
             (PCATTENUATED_REFLECTOR) reflector;
@@ -262,7 +372,7 @@ ReflectorCompositorAttenuatedAddReflectors(
         return ISTATUS_SUCCESS;
     }
 
-    if (attenuated_reflector->vtable == &attenuated_reflector_vtable)
+    if (attenuated_reflector->vtable == (const void*)&attenuated_reflector_vtable)
     {
         PCATTENUATED_REFLECTOR reflector0 =
             (PCATTENUATED_REFLECTOR)attenuated_reflector;
@@ -289,9 +399,9 @@ ReflectorCompositorAttenuatedAddReflectors(
     PATTENUATED_SUM_REFLECTOR allocated_reflector =
         (PATTENUATED_SUM_REFLECTOR)allocation;
 
-    ReflectorInitialize(&allocated_reflector->header,
-                        &attenuated_sum_reflector_vtable,
-                        allocated_reflector);
+    InternalReflectorInitialize(&allocated_reflector->header,
+                                &attenuated_sum_reflector_vtable,
+                                allocated_reflector);
 
     allocated_reflector->added_reflector = added_reflector;
     allocated_reflector->attenuated_reflector = attenuated_reflector;

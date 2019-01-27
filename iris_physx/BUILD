@@ -77,6 +77,8 @@ cc_library(
     hdrs = ["color_integrator_internal.h"],
     deps = [
         ":color_integrator_vtable",
+        ":reflector_internal",
+        ":spectrum_internal",
     ],
 )
 
@@ -336,6 +338,7 @@ cc_library(
     hdrs = ["reflector_compositor.h"],
     srcs = ["reflector_compositor.c"],
     deps = [
+        ":color_integrator",
         ":reflector",
         ":reflector_compositor_internal",
         "//common:static_allocator",
@@ -377,6 +380,7 @@ cc_library(
     hdrs = ["reflector_internal.h"],
     deps = [
         ":reflector_vtable",
+        "//iris_advanced:iris_advanced",
     ],
 )
 
@@ -444,6 +448,7 @@ cc_library(
     hdrs = ["spectrum_compositor.h"],
     srcs = ["spectrum_compositor.c"],
     deps = [
+        ":color_integrator",
         ":reflector",
         ":reflector_internal",
         ":spectrum",
@@ -488,6 +493,7 @@ cc_library(
     hdrs = ["spectrum_internal.h"],
     deps = [
         ":spectrum_vtable",
+        "//iris_advanced:iris_advanced",
     ],
 )
 

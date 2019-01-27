@@ -1922,6 +1922,9 @@ static const float_t cie_z_bar[] = {
     (float_t)0.0 * (float_t)0.5
 };
 
+const static float_t cie_y_integral =
+    (float_t)106.85691491676691100565221859142184257507324218750;
+
 //
 // Static Functions
 //
@@ -1966,8 +1969,34 @@ CieColorIntegratorComputeReflectorColor(
     _Out_ PCOLOR3 color
     )
 {
-    // TODO: IMPLEMENT
-    *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+    float_t x = (float_t)0.0;
+    float_t y = (float_t)0.0;
+    float_t z = (float_t)0.0;
+
+    // The values of cie_x_bar, cie_y_bar, and cie_z_bar have been adjusted
+    // so that this computes the riemann sum using the trapezoidal rule.
+    for (uint16_t i = 0; i < NUM_CIE_SAMPLES; i++)
+    {
+        float_t intensity;
+        ISTATUS status = ReflectorReflect(reflector,
+                                          cie_wavelengths[i],
+                                          &intensity);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        x = fma(intensity, cie_x_bar[i], x);
+        y = fma(intensity, cie_y_bar[i], y);
+        z = fma(intensity, cie_z_bar[i], z);
+    }
+
+    x /= cie_y_integral;
+    y /= cie_y_integral;
+    z /= cie_y_integral;
+
+    *color = ColorCreate(x, y, z);
 
     return ISTATUS_SUCCESS;
 }
