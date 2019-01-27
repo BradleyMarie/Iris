@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:private"])
 cc_test(
     name = "cornell_box",
     srcs = ["cornell_box.cc"],
+    linkstatic = 1,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",

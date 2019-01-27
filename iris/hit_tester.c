@@ -56,6 +56,7 @@ HitTesterCollectHitsAndUpdateSharedHit(
 }
 
 static
+inline
 ISTATUS
 HitTesterTestWorldInternal(
     _Inout_ PHIT_TESTER hit_tester,
