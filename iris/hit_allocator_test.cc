@@ -34,7 +34,11 @@ TEST(HitAllocatorTest, HitAllocatorSetRayGetRay)
     HIT_ALLOCATOR allocator;
     HitAllocatorInitialize(&allocator);
 
-    RAY model_ray;
+    POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    VECTOR3 direction = VectorCreate((float_t) 4.0,
+                                     (float_t) 5.0,
+                                     (float_t) 6.0);
+    RAY model_ray = RayCreate(origin, direction);
     HitAllocatorSetRay(&allocator, &model_ray);
     EXPECT_EQ(&model_ray, HitAllocatorGetRay(&allocator));
 

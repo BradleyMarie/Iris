@@ -40,15 +40,15 @@ NestedCheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
     const NestedParams* param = static_cast<const NestedParams *>(data);
     EXPECT_EQ(param->data, data);
     EXPECT_EQ(param->ray, *ray);
-    EXPECT_EQ(nullptr, *hits);
     *param->triggered = true;
 
+    *hits = NULL;
     if (!param->distances.empty())
     {
         size_t current_depth = *param->nest_count;
@@ -97,14 +97,15 @@ CheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
     const ValidationParams* param = static_cast<const ValidationParams *>(data);
     EXPECT_EQ(param->data, data);
     EXPECT_EQ(param->ray, *ray);
     EXPECT_TRUE(hit_allocator);
-    EXPECT_EQ(nullptr, *hits);
+    *hits = NULL;
+
     *param->triggered = true;
 
     bool triggered = false;
@@ -467,7 +468,7 @@ AllocateHitAtDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
     const float_t* distance = (const float_t*)data;
@@ -532,7 +533,7 @@ AllocateTwoHitAtDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
     const float_t* distance = (const float_t*)data;
@@ -563,9 +564,10 @@ AllocateNoHits(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
+    *hits = NULL;
     return ISTATUS_SUCCESS;
 }
 

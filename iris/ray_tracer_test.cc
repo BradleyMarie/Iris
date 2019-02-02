@@ -34,7 +34,7 @@ AllocateHitRoutine(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Pre_null_ _Outptr_result_maybenull_ PHIT *hits
+    _Outptr_result_maybenull_ PHIT *hits
     )
 {
     auto hit_data = static_cast<const HitData*>(data);

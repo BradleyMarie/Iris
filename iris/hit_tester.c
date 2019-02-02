@@ -71,7 +71,7 @@ HitTesterTestWorldInternal(
     HitAllocatorSetRay(&hit_tester->hit_allocator, &hit_tester->world_ray);
     HitAllocatorSetData(&hit_tester->hit_allocator, hit_data);
 
-    PHIT hit = NULL;
+    PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   &hit_tester->world_ray,
                                   &hit_tester->hit_allocator,
@@ -168,7 +168,7 @@ HitTesterTestPremultipliedGeometry(
     HitAllocatorSetRay(&hit_tester->hit_allocator, &hit_tester->world_ray);
     HitAllocatorSetData(&hit_tester->hit_allocator, hit_data);
 
-    PHIT hit = NULL;
+    PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   &hit_tester->world_ray,
                                   &hit_tester->hit_allocator,
@@ -243,7 +243,7 @@ HitTesterTestTransformedGeometry(
     HitAllocatorSetRay(&hit_tester->hit_allocator, &trace_ray);
     HitAllocatorSetData(&hit_tester->hit_allocator, hit_data);
 
-    PHIT hit = NULL;
+    PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   &trace_ray,
                                   &hit_tester->hit_allocator,
@@ -312,7 +312,7 @@ HitTesterTestNestedGeometry(
     const void *original_data = HitAllocatorGetData(hit_allocator);
     HitAllocatorSetData(hit_allocator, hit_data);
 
-    PHIT hit = NULL;
+    PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   model_ray,
                                   hit_allocator,
