@@ -102,7 +102,6 @@ PointLightSample(
 
     if (!visible)
     {
-        *spectrum = NULL;
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
@@ -150,7 +149,6 @@ PointLightComputeEmissiveWithPdf(
     _Out_ float_t *pdf
     )
 {
-    *spectrum = NULL;
     *pdf = (float_t)0.0;
 
     return ISTATUS_SUCCESS;

@@ -2147,7 +2147,6 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2216,7 +2215,6 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2288,7 +2286,6 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2357,7 +2354,6 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2809,7 +2805,6 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2878,7 +2873,6 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2950,7 +2944,6 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3019,7 +3012,6 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3661,7 +3653,6 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3730,7 +3721,6 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3802,7 +3792,6 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_BACK_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3871,7 +3860,6 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
     status = AreaLightAllocate(
         shape,
         TRIANGLE_FRONT_FACE,
-        nullptr,
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

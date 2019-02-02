@@ -88,17 +88,15 @@ DirectionalLightSample(
         return status;
     }
 
-    *to_light = directional_light->to_light;
-
-    if (visible)
+    if (!visible)
     {
-        *spectrum = directional_light->spectrum;
-        *pdf = (float_t)INFINITY;
+        *pdf = (float_t)0.0;
     }
     else
     {
-        *spectrum = NULL;
-        *pdf = (float_t)0.0;
+        *to_light = directional_light->to_light;
+        *spectrum = directional_light->spectrum;
+        *pdf = (float_t)INFINITY;
     }
 
     return ISTATUS_SUCCESS;
@@ -130,7 +128,6 @@ DirectionalLightComputeEmissiveWithPdf(
     _Out_ float_t *pdf
     )
 {
-    *spectrum = NULL;
     *pdf = (float_t)0.0;
 
     return ISTATUS_SUCCESS;

@@ -267,6 +267,11 @@ SampleDirectLighting(
             return status;
         }
     }
+    else
+    {
+        light_sampled_spectrum = NULL;
+    }
+
 
     if (brdf_sampled_pdf == (float_t)0.0)
     {

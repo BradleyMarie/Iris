@@ -25,7 +25,6 @@ Abstract:
 
 typedef struct _AREA_LIGHT {
     PCEMISSIVE_MATERIAL emissive_material;
-    PMATRIX model_to_world;
     PSHAPE shape;
     uint32_t face;
 } AREA_LIGHT, *PAREA_LIGHT;
@@ -55,9 +54,9 @@ VisibilityTesterProcessHitAreaLight(
     PAREA_LIGHT_AND_RESULTS area_light_and_results =
         (PAREA_LIGHT_AND_RESULTS)context;
 
-    if (area_light_and_results->area_light->shape == (PSHAPE)hit_context->data &&
-        area_light_and_results->area_light->model_to_world == model_to_world &&
-        area_light_and_results->area_light->face == hit_context->front_face)
+    if ((PSHAPE)hit_context->data == area_light_and_results->area_light->shape &&
+        model_to_world == NULL &&
+        hit_context->front_face == area_light_and_results->area_light->face)
     {
         ISTATUS status = 
             EmissiveMaterialSample(area_light_and_results->area_light->emissive_material,
@@ -126,12 +125,9 @@ AreaLightSample(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
-    POINT3 model_hit = PointMatrixInverseMultiply(area_light->model_to_world,
-                                                  hit_point);
-
     POINT3 sampled_point;
     ISTATUS status = ShapeSampleFaceBySolidAngle(area_light->shape,
-                                                 model_hit,
+                                                 hit_point,
                                                  area_light->face,
                                                  rng,
                                                  &sampled_point,
@@ -142,21 +138,27 @@ AreaLightSample(
         return status;
     }
 
-    sampled_point = PointMatrixMultiply(area_light->model_to_world,
-                                        sampled_point);
-
-    VECTOR3 direction_to_light = PointSubtract(sampled_point, hit_point);
-    direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
-
-    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
-    if (*pdf == (float_t)0.0 || isinf(*pdf) || dp <= (float_t)0.0)
+    if (isinf(*pdf))
     {
         *pdf = (float_t)0.0;
-        *spectrum = NULL;
-        *to_light = direction_to_light;
         return ISTATUS_SUCCESS;
     }
 
+    if (*pdf == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    VECTOR3 direction_to_light = PointSubtract(sampled_point, hit_point);
+
+    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
+    if (dp <= (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
+    direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
     RAY ray_to_light = RayCreate(hit_point, direction_to_light);
 
     POINT3 point_on_light;
@@ -169,11 +171,6 @@ AreaLightSample(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
-    }
-
-    if (*spectrum == NULL)
-    {
-        *pdf = (float_t)0.0;
     }
 
     *to_light = direction_to_light;
@@ -238,16 +235,8 @@ AreaLightComputeEmissiveWithPdf(
     float_t distance_squared = VectorDotProduct(to_light_vector,
                                                 to_light_vector);
 
-    // TODO: Preserve model ray to avoid recomputing this.
-    RAY model_to_light = RayMatrixInverseMultiply(area_light->model_to_world,
-                                                  *to_light);
-
-    model_to_light.direction = VectorNormalize(model_to_light.direction,
-                                               NULL,
-                                               NULL);
-
     status = ShapeComputePdfBySolidAngle(area_light->shape,
-                                         &model_to_light,
+                                         to_light,
                                          distance_squared,
                                          area_light->face,
                                          pdf);
@@ -263,7 +252,6 @@ AreaLightFree(
 {
     PAREA_LIGHT area_light = (PAREA_LIGHT)context;
 
-    MatrixRelease(area_light->model_to_world);
     ShapeRelease(area_light->shape);
 }
 
@@ -286,7 +274,6 @@ ISTATUS
 AreaLightAllocate(
     _In_ PSHAPE shape,
     _In_ uint32_t face,
-    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     )
 {
@@ -300,7 +287,7 @@ AreaLightAllocate(
 
     if (light == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     PCEMISSIVE_MATERIAL emissive_material;
@@ -318,7 +305,6 @@ AreaLightAllocate(
 
     AREA_LIGHT area_light;
     area_light.emissive_material = emissive_material;
-    area_light.model_to_world = model_to_world;
     area_light.shape = shape;
     area_light.face = face;
 
@@ -329,7 +315,6 @@ AreaLightAllocate(
                            light);
 
     ShapeRetain(shape);
-    MatrixRetain(model_to_world);
 
     return status;
 }
