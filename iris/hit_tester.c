@@ -77,6 +77,11 @@ HitTesterTestWorldInternal(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
+    if (status == ISTATUS_NO_RESULT)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     if (status != ISTATUS_SUCCESS)
     {
         return status;
@@ -169,6 +174,11 @@ HitTesterTestPremultipliedGeometry(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
+    if (status == ISTATUS_NO_RESULT)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     if (status != ISTATUS_SUCCESS)
     {
         return status;
@@ -239,6 +249,11 @@ HitTesterTestTransformedGeometry(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
+    if (status == ISTATUS_NO_RESULT)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     if (status != ISTATUS_SUCCESS)
     {
         return status;
@@ -308,7 +323,12 @@ HitTesterTestNestedGeometry(
     if (status == ISTATUS_SUCCESS)
     {
         *hits = hit;
-    }    
-    
+    }
+
+    if (status == ISTATUS_NO_RESULT)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     return status;
 }

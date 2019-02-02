@@ -211,6 +211,15 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
+    params.status_to_return = ISTATUS_NO_RESULT;
+    status = HitTesterTestGeometry(&tester,
+                                   CheckGeometryContext,
+                                   &params,
+                                   nullptr);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_TRUE(triggered);
+
+    triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
     status = HitTesterTestGeometry(&tester,
                                    CheckGeometryContext,
@@ -279,6 +288,16 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
+    params.status_to_return = ISTATUS_NO_RESULT;
+    status = HitTesterTestPremultipliedGeometry(&tester,
+                                                CheckGeometryContext,
+                                                &params,
+                                                nullptr,
+                                                nullptr);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_TRUE(triggered);
+
+    triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
@@ -290,6 +309,16 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
 
     triggered = false;
     params.status_to_return = ISTATUS_SUCCESS;
+    status = HitTesterTestPremultipliedGeometry(&tester,
+                                                CheckGeometryContext,
+                                                &params,
+                                                nullptr,
+                                                model_to_world);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_TRUE(triggered);
+
+    triggered = false;
+    params.status_to_return = ISTATUS_NO_RESULT;
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -370,6 +399,17 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
+    params.status_to_return = ISTATUS_NO_RESULT;
+
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              nullptr);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_TRUE(params.triggered);
+
+    triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
 
     status = HitTesterTestTransformedGeometry(&tester,
@@ -390,6 +430,16 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
 
     triggered = false;
     params.status_to_return = ISTATUS_SUCCESS;
+    status = HitTesterTestTransformedGeometry(&tester,
+                                              CheckGeometryContext,
+                                              &params,
+                                              nullptr,
+                                              model_to_world);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_TRUE(triggered);
+
+    triggered = false;
+    params.status_to_return = ISTATUS_NO_RESULT;
     status = HitTesterTestTransformedGeometry(&tester,
                                               CheckGeometryContext,
                                               &params,

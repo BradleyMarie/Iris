@@ -24,6 +24,8 @@ Abstract:
 //
 
 typedef
+_Check_return_
+_Success_(return == 0 || return == 1)
 ISTATUS
 (*PSHAPE_TRACE_ROUTINE)(
     _In_ const void *context,

@@ -52,7 +52,7 @@ SphereTrace(
     // No intersections are possible.
     if (distance_to_chord_midpoint < (float_t)0.0)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_NO_RESULT;
     }
 #endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
         
@@ -62,7 +62,7 @@ SphereTrace(
     // Ray begins inside the sphere. No intersections are possible.
     if (distance_to_center_squared < sphere->radius_squared)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_NO_RESULT;
     }
 #endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
@@ -74,7 +74,7 @@ SphereTrace(
     // The ray completely misses the sphere. No intersections are possible.
     if (sphere->radius_squared < distance_from_chord_to_center_squared)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_NO_RESULT;
     }
 
     float_t half_chord_length = 
@@ -136,9 +136,11 @@ SphereTrace(
             return status;
         }
     }
-#endif // CONSTRUCTIVE_SOLID_GEOMETRY
+#endif
 
     float_t closer_hit = distance_to_chord_midpoint - half_chord_length;
+
+#ifdef CONSTRUCTIVE_SOLID_GEOMETRY
     ISTATUS status = ShapeHitAllocatorAllocate(allocator,
                                                *hit,
                                                closer_hit,
@@ -148,6 +150,17 @@ SphereTrace(
                                                0,
                                                0,
                                                hit);
+#else
+    ISTATUS status = ShapeHitAllocatorAllocate(allocator,
+                                               NULL,
+                                               closer_hit,
+                                               SPHERE_FRONT_FACE,
+                                               SPHERE_BACK_FACE,
+                                               NULL,
+                                               0,
+                                               0,
+                                               hit);
+#endif // CONSTRUCTIVE_SOLID_GEOMETRY
 
     return status;
 }
