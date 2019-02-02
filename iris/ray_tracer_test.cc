@@ -246,11 +246,6 @@ ProcessHitRoutine(
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->front_face);
     EXPECT_EQ((uint32_t)hit_context->distance, hit_context->back_face);
 
-    if (process_data->last_hit_to_process < process_data->hits_processed)
-    {
-        return ISTATUS_DONE;
-    }
-
     return ISTATUS_SUCCESS;
 }
 
@@ -330,11 +325,6 @@ ProcessHitWithCoordinatesRoutine(
     else
     {
         ADD_FAILURE();
-    }
-    
-    if (process_data->last_hit_to_process < process_data->hits_processed)
-    {
-        return ISTATUS_DONE;
     }
     
     return ISTATUS_SUCCESS;
@@ -666,180 +656,6 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinates)
                                                      &process_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(1u, process_data.hits_processed);
-
-    RayTracerFree(ray_tracer);
-    FreeGeometryData(&geometry_data);
-}
-
-TEST(RayTracerTest, RayTracerTraceAllHitsErrors)
-{
-    PRAY_TRACER ray_tracer;
-    EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
-    auto geometry_data = AllocateGeometryData();
-
-    RAY ray = CreateWorldRay();
-
-    float_t minimum_distance = 0.0;
-
-    ISTATUS status = RayTracerTraceAllHits(nullptr,
-                                           ray,
-                                           minimum_distance,
-                                           TraceSceneRoutine,
-                                           &geometry_data,
-                                           ProcessHitWithCoordinatesRoutine,
-                                           nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
-
-    ray.origin.x = INFINITY;
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
-    ray.origin.x = (float_t)4.0;
-
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   (float_t)-1.0f,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
-
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   INFINITY,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   nullptr,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   nullptr,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_05, status);
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutineReturnError,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_29, status);
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutineReturnError,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutineReturnError,
-                                   nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
-
-    RayTracerFree(ray_tracer);
-    FreeGeometryData(&geometry_data);
-}
-
-TEST(RayTracerTest, RayTracerTraceAllHitsEmpty)
-{
-    PRAY_TRACER ray_tracer;
-    EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
-
-    RAY ray = CreateWorldRay();
-
-    float_t minimum_distance = 0.0;
-    
-    ISTATUS status = RayTracerTraceAllHits(ray_tracer,
-                                           ray,
-                                           minimum_distance,
-                                           TraceSceneRoutineEmpty,
-                                           nullptr,
-                                           ProcessHitWithCoordinatesRoutineReturnError,
-                                           nullptr);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-
-    RayTracerFree(ray_tracer);
-}
-
-TEST(RayTracerTest, RayTracerTraceAllHits)
-{
-    PRAY_TRACER ray_tracer;
-    EXPECT_EQ(ISTATUS_SUCCESS, RayTracerAllocate(&ray_tracer));
-    auto geometry_data = AllocateGeometryData();
-
-    RAY ray = CreateWorldRay();
-
-    float_t minimum_distance = 0.0;
-    ProcessHitData process_data;
-    process_data.scalar_dist_1 = geometry_data[5].matrix;
-    process_data.scalar_dist_2 = geometry_data[4].matrix;
-    process_data.translation_dist_5 = geometry_data[1].matrix;
-    process_data.translation_dist_6 = geometry_data[0].matrix;
-    process_data.hits_processed = 0;
-    process_data.last_hit_to_process = 6;
-    process_data.sorted = true;
-    process_data.distance = 1.0;
-    
-    ISTATUS status = RayTracerTraceAllHits(ray_tracer,
-                                           ray,
-                                           minimum_distance,
-                                           TraceSceneRoutine,
-                                           &geometry_data,
-                                           ProcessHitWithCoordinatesRoutine,
-                                           &process_data);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_EQ(6u, process_data.hits_processed);
-    
-    minimum_distance = 1.5;
-    process_data.hits_processed = 0;
-    process_data.last_hit_to_process = 6;
-    process_data.sorted = true;
-    process_data.distance = 2.0;
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   &process_data);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_EQ(5u, process_data.hits_processed);
-    
-    minimum_distance = 0.0;
-    process_data.hits_processed = 0;
-    process_data.last_hit_to_process = 2;
-    process_data.sorted = true;
-    process_data.distance = 1.0;
-    
-    status = RayTracerTraceAllHits(ray_tracer,
-                                   ray,
-                                   minimum_distance,
-                                   TraceSceneRoutine,
-                                   &geometry_data,
-                                   ProcessHitWithCoordinatesRoutine,
-                                   &process_data);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_EQ(3u, process_data.hits_processed);
 
     RayTracerFree(ray_tracer);
     FreeGeometryData(&geometry_data);

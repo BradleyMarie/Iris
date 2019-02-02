@@ -40,7 +40,6 @@ VisibilityTesterProcessHit(
     if (hit_context->distance <= distance_and_result->distance)
     {
         *distance_and_result->visible = false;
-        return ISTATUS_DONE;
     }
     
     return ISTATUS_SUCCESS;
@@ -57,7 +56,7 @@ VisibilityTesterProcessHitAnyDistance(
 
     *visible = false;
     
-    return ISTATUS_DONE;
+    return ISTATUS_SUCCESS;
 }
 
 //

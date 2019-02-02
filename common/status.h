@@ -20,7 +20,6 @@ Abstract:
 typedef _Return_type_success_(return == 0) enum _ISTATUS {
     ISTATUS_SUCCESS           = 0x00,
     ISTATUS_NO_RESULT         = 0x01,
-    ISTATUS_DONE              = 0x01,
     ISTATUS_ALLOCATION_FAILED = 0x02,
     ISTATUS_ARITHMETIC_ERROR  = 0x03,
     ISTATUS_INTEGER_OVERFLOW  = 0x04,

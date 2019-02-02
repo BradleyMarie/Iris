@@ -249,11 +249,6 @@ RayTracerTraceClosestHit(
 
     status = process_hit_routine(process_hit_context, &closest->context);
 
-    if (status == ISTATUS_DONE)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
     return status;
 }
 
@@ -297,63 +292,7 @@ RayTracerTraceClosestHitWithCoordinates(
                                             process_hit_routine,
                                             process_hit_context);
 
-    if (status == ISTATUS_DONE)
-    {
-        return ISTATUS_SUCCESS;
-    }
-    
     return status;
-}
-
-ISTATUS
-RayTracerTraceAllHits(
-    _Inout_ PRAY_TRACER ray_tracer,
-    _In_ RAY ray,
-    _In_ float_t minimum_distance,
-    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
-    _In_opt_ const void *trace_context,
-    _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
-    _Inout_opt_ void *process_hit_context
-    )
-{
-    ISTATUS status = RayTracerValidateArugumentsAndTrace(ray_tracer,
-                                                         ray,
-                                                         minimum_distance,
-                                                         trace_routine,
-                                                         trace_context,
-                                                         process_hit_routine,
-                                                         process_hit_context);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    HitTesterSortHits(&ray_tracer->hit_tester);
-
-    PCFULL_HIT_CONTEXT *hits;
-    size_t num_hits;
-    HitTesterGetHits(&ray_tracer->hit_tester, &hits, &num_hits);
-
-    for (size_t i = 0; i < num_hits; i++)
-    {
-        status = RayTracerProcessHitWithContext(ray,
-                                                hits[i],
-                                                process_hit_routine,
-                                                process_hit_context);
-
-        if (status == ISTATUS_DONE)
-        {
-            break;
-        }
-        
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-    }
-    
-    return ISTATUS_SUCCESS;
 }
 
 void

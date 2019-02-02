@@ -33,8 +33,6 @@ ISTATUS
     );
 
 typedef
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 (*PRAY_TRACER_PROCESS_HIT_ROUTINE)(
     _Inout_opt_ void *context, 
@@ -42,8 +40,6 @@ ISTATUS
     );
     
 typedef
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 (*PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE)(
     _Inout_opt_ void *context, 
@@ -78,17 +74,6 @@ RayTracerTraceClosestHit(
 
 ISTATUS
 RayTracerTraceClosestHitWithCoordinates(
-    _Inout_ PRAY_TRACER ray_tracer,
-    _In_ RAY ray,
-    _In_ float_t minimum_distance,
-    _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
-    _In_opt_ const void *trace_context,
-    _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
-    _Inout_opt_ void *process_hit_context
-    );
-
-ISTATUS
-RayTracerTraceAllHits(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,

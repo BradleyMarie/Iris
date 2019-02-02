@@ -151,6 +151,11 @@ GridPixelSamplerNextSample(
 {
     PGRID_PIXEL_SAMPLER pixel_sampler = (PGRID_PIXEL_SAMPLER)context;
 
+    if (pixel_sampler->pixel_index_u == pixel_sampler->current_pixel_samples_u)
+    {
+        return ISTATUS_NO_RESULT;
+    }
+
     float_t pixel_jitter_u, pixel_jitter_v;
     if (pixel_sampler->jitter_pixel_samples)
     {
@@ -267,10 +272,9 @@ GridPixelSamplerNextSample(
     if (pixel_sampler->pixel_index_u < pixel_sampler->current_pixel_samples_u)
     {
         pixel_sampler->pixel_current_u += pixel_sampler->pixel_sample_width_u;
-        return ISTATUS_SUCCESS;
     }
 
-    return ISTATUS_DONE;
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS

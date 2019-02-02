@@ -93,26 +93,31 @@ PathTracerIntegrate(
             break;
         }
 
-        ISTATUS sampler_status = LightSamplerCollectSamples(light_sampler,
-                                                            rng,
-                                                            hit_point);
+        status = LightSamplerCollectSamples(light_sampler,
+                                            rng,
+                                            hit_point);
 
-        if (ISTATUS_DONE < sampler_status)
+        if (status != ISTATUS_SUCCESS)
         {
-            return sampler_status;
+            return status;
         }
 
-        while (sampler_status == ISTATUS_SUCCESS)
+        for (;;)
         {
             PCLIGHT light;
             float_t pdf;
-            sampler_status = LightSamplerNextSample(light_sampler,
-                                                    &light,
-                                                    &pdf);
+            status = LightSamplerNextSample(light_sampler,
+                                            &light,
+                                            &pdf);
 
-            if (ISTATUS_DONE < sampler_status)
+            if (status == ISTATUS_NO_RESULT)
             {
-                return sampler_status;
+                break;
+            }
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
             }
 
             if (pdf == (float_t)0.0)

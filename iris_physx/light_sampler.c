@@ -50,20 +50,7 @@ LightSamplerCollectSamples(
         rng,
         &light_sampler->collector);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    size_t num_samples =
-        LightSampleCollectorGetSampleCount(&light_sampler->collector);
-
-    if (num_samples == 0)
-    {
-        return ISTATUS_DONE;
-    }
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 _Check_return_
@@ -93,6 +80,11 @@ LightSamplerNextSample(
     size_t num_samples =
         LightSampleCollectorGetSampleCount(&light_sampler->collector);
 
+    if (num_samples == light_sampler->sample_index)
+    {
+        return ISTATUS_NO_RESULT;
+    }
+
     if (num_samples <= light_sampler->sample_index)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -104,11 +96,6 @@ LightSamplerNextSample(
                                   pdf);
 
     light_sampler->sample_index += 1;
-
-    if (num_samples == light_sampler->sample_index)
-    {
-        return ISTATUS_DONE;
-    }
 
     return ISTATUS_SUCCESS;
 }

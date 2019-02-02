@@ -194,7 +194,7 @@ IrisCameraRenderPixel(
     }
 
     COLOR3 pixel_color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-    size_t num_samples = 1;
+    size_t num_samples = 0;
 
     for (;;)
     {
@@ -207,20 +207,27 @@ IrisCameraRenderPixel(
         }
 
         float_t pixel_u, pixel_v, lens_u, lens_v;
-        ISTATUS sampler_status =
+        ISTATUS status =
             PixelSamplerNextSample(context->local.pixel_sampler,
                                    context->local.rng,
                                    &pixel_u,
                                    &pixel_v,
                                    &lens_u,
                                    &lens_v);
-        
-        if (ISTATUS_DONE < sampler_status)
+
+        if (status == ISTATUS_NO_RESULT)
+        {
+            break;
+        }
+
+        if (status != ISTATUS_SUCCESS)
         {
             atomic_store(&context->shared->cancelled, true);
-            context->local.status = sampler_status;
+            context->local.status = status;
             return false;
         }
+
+        num_samples += 1;
 
         RAY ray;
         status = CameraGenerateRay(context->shared->camera,
@@ -233,7 +240,7 @@ IrisCameraRenderPixel(
         if (status != ISTATUS_SUCCESS)
         {
             atomic_store(&context->shared->cancelled, true);
-            context->local.status = sampler_status;
+            context->local.status = status;
             return false;
         }
 
@@ -247,27 +254,23 @@ IrisCameraRenderPixel(
         if (status != ISTATUS_SUCCESS)
         {
             atomic_store(&context->shared->cancelled, true);
-            context->local.status = sampler_status;
+            context->local.status = status;
             return false;
         }
 
         pixel_color = ColorAdd(pixel_color, sample_color);
-
-        if (sampler_status == ISTATUS_DONE)
-        {
-            break;
-        }
-
-        num_samples += 1;
     }
 
-    float_t sample_weight = (float_t)1.0 / (float_t)num_samples;
-    pixel_color = ColorScaleByScalar(pixel_color, sample_weight);
+    if (num_samples != 0)
+    {
+        float_t sample_weight = (float_t)1.0 / (float_t)num_samples;
+        pixel_color = ColorScaleByScalar(pixel_color, sample_weight);
 
-    FramebufferSetPixel(context->shared->framebuffer,
-                        pixel_column,
-                        pixel_row,
-                        pixel_color);
+        FramebufferSetPixel(context->shared->framebuffer,
+                            pixel_column,
+                            pixel_row,
+                            pixel_color);
+    }
 
     return true;
 }

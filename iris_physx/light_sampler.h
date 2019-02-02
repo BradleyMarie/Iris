@@ -29,8 +29,6 @@ typedef const LIGHT_SAMPLER *PCLIGHT_SAMPLER;
 // Functions
 //
 
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS
 LightSamplerCollectSamples(
     _Inout_ PLIGHT_SAMPLER light_sampler,
