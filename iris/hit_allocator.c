@@ -24,6 +24,7 @@ Abstract:
 //
 
 static
+inline
 ISTATUS
 HitAllocatorAllocateInternal(
     _Inout_ PHIT_ALLOCATOR allocator,
