@@ -148,22 +148,22 @@ ISTATUS
 ShapeComputePdfBySolidAngle(
     _In_ PCSHAPE shape,
     _In_ PCRAY to_shape,
-    _In_ float_t distance_squared,
+    _In_ float_t distance,
     _In_ uint32_t face_hit,
     _Out_ float_t *pdf
     )
 {
     assert(shape != NULL);
     assert(to_shape);
-    assert(isfinite(distance_squared));
-    assert((float_t)0.0 < distance_squared);
+    assert(isfinite(distance));
+    assert((float_t)0.0 < distance);
     assert(RayValidate(*to_shape));
     assert(pdf != NULL);
 
     ISTATUS status =
         shape->vtable->compute_pdf_by_solid_angle_routine(shape->data,
                                                           to_shape,
-                                                          distance_squared,
+                                                          distance,
                                                           face_hit,
                                                           pdf);
 

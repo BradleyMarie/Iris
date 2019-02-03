@@ -555,7 +555,7 @@ ISTATUS
 EmissiveTriangleComputePdfBySolidArea(
     _In_opt_ const void *context,
     _In_ PCRAY to_shape,
-    _In_ float_t distance_squared,
+    _In_ float_t distance,
     _In_ uint32_t face_hit,
     _Out_ float_t *pdf
     )
@@ -570,7 +570,7 @@ EmissiveTriangleComputePdfBySolidArea(
         dp = -dp;
     }
 
-    *pdf = distance_squared / (dp * triangle->area);
+    *pdf = (distance * distance) / (dp * triangle->area);
 
     return ISTATUS_SUCCESS;
 }

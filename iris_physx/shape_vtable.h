@@ -80,7 +80,7 @@ ISTATUS
 (*PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE)(
     _In_opt_ const void *context,
     _In_ PCRAY to_shape,
-    _In_ float_t distance_squared,
+    _In_ float_t distance,
     _In_ uint32_t face_hit,
     _Out_ float_t *pdf
     );
