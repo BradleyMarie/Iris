@@ -122,28 +122,22 @@ ShapeGetEmissiveMaterial(
 static
 inline
 ISTATUS
-ShapeSampleFaceBySolidAngle(
+ShapeSampleFace(
     _In_ PCSHAPE shape,
-    _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 sampled_point,
-    _Out_ float_t *pdf
+    _Out_ PPOINT3 sampled_point
     )
 {
     assert(shape != NULL);
-    assert(PointValidate(hit_point));
     assert(rng != NULL);
     assert(sampled_point != NULL);
-    assert(pdf != NULL);
 
     ISTATUS status =
-        shape->vtable->sample_face_by_solid_angle_routine(shape->data,
-                                                          hit_point,
-                                                          face_hit,
-                                                          rng,
-                                                          sampled_point,
-                                                          pdf);
+        shape->vtable->sample_face_routine(shape->data,
+                                           face_hit,
+                                           rng,
+                                           sampled_point);
 
     return status;
 }

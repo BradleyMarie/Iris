@@ -28,6 +28,22 @@ struct _VISIBILITY_TESTER {
     float_t epsilon;
 };
 
+typedef struct _DISTANCE_AND_RESULT {
+    float_t distance;
+    bool *visible;
+} DISTANCE_AND_RESULT, *PDISTANCE_AND_RESULT;
+
+//
+// Extern Functions
+//
+
+extern
+ISTATUS
+VisibilityTesterProcessHit(
+    _Inout_opt_ void *context,
+    _In_ PCHIT_CONTEXT hit_context
+    );
+
 //
 // Functions
 //
@@ -74,6 +90,50 @@ VisibilityTesterConfigure(
     visibility_tester->trace_routine = trace_routine;
     visibility_tester->trace_context = trace_context;
     visibility_tester->epsilon = epsilon;
+}
+
+static
+inline
+ISTATUS
+VisibilityTesterTestInline(
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
+    _In_ RAY ray,
+    _In_ float_t distance_to_object,
+    _Out_ bool *visible
+    )
+{
+    assert(visibility_tester != NULL);
+    assert(RayValidate(ray));
+    assert((float_t)0.0 <= distance_to_object);
+    assert(visible != NULL);
+
+    *visible = true;
+
+    if (distance_to_object <= visibility_tester->epsilon)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    DISTANCE_AND_RESULT distance_and_result;
+    distance_and_result.distance =
+        distance_to_object - visibility_tester->epsilon;
+
+    if (distance_and_result.distance <= visibility_tester->epsilon)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    distance_and_result.visible = visible;
+
+    ISTATUS status = RayTracerTraceClosestHit(visibility_tester->ray_tracer,
+                                              ray,
+                                              visibility_tester->epsilon,
+                                              visibility_tester->trace_routine,
+                                              visibility_tester->trace_context,
+                                              VisibilityTesterProcessHit,
+                                              &distance_and_result);
+
+    return status;
 }
 
 static

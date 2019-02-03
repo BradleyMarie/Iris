@@ -512,13 +512,11 @@ EmissiveTriangleGetEmissiveMaterial(
 
 static
 ISTATUS
-EmissiveTriangleSampleFaceBySolidAngle(
+EmissiveTriangleSampleFace(
     _In_opt_ const void *context,
-    _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 sampled_point,
-    _Out_ float_t *pdf
+    _Out_ PPOINT3 sampled_point
     )
 {
     PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
@@ -549,21 +547,6 @@ EmissiveTriangleSampleFaceBySolidAngle(
                                       triangle->triangle.v0_to_v1,
                                       u);
     *sampled_point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
-
-    VECTOR3 to_triangle = PointSubtract(*sampled_point, hit_point);
-
-    float_t distance_squared;
-    to_triangle = VectorNormalize(to_triangle, &distance_squared, NULL);
-
-    float_t dp = VectorDotProduct(triangle->triangle.surface_normal,
-                                  to_triangle);
-
-    if (face_hit == TRIANGLE_FRONT_FACE)
-    {
-        dp = -dp;
-    }
-
-    *pdf = distance_squared / (dp * triangle->area);
 
     return ISTATUS_SUCCESS;
 }
@@ -649,7 +632,7 @@ static const SHAPE_VTABLE xy_dominant_emissive_triangle_vtable = {
     TriangleComputeNormal,
     TriangleGetMaterial,
     EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
     EmissiveTriangleFree
 };
@@ -660,7 +643,7 @@ static const SHAPE_VTABLE xz_dominant_emissive_triangle_vtable = {
     TriangleComputeNormal,
     TriangleGetMaterial,
     EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
     EmissiveTriangleFree
 };
@@ -671,7 +654,7 @@ static const SHAPE_VTABLE yz_dominant_emissive_triangle_vtable = {
     TriangleComputeNormal,
     TriangleGetMaterial,
     EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFaceBySolidAngle,
+    EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
     EmissiveTriangleFree
 };

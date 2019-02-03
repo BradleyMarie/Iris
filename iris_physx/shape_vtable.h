@@ -70,13 +70,11 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PSHAPE_SAMPLE_FACE_BY_SOLID_ANGLE)(
+(*PSHAPE_SAMPLE_FACE)(
     _In_opt_ const void *context,
-    _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
-    _Out_ PPOINT3 point,
-    _Out_ float_t *pdf
+    _Out_ PPOINT3 point
     );
 
 typedef
@@ -95,7 +93,7 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_COMPUTE_NORMAL_ROUTINE compute_normal_routine;
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
-    PSHAPE_SAMPLE_FACE_BY_SOLID_ANGLE sample_face_by_solid_angle_routine;
+    PSHAPE_SAMPLE_FACE sample_face_routine;
     PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE compute_pdf_by_solid_angle_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;

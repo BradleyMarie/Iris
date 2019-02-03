@@ -16,22 +16,12 @@ Abstract:
 #include "iris_physx/visibility_tester_internal.h"
 
 //
-// Types
-//
-
-typedef struct _DISTANCE_AND_RESULT {
-    float_t distance;
-    bool *visible;
-} DISTANCE_AND_RESULT, *PDISTANCE_AND_RESULT;
-
-//
 // Static Functions
 //
 
-static
 ISTATUS
 VisibilityTesterProcessHit(
-    _Inout_opt_ void *context, 
+    _Inout_opt_ void *context,
     _In_ PCHIT_CONTEXT hit_context
     )
 {
@@ -48,7 +38,7 @@ VisibilityTesterProcessHit(
 static
 ISTATUS
 VisibilityTesterProcessHitAnyDistance(
-    _Inout_opt_ void *context, 
+    _Inout_opt_ void *context,
     _In_ PCHIT_CONTEXT hit_context
     )
 {
@@ -91,31 +81,10 @@ VisibilityTesterTest(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    *visible = true;
-
-    if (distance_to_object <= visibility_tester->epsilon)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    DISTANCE_AND_RESULT distance_and_result;
-    distance_and_result.distance =
-        distance_to_object - visibility_tester->epsilon;
-
-    if (distance_and_result.distance <= visibility_tester->epsilon)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    distance_and_result.visible = visible;
-    
-    ISTATUS status = RayTracerTraceClosestHit(visibility_tester->ray_tracer,
-                                              ray,
-                                              visibility_tester->epsilon,
-                                              visibility_tester->trace_routine,
-                                              visibility_tester->trace_context,
-                                              VisibilityTesterProcessHit,
-                                              &distance_and_result);
+    ISTATUS status = VisibilityTesterTestInline(visibility_tester,
+                                                ray,
+                                                distance_to_object,
+                                                visible);
 
     return status;
 }
