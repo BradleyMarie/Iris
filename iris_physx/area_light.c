@@ -138,14 +138,14 @@ AreaLightSample(
         return status;
     }
 
-    if (isinf(*pdf))
+    if (*pdf <= (float_t)0.0)
     {
-        *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
-    if (*pdf == (float_t)0.0)
+    if (isinf(*pdf))
     {
+        *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 

@@ -42,7 +42,7 @@ LightSampleCollectorAddSample(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!isfinite(pdf) || pdf <= (float_t)0.0)
+    if (!isfinite(pdf))
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

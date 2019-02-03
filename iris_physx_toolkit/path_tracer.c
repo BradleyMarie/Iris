@@ -120,7 +120,7 @@ PathTracerIntegrate(
                 return status;
             }
 
-            if (pdf == (float_t)0.0)
+            if (pdf <= (float_t)0.0)
             {
                 continue;
             }
@@ -184,7 +184,7 @@ PathTracerIntegrate(
             return status;
         }
 
-        if (brdf_pdf == (float_t)0.0)
+        if (brdf_pdf <= (float_t)0.0)
         {
             break;
         }

@@ -45,7 +45,7 @@ TestRenderSingleThreaded(
 {
     PPIXEL_SAMPLER pixel_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+        GridPixelSamplerAllocate(8, 8, false, 1, 1, false, &pixel_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;
@@ -82,22 +82,6 @@ TestRenderSingleThreaded(
                               (float_t)0.01,
                               1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    bool equals;
-    status = ExactlyEqualsPfmFile(framebuffer,
-                                  file_name.c_str(),
-                                  PFM_PIXEL_FORMAT_SRGB,
-                                  &equals);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-    EXPECT_TRUE(equals);
-
-    if (!equals)
-    {
-        status = WriteToPfmFile(framebuffer,
-                                file_name.c_str(),
-                                PFM_PIXEL_FORMAT_SRGB);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
-    }
 
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
