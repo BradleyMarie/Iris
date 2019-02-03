@@ -23,7 +23,7 @@ Abstract:
 
 static
 ISTATUS
-HitTesterCollectHitsAndUpdateSharedHit(
+HitTesterCollectHitsAndUpdateClosestHit(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PCSHARED_HIT_CONTEXT shared_context,
     _In_ PHIT hit
@@ -35,18 +35,13 @@ HitTesterCollectHitsAndUpdateSharedHit(
 
     do
     {
-        if (hit_tester->minimum_distance <= hit->distance)
+        if (hit_tester->minimum_distance <= hit->distance &&
+            (hit_tester->closest_hit == NULL ||
+             hit_tester->closest_hit->hit.distance > hit->distance))
         {
-            bool success = 
-                ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
-
-            if (!success)
-            {
-                return ISTATUS_ALLOCATION_FAILED;
-            }
-
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
             full_hit_context->shared_context = shared_context;
+            hit_tester->closest_hit = full_hit_context;
         }
 
         hit = hit->next;
@@ -89,15 +84,12 @@ HitTesterTestWorldInternal(
 
     while (hit != NULL)
     {
-        if (hit_tester->minimum_distance <= hit->distance)
+        if (hit_tester->minimum_distance <= hit->distance &&
+            (hit_tester->closest_hit == NULL ||
+             hit_tester->closest_hit->hit.distance > hit->distance))
         {
-            bool success = 
-                ConstantPointerListAddPointer(&hit_tester->hit_list, hit);
-
-            if (!success)
-            {
-                return ISTATUS_ALLOCATION_FAILED;
-            }
+            PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
+            hit_tester->closest_hit = full_hit_context;
         }
 
         hit = hit->next;
@@ -201,9 +193,9 @@ HitTesterTestPremultipliedGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    status = HitTesterCollectHitsAndUpdateSharedHit(hit_tester,
-                                                    context,
-                                                    hit);
+    status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
+                                                     context,
+                                                     hit);
 
     return status;
 }
@@ -276,9 +268,9 @@ HitTesterTestTransformedGeometry(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    status = HitTesterCollectHitsAndUpdateSharedHit(hit_tester,
-                                                    context,
-                                                    hit);
+    status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
+                                                     context,
+                                                     hit);
 
     return status;
 }

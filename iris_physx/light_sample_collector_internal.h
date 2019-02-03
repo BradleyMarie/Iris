@@ -15,7 +15,9 @@ Abstract:
 #ifndef _IRIS_PHYSX_LIGHT_SAMPLE_COLLECTOR_INTERNAL_
 #define _IRIS_PHYSX_LIGHT_SAMPLE_COLLECTOR_INTERNAL_
 
-#include "common/const_pointer_list.h"
+#include <stdlib.h>
+
+#include "common/safe_math.h"
 #include "iris_physx/light.h"
 
 //

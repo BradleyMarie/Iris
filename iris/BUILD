@@ -68,7 +68,6 @@ cc_library(
         ":full_hit_context",
         ":hit_allocator_internal",
         ":shared_hit_context_allocator",
-        "//common:const_pointer_list"
     ],
 )
 

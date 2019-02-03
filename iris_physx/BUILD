@@ -221,6 +221,7 @@ cc_library(
     deps = [
         ":light",
         ":light_sample_collector_internal",
+        "//common:safe_math"
     ],
 )
 

@@ -77,28 +77,6 @@ RayTracerValidateArugumentsAndTrace(
     return status;
 }
 
-_Ret_
-static
-PCFULL_HIT_CONTEXT
-RayTracerFindClosestHit(
-    _In_reads_(num_hits) PCFULL_HIT_CONTEXT* hits,
-    _In_ size_t num_hits
-    )
-{
-    assert(hits != NULL);
-    assert(num_hits != 0);
-
-    PCFULL_HIT_CONTEXT closest = hits[0];
-    for (size_t i = 0; i < num_hits; i++)
-    {
-        if (hits[i]->context.distance < closest->context.distance) {
-            closest = hits[i];
-        }
-    }
-
-    return closest;
-}
-
 static
 ISTATUS
 RayTracerProcessHitWithContext(
@@ -236,18 +214,11 @@ RayTracerTraceClosestHit(
         return status;
     }
 
-    PCFULL_HIT_CONTEXT *hits;
-    size_t num_hits;
-    HitTesterGetHits(&ray_tracer->hit_tester, &hits, &num_hits);
-
-    if (num_hits == 0)
+    PCFULL_HIT_CONTEXT closest = ray_tracer->hit_tester.closest_hit;
+    if (closest != NULL)
     {
-        return ISTATUS_SUCCESS;
+        status = process_hit_routine(process_hit_context, &closest->context);
     }
-
-    PCFULL_HIT_CONTEXT closest = RayTracerFindClosestHit(hits, num_hits);
-
-    status = process_hit_routine(process_hit_context, &closest->context);
 
     return status;
 }
@@ -276,21 +247,14 @@ RayTracerTraceClosestHitWithCoordinates(
         return status;
     }
 
-    PCFULL_HIT_CONTEXT *hits;
-    size_t num_hits;
-    HitTesterGetHits(&ray_tracer->hit_tester, &hits, &num_hits);
-
-    if (num_hits == 0)
+    PCFULL_HIT_CONTEXT closest = ray_tracer->hit_tester.closest_hit;
+    if (ray_tracer->hit_tester.closest_hit != NULL)
     {
-        return ISTATUS_SUCCESS;
+        status = RayTracerProcessHitWithContext(ray,
+                                                closest,
+                                                process_hit_routine,
+                                                process_hit_context);
     }
-
-    PCFULL_HIT_CONTEXT closest = RayTracerFindClosestHit(hits, num_hits);
-
-    status = RayTracerProcessHitWithContext(ray,
-                                            closest,
-                                            process_hit_routine,
-                                            process_hit_context);
 
     return status;
 }
