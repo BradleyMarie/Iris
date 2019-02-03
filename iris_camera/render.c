@@ -176,6 +176,7 @@ IrisCameraRenderPixel(
                               context->shared->camera->image_max_v);
     float_t pixel_v_min = pixel_v_max + pixel_v_width;
 
+    size_t num_samples;
     ISTATUS status =
         PixelSamplerPrepareSamples(context->local.pixel_sampler,
                                    context->local.rng,
@@ -186,7 +187,8 @@ IrisCameraRenderPixel(
                                    context->shared->camera->lens_min_u,
                                    context->shared->camera->lens_max_u,
                                    context->shared->camera->lens_min_v,
-                                   context->shared->camera->lens_max_v);
+                                   context->shared->camera->lens_max_v,
+                                   &num_samples);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -194,9 +196,8 @@ IrisCameraRenderPixel(
     }
 
     COLOR3 pixel_color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-    size_t num_samples = 0;
 
-    for (;;)
+    for (size_t index = 0; index < num_samples; index++)
     {
         bool cancelled = atomic_load_explicit(&context->shared->cancelled,
                                               memory_order_relaxed);
@@ -208,17 +209,13 @@ IrisCameraRenderPixel(
 
         float_t pixel_u, pixel_v, lens_u, lens_v;
         ISTATUS status =
-            PixelSamplerNextSample(context->local.pixel_sampler,
-                                   context->local.rng,
-                                   &pixel_u,
-                                   &pixel_v,
-                                   &lens_u,
-                                   &lens_v);
-
-        if (status == ISTATUS_NO_RESULT)
-        {
-            break;
-        }
+            PixelSamplerGetSample(context->local.pixel_sampler,
+                                  context->local.rng,
+                                  index,
+                                  &pixel_u,
+                                  &pixel_v,
+                                  &lens_u,
+                                  &lens_v);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -226,8 +223,6 @@ IrisCameraRenderPixel(
             context->local.status = status;
             return false;
         }
-
-        num_samples += 1;
 
         RAY ray;
         status = CameraGenerateRay(context->shared->camera,
@@ -265,12 +260,12 @@ IrisCameraRenderPixel(
     {
         float_t sample_weight = (float_t)1.0 / (float_t)num_samples;
         pixel_color = ColorScaleByScalar(pixel_color, sample_weight);
-
-        FramebufferSetPixel(context->shared->framebuffer,
-                            pixel_column,
-                            pixel_row,
-                            pixel_color);
     }
+
+    FramebufferSetPixel(context->shared->framebuffer,
+                        pixel_column,
+                        pixel_row,
+                        pixel_color);
 
     return true;
 }

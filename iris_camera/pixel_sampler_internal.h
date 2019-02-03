@@ -43,7 +43,8 @@ PixelSamplerPrepareSamples(
     _In_ float_t lens_min_u,
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v
+    _In_ float_t lens_max_v,
+    _Out_ size_t *num_samples
     )
 {
     assert(pixel_sampler != NULL);
@@ -60,6 +61,7 @@ PixelSamplerPrepareSamples(
     assert(isfinite(lens_min_v));
     assert(isfinite(lens_max_v));
     assert(lens_min_v <= lens_max_v);
+    assert(num_samples != NULL);
 
     ISTATUS status =
         pixel_sampler->vtable->prepare_samples_routine(pixel_sampler->data,
@@ -71,19 +73,19 @@ PixelSamplerPrepareSamples(
                                                        lens_min_u,
                                                        lens_max_u,
                                                        lens_min_v,
-                                                       lens_max_v);
+                                                       lens_max_v,
+                                                       num_samples);
 
     return status;
 }
 
-_Check_return_
-_Success_(return == 0 || return == 1)
 static
 inline
 ISTATUS
-PixelSamplerNextSample(
-    _Inout_ struct _PIXEL_SAMPLER *pixel_sampler,
+PixelSamplerGetSample(
+    _In_ const struct _PIXEL_SAMPLER *pixel_sampler,
     _Inout_ PRANDOM rng,
+    _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
@@ -98,12 +100,13 @@ PixelSamplerNextSample(
     assert(lens_sample_v != NULL);
 
     ISTATUS status =
-        pixel_sampler->vtable->next_sample_routine(pixel_sampler->data,
-                                                   rng,
-                                                   pixel_sample_u,
-                                                   pixel_sample_v,
-                                                   lens_sample_u,
-                                                   lens_sample_v);
+        pixel_sampler->vtable->get_sample_routine(pixel_sampler->data,
+                                                  rng,
+                                                  sample_index,
+                                                  pixel_sample_u,
+                                                  pixel_sample_v,
+                                                  lens_sample_u,
+                                                  lens_sample_v);
 
     return status;
 }

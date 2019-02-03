@@ -37,16 +37,16 @@ ISTATUS
     _In_ float_t lens_min_u,
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v
+    _In_ float_t lens_max_v,
+    _Out_ size_t *num_samples
     );
 
 typedef
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS
-(*PPIXEL_SAMPLER_NEXT_SAMPLE_ROUTINE)(
-    _In_ void *context,
+(*PPIXEL_SAMPLER_GET_SAMPLE_ROUTINE)(
+    _In_ const void *context,
     _Inout_ PRANDOM rng,
+    _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
@@ -62,7 +62,7 @@ ISTATUS
 
 typedef struct _PIXEL_SAMPLER_VTABLE {
     PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine;
-    PPIXEL_SAMPLER_NEXT_SAMPLE_ROUTINE next_sample_routine;
+    PPIXEL_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
     PPIXEL_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } PIXEL_SAMPLER_VTABLE, *PPIXEL_SAMPLER_VTABLE;
