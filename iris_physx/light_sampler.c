@@ -23,7 +23,8 @@ ISTATUS
 LightSamplerCollectSamples(
     _Inout_ PLIGHT_SAMPLER light_sampler,
     _Inout_ PRANDOM rng,
-    _In_ POINT3 point
+    _In_ POINT3 point,
+    _Out_ size_t *num_samples
     )
 {
     if (light_sampler == NULL)
@@ -41,8 +42,12 @@ LightSamplerCollectSamples(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
+    if (num_samples == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
     LightSampleCollectorClear(&light_sampler->collector);
-    light_sampler->sample_index = 0;
 
     ISTATUS status = light_sampler->sample_lights_routine(
         light_sampler->sample_lights_context,
@@ -50,14 +55,21 @@ LightSamplerCollectSamples(
         rng,
         &light_sampler->collector);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *num_samples =
+        LightSampleCollectorGetSampleCount(&light_sampler->collector);
+
+    return ISTATUS_SUCCESS;
 }
 
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS
-LightSamplerNextSample(
-    _Inout_ PLIGHT_SAMPLER light_sampler,
+LightSamplerGetSample(
+    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ size_t sample_index,
     _Out_ PCLIGHT *light,
     _Out_ float_t *pdf
     )
@@ -67,35 +79,28 @@ LightSamplerNextSample(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (light == NULL)
+    size_t num_samples =
+        LightSampleCollectorGetSampleCount(&light_sampler->collector);
+
+    if (num_samples <= sample_index)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (pdf == NULL)
+    if (light == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    size_t num_samples =
-        LightSampleCollectorGetSampleCount(&light_sampler->collector);
-
-    if (num_samples == light_sampler->sample_index)
+    if (pdf == NULL)
     {
-        return ISTATUS_NO_RESULT;
-    }
-
-    if (num_samples <= light_sampler->sample_index)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     LightSampleCollectorGetSample(&light_sampler->collector,
-                                  light_sampler->sample_index,
+                                  sample_index,
                                   light,
                                   pdf);
-
-    light_sampler->sample_index += 1;
 
     return ISTATUS_SUCCESS;
 }

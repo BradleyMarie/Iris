@@ -33,14 +33,14 @@ ISTATUS
 LightSamplerCollectSamples(
     _Inout_ PLIGHT_SAMPLER light_sampler,
     _Inout_ PRANDOM rng,
-    _In_ POINT3 point
+    _In_ POINT3 point,
+    _Out_ size_t *num_samples
     );
 
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS
-LightSamplerNextSample(
-    _Inout_ PLIGHT_SAMPLER light_sampler,
+LightSamplerGetSample(
+    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ size_t sample_index,
     _Out_ PCLIGHT *light,
     _Out_ float_t *pdf
     );

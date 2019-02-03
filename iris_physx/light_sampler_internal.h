@@ -27,7 +27,6 @@ struct _LIGHT_SAMPLER {
     LIGHT_SAMPLE_COLLECTOR collector;
     PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine;
     const void* sample_lights_context;
-    size_t sample_index;
 };
 
 //
@@ -52,7 +51,6 @@ LightSamplerInitialize(
 
     light_sampler->sample_lights_routine = NULL;
     light_sampler->sample_lights_context = NULL;
-    light_sampler->sample_index = 0;
 
     return true;
 }
@@ -72,7 +70,6 @@ LightSamplerConfigure(
     LightSampleCollectorClear(&light_sampler->collector);
     light_sampler->sample_lights_routine = sample_lights_routine;
     light_sampler->sample_lights_context = sample_lights_context;
-    light_sampler->sample_index = 0;
 }
 
 static
