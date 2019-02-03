@@ -183,9 +183,35 @@ CheckEqualsPfmFile(
             COLOR3 pixel_color;
             FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
-            if (fabs((float)pixel_color.x - x) > epsilon ||
-                fabs((float)pixel_color.y - y) > epsilon ||
-                fabs((float)pixel_color.z - z) > epsilon)
+            float transformed_x, transformed_y, transformed_z;
+            if (pixel_format == PFM_PIXEL_FORMAT_XYZ)
+            {
+                transformed_x = (float)pixel_color.x;
+                transformed_y = (float)pixel_color.y;
+                transformed_z = (float)pixel_color.z;
+            }
+            else // pixel_format == PFM_PIXEL_FORMAT_SRGB
+            {
+                transformed_x = 3.2404542f * (float)pixel_color.x -
+                                1.5371385f * (float)pixel_color.y -
+                                0.4985314f * (float)pixel_color.z;
+
+                transformed_y = -0.969266f * (float)pixel_color.x +
+                                1.8760108f * (float)pixel_color.y +
+                                0.0415560f * (float)pixel_color.z;
+
+                transformed_z = 0.0556434f * (float)pixel_color.x -
+                                0.2040259f * (float)pixel_color.y +
+                                1.0572252f * (float)pixel_color.z;
+            }
+
+            transformed_x = fmaxf(0.0f, transformed_x);
+            transformed_y = fmaxf(0.0f, transformed_y);
+            transformed_z = fmaxf(0.0f, transformed_z);
+
+            if (fabs((float)transformed_x - x) > epsilon ||
+                fabs((float)transformed_y - y) > epsilon ||
+                fabs((float)transformed_z - z) > epsilon)
             {
                 if (fclose(file) == EOF)
                 {

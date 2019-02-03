@@ -4,6 +4,9 @@ cc_test(
     name = "cornell_box",
     srcs = ["cornell_box.cc"],
     linkstatic = 1,
+    data = [
+        "//test_results:cornell_box.pfm",
+    ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",

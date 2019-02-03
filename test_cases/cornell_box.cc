@@ -16,7 +16,6 @@ Abstract:
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
-#include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/cie_color_integrator.h"
@@ -45,7 +44,7 @@ TestRenderSingleThreaded(
 {
     PPIXEL_SAMPLER pixel_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(8, 8, false, 1, 1, false, &pixel_sampler);
+        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;
@@ -82,6 +81,15 @@ TestRenderSingleThreaded(
                               (float_t)0.01,
                               1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    bool equals;
+    status = ApproximatelyEqualsPfmFile(framebuffer,
+                                        file_name.c_str(),
+                                        PFM_PIXEL_FORMAT_SRGB,
+                                        (float_t)0.01,
+                                        &equals);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    EXPECT_TRUE(equals);
 
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
