@@ -63,10 +63,7 @@ ShapeHitTesterTestPremultipliedShape(
     _In_opt_ PCMATRIX model_to_world
     )
 {
-    if (shape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
+    assert(shape != NULL);
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
@@ -89,10 +86,7 @@ ShapeHitTesterTestTransformedShape(
     _In_opt_ PCMATRIX model_to_world
     )
 {
-    if (shape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
+    assert(shape != NULL);
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
@@ -115,10 +109,7 @@ ShapeHitTesterTestNestedShape(
     _Out_ PHIT *hits
     )
 {
-    if (shape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
+    assert(shape != NULL);
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
