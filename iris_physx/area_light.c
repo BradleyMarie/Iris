@@ -285,7 +285,7 @@ AreaLightSample(
                                              spectrum,
                                              pdf);
 
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
