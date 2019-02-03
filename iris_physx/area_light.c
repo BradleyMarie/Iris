@@ -16,6 +16,7 @@ Abstract:
 
 #include "iris_physx/area_light.h"
 #include "iris_physx/emissive_material_internal.h"
+#include "iris_physx/hit_tester.h"
 #include "iris_physx/shape_internal.h"
 #include "iris_physx/visibility_tester_internal.h"
 
@@ -40,6 +41,21 @@ typedef struct _AREA_LIGHT_AND_RESULTS {
 //
 // Static Functions
 //
+
+static
+ISTATUS
+VisibilityTesterTraceSingleShape(
+    _In_opt_ const void *context,
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ RAY ray
+    )
+{
+    PCSHAPE shape = (PCSHAPE)context;
+
+    ISTATUS status = ShapeHitTesterTestShape(hit_tester, shape);
+
+    return status;
+}
 
 static
 ISTATUS
@@ -97,12 +113,46 @@ VisibilityTesterTestAreaLight(
     area_light_and_results.hit_point = hit_point;
 
     *spectrum = NULL;
-    ISTATUS status = 
+    ISTATUS status =
         RayTracerTraceClosestHitWithCoordinates(visibility_tester->ray_tracer,
                                                 ray,
                                                 visibility_tester->epsilon,
                                                 visibility_tester->trace_routine,
                                                 visibility_tester->trace_context,
+                                                VisibilityTesterProcessHitAreaLight,
+                                                &area_light_and_results);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+VisibilityTesterTestSingleAreaLight(
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
+    _In_ RAY ray,
+    _In_ PCAREA_LIGHT area_light,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ PPOINT3 hit_point
+    )
+{
+    assert(visibility_tester != NULL);
+    assert(RayValidate(ray));
+    assert(spectrum != NULL);
+    assert(hit_point != NULL);
+
+    AREA_LIGHT_AND_RESULTS area_light_and_results;
+    area_light_and_results.area_light = area_light;
+    area_light_and_results.spectrum = spectrum;
+    area_light_and_results.hit_point = hit_point;
+
+    *spectrum = NULL;
+    ISTATUS status =
+        RayTracerTraceClosestHitWithCoordinates(visibility_tester->ray_tracer,
+                                                ray,
+                                                visibility_tester->epsilon,
+                                                VisibilityTesterTraceSingleShape,
+                                                area_light->shape,
                                                 VisibilityTesterProcessHitAreaLight,
                                                 &area_light_and_results);
 
@@ -150,14 +200,6 @@ AreaLightSample(
     }
 
     VECTOR3 direction_to_light = PointSubtract(sampled_point, hit_point);
-
-    float_t dp = VectorDotProduct(direction_to_light, surface_normal);
-    if (dp <= (float_t)0.0)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
     direction_to_light = VectorNormalize(direction_to_light, NULL, NULL);
     RAY ray_to_light = RayCreate(hit_point, direction_to_light);
 
@@ -191,13 +233,51 @@ AreaLightComputeEmissive(
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
     POINT3 point_on_light;
-    ISTATUS status = VisibilityTesterTestAreaLight(visibility_tester,
-                                                   *to_light,
-                                                   area_light,
-                                                   spectrum,
-                                                   &point_on_light);
+    ISTATUS status = VisibilityTesterTestSingleAreaLight(visibility_tester,
+                                                         *to_light,
+                                                         area_light,
+                                                         spectrum,
+                                                         &point_on_light);
 
-    return status;
+    if (*spectrum == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    VECTOR3 to_light_vector = PointSubtract(point_on_light, to_light->origin);
+    float_t distance_squared = VectorDotProduct(to_light_vector,
+                                                to_light_vector);
+
+    float_t pdf;
+    status = ShapeComputePdfBySolidAngle(area_light->shape,
+                                         to_light,
+                                         distance_squared,
+                                         area_light->face,
+                                         &pdf);
+
+    if (pdf <= (float_t)0.0 || isinf(pdf))
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    bool visible;
+    status = VisibilityTesterTest(visibility_tester,
+                                  *to_light,
+                                  sqrt(distance_squared),
+                                  &visible);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!visible)
+    {
+        *spectrum = NULL;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -214,16 +294,11 @@ AreaLightComputeEmissiveWithPdf(
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
     POINT3 point_on_light;
-    ISTATUS status = VisibilityTesterTestAreaLight(visibility_tester,
-                                                   *to_light,
-                                                   area_light,
-                                                   spectrum,
-                                                   &point_on_light);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
+    ISTATUS status = VisibilityTesterTestSingleAreaLight(visibility_tester,
+                                                         *to_light,
+                                                         area_light,
+                                                         spectrum,
+                                                         &point_on_light);
 
     if (*spectrum == NULL)
     {
@@ -241,7 +316,29 @@ AreaLightComputeEmissiveWithPdf(
                                          area_light->face,
                                          pdf);
 
-    return status;
+    if (*pdf <= (float_t)0.0 || isinf(*pdf))
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
+    bool visible;
+    status = VisibilityTesterTest(visibility_tester,
+                                  *to_light,
+                                  sqrt(distance_squared),
+                                  &visible);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!visible)
+    {
+        *pdf = (float_t)0.0;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static

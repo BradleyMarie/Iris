@@ -145,10 +145,6 @@ BrdfSample(
                                                   outgoing,
                                                   pdf);
 
-    // Should this be made into something stronger than an assertion?
-    assert(isfinite(*pdf));
-    assert((float_t)0.0 <= *pdf);
-
     return status;
 }
 
@@ -256,10 +252,6 @@ BrdfComputeReflectanceWithPdf(
                                                            compositor,
                                                            reflector,
                                                            pdf);
-    
-    // Should this be made into something stronger than an assertion?
-    assert(isfinite(*pdf));
-    assert((float_t)0.0 <= *pdf);
 
     return status;
 }

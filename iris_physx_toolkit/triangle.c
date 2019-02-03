@@ -557,7 +557,13 @@ EmissiveTriangleSampleFaceBySolidAngle(
 
     float_t dp = VectorDotProduct(triangle->triangle.surface_normal,
                                   to_triangle);
-    *pdf = distance_squared / (fabs(dp) * triangle->area);
+
+    if (face_hit == TRIANGLE_FRONT_FACE)
+    {
+        dp = -dp;
+    }
+
+    *pdf = distance_squared / (dp * triangle->area);
 
     return ISTATUS_SUCCESS;
 }
@@ -575,7 +581,13 @@ EmissiveTriangleComputePdfBySolidArea(
 
     float_t dp = VectorDotProduct(triangle->triangle.surface_normal,
                                   to_shape->direction);
-    *pdf = distance_squared / (fabs(dp) * triangle->area);
+
+    if (face_hit == TRIANGLE_FRONT_FACE)
+    {
+        dp = -dp;
+    }
+
+    *pdf = distance_squared / (dp * triangle->area);
 
     return ISTATUS_SUCCESS;
 }

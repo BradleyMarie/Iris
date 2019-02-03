@@ -145,9 +145,6 @@ ShapeSampleFaceBySolidAngle(
                                                           sampled_point,
                                                           pdf);
 
-    // Should this be made into something stronger than an assertion?
-    assert((float_t)0.0 < *pdf);
-
     return status;
 }
 
@@ -175,10 +172,6 @@ ShapeComputePdfBySolidAngle(
                                                           distance_squared,
                                                           face_hit,
                                                           pdf);
-
-    // Should these be made into something stronger than assertions?
-    assert(isfinite(*pdf));
-    assert((float_t)0.0 < *pdf);
 
     return status;
 }

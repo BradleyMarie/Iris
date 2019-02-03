@@ -6,6 +6,7 @@ cc_library(
     srcs = ["area_light.c"],
     deps = [
         ":emissive_material_internal",
+        ":hit_tester",
         ":light",
         ":shape",
         ":shape_internal",
