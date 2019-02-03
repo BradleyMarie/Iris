@@ -64,7 +64,7 @@ TriangleTraceXYDominant(
 
     if (dp == (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t distance_to_plane =
@@ -72,13 +72,13 @@ TriangleTraceXYDominant(
 
     if (isinf(distance_to_plane))
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
 #if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
     if (distance_to_plane < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 #endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
@@ -96,7 +96,7 @@ TriangleTraceXYDominant(
     if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
         additional_data.barycentric_coordinates[1] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[2] =
@@ -107,7 +107,7 @@ TriangleTraceXYDominant(
 
     if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t coordinate_sum = 
@@ -116,7 +116,7 @@ TriangleTraceXYDominant(
 
     if (coordinate_sum > (float_t)1.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
@@ -170,7 +170,7 @@ TriangleTraceXZDominant(
 
     if (dp == (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t distance_to_plane =
@@ -178,13 +178,13 @@ TriangleTraceXZDominant(
 
     if (isinf(distance_to_plane))
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
 #if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
     if (distance_to_plane < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 #endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
@@ -202,7 +202,7 @@ TriangleTraceXZDominant(
     if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
         additional_data.barycentric_coordinates[1] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[2] =
@@ -213,7 +213,7 @@ TriangleTraceXZDominant(
 
     if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t coordinate_sum = 
@@ -222,7 +222,7 @@ TriangleTraceXZDominant(
 
     if (coordinate_sum > (float_t)1.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
@@ -276,7 +276,7 @@ TriangleTraceYZDominant(
 
     if (dp == (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t distance_to_plane =
@@ -284,13 +284,13 @@ TriangleTraceYZDominant(
 
     if (isinf(distance_to_plane))
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
 #if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
     if (distance_to_plane < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 #endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
@@ -308,7 +308,7 @@ TriangleTraceYZDominant(
     if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
         additional_data.barycentric_coordinates[1] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[2] =
@@ -319,7 +319,7 @@ TriangleTraceYZDominant(
 
     if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t coordinate_sum = 
@@ -328,7 +328,7 @@ TriangleTraceYZDominant(
 
     if (coordinate_sum > (float_t)1.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;

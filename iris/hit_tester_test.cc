@@ -40,7 +40,7 @@ NestedCheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     const NestedParams* param = static_cast<const NestedParams *>(data);
@@ -62,7 +62,10 @@ NestedCheckGeometryContext(
                                                          data,
                                                          nullptr,
                                                          &next_hit);
-            EXPECT_EQ(param->status_to_return, status);
+            if (param->status_to_return != ISTATUS_SUCCESS)
+            {
+                EXPECT_EQ(param->status_to_return, status);
+            }
 
             for (size_t i = 0; i < param->elements_per_node; i++) {
                 size_t element = current_depth * param->elements_per_node + i;
@@ -82,6 +85,11 @@ NestedCheckGeometryContext(
         }
     }
 
+    if (*hits == NULL && param->status_to_return == ISTATUS_SUCCESS)
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
+
     return param->status_to_return;
 }
 
@@ -97,14 +105,13 @@ CheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     const ValidationParams* param = static_cast<const ValidationParams *>(data);
     EXPECT_EQ(param->data, data);
     EXPECT_EQ(param->ray, *ray);
     EXPECT_TRUE(hit_allocator);
-    *hits = NULL;
 
     *param->triggered = true;
 
@@ -114,15 +121,14 @@ CheckGeometryContext(
     nested_params.ray = param->ray;
     nested_params.triggered = &triggered;
 
-    PHIT hits;
-    nested_params.status_to_return = ISTATUS_SUCCESS;
+    PHIT nested_hits;
+    nested_params.status_to_return = ISTATUS_NO_INTERSECTION;
     ISTATUS status = HitTesterTestNestedGeometry(hit_allocator,
                                                  NestedCheckGeometryContext,
                                                  &nested_params,
                                                  nullptr,
-                                                 &hits);
-    EXPECT_EQ(ISTATUS_SUCCESS, status);
-    EXPECT_EQ(nullptr, hits);
+                                                 &nested_hits);
+    EXPECT_EQ(ISTATUS_NO_INTERSECTION, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
@@ -131,9 +137,8 @@ CheckGeometryContext(
                                          NestedCheckGeometryContext,
                                          &nested_params,
                                          nullptr,
-                                         &hits);
+                                         &nested_hits);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_30, status);
-    EXPECT_EQ(nullptr, hits);
     EXPECT_TRUE(triggered);
 
     size_t nest_count = 0;
@@ -141,7 +146,6 @@ CheckGeometryContext(
     nested_params.elements_per_node = 2;
     nested_params.distances = { 1.0f, 0.0f, 3.0f, 2.0f, 5.0f, 4.0f };
 
-    PHIT nested_hits;
     nested_params.status_to_return = ISTATUS_SUCCESS;
     status = HitTesterTestNestedGeometry(hit_allocator,
                                          NestedCheckGeometryContext,
@@ -161,6 +165,11 @@ CheckGeometryContext(
         nested_hits = nested_hits->next;
     }
     EXPECT_EQ(6, num_hits);
+
+    if (param->status_to_return == ISTATUS_SUCCESS)
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
 
     return param->status_to_return;
 }
@@ -212,7 +221,7 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
-    params.status_to_return = ISTATUS_NO_RESULT;
+    params.status_to_return = ISTATUS_NO_INTERSECTION;
     status = HitTesterTestGeometry(&tester,
                                    CheckGeometryContext,
                                    &params,
@@ -289,7 +298,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
-    params.status_to_return = ISTATUS_NO_RESULT;
+    params.status_to_return = ISTATUS_NO_INTERSECTION;
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -319,7 +328,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
-    params.status_to_return = ISTATUS_NO_RESULT;
+    params.status_to_return = ISTATUS_NO_INTERSECTION;
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -400,7 +409,7 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
-    params.status_to_return = ISTATUS_NO_RESULT;
+    params.status_to_return = ISTATUS_NO_INTERSECTION;
 
     status = HitTesterTestTransformedGeometry(&tester,
                                               CheckGeometryContext,
@@ -440,7 +449,7 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     EXPECT_TRUE(triggered);
 
     triggered = false;
-    params.status_to_return = ISTATUS_NO_RESULT;
+    params.status_to_return = ISTATUS_NO_INTERSECTION;
     status = HitTesterTestTransformedGeometry(&tester,
                                               CheckGeometryContext,
                                               &params,
@@ -468,7 +477,7 @@ AllocateHitAtDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     const float_t* distance = (const float_t*)data;
@@ -518,7 +527,7 @@ AllocateTwoHitAtDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     const float_t* distance = (const float_t*)data;
@@ -549,11 +558,10 @@ AllocateNoHits(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
-    *hits = NULL;
-    return ISTATUS_SUCCESS;
+    return ISTATUS_NO_INTERSECTION;
 }
 
 void RunWorldHitTest(

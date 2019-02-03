@@ -63,7 +63,7 @@ ISTATUS
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     );
 
 //
@@ -102,7 +102,7 @@ HitTesterTestNestedGeometry(
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     );
 
 #endif // _IRIS_HIT_TESTER_

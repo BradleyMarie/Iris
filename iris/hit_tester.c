@@ -73,7 +73,7 @@ HitTesterTestWorldInternal(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
-    if (status == ISTATUS_NO_RESULT)
+    if (status == ISTATUS_NO_INTERSECTION)
     {
         return ISTATUS_SUCCESS;
     }
@@ -83,7 +83,7 @@ HitTesterTestWorldInternal(
         return status;
     }
 
-    while (hit != NULL)
+    do
     {
         if (hit_tester->minimum_distance <= hit->distance &&
             (hit_tester->closest_hit == NULL ||
@@ -95,7 +95,7 @@ HitTesterTestWorldInternal(
         }
 
         hit = hit->next;
-    }
+    } while (hit != NULL);
 
     return ISTATUS_SUCCESS;
 }
@@ -168,7 +168,7 @@ HitTesterTestPremultipliedGeometry(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
-    if (status == ISTATUS_NO_RESULT)
+    if (status == ISTATUS_NO_INTERSECTION)
     {
         return ISTATUS_SUCCESS;
     }
@@ -176,11 +176,6 @@ HitTesterTestPremultipliedGeometry(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
-    }
-
-    if (hit == NULL)
-    {
-        return ISTATUS_SUCCESS;
     }
 
     status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
@@ -232,7 +227,7 @@ HitTesterTestTransformedGeometry(
                                   &hit_tester->hit_allocator,
                                   &hit);
 
-    if (status == ISTATUS_NO_RESULT)
+    if (status == ISTATUS_NO_INTERSECTION)
     {
         return ISTATUS_SUCCESS;
     }
@@ -240,11 +235,6 @@ HitTesterTestTransformedGeometry(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
-    }
-
-    if (hit == NULL)
-    {
-        return ISTATUS_SUCCESS;
     }
 
     status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
@@ -261,7 +251,7 @@ HitTesterTestNestedGeometry(
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     if (hit_allocator == NULL)
@@ -284,23 +274,12 @@ HitTesterTestNestedGeometry(
     const void *original_data = HitAllocatorGetData(hit_allocator);
     HitAllocatorSetData(hit_allocator, hit_data);
 
-    PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   model_ray,
                                   hit_allocator,
-                                  &hit);
+                                  hits);
 
     HitAllocatorSetData(hit_allocator, original_data);
-
-    if (status == ISTATUS_SUCCESS)
-    {
-        *hits = hit;
-    }
-
-    if (status == ISTATUS_NO_RESULT)
-    {
-        return ISTATUS_SUCCESS;
-    }
 
     return status;
 }

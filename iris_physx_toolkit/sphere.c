@@ -52,7 +52,7 @@ SphereTrace(
     // No intersections are possible.
     if (distance_to_chord_midpoint < (float_t)0.0)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 #endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
         
@@ -62,7 +62,7 @@ SphereTrace(
     // Ray begins inside the sphere. No intersections are possible.
     if (distance_to_center_squared < sphere->radius_squared)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 #endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
@@ -74,7 +74,7 @@ SphereTrace(
     // The ray completely misses the sphere. No intersections are possible.
     if (sphere->radius_squared < distance_from_chord_to_center_squared)
     {
-        return ISTATUS_NO_RESULT;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     float_t half_chord_length = 

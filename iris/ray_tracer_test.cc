@@ -34,7 +34,7 @@ AllocateHitRoutine(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     auto hit_data = static_cast<const HitData*>(data);
@@ -225,8 +225,6 @@ struct ProcessHitData {
 };
 
 static
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 ProcessHitRoutine(
     _Inout_opt_ void *context, 
@@ -250,8 +248,6 @@ ProcessHitRoutine(
 }
 
 static
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 ProcessHitRoutineReturnError(
     _Inout_opt_ void *context, 
@@ -262,8 +258,6 @@ ProcessHitRoutineReturnError(
 }
 
 static
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 ProcessHitWithCoordinatesRoutine(
     _Inout_opt_ void *context, 
@@ -331,8 +325,6 @@ ProcessHitWithCoordinatesRoutine(
 }
 
 static
-_Check_return_
-_Success_(return == 0 || return == 1)
 ISTATUS 
 ProcessHitWithCoordinatesRoutineReturnError(
     _Inout_opt_ void *context, 

@@ -112,7 +112,7 @@ ISTATUS
 ShapeHitTesterTestNestedShape(
     _Inout_ PSHAPE_HIT_ALLOCATOR hit_allocator,
     _In_ PCSHAPE shape,
-    _Outptr_result_maybenull_ PHIT *hits
+    _Out_ PHIT *hits
     )
 {
     if (shape == NULL)
