@@ -68,6 +68,11 @@ VisibilityTesterProcessHitAreaLight(
     PAREA_LIGHT_AND_RESULTS area_light_and_results =
         (PAREA_LIGHT_AND_RESULTS)context;
 
+    if (hit_context->front_face != area_light_and_results->area_light->face)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     POINT3 hit_point = RayEndpoint(*area_light_and_results->ray,
                                    hit_context->distance);
 
