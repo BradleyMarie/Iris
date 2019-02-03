@@ -207,7 +207,6 @@ TEST(HitAllocatorTest, HitAllocatorAllocate)
     ASSERT_EQ(back_face, full_hit->context.back_face);
     ASSERT_EQ(additional_data, full_hit->context.additional_data);
     ASSERT_EQ(additional_data_size, full_hit->context.additional_data_size);
-    ASSERT_EQ(nullptr, full_hit->shared_context);
     ASSERT_FALSE(full_hit->model_hit_point_valid);
 
     HitAllocatorDestroy(&allocator);
@@ -248,7 +247,6 @@ TEST(HitAllocatorTest, HitAllocatorAllocateWithAdditionalData)
     ASSERT_EQ(back_face, full_hit->context.back_face);
     ASSERT_EQ(data, *(int *)full_hit->context.additional_data);
     ASSERT_EQ(additional_data_size, full_hit->context.additional_data_size);
-    ASSERT_EQ(nullptr, full_hit->shared_context);
     ASSERT_FALSE(full_hit->model_hit_point_valid);
 
     HitAllocatorDestroy(&allocator);
@@ -430,7 +428,6 @@ TEST(HitAllocatorTest, HitAllocatorAllocateWithHitPoint)
     ASSERT_EQ(back_face, full_hit->context.back_face);
     ASSERT_EQ(additional_data, full_hit->context.additional_data);
     ASSERT_EQ(additional_data_size, full_hit->context.additional_data_size);
-    ASSERT_EQ(nullptr, full_hit->shared_context);
     ASSERT_TRUE(full_hit->model_hit_point_valid);
     ASSERT_EQ(hit_point, full_hit->model_hit_point);
 
@@ -474,7 +471,6 @@ TEST(HitAllocatorTest, HitAllocatorAllocateWithHitPointAndAdditionalData)
     ASSERT_EQ(back_face, full_hit->context.back_face);
     ASSERT_EQ(data, *(int *)full_hit->context.additional_data);
     ASSERT_EQ(additional_data_size, full_hit->context.additional_data_size);
-    ASSERT_EQ(nullptr, full_hit->shared_context);
     ASSERT_TRUE(full_hit->model_hit_point_valid);
     ASSERT_EQ(hit_point, full_hit->model_hit_point);
 

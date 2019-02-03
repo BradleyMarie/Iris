@@ -610,7 +610,7 @@ void RunWorldHitTest(
     EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
 
     EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
-    EXPECT_EQ(NULL, tester->closest_hit->shared_context);
+    EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
     EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
 }
 
@@ -698,14 +698,14 @@ void RunPremultipliedHitTest(
     if (matrix != nullptr)
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
-        EXPECT_TRUE(tester->closest_hit->shared_context->premultiplied);
-        EXPECT_EQ(matrix, tester->closest_hit->shared_context->model_to_world);
+        EXPECT_TRUE(tester->closest_hit->premultiplied);
+        EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
         EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
     }
     else
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
-        EXPECT_EQ(NULL, tester->closest_hit->shared_context);
+        EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
         EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
     }
 }
@@ -832,14 +832,14 @@ void RunTransformedHitTest(
     if (matrix == nullptr)
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
-        EXPECT_EQ(NULL, tester->closest_hit->shared_context);
+        EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
         EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
     }
     else
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
-        EXPECT_FALSE(tester->closest_hit->shared_context->premultiplied);
-        EXPECT_EQ(matrix, tester->closest_hit->shared_context->model_to_world);
+        EXPECT_FALSE(tester->closest_hit->premultiplied);
+        EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
         EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
     }
 }

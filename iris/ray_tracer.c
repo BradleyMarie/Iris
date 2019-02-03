@@ -89,7 +89,7 @@ RayTracerProcessHitWithContext(
     assert(hit != NULL);
     assert(process_hit_routine != NULL);
 
-    if (hit->shared_context == NULL)
+    if (hit->model_to_world == NULL)
     {
         POINT3 world_hit_point;
         if (hit->model_hit_point_valid)
@@ -109,10 +109,7 @@ RayTracerProcessHitWithContext(
         return status;
     }
 
-    PCSHARED_HIT_CONTEXT shared_context = hit->shared_context;
-    PCMATRIX model_to_world = shared_context->model_to_world;
-
-    if (shared_context->premultiplied)
+    if (hit->premultiplied)
     {
         POINT3 world_hit_point;
         if (hit->model_hit_point_valid)
@@ -125,11 +122,12 @@ RayTracerProcessHitWithContext(
         }
         
         POINT3 model_hit_point = 
-            PointMatrixInverseMultiplyInline(model_to_world, world_hit_point);
+            PointMatrixInverseMultiplyInline(hit->model_to_world,
+                                             world_hit_point);
 
         ISTATUS status = process_hit_routine(process_hit_context,
                                              &hit->context,
-                                             model_to_world,
+                                             hit->model_to_world,
                                              model_hit_point,
                                              world_hit_point);
         return status;
@@ -145,12 +143,13 @@ RayTracerProcessHitWithContext(
     else
     {
         model_hit_point = 
-            PointMatrixInverseMultiplyInline(model_to_world, world_hit_point);
+            PointMatrixInverseMultiplyInline(hit->model_to_world,
+                                             world_hit_point);
     }
 
     ISTATUS status = process_hit_routine(process_hit_context,
                                          &hit->context,
-                                         model_to_world,
+                                         hit->model_to_world,
                                          model_hit_point,
                                          world_hit_point);
     return status;

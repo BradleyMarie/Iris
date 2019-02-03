@@ -17,7 +17,6 @@ Abstract:
 
 #include "iris/full_hit_context.h"
 #include "iris/hit_allocator_internal.h"
-#include "iris/shared_hit_context_allocator.h"
 
 //
 // Types
@@ -25,7 +24,6 @@ Abstract:
 
 struct _HIT_TESTER {
     struct _HIT_ALLOCATOR hit_allocator;
-    SHARED_HIT_CONTEXT_ALLOCATOR context_allocator;
     PCFULL_HIT_CONTEXT closest_hit;
     RAY world_ray;
     float_t minimum_distance;
@@ -45,14 +43,6 @@ HitTesterInitialize(
     )
 {
     assert(hit_tester != NULL);
-
-    bool success =
-        SharedHitContextAllocatorInitialize(&hit_tester->context_allocator);
-    
-    if (!success)
-    {
-        return false;
-    }
 
     HitAllocatorInitialize(&hit_tester->hit_allocator);
 
@@ -76,7 +66,6 @@ HitTesterReset(
     assert((float_t)0.0 <= minimum_distance);
 
     HitAllocatorFreeAll(&hit_tester->hit_allocator);
-    SharedHitContextAllocatorFreeAll(&hit_tester->context_allocator);
 
     hit_tester->closest_hit = NULL;
     hit_tester->world_ray = world_ray;
@@ -93,7 +82,6 @@ HitTesterDestroy(
     assert(hit_tester != NULL);
 
     HitAllocatorDestroy(&hit_tester->hit_allocator);
-    SharedHitContextAllocatorDestroy(&hit_tester->context_allocator);
 }
 
 #endif // _IRIS_HIT_TESTER_INTERNAL_

@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_HIT_ALLOCATOR_INTERNAL_
 
 #include "common/dynamic_allocator.h"
+#include "iris/ray.h"
 
 //
 // Types

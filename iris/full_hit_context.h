@@ -17,7 +17,8 @@ Abstract:
 
 #include "iris/hit.h"
 #include "iris/hit_context.h"
-#include "iris/shared_hit_context.h"
+#include "iris/point.h"
+#include "iris/matrix.h"
 
 //
 // Types
@@ -26,7 +27,8 @@ Abstract:
 typedef struct _FULL_HIT_CONTEXT {
     HIT hit;
     HIT_CONTEXT context;
-    PCSHARED_HIT_CONTEXT shared_context;
+    PCMATRIX model_to_world;
+    bool premultiplied;
     POINT3 model_hit_point;
     bool model_hit_point_valid;
 } FULL_HIT_CONTEXT, *PFULL_HIT_CONTEXT;

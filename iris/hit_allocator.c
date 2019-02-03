@@ -104,8 +104,6 @@ HitAllocatorAllocateInternal(
         hit_context->context.additional_data = NULL;
     }
 
-    hit_context->shared_context = NULL;
-
     if (hit_point != NULL)
     {
         hit_context->model_hit_point = *hit_point;

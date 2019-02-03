@@ -25,12 +25,12 @@ static
 ISTATUS
 HitTesterCollectHitsAndUpdateClosestHit(
     _Inout_ PHIT_TESTER hit_tester,
-    _In_ PCSHARED_HIT_CONTEXT shared_context,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied,
     _In_ PHIT hit
     )
 {
     assert(hit_tester != NULL);
-    assert(shared_context != NULL);
     assert(hit != NULL);
 
     do
@@ -40,7 +40,8 @@ HitTesterCollectHitsAndUpdateClosestHit(
              hit_tester->closest_hit->hit.distance > hit->distance))
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
-            full_hit_context->shared_context = shared_context;
+            full_hit_context->model_to_world = model_to_world;
+            full_hit_context->premultiplied = premultiplied;
             hit_tester->closest_hit = full_hit_context;
         }
 
@@ -89,6 +90,7 @@ HitTesterTestWorldInternal(
              hit_tester->closest_hit->hit.distance > hit->distance))
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
+            full_hit_context->model_to_world = NULL;
             hit_tester->closest_hit = full_hit_context;
         }
 
@@ -181,20 +183,9 @@ HitTesterTestPremultipliedGeometry(
         return ISTATUS_SUCCESS;
     }
 
-    PSHARED_HIT_CONTEXT context;
-    PSHARED_HIT_CONTEXT_ALLOCATOR allocator = &hit_tester->context_allocator;
-    bool ok = SharedHitContextAllocatorAllocate(allocator,
-                                                model_to_world,
-                                                true,
-                                                &context);
-
-    if (!ok)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
-                                                     context,
+                                                     model_to_world,
+                                                     true,
                                                      hit);
 
     return status;
@@ -256,20 +247,9 @@ HitTesterTestTransformedGeometry(
         return ISTATUS_SUCCESS;
     }
 
-    PSHARED_HIT_CONTEXT context;
-    PSHARED_HIT_CONTEXT_ALLOCATOR allocator = &hit_tester->context_allocator;
-    bool ok = SharedHitContextAllocatorAllocate(allocator,
-                                                model_to_world,
-                                                false,
-                                                &context);
-    
-    if (!ok)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     status = HitTesterCollectHitsAndUpdateClosestHit(hit_tester,
-                                                     context,
+                                                     model_to_world,
+                                                     false,
                                                      hit);
 
     return status;

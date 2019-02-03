@@ -6,7 +6,8 @@ cc_library(
     deps = [
         ":hit",
         ":hit_context",
-        ":shared_hit_context",
+        ":point",
+        ":matrix",
     ],
 )
 
@@ -67,7 +68,6 @@ cc_library(
     deps = [
         ":full_hit_context",
         ":hit_allocator_internal",
-        ":shared_hit_context_allocator",
     ],
 )
 
@@ -87,6 +87,7 @@ cc_library(
     name = "hit_allocator_internal",
     hdrs = ["hit_allocator_internal.h"],
     deps = [
+        ":ray",
         "//common:dynamic_allocator",
     ],
 )
@@ -232,34 +233,6 @@ cc_test(
     deps = [
         ":multiply",
         ":ray_tracer",
-        "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
-    ],
-)
-
-cc_library(
-    name = "shared_hit_context",
-    hdrs = ["shared_hit_context.h"],
-    deps = [
-        ":matrix",
-        ":ray",
-    ],
-)
-
-cc_library(
-    name = "shared_hit_context_allocator",
-    hdrs = ["shared_hit_context_allocator.h"],
-    deps = [
-        ":shared_hit_context",
-        "//common:static_allocator",
-    ],
-)
-
-cc_test(
-    name = "shared_hit_context_allocator_test",
-    srcs = ["shared_hit_context_allocator_test.cc"],
-    deps = [
-        ":shared_hit_context_allocator",
         "//test_util:equality",
         "@com_google_googletest//:gtest_main"
     ],
