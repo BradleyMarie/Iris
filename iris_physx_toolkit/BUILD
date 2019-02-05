@@ -46,6 +46,15 @@ cc_library(
 )
 
 cc_library(
+    name = "constructive_solid_geometry",
+    hdrs = ["constructive_solid_geometry.h"],
+    srcs = ["constructive_solid_geometry.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "directional_light",
     hdrs = ["directional_light.h"],
     srcs = ["directional_light.c"],
