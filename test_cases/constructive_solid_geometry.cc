@@ -105,7 +105,7 @@ TestRenderSingleThreaded(
     ColorIntegratorFree(color_integrator);
 }
 
-TEST(ConstructiveSolidGeometryTest, ShpereIntersection)
+TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 {
     PLIST_SCENE scene;
     ISTATUS status = ListSceneAllocate(&scene);
@@ -190,6 +190,107 @@ TEST(ConstructiveSolidGeometryTest, ShpereIntersection)
     TestRenderSingleThreaded(scene,
                              light_sampler,
                              "test_results/csg_sphere_intersection.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    LightRelease(light);
+    BrdfRelease(brdf0);
+    BrdfRelease(brdf1);
+    MaterialRelease(material0);
+    MaterialRelease(material1);
+    ShapeRelease(shape0);
+    ShapeRelease(shape1);
+    ShapeRelease(shape2);
+}
+
+TEST(ConstructiveSolidGeometryTest, SphereUnion)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf0;
+    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf1;
+    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material0;
+    status = ConstantMaterialAllocate(brdf0, &material0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material1;
+    status = ConstantMaterialAllocate(brdf1, &material1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape0;
+    status = SphereAllocate(
+        PointCreate((float_t)-0.25, (float_t)0.0, (float_t)0.0),
+        (float_t)0.5,
+        material0,
+        material0,
+        &shape0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape1;
+    status = SphereAllocate(
+        PointCreate((float_t)0.25, (float_t)0.0, (float_t)0.0),
+        (float_t)0.5,
+        material1,
+        material1,
+        &shape1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape2;
+    status = UnionAllocate(shape0, shape1, &shape2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, shape2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler,
+                             "test_results/csg_sphere_union.pfm");
 
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);

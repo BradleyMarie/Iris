@@ -68,6 +68,8 @@ IntersectionShapeTrace(
     *hit = NULL;
     while (hits0 != NULL && hits1 != NULL)
     {
+        assert(!hits0->next || hits0->distance <= hits0->distance);
+        assert(!hits1->next || hits1->distance <= hits1->distance);
         if (hits0->distance < hits1->distance)
         {
             if (inside1)
@@ -164,6 +166,158 @@ IntersectionShapeCheckBounds(
 }
 
 static
+ISTATUS
+UnionShapeTrace(
+    _In_ const void *context,
+    _In_ PCRAY ray,
+    _In_ PSHAPE_HIT_ALLOCATOR allocator,
+    _Out_ PHIT *hit
+    )
+{
+    PCCSG_SHAPE csg_shape = (PCCSG_SHAPE)context;
+
+    PHIT hits0;
+    ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
+                                                   csg_shape->shapes[0],
+                                                   &hits0);
+
+    if (status == ISTATUS_NO_INTERSECTION)
+    {
+        hits0 = NULL;
+    }
+    else if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PHIT hits1;
+    status = ShapeHitTesterTestNestedShape(allocator,
+                                           csg_shape->shapes[1],
+                                           &hits1);
+
+    if (status == ISTATUS_NO_INTERSECTION)
+    {
+        hits1 = NULL;
+    }
+    else if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PHIT last_hit = NULL;
+    status = ISTATUS_NO_INTERSECTION;
+    *hit = NULL;
+    while (hits0 != NULL && hits1 != NULL)
+    {
+        assert(!hits0->next || hits0->distance <= hits0->distance);
+        assert(!hits1->next || hits1->distance <= hits1->distance);
+        if (hits0->distance < hits1->distance)
+        {
+            if (*hit == NULL)
+            {
+                *hit = hits0;
+                status = ISTATUS_SUCCESS;
+            }
+            else
+            {
+                last_hit->next = hits0;
+            }
+
+            PHIT current_hit = hits0;
+            hits0 = hits0->next;
+            current_hit->next = NULL;
+            last_hit = current_hit;
+        }
+        else
+        {
+            if (*hit == NULL)
+            {
+                *hit = hits1;
+                status = ISTATUS_SUCCESS;
+            }
+            else
+            {
+                last_hit->next = hits1;
+            }
+
+            PHIT current_hit = hits1;
+            hits1 = hits1->next;
+            current_hit->next = NULL;
+            last_hit = current_hit;
+        }
+    }
+
+    while (hits0 != NULL)
+    {
+        assert(!hits0->next || hits0->distance <= hits0->distance);
+        if (*hit == NULL)
+        {
+            *hit = hits0;
+            status = ISTATUS_SUCCESS;
+        }
+        else
+        {
+            last_hit->next = hits0;
+        }
+
+        PHIT current_hit = hits0;
+        hits0 = hits0->next;
+        current_hit->next = NULL;
+        last_hit = current_hit;
+    }
+
+    while (hits1 != NULL)
+    {
+        assert(!hits1->next || hits1->distance <= hits1->distance);
+        if (*hit == NULL)
+        {
+            *hit = hits1;
+            status = ISTATUS_SUCCESS;
+        }
+        else
+        {
+            last_hit->next = hits1;
+        }
+
+        PHIT current_hit = hits1;
+        hits1 = hits1->next;
+        current_hit->next = NULL;
+        last_hit = current_hit;
+    }
+
+    return status;
+}
+
+static
+ISTATUS
+UnionShapeCheckBounds(
+    _In_ const void *context,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ BOUNDING_BOX world_bounds,
+    _Out_ bool *contains
+    )
+{
+    PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
+
+    ISTATUS status = ShapeCheckBounds(csg_shape->shapes[0],
+                                      model_to_world,
+                                      world_bounds,
+                                      contains);
+
+    if (status != ISTATUS_SUCCESS || *contains)
+    {
+        return status;
+    }
+
+    status = ShapeCheckBounds(csg_shape->shapes[1],
+                              model_to_world,
+                              world_bounds,
+                              contains);
+
+    return status;
+}
+
+static
 void
 ConstructiveSolidShapeFree(
     _In_opt_ _Post_invalid_ void *context
@@ -190,12 +344,25 @@ static const SHAPE_VTABLE intersection_vtable = {
     ConstructiveSolidShapeFree
 };
 
+static const SHAPE_VTABLE union_vtable = {
+    UnionShapeTrace,
+    UnionShapeCheckBounds,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ConstructiveSolidShapeFree
+};
+
 //
-// Functions
+// Static Functions
 //
 
+static
 ISTATUS
-IntersectionAllocate(
+CsgAllocate(
+    _In_ PCSHAPE_VTABLE vtable,
     _In_ PSHAPE shape0,
     _In_ PSHAPE shape1,
     _Out_ PSHAPE *result
@@ -227,7 +394,7 @@ IntersectionAllocate(
     csg_shape.shapes[0] = shape0;
     csg_shape.shapes[1] = shape1;
 
-    ISTATUS status = ShapeAllocate(&intersection_vtable,
+    ISTATUS status = ShapeAllocate(vtable,
                                    &csg_shape,
                                    sizeof(CSG_SHAPE),
                                    alignof(CSG_SHAPE),
@@ -242,4 +409,38 @@ IntersectionAllocate(
     ShapeRetain(shape1);
 
     return ISTATUS_SUCCESS;
+}
+
+//
+// Functions
+//
+
+ISTATUS
+IntersectionAllocate(
+    _In_ PSHAPE shape0,
+    _In_ PSHAPE shape1,
+    _Out_ PSHAPE *result
+    )
+{
+    ISTATUS status = CsgAllocate(&intersection_vtable,
+                                 shape0,
+                                 shape1,
+                                 result);
+
+    return status;
+}
+
+ISTATUS
+UnionAllocate(
+    _In_ PSHAPE shape0,
+    _In_ PSHAPE shape1,
+    _Out_ PSHAPE *result
+    )
+{
+    ISTATUS status = CsgAllocate(&union_vtable,
+                                 shape0,
+                                 shape1,
+                                 result);
+
+    return status;
 }

@@ -5,6 +5,7 @@ cc_test(
     srcs = ["constructive_solid_geometry.cc"],
     data = [
         "//test_results:csg_sphere_intersection.pfm",
+        "//test_results:csg_sphere_union.pfm",
     ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",

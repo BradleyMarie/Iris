@@ -32,6 +32,13 @@ IntersectionAllocate(
     _Out_ PSHAPE *result
     );
 
+ISTATUS
+UnionAllocate(
+    _In_ PSHAPE shape0,
+    _In_ PSHAPE shape1,
+    _Out_ PSHAPE *result
+    );
+
 #if __cplusplus
 }
 #endif // __cplusplus
