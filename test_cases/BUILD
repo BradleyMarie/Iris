@@ -22,6 +22,7 @@ cc_test(
         "//iris_physx_toolkit:sample_tracer",
         "//iris_physx_toolkit:sphere",
         "//test_util:pfm",
+        "//test_util:quad",
         "//test_util:spectra",
         "@com_google_googletest//:gtest_main",
     ],

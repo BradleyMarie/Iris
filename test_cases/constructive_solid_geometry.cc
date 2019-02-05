@@ -29,7 +29,133 @@ Abstract:
 #include "iris_physx_toolkit/sphere.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
+#include "test_util/quad.h"
 #include "test_util/spectra.h"
+
+void
+AllocateCubeFace(
+    _In_ POINT3 v0,
+    _In_ POINT3 v1,
+    _In_ POINT3 v2,
+    _In_ POINT3 v3,
+    _In_opt_ PMATERIAL material,
+    _Out_ PSHAPE *cube
+    )
+{
+    PSHAPE shape0, shape1;
+    ISTATUS status = EmissiveQuadAllocate(
+        v0,
+        v1,
+        v2,
+        v3,
+        material,
+        material,
+        nullptr,
+        nullptr,
+        &shape0,
+        &shape1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = UnionAllocate(shape0, shape1, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+    ShapeRelease(shape1);
+}
+
+void
+AllocateCubeFromTriangles(
+    _In_ PMATERIAL material,
+    _Out_ PSHAPE *cube
+    )
+{
+    POINT3 points[] = {
+        PointCreate((float_t)-0.25, (float_t)-0.25, (float_t)-0.25),
+        PointCreate((float_t)0.25, (float_t)-0.25, (float_t)-0.25),
+        PointCreate((float_t)-0.25, (float_t)0.25, (float_t)-0.25),
+        PointCreate((float_t)-0.25, (float_t)-0.25, (float_t)0.25),
+        PointCreate((float_t)0.25, (float_t)0.25, (float_t)-0.25),
+        PointCreate((float_t)-0.25, (float_t)0.25, (float_t)0.25),
+        PointCreate((float_t)0.25, (float_t)-0.25, (float_t)0.25),
+        PointCreate((float_t)0.25, (float_t)0.25, (float_t)0.25),
+    };
+
+    // Front
+    PSHAPE shape0;
+    AllocateCubeFace(points[0],
+                     points[1],
+                     points[4],
+                     points[2],
+                     material,
+                     &shape0);
+
+    // Back
+    PSHAPE shape1;
+    AllocateCubeFace(points[3],
+                     points[6],
+                     points[7],
+                     points[5],
+                     material,
+                     &shape1);
+
+    ISTATUS status = UnionAllocate(shape0, shape1, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+    ShapeRelease(shape1);
+
+    // Left
+    AllocateCubeFace(points[0],
+                     points[2],
+                     points[5],
+                     points[3],
+                     material,
+                     &shape0);
+
+    status = UnionAllocate(shape0, *cube, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+
+    // Right
+    AllocateCubeFace(points[1],
+                     points[4],
+                     points[7],
+                     points[6],
+                     material,
+                     &shape0);
+
+    status = UnionAllocate(shape0, *cube, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+
+    // Bottom
+    AllocateCubeFace(points[0],
+                     points[1],
+                     points[6],
+                     points[3],
+                     material,
+                     &shape0);
+
+    status = UnionAllocate(shape0, *cube, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+
+    // Top
+    AllocateCubeFace(points[2],
+                     points[4],
+                     points[7],
+                     points[5],
+                     material,
+                     &shape0);
+
+    status = UnionAllocate(shape0, *cube, cube);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ShapeRelease(shape0);
+}
 
 void
 TestRenderSingleThreaded(
@@ -305,4 +431,107 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     ShapeRelease(shape0);
     ShapeRelease(shape1);
     ShapeRelease(shape2);
+}
+
+TEST(ConstructiveSolidGeometryTest, RoundedCube)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)1.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector0;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)1.0,
+                                   (float_t)0.0,
+                                   &reflector0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector1;
+    status = TestReflectorAllocate((float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)1.0,
+                                   &reflector1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf0;
+    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf1;
+    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material0;
+    status = ConstantMaterialAllocate(brdf0, &material0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material1;
+    status = ConstantMaterialAllocate(brdf1, &material1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape0;
+    AllocateCubeFromTriangles(material0, &shape0);
+
+    PSHAPE shape1;
+    status = SphereAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+        (float_t)0.37,
+        material1,
+        material1,
+        &shape1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE shape2;
+    status = IntersectionAllocate(shape0, shape1, &shape2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    const float_t pi = (float_t)3.1415926535897932384626433832;
+
+    PMATRIX matrix;
+    status = MatrixAllocateRotation(
+        -pi / (float_t)4.0, (float_t)1.0, (float_t)1.0, (float_t)1.0, &matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddTransformedShape(scene, shape2, matrix);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler,
+                             "test_results/csg_rounded_cube.pfm");
+
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector0);
+    ReflectorRelease(reflector1);
+    LightRelease(light);
+    BrdfRelease(brdf0);
+    BrdfRelease(brdf1);
+    MaterialRelease(material0);
+    MaterialRelease(material1);
+    ShapeRelease(shape0);
+    ShapeRelease(shape1);
+    ShapeRelease(shape2);
+    MatrixRelease(matrix);
 }
