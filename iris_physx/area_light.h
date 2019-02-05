@@ -29,4 +29,12 @@ AreaLightAllocate(
     _Out_ PLIGHT *light
     );
 
+ISTATUS
+NestedAreaLightAllocate(
+    _In_ PSHAPE trace_shape,
+    _In_ PSHAPE light_shape,
+    _In_ uint32_t face,
+    _Out_ PLIGHT *light
+    );
+
 #endif // _IRIS_AREA_LIGHT_

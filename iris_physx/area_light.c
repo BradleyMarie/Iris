@@ -26,7 +26,9 @@ Abstract:
 
 typedef struct _AREA_LIGHT {
     PCEMISSIVE_MATERIAL emissive_material;
-    PSHAPE shape;
+    PRAY_TRACER_PROCESS_HIT_ROUTINE process_hit_routine;
+    PSHAPE trace_shape;
+    PSHAPE light_shape;
     uint32_t face;
 } AREA_LIGHT, *PAREA_LIGHT;
 
@@ -53,7 +55,13 @@ VisibilityTesterTraceSingleShape(
 {
     PCSHAPE shape = (PCSHAPE)context;
 
-    ISTATUS status = ShapeHitTesterTestShape(hit_tester, shape);
+    PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *shape_context = ((const void **)shape)[1];
+    ISTATUS status = HitTesterTestGeometry(hit_tester,
+                                           test_routine,
+                                           shape_context,
+                                           shape);
 
     return status;
 }
@@ -69,6 +77,41 @@ VisibilityTesterProcessHitAreaLight(
         (PAREA_LIGHT_AND_RESULTS)context;
 
     if (hit_context->front_face != area_light_and_results->area_light->face)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    POINT3 hit_point = RayEndpoint(*area_light_and_results->ray,
+                                   hit_context->distance);
+
+    ISTATUS status =
+        EmissiveMaterialSample(area_light_and_results->area_light->emissive_material,
+                               hit_point,
+                               hit_context->additional_data,
+                               area_light_and_results->spectrum);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *(area_light_and_results->distance) = hit_context->distance;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+VisibilityTesterProcessHitNestedAreaLight(
+    _Inout_opt_ void *context,
+    _In_ PCHIT_CONTEXT hit_context
+    )
+{
+    PAREA_LIGHT_AND_RESULTS area_light_and_results =
+        (PAREA_LIGHT_AND_RESULTS)context;
+
+    if (hit_context->data != area_light_and_results->area_light->light_shape ||
+        hit_context->front_face != area_light_and_results->area_light->face)
     {
         return ISTATUS_SUCCESS;
     }
@@ -120,8 +163,8 @@ VisibilityTesterTestSingleAreaLight(
                                  ray,
                                  visibility_tester->epsilon,
                                  VisibilityTesterTraceSingleShape,
-                                 area_light->shape,
-                                 VisibilityTesterProcessHitAreaLight,
+                                 area_light->trace_shape,
+                                 area_light->process_hit_routine,
                                  &area_light_and_results);
 
     return status;
@@ -152,7 +195,7 @@ AreaLightComputeEmissive(
     }
 
     float_t pdf;
-    status = ShapeComputePdfBySolidAngle(area_light->shape,
+    status = ShapeComputePdfBySolidAngle(area_light->light_shape,
                                          to_light,
                                          distance,
                                          area_light->face,
@@ -210,7 +253,7 @@ AreaLightComputeEmissiveWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    status = ShapeComputePdfBySolidAngle(area_light->shape,
+    status = ShapeComputePdfBySolidAngle(area_light->light_shape,
                                          to_light,
                                          distance,
                                          area_light->face,
@@ -258,7 +301,7 @@ AreaLightSample(
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
     POINT3 sampled_point;
-    ISTATUS status = ShapeSampleFace(area_light->shape,
+    ISTATUS status = ShapeSampleFace(area_light->light_shape,
                                      area_light->face,
                                      rng,
                                      &sampled_point);
@@ -290,7 +333,8 @@ AreaLightFree(
 {
     PAREA_LIGHT area_light = (PAREA_LIGHT)context;
 
-    ShapeRelease(area_light->shape);
+    ShapeRelease(area_light->trace_shape);
+    ShapeRelease(area_light->light_shape);
 }
 
 //
@@ -303,6 +347,71 @@ static const LIGHT_VTABLE area_light_vtable = {
     AreaLightComputeEmissiveWithPdf,
     AreaLightFree
 };
+
+//
+// Static Functions
+//
+
+static
+ISTATUS
+AreaLightAllocateInternal(
+    _In_ PSHAPE trace_shape,
+    _In_ PSHAPE light_shape,
+    _In_ uint32_t face,
+    _Out_ PLIGHT *light
+    )
+{
+    assert(trace_shape != NULL);
+    assert(light_shape != NULL);
+    assert(light != NULL);
+
+    PCEMISSIVE_MATERIAL emissive_material;
+    ISTATUS status = ShapeGetEmissiveMaterial(light_shape,
+                                              face,
+                                              &emissive_material);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (emissive_material == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    AREA_LIGHT area_light;
+    area_light.emissive_material = emissive_material;
+    area_light.trace_shape = trace_shape;
+    area_light.light_shape = light_shape;
+    area_light.face = face;
+
+    if (trace_shape == light_shape)
+    {
+        area_light.process_hit_routine = VisibilityTesterProcessHitAreaLight;
+    }
+    else
+    {
+        area_light.process_hit_routine =
+            VisibilityTesterProcessHitNestedAreaLight;
+    }
+
+    status = LightAllocate(&area_light_vtable,
+                           &area_light,
+                           sizeof(AREA_LIGHT),
+                           alignof(AREA_LIGHT),
+                           light);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    ShapeRetain(trace_shape);
+    ShapeRetain(light_shape);
+
+    return ISTATUS_SUCCESS;
+}
 
 //
 // Functions
@@ -328,31 +437,41 @@ AreaLightAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    PCEMISSIVE_MATERIAL emissive_material;
-    ISTATUS status = ShapeGetEmissiveMaterial(shape, face, &emissive_material);
+    ISTATUS status = AreaLightAllocateInternal(shape, shape, face, light);
 
-    if (status != ISTATUS_SUCCESS)
+    return status;
+}
+
+ISTATUS
+NestedAreaLightAllocate(
+    _In_ PSHAPE trace_shape,
+    _In_ PSHAPE light_shape,
+    _In_ uint32_t face,
+    _Out_ PLIGHT *light
+    )
+{
+    if (trace_shape == NULL)
     {
-        return status;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (emissive_material == NULL)
+    if (light_shape == NULL ||
+        light_shape->vtable->get_emissive_material_routine == NULL ||
+        light_shape->vtable->sample_face_routine == NULL ||
+        light_shape->vtable->compute_pdf_by_solid_angle_routine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    AREA_LIGHT area_light;
-    area_light.emissive_material = emissive_material;
-    area_light.shape = shape;
-    area_light.face = face;
+    if (light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
 
-    status = LightAllocate(&area_light_vtable,
-                           &area_light,
-                           sizeof(AREA_LIGHT),
-                           alignof(AREA_LIGHT),
-                           light);
-
-    ShapeRetain(shape);
+    ISTATUS status = AreaLightAllocateInternal(trace_shape,
+                                               light_shape,
+                                               face,
+                                               light);
 
     return status;
 }
