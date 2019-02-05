@@ -205,6 +205,8 @@ UnionShapeTrace(
     }
 
     PHIT last_hit = NULL;
+    bool inside0 = false;
+    bool inside1 = false;
     status = ISTATUS_NO_INTERSECTION;
     *hit = NULL;
     while (hits0 != NULL && hits1 != NULL)
@@ -213,37 +215,55 @@ UnionShapeTrace(
         assert(!hits1->next || hits1->distance <= hits1->distance);
         if (hits0->distance < hits1->distance)
         {
-            if (*hit == NULL)
+            if (!inside1)
             {
-                *hit = hits0;
-                status = ISTATUS_SUCCESS;
+                if (*hit == NULL)
+                {
+                    *hit = hits0;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits0;
+                }
+
+                PHIT current_hit = hits0;
+                hits0 = hits0->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
             }
             else
             {
-                last_hit->next = hits0;
+                hits0 = hits0->next;
             }
 
-            PHIT current_hit = hits0;
-            hits0 = hits0->next;
-            current_hit->next = NULL;
-            last_hit = current_hit;
+            inside0 = !inside0;
         }
         else
         {
-            if (*hit == NULL)
+            if (!inside0)
             {
-                *hit = hits1;
-                status = ISTATUS_SUCCESS;
+                if (*hit == NULL)
+                {
+                    *hit = hits1;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits1;
+                }
+
+                PHIT current_hit = hits1;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
             }
             else
             {
-                last_hit->next = hits1;
+                hits1 = hits1->next;
             }
 
-            PHIT current_hit = hits1;
-            hits1 = hits1->next;
-            current_hit->next = NULL;
-            last_hit = current_hit;
+            inside1 = !inside1;
         }
     }
 
