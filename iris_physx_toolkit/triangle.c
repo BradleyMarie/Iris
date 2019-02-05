@@ -61,26 +61,13 @@ TriangleTraceXYDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-
-    if (dp == (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
-    if (isinf(distance_to_plane))
+    if (!isfinite(distance_to_plane))
     {
         return ISTATUS_NO_INTERSECTION;
     }
-
-#if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
-    if (distance_to_plane < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-#endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
     POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
     VECTOR3 vertex_to_plane_intersection =
@@ -167,26 +154,13 @@ TriangleTraceXZDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-
-    if (dp == (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
-    if (isinf(distance_to_plane))
+    if (!isfinite(distance_to_plane))
     {
         return ISTATUS_NO_INTERSECTION;
     }
-
-#if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
-    if (distance_to_plane < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-#endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
     POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
     VECTOR3 vertex_to_plane_intersection =
@@ -273,26 +247,13 @@ TriangleTraceYZDominant(
 
     VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-
-    if (dp == (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
     float_t distance_to_plane =
         VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
 
-    if (isinf(distance_to_plane))
+    if (!isfinite(distance_to_plane))
     {
         return ISTATUS_NO_INTERSECTION;
     }
-
-#if !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
-    if (distance_to_plane < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-#endif // defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
     POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
     VECTOR3 vertex_to_plane_intersection =
