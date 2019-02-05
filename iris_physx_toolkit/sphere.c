@@ -46,25 +46,8 @@ SphereTrace(
     VECTOR3 to_center = PointSubtract(sphere->center, ray->origin);
     float_t distance_to_chord_midpoint = VectorDotProduct(to_center,
                                                           ray->direction);
-
-#if defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
-    // Either the sphere is behind the ray or the ray starts inside the sphere.
-    // No intersections are possible.
-    if (distance_to_chord_midpoint < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-#endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
         
     float_t distance_to_center_squared = VectorDotProduct(to_center, to_center);
-
-#if defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
-    // Ray begins inside the sphere. No intersections are possible.
-    if (distance_to_center_squared < sphere->radius_squared)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-#endif // defined(ONE_SIDED_GEOMETRY) && !defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
     float_t distance_to_chord_midpoint_squared =
         distance_to_chord_midpoint * distance_to_chord_midpoint;
@@ -80,7 +63,6 @@ SphereTrace(
     float_t half_chord_length = 
         sqrt(sphere->radius_squared - distance_from_chord_to_center_squared);
 
-#if !defined(ONE_SIDED_GEOMETRY) || defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
     // Ray intersects sphere and originates inside the sphere
     if (distance_to_center_squared < sphere->radius_squared)
     {
@@ -95,7 +77,6 @@ SphereTrace(
                                                    0,
                                                    hit);
 
-#ifdef CONSTRUCTIVE_SOLID_GEOMETRY
         if (status != ISTATUS_SUCCESS)
         {
             return status;
@@ -111,56 +92,37 @@ SphereTrace(
                                            0,
                                            0,
                                            hit);
-#endif // CONSTRUCTIVE_SOLID_GEOMETRY
 
         return status;
     }
-#endif // !defined(ONE_SIDED_GEOMETRY) || defined(CONSTRUCTIVE_SOLID_GEOMETRY) 
 
     // Ray intersects sphere and originates outside the sphere.
-#ifdef CONSTRUCTIVE_SOLID_GEOMETRY
-    {
-        float_t farther_hit = distance_to_chord_midpoint + half_chord_length;
-        ISTATUS status = ShapeHitAllocatorAllocate(allocator,
-                                                   NULL,
-                                                   farther_hit,
-                                                   SPHERE_BACK_FACE,
-                                                   SPHERE_FRONT_FACE,
-                                                   NULL,
-                                                   0,
-                                                   0,
-                                                   hit);
+    float_t farther_hit = distance_to_chord_midpoint + half_chord_length;
+    ISTATUS status = ShapeHitAllocatorAllocate(allocator,
+                                                NULL,
+                                                farther_hit,
+                                                SPHERE_BACK_FACE,
+                                                SPHERE_FRONT_FACE,
+                                                NULL,
+                                                0,
+                                                0,
+                                                hit);
 
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
     }
-#endif
 
     float_t closer_hit = distance_to_chord_midpoint - half_chord_length;
-
-#ifdef CONSTRUCTIVE_SOLID_GEOMETRY
-    ISTATUS status = ShapeHitAllocatorAllocate(allocator,
-                                               *hit,
-                                               closer_hit,
-                                               SPHERE_FRONT_FACE,
-                                               SPHERE_BACK_FACE,
-                                               NULL,
-                                               0,
-                                               0,
-                                               hit);
-#else
-    ISTATUS status = ShapeHitAllocatorAllocate(allocator,
-                                               NULL,
-                                               closer_hit,
-                                               SPHERE_FRONT_FACE,
-                                               SPHERE_BACK_FACE,
-                                               NULL,
-                                               0,
-                                               0,
-                                               hit);
-#endif // CONSTRUCTIVE_SOLID_GEOMETRY
+    status = ShapeHitAllocatorAllocate(allocator,
+                                       *hit,
+                                        closer_hit,
+                                        SPHERE_FRONT_FACE,
+                                        SPHERE_BACK_FACE,
+                                        NULL,
+                                        0,
+                                        0,
+                                        hit);
 
     return status;
 }
