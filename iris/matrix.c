@@ -50,12 +50,10 @@ Float4x4DivideRow(
     assert(isfinite(divisor));
     assert(divisor != (float_t) 0.0);
 
-    float_t scalar = (float_t) 1.0 / divisor;
-
-    matrix[row][0] *= scalar;
-    matrix[row][1] *= scalar;
-    matrix[row][2] *= scalar;
-    matrix[row][3] *= scalar;
+    matrix[row][0] /= divisor;
+    matrix[row][1] /= divisor;
+    matrix[row][2] /= divisor;
+    matrix[row][3] /= divisor;
 }
 
 static
