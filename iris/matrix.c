@@ -1096,11 +1096,111 @@ MatrixAllocateProduct(
                   multiplicand0->m[3][2] * multiplicand1->m[2][3] +
                   multiplicand0->m[3][3] * multiplicand1->m[3][3];
 
-    ISTATUS status = MatrixAllocate(m00, m01, m02, m03, 
-                                    m10, m11, m12, m13,
-                                    m20, m21, m22, m23,
-                                    m30, m31, m32, m33,
-                                    product);
+    float_t i00 =
+        multiplicand1->inverse->m[0][0] * multiplicand0->inverse->m[0][0] +
+        multiplicand1->inverse->m[0][1] * multiplicand0->inverse->m[1][0] +
+        multiplicand1->inverse->m[0][2] * multiplicand0->inverse->m[2][0] +
+        multiplicand1->inverse->m[0][3] * multiplicand0->inverse->m[3][0];
+
+    float_t i01 =
+        multiplicand1->inverse->m[0][0] * multiplicand0->inverse->m[0][1] +
+        multiplicand1->inverse->m[0][1] * multiplicand0->inverse->m[1][1] +
+        multiplicand1->inverse->m[0][2] * multiplicand0->inverse->m[2][1] +
+        multiplicand1->inverse->m[0][3] * multiplicand0->inverse->m[3][1];
+
+    float_t i02 =
+        multiplicand1->inverse->m[0][0] * multiplicand0->inverse->m[0][2] +
+        multiplicand1->inverse->m[0][1] * multiplicand0->inverse->m[1][2] +
+        multiplicand1->inverse->m[0][2] * multiplicand0->inverse->m[2][2] +
+        multiplicand1->inverse->m[0][3] * multiplicand0->inverse->m[3][2];
+
+    float_t i03 =
+        multiplicand1->inverse->m[0][0] * multiplicand0->inverse->m[0][3] +
+        multiplicand1->inverse->m[0][1] * multiplicand0->inverse->m[1][3] +
+        multiplicand1->inverse->m[0][2] * multiplicand0->inverse->m[2][3] +
+        multiplicand1->inverse->m[0][3] * multiplicand0->inverse->m[3][3];
+
+    float_t i10 =
+        multiplicand1->inverse->m[1][0] * multiplicand0->inverse->m[0][0] +
+        multiplicand1->inverse->m[1][1] * multiplicand0->inverse->m[1][0] +
+        multiplicand1->inverse->m[1][2] * multiplicand0->inverse->m[2][0] +
+        multiplicand1->inverse->m[1][3] * multiplicand0->inverse->m[3][0];
+
+    float_t i11 =
+        multiplicand1->inverse->m[1][0] * multiplicand0->inverse->m[0][1] +
+        multiplicand1->inverse->m[1][1] * multiplicand0->inverse->m[1][1] +
+        multiplicand1->inverse->m[1][2] * multiplicand0->inverse->m[2][1] +
+        multiplicand1->inverse->m[1][3] * multiplicand0->inverse->m[3][1];
+
+    float_t i12 =
+        multiplicand1->inverse->m[1][0] * multiplicand0->inverse->m[0][2] +
+        multiplicand1->inverse->m[1][1] * multiplicand0->inverse->m[1][2] +
+        multiplicand1->inverse->m[1][2] * multiplicand0->inverse->m[2][2] +
+        multiplicand1->inverse->m[1][3] * multiplicand0->inverse->m[3][2];
+
+    float_t i13 =
+        multiplicand1->inverse->m[1][0] * multiplicand0->inverse->m[0][3] +
+        multiplicand1->inverse->m[1][1] * multiplicand0->inverse->m[1][3] +
+        multiplicand1->inverse->m[1][2] * multiplicand0->inverse->m[2][3] +
+        multiplicand1->inverse->m[1][3] * multiplicand0->inverse->m[3][3];
+
+    float_t i20 =
+        multiplicand1->inverse->m[2][0] * multiplicand0->inverse->m[0][0] +
+        multiplicand1->inverse->m[2][1] * multiplicand0->inverse->m[1][0] +
+        multiplicand1->inverse->m[2][2] * multiplicand0->inverse->m[2][0] +
+        multiplicand1->inverse->m[2][3] * multiplicand0->inverse->m[3][0];
+
+    float_t i21 =
+        multiplicand1->inverse->m[2][0] * multiplicand0->inverse->m[0][1] +
+        multiplicand1->inverse->m[2][1] * multiplicand0->inverse->m[1][1] +
+        multiplicand1->inverse->m[2][2] * multiplicand0->inverse->m[2][1] +
+        multiplicand1->inverse->m[2][3] * multiplicand0->inverse->m[3][1];
+
+    float_t i22 =
+        multiplicand1->inverse->m[2][0] * multiplicand0->inverse->m[0][2] +
+        multiplicand1->inverse->m[2][1] * multiplicand0->inverse->m[1][2] +
+        multiplicand1->inverse->m[2][2] * multiplicand0->inverse->m[2][2] +
+        multiplicand1->inverse->m[2][3] * multiplicand0->inverse->m[3][2];
+
+    float_t i23 =
+        multiplicand1->inverse->m[2][0] * multiplicand0->inverse->m[0][3] +
+        multiplicand1->inverse->m[2][1] * multiplicand0->inverse->m[1][3] +
+        multiplicand1->inverse->m[2][2] * multiplicand0->inverse->m[2][3] +
+        multiplicand1->inverse->m[2][3] * multiplicand0->inverse->m[3][3];
+
+    float_t i30 =
+        multiplicand1->inverse->m[3][0] * multiplicand0->inverse->m[0][0] +
+        multiplicand1->inverse->m[3][1] * multiplicand0->inverse->m[1][0] +
+        multiplicand1->inverse->m[3][2] * multiplicand0->inverse->m[2][0] +
+        multiplicand1->inverse->m[3][3] * multiplicand0->inverse->m[3][0];
+
+    float_t i31 =
+        multiplicand1->inverse->m[3][0] * multiplicand0->inverse->m[0][1] +
+        multiplicand1->inverse->m[3][1] * multiplicand0->inverse->m[1][1] +
+        multiplicand1->inverse->m[3][2] * multiplicand0->inverse->m[2][1] +
+        multiplicand1->inverse->m[3][3] * multiplicand0->inverse->m[3][1];
+
+    float_t i32 =
+        multiplicand1->inverse->m[3][0] * multiplicand0->inverse->m[0][2] +
+        multiplicand1->inverse->m[3][1] * multiplicand0->inverse->m[1][2] +
+        multiplicand1->inverse->m[3][2] * multiplicand0->inverse->m[2][2] +
+        multiplicand1->inverse->m[3][3] * multiplicand0->inverse->m[3][2];
+
+    float_t i33 =
+        multiplicand1->inverse->m[3][0] * multiplicand0->inverse->m[0][3] +
+        multiplicand1->inverse->m[3][1] * multiplicand0->inverse->m[1][3] +
+        multiplicand1->inverse->m[3][2] * multiplicand0->inverse->m[2][3] +
+        multiplicand1->inverse->m[3][3] * multiplicand0->inverse->m[3][3];
+
+    ISTATUS status = MatrixAllocateFromValues(m00, m01, m02, m03, 
+                                              m10, m11, m12, m13,
+                                              m20, m21, m22, m23,
+                                              m30, m31, m32, m33,
+                                              i00, i01, i02, i03, 
+                                              i10, i11, i12, i13,
+                                              i20, i21, i22, i23,
+                                              i30, i31, i32, i33,
+                                              product);
 
     return status;
 }
