@@ -810,10 +810,14 @@ MatrixAllocateRotation(
     float_t m21 = normalized.z * normalized.y * ic + normalized.x * sin_theta;
     float_t m22 = normalized.z * normalized.z * ic + cos_theta;
 
-    ISTATUS status = MatrixAllocate(
+    ISTATUS status = MatrixAllocateFromValues(
         m00, m01, m02, (float_t) 0.0, 
         m10, m11, m12, (float_t) 0.0,
         m20, m21, m22, (float_t) 0.0,
+        (float_t) 0.0, (float_t) 0.0, (float_t) 0.0, (float_t) 1.0,
+        m00, m10, m20, (float_t) 0.0, 
+        m01, m11, m21, (float_t) 0.0,
+        m02, m12, m22, (float_t) 0.0,
         (float_t) 0.0, (float_t) 0.0, (float_t) 0.0, (float_t) 1.0,
         matrix);
 
