@@ -505,12 +505,21 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
 
     const float_t pi = (float_t)3.1415926535897932384626433832;
 
-    PMATRIX matrix;
+    PMATRIX matrix0;
     status = MatrixAllocateRotation(
-        -pi / (float_t)4.0, (float_t)1.0, (float_t)1.0, (float_t)1.0, &matrix);
+        pi / (float_t)4.0, (float_t)0.0, (float_t)1.0, (float_t)0.0, &matrix0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddTransformedShape(scene, shape2, matrix);
+    PMATRIX matrix1;
+    status = MatrixAllocateRotation(
+        pi / (float_t)5.0, (float_t)1.0, (float_t)0.0, (float_t)1.0, &matrix1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATRIX matrix2;
+    status = MatrixAllocateProduct(matrix0, matrix1, &matrix2);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddTransformedShape(scene, shape2, matrix2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -533,5 +542,7 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     ShapeRelease(shape0);
     ShapeRelease(shape1);
     ShapeRelease(shape2);
-    MatrixRelease(matrix);
+    MatrixRelease(matrix0);
+    MatrixRelease(matrix1);
+    MatrixRelease(matrix2);
 }
