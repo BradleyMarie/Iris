@@ -37,72 +37,6 @@ struct _INVERTIBLE_MATRIX {
 //
 
 static
-void
-Float4x4DivideRow(
-    _Inout_ float_t matrix[4][4],
-    _In_range_(0, 3) size_t row,
-    _In_ float_t divisor
-    )
-{
-    assert(matrix != NULL);
-    assert(0 <= row);
-    assert(row <= 3);
-    assert(isfinite(divisor));
-    assert(divisor != (float_t) 0.0);
-
-    matrix[row][0] /= divisor;
-    matrix[row][1] /= divisor;
-    matrix[row][2] /= divisor;
-    matrix[row][3] /= divisor;
-}
-
-static
-void
-Float4x4ScaledSubtractRow(
-    _Inout_ float_t matrix[4][4],
-    _In_range_(0, 3) size_t constant_row,
-    _In_range_(0, 3) size_t modified_row,
-    _In_ float_t scalar
-    )
-{
-    assert(matrix != NULL);
-    assert(0 <= constant_row);
-    assert(constant_row <= 3);
-    assert(0 <= modified_row);
-    assert(modified_row <= 3);
-    assert(constant_row != modified_row);
-    assert(isfinite(scalar));
-
-    matrix[modified_row][0] -= matrix[constant_row][0] * scalar;
-    matrix[modified_row][1] -= matrix[constant_row][1] * scalar;
-    matrix[modified_row][2] -= matrix[constant_row][2] * scalar;
-    matrix[modified_row][3] -= matrix[constant_row][3] * scalar;
-}
-
-static
-void
-Float4x4SwapRows(
-    _Inout_ float_t matrix[4][4],
-    _In_range_(0, 3) size_t row0,
-    _In_range_(0, 3) size_t row1
-    )
-{
-    assert(matrix != NULL);
-    assert(0 <= row0);
-    assert(row0 <= 3);
-    assert(0 <= row1);
-    assert(row1 <= 3);
-    assert(row0 != row1);
-
-    for (size_t index = 0; index < 4; index++)
-    {
-        float_t temp = matrix[row0][index];
-        matrix[row0][index] = matrix[row1][index];
-        matrix[row1][index] = temp;
-    }
-}
-
-static
 ISTATUS
 Float4x4InverseInitialize(
     _In_ float_t m00,
@@ -142,102 +76,119 @@ Float4x4InverseInitialize(
     assert(isfinite(m33));
     assert(inverse != NULL);
 
-    inverse[0][0] = (float_t) 1.0;
-    inverse[0][1] = (float_t) 0.0;
-    inverse[0][2] = (float_t) 0.0;
-    inverse[0][3] = (float_t) 0.0;
-    inverse[1][0] = (float_t) 0.0;
-    inverse[1][1] = (float_t) 1.0;
-    inverse[1][2] = (float_t) 0.0;
-    inverse[1][3] = (float_t) 0.0;
-    inverse[2][0] = (float_t) 0.0;
-    inverse[2][1] = (float_t) 0.0;
-    inverse[2][2] = (float_t) 1.0;
-    inverse[2][3] = (float_t) 0.0;
-    inverse[3][0] = (float_t) 0.0;
-    inverse[3][1] = (float_t) 0.0;
-    inverse[3][2] = (float_t) 0.0;
-    inverse[3][3] = (float_t) 1.0;
+    inverse[0][0] = m00;
+    inverse[0][1] = m01;
+    inverse[0][2] = m02;
+    inverse[0][3] = m03;
+    inverse[1][0] = m10;
+    inverse[1][1] = m11;
+    inverse[1][2] = m12;
+    inverse[1][3] = m13;
+    inverse[2][0] = m20;
+    inverse[2][1] = m21;
+    inverse[2][2] = m22;
+    inverse[2][3] = m23;
+    inverse[3][0] = m30;
+    inverse[3][1] = m31;
+    inverse[3][2] = m32;
+    inverse[3][3] = m33;
 
-    float_t matrix[4][4];
-    matrix[0][0] = m00;
-    matrix[0][1] = m01;
-    matrix[0][2] = m02;
-    matrix[0][3] = m03;
-    matrix[1][0] = m10;
-    matrix[1][1] = m11;
-    matrix[1][2] = m12;
-    matrix[1][3] = m13;
-    matrix[2][0] = m20;
-    matrix[2][1] = m21;
-    matrix[2][2] = m22;
-    matrix[2][3] = m23;
-    matrix[3][0] = m30;
-    matrix[3][1] = m31;
-    matrix[3][2] = m32;
-    matrix[3][3] = m33;
+    size_t column_index[] = { 0, 0, 0, 0 };
+    size_t row_index[] = { 0, 0, 0, 0 };
+    size_t pivot[] = { 0, 0, 0, 0 };
 
-    for (size_t current_row = 0, column_index = 0; 
-         current_row < 4 && column_index < 4; 
-         current_row++, column_index++)
+    for (size_t i = 0; i < 4; i++)
     {
-        size_t row_index;
-        for (; // No Initialization Needed
-             column_index < 4;
-             column_index++)
+        float_t best_candidate = (float_t)0.0;
+        size_t best_column = 0;
+        size_t best_row = 0;
+
+        for (size_t j = 0; j < 4; j++)
         {
-            for (row_index = current_row;
-                 row_index < 4;
-                 row_index++)
-            {
-                if (matrix[row_index][column_index] != (float_t) 0.0)
-                {
-                    break;
-                }
-            }
-
-            if (row_index != 4 &&
-                matrix[row_index][column_index] != (float_t) 0.0)
-            {
-                break;
-            }
-        }
-
-        if (column_index == 4)
-        {
-            return ISTATUS_ARITHMETIC_ERROR;
-        }
-
-        if (row_index != current_row)
-        {
-            Float4x4SwapRows(matrix, row_index, current_row);
-            Float4x4SwapRows(inverse, row_index, current_row);
-        }
-
-        Float4x4DivideRow(inverse, 
-                          current_row,
-                          matrix[current_row][column_index]);
-
-        Float4x4DivideRow(matrix, 
-                          current_row, 
-                          matrix[current_row][column_index]);
-
-        for (size_t row_index = 0; row_index < 4; row_index++)
-        {
-            if (row_index == current_row)
+            if (pivot[j] == 1)
             {
                 continue;
             }
 
-            Float4x4ScaledSubtractRow(inverse, 
-                                      current_row, 
-                                      row_index,
-                                      matrix[row_index][column_index]);
+            for (size_t k = 0; k < 4; k++)
+            {
+                if (pivot[k] == 1)
+                {
+                    continue;
+                }
 
-            Float4x4ScaledSubtractRow(matrix,
-                                      current_row,
-                                      row_index,
-                                      matrix[row_index][column_index]);
+                if (pivot[k] > 1)
+                {
+                    return ISTATUS_ARITHMETIC_ERROR;
+                }
+
+                float_t new_candidate = fabs(inverse[j][k]);
+                if (new_candidate >= best_candidate)
+                {
+                    best_candidate = new_candidate;
+                    best_row = j;
+                    best_column = k;
+                }
+            }
+        }
+
+        pivot[best_column] += 1;
+
+        if (best_row != best_column)
+        {
+            for (size_t k = 0; k < 4; k++)
+            {
+                float_t tmp = inverse[best_row][k];
+                inverse[best_row][k] = inverse[best_column][k];
+                inverse[best_column][k] = tmp;
+            }
+        }
+
+        if (inverse[best_column][best_column] == (float_t)0.0)
+        {
+            return ISTATUS_ARITHMETIC_ERROR;
+        }
+
+        column_index[i] = best_column;
+        row_index[i] = best_row;
+
+        float_t divisor = inverse[best_column][best_column];
+        inverse[best_column][best_column] = (float_t)1.0;
+        for (size_t j = 0; j < 4; j++)
+        {
+            inverse[best_column][j] /= divisor;
+        }
+
+        for (size_t j = 0; j < 4; j++)
+        {
+            if (j == best_column)
+            {
+                continue;
+            }
+
+            float_t scalar = -inverse[j][best_column];
+            inverse[j][best_column] = (float_t)0.0;
+            for (size_t k = 0; k < 4; k++)
+            {
+                inverse[j][k] =
+                    fma(scalar, inverse[best_column][k], inverse[j][k]);
+            }
+        }
+    }
+
+    for (size_t jj = 0; jj < 4; jj++)
+    {
+        size_t j = 3 - jj;
+        if (row_index[j] == column_index[j])
+        {
+            continue;
+        }
+
+        for (size_t k = 0; k < 4; k++)
+        {
+            float_t tmp = inverse[k][row_index[j]];
+            inverse[k][row_index[j]] = inverse[k][column_index[j]];
+            inverse[k][column_index[j]] = tmp;
         }
     }
 

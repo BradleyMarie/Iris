@@ -651,7 +651,7 @@ TEST(MatrixTest, MatrixGetConstantInverse)
 {
     PMATRIX expected;
     ISTATUS status = MatrixAllocate(
-        (float_t) 0.0, (float_t) 0.0, (float_t) 0.0, (float_t) 0.0,
+        (float_t) 1.0, (float_t) 0.0, (float_t) 0.0, (float_t) 0.0,
         (float_t) 0.0, (float_t) 1.0, (float_t) 0.0, (float_t) 0.0,
         (float_t) 0.0, (float_t) 0.0, (float_t) 1.0, (float_t) 0.0,
         (float_t) 0.0, (float_t) 0.0, (float_t) 0.0, (float_t) 1.0,
