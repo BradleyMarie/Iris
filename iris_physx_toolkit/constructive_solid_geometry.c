@@ -32,6 +32,150 @@ typedef const CSG_SHAPE *PCCSG_SHAPE;
 
 static
 ISTATUS
+DifferenceShapeTrace(
+    _In_ const void *context,
+    _In_ PCRAY ray,
+    _In_ PSHAPE_HIT_ALLOCATOR allocator,
+    _Out_ PHIT *hit
+    )
+{
+    PCCSG_SHAPE csg_shape = (PCCSG_SHAPE)context;
+
+    PHIT hits0;
+    ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
+                                                   csg_shape->shapes[0],
+                                                   &hits0);
+
+    if (status == ISTATUS_NO_INTERSECTION)
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PHIT hits1;
+    status = ShapeHitTesterTestNestedShape(allocator,
+                                           csg_shape->shapes[1],
+                                           &hits1);
+
+    if (status == ISTATUS_NO_INTERSECTION)
+    {
+        hits1 = NULL;
+    }
+    else if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PHIT last_hit = NULL;
+    bool inside0 = false;
+    bool inside1 = false;
+    status = ISTATUS_NO_INTERSECTION;
+    *hit = NULL;
+    while (hits0 != NULL && hits1 != NULL)
+    {
+        assert(!hits0->next || hits0->distance <= hits0->distance);
+        assert(!hits1->next || hits1->distance <= hits1->distance);
+        if (hits0->distance < hits1->distance)
+        {
+            if (!inside1)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits0;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits0;
+                }
+
+                PHIT current_hit = hits0;
+                hits0 = hits0->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else
+            {
+                hits0 = hits0->next;
+            }
+
+            inside0 = !inside0;
+        }
+        else
+        {
+            if (inside0)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits1;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits1;
+                }
+
+                PHIT current_hit = hits1;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else
+            {
+                hits1 = hits1->next;
+            }
+
+            inside1 = !inside1;
+        }
+    }
+
+    while (hits0 != NULL)
+    {
+        assert(!hits0->next || hits0->distance <= hits0->distance);
+        if (*hit == NULL)
+        {
+            *hit = hits0;
+            status = ISTATUS_SUCCESS;
+        }
+        else
+        {
+            last_hit->next = hits0;
+        }
+
+        PHIT current_hit = hits0;
+        hits0 = hits0->next;
+        current_hit->next = NULL;
+        last_hit = current_hit;
+    }
+
+    return status;
+}
+
+static
+ISTATUS
+DifferenceShapeCheckBounds(
+    _In_ const void *context,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ BOUNDING_BOX world_bounds,
+    _Out_ bool *contains
+    )
+{
+    PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
+
+    ISTATUS status = ShapeCheckBounds(csg_shape->shapes[0],
+                                      model_to_world,
+                                      world_bounds,
+                                      contains);
+
+    return status;
+}
+
+static
+ISTATUS
 IntersectionShapeTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
@@ -353,6 +497,17 @@ ConstructiveSolidShapeFree(
 // Static Variables
 //
 
+static const SHAPE_VTABLE difference_vtable = {
+    DifferenceShapeTrace,
+    DifferenceShapeCheckBounds,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ConstructiveSolidShapeFree
+};
+
 static const SHAPE_VTABLE intersection_vtable = {
     IntersectionShapeTrace,
     IntersectionShapeCheckBounds,
@@ -434,6 +589,21 @@ CsgAllocate(
 //
 // Functions
 //
+
+ISTATUS
+DifferenceAllocate(
+    _In_ PSHAPE minuend,
+    _In_ PSHAPE subtrahend,
+    _Out_ PSHAPE *result
+    )
+{
+    ISTATUS status = CsgAllocate(&difference_vtable,
+                                 minuend,
+                                 subtrahend,
+                                 result);
+
+    return status;
+}
 
 ISTATUS
 IntersectionAllocate(

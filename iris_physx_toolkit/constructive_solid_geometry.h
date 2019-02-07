@@ -26,6 +26,13 @@ extern "C" {
 //
 
 ISTATUS
+DifferenceAllocate(
+    _In_ PSHAPE minuend,
+    _In_ PSHAPE subtrahend,
+    _Out_ PSHAPE *result
+    );
+
+ISTATUS
 IntersectionAllocate(
     _In_ PSHAPE shape0,
     _In_ PSHAPE shape1,
