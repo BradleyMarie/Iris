@@ -4,6 +4,7 @@ cc_test(
     name = "constructive_solid_geometry",
     srcs = ["constructive_solid_geometry.cc"],
     data = [
+        "//test_results:csg_cube_sphere_difference.pfm",
         "//test_results:csg_rounded_cube.pfm",
         "//test_results:csg_sphere_intersection.pfm",
         "//test_results:csg_sphere_union.pfm",

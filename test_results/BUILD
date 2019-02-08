@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:private"])
 exports_files([
     "blank.pfm",
     "cornell_box.pfm",
+    "csg_cube_sphere_difference.pfm",
     "csg_rounded_cube.pfm",
     "csg_sphere_intersection.pfm",
     "csg_sphere_union.pfm",

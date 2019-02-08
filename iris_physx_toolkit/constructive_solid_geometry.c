@@ -105,7 +105,7 @@ DifferenceShapeTrace(
 
             inside0 = !inside0;
         }
-        else
+        else if (hits0->distance > hits1->distance)
         {
             if (inside0)
             {
@@ -129,6 +129,53 @@ DifferenceShapeTrace(
                 hits1 = hits1->next;
             }
 
+            inside1 = !inside1;
+        }
+        else
+        {
+            if (!inside1)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits0;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits0;
+                }
+
+                PHIT current_hit = hits0;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else if (inside0)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits1;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits1;
+                }
+
+                PHIT current_hit = hits1;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else
+            {
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+            }
+
+            inside0 = !inside0;
             inside1 = !inside1;
         }
     }
@@ -240,7 +287,7 @@ IntersectionShapeTrace(
 
             inside0 = !inside0;
         }
-        else
+        else if(hits0->distance > hits1->distance)
         {
             if (inside0)
             {
@@ -264,6 +311,53 @@ IntersectionShapeTrace(
                 hits1 = hits1->next;
             }
 
+            inside1 = !inside1;
+        }
+        else
+        {
+            if (inside1)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits0;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits0;
+                }
+
+                PHIT current_hit = hits0;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else if (inside0)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits1;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits1;
+                }
+
+                PHIT current_hit = hits1;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else
+            {
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+            }
+
+            inside0 = !inside0;
             inside1 = !inside1;
         }
     }
@@ -383,7 +477,7 @@ UnionShapeTrace(
 
             inside0 = !inside0;
         }
-        else
+        else if (hits0->distance > hits1->distance)
         {
             if (!inside0)
             {
@@ -407,6 +501,53 @@ UnionShapeTrace(
                 hits1 = hits1->next;
             }
 
+            inside1 = !inside1;
+        }
+        else
+        {
+            if (!inside1)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits0;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits0;
+                }
+
+                PHIT current_hit = hits0;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else if (!inside0)
+            {
+                if (*hit == NULL)
+                {
+                    *hit = hits1;
+                    status = ISTATUS_SUCCESS;
+                }
+                else
+                {
+                    last_hit->next = hits1;
+                }
+
+                PHIT current_hit = hits1;
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+                current_hit->next = NULL;
+                last_hit = current_hit;
+            }
+            else
+            {
+                hits0 = hits0->next;
+                hits1 = hits1->next;
+            }
+
+            inside0 = !inside0;
             inside1 = !inside1;
         }
     }
