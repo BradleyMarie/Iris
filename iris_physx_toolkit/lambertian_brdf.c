@@ -52,7 +52,7 @@ CreateOrthogonalVector(
                                        (float_t)1.0,
                                        (float_t)0.0);
             break;
-        default: // VECTOR_Z_AXIS
+        case VECTOR_Z_AXIS:
             unit_vector = VectorCreate((float_t)0.0,
                                        (float_t)0.0,
                                        (float_t)1.0);
