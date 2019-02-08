@@ -28,8 +28,8 @@ Abstract:
 
 typedef struct _TRIANGLE {
     POINT3 v0;
-    VECTOR3 v0_to_v1;
-    VECTOR3 v0_to_v2;
+    POINT3 v1;
+    POINT3 v2;
     VECTOR3 surface_normal;
     PMATERIAL materials[2];
 } TRIANGLE, *PTRIANGLE;
@@ -49,101 +49,98 @@ typedef const EMISSIVE_TRIANGLE *PCEMISSIVE_TRIANGLE;
 //
 
 static
-ISTATUS
-TriangleTraceXYDominant(
-    _In_ const void *context,
-    _In_ PCRAY ray,
-    _In_ PSHAPE_HIT_ALLOCATOR allocator,
-    _Out_ PHIT *hit
+inline
+POINT3
+PointSubtractPoint(
+    _In_ POINT3 p0,
+    _In_ POINT3 p1
     )
 {
-    PCTRIANGLE triangle = (PCTRIANGLE)context;
+    float_t x = p0.x - p1.x;
+    float_t y = p0.y - p1.y;
+    float_t z = p0.z - p1.z;
 
-    VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
-    float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-    float_t distance_to_plane =
-        VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
+    return PointCreate(x, y, z);
+}
 
-    if (!isfinite(distance_to_plane))
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
+static
+inline
+POINT3
+PointScale(
+    _In_ POINT3 p0,
+    _In_ float_t scalar
+    )
+{
+    float_t x = p0.x * scalar;
+    float_t y = p0.y * scalar;
+    float_t z = p0.z * scalar;
 
-    POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
-    VECTOR3 vertex_to_plane_intersection =
-        PointSubtract(plane_intersection, triangle->v0);
+    return PointCreate(x, y, z);
+}
 
-    TRIANGLE_ADDITIONAL_DATA additional_data;
-    additional_data.barycentric_coordinates[1] =
-        (vertex_to_plane_intersection.y * triangle->v0_to_v2.x - 
-         vertex_to_plane_intersection.x * triangle->v0_to_v2.y) /
-        (triangle->v0_to_v1.y * triangle->v0_to_v2.x - 
-         triangle->v0_to_v1.x * triangle->v0_to_v2.y);
+static
+inline
+POINT3
+PointPermuteXDominant(
+    _In_ POINT3 point
+    )
+{
+    return PointCreate(point.z, point.y, point.x);
+}
 
-    if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
-        additional_data.barycentric_coordinates[1] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
+static
+inline
+POINT3
+PointPermuteYDominant(
+    _In_ POINT3 point
+    )
+{
+    return PointCreate(point.x, point.z, point.y);
+}
 
-    additional_data.barycentric_coordinates[2] =
-        (vertex_to_plane_intersection.y * triangle->v0_to_v1.x - 
-         vertex_to_plane_intersection.x * triangle->v0_to_v1.y) /
-        (triangle->v0_to_v2.y * triangle->v0_to_v1.x - 
-         triangle->v0_to_v2.x * triangle->v0_to_v1.y);
+static
+inline
+POINT3
+PointPermuteZDominant(
+    _In_ POINT3 point
+    )
+{
+    return PointCreate(point.y, point.x, point.z);
+}
 
-    if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
+static
+inline
+VECTOR3
+VectorPermuteXDominant(
+    _In_ VECTOR3 vector
+    )
+{
+    return VectorCreate(vector.z, vector.y, vector.x);
+}
 
-    float_t coordinate_sum = 
-        additional_data.barycentric_coordinates[1] +
-        additional_data.barycentric_coordinates[2];
+static
+inline
+VECTOR3
+VectorPermuteYDominant(
+    _In_ VECTOR3 vector
+    )
+{
+    return VectorCreate(vector.x, vector.z, vector.y);
+}
 
-    if (coordinate_sum > (float_t)1.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
-
-    ISTATUS status;
-    if (dp < (float_t)0.0)
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  TRIANGLE_BACK_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
-    else
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_BACK_FACE,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
-
-    return status;
+static
+inline
+VECTOR3
+VectorPermuteZDominant(
+    _In_ VECTOR3 vector
+    )
+{
+    return VectorCreate(vector.y, vector.x, vector.z);
 }
 
 static
 ISTATUS
-TriangleTraceXZDominant(
+TriangleTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
@@ -152,177 +149,110 @@ TriangleTraceXZDominant(
 {
     PCTRIANGLE triangle = (PCTRIANGLE)context;
 
-    VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
+    POINT3 v0 = PointSubtractPoint(triangle->v0, ray->origin);
+    POINT3 v1 = PointSubtractPoint(triangle->v1, ray->origin);
+    POINT3 v2 = PointSubtractPoint(triangle->v2, ray->origin);
+
+    VECTOR_AXIS dominant_axis = VectorDominantAxis(ray->direction);
+
+    VECTOR3 direction;
+    switch (dominant_axis)
+    {
+        case VECTOR_X_AXIS:
+            direction = VectorPermuteXDominant(ray->direction);
+            v0 = PointPermuteXDominant(v0);
+            v1 = PointPermuteXDominant(v1);
+            v2 = PointPermuteXDominant(v2);
+            break;
+        case VECTOR_Y_AXIS:
+            direction = VectorPermuteYDominant(ray->direction);
+            v0 = PointPermuteYDominant(v0);
+            v1 = PointPermuteYDominant(v1);
+            v2 = PointPermuteYDominant(v2);
+            break;
+        case VECTOR_Z_AXIS:
+            direction = VectorPermuteZDominant(ray->direction);
+            v0 = PointPermuteZDominant(v0);
+            v1 = PointPermuteZDominant(v1);
+            v2 = PointPermuteZDominant(v2);
+            break;
+    }
+
+    float_t shear_x = -direction.x / direction.z;
+    float_t shear_y = -direction.y / direction.z;
+
+    v0.x = fma(shear_x, v0.z, v0.x);
+    v0.y = fma(shear_y, v0.z, v0.y);
+    v1.x = fma(shear_x, v1.z, v1.x);
+    v1.y = fma(shear_y, v1.z, v1.y);
+    v2.x = fma(shear_x, v2.z, v2.x);
+    v2.y = fma(shear_y, v2.z, v2.y);
+
+    TRIANGLE_ADDITIONAL_DATA data;
+    data.barycentric_coordinates[0] = v1.x * v2.y - v1.y * v2.x;
+    data.barycentric_coordinates[1] = v2.x * v0.y - v2.y * v0.x;
+    data.barycentric_coordinates[2] = v0.x * v1.y - v0.y * v1.x;
+
+#if FLT_EVAL_METHOD == 0
+    if (data.barycentric_coordinates[0] == (float_t)0.0 ||
+        data.barycentric_coordinates[1] == (float_t)0.0 ||
+        data.barycentric_coordinates[2] == (float_t)0.0)
+    {
+        data.barycentric_coordinates[0] =
+            ((double_t)v1.x * (double_t)v2.y - (double_t)v1.y * (double_t)v2.x);
+        data.barycentric_coordinates[1] =
+            ((double_t)v2.x * (double_t)v0.y - (double_t)v2.y * (double_t)v0.x);
+        data.barycentric_coordinates[2] =
+            ((double_t)v0.x * (double_t)v1.y - (double_t)v0.y * (double_t)v1.x);
+    }
+#endif
+
+    if ((data.barycentric_coordinates[0] < (float_t)0.0 ||
+         data.barycentric_coordinates[1] < (float_t)0.0 ||
+         data.barycentric_coordinates[2] < (float_t)0.0) &&
+        (data.barycentric_coordinates[0] > (float_t)0.0 ||
+         data.barycentric_coordinates[1] > (float_t)0.0 ||
+         data.barycentric_coordinates[2] > (float_t)0.0))
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
+
+    float_t determinant = data.barycentric_coordinates[0] +
+                          data.barycentric_coordinates[1] +
+                          data.barycentric_coordinates[2];
+
+    if (determinant == (float_t)0.0)
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
+
+    float_t shear_z = (float_t)1.0 / direction.z;
+    v0 = PointScale(v0, shear_z);
+    v1 = PointScale(v1, shear_z);
+    v2 = PointScale(v2, shear_z);
+
+    float_t distance = data.barycentric_coordinates[0] * v0.z +
+                       data.barycentric_coordinates[1] * v1.z +
+                       data.barycentric_coordinates[2] * v2.z;
+
+    float_t inverse_determinant = (float_t)1.0 / determinant;
+    distance *= inverse_determinant;
+    data.barycentric_coordinates[0] *= inverse_determinant;
+    data.barycentric_coordinates[1] *= inverse_determinant;
+    data.barycentric_coordinates[2] *= inverse_determinant;
+
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-    float_t distance_to_plane =
-        VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
-
-    if (!isfinite(distance_to_plane))
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
-    VECTOR3 vertex_to_plane_intersection =
-        PointSubtract(plane_intersection, triangle->v0);
-
-    TRIANGLE_ADDITIONAL_DATA additional_data;
-    additional_data.barycentric_coordinates[1] =
-        (vertex_to_plane_intersection.x * triangle->v0_to_v2.z - 
-         vertex_to_plane_intersection.z * triangle->v0_to_v2.x) /
-        (triangle->v0_to_v1.x * triangle->v0_to_v2.z - 
-         triangle->v0_to_v1.z * triangle->v0_to_v2.x);
-
-    if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
-        additional_data.barycentric_coordinates[1] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    additional_data.barycentric_coordinates[2] =
-        (vertex_to_plane_intersection.x * triangle->v0_to_v1.z - 
-         vertex_to_plane_intersection.z * triangle->v0_to_v1.x) /
-        (triangle->v0_to_v2.x * triangle->v0_to_v1.z - 
-         triangle->v0_to_v2.z * triangle->v0_to_v1.x);
-
-    if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    float_t coordinate_sum = 
-        additional_data.barycentric_coordinates[1] +
-        additional_data.barycentric_coordinates[2];
-
-    if (coordinate_sum > (float_t)1.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
-
-    ISTATUS status;
-    if (dp < (float_t)0.0)
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  TRIANGLE_BACK_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
-    else
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_BACK_FACE,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
-
-    return status;
-}
-
-static
-ISTATUS
-TriangleTraceYZDominant(
-    _In_ const void *context,
-    _In_ PCRAY ray,
-    _In_ PSHAPE_HIT_ALLOCATOR allocator,
-    _Out_ PHIT *hit
-    )
-{
-    PCTRIANGLE triangle = (PCTRIANGLE)context;
-
-    VECTOR3 v0_to_ray_origin = PointSubtract(ray->origin, triangle->v0);
-    float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-    float_t distance_to_plane =
-        VectorDotProduct(v0_to_ray_origin, triangle->surface_normal) / -dp;
-
-    if (!isfinite(distance_to_plane))
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    POINT3 plane_intersection = RayEndpoint(*ray, distance_to_plane);
-    VECTOR3 vertex_to_plane_intersection =
-        PointSubtract(plane_intersection, triangle->v0);
-
-    TRIANGLE_ADDITIONAL_DATA additional_data;
-    additional_data.barycentric_coordinates[1] =
-        (vertex_to_plane_intersection.z * triangle->v0_to_v2.y - 
-         vertex_to_plane_intersection.y * triangle->v0_to_v2.z) /
-        (triangle->v0_to_v1.z * triangle->v0_to_v2.y - 
-         triangle->v0_to_v1.y * triangle->v0_to_v2.z);
-
-    if (additional_data.barycentric_coordinates[1] > (float_t)1.0 ||
-        additional_data.barycentric_coordinates[1] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    additional_data.barycentric_coordinates[2] =
-        (vertex_to_plane_intersection.z * triangle->v0_to_v1.y - 
-         vertex_to_plane_intersection.y * triangle->v0_to_v1.z) /
-        (triangle->v0_to_v2.z * triangle->v0_to_v1.y - 
-         triangle->v0_to_v2.y * triangle->v0_to_v1.z);
-
-    if (additional_data.barycentric_coordinates[2] < (float_t)0.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    float_t coordinate_sum = 
-        additional_data.barycentric_coordinates[1] +
-        additional_data.barycentric_coordinates[2];
-
-    if (coordinate_sum > (float_t)1.0)
-    {
-        return ISTATUS_NO_INTERSECTION;
-    }
-
-    additional_data.barycentric_coordinates[0] = (float_t)1.0 - coordinate_sum;
-
-    ISTATUS status;
-    if (dp < (float_t)0.0)
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  TRIANGLE_BACK_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
-    else
-    {
-        status =
-            ShapeHitAllocatorAllocateWithHitPoint(allocator,
-                                                  NULL,
-                                                  distance_to_plane,
-                                                  TRIANGLE_BACK_FACE,
-                                                  TRIANGLE_FRONT_FACE,
-                                                  &additional_data,
-                                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
-                                                  alignof(TRIANGLE_ADDITIONAL_DATA),
-                                                  plane_intersection,
-                                                  hit);
-    }
+    uint32_t face_hit = (dp > (float_t)0.0);
+    ISTATUS status =
+        ShapeHitAllocatorAllocate(allocator,
+                                  NULL,
+                                  distance,
+                                  face_hit,
+                                  !face_hit,
+                                  &data,
+                                  sizeof(TRIANGLE_ADDITIONAL_DATA),
+                                  alignof(TRIANGLE_ADDITIONAL_DATA),
+                                  hit);
 
     return status;
 }
@@ -338,12 +268,9 @@ TriangleCheckBounds(
 {
     PCTRIANGLE triangle = (PCTRIANGLE)context;
 
-    POINT3 v1 = PointVectorAdd(triangle->v0, triangle->v0_to_v1);
-    POINT3 v2 = PointVectorAdd(triangle->v0, triangle->v0_to_v2);
-
     POINT3 world_v0 = PointMatrixMultiply(model_to_world, triangle->v0);
-    POINT3 world_v1 = PointMatrixMultiply(model_to_world, v1);
-    POINT3 world_v2 = PointMatrixMultiply(model_to_world, v2);
+    POINT3 world_v1 = PointMatrixMultiply(model_to_world, triangle->v1);
+    POINT3 world_v2 = PointMatrixMultiply(model_to_world, triangle->v2);
 
     BOUNDING_BOX object_bounds = BoundingBoxCreate(world_v0, world_v1);
     object_bounds = BoundingBoxEnvelop(object_bounds, world_v2);
@@ -377,7 +304,7 @@ TriangleComputeNormal(
     {
         *surface_normal = VectorNegate(triangle->surface_normal);
     }
-    
+
     return ISTATUS_SUCCESS;
 }
 
@@ -420,6 +347,7 @@ TriangleInitialize(
     _In_ POINT3 v2,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
+    _Out_opt_ float_t *area,
     _Out_ PTRIANGLE triangle
     )
 {
@@ -429,20 +357,27 @@ TriangleInitialize(
     assert(triangle != NULL);
 
     triangle->v0 = v0;
-    triangle->v0_to_v1 = PointSubtract(v1, v0);
-    triangle->v0_to_v2 = PointSubtract(v2, v0);
+    triangle->v1 = v1;
+    triangle->v2 = v2;
     triangle->materials[0] = front_material;
     triangle->materials[1] = back_material;
 
+    VECTOR3 v0_to_v1 = PointSubtract(v1, v0);
+    VECTOR3 v0_to_v2 = PointSubtract(v2, v0);
+
     float_t surface_normal_length;
-    triangle->surface_normal =
-        VectorCrossProduct(triangle->v0_to_v1, triangle->v0_to_v2);
+    triangle->surface_normal = VectorCrossProduct(v0_to_v1, v0_to_v2);
     triangle->surface_normal =
         VectorNormalize(triangle->surface_normal, NULL, &surface_normal_length);
 
     if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (area != NULL)
+    {
+        *area = surface_normal_length * (float_t)0.5;
     }
 
     return ISTATUS_SUCCESS;
@@ -504,10 +439,13 @@ EmissiveTriangleSampleFace(
         v = (float_t)1.0 - v;
     }
 
-    POINT3 sum = PointVectorAddScaled(triangle->triangle.v0,
-                                      triangle->triangle.v0_to_v1,
-                                      u);
-    *sampled_point = PointVectorAddScaled(sum, triangle->triangle.v0_to_v2, v);
+    VECTOR3 v0_to_v1 =
+        PointSubtract(triangle->triangle.v1, triangle->triangle.v0);
+    VECTOR3 v0_to_v2 =
+        PointSubtract(triangle->triangle.v2, triangle->triangle.v0);
+
+    POINT3 sum = PointVectorAddScaled(triangle->triangle.v0, v0_to_v1, u);
+    *sampled_point = PointVectorAddScaled(sum, v0_to_v2, v);
 
     return ISTATUS_SUCCESS;
 }
@@ -554,8 +492,8 @@ EmissiveTriangleFree(
 // Static Variables
 //
 
-static const SHAPE_VTABLE xy_dominant_triangle_vtable = {
-    TriangleTraceXYDominant,
+static const SHAPE_VTABLE triangle_vtable = {
+    TriangleTrace,
     TriangleCheckBounds,
     TriangleComputeNormal,
     TriangleGetMaterial,
@@ -565,52 +503,8 @@ static const SHAPE_VTABLE xy_dominant_triangle_vtable = {
     TriangleFree
 };
 
-static const SHAPE_VTABLE xz_dominant_triangle_vtable = {
-    TriangleTraceXZDominant,
-    TriangleCheckBounds,
-    TriangleComputeNormal,
-    TriangleGetMaterial,
-    NULL,
-    NULL,
-    NULL,
-    TriangleFree
-};
-
-static const SHAPE_VTABLE yz_dominant_triangle_vtable = {
-    TriangleTraceYZDominant,
-    TriangleCheckBounds,
-    TriangleComputeNormal,
-    TriangleGetMaterial,
-    NULL,
-    NULL,
-    NULL,
-    TriangleFree
-};
-
-static const SHAPE_VTABLE xy_dominant_emissive_triangle_vtable = {
-    TriangleTraceXYDominant,
-    TriangleCheckBounds,
-    TriangleComputeNormal,
-    TriangleGetMaterial,
-    EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFace,
-    EmissiveTriangleComputePdfBySolidArea,
-    EmissiveTriangleFree
-};
-
-static const SHAPE_VTABLE xz_dominant_emissive_triangle_vtable = {
-    TriangleTraceXZDominant,
-    TriangleCheckBounds,
-    TriangleComputeNormal,
-    TriangleGetMaterial,
-    EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFace,
-    EmissiveTriangleComputePdfBySolidArea,
-    EmissiveTriangleFree
-};
-
-static const SHAPE_VTABLE yz_dominant_emissive_triangle_vtable = {
-    TriangleTraceYZDominant,
+static const SHAPE_VTABLE emissive_triangle_vtable = {
+    TriangleTrace,
     TriangleCheckBounds,
     TriangleComputeNormal,
     TriangleGetMaterial,
@@ -660,6 +554,7 @@ TriangleAllocate(
                                         v2,
                                         front_material,
                                         back_material,
+                                        NULL,
                                         &triangle);
 
     if (status != ISTATUS_SUCCESS)
@@ -667,23 +562,7 @@ TriangleAllocate(
         return status;
     }
 
-    VECTOR_AXIS dominant_axis = VectorDominantAxis(triangle.surface_normal);
-
-    PCSHAPE_VTABLE triangle_vtable;
-    switch (dominant_axis)
-    {
-        case VECTOR_X_AXIS:
-            triangle_vtable = &yz_dominant_triangle_vtable;
-            break;
-        case VECTOR_Y_AXIS:
-            triangle_vtable = &xz_dominant_triangle_vtable;
-            break;
-        default: // VECTOR_Z_AXIS
-            triangle_vtable = &xy_dominant_triangle_vtable;
-            break;
-    }
-
-    status = ShapeAllocate(triangle_vtable,
+    status = ShapeAllocate(&triangle_vtable,
                            &triangle,
                            sizeof(TRIANGLE),
                            alignof(TRIANGLE),
@@ -738,6 +617,7 @@ EmissiveTriangleAllocate(
                                         v2,
                                         front_material,
                                         back_material,
+                                        &triangle.area,
                                         &triangle.triangle);
 
     if (status != ISTATUS_SUCCESS)
@@ -748,28 +628,7 @@ EmissiveTriangleAllocate(
     triangle.emissive_materials[0] = front_emissive_material;
     triangle.emissive_materials[1] = back_emissive_material;
 
-    VECTOR_AXIS dominant_axis =
-        VectorDominantAxis(triangle.triangle.surface_normal);
-
-    PCSHAPE_VTABLE triangle_vtable;
-    switch (dominant_axis)
-    {
-        case VECTOR_X_AXIS:
-            triangle_vtable = &yz_dominant_emissive_triangle_vtable;
-            break;
-        case VECTOR_Y_AXIS:
-            triangle_vtable = &xz_dominant_emissive_triangle_vtable;
-            break;
-        default: // VECTOR_Z_AXIS
-            triangle_vtable = &xy_dominant_emissive_triangle_vtable;
-            break;
-    }
-
-    VECTOR3 cp = VectorCrossProduct(triangle.triangle.v0_to_v1,
-                                    triangle.triangle.v0_to_v2);
-    triangle.area = VectorLength(cp) * (float_t)0.5;
-
-    status = ShapeAllocate(triangle_vtable,
+    status = ShapeAllocate(&emissive_triangle_vtable,
                            &triangle,
                            sizeof(EMISSIVE_TRIANGLE),
                            alignof(EMISSIVE_TRIANGLE),
