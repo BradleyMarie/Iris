@@ -66,21 +66,6 @@ PointSubtractPoint(
 static
 inline
 POINT3
-PointScale(
-    _In_ POINT3 p0,
-    _In_ float_t scalar
-    )
-{
-    float_t x = p0.x * scalar;
-    float_t y = p0.y * scalar;
-    float_t z = p0.z * scalar;
-
-    return PointCreate(x, y, z);
-}
-
-static
-inline
-POINT3
 PointPermuteXDominant(
     _In_ POINT3 point
     )
@@ -227,9 +212,9 @@ TriangleTrace(
     }
 
     float_t shear_z = (float_t)1.0 / direction.z;
-    v0 = PointScale(v0, shear_z);
-    v1 = PointScale(v1, shear_z);
-    v2 = PointScale(v2, shear_z);
+    v0.z = v0.z * shear_z;
+    v1.z = v1.z * shear_z;
+    v2.z = v2.z * shear_z;
 
     float_t distance = data.barycentric_coordinates[0] * v0.z +
                        data.barycentric_coordinates[1] * v1.z +
