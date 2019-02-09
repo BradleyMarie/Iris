@@ -227,13 +227,25 @@ TriangleTrace(
     data.barycentric_coordinates[2] *= inverse_determinant;
 
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
-    uint32_t face_hit = (dp > (float_t)0.0);
+
+    uint32_t front_face, back_face;
+    if (dp < (float_t)0.0)
+    {
+        front_face = TRIANGLE_FRONT_FACE;
+        back_face = TRIANGLE_BACK_FACE;
+    }
+    else
+    {
+        front_face = TRIANGLE_BACK_FACE;
+        back_face = TRIANGLE_FRONT_FACE;
+    }
+
     ISTATUS status =
         ShapeHitAllocatorAllocate(allocator,
                                   NULL,
                                   distance,
-                                  face_hit,
-                                  !face_hit,
+                                  front_face,
+                                  back_face,
                                   &data,
                                   sizeof(TRIANGLE_ADDITIONAL_DATA),
                                   alignof(TRIANGLE_ADDITIONAL_DATA),
