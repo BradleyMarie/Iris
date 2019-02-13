@@ -59,3 +59,13 @@ cc_library(
         "//iris_physx:iris_physx",
     ],
 )
+
+cc_library(
+    name = "teapot",
+    hdrs = ["teapot.h"],
+    srcs = ["teapot.c"],
+    testonly = 1,
+    deps = [
+        "//iris:iris",
+    ],
+)
