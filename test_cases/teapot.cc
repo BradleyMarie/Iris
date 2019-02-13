@@ -45,8 +45,8 @@ TestRenderSingleThreaded(
         VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
         VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
         (float_t)1.0,
-        (float_t)2.0,
-        (float_t)2.0,
+        (float_t)1.5,
+        (float_t)1.5,
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -94,7 +94,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = WriteToPfmFile(framebuffer,
-                            file_name.c_str(),
+                            ("/mnt/c/Users/Brad/Documents/" + file_name).c_str(),
                             PFM_PIXEL_FORMAT_XYZ);
     EXPECT_EQ(status, ISTATUS_SUCCESS);
 
@@ -155,7 +155,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    status = TestSpectrumAllocate((float_t)32.0,
                                   (float_t)0.0,
                                   (float_t)0.0,
                                   &spectrum);
