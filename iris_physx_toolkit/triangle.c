@@ -362,15 +362,15 @@ TriangleInitialize(
     VECTOR3 v0_to_v1 = PointSubtract(v1, v0);
     VECTOR3 v0_to_v2 = PointSubtract(v2, v0);
 
-    float_t surface_normal_length;
     triangle->surface_normal = VectorCrossProduct(v0_to_v1, v0_to_v2);
-    triangle->surface_normal =
-        VectorNormalize(triangle->surface_normal, NULL, &surface_normal_length);
-
+    float_t surface_normal_length = VectorLength(triangle->surface_normal);
     if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
+
+    float_t scalar = (float_t)1.0 / surface_normal_length;
+    triangle->surface_normal = VectorScale(triangle->surface_normal, scalar);
 
     if (area != NULL)
     {
