@@ -132,3 +132,26 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "teapot",
+    srcs = ["teapot.cc"],
+    deps = [
+        "//iris_advanced_toolkit:pcg_random",
+        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:pfm_writer",
+        "//iris_camera_toolkit:pinhole_camera",
+        "//iris_physx_toolkit:all_light_sampler",
+        "//iris_physx_toolkit:constant_material",
+        "//iris_physx_toolkit:lambertian_brdf",
+        "//iris_physx_toolkit:list_scene",
+        "//iris_physx_toolkit:path_tracer",
+        "//iris_physx_toolkit:point_light",
+        "//iris_physx_toolkit:sample_tracer",
+        "//iris_physx_toolkit:triangle",
+        "//test_util:pfm",
+        "//test_util:spectra",
+        "//test_util:teapot",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
