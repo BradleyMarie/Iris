@@ -12,7 +12,6 @@ cc_test(
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
-        "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",
@@ -40,7 +39,6 @@ cc_test(
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
-        "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:cie_color_integrator",
@@ -136,10 +134,13 @@ cc_test(
 cc_test(
     name = "teapot",
     srcs = ["teapot.cc"],
+    data = [
+        "//test_results:teapot_flat.pfm",
+        "//test_results:teapot_smooth.pfm",
+    ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
-        "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",

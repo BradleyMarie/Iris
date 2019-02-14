@@ -337,7 +337,7 @@ TriangleFree(
 }
 
 static
-ISTATUS
+bool
 TriangleInitialize(
     _In_ POINT3 v0,
     _In_ POINT3 v1,
@@ -366,7 +366,7 @@ TriangleInitialize(
     float_t surface_normal_length = VectorLength(triangle->surface_normal);
     if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return false;
     }
 
     float_t scalar = (float_t)1.0 / surface_normal_length;
@@ -377,7 +377,7 @@ TriangleInitialize(
         *area = surface_normal_length * (float_t)0.5;
     }
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 //
@@ -546,24 +546,25 @@ TriangleAllocate(
     }
 
     TRIANGLE triangle;
-    ISTATUS status = TriangleInitialize(v0,
-                                        v1,
-                                        v2,
-                                        front_material,
-                                        back_material,
-                                        NULL,
-                                        &triangle);
+    bool success = TriangleInitialize(v0,
+                                      v1,
+                                      v2,
+                                      front_material,
+                                      back_material,
+                                      NULL,
+                                      &triangle);
 
-    if (status != ISTATUS_SUCCESS)
+    if (!success)
     {
-        return status;
+        *shape = NULL;
+        return ISTATUS_SUCCESS;
     }
 
-    status = ShapeAllocate(&triangle_vtable,
-                           &triangle,
-                           sizeof(TRIANGLE),
-                           alignof(TRIANGLE),
-                           shape);
+    ISTATUS status = ShapeAllocate(&triangle_vtable,
+                                   &triangle,
+                                   sizeof(TRIANGLE),
+                                   alignof(TRIANGLE),
+                                   shape);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -609,27 +610,28 @@ EmissiveTriangleAllocate(
     }
 
     EMISSIVE_TRIANGLE triangle;
-    ISTATUS status = TriangleInitialize(v0,
-                                        v1,
-                                        v2,
-                                        front_material,
-                                        back_material,
-                                        &triangle.area,
-                                        &triangle.triangle);
+    bool success = TriangleInitialize(v0,
+                                      v1,
+                                      v2,
+                                      front_material,
+                                      back_material,
+                                      &triangle.area,
+                                      &triangle.triangle);
 
-    if (status != ISTATUS_SUCCESS)
+    if (!success)
     {
-        return status;
+        *shape = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     triangle.emissive_materials[0] = front_emissive_material;
     triangle.emissive_materials[1] = back_emissive_material;
 
-    status = ShapeAllocate(&emissive_triangle_vtable,
-                           &triangle,
-                           sizeof(EMISSIVE_TRIANGLE),
-                           alignof(EMISSIVE_TRIANGLE),
-                           shape);
+    ISTATUS status = ShapeAllocate(&emissive_triangle_vtable,
+                                   &triangle,
+                                   sizeof(EMISSIVE_TRIANGLE),
+                                   alignof(EMISSIVE_TRIANGLE),
+                                   shape);
 
     if (status != ISTATUS_SUCCESS)
     {

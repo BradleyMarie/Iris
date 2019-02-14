@@ -92,7 +92,7 @@ ListSceneAddShape(
 
     if (shape == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_SUCCESS;
     }
 
     if (!PointerListAddPointer(&list_scene->world_geometry, shape))
@@ -124,7 +124,7 @@ ListSceneAddPremultipliedShape(
 
     if (shape == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_SUCCESS;
     }
 
     PSHAPE_AND_TRANSFORM entry = 
@@ -169,7 +169,7 @@ ListSceneAddTransformedShape(
 
     if (shape == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_SUCCESS;
     }
 
     PSHAPE_AND_TRANSFORM entry = 

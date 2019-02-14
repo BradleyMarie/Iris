@@ -40,20 +40,20 @@ ListSceneAllocate(
 ISTATUS
 ListSceneAddShape(
     _Inout_ PLIST_SCENE list_scene,
-    _In_ PSHAPE shape
+    _In_opt_ PSHAPE shape
     );
 
 ISTATUS
 ListSceneAddPremultipliedShape(
     _Inout_ PLIST_SCENE list_scene,
-    _In_ PSHAPE shape,
+    _In_opt_ PSHAPE shape,
     _In_opt_ PMATRIX model_to_world
     );
 
 ISTATUS
 ListSceneAddTransformedShape(
     _Inout_ PLIST_SCENE list_scene,
-    _In_ PSHAPE shape,
+    _In_opt_ PSHAPE shape,
     _In_opt_ PMATRIX model_to_world
     );
 

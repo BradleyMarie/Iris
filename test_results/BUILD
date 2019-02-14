@@ -13,4 +13,6 @@ exports_files([
     "single_triangle_xy_triangle.pfm",
     "single_triangle_xz_triangle.pfm",
     "single_triangle_yz_triangle.pfm",
+    "teapot_flat.pfm",
+    "teapot_smooth.pfm",
 ])

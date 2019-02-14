@@ -180,7 +180,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
-    status = FramebufferAllocate(500, 500, &framebuffer);
+    status = FramebufferAllocate(256, 256, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRender(camera,
@@ -192,15 +192,10 @@ TestRenderSingleThreaded(
                               std::thread::hardware_concurrency());
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = WriteToPfmFile(framebuffer,
-                            file_name.c_str(),
-                            PFM_PIXEL_FORMAT_XYZ);
-    EXPECT_EQ(status, ISTATUS_SUCCESS);
-
     bool equals;
     status = ApproximatelyEqualsPfmFile(framebuffer,
                                         file_name.c_str(),
-                                        PFM_PIXEL_FORMAT_SRGB,
+                                        PFM_PIXEL_FORMAT_XYZ,
                                         (float_t)0.01,
                                         &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -266,8 +261,7 @@ TEST(TeapotTest, FlatShadedTeapot)
             material,
             nullptr,
             &shape);
-        // Ignore failures for now
-        // ASSERT_EQ(status, ISTATUS_SUCCESS);
+        ASSERT_EQ(status, ISTATUS_SUCCESS);
 
         status = ListSceneAddTransformedShape(scene, shape, nullptr);
         ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -328,11 +322,17 @@ TEST(TeapotTest, SmoothShadedTeapot)
 
     for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
     {
+        VECTOR3 normal0 = teapot_normals[teapot_faces[i].normal0];
+        normal0 = VectorNormalize(normal0, nullptr, nullptr);
+        VECTOR3 normal1 = teapot_normals[teapot_faces[i].normal1];
+        normal1 = VectorNormalize(normal1, nullptr, nullptr);
+        VECTOR3 normal2 = teapot_normals[teapot_faces[i].normal2];
+        normal2 = VectorNormalize(normal2, nullptr, nullptr);
         PMATERIAL material;
         SmoothMaterialAllocate(
-            teapot_normals[teapot_faces[i].normal0],
-            teapot_normals[teapot_faces[i].normal1],
-            teapot_normals[teapot_faces[i].normal2],
+            normal0,
+            normal1,
+            normal2,
             brdf,
             &material);
 
@@ -344,8 +344,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
             material,
             nullptr,
             &shape);
-        // Ignore failures for now
-        // ASSERT_EQ(status, ISTATUS_SUCCESS);
+        ASSERT_EQ(status, ISTATUS_SUCCESS);
 
         status = ListSceneAddTransformedShape(scene, shape, nullptr);
         ASSERT_EQ(status, ISTATUS_SUCCESS);
