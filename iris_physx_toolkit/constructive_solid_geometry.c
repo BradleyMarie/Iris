@@ -733,11 +733,24 @@ CsgAllocate(
 
 ISTATUS
 DifferenceAllocate(
-    _In_ PSHAPE minuend,
-    _In_ PSHAPE subtrahend,
+    _In_opt_ PSHAPE minuend,
+    _In_opt_ PSHAPE subtrahend,
     _Out_ PSHAPE *result
     )
 {
+    if (minuend == NULL)
+    {
+        *result = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (subtrahend == NULL)
+    {
+        ShapeRetain(minuend);
+        *result = minuend;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status = CsgAllocate(&difference_vtable,
                                  minuend,
                                  subtrahend,
@@ -748,11 +761,17 @@ DifferenceAllocate(
 
 ISTATUS
 IntersectionAllocate(
-    _In_ PSHAPE shape0,
-    _In_ PSHAPE shape1,
+    _In_opt_ PSHAPE shape0,
+    _In_opt_ PSHAPE shape1,
     _Out_ PSHAPE *result
     )
 {
+    if (shape0 == NULL || shape1 == NULL)
+    {
+        *result = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status = CsgAllocate(&intersection_vtable,
                                  shape0,
                                  shape1,
@@ -763,11 +782,25 @@ IntersectionAllocate(
 
 ISTATUS
 UnionAllocate(
-    _In_ PSHAPE shape0,
-    _In_ PSHAPE shape1,
+    _In_opt_ PSHAPE shape0,
+    _In_opt_ PSHAPE shape1,
     _Out_ PSHAPE *result
     )
 {
+    if (shape0 == NULL)
+    {
+        ShapeRetain(shape1);
+        *result = shape1;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (shape1 == NULL)
+    {
+        ShapeRetain(shape0);
+        *result = shape0;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status = CsgAllocate(&union_vtable,
                                  shape0,
                                  shape1,

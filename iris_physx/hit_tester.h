@@ -122,8 +122,7 @@ ShapeHitTesterTestNestedShape(
 
     if (shape == NULL)
     {
-        *hits = NULL;
-        return ISTATUS_SUCCESS;
+        return ISTATUS_NO_INTERSECTION;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =

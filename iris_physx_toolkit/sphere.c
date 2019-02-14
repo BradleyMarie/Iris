@@ -247,7 +247,7 @@ SphereAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!isfinite(radius) || radius <= (float_t)0.0)
+    if (!isfinite(radius) || radius < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -255,6 +255,12 @@ SphereAllocate(
     if (shape == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (radius == (float_t)0.0)
+    {
+        *shape = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     SPHERE sphere;

@@ -27,22 +27,22 @@ extern "C" {
 
 ISTATUS
 DifferenceAllocate(
-    _In_ PSHAPE minuend,
-    _In_ PSHAPE subtrahend,
+    _In_opt_ PSHAPE minuend,
+    _In_opt_ PSHAPE subtrahend,
     _Out_ PSHAPE *result
     );
 
 ISTATUS
 IntersectionAllocate(
-    _In_ PSHAPE shape0,
-    _In_ PSHAPE shape1,
+    _In_opt_ PSHAPE shape0,
+    _In_opt_ PSHAPE shape1,
     _Out_ PSHAPE *result
     );
 
 ISTATUS
 UnionAllocate(
-    _In_ PSHAPE shape0,
-    _In_ PSHAPE shape1,
+    _In_opt_ PSHAPE shape0,
+    _In_opt_ PSHAPE shape1,
     _Out_ PSHAPE *result
     );
 
