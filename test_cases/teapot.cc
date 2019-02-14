@@ -32,6 +32,105 @@ Abstract:
 #include "test_util/pfm.h"
 #include "test_util/spectra.h"
 
+//
+// Smooth Material
+//
+
+typedef struct _SMOOTH_MATERIAL {
+    PBRDF brdf;
+    VECTOR3 normals[3];
+} SMOOTH_MATERIAL, *PSMOOTH_MATERIAL;
+
+typedef const SMOOTH_MATERIAL *PCSMOOTH_MATERIAL;
+
+static
+ISTATUS
+SmoothMaterialSample(
+    _In_ const void *context,
+    _In_ POINT3 model_hit_point,
+    _In_ VECTOR3 world_surface_normal,
+    _In_ const void *additional_data,
+    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
+    _Out_ PVECTOR3 world_shading_normal,
+    _Out_ PCBRDF *brdf
+    )
+{
+    PCSMOOTH_MATERIAL smooth_material = (PCSMOOTH_MATERIAL)context;
+    PCTRIANGLE_ADDITIONAL_DATA smooth_data =
+        (PCTRIANGLE_ADDITIONAL_DATA)additional_data;
+
+    *world_shading_normal = VectorScale(smooth_material->normals[0], 
+                                        smooth_data->barycentric_coordinates[0]);
+
+    *world_shading_normal = VectorAddScaled(*world_shading_normal,
+                                            smooth_material->normals[1], 
+                                            smooth_data->barycentric_coordinates[1]);
+
+    *world_shading_normal = VectorAddScaled(*world_shading_normal,
+                                            smooth_material->normals[2], 
+                                            smooth_data->barycentric_coordinates[2]);
+
+    *world_shading_normal = VectorNormalize(*world_shading_normal,
+                                            nullptr,
+                                            nullptr);
+
+    *brdf = smooth_material->brdf;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+void
+SmoothMaterialFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PSMOOTH_MATERIAL smooth_material = (PSMOOTH_MATERIAL)context;
+
+    BrdfRelease(smooth_material->brdf);
+}
+
+static const MATERIAL_VTABLE smooth_material_vtable = {
+    SmoothMaterialSample,
+    SmoothMaterialFree
+};
+
+void
+SmoothMaterialAllocate(
+    _In_ VECTOR3 normal0,
+    _In_ VECTOR3 normal1,
+    _In_ VECTOR3 normal2,
+    _In_ PBRDF brdf,
+    _Out_ PMATERIAL *material
+    )
+{
+    ASSERT_TRUE(VectorValidate(normal0));
+    ASSERT_TRUE(VectorValidate(normal1));
+    ASSERT_TRUE(VectorValidate(normal2));
+    ASSERT_TRUE(brdf);
+    ASSERT_TRUE(material);
+
+    SMOOTH_MATERIAL smooth_material;
+    smooth_material.normals[0] = normal0;
+    smooth_material.normals[1] = normal1;
+    smooth_material.normals[2] = normal2;
+    smooth_material.brdf = brdf;
+
+    ISTATUS status = MaterialAllocate(&smooth_material_vtable,
+                                      &smooth_material,
+                                      sizeof(SMOOTH_MATERIAL),
+                                      alignof(SMOOTH_MATERIAL),
+                                      material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    BrdfRetain(brdf);
+}
+
+//
+// Tests
+//
+
 void
 TestRenderSingleThreaded(
     _In_ PCLIST_SCENE scene,
@@ -94,7 +193,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = WriteToPfmFile(framebuffer,
-                            ("/mnt/c/Users/Brad/Documents/" + file_name).c_str(),
+                            file_name.c_str(),
                             PFM_PIXEL_FORMAT_XYZ);
     EXPECT_EQ(status, ISTATUS_SUCCESS);
 
@@ -113,35 +212,6 @@ TestRenderSingleThreaded(
     SampleTracerFree(sample_tracer);
     ColorIntegratorFree(color_integrator);
     FramebufferFree(framebuffer);
-}
-
-static
-void
-AddTeapotToScene(
-    _In_opt_ PMATRIX model_to_world,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
-    _Inout_ PLIST_SCENE scene
-    )
-{
-    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
-    {
-        PSHAPE shape;
-        ISTATUS status = TriangleAllocate(
-            teapot_vertices[teapot_faces[i].vertex0],
-            teapot_vertices[teapot_faces[i].vertex1],
-            teapot_vertices[teapot_faces[i].vertex2],
-            front_material,
-            back_material,
-            &shape);
-        // Ignore failures for now
-        // ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-        status = ListSceneAddTransformedShape(scene, shape, model_to_world);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-        ShapeRelease(shape);
-    }
 }
 
 TEST(TeapotTest, FlatShadedTeapot)
@@ -186,11 +256,24 @@ TEST(TeapotTest, FlatShadedTeapot)
     status = ConstantMaterialAllocate(brdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    AddTeapotToScene(
-        NULL,
-        material,
-        material,
-        scene);
+    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
+    {
+        PSHAPE shape;
+        ISTATUS status = TriangleAllocate(
+            teapot_vertices[teapot_faces[i].vertex0],
+            teapot_vertices[teapot_faces[i].vertex1],
+            teapot_vertices[teapot_faces[i].vertex2],
+            material,
+            nullptr,
+            &shape);
+        // Ignore failures for now
+        // ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+        status = ListSceneAddTransformedShape(scene, shape, nullptr);
+        ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+        ShapeRelease(shape);
+    }
 
     TestRenderSingleThreaded(scene,
                              light_sampler,
@@ -200,6 +283,84 @@ TEST(TeapotTest, FlatShadedTeapot)
     ReflectorRelease(reflector);
     BrdfRelease(brdf);
     MaterialRelease(material);
+    LightRelease(light);
+    ListSceneFree(scene);
+    AllLightSamplerFree(light_sampler);
+}
+
+TEST(TeapotTest, SmoothShadedTeapot)
+{
+    PLIST_SCENE scene;
+    ISTATUS status = ListSceneAllocate(&scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PALL_LIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM spectrum;
+    status = TestSpectrumAllocate((float_t)32.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector;
+    status = TestReflectorAllocate((float_t)1.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   &reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBRDF brdf;
+    status = LambertianBrdfAllocate(reflector, &brdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-5.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = AllLightSamplerAddLight(light_sampler, light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
+    {
+        PMATERIAL material;
+        SmoothMaterialAllocate(
+            teapot_normals[teapot_faces[i].normal0],
+            teapot_normals[teapot_faces[i].normal1],
+            teapot_normals[teapot_faces[i].normal2],
+            brdf,
+            &material);
+
+        PSHAPE shape;
+        ISTATUS status = TriangleAllocate(
+            teapot_vertices[teapot_faces[i].vertex0],
+            teapot_vertices[teapot_faces[i].vertex1],
+            teapot_vertices[teapot_faces[i].vertex2],
+            material,
+            nullptr,
+            &shape);
+        // Ignore failures for now
+        // ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+        status = ListSceneAddTransformedShape(scene, shape, nullptr);
+        ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+        MaterialRelease(material);
+        ShapeRelease(shape);
+    }
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler,
+                             "test_results/teapot_smooth.pfm");
+
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector);
+    BrdfRelease(brdf);
     LightRelease(light);
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);
