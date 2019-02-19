@@ -102,6 +102,16 @@ cc_library(
 )
 
 cc_library(
+    name = "mirror_bsdf",
+    hdrs = ["mirror_bsdf.h"],
+    srcs = ["mirror_bsdf.c"],
+    deps = [
+        ":attenuated_reflector",
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "one_light_sampler",
     hdrs = ["one_light_sampler.h"],
     srcs = ["one_light_sampler.c"],
