@@ -16,45 +16,45 @@ cc_library(
 )
 
 cc_library(
-    name = "brdf",
-    hdrs = ["brdf.h"],
-    srcs = ["brdf.c"],
+    name = "bsdf",
+    hdrs = ["bsdf.h"],
+    srcs = ["bsdf.c"],
     deps = [
-        ":brdf_internal",
+        ":bsdf_internal",
         "//common:alloc",
     ],
 )
 
 cc_library(
-    name = "brdf_allocator",
-    hdrs = ["brdf_allocator.h"],
-    srcs = ["brdf_allocator.c"],
+    name = "bsdf_allocator",
+    hdrs = ["bsdf_allocator.h"],
+    srcs = ["bsdf_allocator.c"],
     deps = [
-        ":brdf",
-        ":brdf_allocator_internal",
+        ":bsdf",
+        ":bsdf_allocator_internal",
     ],
 )
 
 cc_library(
-    name = "brdf_allocator_internal",
-    hdrs = ["brdf_allocator_internal.h"],
+    name = "bsdf_allocator_internal",
+    hdrs = ["bsdf_allocator_internal.h"],
     deps = [
-        ":brdf_internal",
+        ":bsdf_internal",
         "//common:dynamic_allocator",
     ],
 )
 
 cc_library(
-    name = "brdf_internal",
-    hdrs = ["brdf_internal.h"],
+    name = "bsdf_internal",
+    hdrs = ["bsdf_internal.h"],
     deps = [
-        ":brdf_vtable",
+        ":bsdf_vtable",
     ],
 )
 
 cc_library(
-    name = "brdf_vtable",
-    hdrs = ["brdf_vtable.h"],
+    name = "bsdf_vtable",
+    hdrs = ["bsdf_vtable.h"],
     deps = [
         ":reflector_compositor",
         "//iris:iris",
@@ -143,8 +143,8 @@ cc_library(
     hdrs = ["integrator.h"],
     srcs = ["integrator.c"],
     deps = [
-        ":brdf",
-        ":brdf_internal",
+        ":bsdf",
+        ":bsdf_internal",
         ":color_integrator",
         ":color_integrator_internal",
         ":integrator_vtable",
@@ -174,8 +174,8 @@ cc_library(
     hdrs = ["iris_physx.h"],
     deps = [
         ":area_light",
-        ":brdf",
-        ":brdf_allocator",
+        ":bsdf",
+        ":bsdf_allocator",
         ":color_integrator",
         ":emissive_material",
         ":hit_allocator",
@@ -295,7 +295,7 @@ cc_library(
     name = "material_vtable",
     hdrs = ["material_vtable.h"],
     deps = [
-        ":brdf_allocator",
+        ":bsdf_allocator",
         ":reflector_compositor",
     ],
 )
@@ -305,7 +305,7 @@ cc_library(
     hdrs = ["ray_tracer.h"],
     srcs = ["ray_tracer.c"],
     deps = [
-        ":brdf",
+        ":bsdf",
         ":light",
         ":material_internal",
         ":ray_tracer_internal",
@@ -318,7 +318,7 @@ cc_library(
     name = "ray_tracer_internal",
     hdrs = ["ray_tracer_internal.h"],
     deps = [
-        ":brdf_allocator",
+        ":bsdf_allocator",
         ":reflector_compositor_internal",
         ":reflector_compositor",
         ":light",

@@ -22,7 +22,7 @@ Abstract:
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/one_light_sampler.h"
 #include "iris_physx_toolkit/path_tracer.h"
@@ -150,12 +150,12 @@ TEST(CornellBoxTest, CornellBox)
                                                      white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF white_brdf;
-    status = LambertianBrdfAllocate(white_reflector, &white_brdf);
+    PBSDF white_bsdf;
+    status = LambertianBsdfAllocate(white_reflector, &white_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL white_material;
-    status = ConstantMaterialAllocate(white_brdf, &white_material);
+    status = ConstantMaterialAllocate(white_bsdf, &white_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR red_reflector;
@@ -169,12 +169,12 @@ TEST(CornellBoxTest, CornellBox)
                                                      red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF red_brdf;
-    status = LambertianBrdfAllocate(red_reflector, &red_brdf);
+    PBSDF red_bsdf;
+    status = LambertianBsdfAllocate(red_reflector, &red_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL red_material;
-    status = ConstantMaterialAllocate(red_brdf, &red_material);
+    status = ConstantMaterialAllocate(red_bsdf, &red_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR green_reflector;
@@ -188,12 +188,12 @@ TEST(CornellBoxTest, CornellBox)
                                                      green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF green_brdf;
-    status = LambertianBrdfAllocate(green_reflector, &green_brdf);
+    PBSDF green_bsdf;
+    status = LambertianBsdfAllocate(green_reflector, &green_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL green_material;
-    status = ConstantMaterialAllocate(green_brdf, &green_material);
+    status = ConstantMaterialAllocate(green_bsdf, &green_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM light_spectrum;
@@ -348,9 +348,9 @@ TEST(CornellBoxTest, CornellBox)
     ReflectorRelease(white_reflector);
     ReflectorRelease(red_reflector);
     ReflectorRelease(green_reflector);
-    BrdfRelease(white_brdf);
-    BrdfRelease(red_brdf);
-    BrdfRelease(green_brdf);
+    BsdfRelease(white_bsdf);
+    BsdfRelease(red_bsdf);
+    BsdfRelease(green_bsdf);
     MaterialRelease(white_material);
     MaterialRelease(red_material);
     MaterialRelease(green_material);

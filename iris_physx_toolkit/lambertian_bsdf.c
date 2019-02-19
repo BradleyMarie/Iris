@@ -4,28 +4,28 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    lambertian_brdf.c
+    lambertian_bsdf.c
 
 Abstract:
 
-    Implements a Lambertian BRDF.
+    Implements a Lambertian BSDF.
 
 --*/
 
 #include <stdalign.h>
 
 #include "iris_physx_toolkit/attenuated_reflector.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 
 //
 // Types
 //
 
-typedef struct _LAMBERTIAN_BRDF {
+typedef struct _LAMBERTIAN_BSDF {
     PREFLECTOR reflector;
-} LAMBERTIAN_BRDF, *PLAMBERTIAN_BRDF;
+} LAMBERTIAN_BSDF, *PLAMBERTIAN_BSDF;
 
-typedef const LAMBERTIAN_BRDF *PCLAMBERTIAN_BRDF;
+typedef const LAMBERTIAN_BSDF *PCLAMBERTIAN_BSDF;
 
 //
 // Static Functions
@@ -133,7 +133,7 @@ CosineSampleHemisphere(
 
 static
 ISTATUS
-LambertianBrdfSample(
+LambertianBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -144,7 +144,7 @@ LambertianBrdfSample(
     _Out_ float_t *pdf
     )
 {
-    PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
+    PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
 
     ISTATUS status = CosineSampleHemisphere(normal, rng, outgoing);
 
@@ -155,7 +155,7 @@ LambertianBrdfSample(
 
     status =
         ReflectorCompositorAttenuateReflector(compositor,
-                                              lambertian_brdf->reflector,
+                                              lambertian_bsdf->reflector,
                                               inv_pi,
                                               reflector);
 
@@ -171,7 +171,7 @@ LambertianBrdfSample(
 
 static
 ISTATUS
-LambertianBrdfComputeReflectance(
+LambertianBsdfComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -180,11 +180,11 @@ LambertianBrdfComputeReflectance(
     _Out_ PCREFLECTOR *reflector
     )
 {
-    PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
+    PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
 
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
-                                              lambertian_brdf->reflector,
+                                              lambertian_bsdf->reflector,
                                               inv_pi,
                                               reflector);
 
@@ -193,7 +193,7 @@ LambertianBrdfComputeReflectance(
 
 static
 ISTATUS
-LambertianBrdfComputeReflectanceWithPdf(
+LambertianBsdfComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -203,11 +203,11 @@ LambertianBrdfComputeReflectanceWithPdf(
     _Out_ float_t *pdf
     )
 {
-    PCLAMBERTIAN_BRDF lambertian_brdf = (PCLAMBERTIAN_BRDF)context;
+    PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
 
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
-                                              lambertian_brdf->reflector,
+                                              lambertian_bsdf->reflector,
                                               inv_pi,
                                               reflector);
 
@@ -224,24 +224,24 @@ LambertianBrdfComputeReflectanceWithPdf(
 
 static
 void
-LambertianBrdfFree(
+LambertianBsdfFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
-    PLAMBERTIAN_BRDF lambertian_brdf = (PLAMBERTIAN_BRDF)context;
+    PLAMBERTIAN_BSDF lambertian_bsdf = (PLAMBERTIAN_BSDF)context;
 
-    ReflectorRelease(lambertian_brdf->reflector);
+    ReflectorRelease(lambertian_bsdf->reflector);
 }
 
 //
 // Static Variables
 //
 
-static const BRDF_VTABLE lambertian_brdf_vtable = {
-    LambertianBrdfSample,
-    LambertianBrdfComputeReflectance,
-    LambertianBrdfComputeReflectanceWithPdf,
-    LambertianBrdfFree
+static const BSDF_VTABLE lambertian_bsdf_vtable = {
+    LambertianBsdfSample,
+    LambertianBsdfComputeReflectance,
+    LambertianBsdfComputeReflectanceWithPdf,
+    LambertianBsdfFree
 };
 
 //
@@ -249,9 +249,9 @@ static const BRDF_VTABLE lambertian_brdf_vtable = {
 //
 
 ISTATUS
-LambertianBrdfAllocate(
+LambertianBsdfAllocate(
     _In_ PREFLECTOR reflector,
-    _Out_ PBRDF *brdf
+    _Out_ PBSDF *bsdf
     )
 {
     if (reflector == NULL)
@@ -259,19 +259,19 @@ LambertianBrdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (brdf == NULL)
+    if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    LAMBERTIAN_BRDF lambertian_brdf;
-    lambertian_brdf.reflector = reflector;
+    LAMBERTIAN_BSDF lambertian_bsdf;
+    lambertian_bsdf.reflector = reflector;
 
-    ISTATUS status = BrdfAllocate(&lambertian_brdf_vtable,
-                                  &lambertian_brdf,
-                                  sizeof(LAMBERTIAN_BRDF),
-                                  alignof(LAMBERTIAN_BRDF),
-                                  brdf);
+    ISTATUS status = BsdfAllocate(&lambertian_bsdf_vtable,
+                                  &lambertian_bsdf,
+                                  sizeof(LAMBERTIAN_BSDF),
+                                  alignof(LAMBERTIAN_BSDF),
+                                  bsdf);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -284,13 +284,13 @@ LambertianBrdfAllocate(
 }
 
 ISTATUS
-LambertianBrdfAllocateWithAllocator(
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+LambertianBsdfAllocateWithAllocator(
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
-    if (brdf_allocator == NULL)
+    if (bsdf_allocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -300,20 +300,20 @@ LambertianBrdfAllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (brdf == NULL)
+    if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    LAMBERTIAN_BRDF lambertian_brdf;
-    lambertian_brdf.reflector = (PREFLECTOR)reflector;
+    LAMBERTIAN_BSDF lambertian_bsdf;
+    lambertian_bsdf.reflector = (PREFLECTOR)reflector;
 
-    ISTATUS status = BrdfAllocatorAllocate(brdf_allocator,
-                                           &lambertian_brdf_vtable,
-                                           &lambertian_brdf,
-                                           sizeof(LAMBERTIAN_BRDF),
-                                           alignof(LAMBERTIAN_BRDF),
-                                           brdf);
+    ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
+                                           &lambertian_bsdf_vtable,
+                                           &lambertian_bsdf,
+                                           sizeof(LAMBERTIAN_BSDF),
+                                           alignof(LAMBERTIAN_BSDF),
+                                           bsdf);
 
     return status;   
 }

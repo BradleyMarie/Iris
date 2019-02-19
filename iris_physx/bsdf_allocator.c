@@ -4,33 +4,33 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    brdf_allocator.c
+    bsdf_allocator.c
 
 Abstract:
 
-    Allows allocation of BRDFs cheaply during shading.
+    Allows allocation of BSDFs cheaply during shading.
 
 --*/
 
-#include "iris_physx/brdf_allocator.h"
+#include "iris_physx/bsdf_allocator.h"
 
 #include <assert.h>
 #include <string.h>
 
-#include "iris_physx/brdf_allocator_internal.h"
+#include "iris_physx/bsdf_allocator_internal.h"
 
 //
 // Functions
 //
 
 ISTATUS
-BrdfAllocatorAllocate(
-    _Inout_ PBRDF_ALLOCATOR allocator,
-    _In_ PCBRDF_VTABLE vtable,
+BsdfAllocatorAllocate(
+    _Inout_ PBSDF_ALLOCATOR allocator,
+    _In_ PCBSDF_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
     if (allocator == NULL)
@@ -62,17 +62,17 @@ BrdfAllocatorAllocate(
         }
     }
 
-    if (brdf == NULL)
+    if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    PBRDF brdf_allocation;
+    PBSDF bsdf_allocation;
     void *data_allocation;
     bool success = DynamicMemoryAllocatorAllocate(&allocator->allocator,
-                                                  sizeof(BRDF),
-                                                  alignof(BRDF),
-                                                  (void **)&brdf_allocation,
+                                                  sizeof(BSDF),
+                                                  alignof(BSDF),
+                                                  (void **)&bsdf_allocation,
                                                   data_size,
                                                   data_alignment,
                                                   &data_allocation);
@@ -82,16 +82,16 @@ BrdfAllocatorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    BrdfInitialize(vtable,
+    BsdfInitialize(vtable,
                    data_allocation,
-                   brdf_allocation);
+                   bsdf_allocation);
 
     if (data_size != 0)
     {
         memcpy(data_allocation, data, data_size);
     }
 
-    *brdf = brdf_allocation;
+    *bsdf = bsdf_allocation;
 
     return ISTATUS_SUCCESS;
 }

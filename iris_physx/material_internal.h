@@ -42,28 +42,28 @@ MaterialSample(
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
     assert(material != NULL);
     assert(PointValidate(model_hit_point));
     assert(VectorValidate(world_surface_normal));
-    assert(brdf_allocator != NULL);
+    assert(bsdf_allocator != NULL);
     assert(reflector_compositor != NULL);
     assert(world_shading_normal != NULL);
-    assert(brdf != NULL);
+    assert(bsdf != NULL);
 
     ISTATUS status = material->vtable->sample_routine(material->data,
                                                       model_hit_point,
                                                       world_surface_normal,
                                                       additional_data,
-                                                      brdf_allocator,
+                                                      bsdf_allocator,
                                                       reflector_compositor,
                                                       world_shading_normal,
-                                                      brdf);
+                                                      bsdf);
 
     return status;
 }

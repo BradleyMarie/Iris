@@ -14,8 +14,8 @@ Abstract:
 
 #include <string.h>
 
-#include "iris_physx/brdf_allocator.h"
-#include "iris_physx/brdf_allocator_internal.h"
+#include "iris_physx/bsdf_allocator.h"
+#include "iris_physx/bsdf_allocator_internal.h"
 #include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"

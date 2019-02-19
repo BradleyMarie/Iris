@@ -21,7 +21,7 @@ Abstract:
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/constant_material.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
@@ -37,7 +37,7 @@ Abstract:
 //
 
 typedef struct _SMOOTH_MATERIAL {
-    PBRDF brdf;
+    PBSDF bsdf;
     VECTOR3 normals[3];
 } SMOOTH_MATERIAL, *PSMOOTH_MATERIAL;
 
@@ -50,10 +50,10 @@ SmoothMaterialSample(
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
     PCSMOOTH_MATERIAL smooth_material = (PCSMOOTH_MATERIAL)context;
@@ -75,7 +75,7 @@ SmoothMaterialSample(
                                             nullptr,
                                             nullptr);
 
-    *brdf = smooth_material->brdf;
+    *bsdf = smooth_material->bsdf;
 
     return ISTATUS_SUCCESS;
 }
@@ -88,7 +88,7 @@ SmoothMaterialFree(
 {
     PSMOOTH_MATERIAL smooth_material = (PSMOOTH_MATERIAL)context;
 
-    BrdfRelease(smooth_material->brdf);
+    BsdfRelease(smooth_material->bsdf);
 }
 
 static const MATERIAL_VTABLE smooth_material_vtable = {
@@ -101,21 +101,21 @@ SmoothMaterialAllocate(
     _In_ VECTOR3 normal0,
     _In_ VECTOR3 normal1,
     _In_ VECTOR3 normal2,
-    _In_ PBRDF brdf,
+    _In_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     )
 {
     ASSERT_TRUE(VectorValidate(normal0));
     ASSERT_TRUE(VectorValidate(normal1));
     ASSERT_TRUE(VectorValidate(normal2));
-    ASSERT_TRUE(brdf);
+    ASSERT_TRUE(bsdf);
     ASSERT_TRUE(material);
 
     SMOOTH_MATERIAL smooth_material;
     smooth_material.normals[0] = normal0;
     smooth_material.normals[1] = normal1;
     smooth_material.normals[2] = normal2;
-    smooth_material.brdf = brdf;
+    smooth_material.bsdf = bsdf;
 
     ISTATUS status = MaterialAllocate(&smooth_material_vtable,
                                       &smooth_material,
@@ -124,7 +124,7 @@ SmoothMaterialAllocate(
                                       material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    BrdfRetain(brdf);
+    BsdfRetain(bsdf);
 }
 
 //
@@ -233,8 +233,8 @@ TEST(TeapotTest, FlatShadedTeapot)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -248,7 +248,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    status = ConstantMaterialAllocate(brdf, &material);
+    status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
@@ -275,7 +275,7 @@ TEST(TeapotTest, FlatShadedTeapot)
 
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     MaterialRelease(material);
     LightRelease(light);
     ListSceneFree(scene);
@@ -306,8 +306,8 @@ TEST(TeapotTest, SmoothShadedTeapot)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -333,7 +333,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
             normal0,
             normal1,
             normal2,
-            brdf,
+            bsdf,
             &material);
 
         PSHAPE shape;
@@ -359,7 +359,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
 
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     LightRelease(light);
     ListSceneFree(scene);
     AllLightSamplerFree(light_sampler);

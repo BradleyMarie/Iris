@@ -21,7 +21,7 @@ Abstract:
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/constructive_solid_geometry.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
@@ -262,12 +262,12 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                                    &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf0;
-    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    PBSDF bsdf0;
+    status = LambertianBsdfAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf1;
-    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    PBSDF bsdf1;
+    status = LambertianBsdfAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -278,11 +278,11 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material0;
-    status = ConstantMaterialAllocate(brdf0, &material0);
+    status = ConstantMaterialAllocate(bsdf0, &material0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material1;
-    status = ConstantMaterialAllocate(brdf1, &material1);
+    status = ConstantMaterialAllocate(bsdf1, &material1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape0;
@@ -317,8 +317,8 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
     LightRelease(light);
-    BrdfRelease(brdf0);
-    BrdfRelease(brdf1);
+    BsdfRelease(bsdf0);
+    BsdfRelease(bsdf1);
     MaterialRelease(material0);
     MaterialRelease(material1);
     ShapeRelease(shape0);
@@ -357,12 +357,12 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                                    &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf0;
-    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    PBSDF bsdf0;
+    status = LambertianBsdfAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf1;
-    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    PBSDF bsdf1;
+    status = LambertianBsdfAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -373,11 +373,11 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material0;
-    status = ConstantMaterialAllocate(brdf0, &material0);
+    status = ConstantMaterialAllocate(bsdf0, &material0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material1;
-    status = ConstantMaterialAllocate(brdf1, &material1);
+    status = ConstantMaterialAllocate(bsdf1, &material1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape0;
@@ -418,8 +418,8 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
     LightRelease(light);
-    BrdfRelease(brdf0);
-    BrdfRelease(brdf1);
+    BsdfRelease(bsdf0);
+    BsdfRelease(bsdf1);
     MaterialRelease(material0);
     MaterialRelease(material1);
     ShapeRelease(shape0);
@@ -458,12 +458,12 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                                    &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf0;
-    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    PBSDF bsdf0;
+    status = LambertianBsdfAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf1;
-    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    PBSDF bsdf1;
+    status = LambertianBsdfAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -474,11 +474,11 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material0;
-    status = ConstantMaterialAllocate(brdf0, &material0);
+    status = ConstantMaterialAllocate(bsdf0, &material0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material1;
-    status = ConstantMaterialAllocate(brdf1, &material1);
+    status = ConstantMaterialAllocate(bsdf1, &material1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape0;
@@ -519,8 +519,8 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
     LightRelease(light);
-    BrdfRelease(brdf0);
-    BrdfRelease(brdf1);
+    BsdfRelease(bsdf0);
+    BsdfRelease(bsdf1);
     MaterialRelease(material0);
     MaterialRelease(material1);
     ShapeRelease(shape0);
@@ -559,12 +559,12 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                                    &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf0;
-    status = LambertianBrdfAllocate(reflector0, &brdf0);
+    PBSDF bsdf0;
+    status = LambertianBsdfAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf1;
-    status = LambertianBrdfAllocate(reflector1, &brdf1);
+    PBSDF bsdf1;
+    status = LambertianBsdfAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -575,11 +575,11 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material0;
-    status = ConstantMaterialAllocate(brdf0, &material0);
+    status = ConstantMaterialAllocate(bsdf0, &material0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material1;
-    status = ConstantMaterialAllocate(brdf1, &material1);
+    status = ConstantMaterialAllocate(bsdf1, &material1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape0;
@@ -630,8 +630,8 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
     LightRelease(light);
-    BrdfRelease(brdf0);
-    BrdfRelease(brdf1);
+    BsdfRelease(bsdf0);
+    BsdfRelease(bsdf1);
     MaterialRelease(material0);
     MaterialRelease(material1);
     ShapeRelease(shape0);

@@ -22,7 +22,7 @@ Abstract:
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/directional_light.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
@@ -48,10 +48,10 @@ TriangleMaterialSample(
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
     PCTRIANGLE_MATERIAL triangle_material = (PCTRIANGLE_MATERIAL)context;
@@ -74,9 +74,9 @@ TriangleMaterialSample(
         return status;
     }
 
-    status = LambertianBrdfAllocateWithAllocator(brdf_allocator,
+    status = LambertianBsdfAllocateWithAllocator(bsdf_allocator,
                                                  reflector,
-                                                 brdf);
+                                                 bsdf);
 
     if (status != ISTATUS_SUCCESS)
     {

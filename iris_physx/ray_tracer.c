@@ -26,7 +26,7 @@ Abstract:
 typedef struct _SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT {
     PSHAPE_RAY_TRACER shape_ray_tracer;
     PCSPECTRUM light;
-    PCBRDF brdf;
+    PCBSDF bsdf;
     POINT3 hit_point;
     VECTOR3 surface_normal;
     VECTOR3 shading_normal;
@@ -132,10 +132,10 @@ ShapeRayTracerProcessHit(
                             model_hit_point,
                             process_context->surface_normal,
                             hit_context->additional_data,
-                            &process_context->shape_ray_tracer->brdf_allocator,
+                            &process_context->shape_ray_tracer->bsdf_allocator,
                             &process_context->shape_ray_tracer->reflector_compositor,
                             &process_context->shading_normal,
-                            &process_context->brdf);
+                            &process_context->bsdf);
 
     return status;
 }
@@ -149,7 +149,7 @@ ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
     _In_ RAY ray,
     _Outptr_result_maybenull_ PCSPECTRUM *light,
-    _Outptr_result_maybenull_ PCBRDF *brdf,
+    _Outptr_result_maybenull_ PCBSDF *bsdf,
     _Out_ PPOINT3 hit_point,
     _Out_ PVECTOR3 surface_normal,
     _Out_ PVECTOR3 shading_normal
@@ -170,7 +170,7 @@ ShapeRayTracerTrace(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (brdf == NULL)
+    if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -193,7 +193,7 @@ ShapeRayTracerTrace(
     SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT context;
     context.shape_ray_tracer = ray_tracer;
     context.light = NULL;
-    context.brdf = NULL;
+    context.bsdf = NULL;
 
     ISTATUS status =
         RayTracerTraceClosestHitWithCoordinates(ray_tracer->ray_tracer,
@@ -210,7 +210,7 @@ ShapeRayTracerTrace(
     }
 
     *light = context.light;
-    *brdf = context.brdf;
+    *bsdf = context.bsdf;
     *hit_point = context.hit_point;
     *surface_normal = context.surface_normal;
     *shading_normal = context.shading_normal;

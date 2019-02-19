@@ -9,7 +9,7 @@ Module Name:
 Abstract:
 
     Creates a material that does not support normal mapping which always returns
-    a single BRDF.
+    a single BSDF.
 
 --*/
 
@@ -28,7 +28,7 @@ extern "C" {
 
 ISTATUS
 ConstantMaterialAllocate(
-    _In_ PBRDF brdf,
+    _In_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     );
 

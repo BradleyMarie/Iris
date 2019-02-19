@@ -4,16 +4,16 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    brdf_vtable.h
+    bsdf_vtable.h
 
 Abstract:
 
-    The vtable for a BRDF.
+    The vtable for a BSDF.
 
 --*/
 
-#ifndef _IRIS_PHYSX_BRDF_VTABLE_
-#define _IRIS_PHYSX_BRDF_VTABLE_
+#ifndef _IRIS_PHYSX_BSDF_VTABLE_
+#define _IRIS_PHYSX_BSDF_VTABLE_
 
 #include "iris/iris.h"
 #include "iris_advanced/iris_advanced.h"
@@ -25,7 +25,7 @@ Abstract:
 
 typedef
 ISTATUS
-(*PBRDF_SAMPLE_ROUTINE)(
+(*PBSDF_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -38,7 +38,7 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PBRDF_COMPUTE_REFLECTANCE_ROUTINE)(
+(*PBSDF_COMPUTE_REFLECTANCE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -49,7 +49,7 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PBRDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE)(
+(*PBSDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -59,13 +59,13 @@ ISTATUS
     _Out_ float_t *pdf
     );
 
-typedef struct _BRDF_VTABLE {
-    PBRDF_SAMPLE_ROUTINE sample_routine;
-    PBRDF_COMPUTE_REFLECTANCE_ROUTINE compute_reflectance_routine;
-    PBRDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE compute_reflectance_with_pdf_routine;
+typedef struct _BSDF_VTABLE {
+    PBSDF_SAMPLE_ROUTINE sample_routine;
+    PBSDF_COMPUTE_REFLECTANCE_ROUTINE compute_reflectance_routine;
+    PBSDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE compute_reflectance_with_pdf_routine;
     PFREE_ROUTINE free_routine;
-} BRDF_VTABLE, *PBRDF_VTABLE;
+} BSDF_VTABLE, *PBSDF_VTABLE;
 
-typedef const BRDF_VTABLE *PCBRDF_VTABLE;
+typedef const BSDF_VTABLE *PCBSDF_VTABLE;
 
-#endif // _IRIS_PHYSX_BRDF_VTABLE_
+#endif // _IRIS_PHYSX_BSDF_VTABLE_

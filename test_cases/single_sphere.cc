@@ -20,7 +20,7 @@ Abstract:
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/constant_material.h"
-#include "iris_physx_toolkit/lambertian_brdf.h"
+#include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
@@ -123,8 +123,8 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -135,7 +135,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    status = ConstantMaterialAllocate(brdf, &material);
+    status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape;
@@ -162,7 +162,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     MaterialRelease(material);
     ShapeRelease(shape);
 }
@@ -191,8 +191,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -203,7 +203,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    status = ConstantMaterialAllocate(brdf, &material);
+    status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape;
@@ -235,7 +235,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     MaterialRelease(material);
     ShapeRelease(shape);
     MatrixRelease(matrix);
@@ -265,8 +265,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -277,7 +277,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    status = ConstantMaterialAllocate(brdf, &material);
+    status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape;
@@ -309,7 +309,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     MaterialRelease(material);
     ShapeRelease(shape);
     MatrixRelease(matrix);
@@ -339,8 +339,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
                                    &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PBRDF brdf;
-    status = LambertianBrdfAllocate(reflector, &brdf);
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -351,7 +351,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    status = ConstantMaterialAllocate(brdf, &material);
+    status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape;
@@ -383,7 +383,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
-    BrdfRelease(brdf);
+    BsdfRelease(bsdf);
     MaterialRelease(material);
     ShapeRelease(shape);
     MatrixRelease(matrix);

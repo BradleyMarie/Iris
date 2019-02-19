@@ -15,8 +15,8 @@ Abstract:
 #ifndef _IRIS_PHYSX_RAY_TRACER_INTERNAL_
 #define _IRIS_PHYSX_RAY_TRACER_INTERNAL_
 
-#include "iris_physx/brdf_allocator.h"
-#include "iris_physx/brdf_allocator_internal.h"
+#include "iris_physx/bsdf_allocator.h"
+#include "iris_physx/bsdf_allocator_internal.h"
 #include "iris_physx/reflector_compositor.h"
 #include "iris_physx/reflector_compositor_internal.h"
 
@@ -30,7 +30,7 @@ struct _SHAPE_RAY_TRACER {
     const void *trace_context;
     float_t minimum_distance;
     REFLECTOR_COMPOSITOR reflector_compositor;
-    BRDF_ALLOCATOR brdf_allocator;
+    BSDF_ALLOCATOR bsdf_allocator;
 };
 
 //
@@ -68,7 +68,7 @@ ShapeRayTracerInitialize(
         return false;
     }
 
-    BrdfAllocatorInitialize(&shape_ray_tracer->brdf_allocator);
+    BsdfAllocatorInitialize(&shape_ray_tracer->bsdf_allocator);
 
     return true;
 }
@@ -92,7 +92,7 @@ ShapeRayTracerConfigure(
     shape_ray_tracer->minimum_distance = minimum_distance;
 
     ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
-    BrdfAllocatorClear(&shape_ray_tracer->brdf_allocator);
+    BsdfAllocatorClear(&shape_ray_tracer->bsdf_allocator);
 }
 
 static
@@ -118,7 +118,7 @@ ShapeRayTracerDestroy(
 
     RayTracerFree(shape_ray_tracer->ray_tracer);
     ReflectorCompositorDestroy(&shape_ray_tracer->reflector_compositor);
-    BrdfAllocatorDestroy(&shape_ray_tracer->brdf_allocator);
+    BsdfAllocatorDestroy(&shape_ray_tracer->bsdf_allocator);
 }
 
 #endif // _IRIS_PHYSX_RAY_TRACER_INTERNAL_

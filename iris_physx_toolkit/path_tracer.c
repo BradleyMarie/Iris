@@ -63,12 +63,12 @@ PathTracerIntegrate(
     {
         VECTOR3 surface_normal, shading_normal;
         POINT3 hit_point;
-        PCBRDF brdf;
+        PCBSDF bsdf;
         PCSPECTRUM emitted_light;
         ISTATUS status = ShapeRayTracerTrace(ray_tracer,
                                              trace_ray,
                                              &emitted_light,
-                                             &brdf,
+                                             &bsdf,
                                              &hit_point,
                                              &surface_normal,
                                              &shading_normal);
@@ -88,7 +88,7 @@ PathTracerIntegrate(
             path_tracer->spectra[bounces] = NULL;
         }
 
-        if (brdf == NULL)
+        if (bsdf == NULL)
         {
             break;
         }
@@ -125,7 +125,7 @@ PathTracerIntegrate(
 
             PCSPECTRUM direct_lighting;
             status = SampleDirectLighting(light,
-                                          brdf,
+                                          bsdf,
                                           hit_point,
                                           trace_ray.direction,
                                           surface_normal,
@@ -167,22 +167,22 @@ PathTracerIntegrate(
             break;
         }
 
-        float_t brdf_pdf;
-        status = BrdfSample(brdf,
+        float_t bsdf_pdf;
+        status = BsdfSample(bsdf,
                             trace_ray.direction,
                             surface_normal,
                             rng,
                             allocator,
                             path_tracer->reflectors + bounces,
                             &trace_ray.direction,
-                            &brdf_pdf);
+                            &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
-        if (brdf_pdf <= (float_t)0.0)
+        if (bsdf_pdf <= (float_t)0.0)
         {
             break;
         }
@@ -200,10 +200,10 @@ PathTracerIntegrate(
                                                       trace_ray.direction);
         path_throughput *= albedo * attenuation;
 
-        if (isfinite(brdf_pdf))
+        if (isfinite(bsdf_pdf))
         {
-            path_throughput /= brdf_pdf;
-            attenuation /= brdf_pdf;
+            path_throughput /= bsdf_pdf;
+            attenuation /= bsdf_pdf;
         }
 
         if (path_tracer->min_bounces < bounces)
@@ -234,7 +234,7 @@ PathTracerIntegrate(
 
         path_tracer->attenuations[bounces] = attenuation;
 
-        if (isinf(brdf_pdf))
+        if (isinf(bsdf_pdf))
         {
             add_light_emissions = true;
         }

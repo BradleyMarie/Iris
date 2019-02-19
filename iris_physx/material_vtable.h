@@ -15,7 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_MATERIAL_VTABLE_
 #define _IRIS_PHYSX_MATERIAL_VTABLE_
 
-#include "iris_physx/brdf_allocator.h"
+#include "iris_physx/bsdf_allocator.h"
 #include "iris_physx/reflector_compositor.h"
 
 //
@@ -29,10 +29,10 @@ ISTATUS
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     );
 
 typedef struct _MATERIAL_VTABLE {

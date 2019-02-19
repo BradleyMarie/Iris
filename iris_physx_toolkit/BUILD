@@ -73,9 +73,9 @@ cc_library(
 )
 
 cc_library(
-    name = "lambertian_brdf",
-    hdrs = ["lambertian_brdf.h"],
-    srcs = ["lambertian_brdf.c"],
+    name = "lambertian_bsdf",
+    hdrs = ["lambertian_bsdf.h"],
+    srcs = ["lambertian_bsdf.c"],
     deps = [
         ":attenuated_reflector",
         "//iris_physx:iris_physx",

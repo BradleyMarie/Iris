@@ -4,42 +4,42 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    brdf.h
+    bsdf.h
 
 Abstract:
 
-    The interface for an object representing a BRDF.
+    The interface for an object representing a BSDF.
 
 --*/
 
-#ifndef _IRIS_BRDF_
-#define _IRIS_BRDF_
+#ifndef _IRIS_BSDF_
+#define _IRIS_BSDF_
 
-#include "iris_physx/brdf_vtable.h"
+#include "iris_physx/bsdf_vtable.h"
 
 //
 // Types
 //
 
-typedef struct _BRDF BRDF, *PBRDF;
-typedef const BRDF *PCBRDF;
+typedef struct _BSDF BSDF, *PBSDF;
+typedef const BSDF *PCBSDF;
 
 //
 // Functions
 //
 
 ISTATUS
-BrdfAllocate(
-    _In_ PCBRDF_VTABLE vtable,
+BsdfAllocate(
+    _In_ PCBSDF_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PBRDF *brdf
+    _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-BrdfSample(
-    _In_ PCBRDF brdf,
+BsdfSample(
+    _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _Inout_ PRANDOM rng,
@@ -50,8 +50,8 @@ BrdfSample(
     );
 
 ISTATUS
-BrdfComputeReflectance(
-    _In_ PCBRDF brdf,
+BsdfComputeReflectance(
+    _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
@@ -60,8 +60,8 @@ BrdfComputeReflectance(
     );
 
 ISTATUS
-BrdfComputeReflectanceWithPdf(
-    _In_ PCBRDF brdf,
+BsdfComputeReflectanceWithPdf(
+    _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
@@ -71,13 +71,13 @@ BrdfComputeReflectanceWithPdf(
     );
 
 void
-BrdfRetain(
-    _In_opt_ PBRDF brdf
+BsdfRetain(
+    _In_opt_ PBSDF bsdf
     );
 
 void
-BrdfRelease(
-    _In_opt_ _Post_invalid_ PBRDF brdf
+BsdfRelease(
+    _In_opt_ _Post_invalid_ PBSDF bsdf
     );
 
-#endif // _IRIS_BRDF_
+#endif // _IRIS_BSDF_

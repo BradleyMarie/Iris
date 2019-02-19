@@ -4,25 +4,25 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    brdf_allocator_internal.h
+    bsdf_allocator_internal.h
 
 Abstract:
 
-    Internal headers for BRDF allocator.
+    Internal headers for BSDF allocator.
 
 --*/
 
-#ifndef _IRIS_PHYSX_BRDF_ALLOCATOR_INTERNAL_
-#define _IRIS_PHYSX_BRDF_ALLOCATOR_INTERNAL_
+#ifndef _IRIS_PHYSX_BSDF_ALLOCATOR_INTERNAL_
+#define _IRIS_PHYSX_BSDF_ALLOCATOR_INTERNAL_
 
 #include "common/dynamic_allocator.h"
-#include "iris_physx/brdf_internal.h"
+#include "iris_physx/bsdf_internal.h"
 
 //
 // Types
 //
 
-struct _BRDF_ALLOCATOR {
+struct _BSDF_ALLOCATOR {
     DYNAMIC_MEMORY_ALLOCATOR allocator;
 };
 
@@ -33,8 +33,8 @@ struct _BRDF_ALLOCATOR {
 static
 inline
 void
-BrdfAllocatorInitialize(
-    _Out_ struct _BRDF_ALLOCATOR *allocator
+BsdfAllocatorInitialize(
+    _Out_ struct _BSDF_ALLOCATOR *allocator
     )
 {
     assert(allocator != NULL);
@@ -45,8 +45,8 @@ BrdfAllocatorInitialize(
 static
 inline
 void
-BrdfAllocatorClear(
-    _Inout_ struct _BRDF_ALLOCATOR *allocator
+BsdfAllocatorClear(
+    _Inout_ struct _BSDF_ALLOCATOR *allocator
     )
 {
     assert(allocator != NULL);
@@ -57,8 +57,8 @@ BrdfAllocatorClear(
 static
 inline
 void
-BrdfAllocatorDestroy(
-    _Inout_ struct _BRDF_ALLOCATOR *allocator
+BsdfAllocatorDestroy(
+    _Inout_ struct _BSDF_ALLOCATOR *allocator
     )
 {
     assert(allocator != NULL);
@@ -66,4 +66,4 @@ BrdfAllocatorDestroy(
     DynamicMemoryAllocatorDestroy(&allocator->allocator);
 }
 
-#endif // _IRIS_PHYSX_BRDF_ALLOCATOR_INTERNAL_
+#endif // _IRIS_PHYSX_BSDF_ALLOCATOR_INTERNAL_

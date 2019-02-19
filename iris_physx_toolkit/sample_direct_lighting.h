@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Samples the brdf and light to compute an estimate the direct lighting.
+    Samples the bsdf and light to compute an estimate the direct lighting.
 
 --*/
 
@@ -24,7 +24,7 @@ Abstract:
 ISTATUS
 SampleDirectLighting(
     _In_ PCLIGHT light,
-    _In_ PCBRDF brdf,
+    _In_ PCBSDF bsdf,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 to_hit_point,
     _In_ VECTOR3 surface_normal,

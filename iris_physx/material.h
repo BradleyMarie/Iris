@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    A material computes a BRDF and the surface normal to be used to calculate
+    A material computes a BSDF and the surface normal to be used to calculate
     lambertian falloff from the parameters generated during a successful 
     intersection.
 

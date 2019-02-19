@@ -21,7 +21,7 @@ Abstract:
 //
 
 typedef struct _CONSTANT_MATERIAL {
-    PBRDF brdf;
+    PBSDF bsdf;
 } CONSTANT_MATERIAL, *PCONSTANT_MATERIAL;
 
 typedef const CONSTANT_MATERIAL *PCCONSTANT_MATERIAL;
@@ -37,16 +37,16 @@ ConstantMaterialSample(
     _In_ POINT3 model_hit_point,
     _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
-    _Inout_ PBRDF_ALLOCATOR brdf_allocator,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBRDF *brdf
+    _Out_ PCBSDF *bsdf
     )
 {
     PCCONSTANT_MATERIAL constant_material = (PCCONSTANT_MATERIAL)context;
 
     *world_shading_normal = world_surface_normal;
-    *brdf = constant_material->brdf;
+    *bsdf = constant_material->bsdf;
 
     return ISTATUS_SUCCESS;
 }
@@ -59,7 +59,7 @@ ConstantMaterialFree(
 {
     PCONSTANT_MATERIAL constant_material = (PCONSTANT_MATERIAL)context;
 
-    BrdfRelease(constant_material->brdf);
+    BsdfRelease(constant_material->bsdf);
 }
 
 //
@@ -77,11 +77,11 @@ static const MATERIAL_VTABLE constant_material_vtable = {
 
 ISTATUS
 ConstantMaterialAllocate(
-    _In_ PBRDF brdf,
+    _In_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     )
 {
-    if (brdf == NULL)
+    if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -92,7 +92,7 @@ ConstantMaterialAllocate(
     }
 
     CONSTANT_MATERIAL constant_material;
-    constant_material.brdf = brdf;
+    constant_material.bsdf = bsdf;
 
     ISTATUS status = MaterialAllocate(&constant_material_vtable,
                                       &constant_material,
@@ -105,7 +105,7 @@ ConstantMaterialAllocate(
         return status;
     }
 
-    BrdfRetain(brdf);
+    BsdfRetain(bsdf);
 
     return ISTATUS_SUCCESS;
 }
