@@ -64,6 +64,15 @@ cc_library(
 )
 
 cc_library(
+    name = "fresnel_bsdf",
+    hdrs = ["fresnel_bsdf.h"],
+    srcs = ["fresnel_bsdf.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "interpolated_spectrum",
     hdrs = ["interpolated_spectrum.h"],
     srcs = ["interpolated_spectrum.c"],
@@ -106,7 +115,6 @@ cc_library(
     hdrs = ["mirror_bsdf.h"],
     srcs = ["mirror_bsdf.c"],
     deps = [
-        ":attenuated_reflector",
         "//iris_physx:iris_physx",
     ],
 )

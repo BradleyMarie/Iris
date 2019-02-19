@@ -14,7 +14,6 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/mirror_bsdf.h"
 
 //
