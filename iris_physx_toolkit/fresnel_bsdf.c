@@ -119,7 +119,25 @@ PerfectSpecularReflectorSample(
 
 static
 ISTATUS
-PerfectSpecularReflectorComputeReflectance(
+PerfectSpecularTransmitterSample(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ PVECTOR3 outgoing,
+    _Out_ float_t *pdf
+    )
+{
+    // TODO
+
+    return ISTATUS_ALLOCATION_FAILED;
+}
+
+static
+ISTATUS
+PerfectSpecularComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -135,7 +153,7 @@ PerfectSpecularReflectorComputeReflectance(
 
 static
 ISTATUS
-PerfectSpecularReflectorComputeReflectanceWithPdf(
+PerfectSpecularComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -153,7 +171,7 @@ PerfectSpecularReflectorComputeReflectanceWithPdf(
 
 static
 void
-PerfectSpecularReflectorFree(
+PerfectSpecularFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -166,11 +184,18 @@ PerfectSpecularReflectorFree(
 // Static Variables
 //
 
-static const BSDF_VTABLE perfect_specular_bsdf_vtable = {
+static const BSDF_VTABLE perfect_specular_reflector_vtable = {
     PerfectSpecularReflectorSample,
-    PerfectSpecularReflectorComputeReflectance,
-    PerfectSpecularReflectorComputeReflectanceWithPdf,
-    PerfectSpecularReflectorFree
+    PerfectSpecularComputeReflectance,
+    PerfectSpecularComputeReflectanceWithPdf,
+    PerfectSpecularFree
+};
+
+static const BSDF_VTABLE perfect_specular_transmitter_vtable = {
+    PerfectSpecularTransmitterSample,
+    PerfectSpecularComputeReflectance,
+    PerfectSpecularComputeReflectanceWithPdf,
+    PerfectSpecularFree
 };
 
 //
@@ -212,7 +237,7 @@ PerfectSpecularReflectorAllocate(
     perfect_specular_bsdf.refractive_index_incident = refractive_index_incident;
     perfect_specular_bsdf.refractive_index_transmitted = refractive_index_transmitted;
 
-    ISTATUS status = BsdfAllocate(&perfect_specular_bsdf_vtable,
+    ISTATUS status = BsdfAllocate(&perfect_specular_reflector_vtable,
                                   &perfect_specular_bsdf,
                                   sizeof(PERFECT_SPECULAR_BSDF),
                                   alignof(PERFECT_SPECULAR_BSDF),
@@ -271,7 +296,110 @@ PerfectSpecularReflectorAllocateWithAllocator(
     perfect_specular_bsdf.refractive_index_transmitted = refractive_index_transmitted;
 
     ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
-                                           &perfect_specular_bsdf_vtable,
+                                           &perfect_specular_reflector_vtable,
+                                           &perfect_specular_bsdf,
+                                           sizeof(PERFECT_SPECULAR_BSDF),
+                                           alignof(PERFECT_SPECULAR_BSDF),
+                                           bsdf);
+
+    return status;   
+}
+
+ISTATUS
+PerfectSpecularTransmitterAllocate(
+    _In_ PREFLECTOR reflector,
+    _In_ float_t refractive_index_incident,
+    _In_ float_t refractive_index_transmitted,
+    _Out_ PBSDF *bsdf
+    )
+{
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(refractive_index_incident) ||
+        refractive_index_incident < (float_t)1.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(refractive_index_transmitted) ||
+        refractive_index_transmitted < (float_t)1.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    PERFECT_SPECULAR_BSDF perfect_specular_bsdf;
+    perfect_specular_bsdf.reflector = reflector;
+    perfect_specular_bsdf.refractive_index_incident = refractive_index_incident;
+    perfect_specular_bsdf.refractive_index_transmitted = refractive_index_transmitted;
+
+    ISTATUS status = BsdfAllocate(&perfect_specular_transmitter_vtable,
+                                  &perfect_specular_bsdf,
+                                  sizeof(PERFECT_SPECULAR_BSDF),
+                                  alignof(PERFECT_SPECULAR_BSDF),
+                                  bsdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    ReflectorRetain(reflector);
+
+    return ISTATUS_SUCCESS;
+}
+
+
+ISTATUS
+PerfectSpecularTransmitterAllocateWithAllocator(
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
+    _In_ PCREFLECTOR reflector,
+    _In_ float_t refractive_index_incident,
+    _In_ float_t refractive_index_transmitted,
+    _Out_ PCBSDF *bsdf
+    )
+{
+    if (bsdf_allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(refractive_index_incident) ||
+        refractive_index_incident < (float_t)1.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (!isfinite(refractive_index_transmitted) ||
+        refractive_index_transmitted < (float_t)1.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    PERFECT_SPECULAR_BSDF perfect_specular_bsdf;
+    perfect_specular_bsdf.reflector = (PREFLECTOR)reflector;
+    perfect_specular_bsdf.refractive_index_incident = refractive_index_incident;
+    perfect_specular_bsdf.refractive_index_transmitted = refractive_index_transmitted;
+
+    ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
+                                           &perfect_specular_transmitter_vtable,
                                            &perfect_specular_bsdf,
                                            sizeof(PERFECT_SPECULAR_BSDF),
                                            alignof(PERFECT_SPECULAR_BSDF),
