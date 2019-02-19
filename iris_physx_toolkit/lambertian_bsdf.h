@@ -26,13 +26,13 @@ extern "C" {
 //
 
 ISTATUS
-LambertianBsdfAllocate(
+LambertianReflectorAllocate(
     _In_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-LambertianBsdfAllocateWithAllocator(
+LambertianReflectorAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf

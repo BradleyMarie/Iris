@@ -263,11 +263,11 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
-    status = LambertianBsdfAllocate(reflector0, &bsdf0);
+    status = LambertianReflectorAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf1;
-    status = LambertianBsdfAllocate(reflector1, &bsdf1);
+    status = LambertianReflectorAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -358,11 +358,11 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
-    status = LambertianBsdfAllocate(reflector0, &bsdf0);
+    status = LambertianReflectorAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf1;
-    status = LambertianBsdfAllocate(reflector1, &bsdf1);
+    status = LambertianReflectorAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -459,11 +459,11 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
-    status = LambertianBsdfAllocate(reflector0, &bsdf0);
+    status = LambertianReflectorAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf1;
-    status = LambertianBsdfAllocate(reflector1, &bsdf1);
+    status = LambertianReflectorAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -560,11 +560,11 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
-    status = LambertianBsdfAllocate(reflector0, &bsdf0);
+    status = LambertianReflectorAllocate(reflector0, &bsdf0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf1;
-    status = LambertianBsdfAllocate(reflector1, &bsdf1);
+    status = LambertianReflectorAllocate(reflector1, &bsdf1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;

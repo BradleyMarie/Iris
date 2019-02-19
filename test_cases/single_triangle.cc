@@ -74,9 +74,9 @@ TriangleMaterialSample(
         return status;
     }
 
-    status = LambertianBsdfAllocateWithAllocator(bsdf_allocator,
-                                                 reflector,
-                                                 bsdf);
+    status = LambertianReflectorAllocateWithAllocator(bsdf_allocator,
+                                                      reflector,
+                                                      bsdf);
 
     if (status != ISTATUS_SUCCESS)
     {

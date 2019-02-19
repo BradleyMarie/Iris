@@ -133,7 +133,7 @@ CosineSampleHemisphere(
 
 static
 ISTATUS
-LambertianBsdfSample(
+LambertianReflectorSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -171,7 +171,7 @@ LambertianBsdfSample(
 
 static
 ISTATUS
-LambertianBsdfComputeReflectance(
+LambertianReflectorComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -193,7 +193,7 @@ LambertianBsdfComputeReflectance(
 
 static
 ISTATUS
-LambertianBsdfComputeReflectanceWithPdf(
+LambertianReflectorComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -224,7 +224,7 @@ LambertianBsdfComputeReflectanceWithPdf(
 
 static
 void
-LambertianBsdfFree(
+LambertianReflectorFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -238,10 +238,10 @@ LambertianBsdfFree(
 //
 
 static const BSDF_VTABLE lambertian_bsdf_vtable = {
-    LambertianBsdfSample,
-    LambertianBsdfComputeReflectance,
-    LambertianBsdfComputeReflectanceWithPdf,
-    LambertianBsdfFree
+    LambertianReflectorSample,
+    LambertianReflectorComputeReflectance,
+    LambertianReflectorComputeReflectanceWithPdf,
+    LambertianReflectorFree
 };
 
 //
@@ -249,7 +249,7 @@ static const BSDF_VTABLE lambertian_bsdf_vtable = {
 //
 
 ISTATUS
-LambertianBsdfAllocate(
+LambertianReflectorAllocate(
     _In_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     )
@@ -284,7 +284,7 @@ LambertianBsdfAllocate(
 }
 
 ISTATUS
-LambertianBsdfAllocateWithAllocator(
+LambertianReflectorAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf
