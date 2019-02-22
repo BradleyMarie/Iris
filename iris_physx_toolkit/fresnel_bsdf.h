@@ -26,34 +26,19 @@ extern "C" {
 //
 
 ISTATUS
-PerfectSpecularReflectorAllocate(
-    _In_ PREFLECTOR reflector,
+SpecularDielectricBsdfAllocate(
+    _In_ PREFLECTOR reflected,
+    _In_ PREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-PerfectSpecularReflectorAllocateWithAllocator(
+SpecularDielectricBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
-    _In_ float_t refractive_index_incident,
-    _In_ float_t refractive_index_transmitted,
-    _Out_ PCBSDF *bsdf
-    );
-
-ISTATUS
-PerfectSpecularTransmitterAllocate(
-    _In_ PREFLECTOR reflector,
-    _In_ float_t refractive_index_incident,
-    _In_ float_t refractive_index_transmitted,
-    _Out_ PBSDF *bsdf
-    );
-
-ISTATUS
-PerfectSpecularTransmitterAllocateWithAllocator(
-    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_ PCREFLECTOR reflected,
+    _In_ PCREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PCBSDF *bsdf
