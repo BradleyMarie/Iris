@@ -4,11 +4,11 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-   cornell_box.cc
+   cornell_box_dielectric.cc
 
 Abstract:
 
-   Integration tests which render a Cornell box.
+   Integration tests which render a Cornell box with a dielectric sphere.
 
 --*/
 
@@ -21,13 +21,16 @@ Abstract:
 #include "iris_physx_toolkit/cie_color_integrator.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
+#include "iris_physx_toolkit/fresnel_bsdf.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
 #include "iris_physx_toolkit/lambertian_bsdf.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/one_light_sampler.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
+#include "iris_physx_toolkit/sphere.h"
 #include "iris_physx_toolkit/triangle.h"
+#include "iris_physx_toolkit/uniform_reflector.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
@@ -133,10 +136,42 @@ AddQuadToScene(
     ShapeRelease(shape1);
 }
 
-TEST(CornellBoxTest, CornellBox)
+TEST(CornellBoxDielectricTest, CornellBox)
 {
     PCOLOR_INTEGRATOR color_integrator;
     ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR perfect_reflector;
+    status = UniformReflectorAllocate((float_t)1.0, &perfect_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
+                                                     perfect_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBSDF glass_front_bsdf;
+    status = SpecularDielectricBsdfAllocate(perfect_reflector,
+                                            perfect_reflector,
+                                            (float_t)1.0,
+                                            (float_t)1.5,
+                                            &glass_front_bsdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL glass_front_material;
+    status = ConstantMaterialAllocate(glass_front_bsdf, &glass_front_material);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBSDF glass_back_bsdf;
+    status = SpecularDielectricBsdfAllocate(perfect_reflector,
+                                            perfect_reflector,
+                                            (float_t)1.5,
+                                            (float_t)1.0,
+                                            &glass_back_bsdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL glass_back_material;
+    status = ConstantMaterialAllocate(glass_back_bsdf, &glass_back_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR white_reflector;
@@ -302,17 +337,17 @@ TEST(CornellBoxTest, CornellBox)
         green_material,
         scene);
 
-    for (size_t i = 0; i < 5; i++)
-    {
-        AddQuadToScene(
-            cornell_box_short_box[i][0],
-            cornell_box_short_box[i][1],
-            cornell_box_short_box[i][2],
-            cornell_box_short_box[i][3],
-            white_material,
-            white_material,
-            scene);
-    }
+    PSHAPE sphere;
+    POINT3 center = PointCreate((float_t)-186.0, (float_t)82.0, (float_t)168.0);
+    status = SphereAllocate(center,
+                            (float_t)82.0,
+                            glass_front_material,
+                            glass_back_material,
+                            &sphere);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ListSceneAddShape(scene, sphere);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     for (size_t i = 0; i < 5; i++)
     {
@@ -341,21 +376,27 @@ TEST(CornellBoxTest, CornellBox)
                              scene,
                              light_sampler,
                              color_integrator,
-                             "test_results/cornell_box.pfm");
+                             "test_results/cornell_box_with_dielectric.pfm");
 
     EmissiveMaterialRelease(light_material);
     SpectrumRelease(light_spectrum);
+    ReflectorRelease(perfect_reflector);
     ReflectorRelease(white_reflector);
     ReflectorRelease(red_reflector);
     ReflectorRelease(green_reflector);
+    BsdfRelease(glass_front_bsdf);
+    BsdfRelease(glass_back_bsdf);
     BsdfRelease(white_bsdf);
     BsdfRelease(red_bsdf);
     BsdfRelease(green_bsdf);
+    MaterialRelease(glass_front_material);
+    MaterialRelease(glass_back_material);
     MaterialRelease(white_material);
     MaterialRelease(red_material);
     MaterialRelease(green_material);
     ShapeRelease(light_shape0);
     ShapeRelease(light_shape1);
+    ShapeRelease(sphere);
     LightRelease(light0);
     LightRelease(light1);
     ListSceneFree(scene);

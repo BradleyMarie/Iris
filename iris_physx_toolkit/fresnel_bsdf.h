@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_
+#define _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_
 
 #include "iris_physx/iris_physx.h"
 
@@ -48,4 +48,4 @@ SpecularDielectricBsdfAllocateWithAllocator(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_

@@ -59,6 +59,38 @@ cc_test(
 )
 
 cc_test(
+    name = "cornell_box_dielectric",
+    srcs = ["cornell_box_dielectric.cc"],
+    linkstatic = 1,
+    data = [
+        "//test_results:cornell_box.pfm",
+    ],
+    deps = [
+        "//iris_advanced_toolkit:pcg_random",
+        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:pinhole_camera",
+        "//iris_physx_toolkit:attenuated_reflector",
+        "//iris_physx_toolkit:cie_color_integrator",
+        "//iris_physx_toolkit:constant_emissive_material",
+        "//iris_physx_toolkit:constant_material",
+        "//iris_physx_toolkit:fresnel_bsdf",
+        "//iris_physx_toolkit:interpolated_spectrum",
+        "//iris_physx_toolkit:lambertian_bsdf",
+        "//iris_physx_toolkit:list_scene",
+        "//iris_physx_toolkit:one_light_sampler",
+        "//iris_physx_toolkit:path_tracer",
+        "//iris_physx_toolkit:sample_tracer",
+        "//iris_physx_toolkit:sphere",
+        "//iris_physx_toolkit:triangle",
+        "//iris_physx_toolkit:uniform_reflector",
+        "//test_util:cornell_box",
+        "//test_util:pfm",
+        "//test_util:quad",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "empty_physx",
     srcs = ["empty_physx.cc"],
     data = [
