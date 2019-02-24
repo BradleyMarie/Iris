@@ -63,7 +63,7 @@ cc_test(
     srcs = ["cornell_box_dielectric.cc"],
     linkstatic = 1,
     data = [
-        "//test_results:cornell_box.pfm",
+        "//test_results:cornell_box_with_dielectric.pfm",
     ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
