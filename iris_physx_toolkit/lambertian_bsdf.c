@@ -140,6 +140,7 @@ LambertianReflectorSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -164,6 +165,7 @@ LambertianReflectorSample(
         return status;
     }
 
+    *transmitted = false;
     *pdf = VectorBoundedDotProduct(*outgoing, normal) * inv_pi;
 
     return ISTATUS_SUCCESS;
@@ -177,7 +179,8 @@ LambertianReflectorComputeReflectance(
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted
     )
 {
     PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
@@ -188,7 +191,14 @@ LambertianReflectorComputeReflectance(
                                               inv_pi,
                                               reflector);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *transmitted = false;
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -200,6 +210,7 @@ LambertianReflectorComputeReflectanceWithPdf(
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {
@@ -216,6 +227,7 @@ LambertianReflectorComputeReflectanceWithPdf(
         return status;
     }
 
+    *transmitted = false;
     *pdf = VectorBoundedDotProduct(outgoing, normal) * inv_pi;
 
     return ISTATUS_SUCCESS;

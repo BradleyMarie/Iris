@@ -32,6 +32,7 @@ ISTATUS
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     );
@@ -44,7 +45,8 @@ ISTATUS
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted
     );
 
 typedef
@@ -56,6 +58,7 @@ ISTATUS
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     );
 

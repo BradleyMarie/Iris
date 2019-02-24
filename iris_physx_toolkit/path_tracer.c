@@ -167,6 +167,7 @@ PathTracerIntegrate(
             break;
         }
 
+        bool transmitted;
         float_t bsdf_pdf;
         status = BsdfSample(bsdf,
                             trace_ray.direction,
@@ -174,6 +175,7 @@ PathTracerIntegrate(
                             rng,
                             allocator,
                             path_tracer->reflectors + bounces,
+                            &transmitted,
                             &trace_ray.direction,
                             &bsdf_pdf);
 
@@ -196,8 +198,9 @@ PathTracerIntegrate(
             return status;
         }
 
-        float_t attenuation = VectorBoundedDotProduct(shading_normal,
-                                                      trace_ray.direction);
+        float_t attenuation = VectorPositiveDotProduct(shading_normal,
+                                                       trace_ray.direction,
+                                                       transmitted);
         path_throughput *= albedo * attenuation;
 
         if (isfinite(bsdf_pdf))

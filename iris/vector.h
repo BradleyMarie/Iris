@@ -229,6 +229,25 @@ VectorBoundedDotProduct(
 
 static
 inline
+float_t
+VectorPositiveDotProduct(
+    _In_ VECTOR3 operand0,
+    _In_ VECTOR3 operand1,
+    _In_ bool negate_before_clamp
+    )
+{
+    float_t dp = VectorDotProduct(operand0, operand1);
+
+    if (negate_before_clamp)
+    {
+        dp = -dp;
+    }
+
+    return fmax((float_t)0.0, dp);
+}
+
+static
+inline
 VECTOR3
 VectorNormalize(
     _In_ VECTOR3 vector,

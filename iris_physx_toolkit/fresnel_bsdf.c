@@ -44,6 +44,7 @@ SpecularDielectricBsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -61,6 +62,7 @@ SpecularDielectricBsdfSample(
     if ((float_t)1.0 <= sin_squared_theta_transmitted)
     {
         *reflector = specular_dielectric->reflected;
+        *transmitted = false;
         *outgoing = VectorReflect(incoming, normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
@@ -94,10 +96,14 @@ SpecularDielectricBsdfSample(
     if (random_value < proportion_reflected)
     {
         *reflector = specular_dielectric->reflected;
+        *transmitted = false;
         *outgoing = VectorReflect(incoming, normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
     }
+
+    *reflector = specular_dielectric->transmitted;
+    *transmitted = true;
 
     incoming = VectorScale(incoming, specular_dielectric->refractive_ratio);
 
@@ -106,7 +112,6 @@ SpecularDielectricBsdfSample(
     normal = VectorScale(normal, coeff);
 
     *outgoing = VectorAdd(incoming, normal);
-    *reflector = specular_dielectric->transmitted;
     *pdf = INFINITY;
 
     return ISTATUS_SUCCESS;
@@ -120,10 +125,12 @@ SpecularDielectricBsdfComputeReflectance(
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted
     )
 {
     *reflector = NULL;
+    *transmitted = false;
 
     return ISTATUS_SUCCESS;
 }
@@ -137,6 +144,7 @@ SpecularDielectricBsdfComputeReflectanceWithPdf(
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {

@@ -92,6 +92,7 @@ BsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -126,14 +127,19 @@ BsdfSample(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (outgoing == NULL)
+    if (transmitted == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (pdf == NULL)
+    if (outgoing == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
     }
 
     ISTATUS status = bsdf->vtable->sample_routine(bsdf->data,
@@ -142,6 +148,7 @@ BsdfSample(
                                                   rng,
                                                   compositor,
                                                   reflector,
+                                                  transmitted,
                                                   outgoing,
                                                   pdf);
 
@@ -155,7 +162,8 @@ BsdfComputeReflectance(
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted
     )
 {
     if (bsdf == NULL)
@@ -188,12 +196,18 @@ BsdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
+    if (transmitted == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
     ISTATUS status = bsdf->vtable->compute_reflectance_routine(bsdf->data,
                                                                incoming,
                                                                surface_normal,
                                                                outgoing,
                                                                compositor,
-                                                               reflector);
+                                                               reflector,
+                                                               transmitted);
 
     return status;
 }
@@ -206,6 +220,7 @@ BsdfComputeReflectanceWithPdf(
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {
@@ -239,9 +254,14 @@ BsdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (pdf == NULL)
+    if (transmitted == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     ISTATUS status = 
@@ -251,6 +271,7 @@ BsdfComputeReflectanceWithPdf(
                                                            outgoing,
                                                            compositor,
                                                            reflector,
+                                                           transmitted,
                                                            pdf);
 
     return status;

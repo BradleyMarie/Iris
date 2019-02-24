@@ -39,6 +39,7 @@ MirrorReflectorSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -46,6 +47,7 @@ MirrorReflectorSample(
     PCMIRROR_BSDF mirror_bsdf = (PCMIRROR_BSDF)context;
 
     *reflector = mirror_bsdf->reflector;
+    *transmitted = false;
     *outgoing = VectorReflect(incoming, normal);
     *pdf = INFINITY;
 
@@ -60,10 +62,12 @@ MirrorReflectorComputeReflectance(
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted
     )
 {
     *reflector = NULL;
+    *transmitted = false;
 
     return ISTATUS_SUCCESS;
 }
@@ -77,6 +81,7 @@ MirrorReflectorComputeReflectanceWithPdf(
     _In_ VECTOR3 outgoing,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {

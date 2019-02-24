@@ -213,3 +213,15 @@ TEST(VectorTest, VectorBoundedDotProduct)
     VECTOR3 v2 = VectorCreate((float_t) -4.0, (float_t) -3.0, (float_t) -2.0);
     EXPECT_EQ((float_t) 0.0, VectorBoundedDotProduct(v0, v2));
 }
+
+TEST(VectorTest, VectorPositiveDotProduct)
+{
+    VECTOR3 v0 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) 2.0);
+    VECTOR3 v1 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
+    EXPECT_EQ((float_t) 7.0, VectorPositiveDotProduct(v0, v1, false));
+    EXPECT_EQ((float_t) 0.0, VectorPositiveDotProduct(v0, v1, true));
+
+    VECTOR3 v2 = VectorCreate((float_t) -4.0, (float_t) -3.0, (float_t) -2.0);
+    EXPECT_EQ((float_t) 0.0, VectorPositiveDotProduct(v0, v2, false));
+    EXPECT_EQ((float_t) 7.0, VectorPositiveDotProduct(v0, v2, true));
+}
