@@ -62,6 +62,36 @@ struct _KD_TREE_SCENE {
 
 static
 inline
+bool
+BoundingBoxIntersect(
+    _In_ BOUNDING_BOX box,
+    _In_ POINT3 origin,
+    _In_ VECTOR3 inverted_direction
+    )
+{
+    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction.x;
+    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction.x;
+
+    float_t tmin = min(tx1, tx2);
+    float_t tmax = max(tx1, tx2);
+
+    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction.y;
+    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction.y;
+
+    tmin = max(tmin, min(ty1, ty2));
+    tmax = min(tmax, max(ty1, ty2));
+
+    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction.z;
+    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction.z;
+
+    tmin = max(tmin, min(tz1, tz2));
+    tmax = min(tmax, max(tz1, tz2));
+
+    return tmax >= tmin && tmin >= (float_t)0.0;
+}
+
+static
+inline
 uint32_t
 KdTreeNodeType(
     _In_ PCKD_TREE_NODE node
