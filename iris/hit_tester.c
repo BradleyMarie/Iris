@@ -111,7 +111,7 @@ FULL_HIT_CONTEXT empty_hit = {
 //
 
 ISTATUS
-HitTesterTestGeometry(
+HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,

@@ -46,10 +46,10 @@ ShapeHitTesterTestShape(
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
     const void *context = ((const void **)shape)[1];
-    ISTATUS status = HitTesterTestGeometry(hit_tester,
-                                           test_routine,
-                                           context,
-                                           shape);
+    ISTATUS status = HitTesterTestWorldGeometry(hit_tester,
+                                                test_routine,
+                                                context,
+                                                shape);
 
     return status;
 }

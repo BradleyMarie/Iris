@@ -179,16 +179,16 @@ TEST(HitTesterTest, HitTesterTestWorldGeometryErrors)
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
 
-    ISTATUS status = HitTesterTestGeometry(nullptr,
-                                           CheckGeometryContext,
-                                           nullptr,
-                                           nullptr);
+    ISTATUS status = HitTesterTestWorldGeometry(nullptr,
+                                                CheckGeometryContext,
+                                                nullptr,
+                                                nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = HitTesterTestGeometry(&tester,
-                                   nullptr,
-                                   nullptr,
-                                   nullptr);
+    status = HitTesterTestWorldGeometry(&tester,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
@@ -213,28 +213,28 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     params.triggered = &triggered;
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    ISTATUS status = HitTesterTestGeometry(&tester,
-                                           CheckGeometryContext,
-                                           &params,
-                                           nullptr);
+    ISTATUS status = HitTesterTestWorldGeometry(&tester,
+                                                CheckGeometryContext,
+                                                &params,
+                                                nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
     params.status_to_return = ISTATUS_NO_INTERSECTION;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr);
+    status = HitTesterTestWorldGeometry(&tester,
+                                        CheckGeometryContext,
+                                        &params,
+                                        nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_TRUE(triggered);
 
     triggered = false;
     params.status_to_return = ISTATUS_INVALID_ARGUMENT_COMBINATION_31;
-    status = HitTesterTestGeometry(&tester,
-                                   CheckGeometryContext,
-                                   &params,
-                                   nullptr);
+    status = HitTesterTestWorldGeometry(&tester,
+                                        CheckGeometryContext,
+                                        &params,
+                                        nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_31, status);
     EXPECT_TRUE(triggered);
 
@@ -510,10 +510,10 @@ TEST(HitTesterTest, HitTesterSortHits)
     for (int i = 1; i <= 1000; i++)
     {
         float_t distance = (float_t)(1001 - i);
-        ISTATUS status = HitTesterTestGeometry(&tester,
-                                               AllocateHitAtDistance,
-                                               &distance,
-                                               &hit_data);
+        ISTATUS status = HitTesterTestWorldGeometry(&tester,
+                                                    AllocateHitAtDistance,
+                                                    &distance,
+                                                    &hit_data);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
     }
 
@@ -571,10 +571,10 @@ void RunWorldHitTest(
 {
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestGeometry(tester,
-                                           AllocateTwoHitAtDistance,
-                                           &first_distance,
-                                           &first_hit_data);
+    ISTATUS status = HitTesterTestWorldGeometry(tester,
+                                                AllocateTwoHitAtDistance,
+                                                &first_distance,
+                                                &first_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
@@ -584,10 +584,10 @@ void RunWorldHitTest(
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &second_distance,
-                                   &second_hit_data);
+    status = HitTesterTestWorldGeometry(tester,
+                                        AllocateTwoHitAtDistance,
+                                        &second_distance,
+                                        &second_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     status = HitTesterClosestHit(tester, &closest_hit);
@@ -596,10 +596,10 @@ void RunWorldHitTest(
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &third_distance,
-                                   &third_hit_data);
+    status = HitTesterTestWorldGeometry(tester,
+                                        AllocateTwoHitAtDistance,
+                                        &third_distance,
+                                        &third_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     status = HitTesterClosestHit(tester, &closest_hit);
@@ -608,20 +608,20 @@ void RunWorldHitTest(
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateHitAtDistance,
-                                   &fourth_distance,
-                                   &fourth_hit_data);
+    status = HitTesterTestWorldGeometry(tester,
+                                        AllocateHitAtDistance,
+                                        &fourth_distance,
+                                        &fourth_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     status = HitTesterClosestHit(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
-    status = HitTesterTestGeometry(tester,
-                                   AllocateNoHits,
-                                   nullptr,
-                                   nullptr);
+    status = HitTesterTestWorldGeometry(tester,
+                                        AllocateNoHits,
+                                        nullptr,
+                                        nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     status = HitTesterClosestHit(tester, &closest_hit);

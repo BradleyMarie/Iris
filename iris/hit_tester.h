@@ -20,11 +20,11 @@ Abstract:
     2) Test against an object which defines a coordinate space, but whose 
        intersection test may be done in the world coordinate space. For these
        objects use HitTesterTestPremultipliedGeometry.
-    
+
     3) Test against an object which resides in its own coordinate space and 
        which must have its intersection test done in its model coordinate space.
-       for these objects use HitTesterTestGeometry.
-    
+       for these objects use HitTesterTestTransformedGeometry.
+
     Note, the right thing will happen if the transformation passed in is the 
     identity matrix.
 
@@ -71,7 +71,7 @@ ISTATUS
 //
 
 ISTATUS
-HitTesterTestGeometry(
+HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
