@@ -19,6 +19,12 @@ Abstract:
 #include "iris/hit_allocator_internal.h"
 
 //
+// Extern Data
+//
+
+extern FULL_HIT_CONTEXT empty_hit;
+
+//
 // Types
 //
 
@@ -46,6 +52,7 @@ HitTesterInitialize(
 
     HitAllocatorInitialize(&hit_tester->hit_allocator);
 
+    hit_tester->closest_hit = &empty_hit;
     hit_tester->minimum_distance = (float_t)0.0;
 
     return true;
@@ -67,7 +74,7 @@ HitTesterReset(
 
     HitAllocatorFreeAll(&hit_tester->hit_allocator);
 
-    hit_tester->closest_hit = NULL;
+    hit_tester->closest_hit = &empty_hit;
     hit_tester->world_ray = world_ray;
     hit_tester->minimum_distance = minimum_distance;
 }

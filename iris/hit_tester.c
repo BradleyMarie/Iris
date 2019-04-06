@@ -36,8 +36,7 @@ HitTesterCollectHitsAndUpdateClosestHit(
     do
     {
         if (hit_tester->minimum_distance <= hit->distance &&
-            (hit_tester->closest_hit == NULL ||
-             hit_tester->closest_hit->hit.distance > hit->distance))
+            hit_tester->closest_hit->hit.distance > hit->distance)
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
             full_hit_context->model_to_world = model_to_world;
@@ -86,8 +85,7 @@ HitTesterTestWorldInternal(
     do
     {
         if (hit_tester->minimum_distance <= hit->distance &&
-            (hit_tester->closest_hit == NULL ||
-             hit_tester->closest_hit->hit.distance > hit->distance))
+            hit_tester->closest_hit->hit.distance > hit->distance)
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
             full_hit_context->model_to_world = NULL;
@@ -99,6 +97,14 @@ HitTesterTestWorldInternal(
 
     return ISTATUS_SUCCESS;
 }
+
+//
+// Data
+//
+
+FULL_HIT_CONTEXT empty_hit = {
+    .hit = { NULL, INFINITY }
+};
 
 //
 // Functions
@@ -282,4 +288,25 @@ HitTesterTestNestedGeometry(
     HitAllocatorSetData(hit_allocator, original_data);
 
     return status;
+}
+
+ISTATUS
+HitTesterClosestHit(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    )
+{
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (distance == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *distance = hit_tester->closest_hit->hit.distance;
+
+    return ISTATUS_SUCCESS;
 }

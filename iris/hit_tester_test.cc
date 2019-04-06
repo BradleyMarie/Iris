@@ -577,7 +577,10 @@ void RunWorldHitTest(
                                            &first_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(first_distance, tester->closest_hit->context.distance);
+    float_t closest_hit;
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
@@ -587,7 +590,9 @@ void RunWorldHitTest(
                                    &second_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
@@ -597,7 +602,9 @@ void RunWorldHitTest(
                                    &third_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
@@ -607,7 +614,9 @@ void RunWorldHitTest(
                                    &fourth_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestGeometry(tester,
                                    AllocateNoHits,
@@ -615,11 +624,12 @@ void RunWorldHitTest(
                                    nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
     EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
 }
 
 TEST(HitTesterTest, HitTesterCheckWorldHits)
@@ -634,12 +644,12 @@ TEST(HitTesterTest, HitTesterCheckWorldHits)
     RAY ray = RayCreate(origin, direction);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunWorldHitTest(&tester, (float_t)0.0);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunWorldHitTest(&tester, (float_t)0.0);
     
@@ -661,7 +671,10 @@ void RunPremultipliedHitTest(
                                                         matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(first_distance, tester->closest_hit->context.distance);
+    float_t closest_hit;
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
@@ -672,7 +685,9 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
@@ -683,7 +698,9 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
@@ -694,7 +711,9 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestPremultipliedGeometry(tester,
                                                 AllocateNoHits,
@@ -708,13 +727,19 @@ void RunPremultipliedHitTest(
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_TRUE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
-        EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
-        EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(second_distance, closest_hit);
     }
 }
 
@@ -744,32 +769,32 @@ TEST(HitTesterTest, HitTesterCheckPremultipliedHits)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
     
@@ -793,7 +818,10 @@ void RunTransformedHitTest(
                                                       matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(first_distance, tester->closest_hit->context.distance);
+    float_t closest_hit;
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
     float_t second_distance = (float_t)0.0 + min_distance;
@@ -804,7 +832,9 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
@@ -815,7 +845,9 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
@@ -826,7 +858,9 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestTransformedGeometry(tester,
                                               AllocateNoHits,
@@ -835,20 +869,28 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ(second_distance, closest_hit);
 
     if (matrix == nullptr)
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
-        EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_FALSE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
-        EXPECT_EQ(second_distance, tester->closest_hit->context.distance);
+
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+        EXPECT_EQ(second_distance, closest_hit);
     }
 }
 
@@ -878,39 +920,67 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(nullptr, tester.closest_hit);
+    EXPECT_EQ(&empty_hit, tester.closest_hit);
 
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
     MatrixRelease(model_to_world_2);
+}
+
+TEST(HitTesterTest, HitTesterClosestHitErrors)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(nullptr, &closest_hit);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterClosestHit(&tester, nullptr);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    HitTesterDestroy(&tester);
+}
+
+TEST(HitTesterTest, HitTesterClosestEmpty)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_TRUE(std::isinf(closest_hit));
+
+    HitTesterDestroy(&tester);
 }

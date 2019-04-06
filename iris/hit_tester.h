@@ -105,4 +105,10 @@ HitTesterTestNestedGeometry(
     _Out_ PHIT *hits
     );
 
+ISTATUS
+HitTesterClosestHit(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    );
+
 #endif // _IRIS_HIT_TESTER_
