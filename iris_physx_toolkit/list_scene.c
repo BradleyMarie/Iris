@@ -270,7 +270,7 @@ ListSceneTraceCallback(
         PCSHAPE shape = 
             (PCSHAPE)PointerListRetrieveAtIndex(&list_scene->world_geometry, i);
 
-        ISTATUS status = ShapeHitTesterTestShape(hit_tester, shape);
+        ISTATUS status = ShapeHitTesterTestWorldShape(hit_tester, shape);
 
         if (status != ISTATUS_SUCCESS)
         {
