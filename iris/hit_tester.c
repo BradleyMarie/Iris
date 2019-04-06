@@ -291,6 +291,36 @@ HitTesterTestNestedGeometry(
 }
 
 ISTATUS
+HitTesterTestGeometry(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied
+    )
+{
+    if (premultiplied)
+    {
+        ISTATUS status = HitTesterTestPremultipliedGeometry(hit_tester,
+                                                            test_routine,
+                                                            geometry_data,
+                                                            hit_data,
+                                                            model_to_world);
+
+        return status;
+    }
+
+    ISTATUS status = HitTesterTestTransformedGeometry(hit_tester,
+                                                      test_routine,
+                                                      geometry_data,
+                                                      hit_data,
+                                                      model_to_world);
+
+    return status;
+}
+
+ISTATUS
 HitTesterClosestHit(
     _In_ PCHIT_TESTER hit_tester,
     _Out_ float_t *distance

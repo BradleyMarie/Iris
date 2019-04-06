@@ -12,7 +12,7 @@ Abstract:
     not listed as an argument to any functions in this file because the 
     ray is implicity passed down from the ray tracer.
 
-    There are three possible ways of checking for an intersection.
+    There are four possible ways of checking for an intersection.
 
     1) Test against an object known to reside in world coordinates. For these 
        objects use HitTesterTestWorldGeometry.
@@ -24,6 +24,10 @@ Abstract:
     3) Test against an object which resides in its own coordinate space and 
        which must have its intersection test done in its model coordinate space.
        for these objects use HitTesterTestTransformedGeometry.
+
+    4) Test against an object which has its own coordinate space, but may or may
+       not have its intersection done in the world coordinate space. For these
+       objects use HitTesterTestGeometry.
 
     Note, the right thing will happen if the transformation passed in is the 
     identity matrix.
@@ -94,6 +98,16 @@ HitTesterTestTransformedGeometry(
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
     _In_opt_ PCMATRIX model_to_world
+    );
+
+ISTATUS
+HitTesterTestGeometry(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied
     );
 
 ISTATUS
