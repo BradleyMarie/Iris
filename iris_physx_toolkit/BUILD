@@ -102,6 +102,15 @@ cc_library(
 )
 
 cc_library(
+    name = "kd_tree_scene",
+    hdrs = ["kd_tree_scene.h"],
+    srcs = ["kd_tree_scene.c"],
+    deps = [
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "metric_black_body",
     hdrs = ["metric_black_body.h"],
     srcs = ["metric_black_body.c"],

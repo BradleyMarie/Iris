@@ -103,7 +103,7 @@ HitTesterTestWorldInternal(
 //
 
 FULL_HIT_CONTEXT empty_hit = {
-    .hit = { NULL, INFINITY }
+    .hit = { NULL, (float_t)INFINITY }
 };
 
 //

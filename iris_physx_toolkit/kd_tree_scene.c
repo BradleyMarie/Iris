@@ -19,6 +19,7 @@ Abstract:
 // Defines
 //
 
+#define MAX_TREE_DEPTH   64
 #define INTERIOR_X_SPLIT 0
 #define INTERIOR_Y_SPLIT 1
 #define INTERIOR_Z_SPLIT 2
@@ -56,38 +57,38 @@ struct _KD_TREE_SCENE {
     BOUNDING_BOX scene_bounds;
 };
 
+typedef struct _WORK_ITEM {
+    PCKD_TREE_NODE node;
+    float_t min;
+    float_t max;
+} WORK_ITEM, *PWORK_ITEM;
+
 //
 // Static Functions
 //
 
 static
 inline
-bool
-BoundingBoxIntersect(
-    _In_ BOUNDING_BOX box,
-    _In_ POINT3 origin,
-    _In_ VECTOR3 inverted_direction
+float_t
+VectorGetElement(
+    _In_ VECTOR3 vector,
+    _In_ uint32_t axis
     )
 {
-    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction.x;
-    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction.x;
+    float_t *elements = &vector.x;
+    return elements[axis];
+}
 
-    float_t tmin = min(tx1, tx2);
-    float_t tmax = max(tx1, tx2);
-
-    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction.y;
-    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction.y;
-
-    tmin = max(tmin, min(ty1, ty2));
-    tmax = min(tmax, max(ty1, ty2));
-
-    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction.z;
-    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction.z;
-
-    tmin = max(tmin, min(tz1, tz2));
-    tmax = min(tmax, max(tz1, tz2));
-
-    return tmax >= tmin && tmin >= (float_t)0.0;
+static
+inline
+float_t
+PointGetElement(
+    _In_ POINT3 point,
+    _In_ uint32_t axis
+    )
+{
+    float_t *elements = &point.x;
+    return elements[axis];
 }
 
 static
@@ -123,37 +124,52 @@ KdTreeLeafSize(
 }
 
 static
+inline
+float_t
+KdTreeSplit(
+    _In_ PCKD_TREE_NODE node
+    )
+{
+    assert(!KdTreeNodeIsLeaf(node));
+
+    return node->split_or_offset.split;
+}
+
+static
+inline
+uint32_t
+KdTreeChildOffset(
+    _In_ PCKD_TREE_NODE node
+    )
+{
+    assert(!KdTreeNodeIsLeaf(node));
+
+    return node->flags_and_num_shapes_or_offset & 0x3FFFFFFF;
+}
+
+static
+inline
 ISTATUS
 KdTreeTraceShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
     _In_ PCSHAPE_AND_DATA shape_and_data
     )
 {
-    if (shape_and_data->premultiplied)
-    {
-        ISTATUS status =
-            ShapeHitTesterTestPremultipliedShape(hit_tester,
-                                                 shape_and_data->shape,
-                                                 shape_and_data->model_to_world);
-
-        return status;
-    }
-
-    ISTATUS status =
-        ShapeHitTesterTestTransformedShape(hit_tester,
-                                           shape_and_data->shape,
-                                           shape_and_data->model_to_world);
+    ISTATUS status = ShapeHitTesterTestShape(hit_tester,
+                                             shape_and_data->shape,
+                                             shape_and_data->model_to_world,
+                                             shape_and_data->premultiplied);
 
     return status;
 }
 
 static
+inline
 ISTATUS
 KdTreeProcessLeaf(
     _In_ PCKD_TREE_SCENE kd_tree,
     _In_ PCKD_TREE_NODE node,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCRAY ray
+    _Inout_ PSHAPE_HIT_TESTER hit_tester
     )
 {
     uint32_t num_shapes = KdTreeLeafSize(node);
@@ -186,98 +202,6 @@ KdTreeProcessLeaf(
     return ISTATUS_SUCCESS;
 }
 
-static
-ISTATUS
-KdTreeProcessInteriorX(
-    _In_ PCKD_TREE_SCENE kd_tree,
-    _In_ PCKD_TREE_NODE node,
-    _In_ BOUNDING_BOX node_bounds,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCRAY ray
-    )
-{
-    uint32_t num_shapes = KdTreeLeafSize(node);
-}
-
-static
-ISTATUS
-KdTreeProcessInteriorY(
-    _In_ PCKD_TREE_SCENE kd_tree,
-    _In_ PCKD_TREE_NODE node,
-    _In_ BOUNDING_BOX node_bounds,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCRAY ray
-    )
-{
-    uint32_t num_shapes = KdTreeLeafSize(node);
-}
-
-static
-ISTATUS
-KdTreeProcessInteriorZ(
-    _In_ PCKD_TREE_SCENE kd_tree,
-    _In_ PCKD_TREE_NODE node,
-    _In_ BOUNDING_BOX node_bounds,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCRAY ray
-    )
-{
-    uint32_t num_shapes = KdTreeLeafSize(node);
-}
-
-static
-ISTATUS
-KdTreeSceneTrace(
-    _In_ PCKD_TREE_SCENE kd_tree,
-    _In_ PCKD_TREE_NODE node,
-    _In_ BOUNDING_BOX node_bounds,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCRAY ray
-    )
-{
-    if (KdTreeNodeIsLeaf(node))
-    {
-        ISTATUS status = KdTreeProcessLeaf(kd_tree,
-                                           node,
-                                           hit_tester,
-                                           ray);
-        
-        return status;
-    }
-
-    uint32_t type = KdTreeNodeType(node);
-
-    if (type == INTERIOR_X_SPLIT)
-    {
-        ISTATUS status = KdTreeProcessInteriorX(kd_tree,
-                                                node,
-                                                node_bounds,
-                                                hit_tester,
-                                                ray);
-        
-        return status;
-    }
-
-    if (type == INTERIOR_Y_SPLIT)
-    {
-        ISTATUS status = KdTreeProcessInteriorY(kd_tree,
-                                                node,
-                                                node_bounds,
-                                                hit_tester,
-                                                ray);
-        
-        return status;
-    }
-
-    ISTATUS status = KdTreeProcessInteriorZ(kd_tree,
-                                            node,
-                                            node_bounds,
-                                            hit_tester,
-                                            ray);
-    
-    return status;
-}
-
 //
 // Functions
 //
@@ -304,8 +228,8 @@ KdTreeSceneFree(
 
     for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
     {
-        ShapeRelease(kd_tree_scene->shapes[i].shape);
-        MatrixRelease(kd_tree_scene->shapes[i].model_to_world);
+        ShapeRelease(kd_tree_scene->shapes[i]->shape);
+        MatrixRelease(kd_tree_scene->shapes[i]->model_to_world);
     }
 
     free(kd_tree_scene->nodes);
@@ -327,11 +251,90 @@ KdTreeSceneTraceCallback(
 
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
 
-    ISTATUS status = KdTreeSceneTrace(kd_tree,
-                                      kd_tree->nodes,
-                                      kd_tree->scene_bounds,
-                                      hit_tester,
-                                      &ray);
+    VECTOR3 inverse_direction = VectorCreate((float_t)1.0 / ray.direction.x,
+                                             (float_t)1.0 / ray.direction.y,
+                                             (float_t)1.0 / ray.direction.z);
 
-    return status;
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+
+    PCKD_TREE_NODE current = &kd_tree->nodes[0];
+    float_t min = (float_t)0.0;
+    float_t max = (float_t)INFINITY;
+
+    for (;;)
+    {
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+        if (closest_hit < min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(current))
+        {
+            ISTATUS status = KdTreeProcessLeaf(kd_tree,
+                                               current,
+                                               hit_tester);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            current = work_queue[queue_size].node;
+            min = work_queue[queue_size].min;
+            max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(current);
+        float_t origin = PointGetElement(ray.origin, split_axis);
+        float_t direction = VectorGetElement(inverse_direction, split_axis);
+
+        float_t split = KdTreeSplit(current);
+        float_t plane_distance = (split - origin) * direction;
+
+        uint32_t child_offset = KdTreeChildOffset(current);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = current + 1;
+            far_child = current + child_offset;
+        }
+        else
+        {
+            close_child = current + child_offset;
+            far_child = current + 1;
+        }
+
+        if (max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            current = close_child;
+        }
+        else if (plane_distance < min)
+        {
+            current = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = max;
+            queue_size += 1;
+
+            current = close_child;
+            max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
 }
