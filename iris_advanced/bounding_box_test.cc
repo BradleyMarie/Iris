@@ -135,6 +135,63 @@ TEST(BoundingBoxTest, BoundingBoxEnvelop)
     EXPECT_EQ(box2.corners[0], point1);
 }
 
+TEST(BoundingBoxTest, BoundingBoxUnion)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);
+    BOUNDING_BOX box0 = BoundingBoxCreate(point0, point1);
+
+    POINT3 point2 = PointCreate((float_t) 1.0, (float_t) 1.0, (float_t) 1.0);
+    BOUNDING_BOX box1 = BoundingBoxCreate(point1, point2);
+
+    BOUNDING_BOX box2 = BoundingBoxUnion(box0, box1);
+    EXPECT_EQ(box2.corners[0], point0);
+    EXPECT_EQ(box2.corners[1], point2);
+}
+
+TEST(BoundingBoxTest, BoundingBoxIntersectionEmpty)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);
+    BOUNDING_BOX box0 = BoundingBoxCreate(point0, point1);
+
+    POINT3 point2 = PointCreate((float_t) 1.0, (float_t) 1.0, (float_t) 1.0);
+    BOUNDING_BOX box1 = BoundingBoxCreate(point1, point2);
+
+    BOUNDING_BOX box2 = BoundingBoxIntersection(box0, box1);
+    EXPECT_EQ(box2.corners[0], point1);
+    EXPECT_EQ(box2.corners[1], point1);
+}
+
+TEST(BoundingBoxTest, BoundingBoxIntersectionOnePoint)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);
+    BOUNDING_BOX box0 = BoundingBoxCreate(point0, point1);
+
+    POINT3 point2 = PointCreate((float_t) 1.0, (float_t) 1.0, (float_t) 1.0);
+    BOUNDING_BOX box1 = BoundingBoxCreate(point1, point2);
+
+    BOUNDING_BOX box2 = BoundingBoxIntersection(box0, box1);
+    EXPECT_EQ(box2.corners[0], point1);
+    EXPECT_EQ(box2.corners[1], point1);
+}
+
+TEST(BoundingBoxTest, BoundingBoxIntersection)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 1.0, (float_t) 1.0, (float_t) 1.0);
+    BOUNDING_BOX box0 = BoundingBoxCreate(point0, point1);
+
+    POINT3 point2 = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);
+    POINT3 point3 = PointCreate((float_t) 2.0, (float_t) 2.0, (float_t) 2.0);
+    BOUNDING_BOX box1 = BoundingBoxCreate(point2, point3);
+
+    BOUNDING_BOX box2 = BoundingBoxIntersection(box0, box1);
+    EXPECT_EQ(box2.corners[0], point2);
+    EXPECT_EQ(box2.corners[1], point1);
+}
+
 TEST(BoundingBoxTest, BoundingBoxTransform)
 {
     POINT3 point0 = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);

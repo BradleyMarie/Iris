@@ -93,6 +93,58 @@ BoundingBoxEnvelop(
 static
 inline
 BOUNDING_BOX
+BoundingBoxUnion(
+    _In_ BOUNDING_BOX box0,
+    _In_ BOUNDING_BOX box1
+    )
+{
+    BOUNDING_BOX result = BoundingBoxEnvelop(box0, box1.corners[0]);
+    result = BoundingBoxEnvelop(result, box1.corners[1]);
+    return result;
+}
+
+static
+inline
+BOUNDING_BOX
+BoundingBoxIntersection(
+    _In_ BOUNDING_BOX box0,
+    _In_ BOUNDING_BOX box1
+    )
+{
+    float_t min_x = fmax(box0.corners[0].x, box1.corners[0].x);
+    float_t min_y = fmax(box0.corners[0].y, box1.corners[0].y);
+    float_t min_z = fmax(box0.corners[0].z, box1.corners[0].z);
+    POINT3 corner0 = PointCreate(min_x, min_y, min_z);
+
+    float_t max_x = fmin(box0.corners[1].x, box1.corners[1].x);
+
+    if (max_x < min_x)
+    {
+        return BoundingBoxCreate(corner0, corner0);
+    }
+
+    float_t max_y = fmin(box0.corners[1].y, box1.corners[1].y);
+
+    if (max_y < min_y)
+    {
+        return BoundingBoxCreate(corner0, corner0);
+    }
+
+    float_t max_z = fmin(box0.corners[1].z, box1.corners[1].z);
+
+    if (max_z < min_z)
+    {
+        return BoundingBoxCreate(corner0, corner0);
+    }
+
+    POINT3 corner1 = PointCreate(max_x, max_y, max_z);
+
+    return BoundingBoxCreate(corner0, corner1);
+}
+
+static
+inline
+BOUNDING_BOX
 BoundingBoxTransform(
     _In_opt_ PCMATRIX matrix,
     _In_ BOUNDING_BOX box
