@@ -256,11 +256,10 @@ TriangleTrace(
 
 static
 ISTATUS
-TriangleCheckBounds(
+TriangleComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     PCTRIANGLE triangle = (PCTRIANGLE)context;
@@ -270,9 +269,7 @@ TriangleCheckBounds(
     POINT3 world_v2 = PointMatrixMultiply(model_to_world, triangle->v2);
 
     BOUNDING_BOX object_bounds = BoundingBoxCreate(world_v0, world_v1);
-    object_bounds = BoundingBoxEnvelop(object_bounds, world_v2);
-
-    *contains = BoundingBoxOverlaps(world_bounds, object_bounds);
+    *world_bounds = BoundingBoxEnvelop(object_bounds, world_v2);
 
     return ISTATUS_SUCCESS;
 }
@@ -491,7 +488,7 @@ EmissiveTriangleFree(
 
 static const SHAPE_VTABLE triangle_vtable = {
     TriangleTrace,
-    TriangleCheckBounds,
+    TriangleComputeBounds,
     TriangleComputeNormal,
     TriangleGetMaterial,
     NULL,
@@ -502,7 +499,7 @@ static const SHAPE_VTABLE triangle_vtable = {
 
 static const SHAPE_VTABLE emissive_triangle_vtable = {
     TriangleTrace,
-    TriangleCheckBounds,
+    TriangleComputeBounds,
     TriangleComputeNormal,
     TriangleGetMaterial,
     EmissiveTriangleGetEmissiveMaterial,

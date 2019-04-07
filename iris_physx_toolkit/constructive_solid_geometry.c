@@ -204,19 +204,17 @@ DifferenceShapeTrace(
 
 static
 ISTATUS
-DifferenceShapeCheckBounds(
+DifferenceShapeComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
 
-    ISTATUS status = ShapeCheckBounds(csg_shape->shapes[0],
-                                      model_to_world,
-                                      world_bounds,
-                                      contains);
+    ISTATUS status = ShapeComputeBounds(csg_shape->shapes[0],
+                                        model_to_world,
+                                        world_bounds);
 
     return status;
 }
@@ -367,38 +365,30 @@ IntersectionShapeTrace(
 
 static
 ISTATUS
-IntersectionShapeCheckBounds(
+IntersectionShapeComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
 
-    bool contains0;
-    ISTATUS status = ShapeCheckBounds(csg_shape->shapes[0],
-                                      model_to_world,
-                                      world_bounds,
-                                      &contains0);
+    BOUNDING_BOX bounds0;
+    ISTATUS status = ShapeComputeBounds(csg_shape->shapes[0],
+                                        model_to_world,
+                                        &bounds0);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    bool contains1;
-    status = ShapeCheckBounds(csg_shape->shapes[1],
-                              model_to_world,
-                              world_bounds,
-                              &contains1);
+    BOUNDING_BOX bounds1;
+    status = ShapeComputeBounds(csg_shape->shapes[1],
+                                model_to_world,
+                                &bounds1);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *contains = contains0 && contains1;
+    *world_bounds = BoundingBoxIntersection(bounds0, bounds1);
 
     return ISTATUS_SUCCESS;
 }
@@ -595,29 +585,30 @@ UnionShapeTrace(
 
 static
 ISTATUS
-UnionShapeCheckBounds(
+UnionShapeComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
 
-    ISTATUS status = ShapeCheckBounds(csg_shape->shapes[0],
-                                      model_to_world,
-                                      world_bounds,
-                                      contains);
+    BOUNDING_BOX bounds0;
+    ISTATUS status = ShapeComputeBounds(csg_shape->shapes[0],
+                                        model_to_world,
+                                        &bounds0);
 
-    if (status != ISTATUS_SUCCESS || *contains)
+    if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    status = ShapeCheckBounds(csg_shape->shapes[1],
-                              model_to_world,
-                              world_bounds,
-                              contains);
+    BOUNDING_BOX bounds1;
+    status = ShapeComputeBounds(csg_shape->shapes[1],
+                                model_to_world,
+                                &bounds1);
+
+    *world_bounds = BoundingBoxUnion(bounds0, bounds1);
 
     return status;
 }
@@ -640,7 +631,7 @@ ConstructiveSolidShapeFree(
 
 static const SHAPE_VTABLE difference_vtable = {
     DifferenceShapeTrace,
-    DifferenceShapeCheckBounds,
+    DifferenceShapeComputeBounds,
     NULL,
     NULL,
     NULL,
@@ -651,7 +642,7 @@ static const SHAPE_VTABLE difference_vtable = {
 
 static const SHAPE_VTABLE intersection_vtable = {
     IntersectionShapeTrace,
-    IntersectionShapeCheckBounds,
+    IntersectionShapeComputeBounds,
     NULL,
     NULL,
     NULL,
@@ -662,7 +653,7 @@ static const SHAPE_VTABLE intersection_vtable = {
 
 static const SHAPE_VTABLE union_vtable = {
     UnionShapeTrace,
-    UnionShapeCheckBounds,
+    UnionShapeComputeBounds,
     NULL,
     NULL,
     NULL,

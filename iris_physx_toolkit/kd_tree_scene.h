@@ -34,7 +34,6 @@ typedef const KD_TREE_SCENE *PCKD_TREE_SCENE;
 
 ISTATUS
 KdTreeSceneAllocate(
-    _In_ BOUNDING_BOX scene_bounds,
     _In_reads_(num_shapes) PSHAPE const *shapes,
     _In_reads_(num_shapes) PMATRIX const *transforms,
     _In_reads_(num_shapes) const bool *premultiplied,

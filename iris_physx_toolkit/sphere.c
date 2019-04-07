@@ -129,11 +129,10 @@ SphereTrace(
 
 static
 ISTATUS
-SphereCheckBounds(
+SphereComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     PCSPHERE sphere = (PCSPHERE)context;
@@ -145,9 +144,7 @@ SphereCheckBounds(
     POINT3 upper_bound = PointVectorAdd(sphere->center, to_bound);
 
     BOUNDING_BOX object_bounds = BoundingBoxCreate(lower_bound, upper_bound);
-    object_bounds = BoundingBoxTransform(model_to_world, object_bounds);
-
-    *contains = BoundingBoxOverlaps(world_bounds, object_bounds);
+    *world_bounds = BoundingBoxTransform(model_to_world, object_bounds);
 
     return ISTATUS_SUCCESS;
 }
@@ -220,7 +217,7 @@ SphereFree(
 
 static const SHAPE_VTABLE sphere_vtable = {
     SphereTrace,
-    SphereCheckBounds,
+    SphereComputeBounds,
     SphereComputeNormal,
     SphereGetMaterial,
     NULL,

@@ -16,9 +16,85 @@ Abstract:
 #include "iris_physx_toolkit/kd_tree_scene.h"
 
 //
+// Uncompressed Types
+//
+
+typedef struct _UNCOMPRESSED_NODE UNCOMPRESSED_NODE, *PUNCOMPRESSED_NODE;
+typedef const UNCOMPRESSED_NODE *PCUNCOMPRESSED_NODE;
+
+typedef struct _UNCOMPRESSED_LEAF {
+    _Field_size_(num_indices) uint32_t *indices;
+    size_t num_indices;
+} UNCOMPRESSED_LEAF, *PUNCOMPRESSED_LEAF;
+
+typedef const UNCOMPRESSED_LEAF *PCUNCOMPRESSED_LEAF;
+
+typedef struct _UNCOMPRESSED_INTERIOR {
+    VECTOR_AXIS split_axis;
+    float_t split;
+    PUNCOMPRESSED_NODE left_child;
+    PUNCOMPRESSED_NODE right_child;
+} UNCOMPRESSED_INTERIOR, *PUNCOMPRESSED_INTERIOR;
+
+typedef const UNCOMPRESSED_INTERIOR *PCUNCOMPRESSED_INTERIOR;
+
+typedef union _UNCOMPRESSED_INTERIOR_OR_LEAF {
+    UNCOMPRESSED_INTERIOR interior;
+    UNCOMPRESSED_LEAF leaf;
+} UNCOMPRESSED_INTERIOR_OR_LEAF, *PUNCOMPRESSED_INTERIOR_OR_LEAF;
+
+struct _UNCOMPRESSED_NODE {
+    bool is_leaf;
+    UNCOMPRESSED_INTERIOR_OR_LEAF data;
+};
+
+//
+// Uncompressed Static Functions
+//
+
+static
+void
+UncompressedKdTreeFree(
+    _Inout_ _Post_invalid_ PUNCOMPRESSED_NODE node
+    )
+{
+    if (node->is_leaf)
+    {
+        free(node->data.leaf.indices);
+    }
+    else
+    {
+        UncompressedKdTreeFree(node->data.interior.left_child);
+        UncompressedKdTreeFree(node->data.interior.right_child);
+    }
+
+    free(node);
+}
+
+static
+ISTATUS
+UncompressedKdTreeBuild(
+    _In_ PSHAPE const *shapes,
+    _In_ PMATRIX const *transforms,
+    _In_ const bool *premultiplied,
+    _In_ BOUNDING_BOX bounds,
+    _In_reads_(num_shapes) uint32_t *shape_indices,
+    _In_ size_t num_shapes,
+    _In_ size_t depth_remaining,
+    _Out_ PUNCOMPRESSED_NODE *node,
+    _Out_ size_t *num_nodes,
+    _Out_ size_t *index_slots
+    )
+{
+    // TODO
+    return ISTATUS_SUCCESS;
+}
+
+//
 // Defines
 //
 
+#define MAX_NUM_SHAPES   ((size_t)0x3FFFFFFF)
 #define MAX_TREE_DEPTH   64
 #define INTERIOR_X_SPLIT 0
 #define INTERIOR_Y_SPLIT 1
@@ -52,7 +128,7 @@ typedef const SHAPE_AND_DATA *PCSHAPE_AND_DATA;
 struct _KD_TREE_SCENE {
     KD_TREE_NODE *nodes;
     uint32_t *shape_indices;
-    PSHAPE_AND_DATA *shapes;
+    PSHAPE_AND_DATA shapes;
     uint32_t num_shapes;
     BOUNDING_BOX scene_bounds;
 };
@@ -89,6 +165,69 @@ PointGetElement(
 {
     float_t *elements = &point.x;
     return elements[axis];
+}
+
+static
+inline
+ISTATUS
+KdTreeInitializeLeaf(
+    _Inout_ PKD_TREE_NODE node,
+    _In_ size_t size,
+    _In_ size_t offset
+    )
+{
+    if (MAX_NUM_SHAPES < size)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (UINT32_MAX < offset)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size |= 0xC0000000u;
+
+    node->flags_and_num_shapes_or_offset = size;
+    node->split_or_offset.offset = offset;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+inline
+ISTATUS
+KdTreeInitializeInterior(
+    _Inout_ PKD_TREE_NODE node,
+    _In_ VECTOR_AXIS axis,
+    _In_ size_t child_offset,
+    _In_ float_t split
+    )
+{
+    if (MAX_NUM_SHAPES < child_offset)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    switch (axis)
+    {
+        case VECTOR_X_AXIS:
+            child_offset |= INTERIOR_X_SPLIT << 30;
+            break;
+        case VECTOR_Y_AXIS:
+            child_offset |= INTERIOR_Y_SPLIT << 30;
+            break;
+        case VECTOR_Z_AXIS:
+            child_offset |= INTERIOR_Z_SPLIT << 30;
+            break;
+        default:
+            return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    node->flags_and_num_shapes_or_offset = (uint32_t)child_offset;
+    node->split_or_offset.split = split;
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -183,7 +322,7 @@ KdTreeProcessLeaf(
 
     if (num_shapes == 1)
     {
-        ISTATUS status = KdTreeTraceShape(hit_tester, kd_tree->shapes[offset]);
+        ISTATUS status = KdTreeTraceShape(hit_tester, kd_tree->shapes + offset);
         return status;
     }
 
@@ -191,7 +330,7 @@ KdTreeProcessLeaf(
     for (uint32_t i = 0; i < num_shapes; i++)
     {
         ISTATUS status = KdTreeTraceShape(hit_tester,
-                                          kd_tree->shapes[indices[i]]);
+                                          kd_tree->shapes + indices[i]);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -202,19 +341,284 @@ KdTreeProcessLeaf(
     return ISTATUS_SUCCESS;
 }
 
+static
+ISTATUS
+KdTreeComputeSceneBounds(
+    _In_reads_(num_shapes) PSHAPE const *shapes,
+    _In_reads_(num_shapes) PMATRIX const *transforms,
+    _In_reads_(num_shapes) const bool *premultiplied,
+    _In_ size_t num_shapes,
+    _Out_ PBOUNDING_BOX bounds
+    )
+{
+    PCMATRIX transform = premultiplied[0] ? NULL : transforms[0];
+    ISTATUS status = ShapeComputeBounds(shapes[0],
+                                        transform,
+                                        bounds);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    for (size_t i = 1; i < num_shapes; i++)
+    {
+        BOUNDING_BOX shape_bounds;
+        transform = premultiplied[i] ? NULL : transforms[i];
+        status = ShapeComputeBounds(shapes[i],
+                                    transform,
+                                    &shape_bounds);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *bounds = BoundingBoxUnion(*bounds, shape_bounds);
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+KdTreeBuildImpl(
+    _In_ PCUNCOMPRESSED_NODE uncompressed_node,
+    _In_ PCKD_TREE_NODE nodes,
+    _In_ const uint32_t *indices,
+    _Inout_ PKD_TREE_NODE *next_node,
+    _Inout_ uint32_t **next_index
+    )
+{
+    PKD_TREE_NODE current = *next_node;
+    *next_node += 1;
+
+    if (uncompressed_node->is_leaf)
+    {
+        if (uncompressed_node->data.leaf.num_indices == 1)
+        {
+            size_t offset = (size_t)uncompressed_node->data.leaf.indices[0];
+            ISTATUS status = KdTreeInitializeLeaf(current,
+                                                  1,
+                                                  offset);
+
+            return status;
+        }
+
+        size_t num_indices = uncompressed_node->data.leaf.num_indices;
+        size_t offset = *next_index - indices;
+        for (size_t i = 0; i < num_indices; i++)
+        {
+            **next_index = uncompressed_node->data.leaf.indices[i];
+            *next_index += 1;
+        }
+
+        ISTATUS status = KdTreeInitializeLeaf(current,
+                                              num_indices,
+                                              offset);
+
+        return status;
+    }
+
+    ISTATUS status =
+        KdTreeBuildImpl(uncompressed_node->data.interior.left_child,
+                        nodes,
+                        indices,
+                        next_node,
+                        next_index);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        KdTreeInitializeInterior(current,
+                                 uncompressed_node->data.interior.split_axis,
+                                 *next_node - nodes,
+                                 uncompressed_node->data.interior.split);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        KdTreeBuildImpl(uncompressed_node->data.interior.right_child,
+                        nodes,
+                        indices,
+                        next_node,
+                        next_index);
+
+    return status;
+}
+
+static
+ISTATUS
+KdTreeBuild(
+    _In_ PCUNCOMPRESSED_NODE uncompressed_node,
+    _Inout_ PKD_TREE_NODE nodes,
+    _Inout_ uint32_t *indices
+    )
+{
+    ISTATUS status = KdTreeBuildImpl(uncompressed_node,
+                                     nodes,
+                                     indices,
+                                     &nodes,
+                                     &indices);
+
+    return status;
+}
+
 //
 // Functions
 //
 
 ISTATUS
 KdTreeSceneAllocate(
-    _In_ BOUNDING_BOX scene_bounds,
     _In_reads_(num_shapes) PSHAPE const *shapes,
     _In_reads_(num_shapes) PMATRIX const *transforms,
     _In_reads_(num_shapes) const bool *premultiplied,
     _In_ size_t num_shapes,
     _Out_ PKD_TREE_SCENE *kd_tree_scene
-    );
+    )
+{
+    if (shapes == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (transforms == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (premultiplied == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (MAX_NUM_SHAPES < num_shapes)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (kd_tree_scene == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    BOUNDING_BOX scene_bounds;
+    ISTATUS status = KdTreeComputeSceneBounds(shapes,
+                                              transforms,
+                                              premultiplied,
+                                              num_shapes,
+                                              &scene_bounds);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    uint32_t *offsets = (uint32_t*)calloc(num_shapes, sizeof(uint32_t));
+
+    for (size_t i = 0; i < num_shapes; i++)
+    {
+        offsets[i] = i;
+    }
+
+    PUNCOMPRESSED_NODE uncompressed_node;
+    size_t num_nodes, num_indices;
+    status = UncompressedKdTreeBuild(shapes,
+                                     transforms,
+                                     premultiplied,
+                                     scene_bounds,
+                                     offsets,
+                                     num_shapes,
+                                     MAX_TREE_DEPTH, // TODO: Improve
+                                     &uncompressed_node,
+                                     &num_nodes,
+                                     &num_indices);
+
+    free(offsets);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    // TODO: Align
+    PKD_TREE_NODE nodes = calloc(num_nodes, sizeof(KD_TREE_NODE));
+
+    if (nodes == NULL)
+    {
+        UncompressedKdTreeFree(uncompressed_node);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    // TODO: Align
+    uint32_t *shape_indices = calloc(num_nodes, sizeof(uint32_t));
+
+    if (shape_indices == NULL)
+    {
+        UncompressedKdTreeFree(uncompressed_node);
+        free(nodes);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    // TODO: Align
+    PSHAPE_AND_DATA data = calloc(num_shapes, sizeof(SHAPE_AND_DATA));
+
+    if (data == NULL)
+    {
+        UncompressedKdTreeFree(uncompressed_node);
+        free(nodes);
+        free(shape_indices);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PKD_TREE_SCENE result = malloc(sizeof(KD_TREE_SCENE));
+
+    if (result == NULL)
+    {
+        UncompressedKdTreeFree(uncompressed_node);
+        free(nodes);
+        free(shape_indices);
+        free(data);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    status = KdTreeBuild(uncompressed_node,
+                         nodes,
+                         shape_indices);
+
+    UncompressedKdTreeFree(uncompressed_node);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(nodes);
+        free(shape_indices);
+        free(data);
+        free(result);
+        return status;
+    }
+
+    for (size_t i = 0; i < num_shapes; i++)
+    {
+        ShapeRetain(data[i].shape);
+        MatrixRetain(data[i].model_to_world);
+    }
+
+    result->nodes = nodes;
+    result->shape_indices = shape_indices;
+    result->shapes = data;
+    result->num_shapes = num_shapes;
+    result->scene_bounds = scene_bounds;
+
+    *kd_tree_scene = result;
+
+    return ISTATUS_SUCCESS;
+}
 
 void
 KdTreeSceneFree(
@@ -228,8 +632,8 @@ KdTreeSceneFree(
 
     for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
     {
-        ShapeRelease(kd_tree_scene->shapes[i]->shape);
-        MatrixRelease(kd_tree_scene->shapes[i]->model_to_world);
+        ShapeRelease(kd_tree_scene->shapes[i].shape);
+        MatrixRelease(kd_tree_scene->shapes[i].model_to_world);
     }
 
     free(kd_tree_scene->nodes);

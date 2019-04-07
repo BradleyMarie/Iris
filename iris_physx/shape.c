@@ -88,11 +88,10 @@ ShapeAllocate(
 }
 
 ISTATUS 
-ShapeCheckBounds(
+ShapeComputeBounds(
     _In_ PCSHAPE shape,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     )
 {
     if (shape == NULL)
@@ -100,21 +99,14 @@ ShapeCheckBounds(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!BoundingBoxValidate(world_bounds))
+    if (world_bounds == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (contains == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    ISTATUS status =
-        shape->vtable->check_bounds_routine(shape->data,
-                                            model_to_world,
-                                            world_bounds,
-                                            contains);
+    ISTATUS status = shape->vtable->compute_bounds_routine(shape->data,
+                                                           model_to_world,
+                                                           world_bounds);
 
     return status;
 }

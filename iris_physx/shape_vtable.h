@@ -34,11 +34,10 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PSHAPE_CHECK_BOUNDS_ROUTINE)(
+(*PSHAPE_COMPUTE_BOUNDS_ROUTINE)(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     );
 
 typedef
@@ -87,7 +86,7 @@ ISTATUS
 
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE trace_routine;
-    PSHAPE_CHECK_BOUNDS_ROUTINE check_bounds_routine;
+    PSHAPE_COMPUTE_BOUNDS_ROUTINE compute_bounds_routine;
     PSHAPE_COMPUTE_NORMAL_ROUTINE compute_normal_routine;
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;

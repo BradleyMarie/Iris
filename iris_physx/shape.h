@@ -38,11 +38,10 @@ ShapeAllocate(
     );
 
 ISTATUS 
-ShapeCheckBounds(
+ShapeComputeBounds(
     _In_ PCSHAPE shape,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ BOUNDING_BOX world_bounds,
-    _Out_ bool *contains
+    _Out_ PBOUNDING_BOX world_bounds
     );
 
 void
