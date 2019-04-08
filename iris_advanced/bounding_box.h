@@ -167,6 +167,17 @@ BoundingBoxTransform(
 
 static
 inline
+VECTOR_AXIS
+BoundingBoxDominantAxis(
+    _In_ BOUNDING_BOX box
+    )
+{
+    VECTOR3 diagonal = PointSubtract(box.corners[1], box.corners[0]);
+    return VectorDominantAxis(diagonal);
+}
+
+static
+inline
 bool
 BoundingBoxOverlaps(
     _In_ BOUNDING_BOX box0,

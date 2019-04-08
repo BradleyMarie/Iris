@@ -12,13 +12,29 @@ Abstract:
 
 --*/
 
+#include <string.h>
+
 #include "common/pointer_list.h"
 #include "common/safe_math.h"
 #include "iris_physx_toolkit/kd_tree_scene.h"
 
 //
+// Uncompressed Tree Defines
+//
+
+#define TARGET_LEAF_SIZE ((size_t)1)
+
+//
 // Uncompressed Tree Types
 //
+
+typedef struct _EDGE {
+    size_t primitive;
+    float_t value;
+    bool is_start;
+} EDGE, *PEDGE;
+
+typedef const EDGE *PCEDGE;
 
 typedef struct _UNCOMPRESSED_NODE UNCOMPRESSED_NODE, *PUNCOMPRESSED_NODE;
 typedef const UNCOMPRESSED_NODE *PCUNCOMPRESSED_NODE;
@@ -54,40 +70,186 @@ struct _UNCOMPRESSED_NODE {
 //
 
 static
+int
+EdgeCompare(
+    _In_ const void *edge0,
+    _In_ const void *edge1
+    )
+{
+    PCEDGE left = (PCEDGE)edge0;
+    PCEDGE right = (PCEDGE)edge1;
+
+    if (left->value < right->value)
+    {
+        return -1;
+    }
+
+    if (right->value < left->value)
+    {
+        return 1;
+    }
+
+    if (left->is_start)
+    {
+        return -1;
+    }
+
+    return 1;
+}
+
+static
+VECTOR_AXIS
+NextAxis(
+    _In_ VECTOR_AXIS axis
+    )
+{
+    if (axis == VECTOR_X_AXIS)
+    {
+        return VECTOR_Y_AXIS;
+    }
+
+    if (axis == VECTOR_Y_AXIS)
+    {
+        return VECTOR_Z_AXIS;
+    }
+
+    return VECTOR_X_AXIS;
+}
+
+static
 ISTATUS
-ComputeShapeBounds(
+ComputeBounds(
     _In_reads_(num_shapes) const PSHAPE shapes[],
     _In_reads_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
-    _Out_ PBOUNDING_BOX bounds
+    _Out_writes_(num_shapes) BOUNDING_BOX bounds[],
+    _Out_ PBOUNDING_BOX total_bounds
     )
 {
+    if (num_shapes == 0)
+    {
+        POINT3 point = PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        *total_bounds = BoundingBoxCreate(point, point);
+        return ISTATUS_SUCCESS;
+    }
+
     PCMATRIX transform = premultiplied[0] ? NULL : transforms[0];
     ISTATUS status = ShapeComputeBounds(shapes[0],
                                         transform,
-                                        bounds);
+                                        total_bounds);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
+    bounds[0] = *total_bounds;
+
     for (size_t i = 1; i < num_shapes; i++)
     {
-        BOUNDING_BOX shape_bounds;
         transform = premultiplied[i] ? NULL : transforms[i];
         status = ShapeComputeBounds(shapes[i],
                                     transform,
-                                    &shape_bounds);
+                                    bounds + i);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
-        *bounds = BoundingBoxUnion(*bounds, shape_bounds);
+        *total_bounds = BoundingBoxUnion(*total_bounds, bounds[i]);
     }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+AllocateEdges(
+    _In_ const BOUNDING_BOX shape_bounds[],
+    _In_reads_(num_indices) const size_t shape_indices[],
+    _In_ size_t num_indices,
+    _In_ VECTOR_AXIS axis,
+    _Outptr_result_buffer_(num_indices) PEDGE *edges
+    )
+{
+    size_t num_entries;
+    bool success = CheckedMultiplySizeT(num_indices, 2, &num_entries);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    *edges = calloc(num_entries, sizeof(EDGE));
+
+    if (*edges == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < num_indices; i++)
+    {
+        float_t min, max;
+        switch (axis)
+        {
+            case VECTOR_X_AXIS:
+                min = shape_bounds[shape_indices[i]].corners[0].x;
+                max = shape_bounds[shape_indices[i]].corners[1].x;
+                break;
+            case VECTOR_Y_AXIS:
+                min = shape_bounds[shape_indices[i]].corners[0].y;
+                max = shape_bounds[shape_indices[i]].corners[1].y;
+                break;
+            default: // VECTOR_Z_AXIS
+                min = shape_bounds[shape_indices[i]].corners[0].z;
+                max = shape_bounds[shape_indices[i]].corners[1].z;
+                break;
+        }
+
+        (*edges)[2 * i].is_start = true;
+        (*edges)[2 * i].primitive = shape_indices[i];
+        (*edges)[2 * i].value = min;
+
+        (*edges)[2 * i + 1].is_start = false;
+        (*edges)[2 * i + 1].primitive = shape_indices[i];
+        (*edges)[2 * i + 1].value = max;
+    }
+
+    qsort(*edges, num_entries, sizeof(EDGE), EdgeCompare);
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+UncompressedKdTreeLeafAllocate(
+    _Out_ PUNCOMPRESSED_NODE *node,
+    _In_reads_(num_indices) const size_t shape_indices[],
+    _In_ size_t num_indices
+    )
+{
+    size_t *indices = calloc(num_indices, sizeof(size_t));
+
+    if (indices == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    *node = malloc(sizeof(UNCOMPRESSED_NODE));
+
+    if (*node == NULL)
+    {
+        free(indices);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    memcpy(indices, shape_indices, sizeof(size_t) * num_indices);
+
+    (*node)->is_leaf = true;
+    (*node)->data.leaf.indices = indices;
+    (*node)->data.leaf.num_indices = num_indices;
 
     return ISTATUS_SUCCESS;
 }
@@ -114,11 +276,12 @@ UncompressedKdTreeFree(
 static
 ISTATUS
 UncompressedKdTreeBuildImpl(
-    _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
-    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_ const PSHAPE shapes[],
+    _In_ const PMATRIX transforms[],
+    _In_ const bool premultiplied[],
+    _In_ const BOUNDING_BOX shape_bounds[],
     _In_ BOUNDING_BOX bounds,
-    _In_reads_(num_indices) size_t *shape_indices,
+    _In_reads_(num_indices) const size_t shape_indices[],
     _In_ size_t num_indices,
     _In_ size_t depth_remaining,
     _Out_ PUNCOMPRESSED_NODE *node,
@@ -126,7 +289,29 @@ UncompressedKdTreeBuildImpl(
     _Out_ size_t *index_slots
     )
 {
-    // TODO
+    if (num_indices <= TARGET_LEAF_SIZE || depth_remaining == 0)
+    {
+        ISTATUS status = UncompressedKdTreeLeafAllocate(node,
+                                                        shape_indices,
+                                                        num_indices);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *num_nodes += 1;
+
+        if (1 < num_indices)
+        {
+            num_indices += 1;
+        }
+
+        return ISTATUS_SUCCESS;
+    }
+
+    // TODO: Implement
+
     return ISTATUS_SUCCESS;
 }
 
@@ -138,27 +323,36 @@ UncompressedKdTreeBuild(
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _In_ size_t max_depth,
-    _Out_ PBOUNDING_BOX bounds,
+    _Out_ PBOUNDING_BOX scene_bounds,
     _Out_ PUNCOMPRESSED_NODE *uncompressed_tree,
     _Out_ size_t *num_nodes,
     _Out_ size_t *num_indices
     )
 {
-    ISTATUS status = ComputeShapeBounds(shapes,
-                                        transforms,
-                                        premultiplied,
-                                        num_shapes,
-                                        bounds);
+    PBOUNDING_BOX shape_bounds = calloc(num_shapes, sizeof(BOUNDING_BOX));
+
+    if (shape_bounds == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    ISTATUS status = ComputeBounds(shapes,
+                                   transforms,
+                                   premultiplied,
+                                   num_shapes,
+                                   shape_bounds,
+                                   scene_bounds);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    size_t *indices = (size_t*)calloc(num_shapes, sizeof(size_t));
+    size_t *indices = calloc(num_shapes, sizeof(size_t));
 
     if (indices == NULL)
     {
+        free(shape_bounds);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -170,7 +364,8 @@ UncompressedKdTreeBuild(
     status = UncompressedKdTreeBuildImpl(shapes,
                                          transforms,
                                          premultiplied,
-                                         *bounds,
+                                         shape_bounds,
+                                         *scene_bounds,
                                          indices,
                                          num_shapes,
                                          max_depth,
@@ -178,6 +373,7 @@ UncompressedKdTreeBuild(
                                          num_nodes,
                                          num_indices);
 
+    free(shape_bounds);
     free(indices);
 
     return ISTATUS_SUCCESS;
@@ -189,10 +385,10 @@ UncompressedKdTreeBuild(
 
 #define MAX_CHILD_OFFSET (UINT32_MAX >> 2)
 #define MAX_LEAF_SIZE    (UINT32_MAX >> 2)
-#define INTERIOR_X_SPLIT 0u
-#define INTERIOR_Y_SPLIT 1u
-#define INTERIOR_Z_SPLIT 2u
-#define LEAF             3u
+#define INTERIOR_X_SPLIT 0U
+#define INTERIOR_Y_SPLIT 1U
+#define INTERIOR_Z_SPLIT 2U
+#define LEAF             3U
 
 //
 // Compressed Tree Types
