@@ -101,6 +101,7 @@ cc_test(
         "//iris_camera_toolkit:grid_pixel_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
+        "//iris_physx_toolkit:kd_tree_scene",
         "//iris_physx_toolkit:list_scene",
         "//iris_physx_toolkit:path_tracer",
         "//iris_physx_toolkit:sample_tracer",

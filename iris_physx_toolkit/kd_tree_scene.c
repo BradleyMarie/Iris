@@ -676,6 +676,8 @@ UncompressedKdTreeBuild(
         indices[i] = i;
     }
 
+    *num_nodes = 0;
+    *num_indices = 0;
     status = UncompressedKdTreeBuildImpl(shape_bounds,
                                          *scene_bounds,
                                          indices,
