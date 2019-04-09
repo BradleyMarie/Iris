@@ -222,6 +222,15 @@ TEST(BoundingBoxTest, BoundingBoxTransform)
     EXPECT_EQ(translated.corners[1], bound2);
 }
 
+TEST(BoundingBoxTest, BoundingBoxSurfaceArea)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 1.0, (float_t) 0.0, (float_t) 0.0);
+    BOUNDING_BOX box = BoundingBoxCreate(point0, point1);
+
+    EXPECT_EQ((float_t)10.0, BoundingBoxSurfaceArea(box));
+}
+
 TEST(BoundingBoxTest, BoundingBoxDominantAxis)
 {
     POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);

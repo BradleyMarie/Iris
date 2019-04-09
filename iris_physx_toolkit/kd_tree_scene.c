@@ -23,6 +23,9 @@ Abstract:
 //
 
 #define TARGET_LEAF_SIZE ((size_t)1)
+#define INTERSECTION_COST ((float_t)80.0)
+#define TRAVERSAL_COST ((float_t)1.0)
+#define EMPTY_BONUS ((float_t)0.5)
 
 //
 // Uncompressed Tree Types
@@ -114,6 +117,46 @@ NextAxis(
     }
 
     return VECTOR_X_AXIS;
+}
+
+static
+VECTOR_AXIS
+VectorGetElementByAxis(
+    _In_ VECTOR3 vector,
+    _In_ VECTOR_AXIS axis
+    )
+{
+    if (axis == VECTOR_X_AXIS)
+    {
+        return vector.x;
+    }
+
+    if (axis == VECTOR_Y_AXIS)
+    {
+        return vector.y;
+    }
+
+    return vector.z;
+}
+
+static
+VECTOR_AXIS
+PointGetElementByAxis(
+    _In_ POINT3 point,
+    _In_ VECTOR_AXIS axis
+    )
+{
+    if (axis == VECTOR_X_AXIS)
+    {
+        return point.x;
+    }
+
+    if (axis == VECTOR_Y_AXIS)
+    {
+        return point.y;
+    }
+
+    return point.z;
 }
 
 static
@@ -223,6 +266,90 @@ AllocateEdges(
 }
 
 static
+bool
+EvaluateSplitsOnAxis(
+    _In_reads_(num_edges) const EDGE edges[],
+    _In_ size_t num_edges,
+    _In_ BOUNDING_BOX node_bound,
+    _In_ VECTOR_AXIS axis,
+    _Out_ float_t *best_cost,
+    _Out_ size_t *best_split
+    )
+{
+    *best_cost = INFINITY;
+    *best_split = 0;
+    bool result = false;
+
+    float_t box_surface_area = BoundingBoxSurfaceArea(node_bound);
+    float_t inv_surface_area = (float_t)1.0 / box_surface_area;
+
+    float_t lower_bound = PointGetElementByAxis(node_bound.corners[0], axis);
+    float_t upper_bound = PointGetElementByAxis(node_bound.corners[1], axis);
+
+    VECTOR3 diagonal = PointSubtract(node_bound.corners[1],
+                                     node_bound.corners[0]);
+
+    VECTOR_AXIS next_axis = NextAxis(axis);
+    VECTOR_AXIS next_next_axis = NextAxis(next_axis);
+
+    float_t other_axis0 = VectorGetElementByAxis(diagonal, next_axis);
+    float_t other_axis1 = VectorGetElementByAxis(diagonal, next_next_axis);
+    float_t other_sum = other_axis0 + other_axis1;
+    float_t side_face_area = other_axis0 * other_axis1;
+
+    size_t num_above = num_edges / 2;
+    size_t num_below = 0;
+
+    for (size_t i = 0; i < num_edges; i++)
+    {
+        if (!edges[i].is_start)
+        {
+            num_above -= 1;
+        }
+
+        if (lower_bound < edges[i].value && edges[i].value < upper_bound)
+        {
+            float_t below_area =(float_t)2.0 *
+                (side_face_area + (edges[i].value - lower_bound) * other_sum);
+            float_t above_area = (float_t)2.0 *
+                (side_face_area + (upper_bound - edges[i].value) * other_sum);
+
+            float_t percent_below = below_area * inv_surface_area;
+            float_t percent_above = above_area * inv_surface_area;
+
+            float_t empty_bonus;
+            if (num_above == 0 || num_below == 0)
+            {
+                empty_bonus = EMPTY_BONUS;
+            }
+            else
+            {
+                empty_bonus = (float_t)0.0;
+            }
+
+            float_t empty_modifier = (float_t)1.0 - empty_bonus;
+            float_t cost = TRAVERSAL_COST +
+                INTERSECTION_COST * empty_modifier *
+                (percent_below * num_below + percent_above * num_above);
+
+            if (cost < *best_cost)
+            {
+                result = true;
+                *best_cost = cost;
+                *best_split = i;
+            }
+        }
+
+        if (edges[i].is_start)
+        {
+            num_below += 1;
+        }
+    }
+
+    return result;
+}
+
+static
 ISTATUS
 UncompressedKdTreeLeafAllocate(
     _Out_ PUNCOMPRESSED_NODE *node,
@@ -276,9 +403,6 @@ UncompressedKdTreeFree(
 static
 ISTATUS
 UncompressedKdTreeBuildImpl(
-    _In_ const PSHAPE shapes[],
-    _In_ const PMATRIX transforms[],
-    _In_ const bool premultiplied[],
     _In_ const BOUNDING_BOX shape_bounds[],
     _In_ BOUNDING_BOX bounds,
     _In_reads_(num_indices) const size_t shape_indices[],
@@ -304,13 +428,204 @@ UncompressedKdTreeBuildImpl(
 
         if (1 < num_indices)
         {
-            num_indices += 1;
+            *index_slots += num_indices;
         }
 
         return ISTATUS_SUCCESS;
     }
 
-    // TODO: Implement
+    float_t best_cost = (float_t)num_indices * TRAVERSAL_COST;
+    VECTOR_AXIS best_axis = VECTOR_X_AXIS;
+    size_t best_split = 0;
+    PEDGE best_edges = NULL;
+    bool should_split = false;
+
+    VECTOR_AXIS axis = BoundingBoxDominantAxis(bounds);
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        PEDGE edges = NULL;
+        ISTATUS status = AllocateEdges(shape_bounds,
+                                       shape_indices,
+                                       num_indices,
+                                       axis,
+                                       &edges);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        float_t cost;
+        size_t split;
+        bool success = EvaluateSplitsOnAxis(edges,
+                                            num_indices * 2,
+                                            bounds,
+                                            axis,
+                                            &cost,
+                                            &split);
+
+        if (success && cost < best_cost)
+        {
+            should_split = true;
+            free(best_edges);
+
+            best_cost = cost;
+            best_axis = axis;
+            best_split = split;
+            best_edges = edges;
+        }
+        else
+        {
+            free(edges);
+        }
+    }
+
+    if (!should_split)
+    {
+        ISTATUS status = UncompressedKdTreeLeafAllocate(node,
+                                                        shape_indices,
+                                                        num_indices);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *num_nodes += 1;
+
+        if (1 < num_indices)
+        {
+            *index_slots += num_indices;
+        }
+
+        return ISTATUS_SUCCESS;
+    }
+
+    size_t below_shapes = 0;
+    for (size_t i = 0; i < best_split; i++)
+    {
+        if (best_edges[i].is_start)
+        {
+            below_shapes += 1;
+        }
+    }
+
+    size_t above_shapes = 0;
+    for (size_t i = best_split; i < num_indices * 2; i++)
+    {
+        if (!best_edges[i].is_start)
+        {
+            above_shapes += 1;
+        }
+    }
+
+    size_t *below_indices = calloc(below_shapes, sizeof(size_t));
+    if (below_indices == NULL)
+    {
+        free(best_edges);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t *above_indices = calloc(below_shapes, sizeof(size_t));
+    if (above_indices == NULL)
+    {
+        free(best_edges);
+        free(below_indices);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t below_index = 0;
+    for (size_t i = 0; i < best_split; i++)
+    {
+        if (best_edges[i].is_start)
+        {
+            below_indices[below_index++] = best_edges[i].primitive;
+        }
+    }
+
+    size_t above_index = 0;
+    for (size_t i = best_split; i < num_indices * 2; i++)
+    {
+        if (!best_edges[i].is_start)
+        {
+            above_indices[above_index++] = best_edges[i].primitive;
+        }
+    }
+
+    float_t split = best_edges[best_split].value;
+
+    free(best_edges);
+
+    BOUNDING_BOX below_bounds = bounds;
+    BOUNDING_BOX above_bounds = bounds;
+
+    switch (best_axis)
+    {
+        case VECTOR_X_AXIS:
+            below_bounds.corners[1].x = split;
+            above_bounds.corners[0].x = split;
+            break;
+        case VECTOR_Y_AXIS:
+            below_bounds.corners[1].y = split;
+            above_bounds.corners[0].y = split;
+            break;
+        default:
+            below_bounds.corners[1].z = split;
+            above_bounds.corners[0].z = split;
+            break;
+    }
+
+    PUNCOMPRESSED_NODE below_node;
+    ISTATUS status = UncompressedKdTreeBuildImpl(shape_bounds,
+                                                 below_bounds,
+                                                 below_indices,
+                                                 below_shapes,
+                                                 depth_remaining - 1,
+                                                 &below_node,
+                                                 num_nodes,
+                                                 index_slots);
+
+    free(below_indices);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(above_indices);
+        return status;
+    }
+
+    PUNCOMPRESSED_NODE above_node;
+    status = UncompressedKdTreeBuildImpl(shape_bounds,
+                                         above_bounds,
+                                         above_indices,
+                                         above_shapes,
+                                         depth_remaining - 1,
+                                         &above_node,
+                                         num_nodes,
+                                         index_slots);
+
+    free(above_indices);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        UncompressedKdTreeFree(below_node);
+        return status;
+    }
+
+    *node = malloc(sizeof(UNCOMPRESSED_NODE));
+
+    if (*node != NULL)
+    {
+        UncompressedKdTreeFree(below_node);
+        UncompressedKdTreeFree(above_node);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    (*node)->is_leaf = false;
+    (*node)->data.interior.split = split;
+    (*node)->data.interior.split_axis = best_axis;
+    (*node)->data.interior.left_child = below_node;
+    (*node)->data.interior.right_child = above_node;
 
     return ISTATUS_SUCCESS;
 }
@@ -361,10 +676,7 @@ UncompressedKdTreeBuild(
         indices[i] = i;
     }
 
-    status = UncompressedKdTreeBuildImpl(shapes,
-                                         transforms,
-                                         premultiplied,
-                                         shape_bounds,
+    status = UncompressedKdTreeBuildImpl(shape_bounds,
                                          *scene_bounds,
                                          indices,
                                          num_shapes,

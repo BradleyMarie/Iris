@@ -167,6 +167,22 @@ BoundingBoxTransform(
 
 static
 inline
+float_t
+BoundingBoxSurfaceArea(
+    _In_ BOUNDING_BOX box
+    )
+{
+    VECTOR3 diagonal = PointSubtract(box.corners[1], box.corners[0]);
+    
+    float_t area0 = diagonal.x * diagonal.z;
+    float_t area1 = diagonal.y * diagonal.x;
+    float_t area2 = diagonal.z * diagonal.y;
+    
+    return (float_t)2.0 * (area0 + area1 + area2);
+}
+
+static
+inline
 VECTOR_AXIS
 BoundingBoxDominantAxis(
     _In_ BOUNDING_BOX box
