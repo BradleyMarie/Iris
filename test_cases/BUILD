@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:private"])
 
 cc_test(
     name = "constructive_solid_geometry",
+    shard_count = 4,
     srcs = ["constructive_solid_geometry.cc"],
     data = [
         "//test_results:csg_cube_sphere_difference.pfm",
@@ -45,8 +46,8 @@ cc_test(
         "//iris_physx_toolkit:constant_emissive_material",
         "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:interpolated_spectrum",
+        "//iris_physx_toolkit:kd_tree_scene",
         "//iris_physx_toolkit:lambertian_bsdf",
-        "//iris_physx_toolkit:list_scene",
         "//iris_physx_toolkit:one_light_sampler",
         "//iris_physx_toolkit:path_tracer",
         "//iris_physx_toolkit:sample_tracer",
@@ -75,8 +76,8 @@ cc_test(
         "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:fresnel_bsdf",
         "//iris_physx_toolkit:interpolated_spectrum",
+        "//iris_physx_toolkit:kd_tree_scene",
         "//iris_physx_toolkit:lambertian_bsdf",
-        "//iris_physx_toolkit:list_scene",
         "//iris_physx_toolkit:one_light_sampler",
         "//iris_physx_toolkit:path_tracer",
         "//iris_physx_toolkit:sample_tracer",
@@ -134,6 +135,7 @@ cc_test(
 
 cc_test(
     name = "single_triangle",
+    shard_count = 42,
     srcs = ["single_triangle.cc"],
     data = [
         "//test_results:blank.pfm",

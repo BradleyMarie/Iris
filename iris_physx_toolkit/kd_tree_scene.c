@@ -923,18 +923,6 @@ typedef struct _WORK_ITEM {
 static
 inline
 float_t
-VectorGetElement(
-    _In_ VECTOR3 vector,
-    _In_ uint32_t axis
-    )
-{
-    float_t *elements = &vector.x;
-    return elements[axis];
-}
-
-static
-inline
-float_t
 PointGetElement(
     _In_ POINT3 point,
     _In_ uint32_t axis
@@ -1022,25 +1010,25 @@ bool
 BoundingBoxIntersect(
     _In_ BOUNDING_BOX box,
     _In_ POINT3 origin,
-    _In_ VECTOR3 inverted_direction,
+    _In_ float inverted_direction[3],
     _Out_ float_t *min,
     _Out_ float_t *max
     )
 {
-    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction.x;
-    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction.x;
+    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction[0];
+    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction[0];
 
     *min = fmin(tx1, tx2);
     *max = fmax(tx1, tx2);
 
-    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction.y;
-    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction.y;
+    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction[1];
+    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction[1];
 
     *min = fmax(*min, fmin(ty1, ty2));
     *max = fmin(*max, fmax(ty1, ty2));
 
-    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction.z;
-    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction.z;
+    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction[2];
+    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction[2];
 
     *min = fmax(*min, fmin(tz1, tz2));
     *max = fmin(*max, fmax(tz1, tz2));
@@ -1061,9 +1049,9 @@ KdTreeTraceTree(
     )
 {
     POINT3 ray_origin = ray.origin;
-    VECTOR3 inv_dir = VectorCreate((float_t)1.0 / ray.direction.x,
-                                   (float_t)1.0 / ray.direction.y,
-                                   (float_t)1.0 / ray.direction.z);
+    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
+                        (float_t)1.0 / ray.direction.y,
+                        (float_t)1.0 / ray.direction.z };
 
     float_t node_min, node_max;
     bool intersects = BoundingBoxIntersect(scene_bounds,
@@ -1134,7 +1122,7 @@ KdTreeTraceTree(
 
         uint32_t split_axis = KdTreeNodeType(node);
         float_t origin = PointGetElement(ray_origin, split_axis);
-        float_t direction = VectorGetElement(inv_dir, split_axis);
+        float_t direction = inv_dir[split_axis];
 
         float_t split = KdTreeSplit(node);
         float_t plane_distance = (split - origin) * direction;

@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <string>
+#include <vector>
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
@@ -22,8 +23,8 @@ Abstract:
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
+#include "iris_physx_toolkit/kd_tree_scene.h"
 #include "iris_physx_toolkit/lambertian_bsdf.h"
-#include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/one_light_sampler.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
@@ -36,7 +37,7 @@ Abstract:
 void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
-    _In_ PCLIST_SCENE scene,
+    _In_ PCKD_TREE_SCENE scene,
     _In_ PONE_LIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
@@ -61,7 +62,7 @@ TestRenderSingleThreaded(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        ListSceneTraceCallback,
+        KdTreeSceneTraceCallback,
         scene,
         OneLightSamplerSampleLightsCallback,
         light_sampler,
@@ -106,7 +107,7 @@ AddQuadToScene(
     _In_ POINT3 v3,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
-    _Inout_ PLIST_SCENE scene
+    _Inout_ std::vector<PSHAPE> *shapes
     )
 {
     PSHAPE shape0, shape1;
@@ -123,14 +124,8 @@ AddQuadToScene(
         &shape1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape0);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = ListSceneAddShape(scene, shape1);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    ShapeRelease(shape0);
-    ShapeRelease(shape1);
+    shapes->push_back(shape0);
+    shapes->push_back(shape1);
 }
 
 TEST(CornellBoxTest, CornellBox)
@@ -211,13 +206,11 @@ TEST(CornellBoxTest, CornellBox)
     status = ConstantEmissiveMaterialAllocate(light_spectrum, &light_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PLIST_SCENE scene;
-    status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PONE_LIGHT_SAMPLER light_sampler;
     status = OneLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    std::vector<PSHAPE> shapes;
 
     PSHAPE light_shape0, light_shape1;
     status = EmissiveQuadAllocate(
@@ -233,11 +226,8 @@ TEST(CornellBoxTest, CornellBox)
         &light_shape1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, light_shape0);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = ListSceneAddShape(scene, light_shape1);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    shapes.push_back(light_shape0);
+    shapes.push_back(light_shape1);
 
     PLIGHT light0;
     status = AreaLightAllocate(light_shape0,
@@ -264,7 +254,7 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_ceiling[3],
         white_material,
         white_material,
-        scene);
+        &shapes);
 
     AddQuadToScene(
         cornell_box_back_wall[0],
@@ -273,7 +263,7 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_back_wall[3],
         white_material,
         white_material,
-        scene);
+        &shapes);
                 
     AddQuadToScene(
         cornell_box_floor[0],
@@ -282,7 +272,7 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_floor[3],
         white_material,
         white_material,
-        scene);
+        &shapes);
 
     AddQuadToScene(
         cornell_box_left_wall[0],
@@ -291,7 +281,7 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_left_wall[3],
         red_material,
         red_material,
-        scene);
+        &shapes);
 
     AddQuadToScene(
         cornell_box_right_wall[0],
@@ -300,7 +290,7 @@ TEST(CornellBoxTest, CornellBox)
         cornell_box_right_wall[3],
         green_material,
         green_material,
-        scene);
+        &shapes);
 
     for (size_t i = 0; i < 5; i++)
     {
@@ -311,7 +301,7 @@ TEST(CornellBoxTest, CornellBox)
             cornell_box_short_box[i][3],
             white_material,
             white_material,
-            scene);
+            &shapes);
     }
 
     for (size_t i = 0; i < 5; i++)
@@ -323,8 +313,24 @@ TEST(CornellBoxTest, CornellBox)
             cornell_box_tall_box[i][3],
             white_material,
             white_material,
-            scene);
+            &shapes);
     }
+
+    PMATRIX *transforms = new PMATRIX[shapes.size()];
+    bool *premultiplied = new bool[shapes.size()];
+    for (size_t i = 0; i < shapes.size(); i++)
+    {
+        transforms[i] = nullptr;
+        premultiplied[i] = false;
+    }
+
+    PKD_TREE_SCENE scene;
+    status = KdTreeSceneAllocate(shapes.data(),
+                                 transforms,
+                                 premultiplied,
+                                 shapes.size(),
+                                 &scene);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     PCAMERA camera;
     status = PinholeCameraAllocate(
@@ -343,6 +349,14 @@ TEST(CornellBoxTest, CornellBox)
                              color_integrator,
                              "test_results/cornell_box.pfm");
 
+    for (PSHAPE shape : shapes)
+    {
+        ShapeRelease(shape);
+    }
+
+    delete[] transforms;
+    delete[] premultiplied;
+
     EmissiveMaterialRelease(light_material);
     SpectrumRelease(light_spectrum);
     ReflectorRelease(white_reflector);
@@ -354,11 +368,9 @@ TEST(CornellBoxTest, CornellBox)
     MaterialRelease(white_material);
     MaterialRelease(red_material);
     MaterialRelease(green_material);
-    ShapeRelease(light_shape0);
-    ShapeRelease(light_shape1);
     LightRelease(light0);
     LightRelease(light1);
-    ListSceneFree(scene);
+    KdTreeSceneFree(scene);
     OneLightSamplerFree(light_sampler);
     CameraFree(camera);
     ColorIntegratorFree(color_integrator);

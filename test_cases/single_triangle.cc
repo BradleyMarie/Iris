@@ -211,7 +211,7 @@ TestRender(
                               rng,
                               framebuffer,
                               (float_t)0.001,
-                              std::thread::hardware_concurrency());
+                              1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;
