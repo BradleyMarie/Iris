@@ -268,8 +268,17 @@ TriangleComputeBounds(
     POINT3 world_v1 = PointMatrixMultiply(model_to_world, triangle->v1);
     POINT3 world_v2 = PointMatrixMultiply(model_to_world, triangle->v2);
 
-    BOUNDING_BOX object_bounds = BoundingBoxCreate(world_v0, world_v1);
-    *world_bounds = BoundingBoxEnvelop(object_bounds, world_v2);
+    float_t min_x = fmin(world_v0.x, fmin(world_v1.x, world_v2.x));
+    float_t min_y = fmin(world_v0.y, fmin(world_v1.y, world_v2.y));
+    float_t min_z = fmin(world_v0.z, fmin(world_v1.z, world_v2.z));
+    POINT3 bottom = PointCreate(min_x, min_y, min_z);
+
+    float_t max_x = fmax(world_v0.x, fmax(world_v1.x, world_v2.x));
+    float_t max_y = fmax(world_v0.y, fmax(world_v1.y, world_v2.y));
+    float_t max_z = fmax(world_v0.z, fmax(world_v1.z, world_v2.z));
+    POINT3 top = PointCreate(max_x, max_y, max_z);
+
+    *world_bounds = BoundingBoxCreate(bottom, top);
 
     return ISTATUS_SUCCESS;
 }

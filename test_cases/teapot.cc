@@ -14,6 +14,7 @@ Abstract:
 
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
@@ -22,7 +23,7 @@ Abstract:
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/constant_material.h"
 #include "iris_physx_toolkit/lambertian_bsdf.h"
-#include "iris_physx_toolkit/list_scene.h"
+#include "iris_physx_toolkit/kd_tree_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
@@ -133,7 +134,7 @@ SmoothMaterialAllocate(
 
 void
 TestRenderSingleThreaded(
-    _In_ PCLIST_SCENE scene,
+    _In_ PCKD_TREE_SCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
@@ -171,7 +172,7 @@ TestRenderSingleThreaded(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        ListSceneTraceCallback,
+        KdTreeSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -189,7 +190,7 @@ TestRenderSingleThreaded(
                               rng,
                               framebuffer,
                               (float_t)0.01,
-                              std::thread::hardware_concurrency());
+                              1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     bool equals;
@@ -211,12 +212,8 @@ TestRenderSingleThreaded(
 
 TEST(TeapotTest, FlatShadedTeapot)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -251,6 +248,11 @@ TEST(TeapotTest, FlatShadedTeapot)
     status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    PSHAPE shapes[TEAPOT_FACE_COUNT];
+    PMATRIX transforms[TEAPOT_FACE_COUNT];
+    bool premultiplied[TEAPOT_FACE_COUNT];
+
+    size_t num_shapes = 0;
     for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
     {
         PSHAPE shape;
@@ -263,33 +265,45 @@ TEST(TeapotTest, FlatShadedTeapot)
             &shape);
         ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-        status = ListSceneAddTransformedShape(scene, shape, nullptr);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-        ShapeRelease(shape);
+        if (shape)
+        {
+            shapes[num_shapes] = shape;
+            transforms[num_shapes] = nullptr;
+            premultiplied[num_shapes] = false;
+            num_shapes += 1;
+        }
     }
+
+    PKD_TREE_SCENE scene;
+    status = KdTreeSceneAllocate(shapes,
+                                 transforms,
+                                 premultiplied,
+                                 num_shapes,
+                                 &scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
                              light_sampler,
                              "test_results/teapot_flat.pfm");
+
+    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
+    {
+        ShapeRelease(shapes[i]);
+    }
 
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
     MaterialRelease(material);
     LightRelease(light);
-    ListSceneFree(scene);
+    KdTreeSceneFree(scene);
     AllLightSamplerFree(light_sampler);
 }
 
 TEST(TeapotTest, SmoothShadedTeapot)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -320,6 +334,11 @@ TEST(TeapotTest, SmoothShadedTeapot)
     status = AllLightSamplerAddLight(light_sampler, light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    PSHAPE shapes[TEAPOT_FACE_COUNT];
+    PMATRIX transforms[TEAPOT_FACE_COUNT];
+    bool premultiplied[TEAPOT_FACE_COUNT];
+
+    size_t num_shapes = 0;
     for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
     {
         VECTOR3 normal0 = teapot_normals[teapot_faces[i].normal0];
@@ -346,21 +365,38 @@ TEST(TeapotTest, SmoothShadedTeapot)
             &shape);
         ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-        status = ListSceneAddTransformedShape(scene, shape, nullptr);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
+        if (shape)
+        {
+            shapes[num_shapes] = shape;
+            transforms[num_shapes] = nullptr;
+            premultiplied[num_shapes] = false;
+            num_shapes += 1;
+        }
 
         MaterialRelease(material);
-        ShapeRelease(shape);
     }
+
+    PKD_TREE_SCENE scene;
+    status = KdTreeSceneAllocate(shapes,
+                                 transforms,
+                                 premultiplied,
+                                 num_shapes,
+                                 &scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
                              light_sampler,
                              "test_results/teapot_smooth.pfm");
 
+    for (PSHAPE shape : shapes)
+    {
+        ShapeRelease(shape);
+    }
+
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
     LightRelease(light);
-    ListSceneFree(scene);
+    KdTreeSceneFree(scene);
     AllLightSamplerFree(light_sampler);
 }

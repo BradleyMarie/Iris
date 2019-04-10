@@ -52,8 +52,8 @@ typedef const UNCOMPRESSED_LEAF *PCUNCOMPRESSED_LEAF;
 typedef struct _UNCOMPRESSED_INTERIOR {
     VECTOR_AXIS split_axis;
     float_t split;
-    PUNCOMPRESSED_NODE left_child;
-    PUNCOMPRESSED_NODE right_child;
+    PUNCOMPRESSED_NODE below_child;
+    PUNCOMPRESSED_NODE above_child;
 } UNCOMPRESSED_INTERIOR, *PUNCOMPRESSED_INTERIOR;
 
 typedef const UNCOMPRESSED_INTERIOR *PCUNCOMPRESSED_INTERIOR;
@@ -120,7 +120,7 @@ NextAxis(
 }
 
 static
-VECTOR_AXIS
+float_t
 VectorGetElementByAxis(
     _In_ VECTOR3 vector,
     _In_ VECTOR_AXIS axis
@@ -140,7 +140,7 @@ VectorGetElementByAxis(
 }
 
 static
-VECTOR_AXIS
+float_t
 PointGetElementByAxis(
     _In_ POINT3 point,
     _In_ VECTOR_AXIS axis
@@ -210,7 +210,7 @@ ComputeBounds(
 static
 ISTATUS
 AllocateEdges(
-    _In_ const BOUNDING_BOX shape_bounds[],
+    _In_ const BOUNDING_BOX all_bounds[],
     _In_reads_(num_indices) const size_t shape_indices[],
     _In_ size_t num_indices,
     _In_ VECTOR_AXIS axis,
@@ -238,16 +238,16 @@ AllocateEdges(
         switch (axis)
         {
             case VECTOR_X_AXIS:
-                min = shape_bounds[shape_indices[i]].corners[0].x;
-                max = shape_bounds[shape_indices[i]].corners[1].x;
+                min = all_bounds[shape_indices[i]].corners[0].x;
+                max = all_bounds[shape_indices[i]].corners[1].x;
                 break;
             case VECTOR_Y_AXIS:
-                min = shape_bounds[shape_indices[i]].corners[0].y;
-                max = shape_bounds[shape_indices[i]].corners[1].y;
+                min = all_bounds[shape_indices[i]].corners[0].y;
+                max = all_bounds[shape_indices[i]].corners[1].y;
                 break;
             default: // VECTOR_Z_AXIS
-                min = shape_bounds[shape_indices[i]].corners[0].z;
-                max = shape_bounds[shape_indices[i]].corners[1].z;
+                min = all_bounds[shape_indices[i]].corners[0].z;
+                max = all_bounds[shape_indices[i]].corners[1].z;
                 break;
         }
 
@@ -393,8 +393,8 @@ UncompressedKdTreeFree(
     }
     else
     {
-        UncompressedKdTreeFree(node->data.interior.left_child);
-        UncompressedKdTreeFree(node->data.interior.right_child);
+        UncompressedKdTreeFree(node->data.interior.below_child);
+        UncompressedKdTreeFree(node->data.interior.above_child);
     }
 
     free(node);
@@ -403,8 +403,8 @@ UncompressedKdTreeFree(
 static
 ISTATUS
 UncompressedKdTreeBuildImpl(
-    _In_ const BOUNDING_BOX shape_bounds[],
-    _In_ BOUNDING_BOX bounds,
+    _In_ const BOUNDING_BOX all_bounds[],
+    _In_ BOUNDING_BOX node_bounds,
     _In_reads_(num_indices) const size_t shape_indices[],
     _In_ size_t num_indices,
     _In_ size_t depth_remaining,
@@ -434,18 +434,18 @@ UncompressedKdTreeBuildImpl(
         return ISTATUS_SUCCESS;
     }
 
-    float_t best_cost = (float_t)num_indices * TRAVERSAL_COST;
+    float_t best_cost = (float_t)num_indices * INTERSECTION_COST;
     VECTOR_AXIS best_axis = VECTOR_X_AXIS;
     size_t best_split = 0;
     PEDGE best_edges = NULL;
     bool should_split = false;
 
-    VECTOR_AXIS axis = BoundingBoxDominantAxis(bounds);
+    VECTOR_AXIS axis = BoundingBoxDominantAxis(node_bounds);
 
     for (size_t i = 0; i < 3; i++)
     {
         PEDGE edges = NULL;
-        ISTATUS status = AllocateEdges(shape_bounds,
+        ISTATUS status = AllocateEdges(all_bounds,
                                        shape_indices,
                                        num_indices,
                                        axis,
@@ -460,7 +460,7 @@ UncompressedKdTreeBuildImpl(
         size_t split;
         bool success = EvaluateSplitsOnAxis(edges,
                                             num_indices * 2,
-                                            bounds,
+                                            node_bounds,
                                             axis,
                                             &cost,
                                             &split);
@@ -527,7 +527,7 @@ UncompressedKdTreeBuildImpl(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    size_t *above_indices = calloc(below_shapes, sizeof(size_t));
+    size_t *above_indices = calloc(above_shapes, sizeof(size_t));
     if (above_indices == NULL)
     {
         free(best_edges);
@@ -557,8 +557,8 @@ UncompressedKdTreeBuildImpl(
 
     free(best_edges);
 
-    BOUNDING_BOX below_bounds = bounds;
-    BOUNDING_BOX above_bounds = bounds;
+    BOUNDING_BOX below_bounds = node_bounds;
+    BOUNDING_BOX above_bounds = node_bounds;
 
     switch (best_axis)
     {
@@ -577,7 +577,7 @@ UncompressedKdTreeBuildImpl(
     }
 
     PUNCOMPRESSED_NODE below_node;
-    ISTATUS status = UncompressedKdTreeBuildImpl(shape_bounds,
+    ISTATUS status = UncompressedKdTreeBuildImpl(all_bounds,
                                                  below_bounds,
                                                  below_indices,
                                                  below_shapes,
@@ -595,7 +595,7 @@ UncompressedKdTreeBuildImpl(
     }
 
     PUNCOMPRESSED_NODE above_node;
-    status = UncompressedKdTreeBuildImpl(shape_bounds,
+    status = UncompressedKdTreeBuildImpl(all_bounds,
                                          above_bounds,
                                          above_indices,
                                          above_shapes,
@@ -614,18 +614,20 @@ UncompressedKdTreeBuildImpl(
 
     *node = malloc(sizeof(UNCOMPRESSED_NODE));
 
-    if (*node != NULL)
+    if (*node == NULL)
     {
         UncompressedKdTreeFree(below_node);
         UncompressedKdTreeFree(above_node);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    *num_nodes += 1;
+
     (*node)->is_leaf = false;
     (*node)->data.interior.split = split;
     (*node)->data.interior.split_axis = best_axis;
-    (*node)->data.interior.left_child = below_node;
-    (*node)->data.interior.right_child = above_node;
+    (*node)->data.interior.below_child = below_node;
+    (*node)->data.interior.above_child = above_node;
 
     return ISTATUS_SUCCESS;
 }
@@ -644,9 +646,9 @@ UncompressedKdTreeBuild(
     _Out_ size_t *num_indices
     )
 {
-    PBOUNDING_BOX shape_bounds = calloc(num_shapes, sizeof(BOUNDING_BOX));
+    PBOUNDING_BOX all_bounds = calloc(num_shapes, sizeof(BOUNDING_BOX));
 
-    if (shape_bounds == NULL)
+    if (all_bounds == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -655,7 +657,7 @@ UncompressedKdTreeBuild(
                                    transforms,
                                    premultiplied,
                                    num_shapes,
-                                   shape_bounds,
+                                   all_bounds,
                                    scene_bounds);
 
     if (status != ISTATUS_SUCCESS)
@@ -667,7 +669,7 @@ UncompressedKdTreeBuild(
 
     if (indices == NULL)
     {
-        free(shape_bounds);
+        free(all_bounds);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -678,7 +680,7 @@ UncompressedKdTreeBuild(
 
     *num_nodes = 0;
     *num_indices = 0;
-    status = UncompressedKdTreeBuildImpl(shape_bounds,
+    status = UncompressedKdTreeBuildImpl(all_bounds,
                                          *scene_bounds,
                                          indices,
                                          num_shapes,
@@ -687,10 +689,10 @@ UncompressedKdTreeBuild(
                                          num_nodes,
                                          num_indices);
 
-    free(shape_bounds);
+    free(all_bounds);
     free(indices);
 
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 //
@@ -789,13 +791,11 @@ static
 ISTATUS
 KdTreeBuildImpl(
     _In_ PCUNCOMPRESSED_NODE uncompressed_node,
-    _In_ const KD_TREE_NODE nodes[],
-    _In_ const uint32_t indices[],
+    _In_ const uint32_t *index_base,
     _Inout_ PKD_TREE_NODE *next_node,
     _Inout_ uint32_t **next_index
     )
 {
-    size_t current_index = *next_node - nodes;
     PKD_TREE_NODE current = *next_node;
     *next_node += 1;
 
@@ -812,7 +812,7 @@ KdTreeBuildImpl(
         }
 
         size_t num_indices = uncompressed_node->data.leaf.num_indices;
-        size_t offset = *next_index - indices;
+        size_t offset = *next_index - index_base;
         for (size_t i = 0; i < num_indices; i++)
         {
             if (UINT32_MAX < uncompressed_node->data.leaf.indices[i])
@@ -832,9 +832,8 @@ KdTreeBuildImpl(
     }
 
     ISTATUS status =
-        KdTreeBuildImpl(uncompressed_node->data.interior.left_child,
-                        nodes,
-                        indices,
+        KdTreeBuildImpl(uncompressed_node->data.interior.below_child,
+                        index_base,
                         next_node,
                         next_index);
 
@@ -846,7 +845,7 @@ KdTreeBuildImpl(
     status =
         KdTreeInitializeInterior(current,
                                  uncompressed_node->data.interior.split_axis,
-                                 (*next_node - nodes) - current_index,
+                                 *next_node - current,
                                  uncompressed_node->data.interior.split);
 
     if (status != ISTATUS_SUCCESS)
@@ -855,9 +854,8 @@ KdTreeBuildImpl(
     }
 
     status =
-        KdTreeBuildImpl(uncompressed_node->data.interior.right_child,
-                        nodes,
-                        indices,
+        KdTreeBuildImpl(uncompressed_node->data.interior.above_child,
+                        index_base,
                         next_node,
                         next_index);
 
@@ -873,10 +871,14 @@ KdTreeBuild(
     )
 {
     ISTATUS status = KdTreeBuildImpl(uncompressed_node,
-                                     nodes,
                                      indices,
                                      &nodes,
                                      &indices);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
 
     return status;
 }
@@ -1016,28 +1018,73 @@ KdTreeTraceShape(
 
 static
 inline
+bool
+BoundingBoxIntersect(
+    _In_ BOUNDING_BOX box,
+    _In_ POINT3 origin,
+    _In_ VECTOR3 inverted_direction,
+    _Out_ float_t *min,
+    _Out_ float_t *max
+    )
+{
+    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction.x;
+    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction.x;
+
+    *min = fmin(tx1, tx2);
+    *max = fmax(tx1, tx2);
+
+    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction.y;
+    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction.y;
+
+    *min = fmax(*min, fmin(ty1, ty2));
+    *max = fmin(*max, fmax(ty1, ty2));
+
+    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction.z;
+    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction.z;
+
+    *min = fmax(*min, fmin(tz1, tz2));
+    *max = fmin(*max, fmax(tz1, tz2));
+
+    return *min <= *max;
+}
+
+static
+inline
 ISTATUS
 KdTreeTraceTree(
     _In_ const KD_TREE_NODE node[],
-    _In_ const uint32_t indices[],
+    _In_ const uint32_t all_indices[],
     _In_ const SHAPE_AND_DATA shapes[],
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ POINT3 ray_origin,
-    _In_ VECTOR3 inverse_direction
+    _In_ BOUNDING_BOX scene_bounds,
+    _In_ RAY ray
     )
 {
+    POINT3 ray_origin = ray.origin;
+    VECTOR3 inv_dir = VectorCreate((float_t)1.0 / ray.direction.x,
+                                   (float_t)1.0 / ray.direction.y,
+                                   (float_t)1.0 / ray.direction.z);
+
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(scene_bounds,
+                                           ray.origin,
+                                           inv_dir,
+                                           &node_min,
+                                           &node_max);
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
-    float_t min = (float_t)0.0;
-    float_t max = (float_t)INFINITY;
 
     for (;;)
     {
         float_t closest_hit;
         ShapeHitTesterClosestHit(hit_tester, &closest_hit);
 
-        if (closest_hit < min)
+        if (closest_hit < node_min)
         {
             break;
         }
@@ -1046,29 +1093,30 @@ KdTreeTraceTree(
         {
             uint32_t num_shapes = KdTreeLeafSize(node);
 
-            if (num_shapes == 0)
-            {
-                return ISTATUS_SUCCESS;
-            }
-
-            uint32_t index = node->split_or_index.index;
-
             if (num_shapes == 1)
             {
+                uint32_t index = node->split_or_index.index;
                 ISTATUS status = KdTreeTraceShape(hit_tester,
                                                   shapes + index);
-                return status;
-            }
-
-            uint32_t *indices = indices + index;
-            for (uint32_t i = 0; i < num_shapes; i++)
-            {
-                ISTATUS status = KdTreeTraceShape(hit_tester,
-                                                  shapes + indices[i]);
 
                 if (status != ISTATUS_SUCCESS)
                 {
                     return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    ISTATUS status = KdTreeTraceShape(hit_tester,
+                                                      shapes + node_indices[i]);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
                 }
             }
 
@@ -1079,37 +1127,38 @@ KdTreeTraceTree(
 
             queue_size -= 1;
             node = work_queue[queue_size].node;
-            min = work_queue[queue_size].min;
-            max = work_queue[queue_size].max;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
             continue;
         }
 
         uint32_t split_axis = KdTreeNodeType(node);
         float_t origin = PointGetElement(ray_origin, split_axis);
-        float_t direction = VectorGetElement(inverse_direction, split_axis);
+        float_t direction = VectorGetElement(inv_dir, split_axis);
 
         float_t split = KdTreeSplit(node);
         float_t plane_distance = (split - origin) * direction;
 
-        uint32_t child_offset = KdTreeChildIndex(node);
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
 
         PCKD_TREE_NODE close_child, far_child;
         if (origin < split || (origin == split && direction <= (float_t)0.0))
         {
-            close_child = node + 1;
-            far_child = node + child_offset;
+            close_child = below_child;
+            far_child = above_child;
         }
         else
         {
-            close_child = node + child_offset;
-            far_child = node + 1;
+            close_child = above_child;
+            far_child = below_child;
         }
 
-        if (max < plane_distance || plane_distance <= (float_t)0.0)
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
         {
             node = close_child;
         }
-        else if (plane_distance < min)
+        else if (plane_distance < node_min)
         {
             node = far_child;
         }
@@ -1117,21 +1166,18 @@ KdTreeTraceTree(
         {
             work_queue[queue_size].node = far_child;
             work_queue[queue_size].min = plane_distance;
-            work_queue[queue_size].max = max;
+            work_queue[queue_size].max = node_max;
             queue_size += 1;
 
             node = close_child;
-            max = plane_distance;
+            node_max = plane_distance;
         }
     }
 
     return ISTATUS_SUCCESS;
 }
 
-//
-// Scene Functions
-//
-
+static
 size_t
 Log2(
     _In_ size_t value
@@ -1149,6 +1195,10 @@ Log2(
 
     return 0;
 }
+
+//
+// Scene Functions
+//
 
 ISTATUS
 KdTreeSceneAllocate(
@@ -1276,6 +1326,10 @@ KdTreeSceneAllocate(
 
     for (size_t i = 0; i < num_shapes; i++)
     {
+        data[i].shape = shapes[i];
+        data[i].model_to_world = transforms[i];
+        data[i].premultiplied = premultiplied[i];
+
         ShapeRetain(data[i].shape);
         MatrixRetain(data[i].model_to_world);
     }
@@ -1326,16 +1380,12 @@ KdTreeSceneTraceCallback(
 
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
 
-    VECTOR3 inverse_direction = VectorCreate((float_t)1.0 / ray.direction.x,
-                                             (float_t)1.0 / ray.direction.y,
-                                             (float_t)1.0 / ray.direction.z);
-
     ISTATUS status = KdTreeTraceTree(kd_tree->nodes,
                                      kd_tree->indices,
                                      kd_tree->shapes,
                                      hit_tester,
-                                     ray.origin,
-                                     inverse_direction);
+                                     kd_tree->scene_bounds,
+                                     ray);
 
     return status;
 }
