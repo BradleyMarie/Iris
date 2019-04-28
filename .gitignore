@@ -20,14 +20,14 @@
 # Build artifacts
 bazel-bin/
 bazel-genfiles/
-bazel-Iris/
+bazel-iris/
 bazel-out/
 bazel-testlogs/
 
 # Build artifacts as files
 bazel-bin
 bazel-genfiles
-bazel-Iris
+bazel-iris
 bazel-out
 bazel-testlogs
 
