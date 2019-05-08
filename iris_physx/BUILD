@@ -406,6 +406,34 @@ cc_library(
 )
 
 cc_library(
+    name = "scene",
+    hdrs = ["scene.h"],
+    srcs = ["scene.c"],
+    deps = [
+        ":scene_internal",
+        ":scene_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "scene_internal",
+    hdrs = ["scene_internal.h"],
+    deps = [
+        ":scene_vtable",
+    ],
+)
+
+cc_library(
+    name = "scene_vtable",
+    hdrs = ["scene_vtable.h"],
+    deps = [
+        ":hit_tester",
+        ":shape",
+    ],
+)
+
+cc_library(
     name = "shape",
     hdrs = ["shape.h"],
     srcs = ["shape.c"],
