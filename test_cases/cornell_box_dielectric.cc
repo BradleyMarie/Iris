@@ -40,7 +40,7 @@ Abstract:
 void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
-    _In_ PCKD_TREE_SCENE scene,
+    _In_ PCSCENE scene,
     _In_ PONE_LIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
@@ -65,7 +65,6 @@ TestRenderSingleThreaded(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        KdTreeSceneTraceCallback,
         scene,
         OneLightSamplerSampleLightsCallback,
         light_sampler,
@@ -358,7 +357,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
         premultiplied[i] = false;
     }
 
-    PKD_TREE_SCENE scene;
+    PSCENE scene;
     status = KdTreeSceneAllocate(shapes.data(),
                                  transforms,
                                  premultiplied,
@@ -409,7 +408,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     MaterialRelease(green_material);
     LightRelease(light0);
     LightRelease(light1);
-    KdTreeSceneFree(scene);
+    SceneFree(scene);
     OneLightSamplerFree(light_sampler);
     CameraFree(camera);
     ColorIntegratorFree(color_integrator);

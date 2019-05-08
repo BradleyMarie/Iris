@@ -53,8 +53,16 @@ TEST(EmptyPhysx, ListScene)
     status = PathTracerAllocate(8, 8, (float_t)0.0, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PLIST_SCENE scene;
-    status = ListSceneAllocate(&scene);
+    PSHAPE shape = nullptr;
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               0,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PALL_LIGHT_SAMPLER light_sampler;
@@ -68,7 +76,6 @@ TEST(EmptyPhysx, ListScene)
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        ListSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -95,7 +102,7 @@ TEST(EmptyPhysx, ListScene)
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
@@ -135,7 +142,7 @@ TEST(EmptyPhysx, KdTreeScene)
     PMATRIX matrix = nullptr;
     bool premultiplied = false;
 
-    PKD_TREE_SCENE scene;
+    PSCENE scene;
     status = KdTreeSceneAllocate(&shape,
                                  &matrix,
                                  &premultiplied,
@@ -154,7 +161,6 @@ TEST(EmptyPhysx, KdTreeScene)
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        KdTreeSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -181,7 +187,7 @@ TEST(EmptyPhysx, KdTreeScene)
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
-    KdTreeSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);

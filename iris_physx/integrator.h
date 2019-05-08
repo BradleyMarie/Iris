@@ -16,20 +16,9 @@ Abstract:
 #define _IRIS_PHYSX_INTEGRATOR_
 
 #include "iris_physx/color_integrator.h"
-#include "iris_physx/light_sampler_vtable.h"
 #include "iris_physx/integrator_vtable.h"
-
-//
-// Types
-//
-
-typedef
-ISTATUS 
-(*PSHAPE_RAY_TRACER_TRACE_ROUTINE)(
-    _In_opt_ const void *context, 
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ RAY ray
-    );
+#include "iris_physx/light_sampler_vtable.h"
+#include "iris_physx/scene.h"
 
 //
 // Functions
@@ -47,8 +36,7 @@ IntegratorAllocate(
 ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
-    _In_opt_ const void *trace_context,
+    _In_ PCSCENE scene,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
     _In_ PCCOLOR_INTEGRATOR color_integrator,
@@ -61,8 +49,7 @@ IntegratorIntegrate(
 ISTATUS
 IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PSHAPE_RAY_TRACER_TRACE_ROUTINE trace_routine,
-    _In_opt_ const void *trace_context,
+    _In_ PCSCENE scene,
     _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
     _In_opt_ const void* sample_lights_context,
     _In_ PCCOLOR_INTEGRATOR color_integrator,

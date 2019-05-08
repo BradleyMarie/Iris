@@ -134,7 +134,7 @@ SmoothMaterialAllocate(
 
 void
 TestRenderSingleThreaded(
-    _In_ PCKD_TREE_SCENE scene,
+    _In_ PCSCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
@@ -172,7 +172,6 @@ TestRenderSingleThreaded(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        KdTreeSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -274,7 +273,7 @@ TEST(TeapotTest, FlatShadedTeapot)
         }
     }
 
-    PKD_TREE_SCENE scene;
+    PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
                                  transforms,
                                  premultiplied,
@@ -296,7 +295,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     BsdfRelease(bsdf);
     MaterialRelease(material);
     LightRelease(light);
-    KdTreeSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
 }
 
@@ -376,7 +375,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
         MaterialRelease(material);
     }
 
-    PKD_TREE_SCENE scene;
+    PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
                                  transforms,
                                  premultiplied,
@@ -397,6 +396,6 @@ TEST(TeapotTest, SmoothShadedTeapot)
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
     LightRelease(light);
-    KdTreeSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
 }

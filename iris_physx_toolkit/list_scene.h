@@ -22,55 +22,16 @@ extern "C" {
 #endif // __cplusplus
 
 //
-// Types
-//
-
-typedef struct _LIST_SCENE LIST_SCENE, *PLIST_SCENE;
-typedef const LIST_SCENE *PCLIST_SCENE;
-
-//
 // Functions
 //
 
 ISTATUS
 ListSceneAllocate(
-    _Out_ PLIST_SCENE *list_scene
-    );
-
-ISTATUS
-ListSceneAddShape(
-    _Inout_ PLIST_SCENE list_scene,
-    _In_opt_ PSHAPE shape
-    );
-
-ISTATUS
-ListSceneAddPremultipliedShape(
-    _Inout_ PLIST_SCENE list_scene,
-    _In_opt_ PSHAPE shape,
-    _In_opt_ PMATRIX model_to_world
-    );
-
-ISTATUS
-ListSceneAddTransformedShape(
-    _Inout_ PLIST_SCENE list_scene,
-    _In_opt_ PSHAPE shape,
-    _In_opt_ PMATRIX model_to_world
-    );
-
-void
-ListSceneFree(
-    _In_opt_ _Post_invalid_ PLIST_SCENE list_scene
-    );
-
-//
-// Callback Functions
-//
-
-ISTATUS 
-ListSceneTraceCallback(
-    _In_opt_ const void *context, 
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ RAY ray
+    _In_reads_(num_shapes) const PSHAPE shapes[],
+    _In_reads_(num_shapes) const PMATRIX transforms[],
+    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_ size_t num_shapes,
+    _Out_ PSCENE *scene
     );
 
 #if __cplusplus 

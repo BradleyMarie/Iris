@@ -164,7 +164,7 @@ TriangleMaterialAllocate(
 void
 TestRender(
     _In_ PCCAMERA camera,
-    _In_ PCLIST_SCENE scene,
+    _In_ PCSCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name,
     _In_ float_t epsilon
@@ -193,7 +193,6 @@ TestRender(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        ListSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -242,12 +241,8 @@ static const float_t pi = (float_t)3.1415926535897932384626433832;
 
 TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -299,7 +294,15 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -321,7 +324,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -335,12 +338,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -392,7 +391,15 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -414,7 +421,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -428,12 +435,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -485,7 +488,15 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -507,7 +518,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -521,12 +532,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -578,7 +585,15 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -600,7 +615,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -614,12 +629,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -671,7 +682,15 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -693,7 +712,7 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -707,12 +726,8 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
 
 TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -764,7 +779,15 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -786,7 +809,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -800,12 +823,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -857,7 +876,15 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -879,7 +906,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -893,12 +920,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -950,7 +973,15 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -972,7 +1003,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -986,12 +1017,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1043,7 +1070,15 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1065,7 +1100,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1079,12 +1114,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1136,7 +1167,15 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1158,7 +1197,7 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1172,12 +1211,8 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
 
 TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1229,7 +1264,15 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1251,7 +1294,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1265,12 +1308,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1322,7 +1361,15 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1344,7 +1391,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1358,12 +1405,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1415,7 +1458,15 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1437,7 +1488,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1451,12 +1502,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1508,7 +1555,15 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1530,7 +1585,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1544,12 +1599,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1601,7 +1652,15 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1623,7 +1682,7 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1637,12 +1696,8 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1696,7 +1751,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1718,7 +1781,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1732,12 +1795,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1791,7 +1850,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1813,7 +1880,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1827,12 +1894,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1886,7 +1949,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -1908,7 +1979,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -1922,12 +1993,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -1981,7 +2048,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2003,7 +2078,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2017,12 +2092,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2076,7 +2147,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2098,7 +2177,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2112,12 +2191,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2150,7 +2225,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2172,7 +2255,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
                "test_results/single_emissive_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2183,12 +2266,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2218,7 +2297,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2240,7 +2327,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2251,12 +2338,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2289,7 +2372,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2311,7 +2402,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
                "test_results/single_emissive_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2322,12 +2413,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2357,7 +2444,15 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2379,7 +2474,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2390,12 +2485,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2449,7 +2540,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2471,7 +2570,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2485,12 +2584,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2544,7 +2639,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2566,7 +2669,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2580,12 +2683,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2639,7 +2738,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2661,7 +2768,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2675,12 +2782,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2734,7 +2837,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2756,7 +2867,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -2770,12 +2881,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2808,7 +2915,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2830,7 +2945,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
                "test_results/single_emissive_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2841,12 +2956,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2876,7 +2987,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2898,7 +3017,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2909,12 +3028,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -2947,7 +3062,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -2969,7 +3092,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
                "test_results/single_emissive_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -2980,12 +3103,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3015,7 +3134,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3037,7 +3164,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -3048,12 +3175,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3107,7 +3230,15 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3129,7 +3260,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3143,12 +3274,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3202,7 +3329,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3224,7 +3359,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3238,12 +3373,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3297,7 +3428,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3319,7 +3458,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3333,12 +3472,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3392,7 +3527,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3414,7 +3557,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3428,12 +3571,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3487,7 +3626,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3509,7 +3656,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3523,12 +3670,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3582,7 +3725,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
         &shape);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3604,7 +3755,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -3618,12 +3769,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3656,7 +3803,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3678,7 +3833,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
                "test_results/single_emissive_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -3689,12 +3844,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3724,7 +3875,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3746,7 +3905,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -3757,12 +3916,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3795,7 +3950,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3817,7 +3980,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
                "test_results/single_emissive_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
@@ -3828,12 +3991,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -3863,7 +4022,15 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape);
+     PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -3885,7 +4052,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);

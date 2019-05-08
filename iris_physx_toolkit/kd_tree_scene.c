@@ -12,6 +12,7 @@ Abstract:
 
 --*/
 
+#include <stdalign.h>
 #include <string.h>
 
 #include "common/pointer_list.h"
@@ -902,13 +903,15 @@ typedef struct _SHAPE_AND_DATA {
 
 typedef const SHAPE_AND_DATA *PCSHAPE_AND_DATA;
 
-struct _KD_TREE_SCENE {
+typedef struct _KD_TREE_SCENE {
     KD_TREE_NODE *nodes;
     uint32_t *indices;
     PSHAPE_AND_DATA shapes;
     uint32_t num_shapes;
     BOUNDING_BOX scene_bounds;
-};
+} KD_TREE_SCENE, *PKD_TREE_SCENE;
+
+typedef const KD_TREE_SCENE *PCKD_TREE_SCENE;
 
 typedef struct _WORK_ITEM {
     PCKD_TREE_NODE node;
@@ -1188,13 +1191,69 @@ Log2(
 // Scene Functions
 //
 
+static
+ISTATUS
+KdTreeSceneTrace(
+    _In_opt_ const void *context,
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ RAY ray
+    )
+{
+    assert(context != NULL);
+    assert(hit_tester != NULL);
+    assert(RayValidate(ray));
+
+    PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+
+    ISTATUS status = KdTreeTraceTree(kd_tree->nodes,
+                                     kd_tree->indices,
+                                     kd_tree->shapes,
+                                     hit_tester,
+                                     kd_tree->scene_bounds,
+                                     ray);
+
+    return status;
+}
+
+static
+void
+KdTreeSceneFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PKD_TREE_SCENE kd_tree_scene = (PKD_TREE_SCENE)context;
+
+    for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
+    {
+        ShapeRelease(kd_tree_scene->shapes[i].shape);
+        MatrixRelease(kd_tree_scene->shapes[i].model_to_world);
+    }
+
+    free(kd_tree_scene->nodes);
+    free(kd_tree_scene->indices);
+    free(kd_tree_scene->shapes);
+}
+
+//
+// Static Data
+//
+
+static const SCENE_VTABLE kd_tree_scene_vtable = {
+    KdTreeSceneTrace,
+    KdTreeSceneFree
+};
+
+//
+// Public Functions
+//
+
 ISTATUS
 KdTreeSceneAllocate(
     _In_reads_(num_shapes) const PSHAPE shapes[],
     _In_reads_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
-    _Out_ PKD_TREE_SCENE *kd_tree_scene
+    _Out_ PSCENE *scene
     )
 {
     if (shapes == NULL)
@@ -1212,7 +1271,7 @@ KdTreeSceneAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (kd_tree_scene == NULL)
+    if (scene == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -1286,17 +1345,6 @@ KdTreeSceneAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PKD_TREE_SCENE result = malloc(sizeof(KD_TREE_SCENE));
-
-    if (result == NULL)
-    {
-        UncompressedKdTreeFree(uncompressed_node);
-        free(nodes);
-        free(indices);
-        free(data);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     status = KdTreeBuild(uncompressed_node,
                          nodes,
                          indices);
@@ -1308,7 +1356,27 @@ KdTreeSceneAllocate(
         free(nodes);
         free(indices);
         free(data);
-        free(result);
+        return status;
+    }
+
+    KD_TREE_SCENE result;
+    result.nodes = nodes;
+    result.indices = indices;
+    result.shapes = data;
+    result.num_shapes = num_shapes;
+    result.scene_bounds = scene_bounds;
+
+    status = SceneAllocate(&kd_tree_scene_vtable,
+                           &result,
+                           sizeof(KD_TREE_SCENE),
+                           alignof(KD_TREE_SCENE),
+                           scene);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(nodes);
+        free(indices);
+        free(data);
         return status;
     }
 
@@ -1322,58 +1390,5 @@ KdTreeSceneAllocate(
         MatrixRetain(data[i].model_to_world);
     }
 
-    result->nodes = nodes;
-    result->indices = indices;
-    result->shapes = data;
-    result->num_shapes = num_shapes;
-    result->scene_bounds = scene_bounds;
-
-    *kd_tree_scene = result;
-
     return ISTATUS_SUCCESS;
-}
-
-void
-KdTreeSceneFree(
-    _In_opt_ _Post_invalid_ PKD_TREE_SCENE kd_tree_scene
-    )
-{
-    if (kd_tree_scene == NULL)
-    {
-        return;
-    }
-
-    for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
-    {
-        ShapeRelease(kd_tree_scene->shapes[i].shape);
-        MatrixRelease(kd_tree_scene->shapes[i].model_to_world);
-    }
-
-    free(kd_tree_scene->nodes);
-    free(kd_tree_scene->indices);
-    free(kd_tree_scene->shapes);
-    free(kd_tree_scene);
-}
-
-ISTATUS 
-KdTreeSceneTraceCallback(
-    _In_opt_ const void *context, 
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ RAY ray
-    )
-{
-    assert(context != NULL);
-    assert(hit_tester != NULL);
-    assert(RayValidate(ray));
-
-    PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
-
-    ISTATUS status = KdTreeTraceTree(kd_tree->nodes,
-                                     kd_tree->indices,
-                                     kd_tree->shapes,
-                                     hit_tester,
-                                     kd_tree->scene_bounds,
-                                     ray);
-
-    return status;
 }

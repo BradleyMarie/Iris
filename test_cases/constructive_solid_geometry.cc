@@ -159,7 +159,7 @@ AllocateCubeFromTriangles(
 
 void
 TestRenderSingleThreaded(
-    _In_ PCLIST_SCENE scene,
+    _In_ PCSCENE scene,
     _In_ PALL_LIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
@@ -198,7 +198,6 @@ TestRenderSingleThreaded(
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(
         path_tracer,
-        ListSceneTraceCallback,
         scene,
         AllLightSamplerSampleLightsCallback,
         light_sampler,
@@ -233,12 +232,8 @@ TestRenderSingleThreaded(
 
 TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -301,7 +296,15 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     status = DifferenceAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape2);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape2,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -311,7 +314,7 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                              light_sampler,
                              "test_results/csg_cube_sphere_difference.pfm");
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -328,12 +331,8 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
 
 TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -402,7 +401,15 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     status = IntersectionAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape2);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape2,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -412,7 +419,7 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                              light_sampler,
                              "test_results/csg_sphere_intersection.pfm");
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -429,12 +436,8 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 
 TEST(ConstructiveSolidGeometryTest, SphereUnion)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -503,7 +506,15 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     status = UnionAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddShape(scene, shape2);
+    PMATRIX matrix = nullptr;
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape2,
+                               &matrix,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -513,7 +524,7 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                              light_sampler,
                              "test_results/csg_sphere_union.pfm");
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
@@ -530,12 +541,8 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
 
 TEST(ConstructiveSolidGeometryTest, RoundedCube)
 {
-    PLIST_SCENE scene;
-    ISTATUS status = ListSceneAllocate(&scene);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM spectrum;
@@ -614,7 +621,14 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     status = MatrixAllocateProduct(matrix0, matrix1, &matrix2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ListSceneAddTransformedShape(scene, shape2, matrix2);
+    bool premultiplied = false;
+
+    PSCENE scene;
+    status = ListSceneAllocate(&shape2,
+                               &matrix2,
+                               &premultiplied,
+                               1,
+                               &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = AllLightSamplerAddLight(light_sampler, light);
@@ -624,7 +638,7 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                              light_sampler,
                              "test_results/csg_rounded_cube.pfm");
 
-    ListSceneFree(scene);
+    SceneFree(scene);
     AllLightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);

@@ -28,28 +28,4 @@ struct _SCENE {
     void *data;
 };
 
-//
-// Functions
-//
-
-static
-inline
-ISTATUS
-SceneTrace(
-    _In_ const struct _SCENE *scene,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ RAY ray
-    )
-{
-    assert(scene != NULL);
-    assert(hit_tester != NULL);
-    assert(RayValidate(ray));
-
-    ISTATUS status = scene->vtable->trace_routine(scene->data,
-                                                  hit_tester,
-                                                  ray);
-
-    return status;
-}
-
 #endif // _IRIS_PHYSX_SCENE_INTERNAL_
