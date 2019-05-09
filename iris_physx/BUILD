@@ -237,6 +237,26 @@ cc_library(
 )
 
 cc_library(
+    name = "light_sample_list",
+    hdrs = ["light_sample_list.h"],
+    srcs = ["light_sample_list.c"],
+    deps = [
+        ":light",
+        ":light_sample_list_internal",
+        "//common:safe_math"
+    ],
+)
+
+cc_library(
+    name = "light_sample_list_internal",
+    hdrs = ["light_sample_list_internal.h"],
+    deps = [
+        ":light_sample_collector",
+        ":light_sample_collector_internal",
+    ],
+)
+
+cc_library(
     name = "light_sampler",
     hdrs = ["light_sampler.h"],
     srcs = ["light_sampler.c"],
