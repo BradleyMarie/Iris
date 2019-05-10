@@ -19,7 +19,7 @@ Abstract:
 #include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"
-#include "iris_physx/light_sampler_internal.h"
+#include "iris_physx/light_sample_list_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
 #include "iris_physx/scene_internal.h"
@@ -34,7 +34,7 @@ Abstract:
 struct _INTEGRATOR {
     PCINTEGRATOR_VTABLE vtable;
     SHAPE_RAY_TRACER shape_ray_tracer;
-    LIGHT_SAMPLER light_sampler;
+    LIGHT_SAMPLE_LIST light_sample_list;
     VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
     void *data;
@@ -49,8 +49,7 @@ ISTATUS
 IntegratorIntegrateInternal(
     _Inout_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
     _In_ float_t epsilon,
@@ -69,24 +68,24 @@ IntegratorIntegrateInternal(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (sample_lights_routine == NULL)
+    if (light_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (!RayValidate(ray))
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (isinf(epsilon) || isless(epsilon, (float_t)0.0))
     {
-        return ISTATUS_INVALID_ARGUMENT_07;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     ShapeRayTracerConfigure(&integrator->shape_ray_tracer,
@@ -94,15 +93,12 @@ IntegratorIntegrateInternal(
                             scene->data,
                             epsilon);
 
-    LightSamplerConfigure(&integrator->light_sampler,
-                          sample_lights_routine,
-                          sample_lights_context);
-
     VisibilityTesterConfigure(&integrator->visibility_tester,
                               scene->vtable->trace_routine,
                               scene->data,
                               epsilon);
 
+    LightSampleListClear(&integrator->light_sample_list);
     SpectrumCompositorClear(&integrator->spectrum_compositor);
 
     PREFLECTOR_COMPOSITOR reflector_compositor =
@@ -111,8 +107,9 @@ IntegratorIntegrateInternal(
     ISTATUS status =
         integrator->vtable->integrate_routine(integrator->data,
                                               &ray,
+                                              light_sampler,
+                                              &integrator->light_sample_list,
                                               &integrator->shape_ray_tracer,
-                                              &integrator->light_sampler,
                                               &integrator->visibility_tester,
                                               &integrator->spectrum_compositor,
                                               reflector_compositor,
@@ -194,7 +191,7 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    success = LightSamplerInitialize(&result->light_sampler);
+    success = LightSampleListInitialize(&result->light_sample_list);
 
     if (!success)
     {
@@ -208,7 +205,7 @@ IntegratorAllocate(
     if (!success)
     {
         ShapeRayTracerDestroy(&result->shape_ray_tracer);
-        LightSamplerDestroy(&result->light_sampler);
+        LightSampleListDestroy(&result->light_sample_list);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -218,7 +215,7 @@ IntegratorAllocate(
     if (!success)
     {
         ShapeRayTracerDestroy(&result->shape_ray_tracer);
-        LightSamplerDestroy(&result->light_sampler);
+        LightSampleListDestroy(&result->light_sample_list);
         VisibilityTesterDestroy(&result->visibility_tester);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
@@ -233,8 +230,7 @@ ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
@@ -244,19 +240,18 @@ IntegratorIntegrate(
 {
     if (color_integrator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (color == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     PCSPECTRUM spectrum;
     ISTATUS status = IntegratorIntegrateInternal(integrator,
                                                  scene,
-                                                 sample_lights_routine,
-                                                 sample_lights_context,
+                                                 light_sampler,
                                                  rng,
                                                  ray,
                                                  epsilon,
@@ -278,8 +273,7 @@ ISTATUS
 IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
@@ -289,19 +283,18 @@ IntegratorIntegrateSpectral(
 {
     if (color_integrator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (color == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     PCSPECTRUM spectrum;
     ISTATUS status = IntegratorIntegrateInternal(integrator,
                                                  scene,
-                                                 sample_lights_routine,
-                                                 sample_lights_context,
+                                                 light_sampler,
                                                  rng,
                                                  ray,
                                                  epsilon,
@@ -352,7 +345,7 @@ IntegratorFree(
     }
 
     ShapeRayTracerDestroy(&integrator->shape_ray_tracer);
-    LightSamplerDestroy(&integrator->light_sampler);
+    LightSampleListDestroy(&integrator->light_sample_list);
     VisibilityTesterDestroy(&integrator->visibility_tester);
     SpectrumCompositorDestroy(&integrator->spectrum_compositor);
 

@@ -135,7 +135,7 @@ SmoothMaterialAllocate(
 void
 TestRenderSingleThreaded(
     _In_ PCSCENE scene,
-    _In_ PALL_LIGHT_SAMPLER light_sampler,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -173,7 +173,6 @@ TestRenderSingleThreaded(
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -211,15 +210,11 @@ TestRenderSingleThreaded(
 
 TEST(TeapotTest, FlatShadedTeapot)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)32.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)32.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -240,7 +235,8 @@ TEST(TeapotTest, FlatShadedTeapot)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -296,20 +292,16 @@ TEST(TeapotTest, FlatShadedTeapot)
     MaterialRelease(material);
     LightRelease(light);
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
 }
 
 TEST(TeapotTest, SmoothShadedTeapot)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)32.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)32.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -330,7 +322,8 @@ TEST(TeapotTest, SmoothShadedTeapot)
         &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shapes[TEAPOT_FACE_COUNT];
@@ -397,5 +390,5 @@ TEST(TeapotTest, SmoothShadedTeapot)
     BsdfRelease(bsdf);
     LightRelease(light);
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
 }

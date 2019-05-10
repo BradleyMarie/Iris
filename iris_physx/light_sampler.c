@@ -12,66 +12,94 @@ Abstract:
 
 --*/
 
+#include <stdalign.h>
+#include <string.h>
+
+#include "common/alloc.h"
+#include "iris_physx/light_sample_list_internal.h"
 #include "iris_physx/light_sampler.h"
-#include "iris_physx/light_sampler_internal.h"
+
+//
+// Types
+//
+
+struct _LIGHT_SAMPLER {
+    PCLIGHT_SAMPLER_VTABLE vtable;
+    void *data;
+};
 
 //
 // Functions
 //
 
 ISTATUS
-LightSamplerCollectSamples(
-    _Inout_ PLIGHT_SAMPLER light_sampler,
-    _Inout_ PRANDOM rng,
-    _In_ POINT3 point,
-    _Out_ size_t *num_samples
+LightSamplerAllocate(
+    _In_ PCLIGHT_SAMPLER_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Out_ PLIGHT_SAMPLER *light_sampler
     )
 {
-    if (light_sampler == NULL)
+    if (vtable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (rng == NULL)
+    if (data_size != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        if (data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (data_alignment == 0 ||
+            (data_alignment & (data_alignment - 1)) != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (data_size % data_alignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
-    if (!PointValidate(point))
+    if (light_sampler == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (num_samples == NULL)
+    void *data_allocation;
+    bool success = AlignedAllocWithHeader(sizeof(LIGHT_SAMPLER),
+                                          alignof(LIGHT_SAMPLER),
+                                          (void **)light_sampler,
+                                          data_size,
+                                          data_alignment,
+                                          &data_allocation);
+
+    if (!success)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
-    LightSampleCollectorClear(&light_sampler->collector);
+    (*light_sampler)->vtable = vtable;
+    (*light_sampler)->data = data_allocation;
 
-    ISTATUS status = light_sampler->sample_lights_routine(
-        light_sampler->sample_lights_context,
-        point,
-        rng,
-        &light_sampler->collector);
-
-    if (status != ISTATUS_SUCCESS)
+    if (data_size != 0)
     {
-        return status;
+        memcpy(data_allocation, data, data_size);
     }
-
-    *num_samples =
-        LightSampleCollectorGetSampleCount(&light_sampler->collector);
 
     return ISTATUS_SUCCESS;
 }
 
 ISTATUS
-LightSamplerGetSample(
+LightSamplerSample(
     _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ size_t sample_index,
-    _Out_ PCLIGHT *light,
-    _Out_ float_t *pdf
+    _In_ POINT3 point,
+    _Inout_ PRANDOM rng,
+    _Inout_ PLIGHT_SAMPLE_LIST light_sample_list
     )
 {
     if (light_sampler == NULL)
@@ -79,28 +107,46 @@ LightSamplerGetSample(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    size_t num_samples =
-        LightSampleCollectorGetSampleCount(&light_sampler->collector);
-
-    if (num_samples <= sample_index)
+    if (!PointValidate(point))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (light == NULL)
+    if (rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (pdf == NULL)
+    if (light_sample_list == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    LightSampleCollectorGetSample(&light_sampler->collector,
-                                  sample_index,
-                                  light,
-                                  pdf);
+    LightSampleCollectorClear(&light_sample_list->collector);
 
-    return ISTATUS_SUCCESS;
+    ISTATUS status =
+        light_sampler->vtable->sample_routine(light_sampler->data,
+                                              point,
+                                              rng,
+                                              &light_sample_list->collector);
+
+    return status;
+}
+
+void
+LightSamplerFree(
+    _In_opt_ _Post_invalid_ PLIGHT_SAMPLER light_sampler
+    )
+{
+    if (light_sampler == NULL)
+    {
+        return;
+    }
+
+    if (light_sampler->vtable->free_routine != NULL)
+    {
+        light_sampler->vtable->free_routine(light_sampler->data);
+    }
+
+    free(light_sampler);
 }

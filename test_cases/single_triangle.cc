@@ -165,7 +165,7 @@ void
 TestRender(
     _In_ PCCAMERA camera,
     _In_ PCSCENE scene,
-    _In_ PALL_LIGHT_SAMPLER light_sampler,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name,
     _In_ float_t epsilon
     )
@@ -194,7 +194,6 @@ TestRender(
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -241,12 +240,8 @@ static const float_t pi = (float_t)3.1415926535897932384626433832;
 
 TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -305,7 +300,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -325,7 +321,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -338,12 +334,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -402,7 +394,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -422,7 +415,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -435,12 +428,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -499,7 +488,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -519,7 +509,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -532,12 +522,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -596,7 +582,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -616,7 +603,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -629,12 +616,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestXYTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -693,7 +676,8 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -713,7 +697,7 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -726,12 +710,8 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
 
 TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -790,7 +770,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -810,7 +791,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -823,12 +804,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -887,7 +864,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -907,7 +885,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -920,12 +898,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -984,7 +958,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1004,7 +979,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1017,12 +992,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1081,7 +1052,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1101,7 +1073,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1114,12 +1086,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestXZTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1178,7 +1146,8 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1198,7 +1167,7 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1211,12 +1180,8 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
 
 TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1275,7 +1240,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1295,7 +1261,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1308,12 +1274,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1372,7 +1334,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1392,7 +1355,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1405,12 +1368,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1469,7 +1428,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1489,7 +1449,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1502,12 +1462,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1566,7 +1522,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1586,7 +1543,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1599,12 +1556,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 
 TEST(SingleTriangleTest, TestYZTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1663,7 +1616,8 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1683,7 +1637,7 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1696,12 +1650,8 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1762,7 +1712,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1782,7 +1733,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1795,12 +1746,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1861,7 +1808,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1881,7 +1829,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1894,12 +1842,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -1960,7 +1904,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -1980,7 +1925,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1993,12 +1938,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2059,7 +2000,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2079,7 +2021,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2092,12 +2034,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2158,7 +2096,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2178,7 +2117,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2191,12 +2130,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -2236,7 +2171,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2256,7 +2192,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2266,12 +2202,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2308,7 +2240,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2328,7 +2261,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2338,12 +2271,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -2383,7 +2312,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2403,7 +2333,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2413,12 +2343,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2455,7 +2381,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2475,7 +2402,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2485,12 +2412,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2551,7 +2474,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2571,7 +2495,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2584,12 +2508,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2650,7 +2570,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2670,7 +2591,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2683,12 +2604,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2749,7 +2666,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2769,7 +2687,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2782,12 +2700,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -2848,7 +2762,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2868,7 +2783,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2881,12 +2796,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -2926,7 +2837,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -2946,7 +2858,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2956,12 +2868,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2998,7 +2906,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3018,7 +2927,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3028,12 +2937,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -3073,7 +2978,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3093,7 +2999,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3103,12 +3009,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3145,7 +3047,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3165,7 +3068,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3175,12 +3078,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3241,7 +3140,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3261,7 +3161,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3274,12 +3174,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3340,7 +3236,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3360,7 +3257,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3373,12 +3270,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3439,7 +3332,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3459,7 +3353,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3472,12 +3366,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3538,7 +3428,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3558,7 +3449,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3571,12 +3462,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3637,7 +3524,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3657,7 +3545,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3670,12 +3558,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -3736,7 +3620,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3756,7 +3641,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3769,12 +3654,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -3814,7 +3695,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3834,7 +3716,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3844,12 +3726,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3886,7 +3764,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3906,7 +3785,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3916,12 +3795,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
                                   (float_t)1.0,
                                   (float_t)1.0,
                                   &spectrum);
@@ -3961,7 +3836,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -3981,7 +3857,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
                (float_t)0.01);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3991,12 +3867,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -4033,7 +3905,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCAMERA camera;
@@ -4053,7 +3926,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
                (float_t)0.0);
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);

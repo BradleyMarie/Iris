@@ -12,16 +12,77 @@ Abstract:
 
 --*/
 
-#include "common/pointer_list.h"
+#include <stdalign.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "iris_physx_toolkit/all_light_sampler.h"
 
 //
 // Types
 //
 
-struct _ALL_LIGHT_SAMPLER {
-    POINTER_LIST lights;
-    size_t next_light;
+typedef struct _ALL_LIGHT_SAMPLER {
+    _Field_size_(num_lights) PLIGHT *lights;
+    size_t num_lights;
+} ALL_LIGHT_SAMPLER, *PALL_LIGHT_SAMPLER;
+
+typedef const ALL_LIGHT_SAMPLER *PCALL_LIGHT_SAMPLER;
+
+//
+// Static Functions
+//
+
+static
+ISTATUS
+AllLightSamplerSample(
+    _In_opt_ const void* context,
+    _In_ POINT3 hit,
+    _Inout_ PRANDOM rng,
+    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
+    )
+{
+    PALL_LIGHT_SAMPLER light_sampler = (PALL_LIGHT_SAMPLER)context;
+
+    for (size_t i = 0; i < light_sampler->num_lights; i++)
+    {
+        ISTATUS status =
+            LightSampleCollectorAddSample(collector,
+                                          light_sampler->lights[i],
+                                          (float_t)1.0);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+void
+AllLightSamplerFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PALL_LIGHT_SAMPLER light_sampler = (PALL_LIGHT_SAMPLER)context;
+
+    for (size_t i = 0; i < light_sampler->num_lights; i++)
+    {
+        LightRelease(light_sampler->lights[i]);
+    }
+
+    free(light_sampler->lights);
+}
+
+//
+// Static Data
+//
+
+static const LIGHT_SAMPLER_VTABLE all_light_sampler_vtable = {
+    AllLightSamplerSample,
+    AllLightSamplerFree
 };
 
 //
@@ -30,112 +91,47 @@ struct _ALL_LIGHT_SAMPLER {
 
 ISTATUS
 AllLightSamplerAllocate(
-    _Out_ PALL_LIGHT_SAMPLER *light_sampler
+    _In_reads_(num_lights) PLIGHT *lights,
+    _In_ size_t num_lights,
+    _Out_ PLIGHT_SAMPLER *light_sampler
     )
 {
-    if (light_sampler == NULL)
+    if (lights == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    PALL_LIGHT_SAMPLER result =
-        (PALL_LIGHT_SAMPLER)malloc(sizeof(ALL_LIGHT_SAMPLER));
-
-    if (result == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    if (!PointerListInitialize(&result->lights))
-    {
-        free(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    result->next_light = 0;
-
-    *light_sampler = result;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-AllLightSamplerAddLight(
-    _Inout_ PALL_LIGHT_SAMPLER light_sampler,
-    _In_ PLIGHT light
-    )
-{
     if (light_sampler == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (light == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
+    ALL_LIGHT_SAMPLER result;
+    result.lights = (PLIGHT*)calloc(num_lights, sizeof(PLIGHT));
 
-    if (!PointerListAddPointer(&light_sampler->lights, light))
+    if (result.lights == NULL)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    LightRetain(light);
+    memcpy(result.lights, lights, num_lights * sizeof(PLIGHT));
+    result.num_lights = num_lights;
 
-    return ISTATUS_SUCCESS;
-}
+    ISTATUS status = LightSamplerAllocate(&all_light_sampler_vtable,
+                                          &result,
+                                          sizeof(ALL_LIGHT_SAMPLER),
+                                          alignof(ALL_LIGHT_SAMPLER),
+                                          light_sampler);
 
-void
-AllLightSamplerFree(
-    _In_opt_ _Post_invalid_ PALL_LIGHT_SAMPLER light_sampler
-    )
-{
-    if (light_sampler == NULL)
+    if (status != ISTATUS_SUCCESS)
     {
-        return;
+        free(result.lights);
+        return status;
     }
 
-    size_t num_lights = PointerListGetSize(&light_sampler->lights);
     for (size_t i = 0; i < num_lights; i++)
     {
-        PLIGHT light =
-            (PLIGHT)PointerListRetrieveAtIndex(&light_sampler->lights, i);
-
-        LightRelease(light);
-    }
-
-    PointerListDestroy(&light_sampler->lights);
-    free(light_sampler);
-}
-
-//
-// Callbacks
-//
-
-ISTATUS
-AllLightSamplerSampleLightsCallback(
-    _In_opt_ const void* context,
-    _In_ POINT3 hit,
-    _Inout_ PRANDOM rng,
-    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
-    )
-{
-    PALL_LIGHT_SAMPLER all_light_sampler = (PALL_LIGHT_SAMPLER)context;
-
-    size_t num_lights = PointerListGetSize(&all_light_sampler->lights);
-    for (size_t i = 0; i < num_lights; i++)
-    {
-        PCLIGHT light =
-            (PCLIGHT)PointerListRetrieveAtIndex(&all_light_sampler->lights,
-                                                all_light_sampler->next_light);
-
-        ISTATUS status =
-            LightSampleCollectorAddSample(collector, light, (float_t)1.0);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+        LightRetain(lights[i]);
     }
 
     return ISTATUS_SUCCESS;

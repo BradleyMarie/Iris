@@ -160,7 +160,7 @@ AllocateCubeFromTriangles(
 void
 TestRenderSingleThreaded(
     _In_ PCSCENE scene,
-    _In_ PALL_LIGHT_SAMPLER light_sampler,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -199,7 +199,6 @@ TestRenderSingleThreaded(
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -232,15 +231,11 @@ TestRenderSingleThreaded(
 
 TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)0.0,
+                                          (float_t)1.0,
+                                          (float_t)1.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -307,7 +302,8 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -315,7 +311,7 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                              "test_results/csg_cube_sphere_difference.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -331,15 +327,11 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
 
 TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)0.0,
+                                          (float_t)1.0,
+                                          (float_t)1.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -412,7 +404,8 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -420,7 +413,7 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                              "test_results/csg_sphere_intersection.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -436,15 +429,11 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 
 TEST(ConstructiveSolidGeometryTest, SphereUnion)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)0.0,
+                                          (float_t)1.0,
+                                          (float_t)1.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -517,7 +506,8 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -525,7 +515,7 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                              "test_results/csg_sphere_union.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -541,15 +531,11 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
 
 TEST(ConstructiveSolidGeometryTest, RoundedCube)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)0.0,
+                                          (float_t)1.0,
+                                          (float_t)1.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
@@ -631,7 +617,8 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -639,7 +626,7 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                              "test_results/csg_rounded_cube.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);

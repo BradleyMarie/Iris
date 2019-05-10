@@ -43,8 +43,9 @@ ISTATUS
 PathTracerIntegrate(
     _In_opt_ const void *context,
     _In_ PCRAY ray,
+    _In_ PCLIGHT_SAMPLER light_sampler,
+    _Inout_ PLIGHT_SAMPLE_LIST light_sample_list,
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
-    _Inout_ PLIGHT_SAMPLER light_sampler,
     _Inout_ PVISIBILITY_TESTER visibility_tester,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
     _Inout_ PREFLECTOR_COMPOSITOR allocator,
@@ -93,25 +94,27 @@ PathTracerIntegrate(
             break;
         }
 
-        size_t light_samples;
-        status = LightSamplerCollectSamples(light_sampler,
-                                            rng,
-                                            hit_point,
-                                            &light_samples);
+        status = LightSamplerSample(light_sampler,
+                                    hit_point,
+                                    rng,
+                                    light_sample_list);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
+        size_t light_samples;
+        status = LightSampleListGetSize(light_sample_list, &light_samples);
+
         for (size_t index = 0; index < light_samples; index++)
         {
             PCLIGHT light;
             float_t pdf;
-            status = LightSamplerGetSample(light_sampler,
-                                           index,
-                                           &light,
-                                           &pdf);
+            status = LightSampleListGetSample(light_sample_list,
+                                              index,
+                                              &light,
+                                              &pdf);
 
             if (status != ISTATUS_SUCCESS)
             {

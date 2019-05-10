@@ -23,11 +23,18 @@ Abstract:
 
 typedef
 ISTATUS
-(*PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE)(
+(*PLIGHT_SAMPLER_SAMPLE_ROUTINE)(
     _In_opt_ const void* context,
     _In_ POINT3 point,
     _Inout_ PRANDOM rng,
     _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
     );
+
+typedef struct _LIGHT_SAMPLER_VTABLE {
+    PLIGHT_SAMPLER_SAMPLE_ROUTINE sample_routine;
+    PFREE_ROUTINE free_routine;
+} LIGHT_SAMPLER_VTABLE, *PLIGHT_SAMPLER_VTABLE;
+
+typedef const LIGHT_SAMPLER_VTABLE *PCLIGHT_SAMPLER_VTABLE;
 
 #endif // _IRIS_PHYSX_LIGHT_SAMPLER_VTABLE_

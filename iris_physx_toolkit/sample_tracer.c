@@ -23,8 +23,7 @@ Abstract:
 typedef struct _PHYSX_SAMPLE_TRACER {
     PINTEGRATOR integrator;
     PCSCENE scene;
-    PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine;
-    const void* sample_lights_context;
+    PCLIGHT_SAMPLER light_sampler;
     PCOLOR_INTEGRATOR color_integrator;
 } PHYSX_SAMPLE_TRACER, *PPHYSX_SAMPLE_TRACER;
 
@@ -49,8 +48,7 @@ PhysxSampleTracerTraceRay(
     ISTATUS status =
         IntegratorIntegrate(physx_sample_tracer->integrator,
                             physx_sample_tracer->scene,
-                            physx_sample_tracer->sample_lights_routine,
-                            physx_sample_tracer->sample_lights_context,
+                            physx_sample_tracer->light_sampler,
                             physx_sample_tracer->color_integrator,
                             rng,
                             *ray,
@@ -75,8 +73,7 @@ PhysxSpectralSampleTracerTraceRay(
     ISTATUS status =
         IntegratorIntegrateSpectral(physx_sample_tracer->integrator,
                                     physx_sample_tracer->scene,
-                                    physx_sample_tracer->sample_lights_routine,
-                                    physx_sample_tracer->sample_lights_context,
+                                    physx_sample_tracer->light_sampler,
                                     physx_sample_tracer->color_integrator,
                                     rng,
                                     *ray,
@@ -107,8 +104,7 @@ PhysxSampleTracerDuplicate(
     status =
         PhysxSampleTracerAllocate(integrator,
                                   physx_sample_tracer->scene,
-                                  physx_sample_tracer->sample_lights_routine,
-                                  physx_sample_tracer->sample_lights_context,
+                                  physx_sample_tracer->light_sampler,
                                   physx_sample_tracer->color_integrator,
                                   duplicate);
 
@@ -141,8 +137,7 @@ PhysxSpectralSampleTracerDuplicate(
     status =
         PhysxSpectralSampleTracerAllocate(integrator,
                                           physx_sample_tracer->scene,
-                                          physx_sample_tracer->sample_lights_routine,
-                                          physx_sample_tracer->sample_lights_context,
+                                          physx_sample_tracer->light_sampler,
                                           physx_sample_tracer->color_integrator,
                                           duplicate);
 
@@ -171,8 +166,7 @@ PhysxSampleTracerAllocateInternal(
     _In_ PCSAMPLE_TRACER_VTABLE vtable,
     _In_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
@@ -187,26 +181,25 @@ PhysxSampleTracerAllocateInternal(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (sample_lights_routine == NULL)
+    if (light_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (color_integrator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (sample_tracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     PHYSX_SAMPLE_TRACER physx_sample_tracer;
     physx_sample_tracer.integrator = integrator;
     physx_sample_tracer.scene = scene;
-    physx_sample_tracer.sample_lights_routine = sample_lights_routine;
-    physx_sample_tracer.sample_lights_context = sample_lights_context;
+    physx_sample_tracer.light_sampler = light_sampler;
     physx_sample_tracer.color_integrator = color_integrator;
 
     ISTATUS status = SampleTracerAllocate(vtable,
@@ -247,8 +240,7 @@ ISTATUS
 PhysxSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
@@ -257,8 +249,7 @@ PhysxSampleTracerAllocate(
         PhysxSampleTracerAllocateInternal(&sample_tracer_vtable,
                                           integrator,
                                           scene,
-                                          sample_lights_routine,
-                                          sample_lights_context,
+                                          light_sampler,
                                           color_integrator,
                                           sample_tracer);
 
@@ -269,8 +260,7 @@ ISTATUS
 PhysxSpectralSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
@@ -279,8 +269,7 @@ PhysxSpectralSampleTracerAllocate(
         PhysxSampleTracerAllocateInternal(&spectal_sample_tracer_vtable,
                                           integrator,
                                           scene,
-                                          sample_lights_routine,
-                                          sample_lights_context,
+                                          light_sampler,
                                           color_integrator,
                                           sample_tracer);
 

@@ -47,6 +47,18 @@ LightSampleListInitialize(
 static
 inline
 void
+LightSampleListClear(
+    _Inout_ struct _LIGHT_SAMPLE_LIST *list
+    )
+{
+    assert(list != NULL);
+
+    LightSampleCollectorClear(&list->collector);
+}
+
+static
+inline
+void
 LightSampleListDestroy(
     _Inout_ struct _LIGHT_SAMPLE_LIST *list
     )

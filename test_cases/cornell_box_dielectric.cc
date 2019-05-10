@@ -41,7 +41,7 @@ void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_ PCSCENE scene,
-    _In_ PONE_LIGHT_SAMPLER light_sampler,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
     )
@@ -66,7 +66,6 @@ TestRenderSingleThreaded(
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        OneLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -84,6 +83,8 @@ TestRenderSingleThreaded(
                               (float_t)0.01,
                               1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    WriteToPfmFile(framebuffer, "/mnt/c/Users/Brad/Documents/out.pfm", PFM_PIXEL_FORMAT_SRGB);
 
     bool equals;
     status = ApproximatelyEqualsPfmFile(framebuffer,
@@ -240,10 +241,6 @@ TEST(CornellBoxDielectricTest, CornellBox)
     status = ConstantEmissiveMaterialAllocate(light_spectrum, &light_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PONE_LIGHT_SAMPLER light_sampler;
-    status = OneLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     std::vector<PSHAPE> shapes;
 
     PSHAPE light_shape0, light_shape1;
@@ -269,16 +266,15 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                &light0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = OneLightSamplerAddLight(light_sampler, light0);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PLIGHT light1;
     status = AreaLightAllocate(light_shape1,
                                TRIANGLE_BACK_FACE,
                                &light1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = OneLightSamplerAddLight(light_sampler, light1);
+    PLIGHT lights[2] = { light0, light1 };
+    PLIGHT_SAMPLER light_sampler;
+    status = OneLightSamplerAllocate(lights, 2, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     AddQuadToScene(
@@ -409,7 +405,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     LightRelease(light0);
     LightRelease(light1);
     SceneFree(scene);
-    OneLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     CameraFree(camera);
     ColorIntegratorFree(color_integrator);
 }

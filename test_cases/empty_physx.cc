@@ -65,8 +65,9 @@ TEST(EmptyPhysx, ListScene)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    PLIGHT light = nullptr;
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 0, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
@@ -77,7 +78,6 @@ TEST(EmptyPhysx, ListScene)
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -103,7 +103,7 @@ TEST(EmptyPhysx, ListScene)
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
     ColorIntegratorFree(color_integrator);
@@ -150,8 +150,9 @@ TEST(EmptyPhysx, KdTreeScene)
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PALL_LIGHT_SAMPLER light_sampler;
-    status = AllLightSamplerAllocate(&light_sampler);
+    PLIGHT light = nullptr;
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 0, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
@@ -162,7 +163,6 @@ TEST(EmptyPhysx, KdTreeScene)
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -188,7 +188,7 @@ TEST(EmptyPhysx, KdTreeScene)
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
     ColorIntegratorFree(color_integrator);

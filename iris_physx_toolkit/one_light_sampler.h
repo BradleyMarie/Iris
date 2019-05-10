@@ -21,43 +21,11 @@ Abstract:
 extern "C" {
 #endif // __cplusplus
 
-//
-// Types
-//
-
-typedef struct _ONE_LIGHT_SAMPLER ONE_LIGHT_SAMPLER, *PONE_LIGHT_SAMPLER;
-typedef const ONE_LIGHT_SAMPLER *PCONE_LIGHT_SAMPLER;
-
-//
-// Functions
-//
-
 ISTATUS
 OneLightSamplerAllocate(
-    _Out_ PONE_LIGHT_SAMPLER *light_sampler
-    );
-
-ISTATUS
-OneLightSamplerAddLight(
-    _Inout_ PONE_LIGHT_SAMPLER light_sampler,
-    _In_ PLIGHT light
-    );
-
-void
-OneLightSamplerFree(
-    _In_opt_ _Post_invalid_ PONE_LIGHT_SAMPLER light_sampler
-    );
-
-//
-// Callback Functions
-//
-
-ISTATUS 
-OneLightSamplerSampleLightsCallback(
-    _In_opt_ const void* context,
-    _In_ POINT3 hit,
-    _Inout_ PRANDOM rng,
-    _Inout_ PLIGHT_SAMPLE_COLLECTOR collector
+    _In_reads_(num_lights) PLIGHT *lights,
+    _In_ size_t num_lights,
+    _Out_ PLIGHT_SAMPLER *light_sampler
     );
 
 #if __cplusplus 

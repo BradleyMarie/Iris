@@ -37,8 +37,7 @@ ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
@@ -50,8 +49,7 @@ ISTATUS
 IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
     _In_ PCSCENE scene,
-    _In_ PLIGHT_SAMPLER_SAMPLE_LIGHTS_ROUTINE sample_lights_routine,
-    _In_opt_ const void* sample_lights_context,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,

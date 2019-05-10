@@ -148,7 +148,7 @@ cc_library(
         ":color_integrator",
         ":color_integrator_internal",
         ":integrator_vtable",
-        ":light_sampler_internal",
+        ":light_sample_list_internal",
         ":ray_tracer_internal",
         ":scene",
         ":scene_internal",
@@ -184,6 +184,8 @@ cc_library(
         ":hit_tester",
         ":integrator",
         ":light",
+        ":light_sample_collector",
+        ":light_sample_list",
         ":light_sampler",
         ":material",
         ":ray_tracer",
@@ -261,19 +263,10 @@ cc_library(
     hdrs = ["light_sampler.h"],
     srcs = ["light_sampler.c"],
     deps = [
-        ":light",
-        ":light_sampler_internal",
-    ],
-)
-
-cc_library(
-    name = "light_sampler_internal",
-    hdrs = ["light_sampler_internal.h"],
-    deps = [
-        ":light",
-        ":light_sample_collector",
-        ":light_sample_collector_internal",
+        ":light_sample_list",
+        ":light_sample_list_internal",
         ":light_sampler_vtable",
+        "//common:alloc"
     ],
 )
 
@@ -281,7 +274,7 @@ cc_library(
     name = "light_sampler_vtable",
     hdrs = ["light_sampler_vtable.h"],
     deps = [
-        ":light",
+        ":light_sample_collector",
     ],
 )
 

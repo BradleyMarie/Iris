@@ -32,7 +32,7 @@ Abstract:
 void
 TestRenderSingleThreaded(
     _In_ PCSCENE scene,
-    _In_ PALL_LIGHT_SAMPLER light_sampler,
+    _In_ PCLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -71,7 +71,6 @@ TestRenderSingleThreaded(
     status = PhysxSampleTracerAllocate(
         path_tracer,
         scene,
-        AllLightSamplerSampleLightsCallback,
         light_sampler,
         color_integrator,
         &sample_tracer);
@@ -100,15 +99,11 @@ TestRenderSingleThreaded(
 
 TEST(SingleSphereTest, TestReflectorRedWorldSphere)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -153,7 +148,8 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -161,7 +157,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
                              "TestReflectorRedWorldSphere.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -172,15 +168,11 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
 
 TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -229,7 +221,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -237,7 +230,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
                              "TestReflectorRedTransformedAwaySphere.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -249,15 +242,11 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
 
 TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -306,7 +295,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -314,7 +304,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
                              "TestReflectorRedTransformedUpSphere.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -326,15 +316,11 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
 
 TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
 {
-    PALL_LIGHT_SAMPLER light_sampler;
-    ISTATUS status = AllLightSamplerAllocate(&light_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PSPECTRUM spectrum;
-    status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &spectrum);
+    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
+                                          (float_t)0.0,
+                                          (float_t)0.0,
+                                          &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
@@ -383,7 +369,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = AllLightSamplerAddLight(light_sampler, light);
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     TestRenderSingleThreaded(scene,
@@ -391,7 +378,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
                              "TestReflectorRedTransformedRightSphere.pfm");
 
     SceneFree(scene);
-    AllLightSamplerFree(light_sampler);
+    LightSamplerFree(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
