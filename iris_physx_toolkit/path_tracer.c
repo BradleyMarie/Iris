@@ -338,8 +338,9 @@ PathTracerAllocate(
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
 
-    if (!isgreaterequal(min_termination_probability, (float_t)0.0) ||
-        !isless(min_termination_probability, (float_t)1.0))
+    if (!isfinite(min_termination_probability) ||
+        min_termination_probability < (float_t)0.0 ||
+        (float_t)1.0 < min_termination_probability)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
