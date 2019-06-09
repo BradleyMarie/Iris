@@ -45,6 +45,11 @@ OneLightSamplerSample(
 {
     PONE_LIGHT_SAMPLER light_sampler = (PONE_LIGHT_SAMPLER)context;
 
+    if (light_sampler->num_lights == 0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     size_t light_index;
     ISTATUS status = RandomGenerateIndex(rng,
                                          light_sampler->num_lights,
@@ -109,16 +114,25 @@ OneLightSamplerAllocate(
     }
 
     ONE_LIGHT_SAMPLER result;
-    result.lights = (PLIGHT*)calloc(num_lights, sizeof(PLIGHT));
-
-    if (result.lights == NULL)
+    if (num_lights != 0)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        result.lights = (PLIGHT*)calloc(num_lights, sizeof(PLIGHT));
+
+        if (result.lights == NULL)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        memcpy(result.lights, lights, num_lights * sizeof(PLIGHT));
+        result.pdf = (float_t)1.0 / (float_t)num_lights;
+    }
+    else
+    {
+        result.lights = NULL;
+        result.pdf = (float_t)0.0;
     }
 
-    memcpy(result.lights, lights, num_lights * sizeof(PLIGHT));
     result.num_lights = num_lights;
-    result.pdf = (float_t)1.0 / (float_t)num_lights;
 
     ISTATUS status = LightSamplerAllocate(&one_light_sampler_vtable,
                                           &result,

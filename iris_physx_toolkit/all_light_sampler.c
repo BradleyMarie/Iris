@@ -107,14 +107,22 @@ AllLightSamplerAllocate(
     }
 
     ALL_LIGHT_SAMPLER result;
-    result.lights = (PLIGHT*)calloc(num_lights, sizeof(PLIGHT));
-
-    if (result.lights == NULL)
+    if (num_lights != 0)
     {
-        return ISTATUS_ALLOCATION_FAILED;
+        result.lights = (PLIGHT*)calloc(num_lights, sizeof(PLIGHT));
+
+        if (result.lights == NULL)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        memcpy(result.lights, lights, num_lights * sizeof(PLIGHT));
+    }
+    else
+    {
+        result.lights = NULL;
     }
 
-    memcpy(result.lights, lights, num_lights * sizeof(PLIGHT));
     result.num_lights = num_lights;
 
     ISTATUS status = LightSamplerAllocate(&all_light_sampler_vtable,
