@@ -98,14 +98,14 @@ OneLightSamplerAllocate(
     _Out_ PLIGHT_SAMPLER *light_sampler
     )
 {
-    if (lights == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (light_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (lights == NULL && num_lights != 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
 
     ONE_LIGHT_SAMPLER result;
