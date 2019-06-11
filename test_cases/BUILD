@@ -115,10 +115,15 @@ cc_test(
 cc_test(
     name = "single_sphere",
     srcs = ["single_sphere.cc"],
+    data = [
+        "//test_results:sphere_away.pfm",
+        "//test_results:sphere_center.pfm",
+        "//test_results:sphere_right.pfm",
+        "//test_results:sphere_up.pfm",
+    ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
-        "//iris_camera_toolkit:pfm_writer",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",
@@ -129,6 +134,7 @@ cc_test(
         "//iris_physx_toolkit:sample_tracer",
         "//iris_physx_toolkit:sphere",
         "//test_util:spectra",
+        "//test_util:pfm",
         "@com_google_googletest//:gtest_main",
     ],
 )

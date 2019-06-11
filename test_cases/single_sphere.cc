@@ -16,7 +16,6 @@ Abstract:
 
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_pixel_sampler.h"
-#include "iris_camera_toolkit/pfm_writer.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/constant_material.h"
@@ -28,6 +27,7 @@ Abstract:
 #include "iris_physx_toolkit/sphere.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/spectra.h"
+#include "test_util/pfm.h"
 
 void
 TestRenderSingleThreaded(
@@ -77,17 +77,21 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
-    status = FramebufferAllocate(500, 500, &framebuffer);
+    status = FramebufferAllocate(150, 150, &framebuffer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRenderSingleThreaded(
         camera, pixel_sampler, sample_tracer, rng, framebuffer, (float_t)0.001);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = WriteToPfmFile(framebuffer,
-                            file_name.c_str(),
-                            PFM_PIXEL_FORMAT_XYZ);
-    EXPECT_EQ(status, ISTATUS_SUCCESS);
+    bool equals;
+    status = ApproximatelyEqualsPfmFile(framebuffer,
+                                        file_name.c_str(),
+                                        PFM_PIXEL_FORMAT_XYZ,
+                                        (float_t)0.001,
+                                        &equals);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+    EXPECT_TRUE(equals);
 
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
@@ -154,7 +158,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
 
     TestRenderSingleThreaded(scene,
                              light_sampler, 
-                             "TestReflectorRedWorldSphere.pfm");
+                             "test_results/sphere_center.pfm");
 
     SceneFree(scene);
     LightSamplerFree(light_sampler);
@@ -227,7 +231,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
 
     TestRenderSingleThreaded(scene,
                              light_sampler, 
-                             "TestReflectorRedTransformedAwaySphere.pfm");
+                             "test_results/sphere_away.pfm");
 
     SceneFree(scene);
     LightSamplerFree(light_sampler);
@@ -301,7 +305,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
 
     TestRenderSingleThreaded(scene,
                              light_sampler, 
-                             "TestReflectorRedTransformedUpSphere.pfm");
+                             "test_results/sphere_up.pfm");
 
     SceneFree(scene);
     LightSamplerFree(light_sampler);
@@ -375,7 +379,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
 
     TestRenderSingleThreaded(scene,
                              light_sampler, 
-                             "TestReflectorRedTransformedRightSphere.pfm");
+                             "test_results/sphere_right.pfm");
 
     SceneFree(scene);
     LightSamplerFree(light_sampler);
