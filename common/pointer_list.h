@@ -205,7 +205,7 @@ static
 inline
 void
 PointerListDestroy(
-    _Inout_  PPOINTER_LIST list
+    _Inout_ PPOINTER_LIST list
     )
 {
     assert(list != NULL);

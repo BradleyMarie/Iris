@@ -18,6 +18,7 @@ Abstract:
 #include <stdatomic.h>
 #include <stdlib.h>
 
+#include "common/pointer_list.h"
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/framebuffer_internal.h"
 #include "iris_camera/pixel_sampler_internal.h"
@@ -37,13 +38,13 @@ Abstract:
 typedef struct _RENDER_THREAD_LOCAL_STATE {
     PPIXEL_SAMPLER pixel_sampler;
     PSAMPLE_TRACER sample_tracer;
-    PRANDOM rng;
     ISTATUS status;
 } RENDER_THREAD_LOCAL_STATE, *PRENDER_THREAD_LOCAL_STATE;
 
 typedef struct _RENDER_THREAD_SHARED_STATE {
     PCCAMERA camera;
     PFRAMEBUFFER framebuffer;
+    POINTER_LIST rngs;
     float_t epsilon;
     atomic_bool cancelled;
     atomic_size_t pixel;
@@ -76,7 +77,6 @@ IrisCameraFreeThreadState(
     {
         PixelSamplerFree(thread_state[i].local.pixel_sampler);
         SampleTracerFree(thread_state[i].local.sample_tracer);
-        RandomFree(thread_state[i].local.rng);
     }
 
     free(thread_state);
@@ -89,14 +89,12 @@ IrisCameraAllocateThreadState(
     _In_ PRENDER_THREAD_SHARED_STATE shared_state,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
-    _Inout_ PRANDOM rng,
     _Outptr_result_buffer_(num_threads) PRENDER_THREAD_CONTEXT *thread_state
     )
 {
     assert(num_threads != 0);
     assert(pixel_sampler != NULL);
     assert(sample_tracer != NULL);
-    assert(rng != NULL);
     assert(thread_state != NULL);
 
     PRENDER_THREAD_CONTEXT result =
@@ -110,7 +108,6 @@ IrisCameraAllocateThreadState(
     result[0].shared = shared_state;
     result[0].local.pixel_sampler = pixel_sampler;
     result[0].local.sample_tracer = sample_tracer;
-    result[0].local.rng = rng;
 
     for (size_t i = 1; i < num_threads; i++)
     {
@@ -134,14 +131,6 @@ IrisCameraAllocateThreadState(
             return status;
         }
 
-        status = RandomReplicate(rng, &result[i].local.rng);
-        
-        if (status != ISTATUS_SUCCESS)
-        {
-            IrisCameraFreeThreadState(num_threads, result);
-            return status;
-        }
-
         result[i].local.status = ISTATUS_SUCCESS;
     }
 
@@ -154,6 +143,7 @@ static
 bool
 IrisCameraRenderPixel(
     _Inout_ PRENDER_THREAD_CONTEXT context,
+    _Inout_ PRANDOM rng,
     _In_ float_t pixel_u_width,
     _In_ float_t pixel_v_width,
     _In_ size_t pixel_column,
@@ -161,6 +151,7 @@ IrisCameraRenderPixel(
     )
 {
     assert(context != NULL);
+    assert(rng != NULL);
     assert(isfinite(pixel_u_width));
     assert((float_t)0.0 < pixel_u_width);
     assert(isfinite(pixel_v_width));
@@ -179,7 +170,7 @@ IrisCameraRenderPixel(
     size_t num_samples;
     ISTATUS status =
         PixelSamplerPrepareSamples(context->local.pixel_sampler,
-                                   context->local.rng,
+                                   rng,
                                    pixel_u_min,
                                    pixel_u_max,
                                    pixel_v_min,
@@ -210,7 +201,7 @@ IrisCameraRenderPixel(
         float_t pixel_u, pixel_v, lens_u, lens_v;
         ISTATUS status =
             PixelSamplerGetSample(context->local.pixel_sampler,
-                                  context->local.rng,
+                                  rng,
                                   index,
                                   &pixel_u,
                                   &pixel_v,
@@ -242,7 +233,7 @@ IrisCameraRenderPixel(
         COLOR3 sample_color;
         status = SampleTracerTrace(context->local.sample_tracer,
                                    &ray,
-                                   context->local.rng,
+                                   rng,
                                    context->shared->epsilon,
                                    &sample_color);
 
@@ -313,12 +304,19 @@ IrisCameraRenderThread(
             continue;
         }
 
+        size_t chunk_index = chunk_start / CHUNK_SIZE;
+
         for (size_t i = chunk_start; i < chunk_end; i++)
         {
             size_t column = i % num_columns;
             size_t row = i / num_columns;
 
+            PRANDOM rng =
+                PointerListRetrieveAtIndex(&thread_context->shared->rngs,
+                                           chunk_index);
+
             success = IrisCameraRenderPixel(thread_context,
+                                            rng,
                                             pixel_u_width,
                                             pixel_v_width,
                                             column,
@@ -337,6 +335,22 @@ IrisCameraRenderThread(
     }
 
     return NULL;
+}
+
+void
+IrisCameraFreeRngs(
+    _Inout_ PPOINTER_LIST rng_list
+    )
+{
+    assert(rng_list != NULL);
+
+    size_t num_rngs = PointerListGetSize(rng_list);
+
+    for (size_t i = 0; i < num_rngs; i++)
+    {
+        PRANDOM rng = PointerListRetrieveAtIndex(rng_list, i);
+        RandomFree(rng);
+    }
 }
 
 //
@@ -407,16 +421,63 @@ IrisCameraRender(
     shared_state.cancelled = false;
     shared_state.pixel = 0;
 
+    bool success = PointerListInitialize(&shared_state.rngs);
+
+    if (!success)
+    {
+        free(threads);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t num_columns, num_rows;
+    FramebufferGetSize(framebuffer,
+                       &num_columns,
+                       &num_rows);
+    size_t num_pixels = num_columns * num_rows;
+
+    size_t num_chunks = num_pixels / CHUNK_SIZE;
+
+    if (num_pixels % CHUNK_SIZE != 0)
+    {
+        num_chunks += 1;
+    }
+
+    success = PointerListPrepareToAddPointers(&shared_state.rngs, num_chunks);
+
+    if (!success)
+    {
+        PointerListDestroy(&shared_state.rngs);
+        free(threads);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < num_chunks; i++)
+    {
+        PRANDOM replicated_rng;
+        ISTATUS status = RandomReplicate(rng, &replicated_rng);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            IrisCameraFreeRngs(&shared_state.rngs);
+            PointerListDestroy(&shared_state.rngs);
+            free(threads);
+            return status;
+        }
+
+        PointerListAddPointer(&shared_state.rngs, replicated_rng);
+    }
+
     PRENDER_THREAD_CONTEXT thread_contexts;
     ISTATUS status = IrisCameraAllocateThreadState(number_of_threads,
                                                    &shared_state,
                                                    pixel_sampler,
                                                    sample_tracer,
-                                                   rng,
                                                    &thread_contexts);
 
     if (status != ISTATUS_SUCCESS)
     {
+        IrisCameraFreeRngs(&shared_state.rngs);
+        PointerListDestroy(&shared_state.rngs);
         free(threads);
         return status;
     }
@@ -462,6 +523,8 @@ IrisCameraRender(
     }
 
     IrisCameraFreeThreadState(number_of_threads, thread_contexts);
+    IrisCameraFreeRngs(&shared_state.rngs);
+    PointerListDestroy(&shared_state.rngs);
     free(threads);
 
     return status;

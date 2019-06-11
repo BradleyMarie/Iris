@@ -102,6 +102,7 @@ cc_library(
         ":pixel_sampler_internal",
         ":sample_tracer",
         ":sample_tracer_internal",
+        "//common:pointer_list",
     ],
 )
 
