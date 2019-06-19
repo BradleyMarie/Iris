@@ -538,12 +538,12 @@ TriangleAllocate(
 
     if (!PointValidate(v1))
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (!PointValidate(v2))
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (shape == NULL)
@@ -602,17 +602,17 @@ EmissiveTriangleAllocate(
 
     if (!PointValidate(v1))
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (!PointValidate(v2))
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (shape == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     EMISSIVE_TRIANGLE triangle;
