@@ -518,11 +518,12 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
 };
 
 //
-// Functions
+// Static Functions
 //
 
+static
 ISTATUS
-TriangleAllocate(
+TriangleAllocateInternal(
     _In_ POINT3 v0,
     _In_ POINT3 v1,
     _In_ POINT3 v2,
@@ -531,25 +532,10 @@ TriangleAllocate(
     _Out_ PSHAPE *shape
     )
 {
-    if (!PointValidate(v0))
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (!PointValidate(v1))
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (!PointValidate(v2))
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (shape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
+    assert(PointValidate(v0));
+    assert(PointValidate(v1));
+    assert(PointValidate(v2));
+    assert(shape != NULL);
 
     TRIANGLE triangle;
     bool success = TriangleInitialize(v0,
@@ -583,6 +569,50 @@ TriangleAllocate(
     return ISTATUS_SUCCESS;
 }
 
+//
+// Functions
+//
+
+ISTATUS
+TriangleAllocate(
+    _In_ POINT3 v0,
+    _In_ POINT3 v1,
+    _In_ POINT3 v2,
+    _In_opt_ PMATERIAL front_material,
+    _In_opt_ PMATERIAL back_material,
+    _Out_ PSHAPE *shape
+    )
+{
+    if (!PointValidate(v0))
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!PointValidate(v1))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!PointValidate(v2))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    ISTATUS status = TriangleAllocateInternal(v0,
+                                              v1,
+                                              v2,
+                                              front_material,
+                                              back_material,
+                                              shape);
+
+    return status;
+}
+
 ISTATUS
 EmissiveTriangleAllocate(
     _In_ POINT3 v0,
@@ -613,6 +643,19 @@ EmissiveTriangleAllocate(
     if (shape == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (front_emissive_material == NULL &&
+        back_emissive_material == NULL)
+    {
+        ISTATUS status = TriangleAllocateInternal(v0,
+                                                  v1,
+                                                  v2,
+                                                  front_material,
+                                                  back_material,
+                                                  shape);
+
+        return status;
     }
 
     EMISSIVE_TRIANGLE triangle;
