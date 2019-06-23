@@ -40,7 +40,7 @@ ShapeHitTesterTestWorldShape(
 {
     if (shape == NULL)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
@@ -65,7 +65,7 @@ ShapeHitTesterTestPremultipliedShape(
 {
     if (shape == NULL)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
@@ -91,7 +91,7 @@ ShapeHitTesterTestTransformedShape(
 {
     if (shape == NULL)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
@@ -118,7 +118,7 @@ ShapeHitTesterTestShape(
 {
     if (shape == NULL)
     {
-        return ISTATUS_SUCCESS;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
@@ -143,14 +143,14 @@ ShapeHitTesterTestNestedShape(
     _Out_ PHIT *hits
     )
 {
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
     if (hits == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (shape == NULL)
-    {
-        return ISTATUS_NO_INTERSECTION;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =

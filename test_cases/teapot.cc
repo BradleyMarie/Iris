@@ -258,14 +258,17 @@ TEST(TeapotTest, FlatShadedTeapot)
             material,
             nullptr,
             &shape);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-        if (shape)
+        if (status == ISTATUS_SUCCESS)
         {
             shapes[num_shapes] = shape;
             transforms[num_shapes] = nullptr;
             premultiplied[num_shapes] = false;
             num_shapes += 1;
+        }
+        else
+        {
+            ASSERT_EQ(status, ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
         }
     }
 
@@ -355,7 +358,6 @@ TEST(TeapotTest, SmoothShadedTeapot)
             material,
             nullptr,
             &shape);
-        ASSERT_EQ(status, ISTATUS_SUCCESS);
 
         if (shape)
         {
@@ -363,6 +365,10 @@ TEST(TeapotTest, SmoothShadedTeapot)
             transforms[num_shapes] = nullptr;
             premultiplied[num_shapes] = false;
             num_shapes += 1;
+        }
+        else
+        {
+            ASSERT_EQ(status, ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
         }
 
         MaterialRelease(material);

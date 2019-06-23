@@ -1261,6 +1261,14 @@ KdTreeSceneAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
+    for (size_t i = 0; i < num_shapes; i++)
+    {
+        if (shapes[i] == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+    }
+
     if (transforms == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
