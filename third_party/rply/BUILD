@@ -9,6 +9,6 @@ cc_library(
     ],
     srcs = ["rply.c"],
     visibility = [
-        "//iris_plysx_toolkit:__pkg__",
+        "//iris_physx_toolkit:__pkg__",
     ],
 )

@@ -275,7 +275,6 @@ static void *ply_grow_array(p_ply ply, void **pointer, long *nmemb, long size);
  * Special functions
  * ---------------------------------------------------------------------- */
 static e_ply_storage_mode ply_arch_endian(void);
-static int ply_type_check(void);
 
 /* ----------------------------------------------------------------------
  * Auxiliary read functions
@@ -375,10 +374,6 @@ p_ply ply_open_from_file(FILE *fp, p_ply_error_cb error_cb,
     p_ply ply;
     if (error_cb == NULL) error_cb = ply_error_cb;
     assert(fp);
-    if (!ply_type_check()) {
-        error_cb(NULL, "Incompatible type system");
-        return NULL;
-    }
     ply = ply_alloc();
     if (!ply) {
         error_cb(NULL, "Out of memory");
@@ -477,10 +472,6 @@ p_ply ply_create_to_file(FILE *fp, e_ply_storage_mode storage_mode,
         p_ply_error_cb error_cb, long idata, void *pdata) {
     p_ply ply;
     assert(fp && storage_mode <= PLY_DEFAULT);
-    if (!ply_type_check()) {
-        error_cb(NULL, "Incompatible type system");
-        return NULL;
-    }
     ply = ply_alloc();
     if (!ply) {
         error_cb(NULL, "Out of memory");
@@ -1300,25 +1291,14 @@ static e_ply_storage_mode ply_arch_endian(void) {
     else return PLY_BIG_ENDIAN;
 }
 
-static int ply_type_check(void) {
-    assert(sizeof(t_ply_int8) == 1);
-    assert(sizeof(t_ply_uint8) == 1);
-    assert(sizeof(t_ply_int16) == 2);
-    assert(sizeof(t_ply_uint16) == 2);
-    assert(sizeof(t_ply_int32) == 4);
-    assert(sizeof(t_ply_uint32) == 4);
-    assert(sizeof(float) == 4);
-    assert(sizeof(double) == 8);
-    if (sizeof(t_ply_int8) != 1) return 0;
-    if (sizeof(t_ply_uint8) != 1) return 0;
-    if (sizeof(t_ply_int16) != 2) return 0;
-    if (sizeof(t_ply_uint16) != 2) return 0;
-    if (sizeof(t_ply_int32) != 4) return 0;
-    if (sizeof(t_ply_uint32) != 4) return 0;
-    if (sizeof(float) != 4) return 0;
-    if (sizeof(double) != 8) return 0;
-    return 1;
-}
+static_assert(sizeof(t_ply_int8) == 1, "sizeof(t_ply_int8) != 1");
+static_assert(sizeof(t_ply_uint8) == 1, "sizeof(t_ply_uint8) != 1");
+static_assert(sizeof(t_ply_int16) == 2, "sizeof(t_ply_int16) != 2");
+static_assert(sizeof(t_ply_uint16) == 2, "sizeof(t_ply_uint16) != 2");
+static_assert(sizeof(t_ply_int32) == 4, "sizeof(t_ply_int32) != 4");
+static_assert(sizeof(t_ply_uint32) == 4, "sizeof(t_ply_uint32) != 4");
+static_assert(sizeof(float) == 4, "sizeof(float) != 4");
+static_assert(sizeof(double) == 8, "sizeof(double) != 8");
 
 /* ----------------------------------------------------------------------
  * Output handlers

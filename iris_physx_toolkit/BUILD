@@ -149,6 +149,17 @@ cc_library(
 )
 
 cc_library(
+    name = "ply_reader",
+    hdrs = ["ply_reader.h"],
+    srcs = ["ply_reader.c"],
+    deps = [
+        ":triangle",
+        "//iris_physx:iris_physx",
+        "//third_party/rply:rply",
+    ],
+)
+
+cc_library(
     name = "point_light",
     hdrs = ["point_light.h"],
     srcs = ["point_light.c"],
