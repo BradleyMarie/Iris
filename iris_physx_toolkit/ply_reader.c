@@ -23,6 +23,27 @@ Abstract:
 #include "third_party/rply/rplyfile.h"
 
 //
+// Types
+//
+
+typedef struct _RPLY_CONTEXT {
+    _Field_size_(num_vertices) float_t *x_list;
+    _Field_size_(num_vertices) float_t *y_list;
+    _Field_size_(num_vertices) float_t *z_list;
+    _Field_size_(num_vertices) float_t *nx_list;
+    _Field_size_(num_vertices) float_t *ny_list;
+    _Field_size_(num_vertices) float_t *nz_list;
+    _Field_size_(num_vertices) float_t *u_list;
+    _Field_size_(num_vertices) float_t *v_list;
+    size_t num_vertices;
+    _Field_size_(num_faces) size_t *vertex0_list;
+    _Field_size_(num_faces) size_t *vertex1_list;
+    _Field_size_(num_faces) size_t *vertex2_list;
+    _Field_size_(num_faces) uint32_t *face_index_list;
+    size_t num_faces;
+} RPLY_CONTEXT, *PRPLY_CONTEXT;
+
+//
 // Static Functions
 //
 
