@@ -22,7 +22,7 @@ Abstract:
 // Extern Data
 //
 
-extern FULL_HIT_CONTEXT empty_hit;
+extern const FULL_HIT_CONTEXT empty_hit;
 
 //
 // Types

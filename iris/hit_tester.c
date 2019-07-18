@@ -102,7 +102,7 @@ HitTesterTestWorldInternal(
 // Data
 //
 
-FULL_HIT_CONTEXT empty_hit = {
+const FULL_HIT_CONTEXT empty_hit = {
     .hit = { NULL, (float_t)INFINITY }
 };
 
