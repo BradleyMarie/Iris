@@ -26,7 +26,7 @@ extern "C" {
 //
 
 typedef struct _TRIANGLE_ADDITIONAL_DATA {
-    float barycentric_coordinates[3];
+    float_t barycentric_coordinates[3];
 } TRIANGLE_ADDITIONAL_DATA, *PTRIANGLE_ADDITIONAL_DATA;
 
 typedef const TRIANGLE_ADDITIONAL_DATA *PCTRIANGLE_ADDITIONAL_DATA;
