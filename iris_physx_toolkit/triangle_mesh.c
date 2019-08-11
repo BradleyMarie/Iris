@@ -106,8 +106,8 @@ TriangleMeshAllocate(
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) size_t vertex_indices[][3],
     _In_ size_t num_triangles,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
+    _In_reads_(num_triangles) PMATERIAL front_materials[],
+    _In_reads_(num_triangles) PMATERIAL back_materials[],
     _Out_writes_(num_triangles) PSHAPE shapes[]
     )
 {
@@ -121,9 +121,22 @@ TriangleMeshAllocate(
         return status;
     }
 
-    if (shapes == NULL && num_triangles != 0)
+    if (num_triangles != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        if (front_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_04;
+        }
+
+        if (back_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_05;
+        }
+
+        if (shapes == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_06;
+        }
     }
 
     PSHAPE *shapes_tmp = (PSHAPE*)calloc(num_triangles, sizeof(PSHAPE));
@@ -138,8 +151,8 @@ TriangleMeshAllocate(
         ISTATUS status = TriangleAllocate(vertices[vertex_indices[i][0]],
                                           vertices[vertex_indices[i][1]],
                                           vertices[vertex_indices[i][2]],
-                                          front_material,
-                                          back_material,
+                                          front_materials[i],
+                                          back_materials[i],
                                           shapes_tmp + i);
 
         if (status != ISTATUS_SUCCESS)
@@ -164,10 +177,10 @@ EmissiveTriangleMeshAllocate(
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) size_t vertex_indices[][3],
     _In_ size_t num_triangles,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
-    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
-    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
+    _In_reads_(num_triangles) PMATERIAL front_materials[],
+    _In_reads_(num_triangles) PMATERIAL back_materials[],
+    _In_reads_(num_triangles) PEMISSIVE_MATERIAL front_emissive_materials[],
+    _In_reads_(num_triangles) PEMISSIVE_MATERIAL back_emissive_materials[],
     _Out_writes_(num_triangles) PSHAPE shapes[]
     )
 {
@@ -181,9 +194,32 @@ EmissiveTriangleMeshAllocate(
         return status;
     }
 
-    if (shapes == NULL && num_triangles != 0)
+    if (num_triangles != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_08;
+        if (front_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_04;
+        }
+
+        if (back_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_05;
+        }
+
+        if (front_emissive_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_06;
+        }
+
+        if (back_emissive_materials == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_07;
+        }
+
+        if (shapes == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_08;
+        }
     }
 
     PSHAPE *shapes_tmp = (PSHAPE*)calloc(num_triangles, sizeof(PSHAPE));
@@ -199,10 +235,10 @@ EmissiveTriangleMeshAllocate(
             EmissiveTriangleAllocate(vertices[vertex_indices[i][0]],
                                      vertices[vertex_indices[i][1]],
                                      vertices[vertex_indices[i][2]],
-                                     front_material,
-                                     back_material,
-                                     front_emissive_material,
-                                     back_emissive_material,
+                                     front_materials[i],
+                                     back_materials[i],
+                                     front_emissive_materials[i],
+                                     back_emissive_materials[i],
                                      shapes_tmp + i);
 
         if (status != ISTATUS_SUCCESS)

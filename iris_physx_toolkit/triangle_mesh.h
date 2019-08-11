@@ -48,8 +48,8 @@ TriangleMeshAllocate(
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) size_t vertex_indices[][3],
     _In_ size_t num_triangles,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
+    _In_reads_(num_triangles) PMATERIAL front_materials[],
+    _In_reads_(num_triangles) PMATERIAL back_materials[],
     _Out_writes_(num_triangles) PSHAPE shapes[]
     );
 
@@ -59,10 +59,10 @@ EmissiveTriangleMeshAllocate(
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) size_t vertex_indices[][3],
     _In_ size_t num_triangles,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
-    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
-    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
+    _In_reads_(num_triangles) PMATERIAL front_materials[],
+    _In_reads_(num_triangles) PMATERIAL back_materials[],
+    _In_reads_(num_triangles) PEMISSIVE_MATERIAL front_emissive_materials[],
+    _In_reads_(num_triangles) PEMISSIVE_MATERIAL back_emissive_materials[],
     _Out_writes_(num_triangles) PSHAPE shapes[]
     );
 
