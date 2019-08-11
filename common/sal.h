@@ -36,6 +36,7 @@ Abstract:
 #define _Inout_
 #define _Inout_opt_
 #define _Inout_updates_(size)
+#define _Inout_updates_to_(size, count)
 
 #define _Pre_bytecount_(size)
 #define _Pre_invalid_

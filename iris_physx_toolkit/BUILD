@@ -207,6 +207,16 @@ cc_library(
 )
 
 cc_library(
+    name = "triangle_mesh",
+    hdrs = ["triangle_mesh.h"],
+    srcs = ["triangle_mesh.c"],
+    deps = [
+        ":triangle",
+        "//iris_physx:iris_physx",
+    ],
+)
+
+cc_library(
     name = "uniform_reflector",
     hdrs = ["uniform_reflector.h"],
     srcs = ["uniform_reflector.c"],
