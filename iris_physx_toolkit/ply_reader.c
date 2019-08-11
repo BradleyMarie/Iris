@@ -18,7 +18,6 @@ Abstract:
 #include <string.h>
 
 #include "iris_physx_toolkit/ply_reader.h"
-#include "iris_physx_toolkit/triangle.h"
 #include "third_party/rply/rply.h"
 #include "third_party/rply/rplyfile.h"
 
@@ -71,6 +70,144 @@ AsSizeT(
     return true;
 }
 
+static
+void
+RplyContextDestroy(
+    _In_ _Post_invalid_ PRPLY_CONTEXT rply_context
+    )
+{
+    assert(rply_context != NULL);
+
+    free(rply_context->x_list);
+    free(rply_context->y_list);
+    free(rply_context->z_list);
+    free(rply_context->nx_list);
+    free(rply_context->ny_list);
+    free(rply_context->nz_list);
+    free(rply_context->u_list);
+    free(rply_context->v_list);
+    free(rply_context->vertex0_list);
+    free(rply_context->vertex1_list);
+    free(rply_context->vertex2_list);
+    free(rply_context->face_index_list);
+}
+
+static
+bool
+RplyContextInitialize(
+    _Inout_ PRPLY_CONTEXT rply_context,
+    _In_ size_t num_vertices,
+    _In_ size_t num_faces
+    )
+{
+    assert(rply_context != NULL);
+
+    memset(rply_context, 0, sizeof(RPLY_CONTEXT));
+
+    rply_context->x_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->x_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->y_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->y_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->z_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->z_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->nx_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->nx_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->ny_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->ny_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->nz_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->nz_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->u_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->u_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->v_list = (float_t*)calloc(num_vertices, sizeof(float_t));
+
+    if (rply_context->v_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->num_vertices = num_vertices;
+
+    rply_context->vertex0_list = (size_t*)calloc(num_faces, sizeof(size_t));
+
+    if (rply_context->vertex0_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->vertex1_list = (size_t*)calloc(num_faces, sizeof(size_t));
+
+    if (rply_context->vertex1_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->vertex2_list = (size_t*)calloc(num_faces, sizeof(size_t));
+
+    if (rply_context->vertex2_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->face_index_list = 
+        (uint32_t*)calloc(num_faces, sizeof(uint32_t));
+
+    if (rply_context->face_index_list == NULL)
+    {
+        RplyContextDestroy(rply_context);
+        return false;
+    }
+
+    rply_context->num_faces = num_faces;
+
+    return true;
+}
+
 //
 // Functions
 //
@@ -78,12 +215,7 @@ AsSizeT(
 ISTATUS
 ReadFromPlyFile(
     _In_ const char* filename,
-    _In_opt_ PMATERIAL front_material,
-    _In_opt_ PMATERIAL back_material,
-    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
-    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
-    _Outptr_result_buffer_(*num_shapes) PSHAPE *shapes,
-    _Out_ size_t *num_shapes
+    _Out_ PPLY_DATA *ply_data
     )
 {
     if (filename == NULL)
@@ -91,14 +223,9 @@ ReadFromPlyFile(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (shapes == NULL)
+    if (ply_data == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
-
-    if (num_shapes == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     FILE *file = fopen(filename, "rb");
@@ -158,7 +285,36 @@ ReadFromPlyFile(
         return ISTATUS_IO_ERROR;
     }
 
+    RPLY_CONTEXT rply_context;
+    bool success = RplyContextInitialize(&rply_context,
+                                         num_vertices,
+                                         num_faces);
+
+    if (!success)
+    {
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     // TODO
 
     return ISTATUS_ALLOCATION_FAILED;
+}
+
+void
+FreePlyData(
+    _In_opt_ _Post_invalid_ PPLY_DATA ply_data
+    )
+{
+    if (ply_data == NULL)
+    {
+        return;
+    }
+
+    free(ply_data->vertices);
+    free(ply_data->normals);
+    free(ply_data->uv);
+    free(ply_data->faces);
+    free(ply_data);
 }
