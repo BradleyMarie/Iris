@@ -25,7 +25,8 @@ Abstract:
 #define _In_reads_bytes_(size)
 #define _In_reads_bytes_opt_(size)
 
-#define _Field_size_(size) 
+#define _Field_size_(size)
+#define _Field_size_opt_(size)
 #define _Field_size_bytes_(size) 
 #define _Field_size_bytes_opt_(size) 
 #define _Field_size_full_(size) 

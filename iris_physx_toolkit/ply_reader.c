@@ -17,30 +17,17 @@ Abstract:
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/safe_math.h"
 #include "iris_physx_toolkit/ply_reader.h"
 #include "third_party/rply/rply.h"
 #include "third_party/rply/rplyfile.h"
 
 //
-// Types
+// Defines
 //
 
-typedef struct _RPLY_CONTEXT {
-    _Field_size_(num_vertices) float_t *x_list;
-    _Field_size_(num_vertices) float_t *y_list;
-    _Field_size_(num_vertices) float_t *z_list;
-    _Field_size_(num_vertices) float_t *nx_list;
-    _Field_size_(num_vertices) float_t *ny_list;
-    _Field_size_(num_vertices) float_t *nz_list;
-    _Field_size_(num_vertices) float_t *u_list;
-    _Field_size_(num_vertices) float_t *v_list;
-    size_t num_vertices;
-    _Field_size_(num_faces) size_t *vertex0_list;
-    _Field_size_(num_faces) size_t *vertex1_list;
-    _Field_size_(num_faces) size_t *vertex2_list;
-    _Field_size_(num_faces) uint32_t *face_index_list;
-    size_t num_faces;
-} RPLY_CONTEXT, *PRPLY_CONTEXT;
+#define RPLY_FAILURE 0
+#define RPLY_SUCCESS 1
 
 //
 // Static Functions
@@ -48,9 +35,8 @@ typedef struct _RPLY_CONTEXT {
 
 static
 bool
-AsSizeT(
-    _In_ long value,
-    _Out_ size_t *output
+FitsSizeT(
+    _In_ long value
     )
 {
     if (value < 0)
@@ -65,145 +51,112 @@ AsSizeT(
     }
 #endif
 
+    return true;
+}
+
+static
+bool
+AsSizeT(
+    _In_ long value,
+    _Out_ size_t *output
+    )
+{
+    if (!FitsSizeT(value))
+    {
+        return false;
+    }
+
     *output = (size_t)value;
 
     return true;
 }
 
 static
-void
-RplyContextDestroy(
-    _In_ _Post_invalid_ PRPLY_CONTEXT rply_context
+int
+PlyVertexCallback(
+    _Inout_ p_ply_argument argument
     )
 {
-    assert(rply_context != NULL);
+    return RPLY_SUCCESS;
+}
 
-    free(rply_context->x_list);
-    free(rply_context->y_list);
-    free(rply_context->z_list);
-    free(rply_context->nx_list);
-    free(rply_context->ny_list);
-    free(rply_context->nz_list);
-    free(rply_context->u_list);
-    free(rply_context->v_list);
-    free(rply_context->vertex0_list);
-    free(rply_context->vertex1_list);
-    free(rply_context->vertex2_list);
-    free(rply_context->face_index_list);
+static
+int
+PlyNormalCallback(
+    _Inout_ p_ply_argument argument
+    )
+{
+    return RPLY_SUCCESS;
+}
+
+static
+int
+PlyUvCallback(
+    _Inout_ p_ply_argument argument
+    )
+{
+    return RPLY_SUCCESS;
+}
+
+static
+int
+PlyVertexIndiciesCallback(
+    _Inout_ p_ply_argument argument
+    )
+{
+    return RPLY_SUCCESS;
 }
 
 static
 bool
-RplyContextInitialize(
-    _Inout_ PRPLY_CONTEXT rply_context,
+InitializeUVCallbacks(
+    _Inout_ p_ply ply,
+    _Inout_ PPLY_DATA ply_data,
+    _In_ const char *u_name,
+    _In_ const char *v_name,
     _In_ size_t num_vertices,
-    _In_ size_t num_faces
+    _Inout_ bool *found
     )
 {
-    assert(rply_context != NULL);
+    long num_us = ply_set_read_cb(ply,
+                                  "vertex",
+                                  u_name,
+                                  PlyUvCallback,
+                                  ply_data,
+                                  0);
 
-    memset(rply_context, 0, sizeof(RPLY_CONTEXT));
-
-    rply_context->x_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->x_list == NULL)
+    long num_vs = ply_set_read_cb(ply,
+                                  "vertex",
+                                  v_name,
+                                  PlyUvCallback,
+                                  ply_data,
+                                  1);
+    if (num_us != num_vs)
     {
-        RplyContextDestroy(rply_context);
         return false;
     }
 
-    rply_context->y_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->y_list == NULL)
+    if (*found && (num_us != 0 || num_vs != 0))
     {
-        RplyContextDestroy(rply_context);
         return false;
     }
-
-    rply_context->z_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->z_list == NULL)
+    else
     {
-        RplyContextDestroy(rply_context);
-        return false;
+        if (!FitsSizeT(num_us) || !FitsSizeT(num_vs))
+        {
+            return false;
+        }
+
+        if (num_us != 0)
+        {
+            if (num_us != (long)num_vertices)
+            {
+                return false;
+            }
+
+            *found = true;
+        }
     }
-
-    rply_context->nx_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->nx_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->ny_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->ny_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->nz_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->nz_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->u_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->u_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->v_list = (float_t*)calloc(num_vertices, sizeof(float_t));
-
-    if (rply_context->v_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->num_vertices = num_vertices;
-
-    rply_context->vertex0_list = (size_t*)calloc(num_faces, sizeof(size_t));
-
-    if (rply_context->vertex0_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->vertex1_list = (size_t*)calloc(num_faces, sizeof(size_t));
-
-    if (rply_context->vertex1_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->vertex2_list = (size_t*)calloc(num_faces, sizeof(size_t));
-
-    if (rply_context->vertex2_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->face_index_list = 
-        (uint32_t*)calloc(num_faces, sizeof(uint32_t));
-
-    if (rply_context->face_index_list == NULL)
-    {
-        RplyContextDestroy(rply_context);
-        return false;
-    }
-
-    rply_context->num_faces = num_faces;
 
     return true;
 }
@@ -266,40 +219,217 @@ ReadFromPlyFile(
         {
             if (!AsSizeT(num_instances, &num_faces))
             {
-                break;
+                ply_close(ply);
+                fclose(file);
+                return ISTATUS_INVALID_ARGUMENT_00;
             }
         }
         else if (strcmp(element_name, "vertex") == 0)
         {
             if (!AsSizeT(num_instances, &num_vertices))
             {
-                break;
+                ply_close(ply);
+                fclose(file);
+                return ISTATUS_INVALID_ARGUMENT_00;
             }
         }
     }
 
-    if (num_faces == 0 || num_vertices == 0)
-    {
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_IO_ERROR;
-    }
+    PPLY_DATA context = (PPLY_DATA)calloc(1, sizeof(PLY_DATA));
 
-    RPLY_CONTEXT rply_context;
-    bool success = RplyContextInitialize(&rply_context,
-                                         num_vertices,
-                                         num_faces);
-
-    if (!success)
+    if (context == NULL)
     {
         ply_close(ply);
         fclose(file);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    // TODO
+    //
+    // Vertices
+    //
 
-    return ISTATUS_ALLOCATION_FAILED;
+    if (ply_set_read_cb(ply, "vertex", "x", PlyVertexCallback, context, 0) != (long)num_vertices ||
+        ply_set_read_cb(ply, "vertex", "y", PlyVertexCallback, context, 1) != (long)num_vertices ||
+        ply_set_read_cb(ply, "vertex", "z", PlyVertexCallback, context, 2) != (long)num_vertices)
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_vertices == 0)
+    {
+        context->vertices = NULL;
+    }
+    else
+    {
+        context->vertices = (POINT3*)calloc(num_vertices, sizeof(POINT3));
+
+        if (context->vertices == NULL)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+
+    //
+    // Normals
+    //
+
+    long num_normals = ply_set_read_cb(ply, "vertex", "nx", PlyNormalCallback, context, 0);
+    if (!FitsSizeT(num_normals))
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_normals != 0 && num_normals != (long)num_vertices)
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_normals != ply_set_read_cb(ply, "vertex", "ny", PlyNormalCallback, context, 1))
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_normals != ply_set_read_cb(ply, "vertex", "nz", PlyNormalCallback, context, 2))
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_normals == 0)
+    {
+        context->normals = NULL;
+    }
+    else
+    {
+        context->normals = (VECTOR3*)calloc(num_vertices, sizeof(VECTOR3));
+
+        if (context->normals == NULL)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+
+    //
+    // UVs
+    //
+
+    bool found = false;
+    if (!InitializeUVCallbacks(ply, context, "u", "v", num_vertices, &found) ||
+        !InitializeUVCallbacks(ply, context, "s", "t", num_vertices, &found) ||
+        !InitializeUVCallbacks(ply, context, "texture_u", "texture_v", num_vertices, &found) ||
+        !InitializeUVCallbacks(ply, context, "texture_s", "texture_t", num_vertices, &found))
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (!found)
+    {
+        context->uvs = NULL;
+    }
+    else
+    {
+        size_t num_elements;
+        bool success = CheckedMultiplySizeT(num_vertices, 2, &num_elements);
+
+        if (!success)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        context->uvs = (float_t*)calloc(num_elements, sizeof(float_t));
+
+        if (context->uvs == NULL)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+
+    context->num_vertices = num_vertices;
+
+    //
+    // Vertex Indices
+    //
+
+    long vertex_indices = ply_set_read_cb(ply,
+                                          "face",
+                                          "vertex_indices",
+                                          PlyVertexIndiciesCallback,
+                                          &context,
+                                          0);
+
+    if (vertex_indices != (long)num_faces ||
+        (num_vertices == 0 && num_faces != 0))
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    size_t num_elements;
+    bool success = CheckedMultiplySizeT(num_faces, 6, &num_elements);
+
+    if (!success)
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    context->faces = (size_t*)calloc(num_elements, sizeof(size_t));
+
+    if (context->faces == NULL)
+    {
+        FreePlyData(context);
+        ply_close(ply);
+        fclose(file);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    int read_status = ply_read(ply);
+
+    ply_close(ply);
+    fclose(file);
+
+    if (read_status != RPLY_SUCCESS)
+    {
+        FreePlyData(context);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    *ply_data = context;
+
+    return ISTATUS_SUCCESS;
 }
 
 void
@@ -314,7 +444,7 @@ FreePlyData(
 
     free(ply_data->vertices);
     free(ply_data->normals);
-    free(ply_data->uv);
+    free(ply_data->uvs);
     free(ply_data->faces);
     free(ply_data);
 }

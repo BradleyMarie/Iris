@@ -153,6 +153,7 @@ cc_library(
     hdrs = ["ply_reader.h"],
     srcs = ["ply_reader.c"],
     deps = [
+        "//common:safe_math",
         "//iris_physx:iris_physx",
         "//third_party/rply:rply",
     ],

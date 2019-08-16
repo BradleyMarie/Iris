@@ -27,10 +27,10 @@ extern "C" {
 
 typedef struct _PLY_DATA {
     _Field_size_(num_vertices) POINT3 *vertices;
-    _Field_size_(num_verties) VECTOR3 *normals;
-    _Field_size_(num_vertices) float_t *uv[2];
+    _Field_size_opt_(num_vertices) VECTOR3 *normals;
+    _Field_size_opt_(2 * num_vertices) float_t *uvs; // float uvs[][2]
     size_t num_vertices;
-    _Field_size_(num_faces) size_t *faces[3];
+    _Field_size_(3 * num_faces) size_t *faces; // size_t faces[][3]
     size_t num_faces;
 } PLY_DATA, *PPLY_DATA;
 
