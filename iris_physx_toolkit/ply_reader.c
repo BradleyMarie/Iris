@@ -109,7 +109,112 @@ PlyVertexIndiciesCallback(
 
 static
 bool
-InitializeUVCallbacks(
+InitializeVertexCallbacks(
+    _Inout_ p_ply ply,
+    _Inout_ PPLY_DATA ply_data,
+    _In_ size_t num_vertices
+    )
+{
+    assert(ply != NULL);
+    assert(ply_data != NULL);
+
+    long num_x = ply_set_read_cb(ply,
+                                 "vertex",
+                                 "x",
+                                 PlyVertexCallback,
+                                 ply_data,
+                                 0);
+
+    if (num_x != (long)num_vertices)
+    {
+        return false;
+    }
+
+    long num_y = ply_set_read_cb(ply,
+                                 "vertex",
+                                 "y",
+                                 PlyVertexCallback,
+                                 ply_data,
+                                 1);
+
+    if (num_y != (long)num_vertices)
+    {
+        return false;
+    }
+
+    long num_z = ply_set_read_cb(ply,
+                                 "vertex",
+                                 "z",
+                                 PlyVertexCallback,
+                                 ply_data,
+                                 2);
+
+    return num_z == (long)num_vertices;
+}
+
+
+static
+bool
+InitializeNormalCallbacks(
+    _Inout_ p_ply ply,
+    _Inout_ PPLY_DATA ply_data,
+    _In_ size_t num_vertices,
+    _Out_ bool *found
+    )
+{
+    assert(ply != NULL);
+    assert(ply_data != NULL);
+    assert(found != NULL);
+
+    long num_nx = ply_set_read_cb(ply,
+                                  "vertex",
+                                  "nx",
+                                  PlyNormalCallback,
+                                  ply_data,
+                                  0);
+
+    long expected_normals;
+    if (num_nx != 0)
+    {
+        if (num_nx != (long)num_vertices)
+        {
+            return false;
+        }
+
+        expected_normals = num_vertices;
+        *found = true;
+    }
+    else
+    {
+        expected_normals = 0;
+        *found = false;
+    }
+
+    long num_ny = ply_set_read_cb(ply,
+                                  "vertex",
+                                  "ny",
+                                  PlyNormalCallback,
+                                  ply_data,
+                                  1);
+
+    if (num_ny != expected_normals)
+    {
+        return false;
+    }
+
+    long num_nz = ply_set_read_cb(ply,
+                                  "vertex",
+                                  "nz",
+                                  PlyNormalCallback,
+                                  ply_data,
+                                  2);
+
+    return num_nz == expected_normals;
+}
+
+static
+bool
+InitializeUVCallback(
     _Inout_ p_ply ply,
     _Inout_ PPLY_DATA ply_data,
     _In_ const char *u_name,
@@ -118,6 +223,12 @@ InitializeUVCallbacks(
     _Inout_ bool *found
     )
 {
+    assert(ply != NULL);
+    assert(ply_data != NULL);
+    assert(u_name != NULL);
+    assert(v_name != NULL);
+    assert(found != NULL);
+
     long num_us = ply_set_read_cb(ply,
                                   "vertex",
                                   u_name,
@@ -125,40 +236,84 @@ InitializeUVCallbacks(
                                   ply_data,
                                   0);
 
+    long expected_vs;
+    if (num_us != 0)
+    {
+        if (num_us != (long)num_vertices)
+        {
+            return false;
+        }
+
+        expected_vs = (long)num_vertices;
+        *found = true;
+    }
+    else
+    {
+        expected_vs = 0;
+        *found = false;
+    }
+
     long num_vs = ply_set_read_cb(ply,
                                   "vertex",
                                   v_name,
                                   PlyUvCallback,
                                   ply_data,
                                   1);
-    if (num_us != num_vs)
-    {
+
+    return num_vs != expected_vs;
+}
+
+static
+bool
+InitializeUVCallbacks(
+    _Inout_ p_ply ply,
+    _Inout_ PPLY_DATA ply_data,
+    _In_ size_t num_vertices,
+    _Out_ bool *found
+    )
+{
+    assert(ply != NULL);
+    assert(ply_data != NULL);
+    assert(found != NULL);
+
+    *found = false;
+    bool success = InitializeUVCallback(ply,
+                                        ply_data,
+                                        "u",
+                                        "v",
+                                        num_vertices,
+                                        found);
+    if (!success) {
         return false;
     }
 
-    if (*found && (num_us != 0 || num_vs != 0))
-    {
+    success = InitializeUVCallback(ply,
+                                   ply_data,
+                                   "s",
+                                   "t",
+                                   num_vertices,
+                                   found);
+    if (!success) {
         return false;
     }
-    else
-    {
-        if (!FitsSizeT(num_us) || !FitsSizeT(num_vs))
-        {
-            return false;
-        }
 
-        if (num_us != 0)
-        {
-            if (num_us != (long)num_vertices)
-            {
-                return false;
-            }
-
-            *found = true;
-        }
+    success = InitializeUVCallback(ply,
+                                   ply_data,
+                                   "texture_u",
+                                   "texture_v",
+                                   num_vertices,
+                                   found);
+    if (!success) {
+        return false;
     }
 
-    return true;
+    success = InitializeUVCallback(ply,
+                                   ply_data,
+                                   "texture_s",
+                                   "texture_t",
+                                   num_vertices,
+                                   found);
+    return success;
 }
 
 //
@@ -248,9 +403,7 @@ ReadFromPlyFile(
     // Vertices
     //
 
-    if (ply_set_read_cb(ply, "vertex", "x", PlyVertexCallback, context, 0) != (long)num_vertices ||
-        ply_set_read_cb(ply, "vertex", "y", PlyVertexCallback, context, 1) != (long)num_vertices ||
-        ply_set_read_cb(ply, "vertex", "z", PlyVertexCallback, context, 2) != (long)num_vertices)
+    if (!InitializeVertexCallbacks(ply, context, num_vertices))
     {
         FreePlyData(context);
         ply_close(ply);
@@ -279,8 +432,8 @@ ReadFromPlyFile(
     // Normals
     //
 
-    long num_normals = ply_set_read_cb(ply, "vertex", "nx", PlyNormalCallback, context, 0);
-    if (!FitsSizeT(num_normals))
+    bool found;
+    if (!InitializeNormalCallbacks(ply, context, num_vertices, &found))
     {
         FreePlyData(context);
         ply_close(ply);
@@ -288,31 +441,7 @@ ReadFromPlyFile(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (num_normals != 0 && num_normals != (long)num_vertices)
-    {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (num_normals != ply_set_read_cb(ply, "vertex", "ny", PlyNormalCallback, context, 1))
-    {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (num_normals != ply_set_read_cb(ply, "vertex", "nz", PlyNormalCallback, context, 2))
-    {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (num_normals == 0)
+    if (!found)
     {
         context->normals = NULL;
     }
@@ -333,11 +462,7 @@ ReadFromPlyFile(
     // UVs
     //
 
-    bool found = false;
-    if (!InitializeUVCallbacks(ply, context, "u", "v", num_vertices, &found) ||
-        !InitializeUVCallbacks(ply, context, "s", "t", num_vertices, &found) ||
-        !InitializeUVCallbacks(ply, context, "texture_u", "texture_v", num_vertices, &found) ||
-        !InitializeUVCallbacks(ply, context, "texture_s", "texture_t", num_vertices, &found))
+    if (!InitializeUVCallbacks(ply, context, num_vertices, &found))
     {
         FreePlyData(context);
         ply_close(ply);
@@ -386,35 +511,43 @@ ReadFromPlyFile(
                                           &context,
                                           0);
 
-    if (vertex_indices != (long)num_faces ||
-        (num_vertices == 0 && num_faces != 0))
+    if (vertex_indices != 0)
     {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_INVALID_ARGUMENT_00;
+        if (num_vertices == 0 || vertex_indices != (long)num_faces)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+
+        size_t num_elements;
+        bool success = CheckedMultiplySizeT(num_faces, 6, &num_elements);
+
+        if (!success)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        context->faces = (size_t*)calloc(num_elements, sizeof(size_t));
+
+        if (context->faces == NULL)
+        {
+            FreePlyData(context);
+            ply_close(ply);
+            fclose(file);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+    else
+    {
+        context->faces = NULL;
     }
 
-    size_t num_elements;
-    bool success = CheckedMultiplySizeT(num_faces, 6, &num_elements);
-
-    if (!success)
-    {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    context->faces = (size_t*)calloc(num_elements, sizeof(size_t));
-
-    if (context->faces == NULL)
-    {
-        FreePlyData(context);
-        ply_close(ply);
-        fclose(file);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
+    context->num_faces = 0;
 
     int read_status = ply_read(ply);
 
@@ -425,6 +558,16 @@ ReadFromPlyFile(
     {
         FreePlyData(context);
         return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (context->num_faces != 0)
+    {
+        size_t spaces_required = 3 * sizeof(size_t) * context->num_faces;
+        size_t *resized = (size_t*)realloc(context->faces, spaces_required);
+        if (resized != NULL)
+        {
+            context->faces = resized;
+        }
     }
 
     *ply_data = context;
