@@ -29,6 +29,13 @@ Abstract:
 #define RPLY_FAILURE 0
 #define RPLY_SUCCESS 1
 
+#define FLAG_X 0
+#define FLAG_Y 1
+#define FLAG_Z 2
+
+#define FLAG_U 0
+#define FLAG_V 1
+
 //
 // Static Functions
 //
@@ -77,6 +84,31 @@ PlyVertexCallback(
     _Inout_ p_ply_argument argument
     )
 {
+    void *context;
+    long flags;
+    ply_get_argument_user_data(argument, &context, &flags);
+
+    long index;
+    ply_get_argument_element(argument, NULL, &index);
+
+    float_t value = ply_get_argument_value(argument);
+
+    PPLY_DATA ply_data = (PPLY_DATA)context;
+    switch (flags)
+    {
+        case FLAG_X:
+            ply_data->vertices[index].x = value;
+            break;
+        case FLAG_Y:
+            ply_data->vertices[index].y = value;
+            break;
+        case FLAG_Z:
+            ply_data->vertices[index].z = value;
+            break;
+        default:
+            return RPLY_FAILURE;
+    }
+
     return RPLY_SUCCESS;
 }
 
@@ -86,7 +118,50 @@ PlyNormalCallback(
     _Inout_ p_ply_argument argument
     )
 {
+    void *context;
+    long flags;
+    ply_get_argument_user_data(argument, &context, &flags);
+
+    long index;
+    ply_get_argument_element(argument, NULL, &index);
+
+    float_t value = ply_get_argument_value(argument);
+
+    PPLY_DATA ply_data = (PPLY_DATA)context;
+    switch (flags)
+    {
+        case FLAG_X:
+            ply_data->normals[index].x = value;
+            break;
+        case FLAG_Y:
+            ply_data->normals[index].y = value;
+            break;
+        case FLAG_Z:
+            ply_data->normals[index].z = value;
+            break;
+        default:
+            return RPLY_FAILURE;
+    }
+
     return RPLY_SUCCESS;
+}
+
+static
+size_t
+GetUIndex(
+    _In_ long index
+    )
+{
+    return 2 * index;
+}
+
+static
+size_t
+GetVIndex(
+    _In_ long index
+    )
+{
+    return 2 * index + 1;
 }
 
 static
@@ -95,6 +170,28 @@ PlyUvCallback(
     _Inout_ p_ply_argument argument
     )
 {
+    void *context;
+    long flags;
+    ply_get_argument_user_data(argument, &context, &flags);
+
+    long index;
+    ply_get_argument_element(argument, NULL, &index);
+
+    float_t value = ply_get_argument_value(argument);
+
+    PPLY_DATA ply_data = (PPLY_DATA)context;
+    switch (flags)
+    {
+        case FLAG_U:
+            ply_data->uvs[GetUIndex(index)] = value;
+            break;
+        case FLAG_V:
+            ply_data->uvs[GetVIndex(index)] = value;
+            break;
+        default:
+            return RPLY_FAILURE;
+    }
+
     return RPLY_SUCCESS;
 }
 
@@ -123,7 +220,7 @@ InitializeVertexCallbacks(
                                  "x",
                                  PlyVertexCallback,
                                  ply_data,
-                                 0);
+                                 FLAG_X);
 
     if (num_x != (long)num_vertices)
     {
@@ -135,7 +232,7 @@ InitializeVertexCallbacks(
                                  "y",
                                  PlyVertexCallback,
                                  ply_data,
-                                 1);
+                                 FLAG_Y);
 
     if (num_y != (long)num_vertices)
     {
@@ -147,7 +244,7 @@ InitializeVertexCallbacks(
                                  "z",
                                  PlyVertexCallback,
                                  ply_data,
-                                 2);
+                                 FLAG_Z);
 
     return num_z == (long)num_vertices;
 }
@@ -171,7 +268,7 @@ InitializeNormalCallbacks(
                                   "nx",
                                   PlyNormalCallback,
                                   ply_data,
-                                  0);
+                                  FLAG_X);
 
     long expected_normals;
     if (num_nx != 0)
@@ -195,7 +292,7 @@ InitializeNormalCallbacks(
                                   "ny",
                                   PlyNormalCallback,
                                   ply_data,
-                                  1);
+                                  FLAG_Y);
 
     if (num_ny != expected_normals)
     {
@@ -207,7 +304,7 @@ InitializeNormalCallbacks(
                                   "nz",
                                   PlyNormalCallback,
                                   ply_data,
-                                  2);
+                                  FLAG_Z);
 
     return num_nz == expected_normals;
 }
@@ -234,7 +331,7 @@ InitializeUVCallback(
                                   u_name,
                                   PlyUvCallback,
                                   ply_data,
-                                  0);
+                                  FLAG_U);
 
     long expected_vs;
     if (num_us != 0)
@@ -258,7 +355,7 @@ InitializeUVCallback(
                                   v_name,
                                   PlyUvCallback,
                                   ply_data,
-                                  1);
+                                  FLAG_V);
 
     return num_vs != expected_vs;
 }
