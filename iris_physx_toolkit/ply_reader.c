@@ -201,6 +201,52 @@ PlyVertexIndiciesCallback(
     _Inout_ p_ply_argument argument
     )
 {
+    void *context;
+    long flags;
+    ply_get_argument_user_data(argument, &context, &flags);
+
+    long length, index;
+    ply_get_argument_property(argument, NULL, &length, &index);
+
+    if (index < 0 || length < 3 || 4 < length)
+    {
+        return RPLY_FAILURE;
+    }
+
+    long value = (long)ply_get_argument_value(argument);
+
+    size_t vertex_index;
+    if (!AsSizeT(value, &vertex_index))
+    {
+        return RPLY_FAILURE;
+    }
+
+    PPLY_DATA ply_data = (PPLY_DATA)context;
+    if (vertex_index < ply_data->num_vertices)
+    {
+        return RPLY_FAILURE;
+    }
+
+    switch (index)
+    {
+        case 0:
+        case 1:
+        case 2:
+            ply_data->faces[ply_data->num_faces++] = vertex_index;
+            break;
+        case 3:
+            ply_data->faces[ply_data->num_faces] =
+                ply_data->faces[ply_data->num_faces - 3];
+            ply_data->num_faces += 1;
+            ply_data->faces[ply_data->num_faces] =
+                ply_data->faces[ply_data->num_faces - 2];
+            ply_data->num_faces += 1;
+            ply_data->faces[ply_data->num_faces++] = vertex_index;
+            break;
+        default:
+            return RPLY_FAILURE;
+    }
+
     return RPLY_SUCCESS;
 }
 
@@ -657,14 +703,20 @@ ReadFromPlyFile(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
+    if (context->num_faces % 3 != 0)
+    {
+        FreePlyData(context);
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
     if (context->num_faces != 0)
     {
-        size_t spaces_required = 3 * sizeof(size_t) * context->num_faces;
-        size_t *resized = (size_t*)realloc(context->faces, spaces_required);
+        size_t *resized = (size_t*)realloc(context->faces, context->num_faces);
         if (resized != NULL)
         {
             context->faces = resized;
         }
+        context->num_faces /= 3;
     }
 
     *ply_data = context;
