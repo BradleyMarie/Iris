@@ -208,6 +208,11 @@ PlyVertexIndiciesCallback(
     long length, index;
     ply_get_argument_property(argument, NULL, &length, &index);
 
+    if (index == -1)
+    {
+        return RPLY_SUCCESS;
+    }
+
     if (index < 0 || length < 3 || 4 < length)
     {
         return RPLY_FAILURE;
@@ -222,7 +227,7 @@ PlyVertexIndiciesCallback(
     }
 
     PPLY_DATA ply_data = (PPLY_DATA)context;
-    if (vertex_index < ply_data->num_vertices)
+    if (ply_data->num_vertices <= vertex_index)
     {
         return RPLY_FAILURE;
     }
@@ -380,20 +385,31 @@ InitializeUVCallback(
                                   FLAG_U);
 
     long expected_vs;
-    if (num_us != 0)
+    if (*found)
     {
-        if (num_us != (long)num_vertices)
+        if (num_us != 0)
         {
             return false;
         }
 
-        expected_vs = (long)num_vertices;
-        *found = true;
+        expected_vs = 0;
     }
     else
     {
-        expected_vs = 0;
-        *found = false;
+        if (num_us != 0)
+        {
+            if (num_us != (long)num_vertices)
+            {
+                return false;
+            }
+
+            *found = true;
+            expected_vs = (long)num_vertices;
+        }
+        else
+        {
+            expected_vs = 0;
+        }
     }
 
     long num_vs = ply_set_read_cb(ply,
@@ -403,7 +419,7 @@ InitializeUVCallback(
                                   ply_data,
                                   FLAG_V);
 
-    return num_vs != expected_vs;
+    return num_vs == expected_vs;
 }
 
 static
@@ -651,7 +667,7 @@ ReadFromPlyFile(
                                           "face",
                                           "vertex_indices",
                                           PlyVertexIndiciesCallback,
-                                          &context,
+                                          context,
                                           0);
 
     if (vertex_indices != 0)

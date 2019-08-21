@@ -159,6 +159,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ply_reader_test",
+    srcs = ["ply_reader_test.cc"],
+    deps = [
+        ":ply_reader",
+        "//test_util:equality",
+        "@com_google_googletest//:gtest_main"
+    ],
+)
+
 cc_library(
     name = "point_light",
     hdrs = ["point_light.h"],
