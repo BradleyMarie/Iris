@@ -727,11 +727,13 @@ ReadFromPlyFile(
 
     if (context->num_faces != 0)
     {
-        size_t *resized = (size_t*)realloc(context->faces, context->num_faces);
+        size_t *resized = (size_t*)realloc(context->faces,
+                                           sizeof(size_t) * context->num_faces);
         if (resized != NULL)
         {
             context->faces = resized;
         }
+
         context->num_faces /= 3;
     }
 
