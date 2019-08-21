@@ -735,6 +735,35 @@ ReadFromPlyFile(
         context->num_faces /= 3;
     }
 
+    for (size_t i = 0; i < context->num_vertices; i++)
+    {
+        if (!PointValidate(context->vertices[i]))
+        {
+            FreePlyData(context);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+
+        if (context->normals && !VectorValidate(context->normals[i]))
+        {
+            FreePlyData(context);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+    }
+
+    for (size_t i = 0; i < num_faces; i++)
+    {
+        size_t face_base = 3 * i;
+        size_t face0 = context->faces[face_base];
+        size_t face1 = context->faces[face_base + 1];
+        size_t face2 = context->faces[face_base + 2];
+
+        if (face0 == face1 || face1 == face2 || face0 == face2)
+        {
+            FreePlyData(context);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+    }
+
     *ply_data = context;
 
     return ISTATUS_SUCCESS;
