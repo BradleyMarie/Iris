@@ -208,3 +208,209 @@ TEST(PlyReaderTests, TwoQuads) {
 
   FreePlyData(ply_data);
 }
+
+TEST(PlyReaderTests, OneTriangleWithNormals) {
+  TempFile file("OneTriangleWithNormals.ply");
+  file.Append("element vertex 3");
+  file.Append("property float32 x");
+  file.Append("property float32 y");
+  file.Append("property float32 z");
+  file.Append("property float32 nx");
+  file.Append("property float32 ny");
+  file.Append("property float32 nz");
+  file.Append("element face 1");
+  file.Append("property list uint8 int32 vertex_indices");
+  file.Append("end_header");
+  file.Append("0 0 0 1 0 0");
+  file.Append("0 1 0 0 1 0");
+  file.Append("1 0 0 0 0 1");
+  file.Append("3 0 1 2");
+
+  PPLY_DATA ply_data;
+  ISTATUS status = ReadFromPlyFile(file.FileName(), &ply_data);
+  ASSERT_EQ(ISTATUS_SUCCESS, status);
+  ASSERT_EQ(3u, ply_data->num_vertices);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[0]);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->vertices[1]);
+  EXPECT_EQ(PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[2]);
+  EXPECT_EQ(VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->normals[0]);
+  EXPECT_EQ(VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->normals[1]);
+  EXPECT_EQ(VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0),
+            ply_data->normals[2]);
+  EXPECT_EQ(NULL, ply_data->uvs);
+  ASSERT_EQ(1u, ply_data->num_faces);
+  EXPECT_EQ(0u, ply_data->faces[0]);
+  EXPECT_EQ(1u, ply_data->faces[1]);
+  EXPECT_EQ(2u, ply_data->faces[2]);
+
+  FreePlyData(ply_data);
+}
+
+TEST(PlyReaderTests, OneTriangleWithUvs) {
+  TempFile file("OneTriangleWithUvs.ply");
+  file.Append("element vertex 3");
+  file.Append("property float32 x");
+  file.Append("property float32 y");
+  file.Append("property float32 z");
+  file.Append("property float32 u");
+  file.Append("property float32 v");
+  file.Append("element face 1");
+  file.Append("property list uint8 int32 vertex_indices");
+  file.Append("end_header");
+  file.Append("0 0 0 0 0");
+  file.Append("0 1 0 1 0");
+  file.Append("1 0 0 0 1");
+  file.Append("3 0 1 2");
+
+  PPLY_DATA ply_data;
+  ISTATUS status = ReadFromPlyFile(file.FileName(), &ply_data);
+  ASSERT_EQ(ISTATUS_SUCCESS, status);
+  ASSERT_EQ(3u, ply_data->num_vertices);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[0]);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->vertices[1]);
+  EXPECT_EQ(PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[2]);
+  EXPECT_EQ(NULL, ply_data->normals);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[0]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[1]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[2]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[3]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[4]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[5]);
+  ASSERT_EQ(1u, ply_data->num_faces);
+  EXPECT_EQ(0u, ply_data->faces[0]);
+  EXPECT_EQ(1u, ply_data->faces[1]);
+  EXPECT_EQ(2u, ply_data->faces[2]);
+
+  FreePlyData(ply_data);
+}
+
+TEST(PlyReaderTests, OneTriangleWithSts) {
+  TempFile file("OneTriangleWithSts.ply");
+  file.Append("element vertex 3");
+  file.Append("property float32 x");
+  file.Append("property float32 y");
+  file.Append("property float32 z");
+  file.Append("property float32 s");
+  file.Append("property float32 t");
+  file.Append("element face 1");
+  file.Append("property list uint8 int32 vertex_indices");
+  file.Append("end_header");
+  file.Append("0 0 0 0 0");
+  file.Append("0 1 0 1 0");
+  file.Append("1 0 0 0 1");
+  file.Append("3 0 1 2");
+
+  PPLY_DATA ply_data;
+  ISTATUS status = ReadFromPlyFile(file.FileName(), &ply_data);
+  ASSERT_EQ(ISTATUS_SUCCESS, status);
+  ASSERT_EQ(3u, ply_data->num_vertices);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[0]);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->vertices[1]);
+  EXPECT_EQ(PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[2]);
+  EXPECT_EQ(NULL, ply_data->normals);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[0]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[1]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[2]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[3]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[4]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[5]);
+  ASSERT_EQ(1u, ply_data->num_faces);
+  EXPECT_EQ(0u, ply_data->faces[0]);
+  EXPECT_EQ(1u, ply_data->faces[1]);
+  EXPECT_EQ(2u, ply_data->faces[2]);
+
+  FreePlyData(ply_data);
+}
+
+TEST(PlyReaderTests, OneTriangleWithTextureUvs) {
+  TempFile file("OneTriangleWithTextureUvs.ply");
+  file.Append("element vertex 3");
+  file.Append("property float32 x");
+  file.Append("property float32 y");
+  file.Append("property float32 z");
+  file.Append("property float32 texture_u");
+  file.Append("property float32 texture_v");
+  file.Append("element face 1");
+  file.Append("property list uint8 int32 vertex_indices");
+  file.Append("end_header");
+  file.Append("0 0 0 0 0");
+  file.Append("0 1 0 1 0");
+  file.Append("1 0 0 0 1");
+  file.Append("3 0 1 2");
+
+  PPLY_DATA ply_data;
+  ISTATUS status = ReadFromPlyFile(file.FileName(), &ply_data);
+  ASSERT_EQ(ISTATUS_SUCCESS, status);
+  ASSERT_EQ(3u, ply_data->num_vertices);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[0]);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->vertices[1]);
+  EXPECT_EQ(PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[2]);
+  EXPECT_EQ(NULL, ply_data->normals);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[0]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[1]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[2]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[3]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[4]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[5]);
+  ASSERT_EQ(1u, ply_data->num_faces);
+  EXPECT_EQ(0u, ply_data->faces[0]);
+  EXPECT_EQ(1u, ply_data->faces[1]);
+  EXPECT_EQ(2u, ply_data->faces[2]);
+
+  FreePlyData(ply_data);
+}
+
+TEST(PlyReaderTests, OneTriangleWithTextureSts) {
+  TempFile file("OneTriangleWithTextureSts.ply");
+  file.Append("element vertex 3");
+  file.Append("property float32 x");
+  file.Append("property float32 y");
+  file.Append("property float32 z");
+  file.Append("property float32 texture_s");
+  file.Append("property float32 texture_t");
+  file.Append("element face 1");
+  file.Append("property list uint8 int32 vertex_indices");
+  file.Append("end_header");
+  file.Append("0 0 0 0 0");
+  file.Append("0 1 0 1 0");
+  file.Append("1 0 0 0 1");
+  file.Append("3 0 1 2");
+
+  PPLY_DATA ply_data;
+  ISTATUS status = ReadFromPlyFile(file.FileName(), &ply_data);
+  ASSERT_EQ(ISTATUS_SUCCESS, status);
+  ASSERT_EQ(3u, ply_data->num_vertices);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[0]);
+  EXPECT_EQ(PointCreate((float_t)0.0, (float_t)1.0, (float_t)0.0),
+            ply_data->vertices[1]);
+  EXPECT_EQ(PointCreate((float_t)1.0, (float_t)0.0, (float_t)0.0),
+            ply_data->vertices[2]);
+  EXPECT_EQ(NULL, ply_data->normals);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[0]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[1]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[2]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[3]);
+  EXPECT_EQ((float_t)0.0, ply_data->uvs[4]);
+  EXPECT_EQ((float_t)1.0, ply_data->uvs[5]);
+  ASSERT_EQ(1u, ply_data->num_faces);
+  EXPECT_EQ(0u, ply_data->faces[0]);
+  EXPECT_EQ(1u, ply_data->faces[1]);
+  EXPECT_EQ(2u, ply_data->faces[2]);
+
+  FreePlyData(ply_data);
+}
