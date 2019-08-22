@@ -2,8 +2,8 @@ package(
     default_visibility = [
         "//iris:__pkg__",
         "//iris_advanced:__pkg__",
+        "//iris_advanced_toolkit:__pkg__",
         "//iris_camera:__pkg__",
-        "//iris_physx_toolkit:__pkg__",
         "//test_cases:__pkg__",
     ],
 )

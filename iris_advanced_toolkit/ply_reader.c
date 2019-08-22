@@ -18,7 +18,7 @@ Abstract:
 #include <string.h>
 
 #include "common/safe_math.h"
-#include "iris_physx_toolkit/ply_reader.h"
+#include "iris_advanced_toolkit/ply_reader.h"
 #include "third_party/rply/rply.h"
 #include "third_party/rply/rplyfile.h"
 

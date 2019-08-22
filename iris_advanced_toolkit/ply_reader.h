@@ -12,10 +12,10 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_PLY_READER_
-#define _IRIS_PHYSX_TOOLKIT_PLY_READER_
+#ifndef _IRIS_ADVANCED_TOOLKIT_PLY_READER_
+#define _IRIS_ADVANCED_TOOLKIT_PLY_READER_
 
-#include "iris_physx/iris_physx.h"
+#include "iris_advanced/iris_advanced.h"
 
 #if __cplusplus 
 extern "C" {
@@ -55,4 +55,4 @@ FreePlyData(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_PLY_READER_
+#endif // _IRIS_ADVANCED_TOOLKIT_PLY_READER_

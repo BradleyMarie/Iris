@@ -3,7 +3,7 @@
 #include <string>
 
 #include "googletest/include/gtest/gtest.h"
-#include "iris_physx_toolkit/ply_reader.h"
+#include "iris_advanced_toolkit/ply_reader.h"
 #include "test_util/equality.h"
 
 namespace {
