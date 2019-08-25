@@ -46,7 +46,9 @@ ISTATUS
 TriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) size_t vertex0_indices[],
+    _In_reads_(num_triangles) size_t vertex1_indices[],
+    _In_reads_(num_triangles) size_t vertex2_indices[],
     _In_ size_t num_triangles,
     _In_reads_(num_triangles) PMATERIAL front_materials[],
     _In_reads_(num_triangles) PMATERIAL back_materials[],
@@ -57,7 +59,9 @@ ISTATUS
 EmissiveTriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) size_t vertex0_indices[],
+    _In_reads_(num_triangles) size_t vertex1_indices[],
+    _In_reads_(num_triangles) size_t vertex2_indices[],
     _In_ size_t num_triangles,
     _In_reads_(num_triangles) PMATERIAL front_materials[],
     _In_reads_(num_triangles) PMATERIAL back_materials[],
