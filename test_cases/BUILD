@@ -1,8 +1,9 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_test(
     name = "constructive_solid_geometry",
-    shard_count = 4,
     srcs = ["constructive_solid_geometry.cc"],
     data = [
         "//test_results:csg_cube_sphere_difference.pfm",
@@ -10,6 +11,7 @@ cc_test(
         "//test_results:csg_sphere_intersection.pfm",
         "//test_results:csg_sphere_union.pfm",
     ],
+    shard_count = 4,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
@@ -33,10 +35,10 @@ cc_test(
 cc_test(
     name = "cornell_box",
     srcs = ["cornell_box.cc"],
-    linkstatic = 1,
     data = [
         "//test_results:cornell_box.pfm",
     ],
+    linkstatic = 1,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
@@ -62,10 +64,10 @@ cc_test(
 cc_test(
     name = "cornell_box_dielectric",
     srcs = ["cornell_box_dielectric.cc"],
-    linkstatic = 1,
     data = [
         "//test_results:cornell_box_with_dielectric.pfm",
     ],
+    linkstatic = 1,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",
@@ -157,15 +159,14 @@ cc_test(
         "//iris_physx_toolkit:point_light",
         "//iris_physx_toolkit:sample_tracer",
         "//iris_physx_toolkit:sphere",
-        "//test_util:spectra",
         "//test_util:pfm",
+        "//test_util:spectra",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "single_triangle",
-    shard_count = 42,
     srcs = ["single_triangle.cc"],
     data = [
         "//test_results:blank.pfm",
@@ -176,6 +177,7 @@ cc_test(
         "//test_results:single_triangle_xz_triangle.pfm",
         "//test_results:single_triangle_yz_triangle.pfm",
     ],
+    shard_count = 42,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
         "//iris_camera_toolkit:grid_pixel_sampler",

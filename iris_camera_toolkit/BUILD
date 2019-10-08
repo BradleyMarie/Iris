@@ -1,46 +1,48 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "grid_pixel_sampler",
-    hdrs = ["grid_pixel_sampler.h"],
     srcs = ["grid_pixel_sampler.c"],
+    hdrs = ["grid_pixel_sampler.h"],
     deps = [
-        "//iris_camera:iris_camera",
+        "//iris_camera",
     ],
 )
 
 cc_library(
     name = "orthographic_camera",
-    hdrs = ["orthographic_camera.h"],
     srcs = ["orthographic_camera.c"],
+    hdrs = ["orthographic_camera.h"],
     deps = [
-        "//iris_camera:iris_camera",
+        "//iris_camera",
     ],
 )
 
 cc_library(
     name = "pfm_writer",
-    hdrs = ["pfm_writer.h"],
     srcs = ["pfm_writer.c"],
+    hdrs = ["pfm_writer.h"],
     deps = [
-        "//iris_camera:iris_camera",
+        "//iris_camera",
     ],
 )
 
 cc_library(
     name = "pinhole_camera",
-    hdrs = ["pinhole_camera.h"],
     srcs = ["pinhole_camera.c"],
+    hdrs = ["pinhole_camera.h"],
     deps = [
-        "//iris_camera:iris_camera",
+        "//iris_camera",
     ],
 )
 
 cc_library(
     name = "thin_lens_camera",
-    hdrs = ["thin_lens_camera.h"],
     srcs = ["thin_lens_camera.c"],
+    hdrs = ["thin_lens_camera.h"],
     deps = [
-        "//iris_camera:iris_camera",
+        "//iris_camera",
     ],
 )

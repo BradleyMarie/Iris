@@ -1,10 +1,12 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
     name = "bounding_box",
     hdrs = ["bounding_box.h"],
     deps = [
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -12,7 +14,7 @@ cc_library(
     name = "color",
     hdrs = ["color.h"],
     deps = [
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -21,7 +23,7 @@ cc_test(
     srcs = ["color_test.cc"],
     deps = [
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -31,30 +33,30 @@ cc_test(
     deps = [
         ":bounding_box",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "iris_advanced",
     hdrs = ["iris_advanced.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":bounding_box",
         ":color",
         ":random",
-        "//iris:iris"
+        "//iris",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "random",
-    hdrs = ["random.h"],
     srcs = ["random.c"],
+    hdrs = ["random.h"],
     deps = [
         "//common:alloc",
         "//common:free_routine",
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -63,6 +65,6 @@ cc_test(
     srcs = ["random_test.cc"],
     deps = [
         ":random",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )

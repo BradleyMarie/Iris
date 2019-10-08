@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 package(
     default_visibility = [
         "//iris:__pkg__",
@@ -6,7 +8,7 @@ package(
         "//iris_camera:__pkg__",
         "//iris_physx:__pkg__",
         "//iris_physx_toolkit:__pkg__",
-        "//iris_spectrum:__pkg__"
+        "//iris_spectrum:__pkg__",
     ],
 )
 
@@ -23,7 +25,7 @@ cc_test(
     srcs = ["alloc_test.cc"],
     deps = [
         ":alloc",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -40,7 +42,7 @@ cc_test(
     srcs = ["const_pointer_list_test.cc"],
     deps = [
         ":const_pointer_list",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -57,7 +59,7 @@ cc_test(
     srcs = ["dynamic_allocator_test.cc"],
     deps = [
         ":dynamic_allocator",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -82,7 +84,7 @@ cc_test(
     srcs = ["pointer_list_test.cc"],
     deps = [
         ":pointer_list",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -99,7 +101,7 @@ cc_test(
     srcs = ["safe_math_test.cc"],
     deps = [
         ":safe_math",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -129,6 +131,6 @@ cc_test(
     srcs = ["static_allocator_test.cc"],
     deps = [
         ":static_allocator",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,9 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
     name = "camera",
-    hdrs = ["camera.h"],
     srcs = ["camera.c"],
+    hdrs = ["camera.h"],
     deps = [
         ":camera_internal",
         ":camera_vtable",
@@ -24,7 +26,7 @@ cc_library(
     hdrs = ["camera_vtable.h"],
     deps = [
         "//common:free_routine",
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -32,39 +34,39 @@ cc_library(
     name = "framebuffer_internal",
     hdrs = ["framebuffer_internal.h"],
     deps = [
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "framebuffer",
-    hdrs = ["framebuffer.h"],
     srcs = ["framebuffer.c"],
+    hdrs = ["framebuffer.h"],
     deps = [
         ":framebuffer_internal",
         "//common:safe_math",
-        "//iris:iris",
+        "//iris",
     ],
 )
 
 cc_library(
     name = "iris_camera",
     hdrs = ["iris_camera.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":camera",
         ":framebuffer",
         ":pixel_sampler",
         ":render",
         ":sample_tracer",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "pixel_sampler",
-    hdrs = ["pixel_sampler.h"],
     srcs = ["pixel_sampler.c"],
+    hdrs = ["pixel_sampler.h"],
     deps = [
         ":pixel_sampler_internal",
         ":pixel_sampler_vtable",
@@ -85,14 +87,14 @@ cc_library(
     hdrs = ["pixel_sampler_vtable.h"],
     deps = [
         "//common:free_routine",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "render",
-    hdrs = ["render.h"],
     srcs = ["render.c"],
+    hdrs = ["render.h"],
     deps = [
         ":camera",
         ":camera_internal",
@@ -108,8 +110,8 @@ cc_library(
 
 cc_library(
     name = "sample_tracer",
-    hdrs = ["sample_tracer.h"],
     srcs = ["sample_tracer.c"],
+    hdrs = ["sample_tracer.h"],
     deps = [
         ":sample_tracer_internal",
         ":sample_tracer_vtable",
@@ -129,7 +131,7 @@ cc_library(
     name = "sample_tracer_vtable",
     hdrs = ["sample_tracer_vtable.h"],
     deps = [
-        "//iris_advanced:iris_advanced",
         "//common:free_routine",
+        "//iris_advanced",
     ],
 )

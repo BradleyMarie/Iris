@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
@@ -6,8 +8,8 @@ cc_library(
     deps = [
         ":hit",
         ":hit_context",
-        ":point",
         ":matrix",
+        ":point",
     ],
 )
 
@@ -18,8 +20,8 @@ cc_library(
 
 cc_library(
     name = "hit_allocator",
-    hdrs = ["hit_allocator.h"],
     srcs = ["hit_allocator.c"],
+    hdrs = ["hit_allocator.h"],
     deps = [
         ":full_hit_context",
         ":hit",
@@ -36,7 +38,7 @@ cc_test(
     deps = [
         ":hit_allocator",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -50,8 +52,8 @@ cc_library(
 
 cc_library(
     name = "hit_tester",
-    hdrs = ["hit_tester.h"],
     srcs = ["hit_tester.c"],
+    hdrs = ["hit_tester.h"],
     deps = [
         ":hit_allocator",
         ":hit_allocator_internal",
@@ -79,7 +81,7 @@ cc_test(
         ":hit_tester_internal",
         ":multiply",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -95,11 +97,12 @@ cc_library(
 cc_library(
     name = "iris",
     hdrs = ["iris.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":hit",
         ":hit_allocator",
-        ":hit_tester",
         ":hit_context",
+        ":hit_tester",
         ":matrix",
         ":multiply",
         ":point",
@@ -107,13 +110,12 @@ cc_library(
         ":ray_tracer",
         ":vector",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "matrix",
-    hdrs = ["matrix.h"],
     srcs = ["matrix.c"],
+    hdrs = ["matrix.h"],
     deps = [
         ":matrix_internal",
         ":vector",
@@ -132,14 +134,14 @@ cc_test(
     deps = [
         ":matrix",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "multiply",
-    hdrs = ["multiply.h"],
     srcs = ["multiply.c"],
+    hdrs = ["multiply.h"],
     deps = [
         ":matrix",
         ":multiply_internal",
@@ -163,7 +165,7 @@ cc_test(
         ":matrix",
         ":multiply_internal",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -173,7 +175,7 @@ cc_test(
     deps = [
         ":multiply",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -191,7 +193,7 @@ cc_test(
     deps = [
         ":point",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -210,20 +212,20 @@ cc_test(
     deps = [
         ":ray",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "ray_tracer",
-    hdrs = ["ray_tracer.h"],
     srcs = ["ray_tracer.c"],
+    hdrs = ["ray_tracer.h"],
     deps = [
         ":hit_context",
         ":hit_tester",
         ":hit_tester_internal",
         ":multiply_internal",
-        ":ray"
+        ":ray",
     ],
 )
 
@@ -234,7 +236,7 @@ cc_test(
         ":multiply",
         ":ray_tracer",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -252,6 +254,6 @@ cc_test(
     deps = [
         ":vector",
         "//test_util:equality",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,9 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
     name = "area_light",
-    hdrs = ["area_light.h"],
     srcs = ["area_light.c"],
+    hdrs = ["area_light.h"],
     deps = [
         ":emissive_material_internal",
         ":hit_tester",
@@ -17,8 +19,8 @@ cc_library(
 
 cc_library(
     name = "bsdf",
-    hdrs = ["bsdf.h"],
     srcs = ["bsdf.c"],
+    hdrs = ["bsdf.h"],
     deps = [
         ":bsdf_internal",
         "//common:alloc",
@@ -27,8 +29,8 @@ cc_library(
 
 cc_library(
     name = "bsdf_allocator",
-    hdrs = ["bsdf_allocator.h"],
     srcs = ["bsdf_allocator.c"],
+    hdrs = ["bsdf_allocator.h"],
     deps = [
         ":bsdf",
         ":bsdf_allocator_internal",
@@ -57,15 +59,15 @@ cc_library(
     hdrs = ["bsdf_vtable.h"],
     deps = [
         ":reflector_compositor",
-        "//iris:iris",
-        "//iris_advanced:iris_advanced",
+        "//iris",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "color_integrator",
-    hdrs = ["color_integrator.h"],
     srcs = ["color_integrator.c"],
+    hdrs = ["color_integrator.h"],
     deps = [
         ":color_integrator_internal",
         ":color_integrator_vtable",
@@ -89,14 +91,14 @@ cc_library(
     deps = [
         ":reflector",
         ":spectrum",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "emissive_material",
-    hdrs = ["emissive_material.h"],
     srcs = ["emissive_material.c"],
+    hdrs = ["emissive_material.h"],
     deps = [
         ":emissive_material_internal",
         ":emissive_material_vtable",
@@ -117,7 +119,7 @@ cc_library(
     hdrs = ["emissive_material_vtable.h"],
     deps = [
         ":spectrum",
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -125,7 +127,7 @@ cc_library(
     name = "hit_allocator",
     hdrs = ["hit_allocator.h"],
     deps = [
-        "//iris:iris",
+        "//iris",
     ],
 )
 
@@ -140,8 +142,8 @@ cc_library(
 
 cc_library(
     name = "integrator",
-    hdrs = ["integrator.h"],
     srcs = ["integrator.c"],
+    hdrs = ["integrator.h"],
     deps = [
         ":bsdf",
         ":bsdf_internal",
@@ -163,17 +165,18 @@ cc_library(
     deps = [
         ":hit_tester",
         ":light_sampler",
-        ":spectrum_compositor",
         ":ray_tracer",
         ":reflector_compositor",
+        ":spectrum_compositor",
         ":visibility_tester",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "iris_physx",
     hdrs = ["iris_physx.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":area_light",
         ":bsdf",
@@ -196,15 +199,14 @@ cc_library(
         ":spectrum",
         ":spectrum_compositor",
         ":visibility_tester",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "light",
-    hdrs = ["light.h"],
     srcs = ["light.c"],
+    hdrs = ["light.h"],
     deps = [
         ":light_internal",
         ":light_vtable",
@@ -221,12 +223,12 @@ cc_library(
 
 cc_library(
     name = "light_sample_collector",
-    hdrs = ["light_sample_collector.h"],
     srcs = ["light_sample_collector.c"],
+    hdrs = ["light_sample_collector.h"],
     deps = [
         ":light",
         ":light_sample_collector_internal",
-        "//common:safe_math"
+        "//common:safe_math",
     ],
 )
 
@@ -240,12 +242,12 @@ cc_library(
 
 cc_library(
     name = "light_sample_list",
-    hdrs = ["light_sample_list.h"],
     srcs = ["light_sample_list.c"],
+    hdrs = ["light_sample_list.h"],
     deps = [
         ":light",
         ":light_sample_list_internal",
-        "//common:safe_math"
+        "//common:safe_math",
     ],
 )
 
@@ -260,13 +262,13 @@ cc_library(
 
 cc_library(
     name = "light_sampler",
-    hdrs = ["light_sampler.h"],
     srcs = ["light_sampler.c"],
+    hdrs = ["light_sampler.h"],
     deps = [
         ":light_sample_list",
         ":light_sample_list_internal",
         ":light_sampler_vtable",
-        "//common:alloc"
+        "//common:alloc",
     ],
 )
 
@@ -284,14 +286,14 @@ cc_library(
     deps = [
         ":spectrum_compositor",
         ":visibility_tester",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
 cc_library(
     name = "material",
-    hdrs = ["material.h"],
     srcs = ["material.c"],
+    hdrs = ["material.h"],
     deps = [
         ":material_internal",
         ":material_vtable",
@@ -318,8 +320,8 @@ cc_library(
 
 cc_library(
     name = "ray_tracer",
-    hdrs = ["ray_tracer.h"],
     srcs = ["ray_tracer.c"],
+    hdrs = ["ray_tracer.h"],
     deps = [
         ":bsdf",
         ":light",
@@ -335,16 +337,16 @@ cc_library(
     hdrs = ["ray_tracer_internal.h"],
     deps = [
         ":bsdf_allocator",
-        ":reflector_compositor_internal",
-        ":reflector_compositor",
         ":light",
+        ":reflector_compositor",
+        ":reflector_compositor_internal",
     ],
 )
 
 cc_library(
     name = "reflector",
-    hdrs = ["reflector.h"],
     srcs = ["reflector.c"],
+    hdrs = ["reflector.h"],
     deps = [
         ":reflector_internal",
         "//common:alloc",
@@ -353,8 +355,8 @@ cc_library(
 
 cc_library(
     name = "reflector_compositor",
-    hdrs = ["reflector_compositor.h"],
     srcs = ["reflector_compositor.c"],
+    hdrs = ["reflector_compositor.h"],
     deps = [
         ":color_integrator",
         ":reflector",
@@ -378,15 +380,15 @@ cc_test(
     deps = [
         ":reflector_compositor",
         ":reflector_compositor_test_util",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "reflector_compositor_test_util",
-    hdrs = ["reflector_compositor_test_util.h"],
-    srcs = ["reflector_compositor_test_util.c"],
     testonly = 1,
+    srcs = ["reflector_compositor_test_util.c"],
+    hdrs = ["reflector_compositor_test_util.h"],
     deps = [
         ":reflector_compositor",
         ":reflector_compositor_internal",
@@ -398,7 +400,7 @@ cc_library(
     hdrs = ["reflector_internal.h"],
     deps = [
         ":reflector_vtable",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
@@ -407,7 +409,7 @@ cc_test(
     srcs = ["reflector_test.cc"],
     deps = [
         ":reflector",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -423,8 +425,8 @@ cc_library(
 
 cc_library(
     name = "scene",
-    hdrs = ["scene.h"],
     srcs = ["scene.c"],
+    hdrs = ["scene.h"],
     deps = [
         ":scene_internal",
         ":scene_vtable",
@@ -451,8 +453,8 @@ cc_library(
 
 cc_library(
     name = "shape",
-    hdrs = ["shape.h"],
     srcs = ["shape.c"],
+    hdrs = ["shape.h"],
     deps = [
         ":light",
         ":shape_internal",
@@ -481,8 +483,8 @@ cc_library(
 
 cc_library(
     name = "spectrum",
-    hdrs = ["spectrum.h"],
     srcs = ["spectrum.c"],
+    hdrs = ["spectrum.h"],
     deps = [
         ":spectrum_internal",
         "//common:alloc",
@@ -491,8 +493,8 @@ cc_library(
 
 cc_library(
     name = "spectrum_compositor",
-    hdrs = ["spectrum_compositor.h"],
     srcs = ["spectrum_compositor.c"],
+    hdrs = ["spectrum_compositor.h"],
     deps = [
         ":color_integrator",
         ":reflector",
@@ -522,15 +524,15 @@ cc_test(
         ":reflector_compositor_test_util",
         ":spectrum_compositor",
         ":spectrum_compositor_test_util",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "spectrum_compositor_test_util",
-    hdrs = ["spectrum_compositor_test_util.h"],
-    srcs = ["spectrum_compositor_test_util.c"],
     testonly = 1,
+    srcs = ["spectrum_compositor_test_util.c"],
+    hdrs = ["spectrum_compositor_test_util.h"],
     deps = [
         ":spectrum_compositor",
         ":spectrum_compositor_internal",
@@ -542,7 +544,7 @@ cc_library(
     hdrs = ["spectrum_internal.h"],
     deps = [
         ":spectrum_vtable",
-        "//iris_advanced:iris_advanced",
+        "//iris_advanced",
     ],
 )
 
@@ -551,7 +553,7 @@ cc_test(
     srcs = ["spectrum_test.cc"],
     deps = [
         ":spectrum",
-        "@com_google_googletest//:gtest_main"
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -569,14 +571,14 @@ cc_library(
     name = "visibility_tester_internal",
     hdrs = ["visibility_tester_internal.h"],
     deps = [
-        "//iris:iris",
+        "//iris",
     ],
 )
 
 cc_library(
     name = "visibility_tester",
-    hdrs = ["visibility_tester.h"],
     srcs = ["visibility_tester.c"],
+    hdrs = ["visibility_tester.h"],
     deps = [
         ":visibility_tester_internal",
     ],
