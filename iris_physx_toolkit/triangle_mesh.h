@@ -27,6 +27,7 @@ extern "C" {
 
 typedef struct _TRIANGLE_MESH_ADDITIONAL_DATA {
     float_t barycentric_coordinates[3];
+    uint32_t vertex_indices[3];
 } TRIANGLE_MESH_ADDITIONAL_DATA, *PTRIANGLE_MESH_ADDITIONAL_DATA;
 
 typedef const TRIANGLE_MESH_ADDITIONAL_DATA *PCTRIANGLE_MESH_ADDITIONAL_DATA;
