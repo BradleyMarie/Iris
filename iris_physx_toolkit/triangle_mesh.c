@@ -44,6 +44,7 @@ typedef struct _TRIANGLE {
     uint32_t v1;
     uint32_t v2;
     VECTOR3 surface_normal;
+    uint32_t mesh_face_index;
 } TRIANGLE, *PTRIANGLE;
 
 typedef const TRIANGLE *PCTRIANGLE;
@@ -239,9 +240,7 @@ TriangleTrace(
     data.barycentric_coordinates[0] *= inverse_determinant;
     data.barycentric_coordinates[1] *= inverse_determinant;
     data.barycentric_coordinates[2] *= inverse_determinant;
-    data.vertex_indices[0] = triangle->v0;
-    data.vertex_indices[1] = triangle->v1;
-    data.vertex_indices[2] = triangle->v2;
+    data.mesh_face_index = triangle->mesh_face_index;
 
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
 
@@ -361,6 +360,7 @@ TriangleMeshFree(
     MaterialRelease(mesh->materials[1]);
     EmissiveMaterialRelease(mesh->emissive_materials[0]);
     EmissiveMaterialRelease(mesh->emissive_materials[1]);
+    free(mesh);
 }
 
 static
@@ -378,12 +378,13 @@ TriangleFree(
 }
 
 static
-ISTATUS
+bool
 TriangleInitialize(
     _In_ PTRIANGLE_MESH mesh,
     _In_ uint32_t v0,
     _In_ uint32_t v1,
     _In_ uint32_t v2,
+    _In_ uint32_t mesh_face_index,
     _Out_opt_ float_t *area,
     _Out_ PTRIANGLE triangle
     )
@@ -395,6 +396,7 @@ TriangleInitialize(
     triangle->v0 = v0;
     triangle->v1 = v1;
     triangle->v2 = v2;
+    triangle->mesh_face_index = mesh_face_index;
 
     VECTOR3 v0_to_v1 = PointSubtract(mesh->vertices[v1], mesh->vertices[v0]);
     VECTOR3 v0_to_v2 = PointSubtract(mesh->vertices[v2], mesh->vertices[v0]);
@@ -403,7 +405,7 @@ TriangleInitialize(
     float_t surface_normal_length = VectorLength(triangle->surface_normal);
     if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
     {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        return false;
     }
 
     float_t scalar = (float_t)1.0 / surface_normal_length;
@@ -414,7 +416,7 @@ TriangleInitialize(
         *area = surface_normal_length * (float_t)0.5;
     }
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 //
@@ -546,7 +548,7 @@ ISTATUS
 TriangleMeshValidateVertices(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles
     )
 {
@@ -596,7 +598,8 @@ TriangleMeshValidateVertices(
             vertex_indices[i][0] == vertex_indices[i][2] ||
             vertex_indices[i][1] == vertex_indices[i][2])
         {
-            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+            // TODO: Consider returning ISTATUS_INVALID_ARGUMENT_COMBINATION_00
+            continue;
         }
     }
 
@@ -612,7 +615,6 @@ TriangleMeshAllocateInternal(
     _In_opt_ PMATERIAL back_material,
     _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
     _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
-    _In_ size_t num_triangles,
     _Out_ PTRIANGLE_MESH* mesh
     )
 {
@@ -637,10 +639,10 @@ TriangleMeshAllocateInternal(
     memcpy((*mesh)->vertices, vertices, sizeof(POINT3) * num_vertices);
 
     (*mesh)->materials[0] = front_material;
-    (*mesh)->materials[1] = front_material;
+    (*mesh)->materials[1] = back_material;
     (*mesh)->emissive_materials[0] = front_emissive_material;
-    (*mesh)->emissive_materials[1] = front_emissive_material;
-    (*mesh)->reference_count = num_triangles;
+    (*mesh)->emissive_materials[1] = back_emissive_material;
+    (*mesh)->reference_count = 0;
 
     return ISTATUS_SUCCESS;
 }
@@ -666,11 +668,12 @@ ISTATUS
 TriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
-    _Out_writes_(num_triangles) PSHAPE shapes[]
+    _Out_writes_(num_triangles) PSHAPE shapes[],
+    _Out_ size_t *triangles_allocated
     )
 {
     ISTATUS status = TriangleMeshValidateVertices(vertices,
@@ -688,6 +691,11 @@ TriangleMeshAllocate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
+    if (triangles_allocated == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     PTRIANGLE_MESH mesh;
     status = TriangleMeshAllocateInternal(vertices,
                                           num_vertices,
@@ -695,7 +703,6 @@ TriangleMeshAllocate(
                                           back_material,
                                           NULL,
                                           NULL,
-                                          num_triangles,
                                           &mesh);
 
     if (status != ISTATUS_SUCCESS)
@@ -714,37 +721,59 @@ TriangleMeshAllocate(
     for (size_t i = 0; i < num_triangles; i++)
     {
         TRIANGLE triangle;
-        status = TriangleInitialize(mesh,
-                                    vertex_indices[i][0],
-                                    vertex_indices[i][1],
-                                    vertex_indices[i][2],
-                                    NULL,
-                                    &triangle);
+        bool success = TriangleInitialize(mesh,
+                                          vertex_indices[i][0],
+                                          vertex_indices[i][1],
+                                          vertex_indices[i][2],
+                                          (uint32_t)i,
+                                          NULL,
+                                          &triangle);
 
-        if (status != ISTATUS_SUCCESS)
+        if (!success)
         {
-            assert(status == ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
-            ShapeListFree(shapes_tmp, i);
-            free(shapes_tmp);
-            TriangleMeshFree(mesh);
-            return status;
+            // TODO: Consider returning ISTATUS_INVALID_ARGUMENT_COMBINATION_00
+            continue;
         }
 
         status = ShapeAllocate(&triangle_vtable,
                                &triangle,
                                sizeof(TRIANGLE),
                                alignof(TRIANGLE),
-                               shapes_tmp + i);
+                               shapes_tmp + mesh->reference_count);
 
         if (status != ISTATUS_SUCCESS)
         {
             assert(status == ISTATUS_ALLOCATION_FAILED);
-            ShapeListFree(shapes_tmp, i);
+            ShapeListFree(shapes_tmp, mesh->reference_count);
             free(shapes_tmp);
             TriangleMeshFree(mesh);
             return status;
         }
+
+        mesh->reference_count += 1;
     }
+
+    if (mesh->reference_count == 0)
+    {
+        TriangleMeshFree(mesh);
+        *triangles_allocated = 0;
+    }
+    else
+    {
+        *triangles_allocated = mesh->reference_count;
+    }
+
+    if (mesh->reference_count == 0)
+    {
+        TriangleMeshFree(mesh);
+        *triangles_allocated = 0;
+        return ISTATUS_SUCCESS;
+    }
+
+    MaterialRetain(front_material);
+    MaterialRetain(back_material);
+
+    *triangles_allocated = mesh->reference_count;
 
     memcpy(shapes, shapes_tmp, sizeof(PSHAPE) * num_triangles);
     free(shapes_tmp);
@@ -756,13 +785,14 @@ ISTATUS
 EmissiveTriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
     _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
     _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
-    _Out_writes_(num_triangles) PSHAPE shapes[]
+    _Out_writes_(num_triangles) PSHAPE shapes[],
+    _Out_ size_t *triangles_allocated
     )
 {
     ISTATUS status = TriangleMeshValidateVertices(vertices,
@@ -780,6 +810,11 @@ EmissiveTriangleMeshAllocate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
+    if (triangles_allocated == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
     PTRIANGLE_MESH mesh;
     status = TriangleMeshAllocateInternal(vertices,
                                           num_vertices,
@@ -787,7 +822,6 @@ EmissiveTriangleMeshAllocate(
                                           back_material,
                                           front_emissive_material,
                                           back_emissive_material,
-                                          num_triangles,
                                           &mesh);
 
     if (status != ISTATUS_SUCCESS)
@@ -806,37 +840,51 @@ EmissiveTriangleMeshAllocate(
     for (size_t i = 0; i < num_triangles; i++)
     {
         EMISSIVE_TRIANGLE emissive_triangle;
-        status = TriangleInitialize(mesh,
-                                    vertex_indices[i][0],
-                                    vertex_indices[i][1],
-                                    vertex_indices[i][2],
-                                    &emissive_triangle.area,
-                                    &emissive_triangle.triangle);
+        bool success = TriangleInitialize(mesh,
+                                          vertex_indices[i][0],
+                                          vertex_indices[i][1],
+                                          vertex_indices[i][2],
+                                          (uint32_t)i,
+                                          &emissive_triangle.area,
+                                          &emissive_triangle.triangle);
 
-        if (status != ISTATUS_SUCCESS)
+        if (!success)
         {
-            assert(status == ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
-            ShapeListFree(shapes_tmp, i);
-            free(shapes_tmp);
-            TriangleMeshFree(mesh);
-            return status;
+            // TODO: Consider returning ISTATUS_INVALID_ARGUMENT_COMBINATION_00
+            continue;
         }
 
         status = ShapeAllocate(&emissive_triangle_vtable,
                                &emissive_triangle,
                                sizeof(EMISSIVE_TRIANGLE),
                                alignof(EMISSIVE_TRIANGLE),
-                               shapes_tmp + i);
+                               shapes_tmp + mesh->reference_count);
 
         if (status != ISTATUS_SUCCESS)
         {
             assert(status == ISTATUS_ALLOCATION_FAILED);
-            ShapeListFree(shapes_tmp, i);
+            ShapeListFree(shapes_tmp, mesh->reference_count);
             free(shapes_tmp);
             TriangleMeshFree(mesh);
             return status;
         }
+
+        mesh->reference_count += 1;
     }
+
+    if (mesh->reference_count == 0)
+    {
+        TriangleMeshFree(mesh);
+        *triangles_allocated = 0;
+        return ISTATUS_SUCCESS;
+    }
+
+    MaterialRetain(front_material);
+    MaterialRetain(back_material);
+    EmissiveMaterialRetain(front_emissive_material);
+    EmissiveMaterialRetain(back_emissive_material);
+
+    *triangles_allocated = mesh->reference_count;
 
     memcpy(shapes, shapes_tmp, sizeof(PSHAPE) * num_triangles);
     free(shapes_tmp);

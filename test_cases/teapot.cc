@@ -27,7 +27,7 @@ Abstract:
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
-#include "iris_physx_toolkit/triangle.h"
+#include "iris_physx_toolkit/triangle_mesh.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/teapot.h"
 #include "test_util/pfm.h"
@@ -39,7 +39,6 @@ Abstract:
 
 typedef struct _SMOOTH_MATERIAL {
     PBSDF bsdf;
-    VECTOR3 normals[3];
 } SMOOTH_MATERIAL, *PSMOOTH_MATERIAL;
 
 typedef const SMOOTH_MATERIAL *PCSMOOTH_MATERIAL;
@@ -58,19 +57,21 @@ SmoothMaterialSample(
     )
 {
     PCSMOOTH_MATERIAL smooth_material = (PCSMOOTH_MATERIAL)context;
-    PCTRIANGLE_ADDITIONAL_DATA smooth_data =
-        (PCTRIANGLE_ADDITIONAL_DATA)additional_data;
+    PCTRIANGLE_MESH_ADDITIONAL_DATA triangle_data =
+        (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
 
-    *world_shading_normal = VectorScale(smooth_material->normals[0], 
-                                        smooth_data->barycentric_coordinates[0]);
+    const size_t* normals = teapot_face_normals[triangle_data->mesh_face_index];
 
-    *world_shading_normal = VectorAddScaled(*world_shading_normal,
-                                            smooth_material->normals[1], 
-                                            smooth_data->barycentric_coordinates[1]);
+    *world_shading_normal = VectorScale(teapot_normals[normals[0]],
+                                        triangle_data->barycentric_coordinates[0]);
 
     *world_shading_normal = VectorAddScaled(*world_shading_normal,
-                                            smooth_material->normals[2], 
-                                            smooth_data->barycentric_coordinates[2]);
+                                            teapot_normals[normals[1]],
+                                            triangle_data->barycentric_coordinates[1]);
+
+    *world_shading_normal = VectorAddScaled(*world_shading_normal,
+                                            teapot_normals[normals[2]],
+                                            triangle_data->barycentric_coordinates[2]);
 
     *world_shading_normal = VectorNormalize(*world_shading_normal,
                                             nullptr,
@@ -99,23 +100,14 @@ static const MATERIAL_VTABLE smooth_material_vtable = {
 
 void
 SmoothMaterialAllocate(
-    _In_ VECTOR3 normal0,
-    _In_ VECTOR3 normal1,
-    _In_ VECTOR3 normal2,
     _In_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     )
 {
-    ASSERT_TRUE(VectorValidate(normal0));
-    ASSERT_TRUE(VectorValidate(normal1));
-    ASSERT_TRUE(VectorValidate(normal2));
     ASSERT_TRUE(bsdf);
     ASSERT_TRUE(material);
 
     SMOOTH_MATERIAL smooth_material;
-    smooth_material.normals[0] = normal0;
-    smooth_material.normals[1] = normal1;
-    smooth_material.normals[2] = normal2;
     smooth_material.bsdf = bsdf;
 
     ISTATUS status = MaterialAllocate(&smooth_material_vtable,
@@ -243,40 +235,27 @@ TEST(TeapotTest, FlatShadedTeapot)
     status = ConstantMaterialAllocate(bsdf, &material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PSHAPE shapes[TEAPOT_FACE_COUNT];
-    PMATRIX transforms[TEAPOT_FACE_COUNT];
-    bool premultiplied[TEAPOT_FACE_COUNT];
+    PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
+    PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
+    bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
-    size_t num_shapes = 0;
-    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
-    {
-        PSHAPE shape;
-        ISTATUS status = TriangleAllocate(
-            teapot_vertices[teapot_faces[i].vertex0],
-            teapot_vertices[teapot_faces[i].vertex1],
-            teapot_vertices[teapot_faces[i].vertex2],
-            material,
-            nullptr,
-            &shape);
-
-        if (status == ISTATUS_SUCCESS)
-        {
-            shapes[num_shapes] = shape;
-            transforms[num_shapes] = nullptr;
-            premultiplied[num_shapes] = false;
-            num_shapes += 1;
-        }
-        else
-        {
-            ASSERT_EQ(status, ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
-        }
-    }
+    size_t triangles_allocated;
+    status = TriangleMeshAllocate(
+        teapot_vertices,
+        TEAPOT_VERTEX_COUNT,
+        teapot_face_vertices,
+        TEAPOT_FACE_COUNT,
+        material,
+        nullptr,
+        shapes,
+        &triangles_allocated);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
                                  transforms,
                                  premultiplied,
-                                 num_shapes,
+                                 triangles_allocated,
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -284,7 +263,7 @@ TEST(TeapotTest, FlatShadedTeapot)
                              light_sampler,
                              "test_results/teapot_flat.pfm");
 
-    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
+    for (size_t i = 0; i < triangles_allocated; i++)
     {
         ShapeRelease(shapes[i]);
     }
@@ -329,56 +308,30 @@ TEST(TeapotTest, SmoothShadedTeapot)
     status = AllLightSamplerAllocate(&light, 1, &light_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PSHAPE shapes[TEAPOT_FACE_COUNT];
-    PMATRIX transforms[TEAPOT_FACE_COUNT];
-    bool premultiplied[TEAPOT_FACE_COUNT];
+    PMATERIAL material;
+    SmoothMaterialAllocate(bsdf, &material);
 
-    size_t num_shapes = 0;
-    for (size_t i = 0; i < TEAPOT_FACE_COUNT; i++)
-    {
-        VECTOR3 normal0 = teapot_normals[teapot_faces[i].normal0];
-        normal0 = VectorNormalize(normal0, nullptr, nullptr);
-        VECTOR3 normal1 = teapot_normals[teapot_faces[i].normal1];
-        normal1 = VectorNormalize(normal1, nullptr, nullptr);
-        VECTOR3 normal2 = teapot_normals[teapot_faces[i].normal2];
-        normal2 = VectorNormalize(normal2, nullptr, nullptr);
-        PMATERIAL material;
-        SmoothMaterialAllocate(
-            normal0,
-            normal1,
-            normal2,
-            bsdf,
-            &material);
+    PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
+    PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
+    bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
-        PSHAPE shape;
-        ISTATUS status = TriangleAllocate(
-            teapot_vertices[teapot_faces[i].vertex0],
-            teapot_vertices[teapot_faces[i].vertex1],
-            teapot_vertices[teapot_faces[i].vertex2],
-            material,
-            nullptr,
-            &shape);
-
-        if (shape)
-        {
-            shapes[num_shapes] = shape;
-            transforms[num_shapes] = nullptr;
-            premultiplied[num_shapes] = false;
-            num_shapes += 1;
-        }
-        else
-        {
-            ASSERT_EQ(status, ISTATUS_INVALID_ARGUMENT_COMBINATION_00);
-        }
-
-        MaterialRelease(material);
-    }
+    size_t triangles_allocated;
+    status = TriangleMeshAllocate(
+        teapot_vertices,
+        TEAPOT_VERTEX_COUNT,
+        teapot_face_vertices,
+        TEAPOT_FACE_COUNT,
+        material,
+        nullptr,
+        shapes,
+        &triangles_allocated);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
                                  transforms,
                                  premultiplied,
-                                 num_shapes,
+                                 triangles_allocated,
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -386,14 +339,15 @@ TEST(TeapotTest, SmoothShadedTeapot)
                              light_sampler,
                              "test_results/teapot_smooth.pfm");
 
-    for (PSHAPE shape : shapes)
+    for (size_t i = 0; i < triangles_allocated; i++)
     {
-        ShapeRelease(shape);
+        ShapeRelease(shapes[i]);
     }
 
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
+    MaterialRelease(material);
     LightRelease(light);
     SceneFree(scene);
     LightSamplerFree(light_sampler);

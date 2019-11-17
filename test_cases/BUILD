@@ -216,7 +216,7 @@ cc_test(
         "//iris_physx_toolkit:path_tracer",
         "//iris_physx_toolkit:point_light",
         "//iris_physx_toolkit:sample_tracer",
-        "//iris_physx_toolkit:triangle",
+        "//iris_physx_toolkit:triangle_mesh",
         "//test_util:pfm",
         "//test_util:spectra",
         "//test_util:teapot",

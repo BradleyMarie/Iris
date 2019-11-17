@@ -22,21 +22,6 @@ extern "C" {
 #endif // __cplusplus
 
 //
-// Types
-//
-
-typedef struct _TEAPOT_FACE {
-    size_t vertex0;
-    size_t normal0;
-    size_t vertex1;
-    size_t normal1;
-    size_t vertex2;
-    size_t normal2;
-} TEAPOT_FACE, *PTEAPOT_FACE;
-
-typedef const TEAPOT_FACE *PCTEAPOT_FACE;
-
-//
 // Teapot Data
 //
 
@@ -47,7 +32,8 @@ extern const POINT3 teapot_vertices[TEAPOT_VERTEX_COUNT];
 extern const VECTOR3 teapot_normals[TEAPOT_NORMAL_COUNT];
 
 #define TEAPOT_FACE_COUNT 6320
-extern const TEAPOT_FACE teapot_faces[TEAPOT_FACE_COUNT];
+extern const size_t teapot_face_vertices[TEAPOT_FACE_COUNT][3];
+extern const size_t teapot_face_normals[TEAPOT_FACE_COUNT][3];
 
 #if __cplusplus 
 }

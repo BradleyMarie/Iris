@@ -27,7 +27,7 @@ extern "C" {
 
 typedef struct _TRIANGLE_MESH_ADDITIONAL_DATA {
     float_t barycentric_coordinates[3];
-    uint32_t vertex_indices[3];
+    uint32_t mesh_face_index;
 } TRIANGLE_MESH_ADDITIONAL_DATA, *PTRIANGLE_MESH_ADDITIONAL_DATA;
 
 typedef const TRIANGLE_MESH_ADDITIONAL_DATA *PCTRIANGLE_MESH_ADDITIONAL_DATA;
@@ -47,24 +47,26 @@ ISTATUS
 TriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
-    _Out_writes_(num_triangles) PSHAPE shapes[]
+    _Out_writes_(*triangles_allocated) PSHAPE shapes[],
+    _Out_ size_t *triangles_allocated
     );
 
 ISTATUS
 EmissiveTriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_ size_t num_vertices,
-    _In_reads_(num_triangles) size_t vertex_indices[][3],
+    _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
     _In_opt_ PMATERIAL front_material,
     _In_opt_ PMATERIAL back_material,
     _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
     _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
-    _Out_writes_(num_triangles) PSHAPE shapes[]
+    _Out_writes_(*triangles_allocated) PSHAPE shapes[],
+    _Out_ size_t *triangles_allocated
     );
 
 #if __cplusplus 
