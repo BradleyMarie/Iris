@@ -560,6 +560,19 @@ static const SHAPE_VTABLE triangle_vtable = {
     TriangleFree
 };
 
+static const SHAPE_VTABLE triangle_with_normals_vtable = {
+    TriangleTrace,
+    TriangleComputeBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    NULL,
+    NULL,
+    NULL,
+    TriangleComputeShadingNormal,
+    NULL,
+    TriangleFree
+};
+
 static const SHAPE_VTABLE emissive_triangle_vtable = {
     TriangleTrace,
     TriangleComputeBounds,
@@ -569,6 +582,19 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
     NULL,
+    NULL,
+    TriangleFree
+};
+
+static const SHAPE_VTABLE emissive_triangle_with_normals_vtable = {
+    TriangleTrace,
+    TriangleComputeBounds,
+    TriangleComputeNormal,
+    TriangleGetMaterial,
+    EmissiveTriangleGetEmissiveMaterial,
+    EmissiveTriangleSampleFace,
+    EmissiveTriangleComputePdfBySolidArea,
+    TriangleComputeShadingNormal,
     NULL,
     TriangleFree
 };
@@ -745,7 +771,17 @@ TriangleAllocateInternal(
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status = ShapeAllocate(&triangle_vtable,
+    PCSHAPE_VTABLE vtable;
+    if (mesh->normals != NULL)
+    {
+        vtable = &triangle_with_normals_vtable;
+    }
+    else
+    {
+        vtable = &triangle_vtable;
+    }
+
+    ISTATUS status = ShapeAllocate(vtable,
                                    &triangle,
                                    sizeof(TRIANGLE),
                                    alignof(TRIANGLE),
@@ -780,7 +816,17 @@ EmissiveTriangleAllocateInternal(
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status = ShapeAllocate(&emissive_triangle_vtable,
+    PCSHAPE_VTABLE vtable;
+    if (mesh->normals != NULL)
+    {
+        vtable = &emissive_triangle_with_normals_vtable;
+    }
+    else
+    {
+        vtable = &emissive_triangle_vtable;
+    }
+
+    ISTATUS status = ShapeAllocate(vtable,
                                    &emissive_triangle,
                                    sizeof(EMISSIVE_TRIANGLE),
                                    alignof(EMISSIVE_TRIANGLE),
