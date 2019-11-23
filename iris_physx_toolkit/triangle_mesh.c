@@ -375,6 +375,13 @@ TriangleComputeShadingNormal(
                               mesh->normals[triangle->v2],
                               hit_data->barycentric_coordinates[2]);
 
+    *normal = VectorNormalize(*normal, NULL, NULL);
+
+    if (face_hit == TRIANGLE_MESH_BACK_FACE)
+    {
+        *normal = VectorNegate(*normal);
+    }
+
     return ISTATUS_SUCCESS;
 }
 
@@ -635,7 +642,7 @@ TriangleMeshValidateVerticesAndNormals(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        if (!VectorValidate(normals[vertex_indices[i][0]]))
+        if (normals != NULL && !VectorValidate(normals[vertex_indices[i][0]]))
         {
             return ISTATUS_INVALID_ARGUMENT_02;
         }
@@ -650,7 +657,7 @@ TriangleMeshValidateVerticesAndNormals(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        if (!VectorValidate(normals[vertex_indices[i][1]]))
+        if (normals != NULL && !VectorValidate(normals[vertex_indices[i][1]]))
         {
             return ISTATUS_INVALID_ARGUMENT_02;
         }
@@ -665,7 +672,7 @@ TriangleMeshValidateVerticesAndNormals(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        if (!VectorValidate(normals[vertex_indices[i][2]]))
+        if (normals != NULL && !VectorValidate(normals[vertex_indices[i][2]]))
         {
             return ISTATUS_INVALID_ARGUMENT_02;
         }

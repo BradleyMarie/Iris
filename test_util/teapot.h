@@ -25,15 +25,12 @@ extern "C" {
 // Teapot Data
 //
 
-#define TEAPOT_VERTEX_COUNT 3240
+#define TEAPOT_VERTEX_COUNT 3253
 extern const POINT3 teapot_vertices[TEAPOT_VERTEX_COUNT];
-
-#define TEAPOT_NORMAL_COUNT 3252
-extern const VECTOR3 teapot_normals[TEAPOT_NORMAL_COUNT];
+extern const VECTOR3 teapot_normals[TEAPOT_VERTEX_COUNT];
 
 #define TEAPOT_FACE_COUNT 6320
 extern const size_t teapot_face_vertices[TEAPOT_FACE_COUNT][3];
-extern const size_t teapot_face_normals[TEAPOT_FACE_COUNT][3];
 
 #if __cplusplus 
 }

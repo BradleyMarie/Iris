@@ -46,11 +46,9 @@ ISTATUS
 TriangleMaterialSample(
     _In_ const void *context,
     _In_ POINT3 model_hit_point,
-    _In_ VECTOR3 world_surface_normal,
     _In_ const void *additional_data,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
-    _Out_ PVECTOR3 world_shading_normal,
     _Out_ PCBSDF *bsdf
     )
 {
@@ -82,8 +80,6 @@ TriangleMaterialSample(
     {
         return status;
     }
-
-    *world_shading_normal = world_surface_normal;
 
     return ISTATUS_SUCCESS;
 }

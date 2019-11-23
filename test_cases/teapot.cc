@@ -34,93 +34,6 @@ Abstract:
 #include "test_util/spectra.h"
 
 //
-// Smooth Material
-//
-
-typedef struct _SMOOTH_MATERIAL {
-    PBSDF bsdf;
-} SMOOTH_MATERIAL, *PSMOOTH_MATERIAL;
-
-typedef const SMOOTH_MATERIAL *PCSMOOTH_MATERIAL;
-
-static
-ISTATUS
-SmoothMaterialSample(
-    _In_ const void *context,
-    _In_ POINT3 model_hit_point,
-    _In_ VECTOR3 world_surface_normal,
-    _In_ const void *additional_data,
-    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
-    _Out_ PVECTOR3 world_shading_normal,
-    _Out_ PCBSDF *bsdf
-    )
-{
-    PCSMOOTH_MATERIAL smooth_material = (PCSMOOTH_MATERIAL)context;
-    PCTRIANGLE_MESH_ADDITIONAL_DATA triangle_data =
-        (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
-
-    const size_t* normals = teapot_face_normals[triangle_data->mesh_face_index];
-
-    *world_shading_normal = VectorScale(teapot_normals[normals[0]],
-                                        triangle_data->barycentric_coordinates[0]);
-
-    *world_shading_normal = VectorAddScaled(*world_shading_normal,
-                                            teapot_normals[normals[1]],
-                                            triangle_data->barycentric_coordinates[1]);
-
-    *world_shading_normal = VectorAddScaled(*world_shading_normal,
-                                            teapot_normals[normals[2]],
-                                            triangle_data->barycentric_coordinates[2]);
-
-    *world_shading_normal = VectorNormalize(*world_shading_normal,
-                                            nullptr,
-                                            nullptr);
-
-    *bsdf = smooth_material->bsdf;
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-void
-SmoothMaterialFree(
-    _In_opt_ _Post_invalid_ void *context
-    )
-{
-    PSMOOTH_MATERIAL smooth_material = (PSMOOTH_MATERIAL)context;
-
-    BsdfRelease(smooth_material->bsdf);
-}
-
-static const MATERIAL_VTABLE smooth_material_vtable = {
-    SmoothMaterialSample,
-    SmoothMaterialFree
-};
-
-void
-SmoothMaterialAllocate(
-    _In_ PBSDF bsdf,
-    _Out_ PMATERIAL *material
-    )
-{
-    ASSERT_TRUE(bsdf);
-    ASSERT_TRUE(material);
-
-    SMOOTH_MATERIAL smooth_material;
-    smooth_material.bsdf = bsdf;
-
-    ISTATUS status = MaterialAllocate(&smooth_material_vtable,
-                                      &smooth_material,
-                                      sizeof(SMOOTH_MATERIAL),
-                                      alignof(SMOOTH_MATERIAL),
-                                      material);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    BsdfRetain(bsdf);
-}
-
-//
 // Tests
 //
 
@@ -242,7 +155,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     size_t triangles_allocated;
     status = TriangleMeshAllocate(
         teapot_vertices,
-        teapot_normals,
+        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
@@ -312,7 +225,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
-    SmoothMaterialAllocate(bsdf, &material);
+    ConstantMaterialAllocate(bsdf, &material);
 
     PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
     PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };

@@ -111,14 +111,49 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
+    VECTOR3 model_shading_normal;
+    status = ShapeComputeShadingNormal(shape,
+                                       model_hit_point,
+                                       hit_context->front_face,
+                                       hit_context->additional_data,
+                                       &model_shading_normal);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!VectorValidate(model_shading_normal))
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    status = MaterialSample(material,
+                            model_hit_point,
+                            hit_context->additional_data,
+                            &process_context->shape_ray_tracer->bsdf_allocator,
+                            &process_context->shape_ray_tracer->reflector_compositor,
+                            &process_context->bsdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     // TODO: Make this a function in multiply
     if (model_to_world != NULL)
     {
-        VECTOR3 world_surface_normal;
+        VECTOR3 world_surface_normal, world_shading_normal;
         world_surface_normal = 
             VectorMatrixInverseTransposedMultiply(model_to_world,
                                                   model_surface_normal);
+        world_shading_normal =
+            VectorMatrixInverseTransposedMultiply(model_to_world,
+                                                  model_shading_normal);
         process_context->surface_normal = VectorNormalize(world_surface_normal,
+                                                          NULL,
+                                                          NULL);
+        process_context->shading_normal = VectorNormalize(world_shading_normal,
                                                           NULL,
                                                           NULL);
     }
@@ -126,18 +161,10 @@ ShapeRayTracerProcessHit(
     {
         // TODO: Decide if it is safe to assume this is pre-normalized
         process_context->surface_normal = model_surface_normal;
+        process_context->shading_normal = model_shading_normal;
     }
 
-    status = MaterialSample(material,
-                            model_hit_point,
-                            process_context->surface_normal,
-                            hit_context->additional_data,
-                            &process_context->shape_ray_tracer->bsdf_allocator,
-                            &process_context->shape_ray_tracer->reflector_compositor,
-                            &process_context->shading_normal,
-                            &process_context->bsdf);
-
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 //

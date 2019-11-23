@@ -181,7 +181,7 @@ ShapeComputePdfBySolidAngle(
 static
 inline
 ISTATUS
-ShapeGetShadingNormal(
+ShapeComputeShadingNormal(
     _In_ PCSHAPE shape,
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
