@@ -19,7 +19,15 @@ Abstract:
 #include <stdatomic.h>
 
 #include "iris_physx/light.h"
+#include "iris_physx/normal_map_internal.h"
 #include "iris_physx/shape_vtable.h"
+
+//
+// Extern Data
+//
+
+extern const NORMAL_MAP geometry_normal_map;
+extern const NORMAL_MAP shading_normal_map;
 
 //
 // Types
@@ -166,6 +174,64 @@ ShapeComputePdfBySolidAngle(
                                                           distance,
                                                           face_hit,
                                                           pdf);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeGetShadingNormal(
+    _In_ PCSHAPE shape,
+    _In_ POINT3 hit_point,
+    _In_ uint32_t face_hit,
+    _In_ const void *additional_data,
+    _Out_ PVECTOR3 normal
+    )
+{
+    assert(shape != NULL);
+    assert(PointValidate(hit_point));
+    assert(normal != NULL);
+
+    if (shape->vtable->get_normal_map_routine != NULL)
+    {
+        PCNORMAL_MAP normal_map;
+        ISTATUS status = shape->vtable->get_normal_map_routine(shape->data,
+                                                               face_hit,
+                                                               &normal_map);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (normal_map != NULL)
+        {
+            status = NormalMapCompute(normal_map,
+                                      hit_point,
+                                      additional_data,
+                                      normal);
+
+            return status;
+        }
+    }
+
+    if (shape->vtable->compute_shading_normal_routine != NULL)
+    {
+        ISTATUS status =
+            shape->vtable->compute_shading_normal_routine(shape->data,
+                                                          hit_point,
+                                                          face_hit,
+                                                          additional_data,
+                                                          normal);
+
+        return status;
+    }
+
+    ISTATUS status = shape->vtable->compute_normal_routine(shape->data,
+                                                           hit_point,
+                                                           face_hit,
+                                                           normal);
 
     return status;
 }

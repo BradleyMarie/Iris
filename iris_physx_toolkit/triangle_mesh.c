@@ -525,6 +525,8 @@ static const SHAPE_VTABLE triangle_vtable = {
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
     TriangleFree
 };
 
@@ -536,6 +538,8 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     EmissiveTriangleGetEmissiveMaterial,
     EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
+    NULL,
+    NULL,
     TriangleFree
 };
 

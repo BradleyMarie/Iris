@@ -18,6 +18,7 @@ Abstract:
 #include "iris_physx/emissive_material.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/material.h"
+#include "iris_physx/normal_map.h"
 
 //
 // Types
@@ -84,6 +85,24 @@ ISTATUS
     _Out_ float_t *pdf
     );
 
+typedef
+ISTATUS
+(*PSHAPE_COMPUTE_SHADING_NORMAL)(
+    _In_opt_ const void *context,
+    _In_ POINT3 hit_point,
+    _In_ uint32_t face_hit,
+    _In_ const void *additional_data,
+    _Out_ PVECTOR3 normal
+    );
+
+typedef
+ISTATUS
+(*PSHAPE_GET_NORMAL_MAP)(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCNORMAL_MAP *normal_map
+    );
+
 typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE trace_routine;
     PSHAPE_COMPUTE_BOUNDS_ROUTINE compute_bounds_routine;
@@ -92,6 +111,8 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
     PSHAPE_SAMPLE_FACE sample_face_routine;
     PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE compute_pdf_by_solid_angle_routine;
+    PSHAPE_COMPUTE_SHADING_NORMAL compute_shading_normal_routine;
+    PSHAPE_GET_NORMAL_MAP get_normal_map_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 

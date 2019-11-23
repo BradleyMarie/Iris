@@ -319,6 +319,34 @@ cc_library(
 )
 
 cc_library(
+    name = "normal_map",
+    srcs = ["normal_map.c"],
+    hdrs = ["normal_map.h"],
+    deps = [
+        ":normal_map_internal",
+        ":normal_map_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "normal_map_internal",
+    hdrs = ["normal_map_internal.h"],
+    deps = [
+        ":normal_map_vtable",
+    ],
+)
+
+cc_library(
+    name = "normal_map_vtable",
+    hdrs = ["normal_map_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//iris",
+    ],
+)
+
+cc_library(
     name = "ray_tracer",
     srcs = ["ray_tracer.c"],
     hdrs = ["ray_tracer.h"],
@@ -457,6 +485,7 @@ cc_library(
     hdrs = ["shape.h"],
     deps = [
         ":light",
+        ":normal_map_internal",
         ":shape_internal",
         ":shape_vtable",
         "//common:alloc",
@@ -478,6 +507,7 @@ cc_library(
         ":emissive_material",
         ":hit_allocator",
         ":material",
+        ":normal_map",
     ],
 )
 
