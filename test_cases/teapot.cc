@@ -156,6 +156,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     status = TriangleMeshAllocate(
         teapot_vertices,
         nullptr,
+        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
@@ -235,6 +236,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
     status = TriangleMeshAllocate(
         teapot_vertices,
         teapot_normals,
+        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,

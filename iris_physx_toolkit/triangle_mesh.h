@@ -47,6 +47,7 @@ ISTATUS
 TriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
     _In_reads_opt_(num_vertices) const VECTOR3 normals[],
+    _In_reads_opt_(num_vertices) const float_t texture_coordinates[][2],
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
