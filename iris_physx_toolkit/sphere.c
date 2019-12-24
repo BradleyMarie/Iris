@@ -225,6 +225,7 @@ static const SHAPE_VTABLE sphere_vtable = {
     NULL,
     NULL,
     NULL,
+    NULL,
     SphereFree
 };
 

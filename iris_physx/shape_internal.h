@@ -186,6 +186,7 @@ ShapeComputeShadingNormal(
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
     _Out_ PVECTOR3 normal
     )
 {
@@ -210,6 +211,7 @@ ShapeComputeShadingNormal(
             status = NormalMapCompute(normal_map,
                                       hit_point,
                                       additional_data,
+                                      texture_coordinates,
                                       normal);
 
             return status;
@@ -234,6 +236,42 @@ ShapeComputeShadingNormal(
                                                            normal);
 
     return status;
+}
+
+static
+inline
+ISTATUS
+ShapeComputeTextureCoordinates(
+    _In_ PCSHAPE shape,
+    _In_ POINT3 hit_point,
+    _In_ uint32_t face_hit,
+    _In_ const void *additional_data,
+    _Out_ float_t uv_scratch_space[2],
+    _Out_ const void **texture_coordinates
+    )
+{
+    assert(shape != NULL);
+    assert(PointValidate(hit_point));
+    assert(uv_scratch_space != NULL);
+    assert(texture_coordinates != NULL);
+
+    if (shape->vtable->compute_texture_coordinates != NULL)
+    {
+        ISTATUS status =
+            shape->vtable->compute_texture_coordinates(shape->data,
+                                                       hit_point,
+                                                       face_hit,
+                                                       additional_data,
+                                                       uv_scratch_space);
+
+        *texture_coordinates = uv_scratch_space;
+
+        return status;
+    }
+
+    *texture_coordinates = NULL;
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_PHYSX_SHAPE_INTERNAL_

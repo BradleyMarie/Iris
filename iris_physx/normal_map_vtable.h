@@ -28,6 +28,7 @@ ISTATUS
     _In_ const void *context,
     _In_ POINT3 hit_point,
     _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
     _Out_ PVECTOR3 normal
     );
 

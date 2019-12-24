@@ -41,6 +41,7 @@ MaterialSample(
     _In_ const struct _MATERIAL *material,
     _In_ POINT3 model_hit_point,
     _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PCBSDF *bsdf
@@ -55,6 +56,7 @@ MaterialSample(
     ISTATUS status = material->vtable->sample_routine(material->data,
                                                       model_hit_point,
                                                       additional_data,
+                                                      texture_coordinates,
                                                       bsdf_allocator,
                                                       reflector_compositor,
                                                       bsdf);

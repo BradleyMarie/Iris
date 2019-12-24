@@ -564,6 +564,7 @@ static const SHAPE_VTABLE triangle_vtable = {
     NULL,
     NULL,
     NULL,
+    NULL,
     TriangleFree
 };
 
@@ -576,6 +577,7 @@ static const SHAPE_VTABLE triangle_with_normals_vtable = {
     NULL,
     NULL,
     TriangleComputeShadingNormal,
+    NULL,
     NULL,
     TriangleFree
 };
@@ -590,6 +592,7 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     EmissiveTriangleComputePdfBySolidArea,
     NULL,
     NULL,
+    NULL,
     TriangleFree
 };
 
@@ -602,6 +605,7 @@ static const SHAPE_VTABLE emissive_triangle_with_normals_vtable = {
     EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
     TriangleComputeShadingNormal,
+    NULL,
     NULL,
     TriangleFree
 };

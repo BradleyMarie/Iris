@@ -40,6 +40,7 @@ NormalMapCompute(
     _In_ const struct _NORMAL_MAP *normal_map,
     _In_ POINT3 hit_point,
     _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
     _Out_ PVECTOR3 normal
     )
 {
@@ -50,6 +51,7 @@ NormalMapCompute(
     ISTATUS status = normal_map->vtable->compute_routine(normal_map->data,
                                                          hit_point,
                                                          additional_data,
+                                                         texture_coordinates,
                                                          normal);
 
     return status;

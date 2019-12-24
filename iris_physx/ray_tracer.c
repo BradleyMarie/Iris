@@ -111,11 +111,26 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
+    float_t uv_scratch_space[2];
+    const void *texture_coordinates;
+    status = ShapeComputeTextureCoordinates(shape,
+                                            model_hit_point,
+                                            hit_context->front_face,
+                                            hit_context->additional_data,
+                                            uv_scratch_space,
+                                            &texture_coordinates);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     VECTOR3 model_shading_normal;
     status = ShapeComputeShadingNormal(shape,
                                        model_hit_point,
                                        hit_context->front_face,
                                        hit_context->additional_data,
+                                       texture_coordinates,
                                        &model_shading_normal);
 
     if (status != ISTATUS_SUCCESS)
@@ -131,6 +146,7 @@ ShapeRayTracerProcessHit(
     status = MaterialSample(material,
                             model_hit_point,
                             hit_context->additional_data,
+                            texture_coordinates,
                             &process_context->shape_ray_tracer->bsdf_allocator,
                             &process_context->shape_ray_tracer->reflector_compositor,
                             &process_context->bsdf);
