@@ -160,6 +160,16 @@ cc_library(
 )
 
 cc_library(
+    name = "rgb_interpolator",
+    srcs = ["rgb_interpolator.c"],
+    hdrs = ["rgb_interpolator.h"],
+    deps = [
+        ":interpolated_spectrum",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "sample_direct_lighting",
     srcs = ["sample_direct_lighting.c"],
     hdrs = ["sample_direct_lighting.h"],
