@@ -113,6 +113,16 @@ cc_library(
 )
 
 cc_library(
+    name = "mipmap",
+    srcs = ["mipmap.c"],
+    hdrs = ["mipmap.h"],
+    deps = [
+        ":rgb_interpolator",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "metric_black_body",
     srcs = ["metric_black_body.c"],
     hdrs = ["metric_black_body.h"],
