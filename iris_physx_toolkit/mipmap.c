@@ -24,6 +24,7 @@ Abstract:
 
 struct _SPECTRUM_MIPMAP {
     _Field_size_(width * height) PREFLECTOR *textels;
+    WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
     size_t width;
@@ -39,6 +40,7 @@ SpectrumMipmapAllocate(
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
     _In_ PCRGB_INTERPOLATOR rgb_interpolator,
     _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSPECTRUM_MIPMAP *mipmap
@@ -59,19 +61,26 @@ SpectrumMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (rgb_interpolator == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (color_integrator == NULL)
+    if (rgb_interpolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (mipmap == NULL)
+    if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     size_t num_pixels;
@@ -98,29 +107,30 @@ SpectrumMipmapAllocate(
     }
 
     result->textels = spectra;
-    result->width = width;
-    result->height = height;
+    result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
+    result->width = width;
+    result->height = height;
 
     for (size_t i = 0; i < num_pixels; i++)
     {
         if (!isfinite(textels[i][0]) || textels[i][0] < (float_t)0.0)
         {
             SpectrumMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_01;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i][1]) || textels[i][1] < (float_t)0.0)
         {
             SpectrumMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_02;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i][2]) || textels[i][2] < (float_t)0.0)
         {
             SpectrumMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_03;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         ISTATUS status = RgbInterpolatorAllocateReflector(rgb_interpolator,
@@ -215,23 +225,60 @@ SpectrumMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
 
-    float_t x = floor(mipmap->width_fp * s);
-
-    if (x < (float_t)0.0 || mipmap->width <= x)
+    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
     {
+#if FLT_EVAL_METHOD	== 0
+        float s_intpart, t_intpart;
+        s = modff(s, &s_intpart);
+        t = modff(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 1
+        double s_intpart, t_intpart;
+        s = modf(s, &s_intpart);
+        t = modf(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 2
+        long double s_intpart, t_intpart;
+        s = modfl(s, &s_intpart);
+        t = modfl(t, &t_intpart);
+#endif
+
+        if (s < (float_t)0.0)
+        {
+            s = (float_t)1.0 - s;
+        }
+
+        if (t < (float_t)0.0)
+        {
+            t = (float_t)1.0 - t;
+        }
+    }
+    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    {
+        s = fmin(fmax((float_t)0.0, s), (float_t)1.0);
+        t = fmin(fmax((float_t)0.0, t), (float_t)1.0);
+    }
+    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
+             t < (float_t)0.0 || (float_t)1.0 < t)
+    {
+        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
         *reflector = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    float_t y = floor(mipmap->height_fp * t);
+    size_t x = (size_t)floor(mipmap->width_fp * s);
 
-    if (y < (float_t)0.00 || mipmap->height <= y)
+    if (x == mipmap->width)
     {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
+        x -= 1;
     }
 
-    *reflector = mipmap->textels[(size_t)y * mipmap->width + (size_t)x];
+    size_t y = (size_t)floor(mipmap->height_fp * t);
+
+    if (y == mipmap->height)
+    {
+        y -= 1;
+    }
+
+    *reflector = mipmap->textels[y * mipmap->width + x];
 
     return ISTATUS_SUCCESS;
 }
@@ -262,6 +309,7 @@ SpectrumMipmapFree(
 
 struct _FLOAT_MIPMAP {
     _Field_size_(width * height) float_t *textels;
+    WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
     size_t width;
@@ -277,6 +325,7 @@ FloatMipmapAllocate(
     _In_reads_(height * width) float_t textels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
 {
@@ -295,9 +344,16 @@ FloatMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     size_t num_pixels;
@@ -324,29 +380,30 @@ FloatMipmapAllocate(
     }
 
     result->textels = spectra;
-    result->width = width;
-    result->height = height;
+    result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
+    result->width = width;
+    result->height = height;
 
     for (size_t i = 0; i < num_pixels; i++)
     {
         if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
         {
             FloatMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_01;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
         {
             FloatMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_02;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
         {
             FloatMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_03;
+            return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         result->textels[i] = textels[i];
@@ -409,23 +466,62 @@ FloatMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    float_t x = floor(mipmap->width_fp * s);
 
-    if (x < (float_t)0.0 || mipmap->width <= x)
+
+    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
     {
+#if FLT_EVAL_METHOD	== 0
+        float s_intpart, t_intpart;
+        s = modff(s, &s_intpart);
+        t = modff(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 1
+        double s_intpart, t_intpart;
+        s = modf(s, &s_intpart);
+        t = modf(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 2
+        long double s_intpart, t_intpart;
+        s = modfl(s, &s_intpart);
+        t = modfl(t, &t_intpart);
+#endif
+
+        if (s < (float_t)0.0)
+        {
+            s = (float_t)1.0 - s;
+        }
+
+        if (t < (float_t)0.0)
+        {
+            t = (float_t)1.0 - t;
+        }
+    }
+    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    {
+        s = fmin(fmax((float_t)0.0, s), (float_t)1.0);
+        t = fmin(fmax((float_t)0.0, t), (float_t)1.0);
+    }
+    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
+             t < (float_t)0.0 || (float_t)1.0 < t)
+    {
+        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
         *value = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
-    float_t y = floor(mipmap->height_fp * t);
+    size_t x = (size_t)floor(mipmap->width_fp * s);
 
-    if (y < (float_t)0.00 || mipmap->height <= y)
+    if (x == mipmap->width)
     {
-        *value = (float_t)0.0;
-        return ISTATUS_SUCCESS;
+        x -= 1;
     }
 
-    *value = mipmap->textels[(size_t)y * mipmap->width + (size_t)x];
+    size_t y = (size_t)floor(mipmap->height_fp * t);
+
+    if (y == mipmap->height)
+    {
+        y -= 1;
+    }
+
+    *value = mipmap->textels[y * mipmap->width + x];
 
     return ISTATUS_SUCCESS;
 }

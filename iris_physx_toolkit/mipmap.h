@@ -22,6 +22,16 @@ extern "C" {
 #endif // __cplusplus
 
 //
+// Enums
+//
+
+typedef enum _WRAP_MODE {
+    WRAP_MODE_REPEAT = 0,
+    WRAP_MODE_BLACK = 1,
+    WRAP_MODE_CLAMP = 2
+} WRAP_MODE;
+
+//
 // Types
 //
 
@@ -37,6 +47,7 @@ SpectrumMipmapAllocate(
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
     _In_ PCRGB_INTERPOLATOR rgb_interpolator,
     _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSPECTRUM_MIPMAP *mipmap
@@ -76,6 +87,7 @@ FloatMipmapAllocate(
     _In_reads_(height * width) float_t textels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     );
 
