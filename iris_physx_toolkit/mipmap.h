@@ -35,27 +35,27 @@ typedef enum _WRAP_MODE {
 // Types
 //
 
-typedef struct _SPECTRUM_MIPMAP SPECTRUM_MIPMAP, *PSPECTRUM_MIPMAP;
-typedef const SPECTRUM_MIPMAP *PCSPECTRUM_MIPMAP;
+typedef struct _REFLECTOR_MIPMAP REFLECTOR_MIPMAP, *PREFLECTOR_MIPMAP;
+typedef const REFLECTOR_MIPMAP *PCREFLECTOR_MIPMAP;
 
 //
 // Functions
 //
 
 ISTATUS
-SpectrumMipmapAllocate(
+ReflectorMipmapAllocate(
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _In_ PCRGB_INTERPOLATOR rgb_interpolator,
     _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
-    _Out_ PSPECTRUM_MIPMAP *mipmap
+    _Out_ PREFLECTOR_MIPMAP *mipmap
     );
 
 ISTATUS
-SpectrumMipmapLookup(
-    _In_ PCSPECTRUM_MIPMAP mipmap,
+ReflectorMipmapLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
     _In_ float_t dsdx,
@@ -67,8 +67,8 @@ SpectrumMipmapLookup(
     );
 
 void
-SpectrumMipmapFree(
-    _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
+ReflectorMipmapFree(
+    _In_opt_ _Post_invalid_ PREFLECTOR_MIPMAP mipmap
     );
 
 //
@@ -112,4 +112,4 @@ FloatMipmapFree(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_SPECTRUM_MIPMAP_
+#endif // _IRIS_PHYSX_TOOLKIT_REFLECTOR_MIPMAP_

@@ -83,6 +83,17 @@ cc_library(
 )
 
 cc_library(
+    name = "image_texture",
+    srcs = ["image_texture.c"],
+    hdrs = ["image_texture.h"],
+    deps = [
+        ":float_texture",
+        ":mipmap",
+        ":reflector_texture",
+    ],
+)
+
+cc_library(
     name = "fresnel_bsdf",
     srcs = ["fresnel_bsdf.c"],
     hdrs = ["fresnel_bsdf.h"],

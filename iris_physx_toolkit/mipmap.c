@@ -22,7 +22,7 @@ Abstract:
 // Types
 //
 
-struct _SPECTRUM_MIPMAP {
+struct _REFLECTOR_MIPMAP {
     _Field_size_(width * height) PREFLECTOR *textels;
     WRAP_MODE wrap_mode;
     float_t width_fp;
@@ -36,14 +36,14 @@ struct _SPECTRUM_MIPMAP {
 //
 
 ISTATUS
-SpectrumMipmapAllocate(
+ReflectorMipmapAllocate(
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _In_ PCRGB_INTERPOLATOR rgb_interpolator,
     _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
-    _Out_ PSPECTRUM_MIPMAP *mipmap
+    _Out_ PREFLECTOR_MIPMAP *mipmap
     )
 {
     if (textels == NULL)
@@ -91,7 +91,7 @@ SpectrumMipmapAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PSPECTRUM_MIPMAP result = (PSPECTRUM_MIPMAP)malloc(sizeof(SPECTRUM_MIPMAP));
+    PREFLECTOR_MIPMAP result = (PREFLECTOR_MIPMAP)malloc(sizeof(REFLECTOR_MIPMAP));
 
     if (result == NULL)
     {
@@ -117,19 +117,19 @@ SpectrumMipmapAllocate(
     {
         if (!isfinite(textels[i][0]) || textels[i][0] < (float_t)0.0)
         {
-            SpectrumMipmapFree(result);
+            ReflectorMipmapFree(result);
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i][1]) || textels[i][1] < (float_t)0.0)
         {
-            SpectrumMipmapFree(result);
+            ReflectorMipmapFree(result);
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
         if (!isfinite(textels[i][2]) || textels[i][2] < (float_t)0.0)
         {
-            SpectrumMipmapFree(result);
+            ReflectorMipmapFree(result);
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
@@ -142,7 +142,7 @@ SpectrumMipmapAllocate(
         if (status != ISTATUS_SUCCESS)
         {
             assert(status == ISTATUS_ALLOCATION_FAILED);
-            SpectrumMipmapFree(result);
+            ReflectorMipmapFree(result);
             return status;
         }
 
@@ -157,7 +157,7 @@ SpectrumMipmapAllocate(
         if (status != ISTATUS_SUCCESS)
         {
             assert(status == ISTATUS_ALLOCATION_FAILED);
-            SpectrumMipmapFree(result);
+            ReflectorMipmapFree(result);
             return status;
         }
     }
@@ -168,8 +168,8 @@ SpectrumMipmapAllocate(
 }
 
 ISTATUS
-SpectrumMipmapLookup(
-    _In_ PCSPECTRUM_MIPMAP mipmap,
+ReflectorMipmapLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
     _In_ float_t dsdx,
@@ -284,8 +284,8 @@ SpectrumMipmapLookup(
 }
 
 void
-SpectrumMipmapFree(
-    _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
+ReflectorMipmapFree(
+    _In_opt_ _Post_invalid_ PREFLECTOR_MIPMAP mipmap
     )
 {
     if (mipmap == NULL)

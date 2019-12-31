@@ -29,7 +29,7 @@ ISTATUS
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
-    _Out_ PREFLECTOR *value
+    _Out_ PCREFLECTOR *value
     );
 
 typedef struct _REFLECTOR_TEXTURE_VTABLE {
