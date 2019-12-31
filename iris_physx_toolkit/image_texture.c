@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Implements a Fresnel BSDF.
+    Allocates a texture from a 2D image.
 
 --*/
 

@@ -48,6 +48,16 @@ cc_library(
 )
 
 cc_library(
+    name = "constant_texture",
+    srcs = ["constant_texture.c"],
+    hdrs = ["constant_texture.h"],
+    deps = [
+        ":float_texture",
+        ":reflector_texture",
+    ],
+)
+
+cc_library(
     name = "constructive_solid_geometry",
     srcs = ["constructive_solid_geometry.c"],
     hdrs = ["constructive_solid_geometry.h"],

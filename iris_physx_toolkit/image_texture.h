@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Creates a texture from a 2D image.
+    Allocates a texture from a 2D image.
 
 --*/
 
