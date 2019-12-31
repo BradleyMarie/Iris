@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_physx_toolkit/reflector_texture_vtable.h"
 
+#if __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 //
 // Types
 //
@@ -56,5 +60,9 @@ void
 ReflectorTextureRelease(
     _In_opt_ _Post_invalid_ PREFLECTOR_TEXTURE texture
     );
+
+#if __cplusplus
+}
+#endif // __cplusplus
 
 #endif // _IRIS_PHYSX_TOOLKIT_REFLECTOR_TEXTURE_

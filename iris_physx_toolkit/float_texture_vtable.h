@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_physx/iris_physx.h"
 
+#if __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 //
 // Types
 //
@@ -37,5 +41,9 @@ typedef struct _FLOAT_TEXTURE_VTABLE {
 } FLOAT_TEXTURE_VTABLE, *PFLOAT_TEXTURE_VTABLE;
 
 typedef const FLOAT_TEXTURE_VTABLE *PCFLOAT_TEXTURE_VTABLE;
+
+#if __cplusplus
+}
+#endif // __cplusplus
 
 #endif // _IRIS_PHYSX_TOOLKIT_FLOAT_TEXTURE_VTABLE_

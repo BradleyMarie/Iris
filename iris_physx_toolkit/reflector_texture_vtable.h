@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_physx/iris_physx.h"
 
+#if __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 //
 // Types
 //
@@ -38,5 +42,9 @@ typedef struct _REFLECTOR_TEXTURE_VTABLE {
 } REFLECTOR_TEXTURE_VTABLE, *PREFLECTOR_TEXTURE_VTABLE;
 
 typedef const REFLECTOR_TEXTURE_VTABLE *PCREFLECTOR_TEXTURE_VTABLE;
+
+#if __cplusplus
+}
+#endif // __cplusplus
 
 #endif // _IRIS_PHYSX_TOOLKIT_REFLECTOR_TEXTURE_VTABLE_
