@@ -66,6 +66,23 @@ cc_library(
 )
 
 cc_library(
+    name = "float_texture_vtable",
+    hdrs = ["float_texture_vtable.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "float_texture",
+    srcs = ["float_texture.c"],
+    hdrs = ["float_texture.h"],
+    deps = [
+        ":float_texture_vtable",
+    ],
+)
+
+cc_library(
     name = "fresnel_bsdf",
     srcs = ["fresnel_bsdf.c"],
     hdrs = ["fresnel_bsdf.h"],
@@ -166,6 +183,23 @@ cc_library(
     hdrs = ["point_light.h"],
     deps = [
         "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "reflector_texture_vtable",
+    hdrs = ["reflector_texture_vtable.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "reflector_texture",
+    srcs = ["reflector_texture.c"],
+    hdrs = ["reflector_texture.h"],
+    deps = [
+        ":reflector_texture_vtable",
     ],
 )
 
