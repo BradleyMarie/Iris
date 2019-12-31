@@ -141,6 +141,16 @@ cc_library(
 )
 
 cc_library(
+    name = "matte_material",
+    srcs = ["matte_material.c"],
+    hdrs = ["matte_material.h"],
+    deps = [
+        ":lambertian_bsdf",
+        ":reflector_texture",
+    ],
+)
+
+cc_library(
     name = "mipmap",
     srcs = ["mipmap.c"],
     hdrs = ["mipmap.h"],
