@@ -28,7 +28,8 @@ Abstract:
 #define _Field_size_(size)
 #define _Field_size_opt_(size)
 #define _Field_size_bytes_(size) 
-#define _Field_size_bytes_opt_(size) 
+#define _Field_size_bytes_opt_(size)
+#define _Field_size_part_(size, count)
 #define _Field_size_full_(size) 
 #define _Field_size_full_opt_(size) 
 

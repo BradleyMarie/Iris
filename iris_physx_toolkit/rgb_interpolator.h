@@ -42,20 +42,18 @@ RgbInterpolatorAllocate(
 
 ISTATUS
 RgbInterpolatorAllocateSpectrum(
-    _In_ PCRGB_INTERPOLATOR interpolator,
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PSPECTRUM *spectrum
+    _Inout_ PRGB_INTERPOLATOR interpolator,
+    _In_reads_(num_values) float_t colors[][3],
+    _In_ size_t num_values,
+    _Out_writes_(num_values) PSPECTRUM spectra[]
     );
 
 ISTATUS
 RgbInterpolatorAllocateReflector(
-    _In_ PCRGB_INTERPOLATOR interpolator,
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PREFLECTOR *reflector
+    _Inout_ PRGB_INTERPOLATOR interpolator,
+    _In_reads_(num_values) float_t colors[][3],
+    _In_ size_t num_values,
+    _Out_writes_(num_values) PREFLECTOR reflectors[]
     );
 
 void

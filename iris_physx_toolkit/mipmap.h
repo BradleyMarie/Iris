@@ -48,8 +48,7 @@ ReflectorMipmapAllocate(
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
-    _In_ PCRGB_INTERPOLATOR rgb_interpolator,
-    _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
+    _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
     );
 

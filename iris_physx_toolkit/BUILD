@@ -240,6 +240,7 @@ cc_library(
     hdrs = ["rgb_interpolator.h"],
     deps = [
         ":interpolated_spectrum",
+        "//common:safe_math",
         "//iris_physx",
     ],
 )

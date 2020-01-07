@@ -214,8 +214,7 @@ ReflectorImageTextureAllocate(
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
-    _In_ PCRGB_INTERPOLATOR rgb_interpolator,
-    _Inout_opt_ PCOLOR_INTEGRATOR color_integrator,
+    _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
     _Out_ PREFLECTOR_TEXTURE *texture
     )
 {
@@ -248,7 +247,7 @@ ReflectorImageTextureAllocate(
 
     if (texture == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     REFLECTOR_IMAGE_TEXTURE image_texture;
@@ -257,7 +256,6 @@ ReflectorImageTextureAllocate(
                                              height,
                                              wrap_mode,
                                              rgb_interpolator,
-                                             color_integrator,
                                              &image_texture.mipmap);
 
     if (status != ISTATUS_SUCCESS)
