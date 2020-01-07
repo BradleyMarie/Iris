@@ -1433,6 +1433,8 @@ RgbInterpolatorAllocateSpectrum(
         }
     }
 
+    free(deduped_colors);
+
     RgbInterpolatorSortList(interpolator->spectra, interpolator->num_spectra);
 
     for (size_t i = 0; i < num_values; i++)
@@ -1454,7 +1456,6 @@ RgbInterpolatorAllocateReflector(
     _Out_writes_(num_values) PREFLECTOR reflectors[]
     )
 {
-
     if (interpolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
@@ -1544,9 +1545,9 @@ RgbInterpolatorAllocateReflector(
 
         PREFLECTOR reflector;
         status = InterpolatedReflectorAllocate(interpolator->wavelengths,
-                                              spd,
-                                              interpolator->num_samples,
-                                              &reflector);
+                                               spd,
+                                               interpolator->num_samples,
+                                               &reflector);
 
         free(spd);
 
@@ -1571,6 +1572,8 @@ RgbInterpolatorAllocateReflector(
             return status;
         }
     }
+
+    free(deduped_colors);
 
     RgbInterpolatorSortList(interpolator->reflectors,
                             interpolator->num_reflectors);
