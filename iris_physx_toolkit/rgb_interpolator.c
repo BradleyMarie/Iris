@@ -1336,6 +1336,27 @@ RgbInterpolatorAllocateSpectrum(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
+    for (size_t i = 0; i < num_values; i++)
+    {
+        if (!isfinite(colors[i][0]) ||
+            colors[i][0] < (float_t)0.0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (!isfinite(colors[i][1]) ||
+            colors[i][1] < (float_t)0.0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (!isfinite(colors[i][2]) ||
+            colors[i][2] < (float_t)0.0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+    }
+
     float_t (*deduped_colors)[3];
     size_t num_deduped_colors;
     ISTATUS status = RgbInterpolatorDedupColors(colors,
@@ -1447,6 +1468,30 @@ RgbInterpolatorAllocateReflector(
     if (reflectors == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    for (size_t i = 0; i < num_values; i++)
+    {
+        if (!isfinite(colors[i][0]) ||
+            colors[i][0] < (float_t)0.0 ||
+            (float_t)1.0 < colors[i][0])
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (!isfinite(colors[i][1]) ||
+            colors[i][1] < (float_t)0.0 ||
+            (float_t)1.0 < colors[i][1])
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+
+        if (!isfinite(colors[i][2]) ||
+            colors[i][2] < (float_t)0.0 ||
+            (float_t)1.0 < colors[i][2])
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
     }
 
     float_t (*deduped_colors)[3];
