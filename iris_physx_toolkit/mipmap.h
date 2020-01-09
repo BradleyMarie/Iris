@@ -49,7 +49,9 @@ ReflectorMipmapAllocate(
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
-    _Out_ PREFLECTOR_MIPMAP *mipmap
+    _Out_ PREFLECTOR_MIPMAP *mipmap,
+    _Outptr_result_buffer_(*num_reflectors) PREFLECTOR **reflectors,
+    _Out_ size_t *num_reflectors
     );
 
 ISTATUS

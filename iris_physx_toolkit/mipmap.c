@@ -15,6 +15,7 @@ Abstract:
 #include "iris_physx_toolkit/mipmap.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "common/safe_math.h"
 
@@ -42,7 +43,9 @@ ReflectorMipmapAllocate(
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
-    _Out_ PREFLECTOR_MIPMAP *mipmap
+    _Out_ PREFLECTOR_MIPMAP *mipmap,
+    _Outptr_result_buffer_(*num_reflectors) PREFLECTOR **reflectors,
+    _Out_ size_t *num_reflectors
     )
 {
     if (textels == NULL)
@@ -75,6 +78,16 @@ ReflectorMipmapAllocate(
     if (mipmap == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (reflectors == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (num_reflectors == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
     }
 
     size_t num_pixels;
@@ -141,6 +154,24 @@ ReflectorMipmapAllocate(
     }
 
     *mipmap = result;
+
+    spectra = (PREFLECTOR*)calloc(num_pixels, sizeof(PREFLECTOR));
+
+    if (spectra == NULL)
+    {
+        ReflectorMipmapFree(result);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    memcpy(spectra, result->textels, sizeof(PREFLECTOR) * num_pixels);
+
+    for (size_t i = 0; i < num_pixels; i++)
+    {
+        ReflectorRetain(spectra[i]);
+    }
+
+    *reflectors = spectra;
+    *num_reflectors = num_pixels;
 
     return ISTATUS_SUCCESS;
 }
