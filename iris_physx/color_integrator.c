@@ -307,7 +307,7 @@ ColorIntegratorAllocate(
 }
 
 ISTATUS
-ColorIntegratorPrecomputeSpectrumColor(
+ColorIntegratorCacheSpectrum(
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_opt_ PSPECTRUM spectrum
     )
@@ -363,7 +363,7 @@ ColorIntegratorPrecomputeSpectrumColor(
 }
 
 ISTATUS
-ColorIntegratorPrecomputeReflectorColor(
+ColorIntegratorCacheReflector(
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_opt_ PREFLECTOR reflector
     )

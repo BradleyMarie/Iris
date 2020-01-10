@@ -138,8 +138,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     status = UniformReflectorAllocate((float_t)1.0, &perfect_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
-                                                     perfect_reflector);
+    status = ColorIntegratorCacheReflector(color_integrator, perfect_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF glass_front_bsdf;
@@ -173,8 +172,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                            &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
-                                                     white_reflector);
+    status = ColorIntegratorCacheReflector(color_integrator, white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF white_bsdf;
@@ -192,8 +190,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                            &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
-                                                     red_reflector);
+    status = ColorIntegratorCacheReflector(color_integrator, red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF red_bsdf;
@@ -211,8 +208,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                            &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorPrecomputeReflectorColor(color_integrator,
-                                                     green_reflector);
+    status = ColorIntegratorCacheReflector(color_integrator, green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF green_bsdf;
@@ -230,8 +226,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                           &light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorPrecomputeSpectrumColor(color_integrator,
-                                                    light_spectrum);
+    status = ColorIntegratorCacheSpectrum(color_integrator, light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL light_material;
