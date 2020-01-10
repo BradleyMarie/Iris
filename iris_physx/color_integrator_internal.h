@@ -20,6 +20,14 @@ Abstract:
 #include "iris_physx/color_integrator_vtable.h"
 #include "iris_physx/reflector_internal.h"
 #include "iris_physx/spectrum_internal.h"
+#include "third_party/smhasher/MurmurHash2.h"
+#include "third_party/smhasher/MurmurHash3.h"
+
+//
+// Defines
+//
+
+#define HASH_SEED 0
 
 //
 // Types
@@ -42,110 +50,184 @@ typedef const SPECTRUM_LIST_ENTRY *PCSPECTRUM_LIST_ENTRY;
 struct _COLOR_INTEGRATOR {
     PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE compute_spectrum_color_routine;
     PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE compute_reflector_color_routine;
-    _Field_size_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY reflector_list;
-    _Field_size_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY spectrum_list;
+    _Field_size_full_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY reflector_list;
+    _Field_size_full_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY spectrum_list;
     size_t reflector_list_capacity;
     size_t reflector_list_size;
     size_t spectrum_list_capacity;
     size_t spectrum_list_size;
 };
 
-
-
 //
 // Static Functions
 //
 
 static
-int
-ColorIntegratorCompareSpectrumEntry(
-    _In_ const void* left,
-    _In_ const void* right
+inline
+size_t
+ColorIntegratorSpectrumProbeStart(
+    _In_ size_t list_capacity,
+    _In_ PCSPECTRUM spectrum
     )
 {
-    PCSPECTRUM_LIST_ENTRY left_entry = (PCSPECTRUM_LIST_ENTRY)left;
-    PCSPECTRUM_LIST_ENTRY right_entry = (PCSPECTRUM_LIST_ENTRY)right;
+    assert(list_capacity != 0);
+    assert(spectrum != NULL);
 
-    if (left_entry->spectrum < right_entry->spectrum)
-    {
-        return -1;
+    size_t hash;
+    if (sizeof(PCSPECTRUM) == 4) {
+        MurmurHash3_x86_32(&spectrum, sizeof(PCSPECTRUM), HASH_SEED, &hash);
+    } else if (sizeof(PCSPECTRUM) == 8) {
+        hash = MurmurHash64A(&spectrum, sizeof(PCSPECTRUM), HASH_SEED);
+    } else {
+        assert(false);
+        hash = 0;
     }
 
-    if (left_entry->spectrum > right_entry->spectrum)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-static
-int
-ColorIntegratorCompareReflectorEntry(
-    _In_ const void* left,
-    _In_ const void* right
-    )
-{
-    PCREFLECTOR_LIST_ENTRY left_entry = (PCREFLECTOR_LIST_ENTRY)left;
-    PCREFLECTOR_LIST_ENTRY right_entry = (PCREFLECTOR_LIST_ENTRY)right;
-
-    if (left_entry->reflector < right_entry->reflector)
-    {
-        return -1;
-    }
-
-    if (left_entry->reflector > right_entry->reflector)
-    {
-        return 1;
-    }
-
-    return 0;
+    return hash % list_capacity;
 }
 
 static
 inline
-PCSPECTRUM_LIST_ENTRY
-ColorIntegratorFindSpectrumEntry(
+size_t
+ColorIntegratorReflectorProbeStart(
+    _In_ size_t list_capacity,
+    _In_ PCREFLECTOR reflector
+    )
+{
+    assert(list_capacity != 0);
+    assert(reflector != NULL);
+
+    size_t hash;
+    if (sizeof(PCREFLECTOR) == 4) {
+        MurmurHash3_x86_32(&reflector, sizeof(PCSPECTRUM), HASH_SEED, &hash);
+    } else if (sizeof(PCREFLECTOR) == 8) {
+        hash = MurmurHash64A(&reflector, sizeof(PCREFLECTOR), HASH_SEED);
+    } else {
+        assert(false);
+        hash = 0;
+    }
+
+    return hash % list_capacity;
+}
+
+static
+inline
+bool
+ColorIntegratorFindSpectrum(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCSPECTRUM spectrum
+    _In_ PCSPECTRUM spectrum,
+    _Out_ size_t *index
     )
 {
     assert(color_integrator != NULL);
     assert(spectrum != NULL);
+    assert(index != NULL);
 
-    SPECTRUM_LIST_ENTRY key;
-    key.spectrum = (PSPECTRUM)spectrum;
+    *index = ColorIntegratorSpectrumProbeStart(
+        color_integrator->spectrum_list_capacity, spectrum);
+    for (;;) {
+        if (color_integrator->spectrum_list[*index].spectrum == spectrum)
+        {
+            return true;
+        }
 
-    const void *result = bsearch(&key,
-                                 color_integrator->spectrum_list,
-                                 color_integrator->spectrum_list_size,
-                                 sizeof(SPECTRUM_LIST_ENTRY),
-                                 ColorIntegratorCompareSpectrumEntry);
+        if (color_integrator->spectrum_list[*index].spectrum == NULL)
+        {
+            return false;
+        }
 
-    return (PCSPECTRUM_LIST_ENTRY)result;
+        *index += 1;
+
+        if (*index == color_integrator->spectrum_list_capacity) {
+            *index = 0;
+        }
+    }
+
+    assert(false);
+    return false;
 }
 
 static
 inline
-PCREFLECTOR_LIST_ENTRY
-ColorIntegratorFindReflectorEntry(
+bool
+ColorIntegratorFindReflector(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCREFLECTOR reflector
+    _In_ PCREFLECTOR reflector,
+    _Out_ size_t *index
     )
 {
     assert(color_integrator != NULL);
     assert(reflector != NULL);
+    assert(index != NULL);
 
-    REFLECTOR_LIST_ENTRY key;
-    key.reflector = (PREFLECTOR)reflector;
+    *index = ColorIntegratorReflectorProbeStart(
+        color_integrator->reflector_list_capacity, reflector);
+    for (;;) {
+        if (color_integrator->reflector_list[*index].reflector == reflector)
+        {
+            return true;
+        }
 
-    const void *result = bsearch(&key,
-                                 color_integrator->reflector_list,
-                                 color_integrator->reflector_list_size,
-                                 sizeof(REFLECTOR_LIST_ENTRY),
-                                 ColorIntegratorCompareReflectorEntry);
+        if (color_integrator->reflector_list[*index].reflector == NULL)
+        {
+            return false;
+        }
 
-    return (PCREFLECTOR_LIST_ENTRY)result;
+        *index += 1;
+
+        if (*index == color_integrator->reflector_list_capacity) {
+            *index = 0;
+        }
+    }
+
+    assert(false);
+    return false;
+}
+
+static
+inline
+bool
+ColorIntegratorFindSpectrumEntry(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCSPECTRUM spectrum,
+    _Out_ PCSPECTRUM_LIST_ENTRY *entry
+    )
+{
+    assert(color_integrator != NULL);
+    assert(spectrum != NULL);
+    assert(entry != NULL);
+
+    size_t index;
+    bool result = ColorIntegratorFindSpectrum(color_integrator,
+                                              spectrum,
+                                              &index);
+
+    *entry = color_integrator->spectrum_list + index;
+
+    return result;
+}
+
+static
+inline
+bool
+ColorIntegratorFindReflectorEntry(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCREFLECTOR_LIST_ENTRY *entry
+    )
+{
+    assert(color_integrator != NULL);
+    assert(reflector != NULL);
+    assert(entry != NULL);
+
+    size_t index;
+    bool result = ColorIntegratorFindReflector(color_integrator,
+                                               reflector,
+                                               &index);
+
+    *entry = color_integrator->reflector_list + index;
+
+    return result;
 }
 
 static
@@ -166,11 +248,14 @@ ColorIntegratorComputeSpectrumColor(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY old_entry =
-        ColorIntegratorFindSpectrumEntry(color_integrator, spectrum);
-    if (old_entry != NULL)
+    PCSPECTRUM_LIST_ENTRY entry;
+    bool found = ColorIntegratorFindSpectrumEntry(color_integrator,
+                                                  spectrum,
+                                                  &entry);
+
+    if (found)
     {
-        *color = old_entry->color;
+        *color = entry->color;
         return ISTATUS_SUCCESS;
     }
 
@@ -198,11 +283,14 @@ ColorIntegratorComputeReflectorColor(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY old_entry =
-        ColorIntegratorFindReflectorEntry(color_integrator, reflector);
-    if (old_entry != NULL)
+    PCREFLECTOR_LIST_ENTRY entry;
+    bool found = ColorIntegratorFindReflectorEntry(color_integrator,
+                                                   reflector,
+                                                   &entry);
+
+    if (found)
     {
-        *color = old_entry->color;
+        *color = entry->color;
         return ISTATUS_SUCCESS;
     }
 
@@ -230,11 +318,20 @@ ColorIntegratorComputeSpectrumColorFast(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY old_entry =
-        ColorIntegratorFindSpectrumEntry(color_integrator, spectrum);
-    if (old_entry != NULL)
+    PCSPECTRUM_LIST_ENTRY entry;
+    bool found = ColorIntegratorFindSpectrumEntry(color_integrator,
+                                                  spectrum,
+                                                  &entry);
+
+    if (found)
     {
-        *color = old_entry->color;
+        *color = entry->color;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (found)
+    {
+        *color = entry->color;
         return ISTATUS_SUCCESS;
     }
 
@@ -275,11 +372,14 @@ ColorIntegratorComputeReflectorColorFast(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY old_entry =
-        ColorIntegratorFindReflectorEntry(color_integrator, reflector);
-    if (old_entry != NULL)
+    PCREFLECTOR_LIST_ENTRY entry;
+    bool found = ColorIntegratorFindReflectorEntry(color_integrator,
+                                                   reflector,
+                                                   &entry);
+
+    if (found)
     {
-        *color = old_entry->color;
+        *color = entry->color;
         return ISTATUS_SUCCESS;
     }
 

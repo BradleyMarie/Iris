@@ -72,6 +72,8 @@ cc_library(
         ":color_integrator_internal",
         ":color_integrator_vtable",
         "//common:safe_math",
+        "//third_party/smhasher:murmur2",
+        "//third_party/smhasher:murmur3",
     ],
 )
 
@@ -82,6 +84,8 @@ cc_library(
         ":color_integrator_vtable",
         ":reflector_internal",
         ":spectrum_internal",
+        "//third_party/smhasher:murmur2",
+        "//third_party/smhasher:murmur3",
     ],
 )
 
