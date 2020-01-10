@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["MurmurHash2.h"],
     visibility = [
         "//iris_physx:__pkg__",
+        "//iris_physx_toolkit:__pkg__",
     ],
 )
 
@@ -17,5 +18,6 @@ cc_library(
     hdrs = ["MurmurHash3.h"],
     visibility = [
         "//iris_physx:__pkg__",
+        "//iris_physx_toolkit:__pkg__",
     ],
 )

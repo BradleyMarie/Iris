@@ -39,6 +39,28 @@ cc_library(
 )
 
 cc_library(
+    name = "color_extrapolator_vtable",
+    hdrs = ["color_extrapolator_vtable.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "color_extrapolator",
+    srcs = ["color_extrapolator.c"],
+    hdrs = ["color_extrapolator.h"],
+    deps = [
+        ":color_extrapolator_vtable",
+        "//common:alloc",
+        "//common:safe_math",
+        "//iris_physx",
+        "//third_party/smhasher:murmur2",
+        "//third_party/smhasher:murmur3",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     srcs = ["constant_material.c"],
     hdrs = ["constant_material.h"],

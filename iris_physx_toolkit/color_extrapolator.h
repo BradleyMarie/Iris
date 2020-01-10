@@ -1,0 +1,59 @@
+/*++
+
+Copyright (c) 2019 Brad Weinberger
+
+Module Name:
+
+    color_extrapolator.h
+
+Abstract:
+
+    Computes a spectrum or reflector from a color triple.
+
+--*/
+
+#ifndef _IRIS_PHYSX_TOOLKIT_COLOR_EXTRAPOLATOR_
+#define _IRIS_PHYSX_TOOLKIT_COLOR_EXTRAPOLATOR_
+
+#include "iris_physx_toolkit/color_extrapolator_vtable.h"
+
+//
+// Types
+//
+
+typedef struct _COLOR_EXTRAPOLATOR COLOR_EXTRAPOLATOR, *PCOLOR_EXTRAPOLATOR;
+typedef const COLOR_EXTRAPOLATOR *PCCOLOR_EXTRAPOLATOR;
+
+//
+// Functions
+//
+
+ISTATUS
+ColorExtrapolatorAllocate(
+    _In_ PCCOLOR_EXTRAPOLATOR_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
+    _Out_ PCOLOR_EXTRAPOLATOR *color_extrapolator
+    );
+
+ISTATUS
+ColorExtrapolatorComputeSpectrum(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ float_t color[3],
+    _Out_ PSPECTRUM *spectrum
+    );
+
+ISTATUS
+ColorExtrapolatorComputReflector(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ float_t color[3],
+    _Out_ PREFLECTOR *reflector
+    );
+
+void
+ColorExtrapolatorFree(
+    _In_opt_ _Post_invalid_ PCOLOR_EXTRAPOLATOR color_extrapolator
+    );
+
+#endif // _IRIS_PHYSX_TOOLKIT_COLOR_EXTRAPOLATOR_
