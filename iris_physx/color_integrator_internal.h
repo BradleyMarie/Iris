@@ -48,14 +48,14 @@ typedef struct _SPECTRUM_LIST_ENTRY {
 typedef const SPECTRUM_LIST_ENTRY *PCSPECTRUM_LIST_ENTRY;
 
 struct _COLOR_INTEGRATOR {
-    PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE compute_spectrum_color_routine;
-    PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE compute_reflector_color_routine;
+    PCCOLOR_INTEGRATOR_VTABLE vtable;
     _Field_size_full_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY reflector_list;
     _Field_size_full_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY spectrum_list;
     size_t reflector_list_capacity;
     size_t reflector_list_size;
     size_t spectrum_list_capacity;
     size_t spectrum_list_size;
+    void *data;
 };
 
 //
@@ -260,7 +260,8 @@ ColorIntegratorComputeSpectrumColor(
     }
 
     ISTATUS status =
-        color_integrator->compute_spectrum_color_routine(spectrum, color);
+        color_integrator->vtable->compute_spectrum_color_routine(
+            color_integrator->data, spectrum, color);
 
     return status;
 }
@@ -295,7 +296,8 @@ ColorIntegratorComputeReflectorColor(
     }
 
     ISTATUS status =
-        color_integrator->compute_reflector_color_routine(reflector, color);
+        color_integrator->vtable->compute_reflector_color_routine(
+            color_integrator->data, reflector, color);
 
     return status;
 }
@@ -349,7 +351,8 @@ ColorIntegratorComputeSpectrumColorFast(
     }
 
     ISTATUS status =
-        color_integrator->compute_spectrum_color_routine(spectrum, color);
+        color_integrator->vtable->compute_spectrum_color_routine(
+            color_integrator->data, spectrum, color);
 
     return status;
 }
@@ -397,7 +400,8 @@ ColorIntegratorComputeReflectorColorFast(
     }
 
     ISTATUS status =
-        color_integrator->compute_reflector_color_routine(reflector, color);
+        color_integrator->vtable->compute_reflector_color_routine(
+            color_integrator->data, reflector, color);
 
     return status;
 }

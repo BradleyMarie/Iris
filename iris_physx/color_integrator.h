@@ -30,8 +30,10 @@ typedef const COLOR_INTEGRATOR *PCCOLOR_INTEGRATOR;
 
 ISTATUS
 ColorIntegratorAllocate(
-    _In_ PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE compute_spectrum_color_routine,
-    _In_ PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE compute_reflector_color_routine,
+    _In_ PCCOLOR_INTEGRATOR_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 

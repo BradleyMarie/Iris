@@ -71,6 +71,7 @@ cc_library(
     deps = [
         ":color_integrator_internal",
         ":color_integrator_vtable",
+        "//common:alloc",
         "//common:safe_math",
         "//third_party/smhasher:murmur2",
         "//third_party/smhasher:murmur3",

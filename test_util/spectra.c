@@ -125,6 +125,7 @@ TestReflectorGetAlbedo(
 
 ISTATUS
 TestColorIntegratorComputeSpectrumColor(
+    _In_ const void *context,
     _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
@@ -161,6 +162,7 @@ TestColorIntegratorComputeSpectrumColor(
 
 ISTATUS
 TestColorIntegratorComputeReflectorColor(
+    _In_ const void *context,
     _In_opt_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
     )
@@ -207,6 +209,12 @@ static const SPECTRUM_VTABLE test_spectrum_vtable = {
 static const REFLECTOR_VTABLE test_reflector_vtable = {
     TestReflectorReflect,
     TestReflectorGetAlbedo,
+    NULL
+};
+
+static const COLOR_INTEGRATOR_VTABLE test_integrator_vtable = {
+    TestColorIntegratorComputeSpectrumColor,
+    TestColorIntegratorComputeReflectorColor,
     NULL
 };
 
@@ -309,8 +317,10 @@ TestColorIntegratorAllocate(
     }
 
     ISTATUS status =
-        ColorIntegratorAllocate(TestColorIntegratorComputeSpectrumColor,
-                                TestColorIntegratorComputeReflectorColor,
+        ColorIntegratorAllocate(&test_integrator_vtable,
+                                NULL,
+                                0,
+                                0,
                                 color_integrator);
 
     return status;

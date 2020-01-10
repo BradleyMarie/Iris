@@ -1931,6 +1931,7 @@ const static float_t cie_y_integral =
 
 ISTATUS
 CieColorIntegratorComputeSpectrumColor(
+    _In_ const void *context,
     _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
@@ -1965,6 +1966,7 @@ CieColorIntegratorComputeSpectrumColor(
 
 ISTATUS
 CieColorIntegratorComputeReflectorColor(
+    _In_ const void *context,
     _In_opt_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
     )
@@ -2002,6 +2004,16 @@ CieColorIntegratorComputeReflectorColor(
 }
 
 //
+// Static Data
+//
+
+static const COLOR_INTEGRATOR_VTABLE cie_color_integrator_vtable = {
+    CieColorIntegratorComputeSpectrumColor,
+    CieColorIntegratorComputeReflectorColor,
+    NULL
+};
+
+//
 // Functions
 //
 
@@ -2016,8 +2028,10 @@ CieColorIntegratorAllocate(
     }
 
     ISTATUS status =
-        ColorIntegratorAllocate(CieColorIntegratorComputeSpectrumColor,
-                                CieColorIntegratorComputeReflectorColor,
+        ColorIntegratorAllocate(&cie_color_integrator_vtable,
+                                NULL,
+                                0,
+                                0,
                                 color_integrator);
 
     return status;

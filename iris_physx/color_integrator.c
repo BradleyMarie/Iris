@@ -12,6 +12,9 @@ Abstract:
 
 --*/
 
+#include <stdalign.h>
+
+#include "common/alloc.h"
 #include "common/safe_math.h"
 #include "iris_physx/color_integrator.h"
 #include "iris_physx/color_integrator_internal.h"
@@ -227,58 +230,78 @@ ColorIntegratorAvailableReflectorSlots(
 
 ISTATUS
 ColorIntegratorAllocate(
-    _In_ PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE compute_spectrum_color_routine,
-    _In_ PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE compute_reflector_color_routine,
+    _In_ PCCOLOR_INTEGRATOR_VTABLE vtable,
+    _In_reads_bytes_opt_(data_size) const void *data,
+    _In_ size_t data_size,
+    _In_ size_t data_alignment,
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     )
 {
-    if (compute_spectrum_color_routine == NULL)
+    if (vtable == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (compute_reflector_color_routine == NULL)
+    if (data_size != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        if (data == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        if (data_alignment == 0 ||
+            (data_alignment & (data_alignment - 1)) != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_01;
+        }
+
+        if (data_size % data_alignment != 0)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
+        }
     }
 
     if (color_integrator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    PCOLOR_INTEGRATOR result =
-        (PCOLOR_INTEGRATOR)malloc(sizeof(COLOR_INTEGRATOR));
-    if (result == NULL)
+    void *data_allocation;
+    bool success = AlignedAllocWithHeader(sizeof(COLOR_INTEGRATOR),
+                                          alignof(COLOR_INTEGRATOR),
+                                          (void **)color_integrator,
+                                          data_size,
+                                          data_alignment,
+                                          &data_allocation);
+
+    if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_list = 
+    (*color_integrator)->reflector_list =
         (PREFLECTOR_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(REFLECTOR_LIST_ENTRY));
-    if (result->reflector_list == NULL)
+    if ((*color_integrator)->reflector_list == NULL)
     {
-        free(result);
+        free(*color_integrator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_list = 
+    (*color_integrator)->spectrum_list =
         (PSPECTRUM_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(SPECTRUM_LIST_ENTRY));
-    if (result->spectrum_list == NULL)
+    if ((*color_integrator)->spectrum_list == NULL)
     {
-        free(result->reflector_list);
-        free(result);
+        free((*color_integrator)->reflector_list);
+        free(*color_integrator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->compute_reflector_color_routine = compute_reflector_color_routine;
-    result->compute_spectrum_color_routine = compute_spectrum_color_routine;
-    result->reflector_list_capacity = INITIAL_LIST_SIZE;
-    result->reflector_list_size = 0;
-    result->spectrum_list_capacity = INITIAL_LIST_SIZE;
-    result->spectrum_list_size = 0;
-
-    *color_integrator = result;
+    (*color_integrator)->vtable = vtable;
+    (*color_integrator)->reflector_list_capacity = INITIAL_LIST_SIZE;
+    (*color_integrator)->reflector_list_size = 0;
+    (*color_integrator)->spectrum_list_capacity = INITIAL_LIST_SIZE;
+    (*color_integrator)->spectrum_list_size = 0;
+    (*color_integrator)->data = data_allocation;
 
     return ISTATUS_SUCCESS;
 }
@@ -320,8 +343,9 @@ ColorIntegratorPrecomputeSpectrumColor(
     }
 
     COLOR3 color;
-    ISTATUS status = color_integrator->compute_spectrum_color_routine(spectrum,
-                                                                      &color);
+    ISTATUS status =
+        color_integrator->vtable->compute_spectrum_color_routine(
+            color_integrator->data, spectrum, &color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -375,8 +399,9 @@ ColorIntegratorPrecomputeReflectorColor(
     }
 
     COLOR3 color;
-    ISTATUS status = color_integrator->compute_reflector_color_routine(reflector,
-                                                                       &color);
+    ISTATUS status =
+        color_integrator->vtable->compute_reflector_color_routine(
+            color_integrator->data, reflector, &color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -416,5 +441,11 @@ ColorIntegratorFree(
     }
 
     free(color_integrator->spectrum_list);
+
+    if (color_integrator->vtable->free_routine)
+    {
+        color_integrator->vtable->free_routine(color_integrator->data);
+    }
+
     free(color_integrator);
 }
