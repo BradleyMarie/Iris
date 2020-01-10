@@ -17,6 +17,10 @@ Abstract:
 
 #include "iris_physx_toolkit/color_extrapolator_vtable.h"
 
+#if __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 //
 // Types
 //
@@ -45,7 +49,7 @@ ColorExtrapolatorComputeSpectrum(
     );
 
 ISTATUS
-ColorExtrapolatorComputReflector(
+ColorExtrapolatorComputeReflector(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _In_ float_t color[3],
     _Out_ PREFLECTOR *reflector
@@ -55,5 +59,9 @@ void
 ColorExtrapolatorFree(
     _In_opt_ _Post_invalid_ PCOLOR_EXTRAPOLATOR color_extrapolator
     );
+
+#if __cplusplus
+}
+#endif // __cplusplus
 
 #endif // _IRIS_PHYSX_TOOLKIT_COLOR_EXTRAPOLATOR_

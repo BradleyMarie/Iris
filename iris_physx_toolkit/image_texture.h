@@ -42,10 +42,8 @@ ReflectorImageTextureAllocate(
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
-    _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
-    _Out_ PREFLECTOR_TEXTURE *texture,
-    _Outptr_result_buffer_(*num_reflectors) PREFLECTOR **reflectors,
-    _Out_ size_t *num_reflectors
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PREFLECTOR_TEXTURE *texture
     );
 
 #if __cplusplus 

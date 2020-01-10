@@ -4,20 +4,20 @@ Copyright (c) 2019 Brad Weinberger
 
 Module Name:
 
-    rgb_interpolator.c
+    rgbc_color_extrapolator.c
 
 Abstract:
 
-    Implements an RGB interpolator.
+    Implements an RGB color extrapolator.
 
 --*/
 
-#include "iris_physx_toolkit/rgb_interpolator.h"
+#include "iris_physx_toolkit/rgb_color_extrapolator.h"
 
+#include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "common/safe_math.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
 
 //
@@ -25,26 +25,12 @@ Abstract:
 //
 
 #define NUM_SPECTRAL_SAMPLES 32
-#define LIST_GROWTH_FACTOR 2
-#define LIST_INITIAL_SIZE  8
 
 //
 // Types
 //
 
-typedef union _LIST_DATA {
-    PSPECTRUM spectrum;
-    PREFLECTOR reflector;
-} LIST_DATA;
-
-typedef struct _LIST_ENTRY {
-    float_t color[3];
-    LIST_DATA data;
-} LIST_ENTRY, *PLIST_ENTRY;
-
-typedef const LIST_ENTRY *PCLIST_ENTRY;
-
-struct _RGB_INTERPOLATOR {
+typedef struct _RGB_COLOR_INTERPOLATOR {
     _Field_size_full_(num_samples) float_t *wavelengths;
     _Field_size_full_(num_samples) float_t *spectrum_white;
     _Field_size_full_(num_samples) float_t *spectrum_cyan;
@@ -61,13 +47,9 @@ struct _RGB_INTERPOLATOR {
     _Field_size_full_(num_samples) float_t *reflector_green;
     _Field_size_full_(num_samples) float_t *reflector_blue;
     size_t num_samples;
-    _Field_size_part_(spectra_capacity, num_spectra) PLIST_ENTRY spectra;
-    size_t spectra_capacity;
-    size_t num_spectra;
-    _Field_size_part_(reflectors_capacity, num_reflectors) PLIST_ENTRY reflectors;
-    size_t reflectors_capacity;
-    size_t num_reflectors;
-};
+} RGB_COLOR_INTERPOLATOR, *RGB_COLOR_EXTRAPOLATOR;
+
+typedef const RGB_COLOR_INTERPOLATOR *PCRGB_COLOR_INTERPOLATOR;
 
 //
 // Static Data
@@ -604,7 +586,7 @@ static const float_t reflector_blue[NUM_SPECTRAL_SAMPLES] = {
 
 static
 float_t
-RgbInterpolatorResample(
+RgbColorExtrapolatorResample(
     _In_reads_(num_samples) const float_t wavelengths[],
     _In_reads_(num_samples) const float_t sampled_values[],
     _In_ size_t num_samples,
@@ -661,7 +643,7 @@ RgbInterpolatorResample(
 
 static
 void
-RgbInterpolatorScale(
+RgbColorExtrapolatorScale(
     _In_reads_(num_samples) const float_t input[],
     _In_ size_t num_samples,
     _In_ float_t scalar,
@@ -676,7 +658,7 @@ RgbInterpolatorScale(
 
 static
 void
-RgbInterpolatorScaledAdd(
+RgbColorExtrapolatorScaledAdd(
     _In_reads_(num_samples) const float_t addend[],
     _In_reads_(num_samples) const float_t scaled[],
     _In_ size_t num_samples,
@@ -692,7 +674,7 @@ RgbInterpolatorScaledAdd(
 
 static
 ISTATUS
-RgbInterpolatorCreateSpd(
+RgbColorExtrapolatorCreateSpd(
     _In_ float_t r,
     _In_ float_t g,
     _In_ float_t b,
@@ -717,48 +699,48 @@ RgbInterpolatorCreateSpd(
 
     if (r <= g && r <= b)
     {
-        RgbInterpolatorScale(white, num_samples, r, temp);
+        RgbColorExtrapolatorScale(white, num_samples, r, temp);
         if (g <= b)
         {
-            RgbInterpolatorScaledAdd(temp, cyan, num_samples, g - r, temp);
-            RgbInterpolatorScaledAdd(temp, blue, num_samples, b - g, temp);
+            RgbColorExtrapolatorScaledAdd(temp, cyan, num_samples, g - r, temp);
+            RgbColorExtrapolatorScaledAdd(temp, blue, num_samples, b - g, temp);
         }
         else
         {
-            RgbInterpolatorScaledAdd(temp, cyan, num_samples, b - r, temp);
-            RgbInterpolatorScaledAdd(temp, green, num_samples, g - b, temp);
+            RgbColorExtrapolatorScaledAdd(temp, cyan, num_samples, b - r, temp);
+            RgbColorExtrapolatorScaledAdd(temp, green, num_samples, g - b, temp);
         }
     }
     else if (g <= r && g <= b)
     {
-        RgbInterpolatorScale(white, num_samples, g, temp);
+        RgbColorExtrapolatorScale(white, num_samples, g, temp);
         if (r <= b)
         {
-            RgbInterpolatorScaledAdd(temp, magenta, num_samples, r - g, temp);
-            RgbInterpolatorScaledAdd(temp, blue, num_samples, b - r, temp);
+            RgbColorExtrapolatorScaledAdd(temp, magenta, num_samples, r - g, temp);
+            RgbColorExtrapolatorScaledAdd(temp, blue, num_samples, b - r, temp);
         }
         else
         {
-            RgbInterpolatorScaledAdd(temp, magenta, num_samples, b - g, temp);
-            RgbInterpolatorScaledAdd(temp, red, num_samples, r - b, temp);
+            RgbColorExtrapolatorScaledAdd(temp, magenta, num_samples, b - g, temp);
+            RgbColorExtrapolatorScaledAdd(temp, red, num_samples, r - b, temp);
         }
     }
     else
     {
-        RgbInterpolatorScale(white, num_samples, b, temp);
+        RgbColorExtrapolatorScale(white, num_samples, b, temp);
         if (r <= g)
         {
-            RgbInterpolatorScaledAdd(temp, yellow, num_samples, r - b, temp);
-            RgbInterpolatorScaledAdd(temp, green, num_samples, g - r, temp);
+            RgbColorExtrapolatorScaledAdd(temp, yellow, num_samples, r - b, temp);
+            RgbColorExtrapolatorScaledAdd(temp, green, num_samples, g - r, temp);
         }
         else
         {
-            RgbInterpolatorScaledAdd(temp, yellow, num_samples, g - b, temp);
-            RgbInterpolatorScaledAdd(temp, red, num_samples, r - g, temp);
+            RgbColorExtrapolatorScaledAdd(temp, yellow, num_samples, g - b, temp);
+            RgbColorExtrapolatorScaledAdd(temp, red, num_samples, r - g, temp);
         }
     }
 
-    RgbInterpolatorScale(temp, num_samples, scalar, temp);
+    RgbColorExtrapolatorScale(temp, num_samples, scalar, temp);
 
     for (size_t i = 0; i < num_samples; i++)
     {
@@ -771,288 +753,129 @@ RgbInterpolatorCreateSpd(
 }
 
 static
-int
-RgbInterpolatorCompareColor(
-    const void *left,
-    const void *right
-    )
-{
-    const float_t *left_entry = (const float_t*)left;
-    const float_t *right_entry = (const float_t*)right;
-
-    if (left_entry[0] < right_entry[0])
-    {
-        return -1;
-    }
-    else if (left_entry[0] > right_entry[0])
-    {
-        return 1;
-    }
-    else if (left_entry[1] < right_entry[1])
-    {
-        return -1;
-    }
-    else if (left_entry[1] > right_entry[1])
-    {
-        return 1;
-    }
-    else if (left_entry[2] < right_entry[2])
-    {
-        return 1;
-    }
-    else if (left_entry[2] > right_entry[2])
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-static
-int
-RgbInterpolatorCompareListEntry(
-    const void *left,
-    const void *right
-    )
-{
-    PCLIST_ENTRY left_entry = (PCLIST_ENTRY)left;
-    PCLIST_ENTRY right_entry = (PCLIST_ENTRY)right;
-
-    return RgbInterpolatorCompareColor(left_entry->color, right_entry->color);
-}
-
-static
 ISTATUS
-RgbInterpolatorAddSpectraListEntry(
-    _Inout_ PRGB_INTERPOLATOR interpolator,
+RgbColorExtrapolatorComputeSpectrum(
+    _In_ const void *context,
     _In_ float_t color[3],
-    _In_ PSPECTRUM spectrum
+    _Out_ PSPECTRUM *spectrum
     )
 {
-    if (interpolator->num_spectra == interpolator->spectra_capacity)
+    PCRGB_COLOR_INTERPOLATOR extrapolator = (PCRGB_COLOR_INTERPOLATOR)context;
+
+    float_t *spd;
+    ISTATUS status = RgbColorExtrapolatorCreateSpd(color[0],
+                                                   color[1],
+                                                   color[2],
+                                                   extrapolator->spectrum_white,
+                                                   extrapolator->spectrum_cyan,
+                                                   extrapolator->spectrum_magenta,
+                                                   extrapolator->spectrum_yellow,
+                                                   extrapolator->spectrum_red,
+                                                   extrapolator->spectrum_green,
+                                                   extrapolator->spectrum_blue,
+                                                   extrapolator->num_samples,
+                                                   (float_t)0.86445,
+                                                   &spd);
+
+    if (status != ISTATUS_SUCCESS)
     {
-        size_t new_capacity_bytes;
-        size_t new_capacity;
-        if (interpolator->reflectors_capacity == 0)
-        {
-            new_capacity_bytes = LIST_INITIAL_SIZE * sizeof(LIST_ENTRY);
-            new_capacity = LIST_INITIAL_SIZE;
-        }
-        else
-        {
-            bool success = CheckedMultiplySizeT(interpolator->spectra_capacity,
-                                                LIST_GROWTH_FACTOR * sizeof(LIST_ENTRY),
-                                                &new_capacity_bytes);
-
-            if (!success)
-            {
-                return ISTATUS_ALLOCATION_FAILED;
-            }
-
-            new_capacity = interpolator->spectra_capacity * LIST_GROWTH_FACTOR;
-        }
-
-        PLIST_ENTRY allocated = (PLIST_ENTRY)realloc(interpolator->spectra,
-                                                     new_capacity_bytes);
-        if (allocated == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        interpolator->spectra = allocated;
-        interpolator->spectra_capacity = new_capacity;
+        return status;
     }
 
-    size_t offset = interpolator->num_spectra++;
-    interpolator->spectra[offset].color[0] = color[0];
-    interpolator->spectra[offset].color[1] = color[1];
-    interpolator->spectra[offset].color[2] = color[2];
-    interpolator->spectra[offset].data.spectrum = spectrum;
+    PSPECTRUM spectrum;
+    status = InterpolatedSpectrumAllocate(extrapolator->wavelengths,
+                                          spd,
+                                          extrapolator->num_samples,
+                                          &spectrum);
+
+    free(spd);
 
     return ISTATUS_SUCCESS;
 }
 
 static
 ISTATUS
-RgbInterpolatorAddReflectorsListEntry(
-    _Inout_ PRGB_INTERPOLATOR interpolator,
+RgbColorExtrapolatorComputeReflector(
+    _In_ const void *context,
     _In_ float_t color[3],
-    _In_ PREFLECTOR reflector
+    _Out_ PREFLECTOR *reflector
     )
 {
-    if (interpolator->num_reflectors == interpolator->reflectors_capacity)
+    PCRGB_COLOR_INTERPOLATOR extrapolator = (PCRGB_COLOR_INTERPOLATOR)context;
+
+    float_t *spd;
+    ISTATUS status =
+        RgbColorExtrapolatorCreateSpd(color[0],
+                                      color[1],
+                                      color[2],
+                                      extrapolator->reflector_white,
+                                      extrapolator->reflector_cyan,
+                                      extrapolator->reflector_magenta,
+                                      extrapolator->reflector_yellow,
+                                      extrapolator->reflector_red,
+                                      extrapolator->reflector_green,
+                                      extrapolator->reflector_blue,
+                                      extrapolator->num_samples,
+                                      (float_t)0.94,
+                                      &spd);
+
+    if (status != ISTATUS_SUCCESS)
     {
-        size_t new_capacity_bytes;
-        size_t new_capacity;
-        if (interpolator->reflectors_capacity == 0)
-        {
-            new_capacity_bytes = LIST_INITIAL_SIZE * sizeof(LIST_ENTRY);
-            new_capacity = LIST_INITIAL_SIZE;
-        }
-        else
-        {
-            bool success = CheckedMultiplySizeT(interpolator->reflectors_capacity,
-                                                LIST_GROWTH_FACTOR * sizeof(LIST_ENTRY),
-                                                &new_capacity_bytes);
-
-            if (!success)
-            {
-                return ISTATUS_ALLOCATION_FAILED;
-            }
-
-            new_capacity = interpolator->reflectors_capacity * LIST_GROWTH_FACTOR;
-        }
-
-        PLIST_ENTRY allocated = (PLIST_ENTRY)realloc(interpolator->reflectors,
-                                                     new_capacity_bytes);
-        if (allocated == NULL)
-        {
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        interpolator->reflectors = allocated;
-        interpolator->reflectors_capacity = new_capacity;
+        return status;
     }
 
-    size_t offset = interpolator->num_reflectors++;
-    interpolator->reflectors[offset].color[0] = color[0];
-    interpolator->reflectors[offset].color[1] = color[1];
-    interpolator->reflectors[offset].color[2] = color[2];
-    interpolator->reflectors[offset].data.reflector = reflector;
+    status = InterpolatedReflectorAllocate(extrapolator->wavelengths,
+                                           spd,
+                                           extrapolator->num_samples,
+                                           reflector);
 
-    return ISTATUS_SUCCESS;
-}
+    free(spd);
 
-static
-ISTATUS
-RgbInterpolatorDedupColors(
-    _In_reads_(num_colors) float_t colors[][3],
-    _In_ size_t num_colors,
-    _Outptr_result_buffer_(num_deduped_colors) float_t (**deduped_colors)[3],
-    _Out_ size_t *num_deduped_colors
-    )
-{
-    *deduped_colors = calloc(num_colors, 3 * sizeof(float_t));
-    if (*deduped_colors == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    memcpy(*deduped_colors, colors, 3 * sizeof(float_t) * num_colors);
-    qsort(*deduped_colors,
-          num_colors,
-          3 * sizeof(float_t),
-          RgbInterpolatorCompareColor);
-
-    size_t insertion_index = 1;
-    for (size_t i = 1; i < num_colors; i++)
-    {
-        int compare_result =
-            RgbInterpolatorCompareColor(*deduped_colors[i - 1],
-                                        *deduped_colors[i]);
-        if (compare_result == 0)
-        {
-            continue;
-        }
-
-        *deduped_colors[insertion_index][0] = *deduped_colors[i][0];
-        *deduped_colors[insertion_index][1] = *deduped_colors[i][1];
-        *deduped_colors[insertion_index][2] = *deduped_colors[i][2];
-        insertion_index += 1;
-    }
-
-    void *realloced = realloc(
-        *deduped_colors,3 * sizeof(float_t) * insertion_index);
-
-    if (realloced == NULL)
-    {
-        free(*deduped_colors);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    *deduped_colors = (float_t (*)[3])realloced;
-    *num_deduped_colors = insertion_index;
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
 void
-RgbInterpolatorSortList(
-    _In_reads_(list_size) PLIST_ENTRY list,
-    _In_ size_t list_size
+RgbColorExtrapolatorFree(
+    _In_opt_ _Post_invalid_ RGB_COLOR_EXTRAPOLATOR extrapolator
     )
 {
-    qsort(list, list_size, sizeof(LIST_ENTRY), RgbInterpolatorCompareListEntry);
+    free(extrapolator->wavelengths);
+    free(extrapolator->spectrum_white);
+    free(extrapolator->spectrum_cyan);
+    free(extrapolator->spectrum_magenta);
+    free(extrapolator->spectrum_yellow);
+    free(extrapolator->spectrum_red);
+    free(extrapolator->spectrum_green);
+    free(extrapolator->spectrum_blue);
+    free(extrapolator->reflector_white);
+    free(extrapolator->reflector_cyan);
+    free(extrapolator->reflector_magenta);
+    free(extrapolator->reflector_yellow);
+    free(extrapolator->reflector_red);
+    free(extrapolator->reflector_green);
+    free(extrapolator->reflector_blue);
 }
 
-static
-PLIST_ENTRY
-RgbInterpolatorFindListEntry(
-    _In_reads_(list_size) PCLIST_ENTRY list,
-    _In_ size_t list_size,
-    _In_ float_t color[3]
-    )
-{
-    LIST_ENTRY key;
-    key.color[0] = color[0];
-    key.color[1] = color[1];
-    key.color[2] = color[2];
-    void *search_result = bsearch(&key,
-                                  list,
-                                  list_size,
-                                  sizeof(LIST_ENTRY),
-                                  RgbInterpolatorCompareListEntry);
+//
+// Static Data
+//
 
-    return (PLIST_ENTRY)search_result;
-}
-
-static
-bool
-RgbInterpolatorListContainsColor(
-    _In_reads_(list_size) PCLIST_ENTRY list,
-    _In_ size_t list_size,
-    _In_ float_t color[3]
-    )
-{
-    return RgbInterpolatorFindListEntry(list, list_size, color) != NULL;
-}
-
-static
-PSPECTRUM
-RgbInterpolatorListGetSpectrum(
-    _In_reads_(list_size) PCLIST_ENTRY list,
-    _In_ size_t list_size,
-    _In_ float_t color[3]
-    )
-{
-    PCLIST_ENTRY entry = RgbInterpolatorFindListEntry(list, list_size, color);
-    assert(entry != NULL);
-    return entry->data.spectrum;
-}
-
-static
-PREFLECTOR
-RgbInterpolatorListGetReflector(
-    _In_reads_(list_size) PCLIST_ENTRY list,
-    _In_ size_t list_size,
-    _In_ float_t color[3]
-    )
-{
-    PCLIST_ENTRY entry = RgbInterpolatorFindListEntry(list, list_size, color);
-    assert(entry != NULL);
-    return entry->data.reflector;
-}
+static const COLOR_EXTRAPOLATOR_VTABLE rgb_color_extrapolator_vtable = {
+    RgbColorExtrapolatorComputeSpectrum,
+    RgbColorExtrapolatorComputeReflector,
+    RgbColorExtrapolatorFree
+};
 
 //
 // Functions
 //
 
 ISTATUS
-RgbInterpolatorAllocate(
+RgbColorExtrapolatorAllocate(
     _In_reads_(num_wavelengths) float_t wavelengths[],
     _In_ size_t num_wavelengths,
-    _Out_ PRGB_INTERPOLATOR* interpolator
+    _Out_ PCOLOR_EXTRAPOLATOR* extrapolator
     )
 {
     if (wavelengths == NULL)
@@ -1078,557 +901,243 @@ RgbInterpolatorAllocate(
         }
     }
 
-    if (interpolator == NULL)
+    if (extrapolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    PRGB_INTERPOLATOR result =
-        (PRGB_INTERPOLATOR)calloc(1, sizeof(RGB_INTERPOLATOR));
+    RGB_COLOR_INTERPOLATOR rgb_color_extrapolator;
+    memset(&rgb_color_extrapolator, 0, sizeof(RGB_COLOR_INTERPOLATOR));
 
-    if (result == NULL)
+    rgb_color_extrapolator.wavelengths = calloc(num_wavelengths,
+                                                sizeof(float_t));
+
+    if (rgb_color_extrapolator.wavelengths == NULL)
     {
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->wavelengths = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_white = calloc(num_wavelengths,
+                                                   sizeof(float_t));
 
-    if (result->wavelengths == NULL)
+    if (rgb_color_extrapolator.spectrum_white == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_white = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_cyan = calloc(num_wavelengths,
+                                                  sizeof(float_t));
 
-    if (result->spectrum_white == NULL)
+    if (rgb_color_extrapolator.spectrum_cyan == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_cyan = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_magenta = calloc(num_wavelengths,
+                                                     sizeof(float_t));
 
-    if (result->spectrum_cyan == NULL)
+    if (rgb_color_extrapolator.spectrum_magenta == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_magenta = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_yellow = calloc(num_wavelengths,
+                                                    sizeof(float_t));
 
-    if (result->spectrum_magenta == NULL)
+    if (rgb_color_extrapolator.spectrum_yellow == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_yellow = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_red = calloc(num_wavelengths,
+                                                 sizeof(float_t));
 
-    if (result->spectrum_yellow == NULL)
+    if (rgb_color_extrapolator.spectrum_red == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_red = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_green = calloc(num_wavelengths,
+                                                   sizeof(float_t));
 
-    if (result->spectrum_red == NULL)
+    if (rgb_color_extrapolator.spectrum_green == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_green = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.spectrum_blue = calloc(num_wavelengths,
+                                                  sizeof(float_t));
 
-    if (result->spectrum_green == NULL)
+    if (rgb_color_extrapolator.spectrum_blue == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->spectrum_blue = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_white = calloc(num_wavelengths,
+                                                    sizeof(float_t));
 
-    if (result->spectrum_blue == NULL)
+    if (rgb_color_extrapolator.reflector_white == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_white = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_cyan = calloc(num_wavelengths,
+                                                   sizeof(float_t));
 
-    if (result->reflector_white == NULL)
+    if (rgb_color_extrapolator.reflector_cyan == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_cyan = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_magenta = calloc(num_wavelengths,
+                                                      sizeof(float_t));
 
-    if (result->reflector_cyan == NULL)
+    if (rgb_color_extrapolator.reflector_magenta == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_magenta = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_yellow = calloc(num_wavelengths,
+                                                     sizeof(float_t));
 
-    if (result->reflector_magenta == NULL)
+    if (rgb_color_extrapolator.reflector_yellow == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_yellow = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_red = calloc(num_wavelengths,
+                                                  sizeof(float_t));
 
-    if (result->reflector_yellow == NULL)
+    if (rgb_color_extrapolator.reflector_red == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_red = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_green = calloc(num_wavelengths,
+                                                    sizeof(float_t));
 
-    if (result->reflector_red == NULL)
+    if (rgb_color_extrapolator.reflector_green == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    result->reflector_green = calloc(num_wavelengths, sizeof(float_t));
+    rgb_color_extrapolator.reflector_blue = calloc(num_wavelengths,
+                                                   sizeof(float_t));
 
-    if (result->reflector_green == NULL)
+    if (rgb_color_extrapolator.reflector_blue == NULL)
     {
-        RgbInterpolatorFree(result);
+        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
-
-    result->reflector_blue = calloc(num_wavelengths, sizeof(float_t));
-
-    if (result->reflector_blue == NULL)
-    {
-        RgbInterpolatorFree(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    result->spectra = NULL;
-    result->spectra_capacity = 0;
-    result->num_spectra = 0;
-    result->reflectors = NULL;
-    result->reflectors_capacity = 0;
-    result->num_reflectors = 0;
 
     for (size_t i = 0; i < num_wavelengths; i++)
     {
-        result->wavelengths[i] = wavelengths[i];
+        rgb_color_extrapolator.wavelengths[i] = wavelengths[i];
 
-        result->spectrum_white[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_white[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_white,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_cyan[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_cyan[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_cyan,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_magenta[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_magenta[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_magenta,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_yellow[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_yellow[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_yellow,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_red[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_red[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_red,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_green[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_green[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_green,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->spectrum_blue[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.spectrum_blue[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     spectrum_blue,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_white[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_white[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_white,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_cyan[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_cyan[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_cyan,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_magenta[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_magenta[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_magenta,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_yellow[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_yellow[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_yellow,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_red[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_red[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_red,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_green[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_green[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_green,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
 
-        result->reflector_blue[i] =
-            RgbInterpolatorResample(sample_wavelengths,
+        rgb_color_extrapolator.reflector_blue[i] =
+            RgbColorExtrapolatorResample(sample_wavelengths,
                                     reflector_blue,
                                     NUM_SPECTRAL_SAMPLES,
                                     wavelengths[i]);
-
     }
 
-    *interpolator = result;
+    ISTATUS status = ColorExtrapolatorAllocate(&rgb_color_extrapolator_vtable,
+                                               &rgb_color_extrapolator,
+                                               sizeof(RGB_COLOR_EXTRAPOLATOR),
+                                               alignof(RGB_COLOR_EXTRAPOLATOR),
+                                               extrapolator);
 
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-RgbInterpolatorAllocateSpectrum(
-    _Inout_ PRGB_INTERPOLATOR interpolator,
-    _In_reads_(num_values) float_t colors[][3],
-    _In_ size_t num_values,
-    _Out_writes_(num_values) PSPECTRUM spectra[]
-    )
-{
-    if (interpolator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (colors == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (spectra == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    for (size_t i = 0; i < num_values; i++)
-    {
-        if (!isfinite(colors[i][0]) ||
-            colors[i][0] < (float_t)0.0)
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
-        if (!isfinite(colors[i][1]) ||
-            colors[i][1] < (float_t)0.0)
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
-        if (!isfinite(colors[i][2]) ||
-            colors[i][2] < (float_t)0.0)
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-    }
-
-    float_t (*deduped_colors)[3];
-    size_t num_deduped_colors;
-    ISTATUS status = RgbInterpolatorDedupColors(colors,
-                                                num_values,
-                                                &deduped_colors,
-                                                &num_deduped_colors);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    size_t num_original_spectra = interpolator->num_spectra;
-    for (size_t i = 0; i < num_deduped_colors; i++)
-    {
-        bool contains = RgbInterpolatorListContainsColor(interpolator->spectra,
-                                                         num_original_spectra,
-                                                         deduped_colors[i]);
-        if (contains)
-        {
-            continue;
-        }
-
-        float_t *spd;
-        ISTATUS status = RgbInterpolatorCreateSpd(deduped_colors[i][0],
-                                                  deduped_colors[i][1],
-                                                  deduped_colors[i][2],
-                                                  interpolator->spectrum_white,
-                                                  interpolator->spectrum_cyan,
-                                                  interpolator->spectrum_magenta,
-                                                  interpolator->spectrum_yellow,
-                                                  interpolator->spectrum_red,
-                                                  interpolator->spectrum_green,
-                                                  interpolator->spectrum_blue,
-                                                  interpolator->num_samples,
-                                                  (float_t)0.86445,
-                                                  &spd);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->spectra,
-                                    interpolator->num_spectra);
-            free(deduped_colors);
-            return status;
-        }
-
-        PSPECTRUM spectrum;
-        status = InterpolatedSpectrumAllocate(interpolator->wavelengths,
-                                              spd,
-                                              interpolator->num_samples,
-                                              &spectrum);
-
-        free(spd);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->spectra,
-                                    interpolator->num_spectra);
-            free(deduped_colors);
-            return status;
-        }
-
-        status = RgbInterpolatorAddSpectraListEntry(interpolator,
-                                                    deduped_colors[i],
-                                                    spectrum);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->spectra,
-                                    interpolator->num_spectra);
-            SpectrumRelease(spectrum);
-            free(deduped_colors);
-            return status;
-        }
-    }
-
-    free(deduped_colors);
-
-    RgbInterpolatorSortList(interpolator->spectra, interpolator->num_spectra);
-
-    for (size_t i = 0; i < num_values; i++)
-    {
-        spectra[i] = RgbInterpolatorListGetSpectrum(interpolator->spectra,
-                                                    interpolator->num_spectra,
-                                                    colors[i]);
-        SpectrumRetain(spectra[i]);
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-RgbInterpolatorAllocateReflector(
-    _Inout_ PRGB_INTERPOLATOR interpolator,
-    _In_reads_(num_values) float_t colors[][3],
-    _In_ size_t num_values,
-    _Out_writes_(num_values) PREFLECTOR reflectors[]
-    )
-{
-    if (interpolator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (colors == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (reflectors == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    for (size_t i = 0; i < num_values; i++)
-    {
-        if (!isfinite(colors[i][0]) ||
-            colors[i][0] < (float_t)0.0 ||
-            (float_t)1.0 < colors[i][0])
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
-        if (!isfinite(colors[i][1]) ||
-            colors[i][1] < (float_t)0.0 ||
-            (float_t)1.0 < colors[i][1])
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
-        if (!isfinite(colors[i][2]) ||
-            colors[i][2] < (float_t)0.0 ||
-            (float_t)1.0 < colors[i][2])
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-    }
-
-    float_t (*deduped_colors)[3];
-    size_t num_deduped_colors;
-    ISTATUS status = RgbInterpolatorDedupColors(colors,
-                                                num_values,
-                                                &deduped_colors,
-                                                &num_deduped_colors);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    size_t num_original_reflectors = interpolator->num_reflectors;
-    for (size_t i = 0; i < num_deduped_colors; i++)
-    {
-        bool contains =
-            RgbInterpolatorListContainsColor(interpolator->reflectors,
-                                             num_original_reflectors,
-                                             deduped_colors[i]);
-        if (contains)
-        {
-            continue;
-        }
-
-        float_t *spd;
-        ISTATUS status =
-            RgbInterpolatorCreateSpd(deduped_colors[i][0],
-                                     deduped_colors[i][1],
-                                     deduped_colors[i][2],
-                                     interpolator->reflector_white,
-                                     interpolator->reflector_cyan,
-                                     interpolator->reflector_magenta,
-                                     interpolator->reflector_yellow,
-                                     interpolator->reflector_red,
-                                     interpolator->reflector_green,
-                                     interpolator->reflector_blue,
-                                     interpolator->num_samples,
-                                     (float_t)0.94,
-                                     &spd);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->reflectors,
-                                    interpolator->num_reflectors);
-            free(deduped_colors);
-            return status;
-        }
-
-        PREFLECTOR reflector;
-        status = InterpolatedReflectorAllocate(interpolator->wavelengths,
-                                               spd,
-                                               interpolator->num_samples,
-                                               &reflector);
-
-        free(spd);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->reflectors,
-                                    interpolator->num_reflectors);
-            free(deduped_colors);
-            return status;
-        }
-
-        status = RgbInterpolatorAddReflectorsListEntry(interpolator,
-                                                       deduped_colors[i],
-                                                       reflector);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            RgbInterpolatorSortList(interpolator->reflectors,
-                                    interpolator->num_reflectors);
-            ReflectorRelease(reflector);
-            free(deduped_colors);
-            return status;
-        }
-    }
-
-    free(deduped_colors);
-
-    RgbInterpolatorSortList(interpolator->reflectors,
-                            interpolator->num_reflectors);
-
-    for (size_t i = 0; i < num_values; i++)
-    {
-        reflectors[i] =
-            RgbInterpolatorListGetReflector(interpolator->reflectors,
-                                            interpolator->num_reflectors,
-                                            colors[i]);
-        ReflectorRetain(reflectors[i]);
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-void
-RgbInterpolatorFree(
-    _In_opt_ _Post_invalid_ PRGB_INTERPOLATOR interpolator
-    )
-{
-    if (interpolator == NULL)
-    {
-        return;
-    }
-
-    free(interpolator->wavelengths);
-    free(interpolator->spectrum_white);
-    free(interpolator->spectrum_cyan);
-    free(interpolator->spectrum_magenta);
-    free(interpolator->spectrum_yellow);
-    free(interpolator->spectrum_red);
-    free(interpolator->spectrum_green);
-    free(interpolator->spectrum_blue);
-    free(interpolator->reflector_white);
-    free(interpolator->reflector_cyan);
-    free(interpolator->reflector_magenta);
-    free(interpolator->reflector_yellow);
-    free(interpolator->reflector_red);
-    free(interpolator->reflector_green);
-    free(interpolator->reflector_blue);
-
-    for (size_t i = 0; i < interpolator->num_spectra; i++)
-    {
-        SpectrumRelease(interpolator->spectra[i].data.spectrum);
-    }
-
-    free(interpolator->spectra);
-
-    for (size_t i = 0; i < interpolator->num_reflectors; i++)
-    {
-        ReflectorRelease(interpolator->reflectors[i].data.reflector);
-    }
-
-    free(interpolator->reflectors);
-
-    free(interpolator);
+    return status;
 }

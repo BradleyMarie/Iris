@@ -214,10 +214,8 @@ ReflectorImageTextureAllocate(
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
-    _Inout_ PRGB_INTERPOLATOR rgb_interpolator,
-    _Out_ PREFLECTOR_TEXTURE *texture,
-    _Outptr_result_buffer_(*num_reflectors) PREFLECTOR **reflectors,
-    _Out_ size_t *num_reflectors
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PREFLECTOR_TEXTURE *texture
     )
 {
     if (textels == NULL)
@@ -242,7 +240,7 @@ ReflectorImageTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (rgb_interpolator == NULL)
+    if (color_extrapolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
@@ -252,28 +250,13 @@ ReflectorImageTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (reflectors == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_06;
-    }
-
-    if (num_reflectors == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_07;
-    }
-
-    PREFLECTOR *reflectors_tmp;
-    size_t num_reflectors_tmp;
-
     REFLECTOR_IMAGE_TEXTURE image_texture;
     ISTATUS status = ReflectorMipmapAllocate(textels,
                                              width,
                                              height,
                                              wrap_mode,
-                                             rgb_interpolator,
-                                             &image_texture.mipmap,
-                                             &reflectors_tmp,
-                                             &num_reflectors_tmp);
+                                             color_extrapolator,
+                                             &image_texture.mipmap);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -290,17 +273,9 @@ ReflectorImageTextureAllocate(
     if (status != ISTATUS_SUCCESS)
     {
         assert(status == ISTATUS_ALLOCATION_FAILED);
-        for (size_t i = 0; i < num_reflectors_tmp; i++)
-        {
-            ReflectorRelease(reflectors_tmp[i]);
-        }
-        free(reflectors);
         ReflectorMipmapFree(image_texture.mipmap);
         return status;
     }
-
-    *reflectors = reflectors_tmp;
-    *num_reflectors = num_reflectors_tmp;
 
     return ISTATUS_SUCCESS;
 }

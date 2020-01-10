@@ -187,7 +187,7 @@ cc_library(
     srcs = ["mipmap.c"],
     hdrs = ["mipmap.h"],
     deps = [
-        ":rgb_interpolator",
+        ":color_extrapolator",
         "//iris_physx",
     ],
 )
@@ -253,17 +253,6 @@ cc_library(
     hdrs = ["reflector_texture.h"],
     deps = [
         ":reflector_texture_vtable",
-    ],
-)
-
-cc_library(
-    name = "rgb_interpolator",
-    srcs = ["rgb_interpolator.c"],
-    hdrs = ["rgb_interpolator.h"],
-    deps = [
-        ":interpolated_spectrum",
-        "//common:safe_math",
-        "//iris_physx",
     ],
 )
 

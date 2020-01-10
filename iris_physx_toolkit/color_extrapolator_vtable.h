@@ -15,8 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_COLOR_TOOLKIT_EXTRAPOLATOR_VTABLE_
 #define _IRIS_PHYSX_COLOR_TOOLKIT_EXTRAPOLATOR_VTABLE_
 
-#include "iris_physx/reflector.h"
-#include "iris_physx/spectrum.h"
+#include "iris_physx/iris_physx.h"
 
 //
 // Types

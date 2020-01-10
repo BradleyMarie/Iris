@@ -600,7 +600,7 @@ ColorExtrapolatorComputeSpectrum(
 }
 
 ISTATUS
-ColorExtrapolatorComputReflector(
+ColorExtrapolatorComputeReflector(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _In_ float_t color[3],
     _Out_ PREFLECTOR *reflector
