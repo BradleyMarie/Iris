@@ -302,6 +302,12 @@ ColorIntegratorAllocate(
     (*color_integrator)->spectrum_list_capacity = INITIAL_LIST_SIZE;
     (*color_integrator)->spectrum_list_size = 0;
     (*color_integrator)->data = data_allocation;
+    (*color_integrator)->reference_count = 1;
+
+    if (data_size != 0)
+    {
+        memcpy(data_allocation, data, data_size);
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -419,7 +425,20 @@ ColorIntegratorCacheReflector(
 }
 
 void
-ColorIntegratorFree(
+ColorIntegratorRetain(
+    _In_opt_ PCOLOR_INTEGRATOR color_integrator
+    )
+{
+    if (color_integrator == NULL)
+    {
+        return;
+    }
+
+    atomic_fetch_add(&color_integrator->reference_count, 1);
+}
+
+void
+ColorIntegratorRelease(
     _In_opt_ _Post_invalid_ PCOLOR_INTEGRATOR color_integrator
     )
 {
@@ -428,24 +447,27 @@ ColorIntegratorFree(
         return;
     }
 
-    for (size_t i = 0; i < color_integrator->reflector_list_capacity; i++)
+    if (atomic_fetch_sub(&color_integrator->reference_count, 1) == 1)
     {
-        ReflectorRelease(color_integrator->reflector_list[i].reflector);
+        for (size_t i = 0; i < color_integrator->reflector_list_capacity; i++)
+        {
+            ReflectorRelease(color_integrator->reflector_list[i].reflector);
+        }
+
+        free(color_integrator->reflector_list);
+
+        for (size_t i = 0; i < color_integrator->spectrum_list_capacity; i++)
+        {
+            SpectrumRelease(color_integrator->spectrum_list[i].spectrum);
+        }
+
+        free(color_integrator->spectrum_list);
+
+        if (color_integrator->vtable->free_routine)
+        {
+            color_integrator->vtable->free_routine(color_integrator->data);
+        }
+
+        free(color_integrator);
     }
-
-    free(color_integrator->reflector_list);
-
-    for (size_t i = 0; i < color_integrator->spectrum_list_capacity; i++)
-    {
-        SpectrumRelease(color_integrator->spectrum_list[i].spectrum);
-    }
-
-    free(color_integrator->spectrum_list);
-
-    if (color_integrator->vtable->free_routine)
-    {
-        color_integrator->vtable->free_routine(color_integrator->data);
-    }
-
-    free(color_integrator);
 }

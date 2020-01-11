@@ -37,8 +37,8 @@ Abstract:
 void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
     _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
     )
@@ -60,12 +60,14 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -358,8 +360,8 @@ TEST(CornellBoxTest, CornellBox)
     MaterialRelease(green_material);
     LightRelease(light0);
     LightRelease(light1);
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     CameraFree(camera);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }

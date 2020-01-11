@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <stdalign.h>
+#include <stdatomic.h>
 #include <string.h>
 
 #include "common/alloc.h"
@@ -26,6 +27,7 @@ Abstract:
 struct _LIGHT_SAMPLER {
     PCLIGHT_SAMPLER_VTABLE vtable;
     void *data;
+    atomic_uintmax_t reference_count;
 };
 
 //
@@ -85,6 +87,7 @@ LightSamplerAllocate(
 
     (*light_sampler)->vtable = vtable;
     (*light_sampler)->data = data_allocation;
+    (*light_sampler)->reference_count = 1;
 
     if (data_size != 0)
     {
@@ -134,7 +137,20 @@ LightSamplerSample(
 }
 
 void
-LightSamplerFree(
+LightSamplerRetain(
+    _In_opt_ PLIGHT_SAMPLER light_sampler
+    )
+{
+    if (light_sampler == NULL)
+    {
+        return;
+    }
+
+    atomic_fetch_add(&light_sampler->reference_count, 1);
+}
+
+void
+LightSamplerRelease(
     _In_opt_ _Post_invalid_ PLIGHT_SAMPLER light_sampler
     )
 {
@@ -143,10 +159,13 @@ LightSamplerFree(
         return;
     }
 
-    if (light_sampler->vtable->free_routine != NULL)
+    if (atomic_fetch_sub(&light_sampler->reference_count, 1) == 1)
     {
-        light_sampler->vtable->free_routine(light_sampler->data);
-    }
+        if (light_sampler->vtable->free_routine != NULL)
+        {
+            light_sampler->vtable->free_routine(light_sampler->data);
+        }
 
-    free(light_sampler);
+        free(light_sampler);
+    }
 }

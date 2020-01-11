@@ -48,7 +48,12 @@ LightSamplerSample(
     );
 
 void
-LightSamplerFree(
+LightSamplerRetain(
+    _In_opt_ PLIGHT_SAMPLER light_sampler
+    );
+
+void
+LightSamplerRelease(
     _In_opt_ _Post_invalid_ PLIGHT_SAMPLER light_sampler
     );
 

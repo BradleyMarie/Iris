@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_SCENE_INTERNAL_
 
 #include <assert.h>
+#include <stdatomic.h>
 
 #include "iris_physx/scene_vtable.h"
 
@@ -26,6 +27,7 @@ Abstract:
 struct _SCENE {
     PCSCENE_VTABLE vtable;
     void *data;
+    atomic_uintmax_t reference_count;
 };
 
 #endif // _IRIS_PHYSX_SCENE_INTERNAL_

@@ -161,8 +161,8 @@ TriangleMaterialAllocate(
 void
 TestRender(
     _In_ PCCAMERA camera,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name,
     _In_ float_t epsilon
     )
@@ -188,12 +188,14 @@ TestRender(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -222,7 +224,7 @@ TestRender(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }
 
 //
@@ -317,8 +319,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -411,8 +413,8 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -505,8 +507,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -599,8 +601,8 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -693,8 +695,8 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -787,8 +789,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -881,8 +883,8 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -975,8 +977,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1069,8 +1071,8 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1163,8 +1165,8 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1257,8 +1259,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1351,8 +1353,8 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1445,8 +1447,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1539,8 +1541,8 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1633,8 +1635,8 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1729,8 +1731,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1825,8 +1827,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -1921,8 +1923,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
                "test_results/single_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2017,8 +2019,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2113,8 +2115,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2188,8 +2190,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
                "test_results/single_emissive_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2257,8 +2259,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2329,8 +2331,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
                "test_results/single_emissive_triangle_xy_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2398,8 +2400,8 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2491,8 +2493,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2587,8 +2589,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2683,8 +2685,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
                "test_results/single_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2779,8 +2781,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -2854,8 +2856,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
                "test_results/single_emissive_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2923,8 +2925,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -2995,8 +2997,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
                "test_results/single_emissive_triangle_xz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3064,8 +3066,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3157,8 +3159,8 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3253,8 +3255,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3349,8 +3351,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3445,8 +3447,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
                "test_results/single_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3541,8 +3543,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3637,8 +3639,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -3712,8 +3714,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
                "test_results/single_emissive_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3781,8 +3783,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3853,8 +3855,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
                "test_results/single_emissive_triangle_yz_triangle.pfm",
                (float_t)0.01);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);
@@ -3922,8 +3924,8 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
                "test_results/blank.pfm",
                (float_t)0.0);
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     LightRelease(light);
     EmissiveMaterialRelease(emissive_material);

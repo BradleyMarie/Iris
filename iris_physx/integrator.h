@@ -34,11 +34,17 @@ IntegratorAllocate(
     );
 
 ISTATUS
+IntegratorPrepare(
+    _Inout_ PINTEGRATOR integrator,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
+    _In_ bool precompute_colors
+    );
+
+ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
     _In_ float_t epsilon,
@@ -48,9 +54,6 @@ IntegratorIntegrate(
 ISTATUS
 IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
     _In_ float_t epsilon,

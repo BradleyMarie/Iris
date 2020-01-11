@@ -75,12 +75,14 @@ TEST(EmptyPhysx, ListScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -102,11 +104,11 @@ TEST(EmptyPhysx, ListScene)
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }
 
 TEST(EmptyPhysx, KdTreeScene)
@@ -160,12 +162,14 @@ TEST(EmptyPhysx, KdTreeScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -187,9 +191,9 @@ TEST(EmptyPhysx, KdTreeScene)
     CameraFree(camera);
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }

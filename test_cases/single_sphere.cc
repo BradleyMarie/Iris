@@ -31,8 +31,8 @@ Abstract:
 
 void
 TestRenderSingleThreaded(
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -68,12 +68,14 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -98,7 +100,7 @@ TestRenderSingleThreaded(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }
 
 TEST(SingleSphereTest, TestReflectorRedWorldSphere)
@@ -160,8 +162,8 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
                              light_sampler, 
                              "test_results/sphere_center.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -233,8 +235,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
                              light_sampler, 
                              "test_results/sphere_away.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -307,8 +309,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
                              light_sampler, 
                              "test_results/sphere_up.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);
@@ -381,8 +383,8 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
                              light_sampler, 
                              "test_results/sphere_right.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     LightRelease(light);

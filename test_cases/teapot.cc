@@ -39,8 +39,8 @@ Abstract:
 
 void
 TestRenderSingleThreaded(
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -75,12 +75,14 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -109,7 +111,7 @@ TestRenderSingleThreaded(
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
     FramebufferFree(framebuffer);
 }
 
@@ -190,8 +192,8 @@ TEST(TeapotTest, FlatShadedTeapot)
     BsdfRelease(bsdf);
     MaterialRelease(material);
     LightRelease(light);
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
 }
 
 TEST(TeapotTest, SmoothShadedTeapot)
@@ -270,6 +272,6 @@ TEST(TeapotTest, SmoothShadedTeapot)
     BsdfRelease(bsdf);
     MaterialRelease(material);
     LightRelease(light);
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
 }

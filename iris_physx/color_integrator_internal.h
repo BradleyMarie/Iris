@@ -15,7 +15,9 @@ Abstract:
 #ifndef _IRIS_PHYSX_COLOR_INTEGRATOR_INTERNAL_
 #define _IRIS_PHYSX_COLOR_INTEGRATOR_INTERNAL_
 
+#include <stdatomic.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "iris_physx/color_integrator_vtable.h"
 #include "iris_physx/reflector_internal.h"
@@ -56,6 +58,7 @@ struct _COLOR_INTEGRATOR {
     size_t spectrum_list_capacity;
     size_t spectrum_list_size;
     void *data;
+    atomic_uintptr_t reference_count;
 };
 
 //

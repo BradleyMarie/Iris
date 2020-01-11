@@ -29,18 +29,12 @@ extern "C" {
 ISTATUS
 PhysxSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 
 ISTATUS
 PhysxSpectralSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 

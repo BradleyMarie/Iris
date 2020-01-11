@@ -76,6 +76,7 @@ SceneAllocate(
 
     (*scene)->vtable = vtable;
     (*scene)->data = data_allocation;
+    (*scene)->reference_count = 1;
 
     if (data_size != 0)
     {
@@ -86,7 +87,20 @@ SceneAllocate(
 }
 
 void
-SceneFree(
+SceneRetain(
+    _In_opt_ PSCENE scene
+    )
+{
+    if (scene == NULL)
+    {
+        return;
+    }
+
+    atomic_fetch_add(&scene->reference_count, 1);
+}
+
+void
+SceneRelease(
     _In_opt_ _Post_invalid_ PSCENE scene
     )
 {
@@ -95,10 +109,13 @@ SceneFree(
         return;
     }
 
-    if (scene->vtable->free_routine != NULL)
+    if (atomic_fetch_sub(&scene->reference_count, 1) == 1)
     {
-        scene->vtable->free_routine(scene->data);
-    }
+        if (scene->vtable->free_routine != NULL)
+        {
+            scene->vtable->free_routine(scene->data);
+        }
 
-    free(scene);
+        free(scene);
+    }
 }

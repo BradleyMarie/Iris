@@ -158,8 +158,8 @@ AllocateCubeFromTriangles(
 
 void
 TestRenderSingleThreaded(
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
     _In_ const std::string& file_name
     )
 {
@@ -195,12 +195,14 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(
-        path_tracer,
-        scene,
-        light_sampler,
-        color_integrator,
-        &sample_tracer);
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator,
+                               true);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
@@ -225,7 +227,7 @@ TestRenderSingleThreaded(
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
-    ColorIntegratorFree(color_integrator);
+    ColorIntegratorRelease(color_integrator);
 }
 
 TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
@@ -309,8 +311,8 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                              light_sampler,
                              "test_results/csg_cube_sphere_difference.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -411,8 +413,8 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                              light_sampler,
                              "test_results/csg_sphere_intersection.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -513,8 +515,8 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                              light_sampler,
                              "test_results/csg_sphere_union.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);
@@ -624,8 +626,8 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                              light_sampler,
                              "test_results/csg_rounded_cube.pfm");
 
-    SceneFree(scene);
-    LightSamplerFree(light_sampler);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector0);
     ReflectorRelease(reflector1);

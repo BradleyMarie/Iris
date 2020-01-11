@@ -38,7 +38,12 @@ SceneAllocate(
     );
 
 void
-SceneFree(
+SceneRetain(
+    _In_opt_ PSCENE scene
+    );
+
+void
+SceneRelease(
     _In_opt_ _Post_invalid_ PSCENE scene
     );
     

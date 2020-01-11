@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include <stdalign.h>
+#include <string.h>
 
 #include "common/alloc.h"
 #include "common/safe_math.h"
@@ -527,6 +528,11 @@ ColorExtrapolatorAllocate(
     (*color_extrapolator)->spectrum_list_capacity = INITIAL_LIST_SIZE;
     (*color_extrapolator)->spectrum_list_size = 0;
     (*color_extrapolator)->data = data_allocation;
+
+    if (data_size != 0)
+    {
+        memcpy(data_allocation, data, data_size);
+    }
 
     return ISTATUS_SUCCESS;
 }

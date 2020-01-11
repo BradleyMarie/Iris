@@ -22,9 +22,6 @@ Abstract:
 
 typedef struct _PHYSX_SAMPLE_TRACER {
     PINTEGRATOR integrator;
-    PCSCENE scene;
-    PCLIGHT_SAMPLER light_sampler;
-    PCOLOR_INTEGRATOR color_integrator;
 } PHYSX_SAMPLE_TRACER, *PPHYSX_SAMPLE_TRACER;
 
 typedef const PHYSX_SAMPLE_TRACER *PCPHYSX_SAMPLE_TRACER;
@@ -47,9 +44,6 @@ PhysxSampleTracerTraceRay(
 
     ISTATUS status =
         IntegratorIntegrate(physx_sample_tracer->integrator,
-                            physx_sample_tracer->scene,
-                            physx_sample_tracer->light_sampler,
-                            physx_sample_tracer->color_integrator,
                             rng,
                             *ray,
                             epsilon,
@@ -72,9 +66,6 @@ PhysxSpectralSampleTracerTraceRay(
 
     ISTATUS status =
         IntegratorIntegrateSpectral(physx_sample_tracer->integrator,
-                                    physx_sample_tracer->scene,
-                                    physx_sample_tracer->light_sampler,
-                                    physx_sample_tracer->color_integrator,
                                     rng,
                                     *ray,
                                     epsilon,
@@ -101,12 +92,7 @@ PhysxSampleTracerDuplicate(
         return status;
     }
 
-    status =
-        PhysxSampleTracerAllocate(integrator,
-                                  physx_sample_tracer->scene,
-                                  physx_sample_tracer->light_sampler,
-                                  physx_sample_tracer->color_integrator,
-                                  duplicate);
+    status = PhysxSampleTracerAllocate(integrator, duplicate);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -134,12 +120,7 @@ PhysxSpectralSampleTracerDuplicate(
         return status;
     }
 
-    status =
-        PhysxSpectralSampleTracerAllocate(integrator,
-                                          physx_sample_tracer->scene,
-                                          physx_sample_tracer->light_sampler,
-                                          physx_sample_tracer->color_integrator,
-                                          duplicate);
+    status = PhysxSpectralSampleTracerAllocate(integrator, duplicate);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -165,9 +146,6 @@ ISTATUS
 PhysxSampleTracerAllocateInternal(
     _In_ PCSAMPLE_TRACER_VTABLE vtable,
     _In_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
@@ -176,31 +154,13 @@ PhysxSampleTracerAllocateInternal(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (scene == NULL)
+    if (sample_tracer == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (light_sampler == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (color_integrator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (sample_tracer == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
     PHYSX_SAMPLE_TRACER physx_sample_tracer;
     physx_sample_tracer.integrator = integrator;
-    physx_sample_tracer.scene = scene;
-    physx_sample_tracer.light_sampler = light_sampler;
-    physx_sample_tracer.color_integrator = color_integrator;
 
     ISTATUS status = SampleTracerAllocate(vtable,
                                           &physx_sample_tracer,
@@ -239,18 +199,12 @@ static const SAMPLE_TRACER_VTABLE spectal_sample_tracer_vtable = {
 ISTATUS
 PhysxSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
     ISTATUS status =
         PhysxSampleTracerAllocateInternal(&sample_tracer_vtable,
                                           integrator,
-                                          scene,
-                                          light_sampler,
-                                          color_integrator,
                                           sample_tracer);
 
     return status;
@@ -259,18 +213,12 @@ PhysxSampleTracerAllocate(
 ISTATUS
 PhysxSpectralSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
 {
     ISTATUS status =
         PhysxSampleTracerAllocateInternal(&spectal_sample_tracer_vtable,
                                           integrator,
-                                          scene,
-                                          light_sampler,
-                                          color_integrator,
                                           sample_tracer);
 
     return status;

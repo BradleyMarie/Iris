@@ -37,6 +37,9 @@ struct _INTEGRATOR {
     LIGHT_SAMPLE_LIST light_sample_list;
     VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
+    PSCENE scene;
+    PLIGHT_SAMPLER light_sampler;
+    PCOLOR_INTEGRATOR color_integrator;
     void *data;
 };
 
@@ -221,7 +224,50 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    result->scene = NULL;
+    result->light_sampler = NULL;
+    result->color_integrator = NULL;
+
     *integrator = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+IntegratorPrepare(
+    _Inout_ PINTEGRATOR integrator,
+    _In_ PSCENE scene,
+    _In_ PLIGHT_SAMPLER light_sampler,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
+    _In_ bool precompute_colors
+    )
+{
+    if (integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (light_sampler == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (color_integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    SceneRelease(integrator->scene);
+    LightSamplerRelease(integrator->light_sampler);
+    ColorIntegratorRelease(integrator->color_integrator);
+
+    integrator->scene = scene;
+    integrator->light_sampler = light_sampler;
+    integrator->color_integrator = color_integrator;
+
+    SceneRetain(scene);
+    LightSamplerRetain(light_sampler);
+    ColorIntegratorRetain(color_integrator);
 
     return ISTATUS_SUCCESS;
 }
@@ -229,29 +275,16 @@ IntegratorAllocate(
 ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     )
 {
-    if (color_integrator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (color == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_07;
-    }
-
     PCSPECTRUM spectrum;
     ISTATUS status = IntegratorIntegrateInternal(integrator,
-                                                 scene,
-                                                 light_sampler,
+                                                 integrator->scene,
+                                                 integrator->light_sampler,
                                                  rng,
                                                  ray,
                                                  epsilon,
@@ -262,7 +295,7 @@ IntegratorIntegrate(
         return status;
     }
 
-    status = ColorIntegratorComputeSpectrumColorFast(color_integrator,
+    status = ColorIntegratorComputeSpectrumColorFast(integrator->color_integrator,
                                                      spectrum,
                                                      color);
 
@@ -272,29 +305,16 @@ IntegratorIntegrate(
 ISTATUS
 IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
-    _In_ PCSCENE scene,
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCCOLOR_INTEGRATOR color_integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     )
 {
-    if (color_integrator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (color == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_07;
-    }
-
     PCSPECTRUM spectrum;
     ISTATUS status = IntegratorIntegrateInternal(integrator,
-                                                 scene,
-                                                 light_sampler,
+                                                 integrator->scene,
+                                                 integrator->light_sampler,
                                                  rng,
                                                  ray,
                                                  epsilon,
@@ -305,7 +325,13 @@ IntegratorIntegrateSpectral(
         return status;
     }
 
-    status = ColorIntegratorComputeSpectrumColor(color_integrator,
+    if (spectrum == NULL)
+    {
+        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        return ISTATUS_SUCCESS;
+    }
+
+    status = ColorIntegratorComputeSpectrumColor(integrator->color_integrator,
                                                  spectrum,
                                                  color);
     
@@ -330,6 +356,19 @@ IntegratorDuplicate(
 
     ISTATUS status = integrator->vtable->duplicate_routine(integrator->data,
                                                            duplicate);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    (*duplicate)->scene = integrator->scene;
+    (*duplicate)->light_sampler = integrator->light_sampler;
+    (*duplicate)->color_integrator = integrator->color_integrator;
+
+    SceneRetain(integrator->scene);
+    LightSamplerRetain(integrator->light_sampler);
+    ColorIntegratorRetain(integrator->color_integrator);
 
     return status;
 }

@@ -50,7 +50,12 @@ ColorIntegratorCacheReflector(
     );
 
 void
-ColorIntegratorFree(
+ColorIntegratorRetain(
+    _In_opt_ PCOLOR_INTEGRATOR color_integrator
+    );
+
+void
+ColorIntegratorRelease(
     _In_opt_ _Post_invalid_ PCOLOR_INTEGRATOR color_integrator
     );
 
