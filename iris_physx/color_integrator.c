@@ -34,7 +34,7 @@ static
 inline
 void
 ColorIntegratorInsertSpectrum(
-    _Inout_updates_(list_size) PSPECTRUM_LIST_ENTRY list,
+    _Inout_updates_(list_size) PSPECTRUM_LIST_ENTRY_OLD list,
     _In_ size_t list_size,
     _In_ PSPECTRUM spectrum,
     _In_ COLOR3 color
@@ -71,7 +71,7 @@ static
 inline
 void
 ColorIntegratorInsertReflector(
-    _Inout_updates_(list_size) PREFLECTOR_LIST_ENTRY list,
+    _Inout_updates_(list_size) PREFLECTOR_LIST_ENTRY_OLD list,
     _In_ size_t list_size,
     _In_ PREFLECTOR reflector,
     _In_ COLOR3 color
@@ -120,8 +120,8 @@ ColorIntegratorGrowSpectrumHashTable(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PSPECTRUM_LIST_ENTRY new_list =
-        (PSPECTRUM_LIST_ENTRY)calloc(new_capacity, sizeof(SPECTRUM_LIST_ENTRY));
+    PSPECTRUM_LIST_ENTRY_OLD new_list =
+        (PSPECTRUM_LIST_ENTRY_OLD)calloc(new_capacity, sizeof(SPECTRUM_LIST_ENTRY_OLD));
 
     if (new_list == NULL)
     {
@@ -160,8 +160,8 @@ ColorIntegratorGrowReflectorHashTable(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PREFLECTOR_LIST_ENTRY new_list =
-        (PREFLECTOR_LIST_ENTRY)calloc(new_capacity, sizeof(REFLECTOR_LIST_ENTRY));
+    PREFLECTOR_LIST_ENTRY_OLD new_list =
+        (PREFLECTOR_LIST_ENTRY_OLD)calloc(new_capacity, sizeof(REFLECTOR_LIST_ENTRY_OLD));
 
     if (new_list == NULL)
     {
@@ -280,7 +280,7 @@ ColorIntegratorAllocate(
     }
 
     (*color_integrator)->reflector_list =
-        (PREFLECTOR_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(REFLECTOR_LIST_ENTRY));
+        (PREFLECTOR_LIST_ENTRY_OLD)calloc(INITIAL_LIST_SIZE, sizeof(REFLECTOR_LIST_ENTRY_OLD));
     if ((*color_integrator)->reflector_list == NULL)
     {
         free(*color_integrator);
@@ -288,7 +288,7 @@ ColorIntegratorAllocate(
     }
 
     (*color_integrator)->spectrum_list =
-        (PSPECTRUM_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(SPECTRUM_LIST_ENTRY));
+        (PSPECTRUM_LIST_ENTRY_OLD)calloc(INITIAL_LIST_SIZE, sizeof(SPECTRUM_LIST_ENTRY_OLD));
     if ((*color_integrator)->spectrum_list == NULL)
     {
         free((*color_integrator)->reflector_list);
@@ -328,7 +328,7 @@ ColorIntegratorCacheSpectrum(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY entry;
+    PCSPECTRUM_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindSpectrumEntry(color_integrator,
                                                   spectrum,
                                                   &entry);
@@ -384,7 +384,7 @@ ColorIntegratorCacheReflector(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY entry;
+    PCREFLECTOR_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindReflectorEntry(color_integrator,
                                                    reflector,
                                                    &entry);

@@ -65,6 +65,32 @@ cc_library(
 )
 
 cc_library(
+    name = "color_cache",
+    srcs = ["color_cache.c"],
+    hdrs = ["color_cache.h"],
+    deps = [
+        ":color_cache_internal",
+        ":color_integrator",
+        ":color_integrator_internal",
+        ":reflector",
+        ":reflector_internal",
+        ":spectrum",
+        ":spectrum_internal",
+    ],
+)
+
+cc_library(
+    name = "color_cache_internal",
+    hdrs = ["color_cache_internal.h"],
+    deps = [
+        ":color_integrator",
+        "//common:safe_math",
+        "//third_party/smhasher:murmur2",
+        "//third_party/smhasher:murmur3",
+    ],
+)
+
+cc_library(
     name = "color_integrator",
     srcs = ["color_integrator.c"],
     hdrs = ["color_integrator.h"],

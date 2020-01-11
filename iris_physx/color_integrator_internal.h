@@ -35,24 +35,24 @@ Abstract:
 // Types
 //
 
-typedef struct _REFLECTOR_LIST_ENTRY {
+typedef struct _REFLECTOR_LIST_ENTRY_OLD {
     PREFLECTOR reflector;
     COLOR3 color;
-} REFLECTOR_LIST_ENTRY, *PREFLECTOR_LIST_ENTRY;
+} REFLECTOR_LIST_ENTRY_OLD, *PREFLECTOR_LIST_ENTRY_OLD;
 
-typedef const REFLECTOR_LIST_ENTRY *PCREFLECTOR_LIST_ENTRY;
+typedef const REFLECTOR_LIST_ENTRY_OLD *PCREFLECTOR_LIST_ENTRY_OLD;
 
-typedef struct _SPECTRUM_LIST_ENTRY {
+typedef struct _SPECTRUM_LIST_ENTRY_OLD {
     PSPECTRUM spectrum;
     COLOR3 color;
-} SPECTRUM_LIST_ENTRY, *PSPECTRUM_LIST_ENTRY;
+} SPECTRUM_LIST_ENTRY_OLD, *PSPECTRUM_LIST_ENTRY_OLD;
 
-typedef const SPECTRUM_LIST_ENTRY *PCSPECTRUM_LIST_ENTRY;
+typedef const SPECTRUM_LIST_ENTRY_OLD *PCSPECTRUM_LIST_ENTRY_OLD;
 
 struct _COLOR_INTEGRATOR {
     PCCOLOR_INTEGRATOR_VTABLE vtable;
-    _Field_size_full_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY reflector_list;
-    _Field_size_full_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY spectrum_list;
+    _Field_size_full_(reflector_list_capacity) PREFLECTOR_LIST_ENTRY_OLD reflector_list;
+    _Field_size_full_(spectrum_list_capacity) PSPECTRUM_LIST_ENTRY_OLD spectrum_list;
     size_t reflector_list_capacity;
     size_t reflector_list_size;
     size_t spectrum_list_capacity;
@@ -193,7 +193,7 @@ bool
 ColorIntegratorFindSpectrumEntry(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
     _In_ PCSPECTRUM spectrum,
-    _Out_ PCSPECTRUM_LIST_ENTRY *entry
+    _Out_ PCSPECTRUM_LIST_ENTRY_OLD *entry
     )
 {
     assert(color_integrator != NULL);
@@ -216,7 +216,7 @@ bool
 ColorIntegratorFindReflectorEntry(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
     _In_ PCREFLECTOR reflector,
-    _Out_ PCREFLECTOR_LIST_ENTRY *entry
+    _Out_ PCREFLECTOR_LIST_ENTRY_OLD *entry
     )
 {
     assert(color_integrator != NULL);
@@ -251,7 +251,7 @@ ColorIntegratorComputeSpectrumColor(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY entry;
+    PCSPECTRUM_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindSpectrumEntry(color_integrator,
                                                   spectrum,
                                                   &entry);
@@ -287,7 +287,7 @@ ColorIntegratorComputeReflectorColor(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY entry;
+    PCREFLECTOR_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindReflectorEntry(color_integrator,
                                                    reflector,
                                                    &entry);
@@ -323,7 +323,7 @@ ColorIntegratorComputeSpectrumColorFast(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY entry;
+    PCSPECTRUM_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindSpectrumEntry(color_integrator,
                                                   spectrum,
                                                   &entry);
@@ -378,7 +378,7 @@ ColorIntegratorComputeReflectorColorFast(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY entry;
+    PCREFLECTOR_LIST_ENTRY_OLD entry;
     bool found = ColorIntegratorFindReflectorEntry(color_integrator,
                                                    reflector,
                                                    &entry);
