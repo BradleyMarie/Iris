@@ -66,6 +66,21 @@ MatteMaterialSample(
 }
 
 static
+ISTATUS
+MatteMaterialCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCMATTE_MATERIAL matte_material = (PCMATTE_MATERIAL)context;
+
+    ISTATUS status = ReflectorTextureCacheColors(matte_material->diffuse,
+                                                 color_cache);
+
+    return status;
+}
+
+static
 void
 MatteMaterialFree(
     _In_opt_ _Post_invalid_ void *context
@@ -82,6 +97,7 @@ MatteMaterialFree(
 
 static const MATERIAL_VTABLE matte_material_vtable = {
     MatteMaterialSample,
+    MatteMaterialCacheColors,
     MatteMaterialFree
 };
 

@@ -65,6 +65,12 @@ ReflectorMipmapLookup(
     _Out_ PCREFLECTOR *reflector
     );
 
+ISTATUS
+ReflectorMipmapCacheColors(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ PCOLOR_CACHE color_cache
+    );
+
 void
 ReflectorMipmapFree(
     _In_opt_ _Post_invalid_ PREFLECTOR_MIPMAP mipmap

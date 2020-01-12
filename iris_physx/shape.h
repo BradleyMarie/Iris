@@ -44,6 +44,12 @@ ShapeComputeBounds(
     _Out_ PBOUNDING_BOX world_bounds
     );
 
+ISTATUS
+ShapeCacheColors(
+    _In_ PCSHAPE shape,
+    _In_ PCOLOR_CACHE color_cache
+    );
+
 void
 ShapeRetain(
     _In_opt_ PSHAPE Shape

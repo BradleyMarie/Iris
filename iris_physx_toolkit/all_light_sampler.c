@@ -61,6 +61,29 @@ AllLightSamplerSample(
 }
 
 static
+ISTATUS
+AllLightSamplerCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCALL_LIGHT_SAMPLER light_sampler = (PCALL_LIGHT_SAMPLER)context;
+
+    for (size_t i = 0; i < light_sampler->num_lights; i++)
+    {
+        ISTATUS status = LightCacheColors(light_sampler->lights[i],
+                                          color_cache);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
 void
 AllLightSamplerFree(
     _In_opt_ _Post_invalid_ void *context
@@ -82,6 +105,7 @@ AllLightSamplerFree(
 
 static const LIGHT_SAMPLER_VTABLE all_light_sampler_vtable = {
     AllLightSamplerSample,
+    AllLightSamplerCacheColors,
     AllLightSamplerFree
 };
 

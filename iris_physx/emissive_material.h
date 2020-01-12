@@ -37,6 +37,12 @@ EmissiveMaterialAllocate(
     _Out_ PEMISSIVE_MATERIAL *emissive_material
     );
 
+ISTATUS
+EmissiveMaterialCacheColors(
+    _In_opt_ PCEMISSIVE_MATERIAL emissive_material,
+    _In_ PCOLOR_CACHE color_cache
+    );
+
 void
 EmissiveMaterialRetain(
     _In_opt_ PEMISSIVE_MATERIAL emissive_material

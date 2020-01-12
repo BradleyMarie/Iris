@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_LIGHT_SAMPLER_VTABLE_
 #define _IRIS_PHYSX_LIGHT_SAMPLER_VTABLE_
 
+#include "iris_physx/color_cache.h"
 #include "iris_physx/light_sample_collector.h"
 
 //
@@ -32,6 +33,7 @@ ISTATUS
 
 typedef struct _LIGHT_SAMPLER_VTABLE {
     PLIGHT_SAMPLER_SAMPLE_ROUTINE sample_routine;
+    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } LIGHT_SAMPLER_VTABLE, *PLIGHT_SAMPLER_VTABLE;
 

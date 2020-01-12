@@ -200,6 +200,27 @@ SphereGetMaterial(
 }
 
 static
+ISTATUS
+SphereCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCSPHERE sphere = (PCSPHERE)context;
+
+    ISTATUS status = MaterialCacheColors(sphere->materials[0], color_cache);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = MaterialCacheColors(sphere->materials[1], color_cache);
+
+    return status;
+}
+
+static
 void
 SphereFree(
     _In_opt_ _Post_invalid_ void *context
@@ -226,6 +247,7 @@ static const SHAPE_VTABLE sphere_vtable = {
     NULL,
     NULL,
     NULL,
+    SphereCacheColors,
     SphereFree
 };
 

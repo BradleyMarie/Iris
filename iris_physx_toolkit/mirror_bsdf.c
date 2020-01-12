@@ -90,6 +90,20 @@ MirrorReflectorComputeReflectanceWithPdf(
     return ISTATUS_SUCCESS;
 }
 
+static
+ISTATUS
+MirrorReflectorCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCMIRROR_BSDF mirror_bsdf = (PCMIRROR_BSDF)context;
+
+    ISTATUS status = ColorCacheAddReflector(color_cache,
+                                            mirror_bsdf->reflector);
+
+    return status;
+}
 
 static
 void
@@ -110,6 +124,7 @@ static const BSDF_VTABLE mirror_bsdf_vtable = {
     MirrorReflectorSample,
     MirrorReflectorComputeReflectance,
     MirrorReflectorComputeReflectanceWithPdf,
+    MirrorReflectorCacheColors,
     MirrorReflectorFree
 };
 

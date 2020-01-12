@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_LIGHT_VTABLE_
 
 #include "iris_advanced/iris_advanced.h"
+#include "iris_physx/color_cache.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/visibility_tester.h"
 
@@ -62,6 +63,7 @@ typedef struct _LIGHT_VTABLE {
     LIGHT_SAMPLE_ROUTINE sample_routine;
     PLIGHT_COMPUTE_EMISSIVE_ROUTINE compute_emissive_routine;
     PLIGHT_COMPUTE_EMISSIVE_WITH_PDF_ROUTINE compute_emissive_with_pdf_routine;
+    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } LIGHT_VTABLE, *PLIGHT_VTABLE;
 

@@ -233,6 +233,20 @@ LambertianReflectorComputeReflectanceWithPdf(
     return ISTATUS_SUCCESS;
 }
 
+static
+ISTATUS
+LambertianReflectorCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
+
+    ISTATUS status = ColorCacheAddReflector(color_cache,
+                                            lambertian_bsdf->reflector);
+
+    return status;
+}
 
 static
 void
@@ -253,6 +267,7 @@ static const BSDF_VTABLE lambertian_bsdf_vtable = {
     LambertianReflectorSample,
     LambertianReflectorComputeReflectance,
     LambertianReflectorComputeReflectanceWithPdf,
+    LambertianReflectorCacheColors,
     LambertianReflectorFree
 };
 

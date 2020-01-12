@@ -114,11 +114,28 @@ ConstantReflectorTextureSample(
     _Out_ PCREFLECTOR *reflector
     )
 {
-    PCONSTANT_REFLECTOR_TEXTURE texture = (PCONSTANT_REFLECTOR_TEXTURE)context;
+    PCCONSTANT_REFLECTOR_TEXTURE texture =
+        (PCCONSTANT_REFLECTOR_TEXTURE)context;
 
     *reflector = texture->reflector;
 
     return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+ConstantReflectorTextureColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCCONSTANT_REFLECTOR_TEXTURE constant_material =
+        (PCCONSTANT_REFLECTOR_TEXTURE)context;
+
+    ISTATUS status = ColorCacheAddReflector(color_cache,
+                                            constant_material->reflector);
+
+    return status;
 }
 
 static
@@ -137,6 +154,7 @@ ConstantReflectorTextureFree(
 
 static const REFLECTOR_TEXTURE_VTABLE constant_reflector_texture_vtable = {
     ConstantReflectorTextureSample,
+    ConstantReflectorTextureColors,
     ConstantReflectorTextureFree
 };
 

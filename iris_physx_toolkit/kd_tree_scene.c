@@ -1216,6 +1216,29 @@ KdTreeSceneTrace(
 }
 
 static
+ISTATUS
+KdTreeSceneCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+
+    for (size_t i = 0; i < kd_tree->num_shapes; i++)
+    {
+        ISTATUS status = ShapeCacheColors(kd_tree->shapes[i].shape,
+                                          color_cache);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
 void
 KdTreeSceneFree(
     _In_opt_ _Post_invalid_ void *context
@@ -1240,6 +1263,7 @@ KdTreeSceneFree(
 
 static const SCENE_VTABLE kd_tree_scene_vtable = {
     KdTreeSceneTrace,
+    KdTreeSceneCacheColors,
     KdTreeSceneFree
 };
 

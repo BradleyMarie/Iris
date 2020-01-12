@@ -58,6 +58,7 @@ cc_library(
     name = "bsdf_vtable",
     hdrs = ["bsdf_vtable.h"],
     deps = [
+        ":color_cache",
         ":reflector_compositor",
         "//iris",
         "//iris_advanced",
@@ -149,6 +150,7 @@ cc_library(
     name = "emissive_material_vtable",
     hdrs = ["emissive_material_vtable.h"],
     deps = [
+        ":color_cache",
         ":spectrum",
         "//iris",
     ],
@@ -309,6 +311,7 @@ cc_library(
     name = "light_sampler_vtable",
     hdrs = ["light_sampler_vtable.h"],
     deps = [
+        ":color_cache",
         ":light_sample_collector",
     ],
 )
@@ -317,6 +320,7 @@ cc_library(
     name = "light_vtable",
     hdrs = ["light_vtable.h"],
     deps = [
+        ":color_cache",
         ":spectrum_compositor",
         ":visibility_tester",
         "//iris_advanced",
@@ -347,6 +351,7 @@ cc_library(
     hdrs = ["material_vtable.h"],
     deps = [
         ":bsdf_allocator",
+        ":color_cache",
         ":reflector_compositor",
     ],
 )
@@ -507,6 +512,7 @@ cc_library(
     name = "scene_vtable",
     hdrs = ["scene_vtable.h"],
     deps = [
+        ":color_cache",
         ":hit_tester",
         ":shape",
     ],
@@ -537,6 +543,7 @@ cc_library(
     name = "shape_vtable",
     hdrs = ["shape_vtable.h"],
     deps = [
+        ":color_cache",
         ":emissive_material",
         ":hit_allocator",
         ":material",

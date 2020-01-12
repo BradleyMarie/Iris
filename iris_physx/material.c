@@ -87,6 +87,28 @@ MaterialAllocate(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+MaterialCacheColors(
+    _In_opt_ PCMATERIAL material,
+    _In_ PCOLOR_CACHE color_cache
+    )
+{
+    if (color_cache == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (material == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status = material->vtable->cache_colors_routine(material->data,
+                                                            color_cache);
+
+    return status;
+}
+
 void
 MaterialRetain(
     _In_opt_ PMATERIAL material

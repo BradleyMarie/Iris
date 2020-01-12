@@ -47,6 +47,12 @@ LightSamplerSample(
     _Inout_ PLIGHT_SAMPLE_LIST light_sample_list
     );
 
+ISTATUS
+LightSamplerCacheColors(
+    _In_ PCLIGHT_SAMPLER light_sampler,
+    _In_ PCOLOR_CACHE color_cache
+    );
+
 void
 LightSamplerRetain(
     _In_opt_ PLIGHT_SAMPLER light_sampler

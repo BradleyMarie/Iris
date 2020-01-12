@@ -87,6 +87,29 @@ EmissiveMaterialAllocate(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+EmissiveMaterialCacheColors(
+    _In_opt_ PCEMISSIVE_MATERIAL emissive_material,
+    _In_ PCOLOR_CACHE color_cache
+    )
+{
+    if (color_cache == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (emissive_material == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status =
+        emissive_material->vtable->cache_colors_routine(emissive_material->data,
+                                                        color_cache);
+
+    return status;
+}
+
 void
 EmissiveMaterialRetain(
     _In_opt_ PEMISSIVE_MATERIAL emissive_material

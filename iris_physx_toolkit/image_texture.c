@@ -186,6 +186,20 @@ ReflectorImageTextureSample(
 }
 
 static
+ISTATUS
+ReflectorImageTextureColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PREFLECTOR_IMAGE_TEXTURE texture = (PREFLECTOR_IMAGE_TEXTURE)context;
+
+    ISTATUS status = ReflectorMipmapCacheColors(texture->mipmap, color_cache);
+
+    return status;
+}
+
+static
 void
 ReflectorImageTextureFree(
     _In_opt_ _Post_invalid_ void *context
@@ -201,6 +215,7 @@ ReflectorImageTextureFree(
 
 static const REFLECTOR_TEXTURE_VTABLE reflector_image_texture_vtable = {
     ReflectorImageTextureSample,
+    ReflectorImageTextureColors,
     ReflectorImageTextureFree
 };
 

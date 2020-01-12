@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_MATERIAL_VTABLE_
 
 #include "iris_physx/bsdf_allocator.h"
+#include "iris_physx/color_cache.h"
 #include "iris_physx/reflector_compositor.h"
 
 //
@@ -36,6 +37,7 @@ ISTATUS
 
 typedef struct _MATERIAL_VTABLE {
     PMATERIAL_SAMPLE_ROUTINE sample_routine;
+    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } MATERIAL_VTABLE, *PMATERIAL_VTABLE;
 

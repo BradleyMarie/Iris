@@ -48,6 +48,22 @@ ConstantEmissiveMaterialSample(
 }
 
 static
+ISTATUS
+ConstantEmissiveMaterialColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCONSTANT_EMISSIVE_MATERIAL constant_material =
+        (PCONSTANT_EMISSIVE_MATERIAL)context;
+
+    ISTATUS status = ColorCacheAddSpectrum(color_cache,
+                                           constant_material->spectrum);
+
+    return status;
+}
+
+static
 void
 ConstantEmissiveMaterialFree(
     _In_opt_ _Post_invalid_ void *context
@@ -65,6 +81,7 @@ ConstantEmissiveMaterialFree(
 
 static const EMISSIVE_MATERIAL_VTABLE constant_material_vtable = {
     ConstantEmissiveMaterialSample,
+    ConstantEmissiveMaterialColors,
     ConstantEmissiveMaterialFree
 };
 

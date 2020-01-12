@@ -231,6 +231,62 @@ ListSceneTrace(
 }
 
 static
+ISTATUS
+ListSceneCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCLIST_SCENE list_scene = (PCLIST_SCENE)context;
+
+    size_t list_size = PointerListGetSize(&list_scene->world_geometry);
+    for (size_t i = 0; i < list_size; i++)
+    {
+        PSHAPE shape =
+            (PSHAPE)PointerListRetrieveAtIndex(&list_scene->world_geometry, i);
+
+        ISTATUS status = ShapeCacheColors(shape, color_cache);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    list_size = PointerListGetSize(&list_scene->premultiplied_geometry);
+    for (size_t i = 0; i < list_size; i++)
+    {
+        void* raw_entry =
+            PointerListRetrieveAtIndex(&list_scene->premultiplied_geometry, i);
+        PSHAPE_AND_TRANSFORM entry = (PSHAPE_AND_TRANSFORM)raw_entry;
+
+        ISTATUS status = ShapeCacheColors(entry->shape, color_cache);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    list_size = PointerListGetSize(&list_scene->transformed_geometry);
+    for (size_t i = 0; i < list_size; i++)
+    {
+        void* raw_entry =
+            PointerListRetrieveAtIndex(&list_scene->transformed_geometry, i);
+        PSHAPE_AND_TRANSFORM entry = (PSHAPE_AND_TRANSFORM)raw_entry;
+
+        ISTATUS status = ShapeCacheColors(entry->shape, color_cache);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
 void
 ListSceneFree(
     _In_opt_ _Post_invalid_ void *context
@@ -241,9 +297,9 @@ ListSceneFree(
     size_t list_size = PointerListGetSize(&list_scene->world_geometry);
     for (size_t i = 0; i < list_size; i++)
     {
-        PSHAPE shape = 
+        PSHAPE shape =
             (PSHAPE)PointerListRetrieveAtIndex(&list_scene->world_geometry, i);
-        
+
         ShapeRelease(shape);
     }
 
@@ -252,7 +308,7 @@ ListSceneFree(
     list_size = PointerListGetSize(&list_scene->premultiplied_geometry);
     for (size_t i = 0; i < list_size; i++)
     {
-        void* raw_entry = 
+        void* raw_entry =
             PointerListRetrieveAtIndex(&list_scene->premultiplied_geometry, i);
         PSHAPE_AND_TRANSFORM entry = (PSHAPE_AND_TRANSFORM)raw_entry;
 
@@ -266,7 +322,7 @@ ListSceneFree(
     list_size = PointerListGetSize(&list_scene->transformed_geometry);
     for (size_t i = 0; i < list_size; i++)
     {
-        void* raw_entry = 
+        void* raw_entry =
             PointerListRetrieveAtIndex(&list_scene->transformed_geometry, i);
         PSHAPE_AND_TRANSFORM entry = (PSHAPE_AND_TRANSFORM)raw_entry;
 
@@ -284,6 +340,7 @@ ListSceneFree(
 
 static const SCENE_VTABLE list_scene_vtable = {
     ListSceneTrace,
+    ListSceneCacheColors,
     ListSceneFree
 };
 

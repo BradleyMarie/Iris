@@ -50,6 +50,20 @@ ConstantMaterialSample(
 }
 
 static
+ISTATUS
+ConstantMaterialColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCCONSTANT_MATERIAL constant_material = (PCCONSTANT_MATERIAL)context;
+
+    ISTATUS status = BsdfCacheColors(constant_material->bsdf, color_cache);
+
+    return status;
+}
+
+static
 void
 ConstantMaterialFree(
     _In_opt_ _Post_invalid_ void *context
@@ -66,6 +80,7 @@ ConstantMaterialFree(
 
 static const MATERIAL_VTABLE constant_material_vtable = {
     ConstantMaterialSample,
+    ConstantMaterialColors,
     ConstantMaterialFree
 };
 

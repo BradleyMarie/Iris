@@ -259,7 +259,7 @@ ReflectorToColorMapLookup(
 
 static
 inline
-void
+bool
 SpectrumToColorMapInsert(
     _Inout_ PSPECTRUM_TO_COLOR_MAP map,
     _In_ PCSPECTRUM spectrum,
@@ -274,22 +274,25 @@ SpectrumToColorMapInsert(
     for (;;) {
         if (map->list[index].spectrum == spectrum)
         {
-            return;
+            return false;
         }
 
         if (map->list[index].spectrum == NULL)
         {
             map->list[index].spectrum = spectrum;
             map->list[index].color = color;
-            return;
+            return true;
         }
 
         index += 1;
 
-        if (index == map->capacity) {
+        if (index == map->capacity)
+        {
             index = 0;
         }
     }
+
+    return false;
 }
 
 static
@@ -321,10 +324,13 @@ ReflectorToColorMapInsert(
 
         index += 1;
 
-        if (index == map->capacity) {
+        if (index == map->capacity)
+        {
             index = 0;
         }
     }
+
+    return false;
 }
 
 static
@@ -479,7 +485,7 @@ SpectrumToColorMapAdd(
         }
     }
 
-    bool added = SpectrumToColorMapAdd(map, spectrum, color);
+    bool added = SpectrumToColorMapInsert(map, spectrum, color);
     if (!added)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
@@ -512,7 +518,7 @@ ReflectorToColorMapAdd(
         }
     }
 
-    bool added = ReflectorToColorMapAdd(map, reflector, color);
+    bool added = ReflectorToColorMapInsert(map, reflector, color);
     if (!added)
     {
         return ISTATUS_INVALID_ARGUMENT_01;

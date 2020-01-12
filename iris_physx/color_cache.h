@@ -25,6 +25,13 @@ Abstract:
 typedef struct _COLOR_CACHE COLOR_CACHE, *PCOLOR_CACHE;
 typedef const COLOR_CACHE *PCCOLOR_CACHE;
 
+typedef
+ISTATUS
+(*PCACHE_COLORS_ROUTINE)(
+    _In_opt_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    );
+
 //
 // Functions
 //

@@ -260,6 +260,37 @@ ReflectorMipmapLookup(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+ReflectorMipmapCacheColors(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ PCOLOR_CACHE color_cache
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (color_cache == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    size_t num_pixels = mipmap->width * mipmap->height;
+    for (size_t i = 0; i < num_pixels; i++)
+    {
+        ISTATUS status = ColorCacheAddReflector(color_cache,
+                                                mipmap->textels[i]);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
 void
 ReflectorMipmapFree(
     _In_opt_ _Post_invalid_ PREFLECTOR_MIPMAP mipmap

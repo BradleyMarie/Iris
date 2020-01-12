@@ -134,6 +134,21 @@ DirectionalLightComputeEmissiveWithPdf(
 }
 
 static
+ISTATUS
+DirectionalLightCacheColors(
+    _In_ const void *context,
+    _Inout_ PCOLOR_CACHE color_cache
+    )
+{
+    PCDIRECTIONAL_LIGHT directional_light = (PCDIRECTIONAL_LIGHT)context;
+
+    ISTATUS status = ColorCacheAddSpectrum(color_cache,
+                                           directional_light->spectrum);
+
+    return status;
+}
+
+static
 void
 DirectionalLightFree(
     _In_opt_ _Post_invalid_ void *context
@@ -152,6 +167,7 @@ static const LIGHT_VTABLE directional_light_vtable = {
     DirectionalLightSample,
     DirectionalLightComputeEmissive,
     DirectionalLightComputeEmissiveWithPdf,
+    DirectionalLightCacheColors,
     DirectionalLightFree
 };
 
