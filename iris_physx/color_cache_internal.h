@@ -616,11 +616,15 @@ ColorCacheInitialize(
 static
 inline
 void
-ColorCacheClear(
-    _Inout_ struct _COLOR_CACHE *cache
+ColorCacheReset(
+    _Inout_ struct _COLOR_CACHE *cache,
+    _In_ PCOLOR_INTEGRATOR color_integrator
     )
 {
-    cache->color_integrator = NULL;
+    assert(cache != NULL);
+    assert(color_integrator != NULL);
+
+    cache->color_integrator = color_integrator;
 
     memset(&cache->spectrum_map.list,
            0,
@@ -638,6 +642,8 @@ ColorCacheDestroy(
     _Inout_ struct _COLOR_CACHE *cache
     )
 {
+    assert(cache != NULL);
+
     cache->color_integrator = NULL;
     SpectrumToColorMapDestroy(&cache->spectrum_map);
     ReflectorToColorMapDestroy(&cache->reflector_map);
