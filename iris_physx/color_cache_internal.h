@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_COLOR_CACHE_INTERNAL_
 #define _IRIS_PHYSX_COLOR_CACHE_INTERNAL_
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -56,6 +57,8 @@ typedef struct _SPECTRUM_TO_COLOR_MAP {
     _Field_size_full_(capacity) PSPECTRUM_LIST_ENTRY list;
     size_t capacity;
     size_t size;
+    atomic_uintptr_t reference_count;
+    bool shared;
 } SPECTRUM_TO_COLOR_MAP, *PSPECTRUM_TO_COLOR_MAP;
 
 typedef const SPECTRUM_TO_COLOR_MAP *PCSPECTRUM_TO_COLOR_MAP;
@@ -64,14 +67,16 @@ typedef struct _REFLECTOR_TO_COLOR_MAP {
     _Field_size_full_(capacity) PREFLECTOR_LIST_ENTRY list;
     size_t capacity;
     size_t size;
+    atomic_uintptr_t reference_count;
+    bool shared;
 } REFLECTOR_TO_COLOR_MAP, *PREFLECTOR_TO_COLOR_MAP;
 
 typedef const REFLECTOR_TO_COLOR_MAP *PCREFLECTOR_TO_COLOR_MAP;
 
 struct _COLOR_CACHE {
-    PCCOLOR_INTEGRATOR color_integrator;
-    SPECTRUM_TO_COLOR_MAP spectrum_map;
-    REFLECTOR_TO_COLOR_MAP reflector_map;
+    PCOLOR_INTEGRATOR color_integrator;
+    PSPECTRUM_TO_COLOR_MAP spectrum_map;
+    PREFLECTOR_TO_COLOR_MAP reflector_map;
 };
 
 //
@@ -261,7 +266,7 @@ SpectrumToColorMapInsert(
     _In_ COLOR3 color
     )
 {
-    assert(map != NULL);
+    assert(map != NULL && !map->shared);
     assert(spectrum != NULL);
     assert(ColorValidate(color));
 
@@ -296,7 +301,7 @@ ReflectorToColorMapInsert(
     _In_ COLOR3 color
     )
 {
-    assert(map != NULL);
+    assert(map != NULL && !map->shared);
     assert(reflector != NULL);
     assert(ColorValidate(color));
 
@@ -329,6 +334,8 @@ SpectrumToColorMapGrow(
     _Inout_ PSPECTRUM_TO_COLOR_MAP map
     )
 {
+    assert(map != NULL && !map->shared);
+
     size_t new_capacity;
     bool success = CheckedMultiplySizeT(map->capacity,
                                         SPECTRUM_TO_COLOR_MAP_GROWTH_FACTOR,
@@ -372,6 +379,8 @@ ReflectorToColorMapGrow(
     _Inout_ PREFLECTOR_TO_COLOR_MAP map
     )
 {
+    assert(map != NULL && !map->shared);
+
     size_t new_capacity;
     bool success = CheckedMultiplySizeT(map->capacity,
                                         REFLECTOR_TO_COLOR_MAP_GROWTH_FACTOR,
@@ -457,7 +466,7 @@ SpectrumToColorMapAdd(
     _In_ COLOR3 color
     )
 {
-    assert(map != NULL);
+    assert(map != NULL && !map->shared);
     assert(spectrum != NULL);
     assert(ColorValidate(color));
 
@@ -490,7 +499,7 @@ ReflectorToColorMapAdd(
     _In_ COLOR3 color
     )
 {
-    assert(map != NULL);
+    assert(map != NULL && !map->shared);
     assert(reflector != NULL);
     assert(ColorValidate(color));
 
@@ -517,23 +526,33 @@ ReflectorToColorMapAdd(
 static
 inline
 bool
-SpectrumToColorMapInitialize(
-    _Out_ PSPECTRUM_TO_COLOR_MAP map
+SpectrumToColorMapAllocate(
+    _Out_ PSPECTRUM_TO_COLOR_MAP *map
     )
 {
     assert(map != NULL);
 
-    map->list =
-        (PSPECTRUM_LIST_ENTRY)calloc(
-            SPECTRUM_TO_COLOR_MAP_INITIAL_LIST_SIZE,
-            sizeof(SPECTRUM_LIST_ENTRY));
-    if (map->list == NULL)
+    *map = (PSPECTRUM_TO_COLOR_MAP)malloc(sizeof(SPECTRUM_TO_COLOR_MAP));
+
+    if (*map == NULL)
     {
         return false;
     }
 
-    map->capacity = SPECTRUM_TO_COLOR_MAP_INITIAL_LIST_SIZE;
-    map->size = 0;
+    (*map)->list =
+        (PSPECTRUM_LIST_ENTRY)calloc(
+            SPECTRUM_TO_COLOR_MAP_INITIAL_LIST_SIZE,
+            sizeof(SPECTRUM_LIST_ENTRY));
+    if ((*map)->list == NULL)
+    {
+        free(*map);
+        return false;
+    }
+
+    (*map)->capacity = SPECTRUM_TO_COLOR_MAP_INITIAL_LIST_SIZE;
+    (*map)->size = 0;
+    (*map)->reference_count = 1;
+    (*map)->shared = false;
 
     return ISTATUS_SUCCESS;
 }
@@ -541,23 +560,33 @@ SpectrumToColorMapInitialize(
 static
 inline
 bool
-ReflectorToColorMapInitialize(
-    _Out_ PREFLECTOR_TO_COLOR_MAP map
+ReflectorToColorMapAllocate(
+    _Out_ PREFLECTOR_TO_COLOR_MAP *map
     )
 {
     assert(map != NULL);
 
-    map->list =
-        (PREFLECTOR_LIST_ENTRY)calloc(
-            REFLECTOR_TO_COLOR_MAP_INITIAL_LIST_SIZE,
-            sizeof(REFLECTOR_LIST_ENTRY));
-    if (map->list == NULL)
+    *map = (PREFLECTOR_TO_COLOR_MAP)malloc(sizeof(REFLECTOR_TO_COLOR_MAP));
+
+    if (*map == NULL)
     {
         return false;
     }
 
-    map->capacity = REFLECTOR_TO_COLOR_MAP_INITIAL_LIST_SIZE;
-    map->size = 0;
+    (*map)->list =
+        (PREFLECTOR_LIST_ENTRY)calloc(
+            REFLECTOR_TO_COLOR_MAP_INITIAL_LIST_SIZE,
+            sizeof(REFLECTOR_LIST_ENTRY));
+    if ((*map)->list == NULL)
+    {
+        free(*map);
+        return false;
+    }
+
+    (*map)->capacity = REFLECTOR_TO_COLOR_MAP_INITIAL_LIST_SIZE;
+    (*map)->size = 0;
+    (*map)->reference_count = 1;
+    (*map)->shared = false;
 
     return ISTATUS_SUCCESS;
 }
@@ -565,23 +594,59 @@ ReflectorToColorMapInitialize(
 static
 inline
 void
-SpectrumToColorMapDestroy(
+SpectrumToColorMapRetain(
     _Inout_ PSPECTRUM_TO_COLOR_MAP map
     )
 {
     assert(map != NULL);
-    free(map->list);
+
+    map->shared = true;
+    atomic_fetch_add(&map->reference_count, 1);
 }
 
 static
 inline
 void
-ReflectorToColorMapDestroy(
+ReflectorToColorMapRetain(
     _Inout_ PREFLECTOR_TO_COLOR_MAP map
     )
 {
     assert(map != NULL);
-    free(map->list);
+
+    map->shared = true;
+    atomic_fetch_add(&map->reference_count, 1);
+}
+
+static
+inline
+void
+SpectrumToColorMapRelease(
+    _In_opt_ _Post_invalid_ PSPECTRUM_TO_COLOR_MAP map
+    )
+{
+    assert(map != NULL);
+
+    if (atomic_fetch_sub(&map->reference_count, 1) == 1)
+    {
+        free(map->list);
+        free(map);
+    }
+}
+
+static
+inline
+void
+ReflectorToColorMapRelease(
+    _In_opt_ _Post_invalid_ PREFLECTOR_TO_COLOR_MAP map
+    )
+{
+    assert(map != NULL);
+
+    if (atomic_fetch_sub(&map->reference_count, 1) == 1)
+    {
+        free(map->list);
+        free(map);
+    }
 }
 
 static
@@ -589,7 +654,7 @@ inline
 bool
 ColorCacheInitialize(
     _Out_ struct _COLOR_CACHE *cache,
-    _In_ PCCOLOR_INTEGRATOR color_integrator
+    _In_ PCOLOR_INTEGRATOR color_integrator
     )
 {
     assert(cache != NULL);
@@ -597,25 +662,25 @@ ColorCacheInitialize(
 
     cache->color_integrator = color_integrator;
 
-    bool success = SpectrumToColorMapInitialize(&cache->spectrum_map);
+    bool success = SpectrumToColorMapAllocate(&cache->spectrum_map);
 
     if (!success)
     {
         return false;
     }
 
-    success = ReflectorToColorMapInitialize(&cache->reflector_map);
+    success = ReflectorToColorMapAllocate(&cache->reflector_map);
 
     if (!success)
     {
-        SpectrumToColorMapDestroy(&cache->spectrum_map);
+        SpectrumToColorMapRelease(cache->spectrum_map);
         return false;
     }
 }
 
 static
 inline
-void
+ISTATUS
 ColorCacheReset(
     _Inout_ struct _COLOR_CACHE *cache,
     _In_ PCOLOR_INTEGRATOR color_integrator
@@ -626,13 +691,70 @@ ColorCacheReset(
 
     cache->color_integrator = color_integrator;
 
-    memset(&cache->spectrum_map.list,
-           0,
-           sizeof(SPECTRUM_LIST_ENTRY) * cache->spectrum_map.capacity);
+    PSPECTRUM_TO_COLOR_MAP new_spectrum_map;
+    bool success = SpectrumToColorMapAllocate(&new_spectrum_map);
 
-    memset(&cache->reflector_map.list,
-           0,
-           sizeof(REFLECTOR_LIST_ENTRY) * cache->reflector_map.capacity);
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PREFLECTOR_TO_COLOR_MAP new_reflector_map;
+    success = ReflectorToColorMapAllocate(&new_reflector_map);
+
+    if (!success)
+    {
+        SpectrumToColorMapRelease(new_spectrum_map);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    if (cache->spectrum_map->shared)
+    {
+        SpectrumToColorMapRelease(cache->spectrum_map);
+        cache->spectrum_map = new_spectrum_map;
+    }
+    else
+    {
+        SpectrumToColorMapRelease(new_spectrum_map);
+        memset(cache->spectrum_map->list,
+               0,
+               sizeof(SPECTRUM_LIST_ENTRY) * cache->spectrum_map->capacity);
+    }
+
+    if (cache->reflector_map->shared)
+    {
+        ReflectorToColorMapRelease(cache->reflector_map);
+        cache->reflector_map = new_reflector_map;
+    }
+    else
+    {
+        ReflectorToColorMapRelease(new_reflector_map);
+        memset(cache->reflector_map->list,
+               0,
+               sizeof(REFLECTOR_LIST_ENTRY) * cache->reflector_map->capacity);
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+inline
+void
+ColorCacheDuplicate(
+    _In_ struct _COLOR_CACHE *source,
+    _Out_ struct _COLOR_CACHE *dest
+    )
+{
+    assert(source != NULL);
+    assert(dest != NULL);
+
+    ColorIntegratorRetain(source->color_integrator);
+    SpectrumToColorMapRetain(source->spectrum_map);
+    ReflectorToColorMapRetain(source->reflector_map);
+
+    dest->color_integrator = source->color_integrator;
+    dest->spectrum_map = source->spectrum_map;
+    dest->reflector_map = source->reflector_map;
 }
 
 static
@@ -645,8 +767,8 @@ ColorCacheDestroy(
     assert(cache != NULL);
 
     cache->color_integrator = NULL;
-    SpectrumToColorMapDestroy(&cache->spectrum_map);
-    ReflectorToColorMapDestroy(&cache->reflector_map);
+    SpectrumToColorMapRelease(cache->spectrum_map);
+    ReflectorToColorMapRelease(cache->reflector_map);
 }
 
 #endif // _IRIS_PHYSX_COLOR_CACHE_INTERNAL_

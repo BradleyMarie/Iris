@@ -37,7 +37,7 @@ ColorCacheAddSpectrum(
     }
 
     size_t index;
-    bool found = SpectrumToColorMapFindIndex(&color_cache->spectrum_map,
+    bool found = SpectrumToColorMapFindIndex(color_cache->spectrum_map,
                                              spectrum,
                                              &index);
 
@@ -55,7 +55,7 @@ ColorCacheAddSpectrum(
         return status;
     }
 
-    status = SpectrumToColorMapAdd(&color_cache->spectrum_map,
+    status = SpectrumToColorMapAdd(color_cache->spectrum_map,
                                    spectrum,
                                    color);
 
@@ -79,7 +79,7 @@ ColorCacheAddReflector(
     }
 
     size_t index;
-    bool found = ReflectorToColorMapFindIndex(&color_cache->reflector_map,
+    bool found = ReflectorToColorMapFindIndex(color_cache->reflector_map,
                                               reflector,
                                               &index);
 
@@ -97,7 +97,7 @@ ColorCacheAddReflector(
         return status;
     }
 
-    status = ReflectorToColorMapAdd(&color_cache->reflector_map,
+    status = ReflectorToColorMapAdd(color_cache->reflector_map,
                                     reflector,
                                     color);
 
