@@ -62,7 +62,7 @@ IntegratorIntegrateSpectral(
 
 ISTATUS
 IntegratorDuplicate(
-    _In_ PCINTEGRATOR integrator,
+    _In_ PINTEGRATOR integrator,
     _Out_ PINTEGRATOR *duplicate
     );
 

@@ -178,6 +178,8 @@ cc_library(
     deps = [
         ":bsdf",
         ":bsdf_internal",
+        ":color_cache",
+        ":color_cache_internal",
         ":color_integrator",
         ":color_integrator_internal",
         ":integrator_vtable",

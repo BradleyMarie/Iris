@@ -554,7 +554,7 @@ SpectrumToColorMapAllocate(
     (*map)->reference_count = 1;
     (*map)->shared = false;
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 static
@@ -588,7 +588,7 @@ ReflectorToColorMapAllocate(
     (*map)->reference_count = 1;
     (*map)->shared = false;
 
-    return ISTATUS_SUCCESS;
+    return true;
 }
 
 static
@@ -653,14 +653,12 @@ static
 inline
 bool
 ColorCacheInitialize(
-    _Out_ struct _COLOR_CACHE *cache,
-    _In_ PCOLOR_INTEGRATOR color_integrator
+    _Out_ struct _COLOR_CACHE *cache
     )
 {
     assert(cache != NULL);
-    assert(color_integrator != NULL);
 
-    cache->color_integrator = color_integrator;
+    cache->color_integrator = NULL;
 
     bool success = SpectrumToColorMapAllocate(&cache->spectrum_map);
 
@@ -676,6 +674,8 @@ ColorCacheInitialize(
         SpectrumToColorMapRelease(cache->spectrum_map);
         return false;
     }
+
+    return true;
 }
 
 static
@@ -740,26 +740,6 @@ ColorCacheReset(
 static
 inline
 void
-ColorCacheDuplicate(
-    _In_ struct _COLOR_CACHE *source,
-    _Out_ struct _COLOR_CACHE *dest
-    )
-{
-    assert(source != NULL);
-    assert(dest != NULL);
-
-    ColorIntegratorRetain(source->color_integrator);
-    SpectrumToColorMapRetain(source->spectrum_map);
-    ReflectorToColorMapRetain(source->reflector_map);
-
-    dest->color_integrator = source->color_integrator;
-    dest->spectrum_map = source->spectrum_map;
-    dest->reflector_map = source->reflector_map;
-}
-
-static
-inline
-void
 ColorCacheDestroy(
     _Inout_ struct _COLOR_CACHE *cache
     )
@@ -769,6 +749,28 @@ ColorCacheDestroy(
     cache->color_integrator = NULL;
     SpectrumToColorMapRelease(cache->spectrum_map);
     ReflectorToColorMapRelease(cache->reflector_map);
+}
+
+static
+inline
+void
+ColorCacheShareWith(
+    _In_ struct _COLOR_CACHE *source,
+    _Out_ struct _COLOR_CACHE *dest
+    )
+{
+    assert(source != NULL);
+    assert(dest != NULL);
+
+    ColorCacheDestroy(dest);
+
+    ColorIntegratorRetain(source->color_integrator);
+    SpectrumToColorMapRetain(source->spectrum_map);
+    ReflectorToColorMapRetain(source->reflector_map);
+
+    dest->color_integrator = source->color_integrator;
+    dest->spectrum_map = source->spectrum_map;
+    dest->reflector_map = source->reflector_map;
 }
 
 #endif // _IRIS_PHYSX_COLOR_CACHE_INTERNAL_
