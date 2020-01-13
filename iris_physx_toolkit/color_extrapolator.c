@@ -111,11 +111,16 @@ ColorExtrapolatorSpectrumProbeStart(
     )
 {
     size_t hash;
-    if (sizeof(PCSPECTRUM) == 4) {
+    if (sizeof(PCSPECTRUM) == 4)
+    {
         MurmurHash3_x86_32(color, sizeof(float_t) * 3, HASH_SEED, &hash);
-    } else if (sizeof(PCSPECTRUM) == 8) {
+    }
+    else if (sizeof(PCSPECTRUM) == 8)
+    {
         hash = MurmurHash64A(color, sizeof(float_t) * 3, HASH_SEED);
-    } else {
+    }
+    else
+    {
         assert(false);
         hash = 0;
     }
@@ -132,11 +137,16 @@ ColorExtrapolatorReflectorProbeStart(
     )
 {
     size_t hash;
-    if (sizeof(PCREFLECTOR) == 4) {
+    if (sizeof(PCREFLECTOR) == 4)
+    {
         MurmurHash3_x86_32(color, sizeof(float_t) * 3, HASH_SEED, &hash);
-    } else if (sizeof(PCREFLECTOR) == 8) {
+    }
+    else if (sizeof(PCREFLECTOR) == 8)
+    {
         hash = MurmurHash64A(color, sizeof(float_t) * 3, HASH_SEED);
-    } else {
+    }
+    else
+    {
         assert(false);
         hash = 0;
     }
@@ -155,7 +165,8 @@ ColorExtrapolatorFindSpectrum(
 {
     *index = ColorExtrapolatorSpectrumProbeStart(
         color_extrapolator->spectrum_list_capacity, color);
-    for (;;) {
+    for (;;)
+    {
         if (color_extrapolator->spectrum_list[*index].color[0] == color[0] &&
             color_extrapolator->spectrum_list[*index].color[1] == color[1] &&
             color_extrapolator->spectrum_list[*index].color[2] == color[2])
@@ -170,7 +181,8 @@ ColorExtrapolatorFindSpectrum(
 
         *index += 1;
 
-        if (*index == color_extrapolator->spectrum_list_capacity) {
+        if (*index == color_extrapolator->spectrum_list_capacity)
+        {
             *index = 0;
         }
     }
@@ -190,7 +202,8 @@ ColorExtrapolatorFindReflector(
 {
     *index = ColorExtrapolatorReflectorProbeStart(
         color_extrapolator->reflector_list_capacity, color);
-    for (;;) {
+    for (;;)
+    {
         if (color_extrapolator->reflector_list[*index].color[0] == color[0] &&
             color_extrapolator->reflector_list[*index].color[1] == color[1] &&
             color_extrapolator->reflector_list[*index].color[2] == color[2])
@@ -205,7 +218,8 @@ ColorExtrapolatorFindReflector(
 
         *index += 1;
 
-        if (*index == color_extrapolator->reflector_list_capacity) {
+        if (*index == color_extrapolator->reflector_list_capacity)
+        {
             *index = 0;
         }
     }
@@ -263,7 +277,8 @@ ColorExtrapolatorInsertSpectrum(
     )
 {
     size_t index = ColorExtrapolatorSpectrumProbeStart(list_size, color);
-    for (;;) {
+    for (;;)
+    {
         if (list[index].spectrum == spectrum)
         {
             return;
@@ -280,7 +295,8 @@ ColorExtrapolatorInsertSpectrum(
 
         index += 1;
 
-        if (index == list_size) {
+        if (index == list_size)
+        {
             index = 0;
         }
     }
@@ -297,7 +313,8 @@ ColorExtrapolatorInsertReflector(
     )
 {
     size_t index = ColorExtrapolatorReflectorProbeStart(list_size, color);
-    for (;;) {
+    for (;;)
+    {
         if (list[index].reflector == reflector)
         {
             return;
@@ -314,7 +331,8 @@ ColorExtrapolatorInsertReflector(
 
         index += 1;
 
-        if (index == list_size) {
+        if (index == list_size)
+        {
             index = 0;
         }
     }
@@ -521,6 +539,12 @@ ColorExtrapolatorAllocate(
         free(result->reflector_list);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < INITIAL_LIST_SIZE; i++)
+    {
+        ColorExtrapolatorSetSpectrumEntryEmpty(result->spectrum_list + i);
+        ColorExtrapolatorSetReflectorEntryEmpty(result->reflector_list + i);
     }
 
     result->vtable = vtable;

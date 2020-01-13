@@ -99,16 +99,21 @@ SpectrumToColorMapProbeStart(
     assert(spectrum != NULL);
 
     size_t hash;
-    if (sizeof(PCSPECTRUM) == 4) {
+    if (sizeof(PCSPECTRUM) == 4)
+    {
         MurmurHash3_x86_32(&spectrum,
                            sizeof(PCSPECTRUM),
                            SPECTRUM_TO_COLOR_MAP_HASH_SEED,
                            &hash);
-    } else if (sizeof(PCSPECTRUM) == 8) {
+    }
+    else if (sizeof(PCSPECTRUM) == 8)
+    {
         hash = MurmurHash64A(&spectrum,
                              sizeof(PCSPECTRUM),
                              SPECTRUM_TO_COLOR_MAP_HASH_SEED);
-    } else {
+    }
+    else
+    {
         assert(false);
         hash = 0;
     }
@@ -128,16 +133,21 @@ ReflectorToColorMapProbeStart(
     assert(reflector != NULL);
 
     size_t hash;
-    if (sizeof(PCREFLECTOR) == 4) {
+    if (sizeof(PCREFLECTOR) == 4)
+    {
         MurmurHash3_x86_32(&reflector,
                            sizeof(PCREFLECTOR),
                            REFLECTOR_TO_COLOR_MAP_HASH_SEED,
                            &hash);
-    } else if (sizeof(PCREFLECTOR) == 8) {
+    }
+    else if (sizeof(PCREFLECTOR) == 8)
+    {
         hash = MurmurHash64A(&reflector,
                              sizeof(PCREFLECTOR),
                              REFLECTOR_TO_COLOR_MAP_HASH_SEED);
-    } else {
+    }
+    else
+    {
         assert(false);
         hash = 0;
     }
@@ -159,7 +169,8 @@ SpectrumToColorMapFindIndex(
     assert(index != NULL);
 
     *index = SpectrumToColorMapProbeStart(map->capacity, spectrum);
-    for (;;) {
+    for (;;)
+    {
         if (map->list[*index].spectrum == spectrum)
         {
             return true;
@@ -196,7 +207,8 @@ ReflectorToColorMapFindIndex(
     assert(index != NULL);
 
     *index = ReflectorToColorMapProbeStart(map->capacity, reflector);
-    for (;;) {
+    for (;;)
+    {
         if (map->list[*index].reflector == reflector)
         {
             return true;
@@ -275,7 +287,8 @@ SpectrumToColorMapInsert(
     assert(ColorValidate(color));
 
     size_t index = SpectrumToColorMapProbeStart(map->capacity, spectrum);
-    for (;;) {
+    for (;;)
+    {
         if (map->list[index].spectrum == spectrum)
         {
             return false;
@@ -313,7 +326,8 @@ ReflectorToColorMapInsert(
     assert(ColorValidate(color));
 
     size_t index = ReflectorToColorMapProbeStart(map->capacity, reflector);
-    for (;;) {
+    for (;;)
+    {
         if (map->list[index].reflector == reflector)
         {
             return false;
