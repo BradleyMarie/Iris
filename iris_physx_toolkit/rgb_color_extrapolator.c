@@ -30,7 +30,7 @@ Abstract:
 // Types
 //
 
-typedef struct _RGB_COLOR_INTERPOLATOR {
+typedef struct _RGB_COLOR_EXTRAPOLATOR {
     _Field_size_full_(num_samples) float_t *wavelengths;
     _Field_size_full_(num_samples) float_t *spectrum_white;
     _Field_size_full_(num_samples) float_t *spectrum_cyan;
@@ -47,9 +47,9 @@ typedef struct _RGB_COLOR_INTERPOLATOR {
     _Field_size_full_(num_samples) float_t *reflector_green;
     _Field_size_full_(num_samples) float_t *reflector_blue;
     size_t num_samples;
-} RGB_COLOR_INTERPOLATOR, *RGB_COLOR_EXTRAPOLATOR;
+} RGB_COLOR_EXTRAPOLATOR, *PRGB_COLOR_EXTRAPOLATOR;
 
-typedef const RGB_COLOR_INTERPOLATOR *PCRGB_COLOR_INTERPOLATOR;
+typedef const RGB_COLOR_EXTRAPOLATOR *PCRGB_COLOR_EXTRAPOLATOR;
 
 //
 // Static Data
@@ -760,7 +760,7 @@ RgbColorExtrapolatorComputeSpectrum(
     _Out_ PSPECTRUM *spectrum
     )
 {
-    PCRGB_COLOR_INTERPOLATOR extrapolator = (PCRGB_COLOR_INTERPOLATOR)context;
+    PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
     float_t *spd;
     ISTATUS status = RgbColorExtrapolatorCreateSpd(color[0],
@@ -782,11 +782,10 @@ RgbColorExtrapolatorComputeSpectrum(
         return status;
     }
 
-    PSPECTRUM spectrum;
     status = InterpolatedSpectrumAllocate(extrapolator->wavelengths,
                                           spd,
                                           extrapolator->num_samples,
-                                          &spectrum);
+                                          spectrum);
 
     free(spd);
 
@@ -801,7 +800,7 @@ RgbColorExtrapolatorComputeReflector(
     _Out_ PREFLECTOR *reflector
     )
 {
-    PCRGB_COLOR_INTERPOLATOR extrapolator = (PCRGB_COLOR_INTERPOLATOR)context;
+    PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
     float_t *spd;
     ISTATUS status =
@@ -837,9 +836,11 @@ RgbColorExtrapolatorComputeReflector(
 static
 void
 RgbColorExtrapolatorFree(
-    _In_opt_ _Post_invalid_ RGB_COLOR_EXTRAPOLATOR extrapolator
+    _In_opt_ _Post_invalid_ void *context
     )
 {
+    PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
+
     free(extrapolator->wavelengths);
     free(extrapolator->spectrum_white);
     free(extrapolator->spectrum_cyan);
@@ -906,8 +907,8 @@ RgbColorExtrapolatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    RGB_COLOR_INTERPOLATOR rgb_color_extrapolator;
-    memset(&rgb_color_extrapolator, 0, sizeof(RGB_COLOR_INTERPOLATOR));
+    RGB_COLOR_EXTRAPOLATOR rgb_color_extrapolator;
+    memset(&rgb_color_extrapolator, 0, sizeof(RGB_COLOR_EXTRAPOLATOR));
 
     rgb_color_extrapolator.wavelengths = calloc(num_wavelengths,
                                                 sizeof(float_t));
@@ -1050,87 +1051,87 @@ RgbColorExtrapolatorAllocate(
 
         rgb_color_extrapolator.spectrum_white[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_white,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_white,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_cyan[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_cyan,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_cyan,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_magenta[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_magenta,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_magenta,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_yellow[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_yellow,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_yellow,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_red[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_red,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_red,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_green[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_green,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_green,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_blue[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    spectrum_blue,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         spectrum_blue,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_white[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_white,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_white,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_cyan[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_cyan,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_cyan,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_magenta[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_magenta,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_magenta,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_yellow[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_yellow,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_yellow,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_red[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_red,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_red,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_green[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_green,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_green,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
 
         rgb_color_extrapolator.reflector_blue[i] =
             RgbColorExtrapolatorResample(sample_wavelengths,
-                                    reflector_blue,
-                                    NUM_SPECTRAL_SAMPLES,
-                                    wavelengths[i]);
+                                         reflector_blue,
+                                         NUM_SPECTRAL_SAMPLES,
+                                         wavelengths[i]);
     }
 
     ISTATUS status = ColorExtrapolatorAllocate(&rgb_color_extrapolator_vtable,

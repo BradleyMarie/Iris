@@ -257,6 +257,17 @@ cc_library(
 )
 
 cc_library(
+    name = "rgb_color_extrapolator",
+    srcs = ["rgb_color_extrapolator.c"],
+    hdrs = ["rgb_color_extrapolator.h"],
+    deps = [
+        ":color_extrapolator",
+        ":interpolated_spectrum",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "sample_direct_lighting",
     srcs = ["sample_direct_lighting.c"],
     hdrs = ["sample_direct_lighting.h"],
