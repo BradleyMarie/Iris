@@ -756,7 +756,7 @@ static
 ISTATUS
 RgbColorExtrapolatorComputeSpectrum(
     _In_ const void *context,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PSPECTRUM *spectrum
     )
 {
@@ -796,7 +796,7 @@ static
 ISTATUS
 RgbColorExtrapolatorComputeReflector(
     _In_ const void *context,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PREFLECTOR *reflector
     )
 {

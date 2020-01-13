@@ -25,7 +25,7 @@ typedef
 ISTATUS
 (*PCOLOR_EXTRAPOLATOR_COMPUTE_SPECTRUM_ROUTINE)(
     _In_ const void *context,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PSPECTRUM *spectrum
     );
 
@@ -33,7 +33,7 @@ typedef
 ISTATUS
 (*PCOLOR_EXTRAPOLATOR_COMPUTE_REFLECTOR_ROUTINE)(
     _In_ const void *context,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PREFLECTOR *reflector
     );
 

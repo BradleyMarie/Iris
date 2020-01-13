@@ -543,7 +543,7 @@ ColorExtrapolatorAllocate(
 ISTATUS
 ColorExtrapolatorComputeSpectrum(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PSPECTRUM *spectrum
     )
 {
@@ -611,7 +611,7 @@ ColorExtrapolatorComputeSpectrum(
 ISTATUS
 ColorExtrapolatorComputeReflector(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ float_t color[3],
+    _In_ const float_t color[3],
     _Out_ PREFLECTOR *reflector
     )
 {
