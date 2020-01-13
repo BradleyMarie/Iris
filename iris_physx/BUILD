@@ -99,9 +99,6 @@ cc_library(
         ":color_integrator_internal",
         ":color_integrator_vtable",
         "//common:alloc",
-        "//common:safe_math",
-        "//third_party/smhasher:murmur2",
-        "//third_party/smhasher:murmur3",
     ],
 )
 
@@ -110,10 +107,6 @@ cc_library(
     hdrs = ["color_integrator_internal.h"],
     deps = [
         ":color_integrator_vtable",
-        ":reflector_internal",
-        ":spectrum_internal",
-        "//third_party/smhasher:murmur2",
-        "//third_party/smhasher:murmur3",
     ],
 )
 
@@ -424,7 +417,7 @@ cc_library(
     srcs = ["reflector_compositor.c"],
     hdrs = ["reflector_compositor.h"],
     deps = [
-        ":color_integrator",
+        ":color_cache_internal",
         ":reflector",
         ":reflector_compositor_internal",
         "//common:static_allocator",
@@ -566,7 +559,7 @@ cc_library(
     srcs = ["spectrum_compositor.c"],
     hdrs = ["spectrum_compositor.h"],
     deps = [
-        ":color_integrator",
+        ":color_cache_internal",
         ":reflector",
         ":reflector_compositor_internal",
         ":reflector_internal",

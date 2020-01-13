@@ -37,18 +37,6 @@ ColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 
-ISTATUS
-ColorIntegratorCacheSpectrum(
-    _In_ PCOLOR_INTEGRATOR color_integrator,
-    _In_opt_ PSPECTRUM spectrum
-    );
-
-ISTATUS
-ColorIntegratorCacheReflector(
-    _In_ PCOLOR_INTEGRATOR color_integrator,
-    _In_opt_ PREFLECTOR reflector
-    );
-
 void
 ColorIntegratorRetain(
     _In_opt_ PCOLOR_INTEGRATOR color_integrator

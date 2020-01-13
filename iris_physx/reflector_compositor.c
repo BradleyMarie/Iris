@@ -17,7 +17,7 @@ Abstract:
 #include <assert.h>
 #include <string.h>
 
-#include "iris_physx/color_integrator_internal.h"
+#include "iris_physx/color_cache_internal.h"
 #include "iris_physx/reflector_compositor_internal.h"
 
 //
@@ -76,7 +76,7 @@ AttenuatedReflectorGetAlbedo(
 ISTATUS
 AttenuatedReflectorComputeColor(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     )
 {
@@ -84,9 +84,9 @@ AttenuatedReflectorComputeColor(
         (PCATTENUATED_REFLECTOR)context;
 
     ISTATUS status =
-        ColorIntegratorComputeReflectorColorFast(color_integrator,
-                                                 attenuated_reflector->reflector,
-                                                 color);
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                attenuated_reflector->reflector,
+                                                color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -171,7 +171,7 @@ AttenuatedSumReflectorGetAlbedo(
 ISTATUS
 AttenuatedSumReflectorComputeColor(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     )
 {
@@ -180,9 +180,9 @@ AttenuatedSumReflectorComputeColor(
 
     COLOR3 base;
     ISTATUS status =
-        ColorIntegratorComputeReflectorColorFast(color_integrator,
-                                                 attenuated_reflector->added_reflector,
-                                                 &base);
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                attenuated_reflector->added_reflector,
+                                                &base);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -190,9 +190,9 @@ AttenuatedSumReflectorComputeColor(
     }
 
     status =
-        ColorIntegratorComputeReflectorColorFast(color_integrator,
-                                                 attenuated_reflector->attenuated_reflector,
-                                                 color);
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                attenuated_reflector->attenuated_reflector,
+                                                color);
 
     if (status != ISTATUS_SUCCESS)
     {

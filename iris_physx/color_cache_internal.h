@@ -21,6 +21,9 @@ Abstract:
 
 #include "common/safe_math.h"
 #include "iris_physx/color_integrator.h"
+#include "iris_physx/color_integrator_internal.h"
+#include "iris_physx/reflector_internal.h"
+#include "iris_physx/spectrum_internal.h"
 #include "third_party/smhasher/MurmurHash2.h"
 #include "third_party/smhasher/MurmurHash3.h"
 
@@ -35,6 +38,7 @@ Abstract:
 #define REFLECTOR_TO_COLOR_MAP_INITIAL_LIST_SIZE 16
 #define REFLECTOR_TO_COLOR_MAP_GROWTH_FACTOR 2
 #define REFLECTOR_TO_COLOR_MAP_HASH_SEED 0
+
 //
 // Types
 //
@@ -777,6 +781,92 @@ ColorCacheShareWith(
     dest->color_integrator = source->color_integrator;
     dest->spectrum_map = source->spectrum_map;
     dest->reflector_map = source->reflector_map;
+}
+
+static
+inline
+ISTATUS
+ColorCacheLookupOrComputeSpectrumColor(
+    _In_ const struct _COLOR_CACHE *color_cache,
+    _In_ PCSPECTRUM spectrum,
+    _Out_ PCOLOR3 color
+    )
+{
+    assert(color_cache != NULL);
+    assert(spectrum != NULL);
+    assert(color != NULL);
+
+    bool found = SpectrumToColorMapLookup(color_cache->spectrum_map,
+                                          spectrum,
+                                          color);
+
+    if (found)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    if (spectrum->reference_count == 0)
+    {
+        PCINTERNAL_SPECTRUM_VTABLE internal_vtable =
+            (const void*)spectrum->vtable;
+
+        ISTATUS status =
+            internal_vtable->compute_color_routine(spectrum->data,
+                                                   color_cache,
+                                                   color);
+
+        return status;
+    }
+
+    ISTATUS status =
+        ColorIntegratorComputeSpectrumColor(color_cache->color_integrator,
+                                            spectrum,
+                                            color);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ColorCacheLookupOrComputeReflectorColor(
+    _In_ const struct _COLOR_CACHE *color_cache,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    )
+{
+    assert(color_cache != NULL);
+    assert(reflector != NULL);
+    assert(color != NULL);
+
+    bool found = ReflectorToColorMapLookup(color_cache->reflector_map,
+                                           reflector,
+                                           color);
+
+    if (found)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    if (reflector->reference_count == 0)
+    {
+        PCINTERNAL_REFLECTOR_VTABLE internal_vtable =
+            (const void*)reflector->vtable;
+
+        ISTATUS status =
+            internal_vtable->compute_color_routine(reflector->data,
+                                                   color_cache,
+                                                   color);
+
+        return status;
+    }
+
+    ISTATUS status =
+        ColorIntegratorComputeReflectorColor(color_cache->color_integrator,
+                                             reflector,
+                                             color);
+
+    return status;
 }
 
 #endif // _IRIS_PHYSX_COLOR_CACHE_INTERNAL_

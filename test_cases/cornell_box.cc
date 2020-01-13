@@ -140,9 +140,6 @@ TEST(CornellBoxTest, CornellBox)
                                            &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorCacheReflector(color_integrator, white_reflector);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PBSDF white_bsdf;
     status = LambertianReflectorAllocate(white_reflector, &white_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -156,9 +153,6 @@ TEST(CornellBoxTest, CornellBox)
                                            cornell_box_red_wall_samples,
                                            CORNELL_BOX_WALL_SAMPLES,
                                            &red_reflector);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = ColorIntegratorCacheReflector(color_integrator, red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF red_bsdf;
@@ -176,9 +170,6 @@ TEST(CornellBoxTest, CornellBox)
                                            &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    status = ColorIntegratorCacheReflector(color_integrator, green_reflector);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
     PBSDF green_bsdf;
     status = LambertianReflectorAllocate(green_reflector, &green_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -192,9 +183,6 @@ TEST(CornellBoxTest, CornellBox)
                                           cornell_box_light_samples,
                                           CORNELL_BOX_LIGHT_SAMPLES,
                                           &light_spectrum);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = ColorIntegratorCacheSpectrum(color_integrator, light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL light_material;

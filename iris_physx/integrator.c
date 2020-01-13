@@ -327,9 +327,15 @@ IntegratorIntegrate(
         return status;
     }
 
-    status = ColorIntegratorComputeSpectrumColorFast(integrator->color_integrator,
-                                                     spectrum,
-                                                     color);
+    if (spectrum == NULL)
+    {
+        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        return ISTATUS_SUCCESS;
+    }
+
+    status = ColorCacheLookupOrComputeSpectrumColor(&integrator->color_cache,
+                                                    spectrum,
+                                                    color);
 
     return status;
 }
@@ -366,7 +372,7 @@ IntegratorIntegrateSpectral(
     status = ColorIntegratorComputeSpectrumColor(integrator->color_integrator,
                                                  spectrum,
                                                  color);
-    
+
     return status;
 }
 

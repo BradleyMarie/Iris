@@ -32,7 +32,7 @@ Abstract:
 // Forward Declarations
 //
 
-struct _COLOR_INTEGRATOR;
+struct _COLOR_CACHE;
 
 //
 // Types
@@ -48,7 +48,7 @@ typedef
 ISTATUS
 (*PREFLECTOR_COMPUTE_COLOR_ROUTINE)(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     );
 

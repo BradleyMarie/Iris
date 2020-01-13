@@ -16,7 +16,7 @@ Abstract:
 
 #include <assert.h>
 
-#include "iris_physx/color_integrator_internal.h"
+#include "iris_physx/color_cache_internal.h"
 #include "iris_physx/reflector_compositor_internal.h"
 #include "iris_physx/reflector_internal.h"
 #include "iris_physx/spectrum_compositor_internal.h"
@@ -53,7 +53,7 @@ AttenuatedSpectrumSample(
 ISTATUS
 AttenuatedSpectrumComputeColor(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     )
 {
@@ -61,9 +61,9 @@ AttenuatedSpectrumComputeColor(
         (PCATTENUATED_SPECTRUM)context;
 
     ISTATUS status =
-        ColorIntegratorComputeSpectrumColorFast(color_integrator,
-                                                attenuated_spectrum->spectrum,
-                                                color);
+        ColorCacheLookupOrComputeSpectrumColor(color_cache,
+                                               attenuated_spectrum->spectrum,
+                                               color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -112,7 +112,7 @@ SumSpectrumSample(
 ISTATUS
 SumSpectrumComputeColor(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     )
 {
@@ -120,9 +120,9 @@ SumSpectrumComputeColor(
 
     COLOR3 result;
     ISTATUS status =
-        ColorIntegratorComputeSpectrumColorFast(color_integrator,
-                                                sum_spectrum->spectrum0,
-                                                &result);
+        ColorCacheLookupOrComputeSpectrumColor(color_cache,
+                                               sum_spectrum->spectrum0,
+                                               &result);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -130,9 +130,9 @@ SumSpectrumComputeColor(
     }
 
     status =
-        ColorIntegratorComputeSpectrumColorFast(color_integrator,
-                                                sum_spectrum->spectrum1,
-                                                color);
+        ColorCacheLookupOrComputeSpectrumColor(color_cache,
+                                               sum_spectrum->spectrum1,
+                                               color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -183,7 +183,7 @@ AttenuatedReflectionSpectrumSample(
 ISTATUS
 AttenuatedReflectionSpectrumComputeColor(
     _In_opt_ const void *context,
-    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ const struct _COLOR_CACHE *color_cache,
     _Out_ PCOLOR3 color
     )
 {
@@ -192,9 +192,9 @@ AttenuatedReflectionSpectrumComputeColor(
 
     COLOR3 light_color;
     ISTATUS status =
-        ColorIntegratorComputeSpectrumColorFast(color_integrator,
-                                                spectrum->spectrum,
-                                                &light_color);
+        ColorCacheLookupOrComputeSpectrumColor(color_cache,
+                                               spectrum->spectrum,
+                                               &light_color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -202,9 +202,9 @@ AttenuatedReflectionSpectrumComputeColor(
     }
 
     status =
-        ColorIntegratorComputeReflectorColorFast(color_integrator,
-                                                 spectrum->reflector,
-                                                 color);
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                spectrum->reflector,
+                                                color);
 
     if (status != ISTATUS_SUCCESS)
     {
