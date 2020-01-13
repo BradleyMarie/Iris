@@ -492,10 +492,11 @@ ColorExtrapolatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    PCOLOR_EXTRAPOLATOR result;
     void *data_allocation;
     bool success = AlignedAllocWithHeader(sizeof(COLOR_EXTRAPOLATOR),
                                           alignof(COLOR_EXTRAPOLATOR),
-                                          (void **)color_extrapolator,
+                                          (void **)&result,
                                           data_size,
                                           data_alignment,
                                           &data_allocation);
@@ -505,34 +506,36 @@ ColorExtrapolatorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    (*color_extrapolator)->reflector_list =
+    result->reflector_list =
         (PREFLECTOR_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(REFLECTOR_LIST_ENTRY));
-    if ((*color_extrapolator)->reflector_list == NULL)
+    if (result->reflector_list == NULL)
     {
-        free(*color_extrapolator);
+        free(result);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    (*color_extrapolator)->spectrum_list =
+    result->spectrum_list =
         (PSPECTRUM_LIST_ENTRY)calloc(INITIAL_LIST_SIZE, sizeof(SPECTRUM_LIST_ENTRY));
-    if ((*color_extrapolator)->spectrum_list == NULL)
+    if (result->spectrum_list == NULL)
     {
-        free((*color_extrapolator)->reflector_list);
-        free(*color_extrapolator);
+        free(result->reflector_list);
+        free(result);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    (*color_extrapolator)->vtable = vtable;
-    (*color_extrapolator)->reflector_list_capacity = INITIAL_LIST_SIZE;
-    (*color_extrapolator)->reflector_list_size = 0;
-    (*color_extrapolator)->spectrum_list_capacity = INITIAL_LIST_SIZE;
-    (*color_extrapolator)->spectrum_list_size = 0;
-    (*color_extrapolator)->data = data_allocation;
+    result->vtable = vtable;
+    result->reflector_list_capacity = INITIAL_LIST_SIZE;
+    result->reflector_list_size = 0;
+    result->spectrum_list_capacity = INITIAL_LIST_SIZE;
+    result->spectrum_list_size = 0;
+    result->data = data_allocation;
 
     if (data_size != 0)
     {
         memcpy(data_allocation, data, data_size);
     }
+
+    *color_extrapolator = result;
 
     return ISTATUS_SUCCESS;
 }
