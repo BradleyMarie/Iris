@@ -29,6 +29,7 @@ typedef struct _AREA_LIGHT {
     PRAY_TRACER_PROCESS_HIT_ROUTINE process_hit_routine;
     PSHAPE trace_shape;
     PSHAPE light_shape;
+    PMATRIX model_to_world;
     uint32_t face;
 } AREA_LIGHT, *PAREA_LIGHT;
 
@@ -171,6 +172,83 @@ VisibilityTesterTestSingleAreaLight(
 }
 
 static
+inline
+ISTATUS
+AreaLightComputeEmissiveWithPdfInternal(
+    _In_ const void *context,
+    _In_ RAY model_to_light,
+    _In_ RAY world_to_light,
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ float_t *pdf
+    )
+{
+    assert(context != NULL);
+    assert(RayValidate(model_to_light));
+    assert(RayValidate(world_to_light));
+    assert(visibility_tester != NULL);
+    assert(compositor != NULL);
+    assert(spectrum != NULL);
+    assert(pdf != NULL);
+
+    PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
+
+    float_t distance;
+    ISTATUS status = VisibilityTesterTestSingleAreaLight(visibility_tester,
+                                                         model_to_light,
+                                                         area_light,
+                                                         spectrum,
+                                                         &distance);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (*spectrum == NULL)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
+    status = ShapeComputePdfBySolidAngle(area_light->light_shape,
+                                         &model_to_light,
+                                         distance,
+                                         area_light->face,
+                                         pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (*pdf <= (float_t)0.0 || isinf(*pdf))
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
+    bool visible;
+    status = VisibilityTesterTestInline(visibility_tester,
+                                        world_to_light,
+                                        distance,
+                                        &visible);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!visible)
+    {
+        *pdf = (float_t)0.0;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
 ISTATUS
 AreaLightComputeEmissive(
     _In_ const void *context,
@@ -182,24 +260,38 @@ AreaLightComputeEmissive(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
+    RAY model_to_light = RayMatrixInverseMultiply(area_light->model_to_world,
+                                                  *to_light);
+
     float_t distance;
     ISTATUS status = VisibilityTesterTestSingleAreaLight(visibility_tester,
-                                                         *to_light,
+                                                         model_to_light,
                                                          area_light,
                                                          spectrum,
                                                          &distance);
 
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     if (*spectrum == NULL)
     {
+        *spectrum = NULL;
         return ISTATUS_SUCCESS;
     }
 
     float_t pdf;
     status = ShapeComputePdfBySolidAngle(area_light->light_shape,
-                                         to_light,
+                                         &model_to_light,
                                          distance,
                                          area_light->face,
                                          &pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
 
     if (pdf <= (float_t)0.0 || isinf(pdf))
     {
@@ -227,7 +319,6 @@ AreaLightComputeEmissive(
 }
 
 static
-inline
 ISTATUS
 AreaLightComputeEmissiveWithPdf(
     _In_ const void *context,
@@ -240,48 +331,18 @@ AreaLightComputeEmissiveWithPdf(
 {
     PCAREA_LIGHT area_light = (PCAREA_LIGHT)context;
 
-    float_t distance;
-    ISTATUS status = VisibilityTesterTestSingleAreaLight(visibility_tester,
-                                                         *to_light,
-                                                         area_light,
-                                                         spectrum,
-                                                         &distance);
+    RAY model_to_light = RayMatrixInverseMultiply(area_light->model_to_world,
+                                                  *to_light);
 
-    if (*spectrum == NULL)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
+    ISTATUS status = AreaLightComputeEmissiveWithPdfInternal(context,
+                                                             model_to_light,
+                                                             *to_light,
+                                                             visibility_tester,
+                                                             compositor,
+                                                             spectrum,
+                                                             pdf);
 
-    status = ShapeComputePdfBySolidAngle(area_light->light_shape,
-                                         to_light,
-                                         distance,
-                                         area_light->face,
-                                         pdf);
-
-    if (*pdf <= (float_t)0.0 || isinf(*pdf))
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    bool visible;
-    status = VisibilityTesterTestInline(visibility_tester,
-                                        *to_light,
-                                        distance,
-                                        &visible);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (!visible)
-    {
-        *pdf = (float_t)0.0;
-    }
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
@@ -311,17 +372,24 @@ AreaLightSample(
         return status;
     }
 
-    *to_light = PointSubtract(sampled_point, hit_point);
+    POINT3 world_sampled_point;
+    world_sampled_point = PointMatrixMultiply(area_light->model_to_world,
+                                              sampled_point);
+
+    *to_light = PointSubtract(world_sampled_point, hit_point);
     *to_light = VectorNormalize(*to_light, NULL, NULL);
-    RAY ray_to_light = RayCreate(hit_point, *to_light);
 
-    status = AreaLightComputeEmissiveWithPdf(context,
-                                             &ray_to_light,
-                                             visibility_tester,
-                                             compositor,
-                                             spectrum,
-                                             pdf);
+    RAY world_ray_to_light = RayCreate(hit_point, *to_light);
+    RAY model_ray_to_light =
+        RayMatrixInverseMultiply(area_light->model_to_world, world_ray_to_light);
 
+    status = AreaLightComputeEmissiveWithPdfInternal(context,
+                                                     world_ray_to_light,
+                                                     model_ray_to_light,
+                                                     visibility_tester,
+                                                     compositor,
+                                                     spectrum,
+                                                     pdf);
     return status;
 }
 
@@ -345,6 +413,7 @@ AreaLightFree(
 
     ShapeRelease(area_light->trace_shape);
     ShapeRelease(area_light->light_shape);
+    MatrixRelease(area_light->model_to_world);
 }
 
 //
@@ -369,6 +438,7 @@ AreaLightAllocateInternal(
     _In_ PSHAPE trace_shape,
     _In_ PSHAPE light_shape,
     _In_ uint32_t face,
+    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     )
 {
@@ -395,6 +465,7 @@ AreaLightAllocateInternal(
     area_light.emissive_material = emissive_material;
     area_light.trace_shape = trace_shape;
     area_light.light_shape = light_shape;
+    area_light.model_to_world = model_to_world;
     area_light.face = face;
 
     if (trace_shape == light_shape)
@@ -420,6 +491,7 @@ AreaLightAllocateInternal(
 
     ShapeRetain(trace_shape);
     ShapeRetain(light_shape);
+    MatrixRetain(model_to_world);
 
     return ISTATUS_SUCCESS;
 }
@@ -432,6 +504,7 @@ ISTATUS
 AreaLightAllocate(
     _In_ PSHAPE shape,
     _In_ uint32_t face,
+    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     )
 {
@@ -445,10 +518,14 @@ AreaLightAllocate(
 
     if (light == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_03;
     }
 
-    ISTATUS status = AreaLightAllocateInternal(shape, shape, face, light);
+    ISTATUS status = AreaLightAllocateInternal(shape,
+                                               shape,
+                                               face,
+                                               model_to_world,
+                                               light);
 
     return status;
 }
@@ -458,6 +535,7 @@ NestedAreaLightAllocate(
     _In_ PSHAPE trace_shape,
     _In_ PSHAPE light_shape,
     _In_ uint32_t face,
+    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     )
 {
@@ -476,12 +554,13 @@ NestedAreaLightAllocate(
 
     if (light == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     ISTATUS status = AreaLightAllocateInternal(trace_shape,
                                                light_shape,
                                                face,
+                                               model_to_world,
                                                light);
 
     return status;

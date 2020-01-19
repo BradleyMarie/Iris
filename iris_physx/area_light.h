@@ -26,6 +26,7 @@ ISTATUS
 AreaLightAllocate(
     _In_ PSHAPE shape,
     _In_ uint32_t face,
+    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     );
 
@@ -34,6 +35,7 @@ NestedAreaLightAllocate(
     _In_ PSHAPE trace_shape,
     _In_ PSHAPE light_shape,
     _In_ uint32_t face,
+    _In_opt_ PMATRIX model_to_world,
     _Out_ PLIGHT *light
     );
 

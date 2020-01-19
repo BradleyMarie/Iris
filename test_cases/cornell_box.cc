@@ -211,12 +211,14 @@ TEST(CornellBoxTest, CornellBox)
     PLIGHT light0;
     status = AreaLightAllocate(light_shape0,
                                TRIANGLE_BACK_FACE,
+                               nullptr,
                                &light0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light1;
     status = AreaLightAllocate(light_shape1,
                                TRIANGLE_BACK_FACE,
+                               nullptr,
                                &light1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
