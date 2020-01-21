@@ -23,6 +23,10 @@ Abstract:
 
 typedef struct _FLOAT_IMAGE_TEXTURE {
     PFLOAT_MIPMAP mipmap;
+    float_t u_offset;
+    float_t v_offset;
+    float_t u_scalar;
+    float_t v_scalar;
 } FLOAT_IMAGE_TEXTURE, *PFLOAT_IMAGE_TEXTURE;
 
 typedef const FLOAT_IMAGE_TEXTURE *PCFLOAT_IMAGE_TEXTURE;
@@ -44,9 +48,12 @@ FloatImageTextureSample(
     PFLOAT_IMAGE_TEXTURE texture = (PFLOAT_IMAGE_TEXTURE)context;
     const float *uv = (const float*)texture_coordinates;
 
+    float_t u = fma(uv[0], texture->u_scalar, texture->u_offset);
+    float_t v = fma(uv[1], texture->v_scalar, texture->v_offset);
+
     ISTATUS status = FloatMipmapLookup(texture->mipmap,
-                                       uv[0],
-                                       uv[1],
+                                       u,
+                                       v,
                                        (float_t)0.0,
                                        (float_t)0.0, 
                                        (float_t)0.0,
@@ -82,6 +89,10 @@ static const FLOAT_TEXTURE_VTABLE float_image_texture_vtable = {
 ISTATUS
 FloatImageTextureAllocate(
     _In_ PFLOAT_MIPMAP mipmap,
+    _In_ float_t u_offset,
+    _In_ float_t v_offset,
+    _In_ float_t u_scalar,
+    _In_ float_t v_scalar,
     _Out_ PFLOAT_TEXTURE *texture
     )
 {
@@ -90,13 +101,37 @@ FloatImageTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (texture == 0)
+    if (!isfinite(u_offset))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (!isfinite(v_offset))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (!isfinite(u_scalar))
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (!isfinite(v_scalar))
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (texture == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     FLOAT_IMAGE_TEXTURE image_texture;
     image_texture.mipmap = mipmap;
+    image_texture.u_offset = u_offset;
+    image_texture.v_offset = v_offset;
+    image_texture.u_scalar = u_scalar;
+    image_texture.v_scalar = v_scalar;
 
     ISTATUS status = FloatTextureAllocate(&float_image_texture_vtable,
                                           &image_texture,
@@ -113,6 +148,10 @@ FloatImageTextureAllocate(
 
 typedef struct _REFLECTOR_IMAGE_TEXTURE {
     PREFLECTOR_MIPMAP mipmap;
+    float_t u_offset;
+    float_t v_offset;
+    float_t u_scalar;
+    float_t v_scalar;
 } REFLECTOR_IMAGE_TEXTURE, *PREFLECTOR_IMAGE_TEXTURE;
 
 typedef const REFLECTOR_IMAGE_TEXTURE *PCREFLECTOR_IMAGE_TEXTURE;
@@ -135,9 +174,12 @@ ReflectorImageTextureSample(
     PREFLECTOR_IMAGE_TEXTURE texture = (PREFLECTOR_IMAGE_TEXTURE)context;
     const float *uv = (const float*)texture_coordinates;
 
+    float_t u = fma(uv[0], texture->u_scalar, texture->u_offset);
+    float_t v = fma(uv[1], texture->v_scalar, texture->v_offset);
+
     ISTATUS status = ReflectorMipmapLookup(texture->mipmap,
-                                           uv[0],
-                                           uv[1],
+                                           u,
+                                           v,
                                            (float_t)0.0,
                                            (float_t)0.0, 
                                            (float_t)0.0,
@@ -189,6 +231,10 @@ static const REFLECTOR_TEXTURE_VTABLE reflector_image_texture_vtable = {
 ISTATUS
 ReflectorImageTextureAllocate(
     _In_ PREFLECTOR_MIPMAP mipmap,
+    _In_ float_t u_offset,
+    _In_ float_t v_offset,
+    _In_ float_t u_scalar,
+    _In_ float_t v_scalar,
     _Out_ PREFLECTOR_TEXTURE *texture
     )
 {
@@ -197,13 +243,37 @@ ReflectorImageTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (texture == 0)
+    if (!isfinite(u_offset))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (!isfinite(v_offset))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (!isfinite(u_scalar))
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (!isfinite(v_scalar))
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (texture == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     REFLECTOR_IMAGE_TEXTURE image_texture;
     image_texture.mipmap = mipmap;
+    image_texture.u_offset = u_offset;
+    image_texture.v_offset = v_offset;
+    image_texture.u_scalar = u_scalar;
+    image_texture.v_scalar = v_scalar;
 
     ISTATUS status = ReflectorTextureAllocate(&reflector_image_texture_vtable,
                                               &image_texture,

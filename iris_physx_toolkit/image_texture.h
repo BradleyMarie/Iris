@@ -30,12 +30,20 @@ extern "C" {
 ISTATUS
 FloatImageTextureAllocate(
     _In_ PFLOAT_MIPMAP mipmap,
+    _In_ float_t u_offset,
+    _In_ float_t v_offset,
+    _In_ float_t u_scalar,
+    _In_ float_t v_scalar,
     _Out_ PFLOAT_TEXTURE *texture
     );
 
 ISTATUS
 ReflectorImageTextureAllocate(
     _In_ PREFLECTOR_MIPMAP mipmap,
+    _In_ float_t u_offset,
+    _In_ float_t v_offset,
+    _In_ float_t u_scalar,
+    _In_ float_t v_scalar,
     _Out_ PREFLECTOR_TEXTURE *texture
     );
 
