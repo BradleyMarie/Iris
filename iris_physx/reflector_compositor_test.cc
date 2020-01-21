@@ -122,6 +122,29 @@ TEST(ReflectorCompositorTest, ReflectorCompositorAttenuatedAddReflectorsErrors)
     ReflectorCompositorFree(compositor);
 }
 
+TEST(ReflectorCompositorTest, ReflectorCompositorMultiplyReflectorsErrors)
+{
+    PREFLECTOR_COMPOSITOR compositor = ReflectorCompositorCreate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PREFLECTOR reflector = (PREFLECTOR)(void*)(uintptr_t)1;
+
+    PCREFLECTOR output;
+    ISTATUS status = ReflectorCompositorMultiplyReflectors(NULL,
+                                                           reflector,
+                                                           reflector,
+                                                           &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   reflector,
+                                                   reflector,
+                                                   NULL);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    ReflectorCompositorFree(compositor);
+}
+
 struct CutoffContext {
     float_t cutoff;
     float_t reflectance;
@@ -392,6 +415,57 @@ TEST(ReflectorCompositor, ReflectorCompositorAttenuateReflector)
 
     ReflectorRelease(root_reflector0);
     ReflectorRelease(root_reflector0);
+
+    ReflectorCompositorFree(compositor);
+}
+
+TEST(ReflectorCompositor, ReflectorCompositorMultiplyReflectors)
+{
+    PREFLECTOR_COMPOSITOR compositor = ReflectorCompositorCreate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PREFLECTOR root_reflector = CutoffReflectorCreate((float_t)0.5,
+                                                       (float_t)1.5);
+    ASSERT_TRUE(NULL != root_reflector);
+
+    PCREFLECTOR result;
+    ISTATUS status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                           root_reflector,
+                                                           NULL,
+                                                           &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   NULL,
+                                                   root_reflector,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   NULL,
+                                                   NULL,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                  root_reflector,
+                                                  root_reflector,
+                                                  &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t value;
+    status = ReflectorReflect(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.25, value);
+
+    status = ReflectorReflect(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    ReflectorRelease(root_reflector);
 
     ReflectorCompositorFree(compositor);
 }

@@ -39,9 +39,18 @@ typedef struct _ATTENUATED_SUM_REFLECTOR {
 
 typedef const ATTENUATED_SUM_REFLECTOR *PCATTENUATED_SUM_REFLECTOR;
 
+typedef struct _PRODUCT_REFLECTOR {
+    struct _REFLECTOR header;
+    const struct _REFLECTOR *multiplicand0;
+    const struct _REFLECTOR *multiplicand1;
+} PRODUCT_REFLECTOR, *PPRODUCT_REFLECTOR;
+
+typedef const PRODUCT_REFLECTOR *PCPRODUCT_REFLECTOR;
+
 struct _REFLECTOR_COMPOSITOR {
     STATIC_MEMORY_ALLOCATOR attenuated_sum_reflector_allocator;
     STATIC_MEMORY_ALLOCATOR attenuated_reflector_allocator;
+    STATIC_MEMORY_ALLOCATOR product_reflector_allocator;
 };
 
 //
@@ -76,6 +85,17 @@ ReflectorCompositorInitialize(
             &compositor->attenuated_sum_reflector_allocator);
     }
 
+    success = StaticMemoryAllocatorInitialize(
+        &compositor->product_reflector_allocator,
+        sizeof(PRODUCT_REFLECTOR));
+    if (!success)
+    {
+        StaticMemoryAllocatorDestroy(
+            &compositor->attenuated_sum_reflector_allocator);
+        StaticMemoryAllocatorDestroy(
+            &compositor->attenuated_reflector_allocator);
+    }
+
     return success;
 }
 
@@ -90,6 +110,7 @@ ReflectorCompositorClear(
 
     StaticMemoryAllocatorFreeAll(&compositor->attenuated_sum_reflector_allocator);
     StaticMemoryAllocatorFreeAll(&compositor->attenuated_reflector_allocator);
+    StaticMemoryAllocatorFreeAll(&compositor->product_reflector_allocator);
 }
 
 static
@@ -103,6 +124,7 @@ ReflectorCompositorDestroy(
 
     StaticMemoryAllocatorDestroy(&compositor->attenuated_sum_reflector_allocator);
     StaticMemoryAllocatorDestroy(&compositor->attenuated_reflector_allocator);
+    StaticMemoryAllocatorDestroy(&compositor->product_reflector_allocator);
 }
 
 #endif // _IRIS_PHYSX_REFLECTOR_COMPOSITOR_INTERNAL_

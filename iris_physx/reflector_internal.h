@@ -26,7 +26,8 @@ Abstract:
 
 #define ATTENUATED_REFLECTOR_TYPE     0
 #define ATTENUATED_SUM_REFLECTOR_TYPE 1
-#define EXTERNAL_REFLECTOR_TYPE       2
+#define PRODUCT_REFLECTOR_TYPE        2
+#define EXTERNAL_REFLECTOR_TYPE       3
 
 //
 // Forward Declarations

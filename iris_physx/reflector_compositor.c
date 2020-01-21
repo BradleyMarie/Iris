@@ -206,6 +206,107 @@ AttenuatedSumReflectorComputeColor(
     return ISTATUS_SUCCESS;
 }
 
+static
+ISTATUS
+ProductReflectorReflect(
+    _In_ const void *context,
+    _In_ float_t wavelength,
+    _Out_ float_t *reflectance
+    )
+{
+    PCPRODUCT_REFLECTOR reflector = (PCPRODUCT_REFLECTOR)context;
+
+    float_t multiplicand;
+    ISTATUS status = ReflectorReflectInline(reflector->multiplicand0,
+                                            wavelength,
+                                            &multiplicand);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorReflectInline(reflector->multiplicand1,
+                                    wavelength,
+                                    reflectance);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *reflectance *= multiplicand;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+ProductReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *reflectance
+    )
+{
+    PCPRODUCT_REFLECTOR reflector = (PCPRODUCT_REFLECTOR)context;
+
+    float_t multiplicand;
+    ISTATUS status = ReflectorGetAlbedoInline(reflector->multiplicand0,
+                                              &multiplicand);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorGetAlbedoInline(reflector->multiplicand1,
+                                      reflectance);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *reflectance *= multiplicand;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ProductReflectorComputeColor(
+    _In_opt_ const void *context,
+    _In_ const struct _COLOR_CACHE *color_cache,
+    _Out_ PCOLOR3 color
+    )
+{
+    PCPRODUCT_REFLECTOR attenuated_reflector =
+        (PCPRODUCT_REFLECTOR)context;
+
+    COLOR3 multiplicand;
+    ISTATUS status =
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                attenuated_reflector->multiplicand0,
+                                                &multiplicand);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status =
+        ColorCacheLookupOrComputeReflectorColor(color_cache,
+                                                attenuated_reflector->multiplicand1,
+                                                color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *color = ColorScaleByColor(multiplicand, *color);
+
+    return ISTATUS_SUCCESS;
+}
+
 //
 // Static Variables
 //
@@ -218,6 +319,11 @@ const static INTERNAL_REFLECTOR_VTABLE attenuated_reflector_vtable = {
 const static INTERNAL_REFLECTOR_VTABLE attenuated_sum_reflector_vtable = {
     { AttenuatedSumReflectorReflect, AttenuatedSumReflectorGetAlbedo },
     AttenuatedSumReflectorComputeColor
+};
+
+const static INTERNAL_REFLECTOR_VTABLE product_reflector_vtable = {
+    { ProductReflectorReflect, ProductReflectorGetAlbedo },
+    ProductReflectorComputeColor
 };
 
 //
@@ -410,6 +516,55 @@ ReflectorCompositorAttenuatedAddReflectors(
     allocated_reflector->attenuation = attenuation;
 
     *result = &allocated_reflector->header;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ReflectorCompositorMultiplyReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _In_ PCREFLECTOR multiplicand0,
+    _In_ PCREFLECTOR multiplicand1,
+    _Out_ PCREFLECTOR *product
+    )
+{
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (product == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (multiplicand0 == NULL || multiplicand1 == NULL)
+    {
+        *product = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    void *allocation;
+    bool success = StaticMemoryAllocatorAllocate(
+        &compositor->product_reflector_allocator, &allocation);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PPRODUCT_REFLECTOR allocated_reflector =
+        (PPRODUCT_REFLECTOR)allocation;
+
+    InternalReflectorInitialize(&allocated_reflector->header,
+                                &product_reflector_vtable,
+                                allocated_reflector,
+                                PRODUCT_REFLECTOR_TYPE);
+
+    allocated_reflector->multiplicand0 = multiplicand0;
+    allocated_reflector->multiplicand1 = multiplicand1;
+
+    *product = &allocated_reflector->header;
 
     return ISTATUS_SUCCESS;
 }
