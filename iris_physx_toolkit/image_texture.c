@@ -81,67 +81,30 @@ static const FLOAT_TEXTURE_VTABLE float_image_texture_vtable = {
 
 ISTATUS
 FloatImageTextureAllocate(
-    _In_reads_(height * width) float_t textels[],
-    _In_ size_t width,
-    _In_ size_t height,
-    _In_ WRAP_MODE wrap_mode,
+    _In_ PFLOAT_MIPMAP mipmap,
     _Out_ PFLOAT_TEXTURE *texture
     )
 {
-    if (textels == NULL)
+    if (mipmap == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (width == 0)
+    if (texture == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (height == 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (texture == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
     FLOAT_IMAGE_TEXTURE image_texture;
-    ISTATUS status = FloatMipmapAllocateFromFloats(textels,
-                                                   width,
-                                                   height,
-                                                   wrap_mode,
-                                                   &image_texture.mipmap);
+    image_texture.mipmap = mipmap;
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        assert(status == ISTATUS_ALLOCATION_FAILED);
-        return status;
-    }
+    ISTATUS status = FloatTextureAllocate(&float_image_texture_vtable,
+                                          &image_texture,
+                                          sizeof(FLOAT_IMAGE_TEXTURE),
+                                          alignof(FLOAT_IMAGE_TEXTURE),
+                                          texture);
 
-    status  = FloatTextureAllocate(&float_image_texture_vtable,
-                                   &image_texture,
-                                   sizeof(FLOAT_IMAGE_TEXTURE),
-                                   alignof(FLOAT_IMAGE_TEXTURE),
-                                   texture);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        assert(status == ISTATUS_ALLOCATION_FAILED);
-        FloatMipmapFree(image_texture.mipmap);
-        return status;
-    }
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 //
@@ -225,72 +188,28 @@ static const REFLECTOR_TEXTURE_VTABLE reflector_image_texture_vtable = {
 
 ISTATUS
 ReflectorImageTextureAllocate(
-    _In_reads_(height * width) float_t textels[][3],
-    _In_ size_t width,
-    _In_ size_t height,
-    _In_ WRAP_MODE wrap_mode,
-    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ PREFLECTOR_MIPMAP mipmap,
     _Out_ PREFLECTOR_TEXTURE *texture
     )
 {
-    if (textels == NULL)
+    if (mipmap == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (width == 0)
+    if (texture == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (height == 0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (color_extrapolator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (texture == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
-
     REFLECTOR_IMAGE_TEXTURE image_texture;
-    ISTATUS status = ReflectorMipmapAllocateFromFloats(textels,
-                                                       width,
-                                                       height,
-                                                       wrap_mode,
-                                                       color_extrapolator,
-                                                       &image_texture.mipmap);
+    image_texture.mipmap = mipmap;
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        assert(status == ISTATUS_ALLOCATION_FAILED);
-        return status;
-    }
+    ISTATUS status = ReflectorTextureAllocate(&reflector_image_texture_vtable,
+                                              &image_texture,
+                                              sizeof(PREFLECTOR_IMAGE_TEXTURE),
+                                              alignof(PREFLECTOR_IMAGE_TEXTURE),
+                                              texture);
 
-    status  = ReflectorTextureAllocate(&reflector_image_texture_vtable,
-                                       &image_texture,
-                                       sizeof(PREFLECTOR_IMAGE_TEXTURE),
-                                       alignof(PREFLECTOR_IMAGE_TEXTURE),
-                                       texture);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        assert(status == ISTATUS_ALLOCATION_FAILED);
-        ReflectorMipmapFree(image_texture.mipmap);
-        return status;
-    }
-
-    return ISTATUS_SUCCESS;
+    return status;
 }

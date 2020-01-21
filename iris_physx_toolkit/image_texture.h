@@ -29,20 +29,13 @@ extern "C" {
 
 ISTATUS
 FloatImageTextureAllocate(
-    _In_reads_(height * width) float_t textels[],
-    _In_ size_t width,
-    _In_ size_t height,
-    _In_ WRAP_MODE wrap_mode,
+    _In_ PFLOAT_MIPMAP mipmap,
     _Out_ PFLOAT_TEXTURE *texture
     );
 
 ISTATUS
 ReflectorImageTextureAllocate(
-    _In_reads_(height * width) float_t textels[][3],
-    _In_ size_t width,
-    _In_ size_t height,
-    _In_ WRAP_MODE wrap_mode,
-    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ PREFLECTOR_MIPMAP mipmap,
     _Out_ PREFLECTOR_TEXTURE *texture
     );
 
