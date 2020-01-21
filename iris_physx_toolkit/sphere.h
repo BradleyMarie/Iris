@@ -41,6 +41,17 @@ SphereAllocate(
     _Out_ PSHAPE *shape
     );
 
+ISTATUS
+EmissiveSphereAllocate(
+    _In_ POINT3 center,
+    _In_ float_t radius,
+    _In_opt_ PMATERIAL front_material,
+    _In_opt_ PMATERIAL back_material,
+    _In_opt_ PEMISSIVE_MATERIAL front_emissive_material,
+    _In_opt_ PEMISSIVE_MATERIAL back_emissive_material,
+    _Out_ PSHAPE *shape
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus
