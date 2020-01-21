@@ -250,6 +250,16 @@ cc_library(
 )
 
 cc_library(
+    name = "product_texture",
+    srcs = ["product_texture.c"],
+    hdrs = ["product_texture.h"],
+    deps = [
+        ":float_texture",
+        ":reflector_texture",
+    ],
+)
+
+cc_library(
     name = "reflector_texture_vtable",
     hdrs = ["reflector_texture_vtable.h"],
     deps = [
