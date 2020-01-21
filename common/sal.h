@@ -18,6 +18,7 @@ Abstract:
 #ifndef _In_
 
 #define _In_
+#define _In_z_
 #define _In_opt_
 #define _In_range_(low, hi)
 #define _In_reads_(size)

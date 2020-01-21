@@ -116,11 +116,11 @@ FloatImageTextureAllocate(
     }
 
     FLOAT_IMAGE_TEXTURE image_texture;
-    ISTATUS status = FloatMipmapAllocate(textels,
-                                         width,
-                                         height,
-                                         wrap_mode,
-                                         &image_texture.mipmap);
+    ISTATUS status = FloatMipmapAllocateFromFloats(textels,
+                                                   width,
+                                                   height,
+                                                   wrap_mode,
+                                                   &image_texture.mipmap);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -266,12 +266,12 @@ ReflectorImageTextureAllocate(
     }
 
     REFLECTOR_IMAGE_TEXTURE image_texture;
-    ISTATUS status = ReflectorMipmapAllocate(textels,
-                                             width,
-                                             height,
-                                             wrap_mode,
-                                             color_extrapolator,
-                                             &image_texture.mipmap);
+    ISTATUS status = ReflectorMipmapAllocateFromFloats(textels,
+                                                       width,
+                                                       height,
+                                                       wrap_mode,
+                                                       color_extrapolator,
+                                                       &image_texture.mipmap);
 
     if (status != ISTATUS_SUCCESS)
     {

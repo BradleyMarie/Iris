@@ -231,6 +231,16 @@ cc_library(
 )
 
 cc_library(
+    name = "png_mipmap",
+    srcs = ["png_mipmap.c"],
+    hdrs = ["png_mipmap.h"],
+    deps = [
+        ":mipmap",
+        "//third_party/stb:stb_image",
+    ],
+)
+
+cc_library(
     name = "point_light",
     srcs = ["point_light.c"],
     hdrs = ["point_light.h"],

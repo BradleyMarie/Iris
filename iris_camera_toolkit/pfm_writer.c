@@ -41,7 +41,7 @@ IsLittleEndian(
 ISTATUS
 WriteToPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
-    _In_ const char* filename,
+    _In_z_ const char* filename,
     _In_ PFM_PIXEL_FORMAT pixel_format
     )
 {

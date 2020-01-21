@@ -14,6 +14,7 @@ Abstract:
 
 #include "iris_physx_toolkit/mipmap.h"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -33,11 +34,67 @@ struct _REFLECTOR_MIPMAP {
 };
 
 //
+// Static Functions
+//
+
+static
+bool
+ReflectorMipmapAllocate(
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PREFLECTOR_MIPMAP *mipmap
+    )
+{
+    assert(width != 0);
+    assert(height != 0);
+    assert(mipmap != NULL);
+    assert(wrap_mode == WRAP_MODE_REPEAT ||
+           wrap_mode == WRAP_MODE_BLACK ||
+           wrap_mode == WRAP_MODE_CLAMP);
+
+    size_t num_pixels;
+    bool success = CheckedMultiplySizeT(width, height, &num_pixels);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    PREFLECTOR_MIPMAP result =
+        (PREFLECTOR_MIPMAP)malloc(sizeof(REFLECTOR_MIPMAP));
+
+    if (result == NULL)
+    {
+        return false;
+    }
+
+    PREFLECTOR *spectra = (PREFLECTOR*)calloc(num_pixels, sizeof(PREFLECTOR));
+
+    if (spectra == NULL)
+    {
+        free(result);
+        return false;
+    }
+
+    result->textels = spectra;
+    result->wrap_mode = wrap_mode;
+    result->width_fp = (float_t)width;
+    result->height_fp = (float_t)height;
+    result->width = width;
+    result->height = height;
+
+    *mipmap = result;
+
+    return true;
+}
+
+//
 // Functions
 //
 
 ISTATUS
-ReflectorMipmapAllocate(
+ReflectorMipmapAllocateFromFloats(
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
@@ -78,37 +135,15 @@ ReflectorMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    size_t num_pixels;
-    bool success = CheckedMultiplySizeT(width, height, &num_pixels);
+    PREFLECTOR_MIPMAP result;
+    bool success = ReflectorMipmapAllocate(width, height, wrap_mode, &result);
 
     if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PREFLECTOR_MIPMAP result = (PREFLECTOR_MIPMAP)malloc(sizeof(REFLECTOR_MIPMAP));
-
-    if (result == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    PREFLECTOR *spectra = (PREFLECTOR*)calloc(num_pixels, sizeof(PREFLECTOR));
-
-    if (spectra == NULL)
-    {
-        free(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    result->textels = spectra;
-    result->wrap_mode = wrap_mode;
-    result->width_fp = (float_t)width;
-    result->height_fp = (float_t)height;
-    result->width = width;
-    result->height = height;
-
-    for (size_t i = 0; i < num_pixels; i++)
+    for (size_t i = 0; i < width * height; i++)
     {
         if (!isfinite(textels[i][0]) || textels[i][0] < (float_t)0.0)
         {
@@ -130,6 +165,79 @@ ReflectorMipmapAllocate(
 
         ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
                                                            textels[i],
+                                                           result->textels + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            ReflectorMipmapFree(result);
+            return status;
+        }
+    }
+
+    *mipmap = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ReflectorMipmapAllocateFromBytes(
+    _In_reads_(height * width) unsigned char textels[][3],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PREFLECTOR_MIPMAP *mipmap
+    )
+{
+    if (textels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (width == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (height == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (color_extrapolator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    PREFLECTOR_MIPMAP result;
+    bool success = ReflectorMipmapAllocate(width, height, wrap_mode, &result);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        float_t rgb[3];
+        rgb[0] = (float_t)textels[i][0] / (float_t)UCHAR_MAX;
+        rgb[1] = (float_t)textels[i][1] / (float_t)UCHAR_MAX;
+        rgb[2] = (float_t)textels[i][2] / (float_t)UCHAR_MAX;
+
+        ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                                           rgb,
                                                            result->textels + i);
 
         if (status != ISTATUS_SUCCESS)
@@ -325,11 +433,66 @@ struct _FLOAT_MIPMAP {
 };
 
 //
+// Static Functions
+//
+
+static
+bool
+FloatMipmapAllocate(
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    )
+{
+    assert(width != 0);
+    assert(height != 0);
+    assert(mipmap != NULL);
+    assert(wrap_mode == WRAP_MODE_REPEAT ||
+           wrap_mode == WRAP_MODE_BLACK ||
+           wrap_mode == WRAP_MODE_CLAMP);
+
+    size_t num_pixels;
+    bool success = CheckedMultiplySizeT(width, height, &num_pixels);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    PFLOAT_MIPMAP result = (PFLOAT_MIPMAP)malloc(sizeof(FLOAT_MIPMAP));
+
+    if (result == NULL)
+    {
+        return false;
+    }
+
+    float_t *spectra = (float_t*)calloc(num_pixels, sizeof(float_t));
+
+    if (spectra == NULL)
+    {
+        free(result);
+        return false;
+    }
+
+    result->textels = spectra;
+    result->wrap_mode = wrap_mode;
+    result->width_fp = (float_t)width;
+    result->height_fp = (float_t)height;
+    result->width = width;
+    result->height = height;
+
+    *mipmap = result;
+
+    return true;
+}
+
+//
 // Functions
 //
 
 ISTATUS
-FloatMipmapAllocate(
+FloatMipmapAllocateFromFloats(
     _In_reads_(height * width) float_t textels[],
     _In_ size_t width,
     _In_ size_t height,
@@ -364,50 +527,16 @@ FloatMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    size_t num_pixels;
-    bool success = CheckedMultiplySizeT(width, height, &num_pixels);
+    PFLOAT_MIPMAP result;
+    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
 
     if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PFLOAT_MIPMAP result = (PFLOAT_MIPMAP)malloc(sizeof(FLOAT_MIPMAP));
-
-    if (result == NULL)
+    for (size_t i = 0; i < width * height; i++)
     {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    float_t *spectra = (float_t*)calloc(num_pixels, sizeof(float_t));
-
-    if (spectra == NULL)
-    {
-        free(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    result->textels = spectra;
-    result->wrap_mode = wrap_mode;
-    result->width_fp = (float_t)width;
-    result->height_fp = (float_t)height;
-    result->width = width;
-    result->height = height;
-
-    for (size_t i = 0; i < num_pixels; i++)
-    {
-        if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
-        {
-            FloatMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_00;
-        }
-
-        if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
-        {
-            FloatMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_00;
-        }
-
         if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
         {
             FloatMipmapFree(result);
@@ -415,6 +544,60 @@ FloatMipmapAllocate(
         }
 
         result->textels[i] = textels[i];
+    }
+
+    *mipmap = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapAllocateFromBytes(
+    _In_reads_(height * width) unsigned char textels[],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    )
+{
+    if (textels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (width == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (height == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    PFLOAT_MIPMAP result;
+    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        result->textels[i] = (float_t)textels[i] / (float_t)UCHAR_MAX;
     }
 
     *mipmap = result;
@@ -473,8 +656,6 @@ FloatMipmapLookup(
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
-
-
 
     if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
     {

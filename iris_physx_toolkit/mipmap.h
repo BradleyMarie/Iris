@@ -43,8 +43,18 @@ typedef const REFLECTOR_MIPMAP *PCREFLECTOR_MIPMAP;
 //
 
 ISTATUS
-ReflectorMipmapAllocate(
+ReflectorMipmapAllocateFromFloats(
     _In_reads_(height * width) float_t textels[][3],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PREFLECTOR_MIPMAP *mipmap
+    );
+
+ISTATUS
+ReflectorMipmapAllocateFromBytes(
+    _In_reads_(height * width) unsigned char textels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
@@ -88,8 +98,17 @@ typedef const FLOAT_MIPMAP *PCFLOAT_MIPMAP;
 //
 
 ISTATUS
-FloatMipmapAllocate(
+FloatMipmapAllocateFromFloats(
     _In_reads_(height * width) float_t textels[],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    );
+
+ISTATUS
+FloatMipmapAllocateFromBytes(
+    _In_reads_(height * width) unsigned char textels[],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,

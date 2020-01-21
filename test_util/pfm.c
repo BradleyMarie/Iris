@@ -63,7 +63,7 @@ SwapBytes(
 ISTATUS
 CheckEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
-    _In_ const char* filename,
+    _In_z_ const char* filename,
     _In_ PFM_PIXEL_FORMAT pixel_format,
     _In_ float_t epsilon,
     _Out_ bool *result
@@ -240,7 +240,7 @@ CheckEqualsPfmFile(
 ISTATUS
 ExactlyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
-    _In_ const char* filename,
+    _In_z_ const char* filename,
     _In_ PFM_PIXEL_FORMAT pixel_format,
     _Out_ bool *result
     )
@@ -262,7 +262,7 @@ ExactlyEqualsPfmFile(
 ISTATUS
 ApproximatelyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
-    _In_ const char* filename,
+    _In_z_ const char* filename,
     _In_ PFM_PIXEL_FORMAT pixel_format,
     _In_ float_t epsilon,
     _Out_ bool *result
