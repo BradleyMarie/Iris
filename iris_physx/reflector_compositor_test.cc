@@ -451,15 +451,64 @@ TEST(ReflectorCompositor, ReflectorCompositorMultiplyReflectors)
     ASSERT_EQ(NULL, result);
 
     status = ReflectorCompositorMultiplyReflectors(compositor,
-                                                  root_reflector,
-                                                  root_reflector,
-                                                  &result);
+                                                   root_reflector,
+                                                   root_reflector,
+                                                   &result);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     float_t value;
     status = ReflectorReflect(result, (float_t)1.0, &value);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)0.25, value);
+
+    status = ReflectorReflect(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    PCREFLECTOR attenuated_reflector;
+    status = ReflectorCompositorAttenuateReflector(compositor,
+                                                   root_reflector,
+                                                   (float_t)0.5,
+                                                   &attenuated_reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   root_reflector,
+                                                   attenuated_reflector,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorReflect(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.125, value);
+
+    status = ReflectorReflect(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   attenuated_reflector,
+                                                   root_reflector,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorReflect(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.125, value);
+
+    status = ReflectorReflect(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   attenuated_reflector,
+                                                   attenuated_reflector,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorReflect(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0625, value);
 
     status = ReflectorReflect(result, (float_t)2.0, &value);
     ASSERT_EQ(ISTATUS_SUCCESS, status);

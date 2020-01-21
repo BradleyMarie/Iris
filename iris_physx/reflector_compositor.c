@@ -544,6 +544,40 @@ ReflectorCompositorMultiplyReflectors(
         return ISTATUS_SUCCESS;
     }
 
+    float_t attenuation;
+    if (multiplicand0->vtable == (const void*)&attenuated_reflector_vtable &&
+        multiplicand1->vtable == (const void*)&attenuated_reflector_vtable)
+    {
+        PCATTENUATED_REFLECTOR reflector0 =
+            (PCATTENUATED_REFLECTOR) multiplicand0;
+        PCATTENUATED_REFLECTOR reflector1 =
+            (PCATTENUATED_REFLECTOR) multiplicand1;
+
+        attenuation = reflector0->attenuation * reflector1->attenuation;
+        multiplicand0 = reflector0->reflector;
+        multiplicand1 = reflector1->reflector;
+    }
+    else if (multiplicand0->vtable == (const void*)&attenuated_reflector_vtable)
+    {
+        PCATTENUATED_REFLECTOR reflector =
+            (PCATTENUATED_REFLECTOR) multiplicand0;
+
+        attenuation = reflector->attenuation;
+        multiplicand0 = reflector->reflector;
+    }
+    else if (multiplicand1->vtable == (const void*)&attenuated_reflector_vtable)
+    {
+        PCATTENUATED_REFLECTOR reflector =
+            (PCATTENUATED_REFLECTOR) multiplicand1;
+
+        attenuation = reflector->attenuation;
+        multiplicand1 = reflector->reflector;
+    }
+    else
+    {
+        attenuation = (float_t)1.0;
+    }
+
     void *allocation;
     bool success = StaticMemoryAllocatorAllocate(
         &compositor->product_reflector_allocator, &allocation);
@@ -553,18 +587,43 @@ ReflectorCompositorMultiplyReflectors(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PPRODUCT_REFLECTOR allocated_reflector =
+    PPRODUCT_REFLECTOR allocated_product =
         (PPRODUCT_REFLECTOR)allocation;
 
-    InternalReflectorInitialize(&allocated_reflector->header,
+    InternalReflectorInitialize(&allocated_product->header,
                                 &product_reflector_vtable,
-                                allocated_reflector,
+                                allocated_product,
                                 PRODUCT_REFLECTOR_TYPE);
 
-    allocated_reflector->multiplicand0 = multiplicand0;
-    allocated_reflector->multiplicand1 = multiplicand1;
+    allocated_product->multiplicand0 = multiplicand0;
+    allocated_product->multiplicand1 = multiplicand1;
 
-    *product = &allocated_reflector->header;
+    if (attenuation == (float_t)1.0)
+    {
+        *product = &allocated_product->header;
+        return ISTATUS_SUCCESS;
+    }
+
+    success = StaticMemoryAllocatorAllocate(
+        &compositor->attenuated_reflector_allocator, &allocation);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PATTENUATED_REFLECTOR allocated_attenuated_reflector =
+        (PATTENUATED_REFLECTOR)allocation;
+
+    InternalReflectorInitialize(&allocated_attenuated_reflector->header,
+                                &attenuated_reflector_vtable,
+                                allocated_attenuated_reflector,
+                                ATTENUATED_REFLECTOR_TYPE);
+
+    allocated_attenuated_reflector->reflector = &allocated_product->header;
+    allocated_attenuated_reflector->attenuation = attenuation;
+
+    *product = &allocated_attenuated_reflector->header;
 
     return ISTATUS_SUCCESS;
 }
