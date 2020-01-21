@@ -14,6 +14,7 @@ Abstract:
 
 #include "iris_physx_toolkit/png_mipmap.h"
 
+#define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
 #include "third_party/stb/stb_image.h"
 

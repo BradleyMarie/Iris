@@ -37,7 +37,7 @@ typedef const FLOAT_IMAGE_TEXTURE *PCFLOAT_IMAGE_TEXTURE;
 
 static
 ISTATUS
-FloatImageTextureSample(
+ImageFloatTextureSample(
     _In_ const void *context,
     _In_ POINT3 model_hit_point,
     _In_ const void *additional_data,
@@ -65,7 +65,7 @@ FloatImageTextureSample(
 
 static
 void
-FloatImageTextureFree(
+ImageFloatTextureFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -78,8 +78,8 @@ FloatImageTextureFree(
 //
 
 static const FLOAT_TEXTURE_VTABLE float_image_texture_vtable = {
-    FloatImageTextureSample,
-    FloatImageTextureFree
+    ImageFloatTextureSample,
+    ImageFloatTextureFree
 };
 
 //
@@ -87,7 +87,7 @@ static const FLOAT_TEXTURE_VTABLE float_image_texture_vtable = {
 //
 
 ISTATUS
-FloatImageTextureAllocate(
+ImageFloatTextureAllocate(
     _In_ PFLOAT_MIPMAP mipmap,
     _In_ float_t u_offset,
     _In_ float_t v_offset,
@@ -162,7 +162,7 @@ typedef const REFLECTOR_IMAGE_TEXTURE *PCREFLECTOR_IMAGE_TEXTURE;
 
 static
 ISTATUS
-ReflectorImageTextureSample(
+ImageReflectorTextureSample(
     _In_ const void *context,
     _In_ POINT3 model_hit_point,
     _In_ const void *additional_data,
@@ -192,7 +192,7 @@ ReflectorImageTextureSample(
 
 static
 ISTATUS
-ReflectorImageTextureColors(
+ImageReflectorTextureColors(
     _In_ const void *context,
     _Inout_ PCOLOR_CACHE color_cache
     )
@@ -206,7 +206,7 @@ ReflectorImageTextureColors(
 
 static
 void
-ReflectorImageTextureFree(
+ImageReflectorTextureFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -219,9 +219,9 @@ ReflectorImageTextureFree(
 //
 
 static const REFLECTOR_TEXTURE_VTABLE reflector_image_texture_vtable = {
-    ReflectorImageTextureSample,
-    ReflectorImageTextureColors,
-    ReflectorImageTextureFree
+    ImageReflectorTextureSample,
+    ImageReflectorTextureColors,
+    ImageReflectorTextureFree
 };
 
 //
@@ -229,7 +229,7 @@ static const REFLECTOR_TEXTURE_VTABLE reflector_image_texture_vtable = {
 //
 
 ISTATUS
-ReflectorImageTextureAllocate(
+ImageReflectorTextureAllocate(
     _In_ PREFLECTOR_MIPMAP mipmap,
     _In_ float_t u_offset,
     _In_ float_t v_offset,

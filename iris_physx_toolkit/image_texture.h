@@ -28,7 +28,7 @@ extern "C" {
 //
 
 ISTATUS
-FloatImageTextureAllocate(
+ImageFloatTextureAllocate(
     _In_ PFLOAT_MIPMAP mipmap,
     _In_ float_t u_offset,
     _In_ float_t v_offset,
@@ -38,7 +38,7 @@ FloatImageTextureAllocate(
     );
 
 ISTATUS
-ReflectorImageTextureAllocate(
+ImageReflectorTextureAllocate(
     _In_ PREFLECTOR_MIPMAP mipmap,
     _In_ float_t u_offset,
     _In_ float_t v_offset,
