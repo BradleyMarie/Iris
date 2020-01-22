@@ -39,13 +39,13 @@ ISTATUS
 ISTATUS
 ColorCacheAddSpectrum(
     _In_ PCOLOR_CACHE color_cache,
-    _In_opt_ PSPECTRUM spectrum
+    _In_opt_ PCSPECTRUM spectrum
     );
 
 ISTATUS
 ColorCacheAddReflector(
     _In_ PCOLOR_CACHE color_cache,
-    _In_opt_ PREFLECTOR reflector
+    _In_opt_ PCREFLECTOR reflector
     );
 
 #endif // _IRIS_PHYSX_COLOR_CACHE_

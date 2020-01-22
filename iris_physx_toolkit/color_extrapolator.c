@@ -279,12 +279,7 @@ ColorExtrapolatorInsertSpectrum(
     size_t index = ColorExtrapolatorSpectrumProbeStart(list_size, color);
     for (;;)
     {
-        if (list[index].spectrum == spectrum)
-        {
-            return;
-        }
-
-        if (list[index].spectrum == NULL)
+        if (ColorExtrapolatorIsSpectrumEntryEmpty(list + index))
         {
             list[index].color[0] = color[0];
             list[index].color[1] = color[1];
@@ -315,12 +310,7 @@ ColorExtrapolatorInsertReflector(
     size_t index = ColorExtrapolatorReflectorProbeStart(list_size, color);
     for (;;)
     {
-        if (list[index].reflector == reflector)
-        {
-            return;
-        }
-
-        if (list[index].reflector == NULL)
+        if (ColorExtrapolatorIsReflectorEntryEmpty(list + index))
         {
             list[index].color[0] = color[0];
             list[index].color[1] = color[1];
@@ -597,7 +587,7 @@ ColorExtrapolatorComputeSpectrum(
     if (found)
     {
         *spectrum = entry->spectrum;
-        SpectrumRelease(entry->spectrum); 
+        SpectrumRetain(entry->spectrum);
         return ISTATUS_SUCCESS;
     }
 
@@ -625,6 +615,8 @@ ColorExtrapolatorComputeSpectrum(
                                     color_extrapolator->spectrum_list_capacity,
                                     color,
                                     result);
+
+    color_extrapolator->spectrum_list_size += 1;
 
     SpectrumRetain(result);
     *spectrum = result;
@@ -665,7 +657,7 @@ ColorExtrapolatorComputeReflector(
     if (found)
     {
         *reflector = entry->reflector;
-        ReflectorRelease(entry->reflector); 
+        ReflectorRetain(entry->reflector);
         return ISTATUS_SUCCESS;
     }
 
@@ -693,6 +685,8 @@ ColorExtrapolatorComputeReflector(
                                      color_extrapolator->reflector_list_capacity,
                                      color,
                                      result);
+
+    color_extrapolator->reflector_list_size += 1;
 
     ReflectorRetain(result);
     *reflector = result;

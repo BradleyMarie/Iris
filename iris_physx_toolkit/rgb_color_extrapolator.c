@@ -1134,6 +1134,8 @@ RgbColorExtrapolatorAllocate(
                                          wavelengths[i]);
     }
 
+    rgb_color_extrapolator.num_samples = num_wavelengths;
+
     ISTATUS status = ColorExtrapolatorAllocate(&rgb_color_extrapolator_vtable,
                                                &rgb_color_extrapolator,
                                                sizeof(RGB_COLOR_EXTRAPOLATOR),

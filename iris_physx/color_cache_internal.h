@@ -386,6 +386,11 @@ SpectrumToColorMapGrow(
 
     for (size_t i = 0; i < old_capacity; i++)
     {
+        if (old_list[i].spectrum == NULL)
+        {
+            continue;
+        }
+
         SpectrumToColorMapInsert(map,
                                  old_list[i].spectrum,
                                  old_list[i].color);
@@ -431,6 +436,11 @@ ReflectorToColorMapGrow(
 
     for (size_t i = 0; i < old_capacity; i++)
     {
+        if (old_list[i].reflector == NULL)
+        {
+            continue;
+        }
+
         ReflectorToColorMapInsert(map,
                                   old_list[i].reflector,
                                   old_list[i].color);
@@ -497,7 +507,7 @@ SpectrumToColorMapAdd(
     if (SpectrumToColorMapAvailableSlots(map) == 0)
     {
         bool resized = SpectrumToColorMapGrow(map);
-        if (resized)
+        if (!resized)
         {
             return ISTATUS_ALLOCATION_FAILED;
         }
@@ -530,7 +540,7 @@ ReflectorToColorMapAdd(
     if (ReflectorToColorMapAvailableSlots(map) == 0)
     {
         bool resized = ReflectorToColorMapGrow(map);
-        if (resized)
+        if (!resized)
         {
             return ISTATUS_ALLOCATION_FAILED;
         }

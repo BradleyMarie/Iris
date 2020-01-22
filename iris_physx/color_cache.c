@@ -23,7 +23,7 @@ Abstract:
 ISTATUS
 ColorCacheAddSpectrum(
     _In_ PCOLOR_CACHE color_cache,
-    _In_opt_ PSPECTRUM spectrum
+    _In_opt_ PCSPECTRUM spectrum
     )
 {
     if (color_cache == NULL)
@@ -65,7 +65,7 @@ ColorCacheAddSpectrum(
 ISTATUS
 ColorCacheAddReflector(
     _In_ PCOLOR_CACHE color_cache,
-    _In_opt_ PREFLECTOR reflector
+    _In_opt_ PCREFLECTOR reflector
     )
 {
     if (color_cache == NULL)
