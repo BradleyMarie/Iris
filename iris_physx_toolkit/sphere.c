@@ -292,7 +292,7 @@ EmissiveSphereSampleFace(
         return status;
     }
 
-    float_t z = (float_t)sphere->radius - (float_t)2.0 * u;
+    float_t z = sphere->radius - (float_t)2.0 * sphere->radius * u;
     float_t r = sqrt(fmax((float_t)0.0, sphere->sphere.radius_squared - z * z));
     float_t phi = two_pi * v;
 
