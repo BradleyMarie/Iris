@@ -820,15 +820,6 @@ ColorCacheLookupOrComputeSpectrumColor(
     assert(spectrum != NULL);
     assert(color != NULL);
 
-    bool found = SpectrumToColorMapLookup(color_cache->spectrum_map,
-                                          spectrum,
-                                          color);
-
-    if (found)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
     if (spectrum->reference_count == 0)
     {
         PCINTERNAL_SPECTRUM_VTABLE internal_vtable =
@@ -840,6 +831,15 @@ ColorCacheLookupOrComputeSpectrumColor(
                                                    color);
 
         return status;
+    }
+
+    bool found = SpectrumToColorMapLookup(color_cache->spectrum_map,
+                                          spectrum,
+                                          color);
+
+    if (found)
+    {
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status =
@@ -863,15 +863,6 @@ ColorCacheLookupOrComputeReflectorColor(
     assert(reflector != NULL);
     assert(color != NULL);
 
-    bool found = ReflectorToColorMapLookup(color_cache->reflector_map,
-                                           reflector,
-                                           color);
-
-    if (found)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
     if (reflector->reference_count == 0)
     {
         PCINTERNAL_REFLECTOR_VTABLE internal_vtable =
@@ -883,6 +874,15 @@ ColorCacheLookupOrComputeReflectorColor(
                                                    color);
 
         return status;
+    }
+
+    bool found = ReflectorToColorMapLookup(color_cache->reflector_map,
+                                           reflector,
+                                           color);
+
+    if (found)
+    {
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status =
