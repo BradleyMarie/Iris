@@ -384,8 +384,8 @@ AreaLightSample(
         RayMatrixInverseMultiply(area_light->model_to_world, world_ray_to_light);
 
     status = AreaLightComputeEmissiveWithPdfInternal(context,
-                                                     world_ray_to_light,
                                                      model_ray_to_light,
+                                                     world_ray_to_light,
                                                      visibility_tester,
                                                      compositor,
                                                      spectrum,
