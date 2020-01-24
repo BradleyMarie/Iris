@@ -312,23 +312,23 @@ EmissiveSphereComputePdfBySolidArea(
 {
     PEMISSIVE_SPHERE sphere = (PEMISSIVE_SPHERE)context;
 
-    VECTOR3 to_center = PointSubtract(to_shape->origin, sphere->sphere.center);
-    float_t distance_squared_to_center = VectorDotProduct(to_center, to_center);
-
-    if (distance_squared_to_center <= sphere->sphere.radius_squared)
+    if (face_hit == SPHERE_BACK_FACE)
     {
-        *pdf = (float_t)2.0 * two_pi;
+        float_t area = (float_t)2.0 * two_pi * sphere->sphere.radius_squared;
+        *pdf = (float_t)1.0 / area;
         return ISTATUS_SUCCESS;
     }
 
-    float_t sin_theta_squared =
-        sphere->sphere.radius_squared / distance_squared_to_center;
+    VECTOR3 to_center = PointSubtract(to_shape->origin, sphere->sphere.center);
+    float_t distance_to_center_squared = VectorDotProduct(to_center, to_center);
 
-    float_t cos_theta_squared = fmax((float_t)0.0,
-                                     (float_t)1.0 - sin_theta_squared);
+    float_t sin_theta_squared =
+        sphere->sphere.radius_squared / distance_to_center_squared;
+    float_t cos_theta_squared =
+        fmax((float_t)0.0, (float_t)1.0 - sin_theta_squared);
     float_t cos_theta = sqrt(cos_theta_squared);
 
-    *pdf = two_pi * ((float_t)1.0 - cos_theta);
+    *pdf = (float_t)1.0 / (two_pi * ((float_t)1.0 - cos_theta));
 
     return ISTATUS_SUCCESS;
 }
