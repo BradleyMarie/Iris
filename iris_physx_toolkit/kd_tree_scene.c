@@ -215,7 +215,7 @@ AllocateEdges(
     _In_reads_(num_indices) const size_t shape_indices[],
     _In_ size_t num_indices,
     _In_ VECTOR_AXIS axis,
-    _Outptr_result_buffer_(num_indices) PEDGE *edges
+    _Outptr_result_buffer_(2 * num_indices) PEDGE *edges
     )
 {
     size_t num_entries;
@@ -480,6 +480,8 @@ UncompressedKdTreeBuildImpl(
         {
             free(edges);
         }
+
+        axis = NextAxis(axis);
     }
 
     if (!should_split)
