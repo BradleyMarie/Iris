@@ -277,8 +277,8 @@ ImageReflectorTextureAllocate(
 
     ISTATUS status = ReflectorTextureAllocate(&reflector_image_texture_vtable,
                                               &image_texture,
-                                              sizeof(PREFLECTOR_IMAGE_TEXTURE),
-                                              alignof(PREFLECTOR_IMAGE_TEXTURE),
+                                              sizeof(REFLECTOR_IMAGE_TEXTURE),
+                                              alignof(REFLECTOR_IMAGE_TEXTURE),
                                               texture);
 
     return status;

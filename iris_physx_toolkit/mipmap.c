@@ -328,12 +328,12 @@ ReflectorMipmapLookup(
 
         if (s < (float_t)0.0)
         {
-            s = (float_t)1.0 - s;
+            s = (float_t)1.0 + s;
         }
 
         if (t < (float_t)0.0)
         {
-            t = (float_t)1.0 - t;
+            t = (float_t)1.0 + t;
         }
     }
     else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
@@ -675,12 +675,12 @@ FloatMipmapLookup(
 
         if (s < (float_t)0.0)
         {
-            s = (float_t)1.0 - s;
+            s = (float_t)1.0 + s;
         }
 
         if (t < (float_t)0.0)
         {
-            t = (float_t)1.0 - t;
+            t = (float_t)1.0 + t;
         }
     }
     else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
