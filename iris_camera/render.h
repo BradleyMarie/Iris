@@ -28,6 +28,7 @@ Abstract:
 ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA camera,
+    _In_opt_ PCMATRIX camera_to_world,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
@@ -39,6 +40,7 @@ IrisCameraRender(
 ISTATUS
 IrisCameraRenderSingleThreaded(
     _In_ PCCAMERA camera,
+    _In_opt_ PCMATRIX camera_to_world,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,

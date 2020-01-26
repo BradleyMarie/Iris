@@ -235,6 +235,7 @@ TestRender(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRender(camera,
+                              nullptr,
                               pixel_sampler,
                               sample_tracer,
                               rng,

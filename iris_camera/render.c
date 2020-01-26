@@ -43,6 +43,7 @@ typedef struct _RENDER_THREAD_LOCAL_STATE {
 
 typedef struct _RENDER_THREAD_SHARED_STATE {
     PCCAMERA camera;
+    PCMATRIX camera_to_world;
     PFRAMEBUFFER framebuffer;
     POINTER_LIST rngs;
     float_t epsilon;
@@ -215,13 +216,13 @@ IrisCameraRenderPixel(
             return false;
         }
 
-        RAY ray;
+        RAY camera_ray;
         status = CameraGenerateRay(context->shared->camera,
                                    pixel_u,
                                    pixel_v,
                                    lens_u,
                                    lens_v,
-                                   &ray);
+                                   &camera_ray);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -230,9 +231,13 @@ IrisCameraRenderPixel(
             return false;
         }
 
+        RAY world_ray = RayMatrixMultiply(context->shared->camera_to_world,
+                                          camera_ray);
+        world_ray.direction = VectorNormalize(world_ray.direction, NULL, NULL);
+
         COLOR3 sample_color;
         status = SampleTracerTrace(context->local.sample_tracer,
-                                   &ray,
+                                   &world_ray,
                                    rng,
                                    context->shared->epsilon,
                                    &sample_color);
@@ -360,6 +365,7 @@ IrisCameraFreeRngs(
 ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA camera,
+    _In_opt_ PCMATRIX camera_to_world,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
@@ -375,32 +381,32 @@ IrisCameraRender(
 
     if (pixel_sampler == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (sample_tracer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (rng == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (framebuffer == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (!isfinite(epsilon) || epsilon < (float_t)0.0)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     if (number_of_threads < 1)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_07;
     }
 
     pthread_t *threads = NULL;
@@ -416,6 +422,7 @@ IrisCameraRender(
 
     RENDER_THREAD_SHARED_STATE shared_state;
     shared_state.camera = camera;
+    shared_state.camera_to_world = camera_to_world;
     shared_state.framebuffer = framebuffer;
     shared_state.epsilon = epsilon;
     shared_state.cancelled = false;
@@ -533,6 +540,7 @@ IrisCameraRender(
 ISTATUS
 IrisCameraRenderSingleThreaded(
     _In_ PCCAMERA camera,
+    _In_opt_ PCMATRIX camera_to_world,
     _Inout_ PPIXEL_SAMPLER pixel_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
@@ -541,6 +549,7 @@ IrisCameraRenderSingleThreaded(
     )
 {
     ISTATUS status = IrisCameraRender(camera,
+                                      camera_to_world,
                                       pixel_sampler,
                                       sample_tracer,
                                       rng,

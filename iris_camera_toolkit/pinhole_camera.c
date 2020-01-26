@@ -57,8 +57,6 @@ PinholeCameraGenerateRay(
     VECTOR3 camera_direction = PointSubtract(pinhole_camera->location,
                                              frame_origin);
 
-    camera_direction = VectorNormalize(camera_direction, NULL, NULL);
-
     *ray = RayCreate(pinhole_camera->location, camera_direction);
 
     return ISTATUS_SUCCESS;

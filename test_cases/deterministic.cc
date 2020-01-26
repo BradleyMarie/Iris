@@ -74,6 +74,7 @@ TestRender(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRenderSingleThreaded(camera,
+                                            nullptr,
                                             pixel_sampler,
                                             sample_tracer,
                                             rng0,
@@ -94,6 +95,7 @@ TestRender(
 
     size_t num_threads = std::max(2u, std::thread::hardware_concurrency());
     status = IrisCameraRender(camera,
+                              nullptr,
                               pixel_sampler,
                               sample_tracer,
                               rng1,

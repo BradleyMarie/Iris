@@ -78,6 +78,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IrisCameraRenderSingleThreaded(camera,
+                                            nullptr,
                                             pixel_sampler,
                                             sample_tracer,
                                             rng,

@@ -71,8 +71,6 @@ ThinLensCameraGenerateRay(
     VECTOR3 camera_direction = PointSubtract(ray_origin,
                                              frame_origin);
 
-    camera_direction = VectorNormalize(camera_direction, NULL, NULL);
-
     *ray = RayCreate(ray_origin, camera_direction);
 
     return ISTATUS_SUCCESS;
