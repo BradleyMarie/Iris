@@ -292,6 +292,11 @@ IntegratorPrepare(
     LightSamplerRetain(light_sampler);
     ColorIntegratorRetain(color_integrator);
 
+    if (!precompute_colors)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     status = SceneCacheColors(scene, &integrator->color_cache);
 
     if (status != ISTATUS_SUCCESS)
