@@ -86,6 +86,67 @@ ColorIntegratorAllocate(
     return ISTATUS_SUCCESS;
 }
 
+
+
+ISTATUS
+ColorIntegratorComputeSpectrumColor(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCSPECTRUM spectrum,
+    _Out_ PCOLOR3 color
+    )
+{
+    if (color_integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (color == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    ISTATUS status = ColorIntegratorComputeSpectrumColorStatic(color_integrator,
+                                                               spectrum,
+                                                               color);
+
+    return status;
+}
+
+ISTATUS
+ColorIntegratorComputeReflectorColor(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    )
+{
+    if (color_integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (color == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    ISTATUS status =
+        ColorIntegratorComputeReflectorColorStatic(color_integrator,
+                                                   reflector,
+                                                   color);
+
+    return status;
+}
+
 void
 ColorIntegratorRetain(
     _In_opt_ PCOLOR_INTEGRATOR color_integrator

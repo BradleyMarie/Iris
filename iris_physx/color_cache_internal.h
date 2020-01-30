@@ -843,9 +843,9 @@ ColorCacheLookupOrComputeSpectrumColor(
     }
 
     ISTATUS status =
-        ColorIntegratorComputeSpectrumColor(color_cache->color_integrator,
-                                            spectrum,
-                                            color);
+        ColorIntegratorComputeSpectrumColorStatic(color_cache->color_integrator,
+                                                  spectrum,
+                                                  color);
 
     return status;
 }
@@ -886,9 +886,9 @@ ColorCacheLookupOrComputeReflectorColor(
     }
 
     ISTATUS status =
-        ColorIntegratorComputeReflectorColor(color_cache->color_integrator,
-                                             reflector,
-                                             color);
+        ColorIntegratorComputeReflectorColorStatic(color_cache->color_integrator,
+                                                   reflector,
+                                                   color);
 
     return status;
 }

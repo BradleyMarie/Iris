@@ -47,7 +47,7 @@ ColorCacheAddSpectrum(
     }
 
     COLOR3 color;
-    ISTATUS status = ColorIntegratorComputeSpectrumColor(
+    ISTATUS status = ColorIntegratorComputeSpectrumColorStatic(
         color_cache->color_integrator, spectrum, &color);
 
     if (status != ISTATUS_SUCCESS)
@@ -89,7 +89,7 @@ ColorCacheAddReflector(
     }
 
     COLOR3 color;
-    ISTATUS status = ColorIntegratorComputeReflectorColor(
+    ISTATUS status = ColorIntegratorComputeReflectorColorStatic(
         color_cache->color_integrator, reflector, &color);
 
     if (status != ISTATUS_SUCCESS)

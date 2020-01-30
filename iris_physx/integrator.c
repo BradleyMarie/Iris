@@ -369,9 +369,10 @@ IntegratorIntegrateSpectral(
         return ISTATUS_SUCCESS;
     }
 
-    status = ColorIntegratorComputeSpectrumColor(integrator->color_integrator,
-                                                 spectrum,
-                                                 color);
+    status =
+        ColorIntegratorComputeSpectrumColorStatic(integrator->color_integrator,
+                                                  spectrum,
+                                                  color);
 
     return status;
 }

@@ -37,6 +37,20 @@ ColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 
+ISTATUS
+ColorIntegratorComputeSpectrumColor(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCSPECTRUM spectrum,
+    _Out_ PCOLOR3 color
+    );
+
+ISTATUS
+ColorIntegratorComputeReflectorColor(
+    _In_ const struct _COLOR_INTEGRATOR *color_integrator,
+    _In_ PCREFLECTOR reflector,
+    _Out_ PCOLOR3 color
+    );
+
 void
 ColorIntegratorRetain(
     _In_opt_ PCOLOR_INTEGRATOR color_integrator
