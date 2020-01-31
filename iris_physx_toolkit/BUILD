@@ -349,6 +349,7 @@ cc_library(
     srcs = ["xyz_spectra.c"],
     hdrs = ["xyz_spectra.h"],
     deps = [
+        ":color_extrapolator",
         "//iris_physx",
     ],
 )
