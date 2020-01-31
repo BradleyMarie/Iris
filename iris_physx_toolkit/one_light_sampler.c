@@ -68,29 +68,6 @@ OneLightSamplerSample(
 }
 
 static
-ISTATUS
-OneLightSamplerCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCONE_LIGHT_SAMPLER light_sampler = (PCONE_LIGHT_SAMPLER)context;
-
-    for (size_t i = 0; i < light_sampler->num_lights; i++)
-    {
-        ISTATUS status = LightCacheColors(light_sampler->lights[i],
-                                          color_cache);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-static
 void
 OneLightSamplerFree(
     _In_opt_ _Post_invalid_ void *context
@@ -112,7 +89,6 @@ OneLightSamplerFree(
 
 static const LIGHT_SAMPLER_VTABLE one_light_sampler_vtable = {
     OneLightSamplerSample,
-    OneLightSamplerCacheColors,
     OneLightSamplerFree
 };
 

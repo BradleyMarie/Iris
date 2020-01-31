@@ -111,28 +111,6 @@ ShapeComputeBounds(
     return status;
 }
 
-ISTATUS
-ShapeCacheColors(
-    _In_opt_ PCSHAPE shape,
-    _In_ PCOLOR_CACHE color_cache
-    )
-{
-    if (shape == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (color_cache == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    ISTATUS status = shape->vtable->cache_colors_routine(shape->data,
-                                                         color_cache);
-
-    return status;
-}
-
 void
 ShapeRetain(
     _In_opt_ PSHAPE shape

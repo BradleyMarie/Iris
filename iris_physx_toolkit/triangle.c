@@ -331,27 +331,6 @@ TriangleGetMaterial(
 }
 
 static
-ISTATUS
-TriangleCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCTRIANGLE triangle = (PCTRIANGLE)context;
-
-    ISTATUS status = MaterialCacheColors(triangle->materials[0], color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = MaterialCacheColors(triangle->materials[1], color_cache);
-
-    return status;
-}
-
-static
 void
 TriangleFree(
     _In_opt_ _Post_invalid_ void *context
@@ -499,44 +478,6 @@ EmissiveTriangleComputePdfBySolidArea(
 }
 
 static
-ISTATUS
-EmissiveTriangleCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PEMISSIVE_TRIANGLE triangle = (PEMISSIVE_TRIANGLE)context;
-
-    ISTATUS status = MaterialCacheColors(triangle->triangle.materials[0],
-                                         color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = MaterialCacheColors(triangle->triangle.materials[1], color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = EmissiveMaterialCacheColors(triangle->emissive_materials[0],
-                                         color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = EmissiveMaterialCacheColors(triangle->emissive_materials[1],
-                                         color_cache);
-
-    return status;
-}
-
-static
 void
 EmissiveTriangleFree(
     _In_opt_ _Post_invalid_ void *context
@@ -565,7 +506,6 @@ static const SHAPE_VTABLE triangle_vtable = {
     NULL,
     NULL,
     NULL,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -580,7 +520,6 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     NULL,
     NULL,
     NULL,
-    EmissiveTriangleCacheColors,
     EmissiveTriangleFree
 };
 

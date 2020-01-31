@@ -252,28 +252,6 @@ LightComputeEmissiveWithPdf(
     return status;
 }
 
-ISTATUS
-LightCacheColors(
-    _In_ PCLIGHT light,
-    _In_ PCOLOR_CACHE color_cache
-    )
-{
-    if (light == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (color_cache == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    ISTATUS status = light->vtable->cache_colors_routine(light->data,
-                                                         color_cache);
-
-    return status;
-}
-
 void
 LightRetain(
     _In_opt_ PLIGHT light

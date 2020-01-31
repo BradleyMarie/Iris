@@ -15,7 +15,6 @@ Abstract:
 #ifndef _IRIS_PHYSX_SCENE_VTABLE_
 #define _IRIS_PHYSX_SCENE_VTABLE_
 
-#include "iris_physx/color_cache.h"
 #include "iris_physx/hit_tester.h"
 #include "iris_physx/shape.h"
 
@@ -33,7 +32,6 @@ ISTATUS
 
 typedef struct _SCENE_VTABLE {
     PSCENE_TRACE_ROUTINE trace_routine;
-    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } SCENE_VTABLE, *PSCENE_VTABLE;
 

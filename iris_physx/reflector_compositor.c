@@ -17,7 +17,6 @@ Abstract:
 #include <assert.h>
 #include <string.h>
 
-#include "iris_physx/color_cache_internal.h"
 #include "iris_physx/reflector_compositor_internal.h"
 
 //
@@ -69,31 +68,6 @@ AttenuatedReflectorGetAlbedo(
     }
 
     *reflectance *= attenuated_reflector->attenuation;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-AttenuatedReflectorComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCATTENUATED_REFLECTOR attenuated_reflector =
-        (PCATTENUATED_REFLECTOR)context;
-
-    ISTATUS status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                attenuated_reflector->reflector,
-                                                color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorScaleByScalar(*color, attenuated_reflector->attenuation);
 
     return ISTATUS_SUCCESS;
 }
@@ -168,44 +142,6 @@ AttenuatedSumReflectorGetAlbedo(
     return ISTATUS_SUCCESS;
 }
 
-ISTATUS
-AttenuatedSumReflectorComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCATTENUATED_SUM_REFLECTOR attenuated_reflector =
-        (PCATTENUATED_SUM_REFLECTOR)context;
-
-    COLOR3 base;
-    ISTATUS status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                attenuated_reflector->added_reflector,
-                                                &base);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                attenuated_reflector->attenuated_reflector,
-                                                color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorAddScaled(base,
-                            *color,
-                            attenuated_reflector->attenuation);
-
-    return ISTATUS_SUCCESS;
-}
-
 static
 ISTATUS
 ProductReflectorReflect(
@@ -271,59 +207,26 @@ ProductReflectorGetAlbedo(
     return ISTATUS_SUCCESS;
 }
 
-ISTATUS
-ProductReflectorComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCPRODUCT_REFLECTOR attenuated_reflector =
-        (PCPRODUCT_REFLECTOR)context;
-
-    COLOR3 multiplicand;
-    ISTATUS status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                attenuated_reflector->multiplicand0,
-                                                &multiplicand);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                attenuated_reflector->multiplicand1,
-                                                color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorScaleByColor(multiplicand, *color);
-
-    return ISTATUS_SUCCESS;
-}
-
 //
 // Static Variables
 //
 
-const static INTERNAL_REFLECTOR_VTABLE attenuated_reflector_vtable = {
-    { AttenuatedReflectorReflect, AttenuatedReflectorGetAlbedo },
-    AttenuatedReflectorComputeColor
+const static REFLECTOR_VTABLE attenuated_reflector_vtable = {
+    AttenuatedReflectorReflect,
+    AttenuatedReflectorGetAlbedo,
+    NULL
 };
 
-const static INTERNAL_REFLECTOR_VTABLE attenuated_sum_reflector_vtable = {
-    { AttenuatedSumReflectorReflect, AttenuatedSumReflectorGetAlbedo },
-    AttenuatedSumReflectorComputeColor
+const static REFLECTOR_VTABLE attenuated_sum_reflector_vtable = {
+    AttenuatedSumReflectorReflect,
+    AttenuatedSumReflectorGetAlbedo,
+    NULL
 };
 
-const static INTERNAL_REFLECTOR_VTABLE product_reflector_vtable = {
-    { ProductReflectorReflect, ProductReflectorGetAlbedo },
-    ProductReflectorComputeColor
+const static REFLECTOR_VTABLE product_reflector_vtable = {
+    ProductReflectorReflect,
+    ProductReflectorGetAlbedo,
+    NULL
 };
 
 //

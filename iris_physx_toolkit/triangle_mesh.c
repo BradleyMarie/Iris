@@ -426,44 +426,6 @@ TriangleComputeTextureCoordinates(
 }
 
 static
-ISTATUS
-TriangleCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCTRIANGLE triangle = (PCTRIANGLE)context;
-    PCTRIANGLE_MESH mesh = triangle->mesh;
-
-    ISTATUS status = MaterialCacheColors(mesh->materials[0], color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = MaterialCacheColors(mesh->materials[1], color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = EmissiveMaterialCacheColors(mesh->emissive_materials[0],
-                                         color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = EmissiveMaterialCacheColors(mesh->emissive_materials[1],
-                                         color_cache);
-
-    return status;
-}
-
-static
 void
 TriangleMeshFree(
     _In_opt_ _Post_invalid_ PTRIANGLE_MESH mesh
@@ -644,7 +606,6 @@ static const SHAPE_VTABLE triangle_vtable = {
     NULL,
     NULL,
     NULL,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -659,7 +620,6 @@ static const SHAPE_VTABLE triangle_with_normals_vtable = {
     TriangleComputeShadingNormal,
     NULL,
     NULL,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -674,7 +634,6 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     NULL,
     NULL,
     NULL,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -689,7 +648,6 @@ static const SHAPE_VTABLE emissive_triangle_with_normals_vtable = {
     TriangleComputeShadingNormal,
     NULL,
     NULL,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -704,7 +662,6 @@ static const SHAPE_VTABLE triangle_uvs_vtable = {
     NULL,
     NULL,
     TriangleComputeTextureCoordinates,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -719,7 +676,6 @@ static const SHAPE_VTABLE triangle_with_normals_uvs_vtable = {
     TriangleComputeShadingNormal,
     NULL,
     TriangleComputeTextureCoordinates,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -734,7 +690,6 @@ static const SHAPE_VTABLE emissive_triangle_uvs_vtable = {
     NULL,
     NULL,
     TriangleComputeTextureCoordinates,
-    TriangleCacheColors,
     TriangleFree
 };
 
@@ -749,7 +704,6 @@ static const SHAPE_VTABLE emissive_triangle_with_normals_uvs_vtable = {
     TriangleComputeShadingNormal,
     NULL,
     TriangleComputeTextureCoordinates,
-    TriangleCacheColors,
     TriangleFree
 };
 

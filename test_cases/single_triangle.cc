@@ -86,37 +86,6 @@ TriangleMaterialSample(
 }
 
 static
-ISTATUS
-TriangleMaterialCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCTRIANGLE_MATERIAL triangle_material = (PCTRIANGLE_MATERIAL)context;
-
-    ISTATUS status = ColorCacheAddReflector(color_cache,
-                                            triangle_material->reflectors[0]);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ColorCacheAddReflector(color_cache,
-                                    triangle_material->reflectors[1]);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ColorCacheAddReflector(color_cache,
-                                    triangle_material->reflectors[2]);
-
-    return status;
-}
-
-static
 void
 TriangleMaterialFree(
     _In_opt_ _Post_invalid_ void *context
@@ -131,7 +100,6 @@ TriangleMaterialFree(
 
 static const MATERIAL_VTABLE triangle_material_vtable = {
     TriangleMaterialSample,
-    TriangleMaterialCacheColors,
     TriangleMaterialFree
 };
 

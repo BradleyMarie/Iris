@@ -15,7 +15,6 @@ Abstract:
 #ifndef _IRIS_PHYSX_SHAPE_VTABLE_
 #define _IRIS_PHYSX_SHAPE_VTABLE_
 
-#include "iris_physx/color_cache.h"
 #include "iris_physx/emissive_material.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/material.h"
@@ -125,7 +124,6 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_COMPUTE_SHADING_NORMAL compute_shading_normal_routine;
     PSHAPE_GET_NORMAL_MAP get_normal_map_routine;
     PSHAPE_COMPUTE_TEXTURE_COORDINATES compute_texture_coordinates;
-    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;
 

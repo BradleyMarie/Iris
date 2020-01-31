@@ -73,12 +73,6 @@ BsdfComputeReflectanceWithPdf(
     _Out_ float_t *pdf
     );
 
-ISTATUS
-BsdfCacheColors(
-    _In_opt_ PCBSDF bsdf,
-    _In_ PCOLOR_CACHE color_cache
-    );
-
 void
 BsdfRetain(
     _In_opt_ PBSDF bsdf

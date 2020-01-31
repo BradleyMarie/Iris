@@ -394,16 +394,6 @@ AreaLightSample(
 }
 
 static
-ISTATUS
-AreaLightCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    return ISTATUS_SUCCESS;
-}
-
-static
 void
 AreaLightFree(
     _In_opt_ _Post_invalid_ void *context
@@ -424,7 +414,6 @@ static const LIGHT_VTABLE area_light_vtable = {
     AreaLightSample,
     AreaLightComputeEmissive,
     AreaLightComputeEmissiveWithPdf,
-    AreaLightCacheColors,
     AreaLightFree
 };
 

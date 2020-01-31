@@ -17,7 +17,6 @@ Abstract:
 
 #include "iris/iris.h"
 #include "iris_advanced/iris_advanced.h"
-#include "iris_physx/color_cache.h"
 #include "iris_physx/reflector_compositor.h"
 
 //
@@ -67,7 +66,6 @@ typedef struct _BSDF_VTABLE {
     PBSDF_SAMPLE_ROUTINE sample_routine;
     PBSDF_COMPUTE_REFLECTANCE_ROUTINE compute_reflectance_routine;
     PBSDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE compute_reflectance_with_pdf_routine;
-    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } BSDF_VTABLE, *PBSDF_VTABLE;
 

@@ -51,12 +51,6 @@ ReflectorTextureSample(
     _Out_ PCREFLECTOR *value
     );
 
-ISTATUS
-ReflectorTextureCacheColors(
-    _In_opt_ PCREFLECTOR_TEXTURE texture,
-    _In_ PCOLOR_CACHE color_cache
-    );
-
 void
 ReflectorTextureRetain(
     _In_opt_ PREFLECTOR_TEXTURE texture

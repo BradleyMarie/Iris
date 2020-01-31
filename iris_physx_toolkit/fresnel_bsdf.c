@@ -154,29 +154,6 @@ SpecularDielectricBsdfComputeReflectanceWithPdf(
 }
 
 static
-ISTATUS
-SpecularDielectricBsdfColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCSPECULAR_DIELECTRIC specular_dielectric = (PCSPECULAR_DIELECTRIC)context;
-
-    ISTATUS status = ColorCacheAddReflector(color_cache,
-                                            specular_dielectric->reflected);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ColorCacheAddReflector(color_cache,
-                                    specular_dielectric->transmitted);
-
-    return status;
-}
-
-static
 void
 SpecularDielectricBsdfFree(
     _In_opt_ _Post_invalid_ void *context
@@ -196,7 +173,6 @@ static const BSDF_VTABLE perfect_specular_reflector_vtable = {
     SpecularDielectricBsdfSample,
     SpecularDielectricBsdfComputeReflectance,
     SpecularDielectricBsdfComputeReflectanceWithPdf,
-    SpecularDielectricBsdfColors,
     SpecularDielectricBsdfFree
 };
 

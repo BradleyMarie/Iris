@@ -54,28 +54,6 @@ PhysxSampleTracerTraceRay(
 
 static
 ISTATUS
-PhysxSpectralSampleTracerTraceRay(
-    _In_opt_ void *context,
-    _In_ PCRAY ray,
-    _In_ PRANDOM rng,
-    _In_ float_t epsilon,
-    _Out_ PCOLOR3 color
-    )
-{
-    PPHYSX_SAMPLE_TRACER physx_sample_tracer = (PPHYSX_SAMPLE_TRACER)context;
-
-    ISTATUS status =
-        IntegratorIntegrateSpectral(physx_sample_tracer->integrator,
-                                    rng,
-                                    *ray,
-                                    epsilon,
-                                    color);
-
-    return status;
-}
-
-static
-ISTATUS
 PhysxSampleTracerDuplicate(
     _In_opt_ const void *context,
     _Out_ PSAMPLE_TRACER *duplicate
@@ -103,34 +81,6 @@ PhysxSampleTracerDuplicate(
 }
 
 static
-ISTATUS
-PhysxSpectralSampleTracerDuplicate(
-    _In_opt_ const void *context,
-    _Out_ PSAMPLE_TRACER *duplicate
-    )
-{
-    PCPHYSX_SAMPLE_TRACER physx_sample_tracer = (PCPHYSX_SAMPLE_TRACER)context;
-
-    PINTEGRATOR integrator;
-    ISTATUS status = IntegratorDuplicate(physx_sample_tracer->integrator,
-                                         &integrator);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = PhysxSpectralSampleTracerAllocate(integrator, duplicate);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        IntegratorFree(integrator);
-    }
-
-    return status;
-}
-
-static
 void
 PhysxSampleTracerFree(
     _In_opt_ _Post_invalid_ void *context
@@ -141,10 +91,22 @@ PhysxSampleTracerFree(
     IntegratorFree(physx_sample_tracer->integrator);
 }
 
-static
+//
+// Static Data
+//
+
+static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
+    PhysxSampleTracerTraceRay,
+    PhysxSampleTracerDuplicate,
+    PhysxSampleTracerFree
+};
+
+//
+// Functions
+//
+
 ISTATUS
-PhysxSampleTracerAllocateInternal(
-    _In_ PCSAMPLE_TRACER_VTABLE vtable,
+PhysxSampleTracerAllocate(
     _In_ PINTEGRATOR integrator,
     _Out_ PSAMPLE_TRACER *sample_tracer
     )
@@ -162,7 +124,7 @@ PhysxSampleTracerAllocateInternal(
     PHYSX_SAMPLE_TRACER physx_sample_tracer;
     physx_sample_tracer.integrator = integrator;
 
-    ISTATUS status = SampleTracerAllocate(vtable,
+    ISTATUS status = SampleTracerAllocate(&sample_tracer_vtable,
                                           &physx_sample_tracer,
                                           sizeof(PHYSX_SAMPLE_TRACER),
                                           alignof(PHYSX_SAMPLE_TRACER),
@@ -174,52 +136,4 @@ PhysxSampleTracerAllocateInternal(
     }
 
     return ISTATUS_SUCCESS;
-}
-
-//
-// Static Data
-//
-
-static const SAMPLE_TRACER_VTABLE sample_tracer_vtable = {
-    PhysxSampleTracerTraceRay,
-    PhysxSampleTracerDuplicate,
-    PhysxSampleTracerFree
-};
-
-static const SAMPLE_TRACER_VTABLE spectal_sample_tracer_vtable = {
-    PhysxSpectralSampleTracerTraceRay,
-    PhysxSpectralSampleTracerDuplicate,
-    PhysxSampleTracerFree
-};
-
-//
-// Functions
-//
-
-ISTATUS
-PhysxSampleTracerAllocate(
-    _In_ PINTEGRATOR integrator,
-    _Out_ PSAMPLE_TRACER *sample_tracer
-    )
-{
-    ISTATUS status =
-        PhysxSampleTracerAllocateInternal(&sample_tracer_vtable,
-                                          integrator,
-                                          sample_tracer);
-
-    return status;
-}
-
-ISTATUS
-PhysxSpectralSampleTracerAllocate(
-    _In_ PINTEGRATOR integrator,
-    _Out_ PSAMPLE_TRACER *sample_tracer
-    )
-{
-    ISTATUS status =
-        PhysxSampleTracerAllocateInternal(&spectal_sample_tracer_vtable,
-                                          integrator,
-                                          sample_tracer);
-
-    return status;
 }

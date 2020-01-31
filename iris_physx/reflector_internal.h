@@ -30,12 +30,6 @@ Abstract:
 #define EXTERNAL_REFLECTOR_TYPE       3
 
 //
-// Forward Declarations
-//
-
-struct _COLOR_CACHE;
-
-//
 // Types
 //
 
@@ -44,21 +38,6 @@ struct _REFLECTOR {
     void *data;
     atomic_uintmax_t reference_count;
 };
-
-typedef
-ISTATUS
-(*PREFLECTOR_COMPUTE_COLOR_ROUTINE)(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    );
-
-typedef struct _INTERNAL_REFLECTOR_VTABLE {
-    REFLECTOR_VTABLE reflector_vtable;
-    PREFLECTOR_COMPUTE_COLOR_ROUTINE compute_color_routine;
-} INTERNAL_REFLECTOR_VTABLE, *PINTERNAL_REFLECTOR_VTABLE;
-
-typedef const INTERNAL_REFLECTOR_VTABLE *PCINTERNAL_REFLECTOR_VTABLE;
 
 //
 // Functions
@@ -86,7 +65,7 @@ inline
 void
 InternalReflectorInitialize(
     _Out_ struct _REFLECTOR *reflector,
-    _In_ PCINTERNAL_REFLECTOR_VTABLE vtable,
+    _In_ PCREFLECTOR_VTABLE vtable,
     _In_opt_ void *data,
     _In_ size_t type
     )
@@ -95,7 +74,7 @@ InternalReflectorInitialize(
     assert(vtable != NULL);
     assert(type < EXTERNAL_REFLECTOR_TYPE);
 
-    reflector->vtable = &vtable->reflector_vtable;
+    reflector->vtable = vtable;
     reflector->data = data;
     reflector->reference_count = type;
 }

@@ -21,12 +21,6 @@ Abstract:
 #include "iris_physx/spectrum_vtable.h"
 
 //
-// Forward Declarations
-//
-
-struct _COLOR_CACHE;
-
-//
 // Types
 //
 
@@ -35,21 +29,6 @@ struct _SPECTRUM {
     void *data;
     atomic_uintmax_t reference_count;
 };
-
-typedef
-ISTATUS
-(*PSPECTRUM_COMPUTE_COLOR_ROUTINE)(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    );
-
-typedef struct _INTERNAL_SPECTRUM_VTABLE {
-    SPECTRUM_VTABLE spectrum_vtable;
-    PSPECTRUM_COMPUTE_COLOR_ROUTINE compute_color_routine;
-} INTERNAL_SPECTRUM_VTABLE, *PINTERNAL_SPECTRUM_VTABLE;
-
-typedef const INTERNAL_SPECTRUM_VTABLE *PCINTERNAL_SPECTRUM_VTABLE;
 
 //
 // Functions
@@ -77,14 +56,14 @@ inline
 void
 InternalSpectrumInitialize(
     _Out_ struct _SPECTRUM *spectrum,
-    _In_ PCINTERNAL_SPECTRUM_VTABLE vtable,
+    _In_ PCSPECTRUM_VTABLE vtable,
     _In_opt_ void *data
     )
 {
     assert(spectrum != NULL);
     assert(vtable != NULL);
 
-    spectrum->vtable = &vtable->spectrum_vtable;
+    spectrum->vtable = vtable;
     spectrum->data = data;
     spectrum->reference_count = 0;
 }

@@ -33,13 +33,13 @@ Abstract:
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
+#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_ PSCENE scene,
     _In_ PLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
     _In_ const std::string& file_name
     )
 {
@@ -61,6 +61,10 @@ TestRenderSingleThreaded(
 
     PSAMPLE_TRACER sample_tracer;
     status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PCOLOR_INTEGRATOR color_integrator;
+    status = TestColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IntegratorPrepare(path_tracer,
@@ -94,6 +98,7 @@ TestRenderSingleThreaded(
 
     PixelSamplerFree(pixel_sampler);
     RandomFree(rng);
+    ColorIntegratorRelease(color_integrator);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);
 }
@@ -134,12 +139,24 @@ TEST(CornellBoxTest, CornellBox)
     ISTATUS status = CieColorIntegratorAllocate(false, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PREFLECTOR white_reflector;
+    PREFLECTOR interpolated_white_reflector;
     status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
                                            cornell_box_white_wall_samples,
                                            CORNELL_BOX_WALL_SAMPLES,
-                                           &white_reflector);
+                                           &interpolated_white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    COLOR3 color;
+    status = ColorIntegratorComputeReflectorColor(color_integrator,
+                                                  interpolated_white_reflector,
+                                                  &color);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR white_reflector;
+    status = TestReflectorAllocate(color.x, color.y, color.z, &white_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ReflectorRelease(interpolated_white_reflector);
 
     PBSDF white_bsdf;
     status = LambertianReflectorAllocate(white_reflector, &white_bsdf);
@@ -149,12 +166,23 @@ TEST(CornellBoxTest, CornellBox)
     status = ConstantMaterialAllocate(white_bsdf, &white_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PREFLECTOR red_reflector;
+    PREFLECTOR interpolated_red_reflector;
     status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
                                            cornell_box_red_wall_samples,
                                            CORNELL_BOX_WALL_SAMPLES,
-                                           &red_reflector);
+                                           &interpolated_red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorComputeReflectorColor(color_integrator,
+                                                  interpolated_red_reflector,
+                                                  &color);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR red_reflector;
+    status = TestReflectorAllocate(color.x, color.y, color.z, &red_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ReflectorRelease(interpolated_red_reflector);
 
     PBSDF red_bsdf;
     status = LambertianReflectorAllocate(red_reflector, &red_bsdf);
@@ -164,12 +192,23 @@ TEST(CornellBoxTest, CornellBox)
     status = ConstantMaterialAllocate(red_bsdf, &red_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PREFLECTOR green_reflector;
+    PREFLECTOR interpolated_green_reflector;
     status = InterpolatedReflectorAllocate(cornell_box_wall_wavelengths,
                                            cornell_box_green_wall_samples,
                                            CORNELL_BOX_WALL_SAMPLES,
-                                           &green_reflector);
+                                           &interpolated_green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorComputeReflectorColor(color_integrator,
+                                                  interpolated_green_reflector,
+                                                  &color);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR green_reflector;
+    status = TestReflectorAllocate(color.x, color.y, color.z, &green_reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    ReflectorRelease(interpolated_green_reflector);
 
     PBSDF green_bsdf;
     status = LambertianReflectorAllocate(green_reflector, &green_bsdf);
@@ -179,12 +218,23 @@ TEST(CornellBoxTest, CornellBox)
     status = ConstantMaterialAllocate(green_bsdf, &green_material);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PSPECTRUM light_spectrum;
+    PSPECTRUM interpolated_light_spectrum;
     status = InterpolatedSpectrumAllocate(cornell_box_light_wavelengths,
                                           cornell_box_light_samples,
                                           CORNELL_BOX_LIGHT_SAMPLES,
-                                          &light_spectrum);
+                                          &interpolated_light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = ColorIntegratorComputeSpectrumColor(color_integrator,
+                                                 interpolated_light_spectrum,
+                                                 &color);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSPECTRUM light_spectrum;
+    status = TestSpectrumAllocate(color.x, color.y, color.z, &light_spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    SpectrumRelease(interpolated_light_spectrum);
 
     PEMISSIVE_MATERIAL light_material;
     status = ConstantEmissiveMaterialAllocate(light_spectrum, &light_material);
@@ -327,7 +377,6 @@ TEST(CornellBoxTest, CornellBox)
     TestRenderSingleThreaded(camera,
                              scene,
                              light_sampler,
-                             color_integrator,
                              "test_results/cornell_box.pfm");
 
     for (PSHAPE shape : shapes)

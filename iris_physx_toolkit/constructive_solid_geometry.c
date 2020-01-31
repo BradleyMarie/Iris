@@ -614,27 +614,6 @@ UnionShapeComputeBounds(
 }
 
 static
-ISTATUS
-ConstructiveSolidShapeCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCSG_SHAPE csg_shape = (PCSG_SHAPE)context;
-
-    ISTATUS status = ShapeCacheColors(csg_shape->shapes[0], color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ShapeCacheColors(csg_shape->shapes[1], color_cache);
-
-    return status;
-}
-
-static
 void
 ConstructiveSolidShapeFree(
     _In_opt_ _Post_invalid_ void *context
@@ -661,7 +640,6 @@ static const SHAPE_VTABLE difference_vtable = {
     NULL,
     NULL,
     NULL,
-    ConstructiveSolidShapeCacheColors,
     ConstructiveSolidShapeFree
 };
 
@@ -676,7 +654,6 @@ static const SHAPE_VTABLE intersection_vtable = {
     NULL,
     NULL,
     NULL,
-    ConstructiveSolidShapeCacheColors,
     ConstructiveSolidShapeFree
 };
 
@@ -691,7 +668,6 @@ static const SHAPE_VTABLE union_vtable = {
     NULL,
     NULL,
     NULL,
-    ConstructiveSolidShapeCacheColors,
     ConstructiveSolidShapeFree
 };
 

@@ -16,7 +16,6 @@ Abstract:
 #define _IRIS_PHYSX_EMISSIVE_MATERIAL_VTABLE_
 
 #include "iris/iris.h"
-#include "iris_physx/color_cache.h"
 #include "iris_physx/spectrum.h"
 
 //
@@ -34,7 +33,6 @@ ISTATUS
 
 typedef struct _EMISSIVE_MATERIAL_VTABLE {
     PEMISSIVE_MATERIAL_SAMPLE_ROUTINE sample_routine;
-    PCACHE_COLORS_ROUTINE cache_colors_routine;
     PFREE_ROUTINE free_routine;
 } EMISSIVE_MATERIAL_VTABLE, *PEMISSIVE_MATERIAL_VTABLE;
 

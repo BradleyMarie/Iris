@@ -136,29 +136,6 @@ LightSamplerSample(
     return status;
 }
 
-ISTATUS
-LightSamplerCacheColors(
-    _In_ PCLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_CACHE color_cache
-    )
-{
-    if (light_sampler == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (color_cache == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    ISTATUS status =
-        light_sampler->vtable->cache_colors_routine(light_sampler->data,
-                                                    color_cache);
-
-    return status;
-}
-
 void
 LightSamplerRetain(
     _In_opt_ PLIGHT_SAMPLER light_sampler

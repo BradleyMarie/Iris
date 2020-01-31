@@ -137,28 +137,6 @@ ReflectorTextureSample(
     return status;
 }
 
-ISTATUS
-ReflectorTextureCacheColors(
-    _In_opt_ PCREFLECTOR_TEXTURE texture,
-    _In_ PCOLOR_CACHE color_cache
-    )
-{
-    if (color_cache == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (texture == NULL)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    ISTATUS status = texture->vtable->cache_colors_routine(texture->data,
-                                                           color_cache);
-
-    return status;
-}
-
 void
 ReflectorTextureRetain(
     _In_opt_ PREFLECTOR_TEXTURE texture

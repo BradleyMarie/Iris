@@ -16,7 +16,6 @@ Abstract:
 
 #include <assert.h>
 
-#include "iris_physx/color_cache_internal.h"
 #include "iris_physx/reflector_compositor_internal.h"
 #include "iris_physx/reflector_internal.h"
 #include "iris_physx/spectrum_compositor_internal.h"
@@ -48,31 +47,6 @@ AttenuatedSpectrumSample(
 
     *intensity = output_intensity * attenuated_spectrum->attenuation;
     return ISTATUS_SUCCESS; 
-}
-
-ISTATUS
-AttenuatedSpectrumComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCATTENUATED_SPECTRUM attenuated_spectrum =
-        (PCATTENUATED_SPECTRUM)context;
-
-    ISTATUS status =
-        ColorCacheLookupOrComputeSpectrumColor(color_cache,
-                                               attenuated_spectrum->spectrum,
-                                               color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorScaleByScalar(*color, attenuated_spectrum->attenuation);
-
-    return ISTATUS_SUCCESS;
 }
 
 static
@@ -107,41 +81,6 @@ SumSpectrumSample(
 
     *intensity = intensity0 + intensity1;
     return ISTATUS_SUCCESS; 
-}
-
-ISTATUS
-SumSpectrumComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCSUM_SPECTRUM sum_spectrum = (PCSUM_SPECTRUM) context;
-
-    COLOR3 result;
-    ISTATUS status =
-        ColorCacheLookupOrComputeSpectrumColor(color_cache,
-                                               sum_spectrum->spectrum0,
-                                               &result);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status =
-        ColorCacheLookupOrComputeSpectrumColor(color_cache,
-                                               sum_spectrum->spectrum1,
-                                               color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorAdd(result, *color);
-
-    return ISTATUS_SUCCESS;
 }
 
 static
@@ -180,60 +119,23 @@ AttenuatedReflectionSpectrumSample(
     return ISTATUS_SUCCESS; 
 }
 
-ISTATUS
-AttenuatedReflectionSpectrumComputeColor(
-    _In_opt_ const void *context,
-    _In_ const struct _COLOR_CACHE *color_cache,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCATTENUATED_REFLECTION_SPECTRUM spectrum =
-        (PCATTENUATED_REFLECTION_SPECTRUM) context;
-
-    COLOR3 light_color;
-    ISTATUS status =
-        ColorCacheLookupOrComputeSpectrumColor(color_cache,
-                                               spectrum->spectrum,
-                                               &light_color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status =
-        ColorCacheLookupOrComputeReflectorColor(color_cache,
-                                                spectrum->reflector,
-                                                color);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *color = ColorScaleByColor(*color, light_color);
-    *color = ColorScaleByScalar(*color, spectrum->attenuation);
-
-    return ISTATUS_SUCCESS;
-}
-
 //
 // Static Variables
 //
 
-const static INTERNAL_SPECTRUM_VTABLE sum_spectrum_vtable = {
-    { SumSpectrumSample, NULL },
-    SumSpectrumComputeColor
+const static SPECTRUM_VTABLE sum_spectrum_vtable = {
+    SumSpectrumSample,
+    NULL
 };
 
-const static INTERNAL_SPECTRUM_VTABLE attenuated_spectrum_vtable = {
-    { AttenuatedSpectrumSample, NULL },
-    AttenuatedSpectrumComputeColor
+const static SPECTRUM_VTABLE attenuated_spectrum_vtable = {
+    AttenuatedSpectrumSample,
+    NULL
 };
 
-const static INTERNAL_SPECTRUM_VTABLE attenuated_reflection_spectrum_vtable = {
-    { AttenuatedReflectionSpectrumSample, NULL },
-    AttenuatedReflectionSpectrumComputeColor
+const static SPECTRUM_VTABLE attenuated_reflection_spectrum_vtable = {
+    AttenuatedReflectionSpectrumSample,
+    NULL
 };
 
 //

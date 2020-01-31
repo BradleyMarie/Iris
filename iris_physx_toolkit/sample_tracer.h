@@ -32,12 +32,6 @@ PhysxSampleTracerAllocate(
     _Out_ PSAMPLE_TRACER *sample_tracer
     );
 
-ISTATUS
-PhysxSpectralSampleTracerAllocate(
-    _In_ PINTEGRATOR integrator,
-    _Out_ PSAMPLE_TRACER *sample_tracer
-    );
-
 #if __cplusplus 
 }
 #endif // __cplusplus

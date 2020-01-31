@@ -69,12 +69,6 @@ LightComputeEmissiveWithPdf(
     _Out_ float_t *pdf
     );
 
-ISTATUS
-LightCacheColors(
-    _In_ PCLIGHT light,
-    _In_ PCOLOR_CACHE color_cache
-    );
-
 void
 LightRetain(
     _In_opt_ PLIGHT light

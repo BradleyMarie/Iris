@@ -16,8 +16,6 @@ Abstract:
 
 #include "iris_physx/bsdf_allocator.h"
 #include "iris_physx/bsdf_allocator_internal.h"
-#include "iris_physx/color_cache.h"
-#include "iris_physx/color_cache_internal.h"
 #include "iris_physx/color_integrator_internal.h"
 #include "iris_physx/integrator.h"
 #include "iris_physx/integrator_vtable.h"
@@ -39,7 +37,6 @@ struct _INTEGRATOR {
     LIGHT_SAMPLE_LIST light_sample_list;
     VISIBILITY_TESTER visibility_tester;
     SPECTRUM_COMPOSITOR spectrum_compositor;
-    COLOR_CACHE color_cache;
     PSCENE scene;
     PLIGHT_SAMPLER light_sampler;
     PCOLOR_INTEGRATOR color_integrator;
@@ -227,18 +224,6 @@ IntegratorAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    success = ColorCacheInitialize(&result->color_cache);
-
-    if (!success)
-    {
-        ShapeRayTracerDestroy(&result->shape_ray_tracer);
-        LightSampleListDestroy(&result->light_sample_list);
-        VisibilityTesterDestroy(&result->visibility_tester);
-        SpectrumCompositorDestroy(&result->spectrum_compositor);
-        free(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     result->scene = NULL;
     result->light_sampler = NULL;
     result->color_integrator = NULL;
@@ -272,14 +257,6 @@ IntegratorPrepare(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    ISTATUS status = ColorCacheReset(&integrator->color_cache,
-                                     color_integrator);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
     SceneRelease(integrator->scene);
     LightSamplerRelease(integrator->light_sampler);
     ColorIntegratorRelease(integrator->color_integrator);
@@ -292,61 +269,11 @@ IntegratorPrepare(
     LightSamplerRetain(light_sampler);
     ColorIntegratorRetain(color_integrator);
 
-    if (!precompute_colors)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    status = SceneCacheColors(scene, &integrator->color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = LightSamplerCacheColors(light_sampler, &integrator->color_cache);
-
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS
 IntegratorIntegrate(
-    _Inout_ PINTEGRATOR integrator,
-    _Inout_ PRANDOM rng,
-    _In_ RAY ray,
-    _In_ float_t epsilon,
-    _Out_ PCOLOR3 color
-    )
-{
-    PCSPECTRUM spectrum;
-    ISTATUS status = IntegratorIntegrateInternal(integrator,
-                                                 integrator->scene,
-                                                 integrator->light_sampler,
-                                                 rng,
-                                                 ray,
-                                                 epsilon,
-                                                 &spectrum);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (spectrum == NULL)
-    {
-        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-        return ISTATUS_SUCCESS;
-    }
-
-    status = ColorCacheLookupOrComputeSpectrumColor(&integrator->color_cache,
-                                                    spectrum,
-                                                    color);
-
-    return status;
-}
-
-ISTATUS
-IntegratorIntegrateSpectral(
     _Inout_ PINTEGRATOR integrator,
     _Inout_ PRANDOM rng,
     _In_ RAY ray,
@@ -411,7 +338,6 @@ IntegratorDuplicate(
     result->light_sampler = integrator->light_sampler;
     result->color_integrator = integrator->color_integrator;
 
-    ColorCacheShareWith(&integrator->color_cache, &result->color_cache);
     SceneRetain(integrator->scene);
     LightSamplerRetain(integrator->light_sampler);
     ColorIntegratorRetain(integrator->color_integrator);
@@ -435,7 +361,6 @@ IntegratorFree(
     LightSampleListDestroy(&integrator->light_sample_list);
     VisibilityTesterDestroy(&integrator->visibility_tester);
     SpectrumCompositorDestroy(&integrator->spectrum_compositor);
-    ColorCacheDestroy(&integrator->color_cache);
 
     if (integrator->vtable->free_routine != NULL)
     {

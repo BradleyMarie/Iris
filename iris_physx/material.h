@@ -39,12 +39,6 @@ MaterialAllocate(
     _Out_ PMATERIAL *material
     );
 
-ISTATUS
-MaterialCacheColors(
-    _In_opt_ PCMATERIAL material,
-    _In_ PCOLOR_CACHE color_cache
-    );
-
 void
 MaterialRetain(
     _In_opt_ PMATERIAL material

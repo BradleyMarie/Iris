@@ -52,15 +52,6 @@ IntegratorIntegrate(
     );
 
 ISTATUS
-IntegratorIntegrateSpectral(
-    _Inout_ PINTEGRATOR integrator,
-    _Inout_ PRANDOM rng,
-    _In_ RAY ray,
-    _In_ float_t epsilon,
-    _Out_ PCOLOR3 color
-    );
-
-ISTATUS
 IntegratorDuplicate(
     _In_ PINTEGRATOR integrator,
     _Out_ PINTEGRATOR *duplicate

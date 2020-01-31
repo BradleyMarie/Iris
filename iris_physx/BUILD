@@ -58,36 +58,9 @@ cc_library(
     name = "bsdf_vtable",
     hdrs = ["bsdf_vtable.h"],
     deps = [
-        ":color_cache",
         ":reflector_compositor",
         "//iris",
         "//iris_advanced",
-    ],
-)
-
-cc_library(
-    name = "color_cache",
-    srcs = ["color_cache.c"],
-    hdrs = ["color_cache.h"],
-    deps = [
-        ":color_cache_internal",
-        ":color_integrator",
-        ":color_integrator_internal",
-        ":reflector",
-        ":reflector_internal",
-        ":spectrum",
-        ":spectrum_internal",
-    ],
-)
-
-cc_library(
-    name = "color_cache_internal",
-    hdrs = ["color_cache_internal.h"],
-    deps = [
-        ":color_integrator",
-        "//common:safe_math",
-        "//third_party/smhasher:murmur2",
-        "//third_party/smhasher:murmur3",
     ],
 )
 
@@ -143,7 +116,6 @@ cc_library(
     name = "emissive_material_vtable",
     hdrs = ["emissive_material_vtable.h"],
     deps = [
-        ":color_cache",
         ":spectrum",
         "//iris",
     ],
@@ -173,8 +145,6 @@ cc_library(
     deps = [
         ":bsdf",
         ":bsdf_internal",
-        ":color_cache",
-        ":color_cache_internal",
         ":color_integrator",
         ":color_integrator_internal",
         ":integrator_vtable",
@@ -304,7 +274,6 @@ cc_library(
     name = "light_sampler_vtable",
     hdrs = ["light_sampler_vtable.h"],
     deps = [
-        ":color_cache",
         ":light_sample_collector",
     ],
 )
@@ -313,7 +282,6 @@ cc_library(
     name = "light_vtable",
     hdrs = ["light_vtable.h"],
     deps = [
-        ":color_cache",
         ":spectrum_compositor",
         ":visibility_tester",
         "//iris_advanced",
@@ -344,7 +312,6 @@ cc_library(
     hdrs = ["material_vtable.h"],
     deps = [
         ":bsdf_allocator",
-        ":color_cache",
         ":reflector_compositor",
     ],
 )
@@ -417,7 +384,6 @@ cc_library(
     srcs = ["reflector_compositor.c"],
     hdrs = ["reflector_compositor.h"],
     deps = [
-        ":color_cache_internal",
         ":reflector",
         ":reflector_compositor_internal",
         "//common:static_allocator",
@@ -505,7 +471,6 @@ cc_library(
     name = "scene_vtable",
     hdrs = ["scene_vtable.h"],
     deps = [
-        ":color_cache",
         ":hit_tester",
         ":shape",
     ],
@@ -536,7 +501,6 @@ cc_library(
     name = "shape_vtable",
     hdrs = ["shape_vtable.h"],
     deps = [
-        ":color_cache",
         ":emissive_material",
         ":hit_allocator",
         ":material",
@@ -559,7 +523,6 @@ cc_library(
     srcs = ["spectrum_compositor.c"],
     hdrs = ["spectrum_compositor.h"],
     deps = [
-        ":color_cache_internal",
         ":reflector",
         ":reflector_compositor_internal",
         ":reflector_internal",

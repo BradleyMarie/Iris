@@ -203,34 +203,6 @@ ProductReflectorTextureSample(
 }
 
 static
-ISTATUS
-ProductReflectorTextureColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCPRODUCT_REFLECTOR_TEXTURE texture =
-        (PCPRODUCT_REFLECTOR_TEXTURE)context;
-
-    ISTATUS status = ReflectorTextureCacheColors(texture->multiplicand0,
-                                                 color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ReflectorTextureCacheColors(texture->multiplicand1, color_cache);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    return status;
-}
-
-static
 void
 ProductReflectorTextureFree(
     _In_opt_ _Post_invalid_ void *context
@@ -247,7 +219,6 @@ ProductReflectorTextureFree(
 
 static const REFLECTOR_TEXTURE_VTABLE product_reflector_texture_vtable = {
     ProductReflectorTextureSample,
-    ProductReflectorTextureColors,
     ProductReflectorTextureFree
 };
 

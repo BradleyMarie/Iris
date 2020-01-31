@@ -37,12 +37,6 @@ SceneAllocate(
     _Out_ PSCENE *scene
     );
 
-ISTATUS
-SceneCacheColors(
-    _In_ PCSCENE scene,
-    _In_ PCOLOR_CACHE color_cache
-    );
-
 void
 SceneRetain(
     _In_opt_ PSCENE scene

@@ -57,6 +57,7 @@ cc_test(
         "//test_util:cornell_box",
         "//test_util:pfm",
         "//test_util:quad",
+        "//test_util:spectra",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -89,6 +90,7 @@ cc_test(
         "//test_util:cornell_box",
         "//test_util:pfm",
         "//test_util:quad",
+        "//test_util:spectra",
         "@com_google_googletest//:gtest_main",
     ],
 )

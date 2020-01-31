@@ -155,20 +155,6 @@ PointLightComputeEmissiveWithPdf(
 }
 
 static
-ISTATUS
-PointLightCacheColors(
-    _In_ const void *context,
-    _Inout_ PCOLOR_CACHE color_cache
-    )
-{
-    PCPOINT_LIGHT point_light = (PCPOINT_LIGHT)context;
-
-    ISTATUS status = ColorCacheAddSpectrum(color_cache, point_light->spectrum);
-
-    return status;
-}
-
-static
 void
 PointLightFree(
     _In_opt_ _Post_invalid_ void *context
@@ -187,7 +173,6 @@ static const LIGHT_VTABLE point_light_vtable = {
     PointLightSample,
     PointLightComputeEmissive,
     PointLightComputeEmissiveWithPdf,
-    PointLightCacheColors,
     PointLightFree
 };
 

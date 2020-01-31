@@ -277,28 +277,6 @@ BsdfComputeReflectanceWithPdf(
     return status;
 }
 
-ISTATUS
-BsdfCacheColors(
-    _In_opt_ PCBSDF bsdf,
-    _In_ PCOLOR_CACHE color_cache
-    )
-{
-    if (color_cache == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (bsdf == NULL)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    ISTATUS status = bsdf->vtable->cache_colors_routine(bsdf->data,
-                                                        color_cache);
-
-    return status;
-}
-
 void
 BsdfRetain(
     _In_opt_ PBSDF bsdf
