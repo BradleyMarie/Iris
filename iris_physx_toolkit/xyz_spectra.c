@@ -243,6 +243,10 @@ RgbColorExtrapolatorComputeReflector(
     )
 {
     COLOR3 xyz = RgbToXyz(color);
+    xyz.x = fmin(xyz.x, (float_t)1.0);
+    xyz.y = fmin(xyz.y, (float_t)1.0);
+    xyz.z = fmin(xyz.z, (float_t)1.0);
+
     ISTATUS status = XyzReflectorAllocate(xyz.x, xyz.y, xyz.z, reflector);
     return status;
 }
