@@ -357,6 +357,10 @@ IntegratorFree(
         return;
     }
 
+    SceneRelease(integrator->scene);
+    ColorIntegratorRelease(integrator->color_integrator);
+    LightSamplerRelease(integrator->light_sampler);
+
     ShapeRayTracerDestroy(&integrator->shape_ray_tracer);
     LightSampleListDestroy(&integrator->light_sample_list);
     VisibilityTesterDestroy(&integrator->visibility_tester);
