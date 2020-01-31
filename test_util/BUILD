@@ -54,16 +54,6 @@ cc_library(
 )
 
 cc_library(
-    name = "spectra",
-    testonly = 1,
-    srcs = ["spectra.c"],
-    hdrs = ["spectra.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "teapot",
     testonly = 1,
     srcs = ["teapot.c"],

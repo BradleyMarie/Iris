@@ -20,9 +20,9 @@ Abstract:
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
+#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
 
 TEST(EmptyPhysx, ListScene)
 {
@@ -71,7 +71,7 @@ TEST(EmptyPhysx, ListScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = TestColorIntegratorAllocate(&color_integrator);
+    status = XyzColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -163,7 +163,7 @@ TEST(EmptyPhysx, KdTreeScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = TestColorIntegratorAllocate(&color_integrator);
+    status = XyzColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;

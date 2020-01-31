@@ -32,11 +32,11 @@ Abstract:
 #include "iris_physx_toolkit/sphere.h"
 #include "iris_physx_toolkit/triangle.h"
 #include "iris_physx_toolkit/uniform_reflector.h"
+#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
-#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(
@@ -63,7 +63,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = TestColorIntegratorAllocate(&color_integrator);
+    status = XyzColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IntegratorPrepare(path_tracer,
@@ -184,7 +184,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR white_reflector;
-    status = TestReflectorAllocate(color.x, color.y, color.z, &white_reflector);
+    status = XyzReflectorAllocate(color.x, color.y, color.z, &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_white_reflector);
@@ -210,7 +210,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR red_reflector;
-    status = TestReflectorAllocate(color.x, color.y, color.z, &red_reflector);
+    status = XyzReflectorAllocate(color.x, color.y, color.z, &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_red_reflector);
@@ -236,7 +236,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR green_reflector;
-    status = TestReflectorAllocate(color.x, color.y, color.z, &green_reflector);
+    status = XyzReflectorAllocate(color.x, color.y, color.z, &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_green_reflector);
@@ -262,7 +262,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM light_spectrum;
-    status = TestSpectrumAllocate(color.x, color.y, color.z, &light_spectrum);
+    status = XyzSpectrumAllocate(color.x, color.y, color.z, &light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     SpectrumRelease(interpolated_light_spectrum);

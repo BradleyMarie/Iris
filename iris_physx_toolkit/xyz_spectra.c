@@ -4,17 +4,17 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    spectra.c
+    xyz_spectra.c
 
 Abstract:
 
-    Implements the test spectrum, reflector, and color integrator.
+    Implements the XYZ spectrum, reflector, and color integrator.
 
 --*/
 
 #include <stdalign.h>
 
-#include "test_util/spectra.h"
+#include "iris_physx_toolkit/xyz_spectra.h"
 
 //
 // Constants
@@ -28,21 +28,21 @@ Abstract:
 // Types
 //
 
-typedef struct _TEST_SPECTRUM {
+typedef struct _XYZ_SPECTRUM {
     float_t x;
     float_t y;
     float_t z;
-} TEST_SPECTRUM, *PTEST_SPECTRUM;
+} XYZ_SPECTRUM, *PXYZ_SPECTRUM;
 
-typedef const TEST_SPECTRUM *PCTEST_SPECTRUM;
+typedef const XYZ_SPECTRUM *PCXYZ_SPECTRUM;
 
-typedef struct _TEST_REFLECTOR {
+typedef struct _XYZ_REFLECTOR {
     float_t x;
     float_t y;
     float_t z;
-} TEST_REFLECTOR, *PTEST_REFLECTOR;
+} XYZ_REFLECTOR, *PXYZ_REFLECTOR;
 
-typedef const TEST_REFLECTOR *PCTEST_REFLECTOR;
+typedef const XYZ_REFLECTOR *PCXYZ_REFLECTOR;
 
 //
 // Static Functions
@@ -50,25 +50,25 @@ typedef const TEST_REFLECTOR *PCTEST_REFLECTOR;
 
 static
 ISTATUS
-TestSpectrumSample(
+XyzSpectrumSample(
     _In_ const void *context,
     _In_ float_t wavelength,
     _Out_ float_t *intensity
     )
 {
-    PCTEST_SPECTRUM test_spectrum = (PCTEST_SPECTRUM)context;
+    PCXYZ_SPECTRUM xyz_spectrum = (PCXYZ_SPECTRUM)context;
 
     if (wavelength == X_WAVELENGTH)
     {
-        *intensity = test_spectrum->x;
+        *intensity = xyz_spectrum->x;
     }
     else if (wavelength == Y_WAVELENGTH)
     {
-        *intensity = test_spectrum->y;
+        *intensity = xyz_spectrum->y;
     }
     else if (wavelength == Z_WAVELENGTH)
     {
-        *intensity = test_spectrum->z;
+        *intensity = xyz_spectrum->z;
     }
     else
     {
@@ -80,25 +80,25 @@ TestSpectrumSample(
 
 static
 ISTATUS
-TestReflectorReflect(
+XyzReflectorReflect(
     _In_ const void *context,
     _In_ float_t wavelength,
     _Out_ float_t *reflectance
     )
 {
-    PCTEST_REFLECTOR test_reflector = (PCTEST_REFLECTOR)context;
+    PCXYZ_REFLECTOR xyz_reflector = (PCXYZ_REFLECTOR)context;
 
     if (wavelength == X_WAVELENGTH)
     {
-        *reflectance = test_reflector->x;
+        *reflectance = xyz_reflector->x;
     }
     else if (wavelength == Y_WAVELENGTH)
     {
-        *reflectance = test_reflector->y;
+        *reflectance = xyz_reflector->y;
     }
     else if (wavelength == Z_WAVELENGTH)
     {
-        *reflectance = test_reflector->z;
+        *reflectance = xyz_reflector->z;
     }
     else
     {
@@ -110,21 +110,20 @@ TestReflectorReflect(
 
 static
 ISTATUS
-TestReflectorGetAlbedo(
+XyzReflectorGetAlbedo(
     _In_ const void *context,
     _Out_ float_t *albedo
     )
 {
-    PCTEST_REFLECTOR test_reflector = (PCTEST_REFLECTOR)context;
+    PCXYZ_REFLECTOR xyz_reflector = (PCXYZ_REFLECTOR)context;
 
-    float_t sum = test_reflector->x + test_reflector->y + test_reflector->z;
-    *albedo = sum / (float_t)3.0;
+    *albedo = xyz_reflector->y;
 
     return ISTATUS_SUCCESS;
 }
 
 ISTATUS
-TestColorIntegratorComputeSpectrumColor(
+XyzColorIntegratorComputeSpectrumColor(
     _In_ const void *context,
     _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
@@ -161,7 +160,7 @@ TestColorIntegratorComputeSpectrumColor(
 }
 
 ISTATUS
-TestColorIntegratorComputeReflectorColor(
+XyzColorIntegratorComputeReflectorColor(
     _In_ const void *context,
     _In_opt_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
@@ -201,20 +200,20 @@ TestColorIntegratorComputeReflectorColor(
 // Static Variables
 //
 
-static const SPECTRUM_VTABLE test_spectrum_vtable = {
-    TestSpectrumSample,
+static const SPECTRUM_VTABLE xyz_spectrum_vtable = {
+    XyzSpectrumSample,
     NULL
 };
 
-static const REFLECTOR_VTABLE test_reflector_vtable = {
-    TestReflectorReflect,
-    TestReflectorGetAlbedo,
+static const REFLECTOR_VTABLE xyz_reflector_vtable = {
+    XyzReflectorReflect,
+    XyzReflectorGetAlbedo,
     NULL
 };
 
-static const COLOR_INTEGRATOR_VTABLE test_integrator_vtable = {
-    TestColorIntegratorComputeSpectrumColor,
-    TestColorIntegratorComputeReflectorColor,
+static const COLOR_INTEGRATOR_VTABLE xyz_integrator_vtable = {
+    XyzColorIntegratorComputeSpectrumColor,
+    XyzColorIntegratorComputeReflectorColor,
     NULL
 };
 
@@ -223,24 +222,24 @@ static const COLOR_INTEGRATOR_VTABLE test_integrator_vtable = {
 //
 
 ISTATUS
-TestSpectrumAllocate(
+XyzSpectrumAllocate(
     _In_ float_t x,
     _In_ float_t y,
     _In_ float_t z,
     _Out_ PSPECTRUM *spectrum
     )
 {
-    if (isinf(x) || isless(x, (float_t)0.0))
+    if (!isfinite(x) || x < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (isinf(y) || isless(y, (float_t)0.0))
+    if (!isfinite(y) || y < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (isinf(z) || isless(z, (float_t)0.0))
+    if (!isfinite(z) || z < (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -250,39 +249,39 @@ TestSpectrumAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    TEST_SPECTRUM test_spectrum;
-    test_spectrum.x = x;
-    test_spectrum.y = y;
-    test_spectrum.z = z;
+    XYZ_SPECTRUM xyz_spectrum;
+    xyz_spectrum.x = x;
+    xyz_spectrum.y = y;
+    xyz_spectrum.z = z;
 
-    ISTATUS status = SpectrumAllocate(&test_spectrum_vtable,
-                                      &test_spectrum,
-                                      sizeof(TEST_SPECTRUM),
-                                      alignof(TEST_SPECTRUM),
+    ISTATUS status = SpectrumAllocate(&xyz_spectrum_vtable,
+                                      &xyz_spectrum,
+                                      sizeof(XYZ_SPECTRUM),
+                                      alignof(XYZ_SPECTRUM),
                                       spectrum);
 
     return status;
 }
 
 ISTATUS
-TestReflectorAllocate(
+XyzReflectorAllocate(
     _In_ float_t x,
     _In_ float_t y,
     _In_ float_t z,
     _Out_ PREFLECTOR *reflector
     )
 {
-    if (isinf(x) || isless(x, (float_t)0.0))
+    if (!isfinite(x) || x < (float_t)0.0 || (float_t)1.0 < x)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (isinf(y) || isless(y, (float_t)0.0))
+    if (!isfinite(y) || y < (float_t)0.0 || (float_t)1.0 < y)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (isinf(z) || isless(z, (float_t)0.0))
+    if (!isfinite(z) || z < (float_t)0.0 || (float_t)1.0 < z)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -292,22 +291,22 @@ TestReflectorAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    TEST_REFLECTOR test_reflector;
-    test_reflector.x = x;
-    test_reflector.y = y;
-    test_reflector.z = z;
+    XYZ_REFLECTOR xyz_reflector;
+    xyz_reflector.x = x;
+    xyz_reflector.y = y;
+    xyz_reflector.z = z;
 
-    ISTATUS status = ReflectorAllocate(&test_reflector_vtable,
-                                       &test_reflector,
-                                       sizeof(TEST_REFLECTOR),
-                                       alignof(TEST_REFLECTOR),
+    ISTATUS status = ReflectorAllocate(&xyz_reflector_vtable,
+                                       &xyz_reflector,
+                                       sizeof(XYZ_REFLECTOR),
+                                       alignof(XYZ_REFLECTOR),
                                        reflector);
 
     return status;
 }
 
 ISTATUS
-TestColorIntegratorAllocate(
+XyzColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     )
 {
@@ -316,12 +315,11 @@ TestColorIntegratorAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    ISTATUS status =
-        ColorIntegratorAllocate(&test_integrator_vtable,
-                                NULL,
-                                0,
-                                0,
-                                color_integrator);
+    ISTATUS status = ColorIntegratorAllocate(&xyz_integrator_vtable,
+                                             NULL,
+                                             0,
+                                             0,
+                                             color_integrator);
 
     return status;
 }

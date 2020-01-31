@@ -4,17 +4,18 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    spectra.h
+    xyz_spectra.h
 
 Abstract:
 
-    A spectrum, reflector, and color integrator for use in testing which
-    directly map X, Y, and Z values to the outputs of the integrator.
+    A spectrum, reflector, and color integrator for use in non-spectral
+    rendering which only use the x, y, and z values of the color of a reflector
+    or spectrum.
 
 --*/
 
-#ifndef _TEST_SPECTRA_
-#define _TEST_SPECTRA_
+#ifndef _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_
+#define _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_
 
 #include "iris_physx/iris_physx.h"
 
@@ -27,7 +28,7 @@ extern "C" {
 //
 
 ISTATUS
-TestSpectrumAllocate(
+XyzSpectrumAllocate(
     _In_ float_t x,
     _In_ float_t y,
     _In_ float_t z,
@@ -35,7 +36,7 @@ TestSpectrumAllocate(
     );
 
 ISTATUS
-TestReflectorAllocate(
+XyzReflectorAllocate(
     _In_ float_t x,
     _In_ float_t y,
     _In_ float_t z,
@@ -43,7 +44,7 @@ TestReflectorAllocate(
     );
 
 ISTATUS
-TestColorIntegratorAllocate(
+XyzColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 
@@ -51,4 +52,4 @@ TestColorIntegratorAllocate(
 }
 #endif // __cplusplus
 
-#endif // _TEST_SPECTRA_
+#endif // _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_

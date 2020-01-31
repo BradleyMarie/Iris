@@ -343,3 +343,12 @@ cc_library(
         "//iris_physx",
     ],
 )
+
+cc_library(
+    name = "xyz_spectra",
+    srcs = ["xyz_spectra.c"],
+    hdrs = ["xyz_spectra.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)

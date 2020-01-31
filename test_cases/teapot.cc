@@ -28,10 +28,10 @@ Abstract:
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle_mesh.h"
+#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/teapot.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
 
 //
 // Tests
@@ -71,7 +71,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = TestColorIntegratorAllocate(&color_integrator);
+    status = XyzColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -119,17 +119,17 @@ TestRenderSingleThreaded(
 TEST(TeapotTest, FlatShadedTeapot)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)32.0,
-                                          (float_t)0.0,
-                                          (float_t)0.0,
-                                          &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
+                                         (float_t)0.0,
+                                         (float_t)0.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
@@ -200,17 +200,17 @@ TEST(TeapotTest, FlatShadedTeapot)
 TEST(TeapotTest, SmoothShadedTeapot)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)32.0,
-                                          (float_t)0.0,
-                                          (float_t)0.0,
-                                          &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
+                                         (float_t)0.0,
+                                         (float_t)0.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;

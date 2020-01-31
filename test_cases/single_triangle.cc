@@ -27,9 +27,9 @@ Abstract:
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle.h"
+#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
 
 //
 // Triangle Material
@@ -184,7 +184,7 @@ TestRender(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = TestColorIntegratorAllocate(&color_integrator);
+    status = XyzColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -241,28 +241,28 @@ static const float_t pi = (float_t)3.1415926535897932384626433832;
 TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -335,28 +335,28 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
 TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -429,28 +429,28 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
 TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -523,28 +523,28 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
 TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -617,28 +617,28 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
 TEST(SingleTriangleTest, TestXYTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -711,28 +711,28 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
 TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -805,28 +805,28 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
 TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -899,28 +899,28 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
 TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -993,28 +993,28 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
 TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1087,28 +1087,28 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
 TEST(SingleTriangleTest, TestXZTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1181,28 +1181,28 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
 TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1275,28 +1275,28 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
 TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1369,28 +1369,28 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
 TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1463,28 +1463,28 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
 TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1557,28 +1557,28 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
 TEST(SingleTriangleTest, TestYZTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1651,28 +1651,28 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1747,28 +1747,28 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1843,28 +1843,28 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -1939,28 +1939,28 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2035,28 +2035,28 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2131,10 +2131,10 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2204,7 +2204,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2274,10 +2274,10 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2347,7 +2347,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
 TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2417,28 +2417,28 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2513,28 +2513,28 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2609,28 +2609,28 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2705,28 +2705,28 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -2801,10 +2801,10 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2874,7 +2874,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -2944,10 +2944,10 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3017,7 +3017,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3087,28 +3087,28 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
 TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3183,28 +3183,28 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3279,28 +3279,28 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3375,28 +3375,28 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3471,28 +3471,28 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3567,28 +3567,28 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector0;
-    status = TestReflectorAllocate((float_t)1.0,
-                                   (float_t)0.0,
-                                   (float_t)0.0,
-                                   &reflector0);
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector1;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)1.0,
-                                   (float_t)0.0,
-                                   &reflector1);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)1.0,
+                                  (float_t)0.0,
+                                  &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR reflector2;
-    status = TestReflectorAllocate((float_t)0.0,
-                                   (float_t)0.0,
-                                   (float_t)1.0,
-                                   &reflector2);
+    status = XyzReflectorAllocate((float_t)0.0,
+                                  (float_t)0.0,
+                                  (float_t)1.0,
+                                  &reflector2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL material;
@@ -3663,10 +3663,10 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3736,7 +3736,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3806,10 +3806,10 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate((float_t)1.0,
-                                  (float_t)1.0,
-                                  (float_t)1.0,
-                                  &spectrum);
+    ISTATUS status = XyzSpectrumAllocate((float_t)1.0,
+                                         (float_t)1.0,
+                                         (float_t)1.0,
+                                         &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
@@ -3879,7 +3879,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
 TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
 {
     PSPECTRUM spectrum;
-    ISTATUS status = TestSpectrumAllocate(pi, pi, pi, &spectrum);
+    ISTATUS status = XyzSpectrumAllocate(pi, pi, pi, &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PEMISSIVE_MATERIAL emissive_material;
