@@ -52,6 +52,10 @@ HitTesterCollectHitsAndUpdateClosestHit(
         HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
                                   hit_tester->closest_hit->allocation_handle);
     }
+    else
+    {
+        HitAllocatorFreeAll(&hit_tester->hit_allocator);
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -105,6 +109,10 @@ HitTesterTestWorldInternal(
     {
         HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
                                   hit_tester->closest_hit->allocation_handle);
+    }
+    else
+    {
+        HitAllocatorFreeAll(&hit_tester->hit_allocator);
     }
 
     return ISTATUS_SUCCESS;
