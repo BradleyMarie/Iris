@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_FULL_HIT_CONTEXT_
 #define _IRIS_FULL_HIT_CONTEXT_
 
+#include "common/dynamic_allocator.h"
 #include "iris/hit.h"
 #include "iris/hit_context.h"
 #include "iris/point.h"
@@ -27,6 +28,7 @@ Abstract:
 typedef struct _FULL_HIT_CONTEXT {
     HIT hit;
     HIT_CONTEXT context;
+    PDYNAMIC_ALLOCATION allocation_handle;
     PCMATRIX model_to_world;
     bool premultiplied;
     POINT3 model_hit_point;

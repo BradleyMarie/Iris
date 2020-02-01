@@ -72,8 +72,10 @@ HitAllocatorAllocateInternal(
     }
 
     PFULL_HIT_CONTEXT hit_context;
+    PDYNAMIC_ALLOCATION allocation_handle;
     void *additional_data_dest;
     bool success = DynamicMemoryAllocatorAllocate(&allocator->allocator,
+                                                  &allocation_handle,
                                                   sizeof(FULL_HIT_CONTEXT),
                                                   alignof(FULL_HIT_CONTEXT),
                                                   (void **)&hit_context,
@@ -103,6 +105,8 @@ HitAllocatorAllocateInternal(
     {
         hit_context->context.additional_data = NULL;
     }
+
+    hit_context->allocation_handle = allocation_handle;
 
     if (hit_point != NULL)
     {

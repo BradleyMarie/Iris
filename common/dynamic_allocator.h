@@ -30,8 +30,6 @@ Abstract:
 // Types
 //
 
-struct _DYNAMIC_ALLOCATION;
-
 _Struct_size_bytes_(size)
 typedef struct _DYNAMIC_ALLOCATION {
     size_t size;
@@ -70,6 +68,7 @@ inline
 bool
 DynamicMemoryAllocatorAllocate(
     _Inout_ PDYNAMIC_MEMORY_ALLOCATOR allocator,
+    _Out_opt_ PDYNAMIC_ALLOCATION *allocation_handle,
     _In_ _Pre_satisfies_(_Curr_ != 0) size_t header_size,
     _In_ _Pre_satisfies_(_Curr_ != 0 && (_Curr_ & (_Curr_ - 1)) == 0 && header_size % _Curr_ == 0) size_t header_alignment,
     _Outptr_result_bytebuffer_(header_size) void **header,
@@ -142,6 +141,11 @@ DynamicMemoryAllocatorAllocate(
             result->prev = next_prev;
         }
 
+        if (allocation_handle != NULL)
+        {
+            *allocation_handle = result;
+        }
+
         allocator->next_allocation = result->next;
     }
     else
@@ -180,6 +184,11 @@ DynamicMemoryAllocatorAllocate(
 
         allocator->last_allocation = result;
 
+        if (allocation_handle != NULL)
+        {
+            *allocation_handle = result;
+        }
+
         result->size = allocation_size;
         result->next = NULL;
         result->prev = next_prev;
@@ -198,6 +207,41 @@ DynamicMemoryAllocatorFreeAll(
     assert(allocator != NULL);
 
     allocator->next_allocation = allocator->first_allocation;
+}
+
+static
+inline
+void
+DynamicMemoryAllocatorFreeAllExcept(
+    _Inout_ PDYNAMIC_MEMORY_ALLOCATOR allocator,
+    _In_ PDYNAMIC_ALLOCATION allocation
+    )
+{
+    assert(allocator != NULL);
+    assert(allocation != NULL);
+
+    if (allocator->first_allocation != allocation)
+    {
+        if (allocator->last_allocation != allocation)
+        {
+            allocation->next->prev = allocation->prev;
+            allocation->prev->next = allocation->next;
+        }
+        else
+        {
+            allocator->last_allocation = allocation->prev;
+            allocation->prev->next = NULL;
+        }
+
+        allocator->first_allocation->prev = allocation;
+
+        allocation->next = allocator->first_allocation;
+        allocation->prev = NULL;
+
+        allocator->first_allocation = allocation;
+    }
+
+    allocator->next_allocation = allocation->next;
 }
 
 static

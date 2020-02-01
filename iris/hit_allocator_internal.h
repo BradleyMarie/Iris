@@ -116,6 +116,21 @@ HitAllocatorFreeAll(
 static
 inline
 void
+HitAllocatorFreeAllExcept(
+    _Inout_ struct _HIT_ALLOCATOR *allocator,
+    _In_ PDYNAMIC_ALLOCATION allocation_handle
+    )
+{
+    assert(allocator != NULL);
+    assert(allocation_handle != NULL);
+
+    DynamicMemoryAllocatorFreeAllExcept(&allocator->allocator,
+                                        allocation_handle);
+}
+
+static
+inline
+void
 HitAllocatorDestroy(
     _Inout_ struct _HIT_ALLOCATOR *allocator
     )

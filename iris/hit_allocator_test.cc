@@ -857,5 +857,168 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         EXPECT_EQ(entry.second, full_hit->model_hit_point);
     }
 
+    for (size_t i = 1; i < hits_in_order.size(); i++)
+    {
+        nexts.erase(hits_in_order[i]);
+        distances.erase(hits_in_order[i]);
+        front_faces.erase(hits_in_order[i]);
+        back_faces.erase(hits_in_order[i]);
+        hit_points.erase(hits_in_order[i]);
+        no_hit_points.erase(hits_in_order[i]);
+        data.erase(hits_in_order[i]);
+        data_sizes.erase(hits_in_order[i]);
+    }
+
+    hits_in_order.resize(1);
+
+    HitAllocatorFreeAllExcept(&allocator, reinterpret_cast<PCFULL_HIT_CONTEXT>(hits_in_order.back())->allocation_handle);
+
+    last = nullptr;
+    for (uintptr_t i = 0; i < 2000; i++)
+    {
+        size_t datum_size = 0;
+        if (should_do_action(rng) != 1)
+        {
+            datum_size = size_generator(rng);
+        }
+
+        PHIT next = nullptr;
+        if (should_do_action(rng) != 1)
+        {
+            next = last;
+        }
+
+        std::string random_string = GenerateRandomString(datum_size, &rng);
+
+        float_t distance = (float_t)float_generator(rng);
+        uint32_t front_face = face_generator(rng);
+        uint32_t back_face = face_generator(rng);
+        size_t additional_data_size = datum_size;
+        size_t additional_data_alignment = GetAlignment(datum_size);
+
+        const void *additional_data = nullptr;
+        if (datum_size != 0)
+        {
+            additional_data = random_string.c_str();
+        }
+
+        HitAllocatorSetData(&allocator, (const void *)i);
+
+        PHIT hit;
+        if (should_do_action(rng) < 8) {
+            POINT3 hit_point = PointCreate((float_t)float_generator(rng),
+                                           (float_t)float_generator(rng),
+                                           (float_t)float_generator(rng));
+            ISTATUS status = HitAllocatorAllocateWithHitPoint(&allocator,
+                                                              next,
+                                                              distance,
+                                                              front_face,
+                                                              back_face,
+                                                              additional_data,
+                                                              additional_data_size,
+                                                              additional_data_alignment,
+                                                              hit_point,
+                                                              &hit);
+            ASSERT_EQ(ISTATUS_SUCCESS, status);
+            hit_points[hit] = hit_point;
+        }
+        else
+        {
+            ISTATUS status = HitAllocatorAllocate(&allocator,
+                                                  next,
+                                                  distance,
+                                                  front_face,
+                                                  back_face,
+                                                  additional_data,
+                                                  additional_data_size,
+                                                  additional_data_alignment,
+                                                  &hit);
+            ASSERT_EQ(ISTATUS_SUCCESS, status);
+            no_hit_points.insert(hit);
+        }
+
+        hits_in_order.push_back(hit);
+        nexts[hit] = next;
+        distances[hit] = distance;
+        front_faces[hit] = front_face;
+        back_faces[hit] = back_face;
+        data_sizes[hit] = additional_data_size;
+
+        if (additional_data_size != 0)
+        {
+            data[hit] = random_string;
+        }
+
+        last = hit;
+    }
+
+    EXPECT_EQ(2001u, hits_in_order.size());
+
+    for (const auto& entry : nexts)
+    {
+        EXPECT_EQ(entry.second, entry.first->next);
+    }
+
+    for (const auto& entry : distances)
+    {
+        EXPECT_EQ(entry.second, entry.first->distance);
+    }
+
+    for (uintptr_t i = 0; i < hits_in_order.size(); i++)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)hits_in_order[i];
+        if (i == 0)
+        {
+            EXPECT_EQ(i, (uintptr_t)full_hit->context.data);
+        }
+        else
+        {
+            EXPECT_EQ(i - 1, (uintptr_t)full_hit->context.data);
+        }
+    }
+
+    for (const auto& entry : front_faces)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry.first;
+        EXPECT_EQ(entry.second, full_hit->context.front_face);
+    }
+
+    for (const auto& entry : back_faces)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry.first;
+        EXPECT_EQ(entry.second, full_hit->context.back_face);
+    }
+
+    for (const auto& entry : data_sizes)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry.first;
+        EXPECT_EQ(entry.second, full_hit->context.additional_data_size);
+
+        if (entry.second == 0)
+        {
+            EXPECT_EQ(nullptr, full_hit->context.additional_data);
+        }
+    }
+
+    for (const auto& entry : data)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry.first;
+        EXPECT_STREQ(entry.second.c_str(), (const char *)full_hit->context.additional_data);
+        EXPECT_EQ(0u, (uintptr_t)full_hit->context.additional_data % GetAlignment(full_hit->context.additional_data_size));
+    }
+
+    for (const auto& entry : no_hit_points)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry;
+        EXPECT_FALSE(full_hit->model_hit_point_valid);
+    }
+
+    for (const auto& entry : hit_points)
+    {
+        PCFULL_HIT_CONTEXT full_hit = (PCFULL_HIT_CONTEXT)(const void *)entry.first;
+        EXPECT_TRUE(full_hit->model_hit_point_valid);
+        EXPECT_EQ(entry.second, full_hit->model_hit_point);
+    }
+
     HitAllocatorDestroy(&allocator);
 }

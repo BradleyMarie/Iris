@@ -70,6 +70,7 @@ BsdfAllocatorAllocate(
     PBSDF bsdf_allocation;
     void *data_allocation;
     bool success = DynamicMemoryAllocatorAllocate(&allocator->allocator,
+                                                  NULL,
                                                   sizeof(BSDF),
                                                   alignof(BSDF),
                                                   (void **)&bsdf_allocation,

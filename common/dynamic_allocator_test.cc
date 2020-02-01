@@ -48,6 +48,7 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorAllocate)
         int *header;
         int *data;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   nullptr,
                                                    size,
                                                    alignof(int),
                                                    (void **)&header,
@@ -89,6 +90,7 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorFreeAll)
         int *header;
         int *datum;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   nullptr,
                                                    sizeof(int),
                                                    alignof(int),
                                                    (void **)&header,
@@ -107,6 +109,7 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorFreeAll)
         int *header;
         int *datum;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   nullptr,
                                                    sizeof(int),
                                                    alignof(int),
                                                    (void **)&header,
@@ -117,6 +120,78 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorFreeAll)
         EXPECT_EQ(1u, headers.erase(header));
         EXPECT_EQ(1u, data.erase(datum));
     }
+
+    DynamicMemoryAllocatorDestroy(&allocator);
+}
+
+TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorFreeExcept)
+{
+    DYNAMIC_MEMORY_ALLOCATOR allocator;
+    DynamicMemoryAllocatorInitialize(&allocator);
+
+    std::set<PDYNAMIC_ALLOCATION> handles;
+    std::set<int *> headers;
+    std::set<int *> data;
+    for (int i = 0; i < 1000; i++)
+    {
+        PDYNAMIC_ALLOCATION handle;
+        int *header;
+        int *datum;
+        ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   &handle,
+                                                   sizeof(int),
+                                                   alignof(int),
+                                                   (void **)&header,
+                                                   sizeof(int),
+                                                   alignof(int),
+                                                   (void **)&datum));
+
+        handles.insert(handle);
+        headers.insert(header);
+        data.insert(datum);
+    }
+
+    PDYNAMIC_ALLOCATION saved_handle;
+    int *saved_header;
+    int *saved_datum;
+    ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                               &saved_handle,
+                                               sizeof(int),
+                                               alignof(int),
+                                               (void **)&saved_header,
+                                               sizeof(int),
+                                               alignof(int),
+                                               (void **)&saved_datum));
+
+    *saved_header = 0;
+    *saved_datum = 1;
+
+    DynamicMemoryAllocatorFreeAllExcept(&allocator, saved_handle);
+
+    for (int i = 0; i < 1000; i++)
+    {
+        PDYNAMIC_ALLOCATION handle;
+        int *header;
+        int *datum;
+        ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   &handle,
+                                                   sizeof(int),
+                                                   alignof(int),
+                                                   (void **)&header,
+                                                   sizeof(int),
+                                                   alignof(int),
+                                                   (void **)&datum));
+
+        EXPECT_NE(saved_handle, handle);
+        EXPECT_NE(saved_header, header);
+        EXPECT_NE(saved_datum, datum);
+        EXPECT_EQ(1u, handles.erase(handle));
+        EXPECT_EQ(1u, headers.erase(header));
+        EXPECT_EQ(1u, data.erase(datum));
+    }
+
+    EXPECT_EQ(0, *saved_header);
+    EXPECT_EQ(1, *saved_datum);
 
     DynamicMemoryAllocatorDestroy(&allocator);
 }
@@ -214,6 +289,7 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         char *header;
         char *datum;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   nullptr,
                                                    header_size,
                                                    GetAlignment(header_size),
                                                    (void **)&header,
@@ -272,6 +348,7 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         char *header;
         char *datum;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
+                                                   nullptr,
                                                    header_size,
                                                    GetAlignment(header_size),
                                                    (void **)&header,

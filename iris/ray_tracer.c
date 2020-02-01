@@ -73,7 +73,7 @@ RayTracerValidateArugumentsAndTrace(
     ISTATUS status = trace_routine(trace_context,
                                    &ray_tracer->hit_tester,
                                    ray);
-    
+
     return status;
 }
 

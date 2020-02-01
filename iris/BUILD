@@ -10,6 +10,7 @@ cc_library(
         ":hit_context",
         ":matrix",
         ":point",
+        "//common:dynamic_allocator",
     ],
 )
 
