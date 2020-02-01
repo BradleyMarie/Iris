@@ -86,6 +86,11 @@ FramebufferAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    for (size_t i = 0; i < num_rows * num_columns; i++)
+    {
+        result->data[i] = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+    }
+
     result->num_columns = num_columns;
     result->num_rows = num_rows;
 
