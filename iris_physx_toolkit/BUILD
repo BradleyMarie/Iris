@@ -288,6 +288,16 @@ cc_library(
 )
 
 cc_library(
+    name = "rgb_spectra",
+    srcs = ["rgb_spectra.c"],
+    hdrs = ["rgb_spectra.h"],
+    deps = [
+        ":color_extrapolator",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "sample_direct_lighting",
     srcs = ["sample_direct_lighting.c"],
     hdrs = ["sample_direct_lighting.h"],
@@ -340,16 +350,6 @@ cc_library(
     srcs = ["uniform_reflector.c"],
     hdrs = ["uniform_reflector.h"],
     deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "xyz_spectra",
-    srcs = ["xyz_spectra.c"],
-    hdrs = ["xyz_spectra.h"],
-    deps = [
-        ":color_extrapolator",
         "//iris_physx",
     ],
 )

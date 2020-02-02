@@ -32,11 +32,11 @@ Abstract:
 #include "iris_physx_toolkit/sphere.h"
 #include "iris_physx_toolkit/triangle.h"
 #include "iris_physx_toolkit/uniform_reflector.h"
-#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
+#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(

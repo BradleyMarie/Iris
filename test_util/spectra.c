@@ -15,7 +15,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/xyz_spectra.h"
+#include "test_util/spectra.h"
 
 //
 // Constants
@@ -197,60 +197,6 @@ XyzColorIntegratorComputeReflectorColor(
     return ISTATUS_SUCCESS;
 }
 
-static
-inline
-COLOR3
-RgbToXyz(
-    _In_ const float_t rgb[3]
-    )
-{
-  float_t x = (float_t)0.412453f * rgb[0] +
-              (float_t)0.357580f * rgb[1] +
-              (float_t)0.180423f * rgb[2];
-  float_t y = (float_t)0.212671f * rgb[0] +
-              (float_t)0.715160f * rgb[1] +
-              (float_t)0.072169f * rgb[2];
-  float_t z = (float_t)0.019334f * rgb[0] +
-              (float_t)0.119193f * rgb[1] +
-              (float_t)0.950227f * rgb[2];
-
-  x = fmax((float_t)0.0, x);
-  y = fmax((float_t)0.0, y);
-  z = fmax((float_t)0.0, z);
-
-  return ColorCreate(x, y, z);
-}
-
-static
-ISTATUS
-RgbColorExtrapolatorComputeSpectrum(
-    _In_ const void *context,
-    _In_ const float_t color[3],
-    _Out_ PSPECTRUM *spectrum
-    )
-{
-    COLOR3 xyz = RgbToXyz(color);
-    ISTATUS status = XyzSpectrumAllocate(xyz.x, xyz.y, xyz.z, spectrum);
-    return status;
-}
-
-static
-ISTATUS
-RgbColorExtrapolatorComputeReflector(
-    _In_ const void *context,
-    _In_ const float_t color[3],
-    _Out_ PREFLECTOR *reflector
-    )
-{
-    COLOR3 xyz = RgbToXyz(color);
-    xyz.x = fmin(xyz.x, (float_t)1.0);
-    xyz.y = fmin(xyz.y, (float_t)1.0);
-    xyz.z = fmin(xyz.z, (float_t)1.0);
-
-    ISTATUS status = XyzReflectorAllocate(xyz.x, xyz.y, xyz.z, reflector);
-    return status;
-}
-
 //
 // Static Variables
 //
@@ -269,12 +215,6 @@ static const REFLECTOR_VTABLE xyz_reflector_vtable = {
 static const COLOR_INTEGRATOR_VTABLE xyz_integrator_vtable = {
     XyzColorIntegratorComputeSpectrumColor,
     XyzColorIntegratorComputeReflectorColor,
-    NULL
-};
-
-static const COLOR_EXTRAPOLATOR_VTABLE xyz_extrapolator_vtable = {
-    RgbColorExtrapolatorComputeSpectrum,
-    RgbColorExtrapolatorComputeReflector,
     NULL
 };
 
@@ -381,25 +321,6 @@ XyzColorIntegratorAllocate(
                                              0,
                                              0,
                                              color_integrator);
-
-    return status;
-}
-
-ISTATUS
-XyzColorExtrapolatorAllocate(
-    _Out_ PCOLOR_EXTRAPOLATOR *color_extrapolator
-    )
-{
-    if (color_extrapolator == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    ISTATUS status = ColorExtrapolatorAllocate(&xyz_extrapolator_vtable,
-                                               NULL,
-                                               0,
-                                               0,
-                                               color_extrapolator);
 
     return status;
 }

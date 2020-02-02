@@ -4,18 +4,18 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    xyz_spectra.h
+    rgb_spectra.h
 
 Abstract:
 
     A spectrum, reflector, color integrator, and color extrapolator for use in
-    non-spectral rendering which only use the x, y, and z values of the color
+    non-spectral rendering which only use the r, g, and b values of the color
     of a reflector or spectrum in shading computations.
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_
-#define _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_
+#ifndef _IRIS_PHYSX_TOOLKIT_RGB_SPECTRA_
+#define _IRIS_PHYSX_TOOLKIT_RGB_SPECTRA_
 
 #include "iris_physx/iris_physx.h"
 #include "iris_physx_toolkit/color_extrapolator.h"
@@ -29,28 +29,28 @@ extern "C" {
 //
 
 ISTATUS
-XyzSpectrumAllocate(
-    _In_ float_t x,
-    _In_ float_t y,
-    _In_ float_t z,
+RgbSpectrumAllocate(
+    _In_ float_t r,
+    _In_ float_t g,
+    _In_ float_t b,
     _Out_ PSPECTRUM *spectrum
     );
 
 ISTATUS
-XyzReflectorAllocate(
-    _In_ float_t x,
-    _In_ float_t y,
-    _In_ float_t z,
+RgbReflectorAllocate(
+    _In_ float_t r,
+    _In_ float_t g,
+    _In_ float_t b,
     _Out_ PREFLECTOR *reflector
     );
 
 ISTATUS
-XyzColorIntegratorAllocate(
+RgbColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 
 ISTATUS
-XyzColorExtrapolatorAllocate(
+RgbColorExtrapolatorAllocate(
     _Out_ PCOLOR_EXTRAPOLATOR *color_extrapolator
     );
 
@@ -58,4 +58,4 @@ XyzColorExtrapolatorAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_XYZ_SPECTRA_
+#endif // _IRIS_PHYSX_TOOLKIT_RGB_SPECTRA_

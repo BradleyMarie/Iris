@@ -28,10 +28,10 @@ Abstract:
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
 #include "iris_physx_toolkit/triangle_mesh.h"
-#include "iris_physx_toolkit/xyz_spectra.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/teapot.h"
 #include "test_util/pfm.h"
+#include "test_util/spectra.h"
 
 //
 // Tests
