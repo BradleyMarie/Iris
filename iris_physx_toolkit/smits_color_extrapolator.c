@@ -4,7 +4,7 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    rgbc_color_extrapolator.c
+    smits_color_extrapolator.c
 
 Abstract:
 
@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include "iris_physx_toolkit/rgb_color_extrapolator.h"
+#include "iris_physx_toolkit/smits_color_extrapolator.h"
 
 #include <stdalign.h>
 #include <stdlib.h>
@@ -586,7 +586,7 @@ static const float_t reflector_blue[NUM_SPECTRAL_SAMPLES] = {
 
 static
 float_t
-RgbColorExtrapolatorResample(
+SmitsColorExtrapolatorResample(
     _In_reads_(num_samples) const float_t wavelengths[],
     _In_reads_(num_samples) const float_t sampled_values[],
     _In_ size_t num_samples,
@@ -643,7 +643,7 @@ RgbColorExtrapolatorResample(
 
 static
 void
-RgbColorExtrapolatorScale(
+SmitsColorExtrapolatorScale(
     _In_reads_(num_samples) const float_t input[],
     _In_ size_t num_samples,
     _In_ float_t scalar,
@@ -658,7 +658,7 @@ RgbColorExtrapolatorScale(
 
 static
 void
-RgbColorExtrapolatorScaledAdd(
+SmitsColorExtrapolatorScaledAdd(
     _In_reads_(num_samples) const float_t addend[],
     _In_reads_(num_samples) const float_t scaled[],
     _In_ size_t num_samples,
@@ -674,7 +674,7 @@ RgbColorExtrapolatorScaledAdd(
 
 static
 ISTATUS
-RgbColorExtrapolatorCreateSpd(
+SmitsColorExtrapolatorCreateSpd(
     _In_ float_t r,
     _In_ float_t g,
     _In_ float_t b,
@@ -699,48 +699,48 @@ RgbColorExtrapolatorCreateSpd(
 
     if (r <= g && r <= b)
     {
-        RgbColorExtrapolatorScale(white, num_samples, r, temp);
+        SmitsColorExtrapolatorScale(white, num_samples, r, temp);
         if (g <= b)
         {
-            RgbColorExtrapolatorScaledAdd(temp, cyan, num_samples, g - r, temp);
-            RgbColorExtrapolatorScaledAdd(temp, blue, num_samples, b - g, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, cyan, num_samples, g - r, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, blue, num_samples, b - g, temp);
         }
         else
         {
-            RgbColorExtrapolatorScaledAdd(temp, cyan, num_samples, b - r, temp);
-            RgbColorExtrapolatorScaledAdd(temp, green, num_samples, g - b, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, cyan, num_samples, b - r, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, green, num_samples, g - b, temp);
         }
     }
     else if (g <= r && g <= b)
     {
-        RgbColorExtrapolatorScale(white, num_samples, g, temp);
+        SmitsColorExtrapolatorScale(white, num_samples, g, temp);
         if (r <= b)
         {
-            RgbColorExtrapolatorScaledAdd(temp, magenta, num_samples, r - g, temp);
-            RgbColorExtrapolatorScaledAdd(temp, blue, num_samples, b - r, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, magenta, num_samples, r - g, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, blue, num_samples, b - r, temp);
         }
         else
         {
-            RgbColorExtrapolatorScaledAdd(temp, magenta, num_samples, b - g, temp);
-            RgbColorExtrapolatorScaledAdd(temp, red, num_samples, r - b, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, magenta, num_samples, b - g, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, red, num_samples, r - b, temp);
         }
     }
     else
     {
-        RgbColorExtrapolatorScale(white, num_samples, b, temp);
+        SmitsColorExtrapolatorScale(white, num_samples, b, temp);
         if (r <= g)
         {
-            RgbColorExtrapolatorScaledAdd(temp, yellow, num_samples, r - b, temp);
-            RgbColorExtrapolatorScaledAdd(temp, green, num_samples, g - r, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, yellow, num_samples, r - b, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, green, num_samples, g - r, temp);
         }
         else
         {
-            RgbColorExtrapolatorScaledAdd(temp, yellow, num_samples, g - b, temp);
-            RgbColorExtrapolatorScaledAdd(temp, red, num_samples, r - g, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, yellow, num_samples, g - b, temp);
+            SmitsColorExtrapolatorScaledAdd(temp, red, num_samples, r - g, temp);
         }
     }
 
-    RgbColorExtrapolatorScale(temp, num_samples, scalar, temp);
+    SmitsColorExtrapolatorScale(temp, num_samples, scalar, temp);
 
     for (size_t i = 0; i < num_samples; i++)
     {
@@ -754,7 +754,7 @@ RgbColorExtrapolatorCreateSpd(
 
 static
 ISTATUS
-RgbColorExtrapolatorComputeSpectrum(
+SmitsColorExtrapolatorComputeSpectrum(
     _In_ const void *context,
     _In_ const float_t color[3],
     _Out_ PSPECTRUM *spectrum
@@ -763,19 +763,19 @@ RgbColorExtrapolatorComputeSpectrum(
     PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
     float_t *spd;
-    ISTATUS status = RgbColorExtrapolatorCreateSpd(color[0],
-                                                   color[1],
-                                                   color[2],
-                                                   extrapolator->spectrum_white,
-                                                   extrapolator->spectrum_cyan,
-                                                   extrapolator->spectrum_magenta,
-                                                   extrapolator->spectrum_yellow,
-                                                   extrapolator->spectrum_red,
-                                                   extrapolator->spectrum_green,
-                                                   extrapolator->spectrum_blue,
-                                                   extrapolator->num_samples,
-                                                   (float_t)0.86445,
-                                                   &spd);
+    ISTATUS status = SmitsColorExtrapolatorCreateSpd(color[0],
+                                                     color[1],
+                                                     color[2],
+                                                     extrapolator->spectrum_white,
+                                                     extrapolator->spectrum_cyan,
+                                                     extrapolator->spectrum_magenta,
+                                                     extrapolator->spectrum_yellow,
+                                                     extrapolator->spectrum_red,
+                                                     extrapolator->spectrum_green,
+                                                     extrapolator->spectrum_blue,
+                                                     extrapolator->num_samples,
+                                                     (float_t)0.86445,
+                                                     &spd);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -794,7 +794,7 @@ RgbColorExtrapolatorComputeSpectrum(
 
 static
 ISTATUS
-RgbColorExtrapolatorComputeReflector(
+SmitsColorExtrapolatorComputeReflector(
     _In_ const void *context,
     _In_ const float_t color[3],
     _Out_ PREFLECTOR *reflector
@@ -804,19 +804,19 @@ RgbColorExtrapolatorComputeReflector(
 
     float_t *spd;
     ISTATUS status =
-        RgbColorExtrapolatorCreateSpd(color[0],
-                                      color[1],
-                                      color[2],
-                                      extrapolator->reflector_white,
-                                      extrapolator->reflector_cyan,
-                                      extrapolator->reflector_magenta,
-                                      extrapolator->reflector_yellow,
-                                      extrapolator->reflector_red,
-                                      extrapolator->reflector_green,
-                                      extrapolator->reflector_blue,
-                                      extrapolator->num_samples,
-                                      (float_t)0.94,
-                                      &spd);
+        SmitsColorExtrapolatorCreateSpd(color[0],
+                                        color[1],
+                                        color[2],
+                                        extrapolator->reflector_white,
+                                        extrapolator->reflector_cyan,
+                                        extrapolator->reflector_magenta,
+                                        extrapolator->reflector_yellow,
+                                        extrapolator->reflector_red,
+                                        extrapolator->reflector_green,
+                                        extrapolator->reflector_blue,
+                                        extrapolator->num_samples,
+                                        (float_t)0.94,
+                                        &spd);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -835,7 +835,7 @@ RgbColorExtrapolatorComputeReflector(
 
 static
 void
-RgbColorExtrapolatorFree(
+SmitsColorExtrapolatorFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -863,9 +863,9 @@ RgbColorExtrapolatorFree(
 //
 
 static const COLOR_EXTRAPOLATOR_VTABLE rgb_color_extrapolator_vtable = {
-    RgbColorExtrapolatorComputeSpectrum,
-    RgbColorExtrapolatorComputeReflector,
-    RgbColorExtrapolatorFree
+    SmitsColorExtrapolatorComputeSpectrum,
+    SmitsColorExtrapolatorComputeReflector,
+    SmitsColorExtrapolatorFree
 };
 
 //
@@ -873,7 +873,7 @@ static const COLOR_EXTRAPOLATOR_VTABLE rgb_color_extrapolator_vtable = {
 //
 
 ISTATUS
-RgbColorExtrapolatorAllocate(
+SmitsColorExtrapolatorAllocate(
     _In_reads_(num_wavelengths) float_t wavelengths[],
     _In_ size_t num_wavelengths,
     _Out_ PCOLOR_EXTRAPOLATOR* extrapolator
@@ -915,7 +915,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.wavelengths == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -924,7 +924,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_white == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -933,7 +933,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_cyan == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -942,7 +942,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_magenta == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -951,7 +951,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_yellow == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -960,7 +960,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_red == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -969,7 +969,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_green == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -978,7 +978,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.spectrum_blue == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -987,7 +987,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_white == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -996,7 +996,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_cyan == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1005,7 +1005,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_magenta == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1014,7 +1014,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_yellow == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1023,7 +1023,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_red == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1032,7 +1032,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_green == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1041,7 +1041,7 @@ RgbColorExtrapolatorAllocate(
 
     if (rgb_color_extrapolator.reflector_blue == NULL)
     {
-        RgbColorExtrapolatorFree(&rgb_color_extrapolator);
+        SmitsColorExtrapolatorFree(&rgb_color_extrapolator);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -1050,88 +1050,88 @@ RgbColorExtrapolatorAllocate(
         rgb_color_extrapolator.wavelengths[i] = wavelengths[i];
 
         rgb_color_extrapolator.spectrum_white[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_white,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_white,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_cyan[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_cyan,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_cyan,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_magenta[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_magenta,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_magenta,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_yellow[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_yellow,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_yellow,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_red[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_red,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_red,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_green[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_green,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_green,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.spectrum_blue[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         spectrum_blue,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           spectrum_blue,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_white[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_white,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_white,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_cyan[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_cyan,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_cyan,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_magenta[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_magenta,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_magenta,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_yellow[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_yellow,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_yellow,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_red[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_red,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_red,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_green[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_green,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_green,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
 
         rgb_color_extrapolator.reflector_blue[i] =
-            RgbColorExtrapolatorResample(sample_wavelengths,
-                                         reflector_blue,
-                                         NUM_SPECTRAL_SAMPLES,
-                                         wavelengths[i]);
+            SmitsColorExtrapolatorResample(sample_wavelengths,
+                                           reflector_blue,
+                                           NUM_SPECTRAL_SAMPLES,
+                                           wavelengths[i]);
     }
 
     rgb_color_extrapolator.num_samples = num_wavelengths;

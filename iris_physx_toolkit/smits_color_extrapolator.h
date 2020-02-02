@@ -4,7 +4,7 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    rgbc_color_extrapolator.h
+    smits_color_extrapolator.h
 
 Abstract:
 
@@ -13,8 +13,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_RGB_COLOR_EXTRAPOLATOR_
-#define _IRIS_PHYSX_TOOLKIT_RGB_COLOR_EXTRAPOLATOR_
+#ifndef _IRIS_PHYSX_TOOLKIT_SMITS_COLOR_EXTRAPOLATOR_
+#define _IRIS_PHYSX_TOOLKIT_SMITS_COLOR_EXTRAPOLATOR_
 
 #include "iris_physx/iris_physx.h"
 #include "iris_physx_toolkit/color_extrapolator.h"
@@ -28,7 +28,7 @@ extern "C" {
 //
 
 ISTATUS
-RgbColorExtrapolatorAllocate(
+SmitsColorExtrapolatorAllocate(
     _In_reads_(num_wavelengths) float_t wavelengths[],
     _In_ size_t num_wavelengths,
     _Out_ PCOLOR_EXTRAPOLATOR* extrapolator
@@ -38,4 +38,4 @@ RgbColorExtrapolatorAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_RGB_COLOR_EXTRAPOLATOR_
+#endif // _IRIS_PHYSX_TOOLKIT_SMITS_COLOR_EXTRAPOLATOR_

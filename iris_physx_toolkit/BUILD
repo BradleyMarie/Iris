@@ -277,17 +277,6 @@ cc_library(
 )
 
 cc_library(
-    name = "rgb_color_extrapolator",
-    srcs = ["rgb_color_extrapolator.c"],
-    hdrs = ["rgb_color_extrapolator.h"],
-    deps = [
-        ":color_extrapolator",
-        ":interpolated_spectrum",
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "rgb_spectra",
     srcs = ["rgb_spectra.c"],
     hdrs = ["rgb_spectra.h"],
@@ -313,6 +302,17 @@ cc_library(
     hdrs = ["sample_tracer.h"],
     deps = [
         "//iris_camera",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "smits_color_extrapolator",
+    srcs = ["smits_color_extrapolator.c"],
+    hdrs = ["smits_color_extrapolator.h"],
+    deps = [
+        ":color_extrapolator",
+        ":interpolated_spectrum",
         "//iris_physx",
     ],
 )
