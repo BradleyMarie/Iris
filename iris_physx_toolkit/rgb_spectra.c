@@ -217,38 +217,6 @@ RgbColorIntegratorComputeReflectorColor(
     return ISTATUS_SUCCESS;
 }
 
-static
-ISTATUS
-RgbColorExtrapolatorComputeSpectrum(
-    _In_ const void *context,
-    _In_ const float_t color[3],
-    _Out_ PSPECTRUM *spectrum
-    )
-{
-    ISTATUS status = RgbSpectrumAllocate(color[0],
-                                         color[1],
-                                         color[2],
-                                         spectrum);
-
-    return status;
-}
-
-static
-ISTATUS
-RgbColorExtrapolatorComputeReflector(
-    _In_ const void *context,
-    _In_ const float_t color[3],
-    _Out_ PREFLECTOR *reflector
-    )
-{
-    ISTATUS status = RgbReflectorAllocate(color[0],
-                                          color[1],
-                                          color[2],
-                                          reflector);
-
-    return status;
-}
-
 //
 // Static Variables
 //
@@ -263,6 +231,97 @@ static const REFLECTOR_VTABLE rgb_reflector_vtable = {
     RgbReflectorGetAlbedo,
     NULL
 };
+
+//
+// Static Functions
+//
+
+static
+ISTATUS
+RgbColorExtrapolatorComputeSpectrum(
+    _In_ const void *context,
+    _In_ const float_t color[3],
+    _Out_ PSPECTRUM *spectrum
+    )
+{
+    if (!isfinite(color[0]) || color[0] < (float_t)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(color[1]) || color[1] < (float_t)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(color[2]) || color[2] < (float_t)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    RGB_SPECTRUM rgb_spectrum;
+    rgb_spectrum.data[0] = color[0];
+    rgb_spectrum.data[1] = color[1];
+    rgb_spectrum.data[2] = color[2];
+
+    ISTATUS status = SpectrumAllocate(&rgb_spectrum_vtable,
+                                      &rgb_spectrum,
+                                      sizeof(RGB_SPECTRUM),
+                                      alignof(RGB_SPECTRUM),
+                                      spectrum);
+
+    return status;
+}
+
+static
+ISTATUS
+RgbColorExtrapolatorComputeReflector(
+    _In_ const void *context,
+    _In_ const float_t color[3],
+    _Out_ PREFLECTOR *reflector
+    )
+{
+    if (!isfinite(color[0]) ||
+        color[0] < (float_t)0.0 ||
+        (float_t)1.0 < color[0])
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(color[1]) ||
+        color[1] < (float_t)0.0 ||
+        (float_t)1.0 < color[1])
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(color[2]) ||
+        color[2] < (float_t)0.0 ||
+        (float_t)1.0 < color[2])
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    COLOR3 xyz = RgbToXyz(color[0], color[1], color[2]);
+
+    RGB_REFLECTOR rgb_reflector;
+    rgb_reflector.data[0] = color[0];
+    rgb_reflector.data[1] = color[1];
+    rgb_reflector.data[2] = color[2];
+    rgb_reflector.albedo = fmin(xyz.y, (float_t)1.0);
+
+    ISTATUS status = ReflectorAllocate(&rgb_reflector_vtable,
+                                       &rgb_reflector,
+                                       sizeof(RGB_REFLECTOR),
+                                       alignof(RGB_REFLECTOR),
+                                       reflector);
+
+    return status;
+}
+
+//
+// Static Variables
+//
 
 static const COLOR_INTEGRATOR_VTABLE rgb_integrator_vtable = {
     RgbColorIntegratorComputeSpectrumColor,
@@ -279,93 +338,6 @@ static const COLOR_EXTRAPOLATOR_VTABLE rgb_extrapolator_vtable = {
 //
 // Functions
 //
-
-ISTATUS
-RgbSpectrumAllocate(
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PSPECTRUM *spectrum
-    )
-{
-    if (!isfinite(r) || r < (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (!isfinite(g) || g < (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (!isfinite(b) || b < (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    RGB_SPECTRUM rgb_spectrum;
-    rgb_spectrum.data[0] = r;
-    rgb_spectrum.data[1] = g;
-    rgb_spectrum.data[2] = b;
-
-    ISTATUS status = SpectrumAllocate(&rgb_spectrum_vtable,
-                                      &rgb_spectrum,
-                                      sizeof(RGB_SPECTRUM),
-                                      alignof(RGB_SPECTRUM),
-                                      spectrum);
-
-    return status;
-}
-
-ISTATUS
-RgbReflectorAllocate(
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PREFLECTOR *reflector
-    )
-{
-    if (!isfinite(r) || r < (float_t)0.0 || (float_t)1.0 < r)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (!isfinite(g) || g < (float_t)0.0 || (float_t)1.0 < g)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (!isfinite(b) || b < (float_t)0.0 || (float_t)1.0 < b)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    COLOR3 xyz = RgbToXyz(r, g, b);
-
-    RGB_REFLECTOR rgb_reflector;
-    rgb_reflector.data[0] = r;
-    rgb_reflector.data[1] = g;
-    rgb_reflector.data[2] = b;
-    rgb_reflector.albedo = fmin(xyz.y, (float_t)1.0);
-
-    ISTATUS status = ReflectorAllocate(&rgb_reflector_vtable,
-                                       &rgb_reflector,
-                                       sizeof(RGB_REFLECTOR),
-                                       alignof(RGB_REFLECTOR),
-                                       reflector);
-
-    return status;
-}
 
 ISTATUS
 RgbColorIntegratorAllocate(

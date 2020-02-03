@@ -29,22 +29,6 @@ extern "C" {
 //
 
 ISTATUS
-RgbSpectrumAllocate(
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PSPECTRUM *spectrum
-    );
-
-ISTATUS
-RgbReflectorAllocate(
-    _In_ float_t r,
-    _In_ float_t g,
-    _In_ float_t b,
-    _Out_ PREFLECTOR *reflector
-    );
-
-ISTATUS
 RgbColorIntegratorAllocate(
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
