@@ -38,7 +38,6 @@ cc_library(
     hdrs = ["pfm.h"],
     deps = [
         "//iris_camera",
-        "//iris_camera_toolkit:pfm_writer",
     ],
 )
 

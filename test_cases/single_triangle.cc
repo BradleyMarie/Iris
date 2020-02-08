@@ -215,7 +215,7 @@ TestRender(
     bool equals;
     status = ApproximatelyEqualsPfmFile(framebuffer,
                                         file_name.c_str(),
-                                        PFM_PIXEL_FORMAT_XYZ,
+                                        COLOR_SPACE_XYZ,
                                         epsilon,
                                         &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);

@@ -102,7 +102,7 @@ TestRenderSingleThreaded(
     bool equals;
     status = ApproximatelyEqualsPfmFile(framebuffer,
                                         file_name.c_str(),
-                                        PFM_PIXEL_FORMAT_XYZ,
+                                        COLOR_SPACE_XYZ,
                                         (float_t)0.01,
                                         &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);

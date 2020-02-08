@@ -90,7 +90,7 @@ TestRenderSingleThreaded(
     bool equals;
     status = ApproximatelyEqualsPfmFile(framebuffer,
                                         file_name.c_str(),
-                                        PFM_PIXEL_FORMAT_SRGB,
+                                        COLOR_SPACE_LINEAR_SRGB,
                                         (float_t)0.01,
                                         &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -153,7 +153,10 @@ TEST(CornellBoxTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR white_reflector;
-    status = XyzReflectorAllocate(color.x, color.y, color.z, &white_reflector);
+    status = XyzReflectorAllocate(color.values[0],
+                                  color.values[1],
+                                  color.values[2],
+                                  &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_white_reflector);
@@ -179,7 +182,10 @@ TEST(CornellBoxTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR red_reflector;
-    status = XyzReflectorAllocate(color.x, color.y, color.z, &red_reflector);
+    status = XyzReflectorAllocate(color.values[0],
+                                  color.values[1],
+                                  color.values[2],
+                                  &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_red_reflector);
@@ -205,7 +211,10 @@ TEST(CornellBoxTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR green_reflector;
-    status = XyzReflectorAllocate(color.x, color.y, color.z, &green_reflector);
+    status = XyzReflectorAllocate(color.values[0],
+                                  color.values[1],
+                                  color.values[2],
+                                  &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_green_reflector);
@@ -231,7 +240,10 @@ TEST(CornellBoxTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM light_spectrum;
-    status = XyzSpectrumAllocate(color.x, color.y, color.z, &light_spectrum);
+    status = XyzSpectrumAllocate(color.values[0],
+                                  color.values[1],
+                                  color.values[2],
+                                  &light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     SpectrumRelease(interpolated_light_spectrum);

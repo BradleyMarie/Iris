@@ -16,7 +16,6 @@ Abstract:
 #define _TEST_UTIL_PFM_
 
 #include "iris_camera/iris_camera.h"
-#include "iris_camera_toolkit/pfm_writer.h"
 
 #if __cplusplus 
 extern "C" {
@@ -30,7 +29,7 @@ ISTATUS
 ExactlyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ COLOR_SPACE color_space,
     _Out_ bool *result
     );
 
@@ -38,7 +37,7 @@ ISTATUS
 ApproximatelyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ COLOR_SPACE color_space,
     _In_ float_t epsilon,
     _Out_ bool *result
     );

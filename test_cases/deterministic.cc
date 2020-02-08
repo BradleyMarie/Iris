@@ -32,6 +32,7 @@ Abstract:
 #include "iris_physx_toolkit/triangle.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/cornell_box.h"
+#include "test_util/equality.h"
 #include "test_util/quad.h"
 
 void
@@ -116,9 +117,7 @@ TestRender(
             status = FramebufferGetPixel(framebuffer1, i, j, &color1);
             ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-            EXPECT_EQ(color0.x, color1.x);
-            EXPECT_EQ(color0.y, color1.y);
-            EXPECT_EQ(color0.z, color1.z);
+            EXPECT_EQ(color0, color1);
         }
     }
 

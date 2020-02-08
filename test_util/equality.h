@@ -57,7 +57,20 @@ operator==(
     const COLOR3& c1
     )
 {
-    return c0.x == c1.x && c0.y == c1.y && c0.z == c1.z;
+    bool result = c0.values[0] == c1.values[0] &&
+                  c0.values[1] == c1.values[1] &&
+                  c0.values[2] == c1.values[2] &&
+                  c0.color_space == c1.color_space;
+    return result;
+}
+
+MATCHER_P2(ApproximatelyEqualsColor, value, epsilon, "")
+{
+    bool result = std::abs(value.values[0] - arg.values[0]) <= epsilon &&
+                  std::abs(value.values[1] - arg.values[1]) <= epsilon &&
+                  std::abs(value.values[2] - arg.values[2]) <= epsilon &&
+                  value.color_space == arg.color_space;
+    return result;
 }
 
 MATCHER_P(EqualsMatrix, value, "")

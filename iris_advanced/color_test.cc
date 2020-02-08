@@ -21,109 +21,256 @@ extern "C" {
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/equality.h"
 
+TEST(ColorTest, ColorValidate)
+{
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+    EXPECT_TRUE(ColorValidate(color));
+
+    color.values[0] = (float_t) INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[0] = (float_t) -INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[0] = (float_t) -1.0;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[0] = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(ColorValidate(color));
+    color.values[0] = (float_t) 0.0;
+
+    color.values[1] = (float_t) INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[1] = (float_t) -INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[1] = (float_t) -1.0;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[1] = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(ColorValidate(color));
+    color.values[1] = (float_t) 0.0;
+
+    color.values[2] = (float_t) INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[2] = (float_t) -INFINITY;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[2] = (float_t) -1.0;
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.values[2] = std::numeric_limits<float_t>::quiet_NaN();
+    EXPECT_FALSE(ColorValidate(color));
+    color.values[2] = (float_t) 0.0;
+
+    color.color_space = (COLOR_SPACE)(COLOR_SPACE_XYZ - 1);
+    EXPECT_FALSE(ColorValidate(color));
+
+    color.color_space = (COLOR_SPACE)(COLOR_SPACE_LINEAR_SRGB + 1);
+    EXPECT_FALSE(ColorValidate(color));
+}
+
 TEST(ColorTest, ColorTestCreate)
 {
-    COLOR3 actual = ColorCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 actual = ColorCreate(COLOR_SPACE_XYZ, values);
 
     COLOR3 expected;
-    expected.x = (float_t)1.0;
-    expected.y = (float_t)2.0;
-    expected.z = (float_t)3.0;
+    expected.values[0] = (float_t)1.0;
+    expected.values[1] = (float_t)2.0;
+    expected.values[2] = (float_t)3.0;
+    expected.color_space = COLOR_SPACE_XYZ;
 
     EXPECT_EQ(expected, actual);
 }
 
-TEST(ColorTest, ColorAdd)
+TEST(ColorTest, ColorTestCreateBlack)
 {
-    COLOR3 c0 = ColorCreate((float_t) 1.0, (float_t) 3.0, (float_t) 1.0);
-    COLOR3 c1 = ColorCreate((float_t) 2.0, (float_t) 2.0, (float_t) 1.0);
-    COLOR3 actual = ColorAdd(c0, c1);
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 actual = ColorCreateBlack();
 
-    COLOR3 expected = ColorCreate((float_t) 3.0, 
-                                  (float_t) 5.0, 
-                                  (float_t) 2.0);
-
-    EXPECT_EQ(expected, actual);
-}
-
-TEST(ColorTest, ColorAddScaled)
-{
-    COLOR3 c0 = ColorCreate((float_t) 1.0, (float_t) 3.0, (float_t) 1.0);
-    COLOR3 c1 = ColorCreate((float_t) 2.0, (float_t) 2.0, (float_t) 1.0);
-    COLOR3 actual = ColorAddScaled(c0, c1, (float_t)2.0);
-
-    COLOR3 expected = ColorCreate((float_t) 5.0, 
-                                  (float_t) 7.0, 
-                                  (float_t) 3.0);
-
-    EXPECT_EQ(expected, actual);
-}
-
-TEST(ColorTest, ColorScaleByColor)
-{
-    COLOR3 c0 = ColorCreate((float_t) 1.0, (float_t) 3.0, (float_t) 1.0);
-    COLOR3 c1 = ColorCreate((float_t) 2.0, (float_t) 2.0, (float_t) 1.0);
-    COLOR3 actual = ColorScaleByColor(c0, c1);
-
-    COLOR3 expected = ColorCreate((float_t) 2.0, 
-                                  (float_t) 6.0, 
-                                  (float_t) 1.0);
+    COLOR3 expected;
+    expected.values[0] = (float_t)0.0;
+    expected.values[1] = (float_t)0.0;
+    expected.values[2] = (float_t)0.0;
+    expected.color_space = COLOR_SPACE_XYZ;
 
     EXPECT_EQ(expected, actual);
 }
 
 TEST(ColorTest, ColorScaleByScalar)
 {
-    COLOR3 c0 = ColorCreate((float_t) 1.0, (float_t) 3.0, (float_t) 1.0);
-    COLOR3 actual = ColorScaleByScalar(c0, (float_t)2.0);
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+    COLOR3 actual = ColorScale(color, 2.0f);
 
-    COLOR3 expected = ColorCreate((float_t) 2.0, 
-                                  (float_t) 6.0, 
-                                  (float_t) 2.0);
+    float expected_values[3] = {2.0f, 4.0f, 6.0f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_XYZ, expected_values);
 
     EXPECT_EQ(expected, actual);
 }
 
-TEST(ColorTest, ColorValidate)
+TEST(ColorTest, ColorToXyzXyz)
 {
-    COLOR3 color = ColorCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
-    EXPECT_TRUE(ColorValidate(color));
+    float xyz_values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 expected_xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    COLOR3 actual_xyz_color = ColorToXyz(expected_xyz_color);
+    EXPECT_EQ(expected_xyz_color, actual_xyz_color);
+}
 
-    color.x = (float_t) INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+TEST(ColorTest, ColorToXyzLinearSrgb)
+{
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 srgb_actual_xyz_color = ColorToXyz(srgb_color);
 
-    color.x = (float_t) -INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+    float srgb_expected_xyz_values[3] =
+        {0.475235015f, 0.50000006f, 0.544414997f};
+    COLOR3 srgb_expected_xyz_color = ColorCreate(COLOR_SPACE_XYZ,
+                                                 srgb_expected_xyz_values);
+    EXPECT_THAT(srgb_expected_xyz_color,
+                ApproximatelyEqualsColor(srgb_actual_xyz_color, 0.01f));
+}
 
-    color.x = (float_t) -1.0;
-    EXPECT_FALSE(ColorValidate(color));
+TEST(ColorTest, ColorConvertXyzToXyz)
+{
+    float xyz_values[3] = {0.5f, 2.0f, 3.0f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    EXPECT_EQ(xyz_color, ColorConvert(xyz_color, COLOR_SPACE_XYZ));
+}
 
-    color.x = std::numeric_limits<float_t>::quiet_NaN();
-    EXPECT_FALSE(ColorValidate(color));
-    color.x = (float_t) 0.0;
+TEST(ColorTest, ColorConvertLinearSrgbToLinearSrgb)
+{
+    float xyz_values[3] = {0.5f, 2.0f, 3.0f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, xyz_values);
+    EXPECT_EQ(xyz_color, ColorConvert(xyz_color, COLOR_SPACE_LINEAR_SRGB));
+}
 
-    color.y = (float_t) INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+TEST(ColorTest, ColorConvertLinearSrgbToXyz)
+{
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 srgb_actual_xyz_color = ColorConvert(srgb_color, COLOR_SPACE_XYZ);
 
-    color.y = (float_t) -INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+    float srgb_expected_xyz_values[3] =
+        {0.475235015f, 0.50000006f, 0.544414997f};
+    COLOR3 srgb_expected_xyz_color = ColorCreate(COLOR_SPACE_XYZ,
+                                                 srgb_expected_xyz_values);
+    EXPECT_THAT(srgb_expected_xyz_color,
+                ApproximatelyEqualsColor(srgb_actual_xyz_color, 0.01f));
+}
 
-    color.y = (float_t) -1.0;
-    EXPECT_FALSE(ColorValidate(color));
+TEST(ColorTest, ColorConvertXyzToLinearSrgb)
+{
+    float xyz_values[3] =
+        {0.475235015f, 0.50000006f, 0.544414997f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
 
-    color.y = std::numeric_limits<float_t>::quiet_NaN();
-    EXPECT_FALSE(ColorValidate(color));
-    color.y = (float_t) 0.0;
-    
-    color.z = (float_t) INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+    float expected_srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 expected_srgb_color =
+        ColorCreate(COLOR_SPACE_LINEAR_SRGB, expected_srgb_values);
+    COLOR3 actual_srgb_color = ColorConvert(xyz_color, COLOR_SPACE_LINEAR_SRGB);
+    EXPECT_THAT(expected_srgb_color,
+                ApproximatelyEqualsColor(actual_srgb_color, 0.01f));
+}
 
-    color.z = (float_t) -INFINITY;
-    EXPECT_FALSE(ColorValidate(color));
+TEST(ColorTest, ColorAddXyzToXyzToXyz)
+{
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_XYZ, values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_XYZ, values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_XYZ);
 
-    color.z = (float_t) -1.0;
-    EXPECT_FALSE(ColorValidate(color));
+    float expected_values[3] = {2.0f, 4.0f, 6.0f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_XYZ, expected_values);
 
-    color.z = std::numeric_limits<float_t>::quiet_NaN();
-    EXPECT_FALSE(ColorValidate(color));
+    EXPECT_EQ(expected, actual);
+}
+
+TEST(ColorTest, ColorAddLinearSrgbToLinearSrgbToLinearSrgb)
+{
+    float values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_LINEAR_SRGB);
+
+    float expected_values[3] = {2.0f, 4.0f, 6.0f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_LINEAR_SRGB, expected_values);
+
+    EXPECT_EQ(expected, actual);
+}
+
+TEST(ColorTest, ColorAddLinearSrgbToLinearSrgbToXyz)
+{
+    float values[3] = {0.25f, 0.25f, 0.25f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_XYZ);
+
+    float expected_values[3] =
+        {0.475235015f, 0.50000006f, 0.544414997f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_XYZ, expected_values);
+
+    EXPECT_EQ(expected, actual);
+}
+
+TEST(ColorTest, ColorAddLinearSrgbToXyzToXyz)
+{
+    float xyz_values[3] = {0.5f, 0.5f, 0.5f};
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_XYZ);
+
+    float expected_values[3] =
+        {0.975235015f, 1.00000006f, 1.044414997f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_XYZ, expected_values);
+
+    EXPECT_THAT(expected, ApproximatelyEqualsColor(actual, 0.01f));
+}
+
+TEST(ColorTest, ColorAddXyzToLinearSrgbToXyz)
+{
+    float xyz_values[3] = {0.5f, 0.5f, 0.5f};
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_XYZ);
+
+    float expected_values[3] =
+        {0.975235015f, 1.00000006f, 1.044414997f};
+    COLOR3 expected = ColorCreate(COLOR_SPACE_XYZ, expected_values);
+
+    EXPECT_THAT(expected, ApproximatelyEqualsColor(actual, 0.01f));
+}
+
+TEST(ColorTest, ColorAddLinearSrgbToXyzToLinearSrgb)
+{
+    float xyz_values[3] = {0.475235015f, 0.50000006f, 0.544414997f};
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_LINEAR_SRGB);
+
+    float expected_values[3] = { 1.0f, 1.0f, 1.0f };
+    COLOR3 expected = ColorCreate(COLOR_SPACE_LINEAR_SRGB, expected_values);
+
+    EXPECT_THAT(expected, ApproximatelyEqualsColor(actual, 0.01f));
+}
+
+TEST(ColorTest, ColorAddXyzToLinearSrgbToLinearSrgb)
+{
+    float xyz_values[3] = {0.475235015f, 0.50000006f, 0.544414997f};
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 c0 = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    COLOR3 c1 = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    COLOR3 actual = ColorAdd(c0, c1, COLOR_SPACE_LINEAR_SRGB);
+
+    float expected_values[3] = { 1.0f, 1.0f, 1.0f };
+    COLOR3 expected = ColorCreate(COLOR_SPACE_LINEAR_SRGB, expected_values);
+
+    EXPECT_THAT(expected, ApproximatelyEqualsColor(actual, 0.01f));
 }

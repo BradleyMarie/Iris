@@ -1936,9 +1936,7 @@ CieColorIntegratorComputeSpectrumColor(
     _Out_ PCOLOR3 color
     )
 {
-    float_t x = (float_t)0.0;
-    float_t y = (float_t)0.0;
-    float_t z = (float_t)0.0;
+    float_t values[3] = { (float_t)0.0, (float_t)0.0, (float_t)0.0 };
 
     // The values of cie_x_bar, cie_y_bar, and cie_z_bar have been adjusted
     // so that this computes the riemann sum using the trapezoidal rule.
@@ -1954,12 +1952,12 @@ CieColorIntegratorComputeSpectrumColor(
             return status;
         }
 
-        x = fma(intensity, cie_x_bar[i], x);
-        y = fma(intensity, cie_y_bar[i], y);
-        z = fma(intensity, cie_z_bar[i], z);
+        values[0] = fma(intensity, cie_x_bar[i], values[0]);
+        values[1] = fma(intensity, cie_y_bar[i], values[1]);
+        values[2] = fma(intensity, cie_z_bar[i], values[2]);
     }
 
-    *color = ColorCreate(x, y, z);
+    *color = ColorCreate(COLOR_SPACE_XYZ, values);
 
     return ISTATUS_SUCCESS;
 }
@@ -1971,9 +1969,7 @@ CieColorIntegratorComputeReflectiveSpectrumColor(
     _Out_ PCOLOR3 color
     )
 {
-    float_t x = (float_t)0.0;
-    float_t y = (float_t)0.0;
-    float_t z = (float_t)0.0;
+    float_t values[3] = { (float_t)0.0, (float_t)0.0, (float_t)0.0 };
 
     // The values of cie_x_bar, cie_y_bar, and cie_z_bar have been adjusted
     // so that this computes the riemann sum using the trapezoidal rule.
@@ -1989,16 +1985,16 @@ CieColorIntegratorComputeReflectiveSpectrumColor(
             return status;
         }
 
-        x = fma(intensity, cie_x_bar[i], x);
-        y = fma(intensity, cie_y_bar[i], y);
-        z = fma(intensity, cie_z_bar[i], z);
+        values[0] = fma(intensity, cie_x_bar[i], values[0]);
+        values[1] = fma(intensity, cie_y_bar[i], values[1]);
+        values[2] = fma(intensity, cie_z_bar[i], values[2]);
     }
 
-    x /= cie_y_integral;
-    y /= cie_y_integral;
-    z /= cie_y_integral;
+    values[0] /= cie_y_integral;
+    values[1] /= cie_y_integral;
+    values[2] /= cie_y_integral;
 
-    *color = ColorCreate(x, y, z);
+    *color = ColorCreate(COLOR_SPACE_XYZ, values);
 
     return ISTATUS_SUCCESS;
 }
@@ -2010,9 +2006,7 @@ CieColorIntegratorComputeReflectorColor(
     _Out_ PCOLOR3 color
     )
 {
-    float_t x = (float_t)0.0;
-    float_t y = (float_t)0.0;
-    float_t z = (float_t)0.0;
+    float_t values[3] = { (float_t)0.0, (float_t)0.0, (float_t)0.0 };
 
     // The values of cie_x_bar, cie_y_bar, and cie_z_bar have been adjusted
     // so that this computes the riemann sum using the trapezoidal rule.
@@ -2028,16 +2022,16 @@ CieColorIntegratorComputeReflectorColor(
             return status;
         }
 
-        x = fma(intensity, cie_x_bar[i], x);
-        y = fma(intensity, cie_y_bar[i], y);
-        z = fma(intensity, cie_z_bar[i], z);
+        values[0] = fma(intensity, cie_x_bar[i], values[0]);
+        values[1] = fma(intensity, cie_y_bar[i], values[1]);
+        values[2] = fma(intensity, cie_z_bar[i], values[2]);
     }
 
-    x /= cie_y_integral;
-    y /= cie_y_integral;
-    z /= cie_y_integral;
+    values[0] /= cie_y_integral;
+    values[1] /= cie_y_integral;
+    values[2] /= cie_y_integral;
 
-    *color = ColorCreate(x, y, z);
+    *color = ColorCreate(COLOR_SPACE_XYZ, values);
 
     return ISTATUS_SUCCESS;
 }

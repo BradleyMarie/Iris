@@ -297,7 +297,7 @@ IntegratorIntegrate(
 
     if (spectrum == NULL)
     {
-        *color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        *color = ColorCreateBlack();
         return ISTATUS_SUCCESS;
     }
 

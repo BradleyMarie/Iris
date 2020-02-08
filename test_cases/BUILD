@@ -114,6 +114,7 @@ cc_test(
         "//iris_physx_toolkit:sample_tracer",
         "//iris_physx_toolkit:triangle",
         "//test_util:cornell_box",
+        "//test_util:equality",
         "//test_util:quad",
         "@com_google_googletest//:gtest_main",
     ],

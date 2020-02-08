@@ -42,7 +42,7 @@ ISTATUS
 WriteToPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format
+    _In_ COLOR_SPACE color_space
     )
 {
     if (framebuffer == NULL)
@@ -90,45 +90,9 @@ WriteToPfmFile(
             COLOR3 pixel_color;
             FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
 
-            float x, y, z;
-            if (pixel_format == PFM_PIXEL_FORMAT_XYZ)
-            {
-                x = (float)pixel_color.x;
-                y = (float)pixel_color.y;
-                z = (float)pixel_color.z;
-            }
-            else // pixel_format == PFM_PIXEL_FORMAT_SRGB
-            {
-                x = 3.2404542f * (float)pixel_color.x -
-                    1.5371385f * (float)pixel_color.y -
-                    0.4985314f * (float)pixel_color.z;
+            pixel_color = ColorConvert(pixel_color, color_space);
 
-                y = -0.969266f * (float)pixel_color.x +
-                    1.8760108f * (float)pixel_color.y +
-                    0.0415560f * (float)pixel_color.z;
-
-                z = 0.0556434f * (float)pixel_color.x -
-                    0.2040259f * (float)pixel_color.y +
-                    1.0572252f * (float)pixel_color.z;
-            }
-
-            x = fmaxf(0.0f, x);
-            y = fmaxf(0.0f, y);
-            z = fmaxf(0.0f, z);
-
-            if (fwrite(&x, sizeof(float), 1, file) != 1)
-            {
-                fclose(file);
-                return ISTATUS_IO_ERROR;
-            }
-
-            if (fwrite(&y, sizeof(float), 1, file) != 1)
-            {
-                fclose(file);
-                return ISTATUS_IO_ERROR;
-            }
-
-            if (fwrite(&z, sizeof(float), 1, file) != 1)
+            if (fwrite(pixel_color.values, sizeof(float), 3, file) != 3)
             {
                 fclose(file);
                 return ISTATUS_IO_ERROR;

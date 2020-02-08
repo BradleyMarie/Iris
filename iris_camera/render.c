@@ -187,7 +187,7 @@ IrisCameraRenderPixel(
         return status;
     }
 
-    COLOR3 pixel_color = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+    COLOR3 pixel_color = ColorCreateBlack();
 
     for (size_t index = 0; index < num_samples; index++)
     {
@@ -249,13 +249,15 @@ IrisCameraRenderPixel(
             return false;
         }
 
-        pixel_color = ColorAdd(pixel_color, sample_color);
+        pixel_color = ColorAdd(pixel_color,
+                               sample_color,
+                               sample_color.color_space);
     }
 
     if (num_samples != 0)
     {
-        float_t sample_weight = (float_t)1.0 / (float_t)num_samples;
-        pixel_color = ColorScaleByScalar(pixel_color, sample_weight);
+        float sample_weight = 1.0f / (float)num_samples;
+        pixel_color = ColorScale(pixel_color, sample_weight);
     }
 
     FramebufferSetPixel(context->shared->framebuffer,

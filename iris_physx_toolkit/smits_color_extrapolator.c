@@ -756,16 +756,18 @@ static
 ISTATUS
 SmitsColorExtrapolatorComputeSpectrum(
     _In_ const void *context,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PSPECTRUM *spectrum
     )
 {
     PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
+    color = ColorConvert(color, COLOR_SPACE_LINEAR_SRGB);
+
     float_t *spd;
-    ISTATUS status = SmitsColorExtrapolatorCreateSpd(color[0],
-                                                     color[1],
-                                                     color[2],
+    ISTATUS status = SmitsColorExtrapolatorCreateSpd(color.values[0],
+                                                     color.values[1],
+                                                     color.values[2],
                                                      extrapolator->spectrum_white,
                                                      extrapolator->spectrum_cyan,
                                                      extrapolator->spectrum_magenta,
@@ -796,17 +798,19 @@ static
 ISTATUS
 SmitsColorExtrapolatorComputeReflector(
     _In_ const void *context,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PREFLECTOR *reflector
     )
 {
     PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
+    color = ColorConvert(color, COLOR_SPACE_LINEAR_SRGB);
+
     float_t *spd;
     ISTATUS status =
-        SmitsColorExtrapolatorCreateSpd(color[0],
-                                        color[1],
-                                        color[2],
+        SmitsColorExtrapolatorCreateSpd(color.values[0],
+                                        color.values[1],
+                                        color.values[2],
                                         extrapolator->reflector_white,
                                         extrapolator->reflector_cyan,
                                         extrapolator->reflector_magenta,

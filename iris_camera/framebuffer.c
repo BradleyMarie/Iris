@@ -88,7 +88,7 @@ FramebufferAllocate(
 
     for (size_t i = 0; i < num_pixels; i++)
     {
-        result->data[i] = ColorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+        result->data[i] = ColorCreateBlack();
     }
 
     result->num_columns = num_columns;

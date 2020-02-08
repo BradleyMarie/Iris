@@ -130,9 +130,10 @@ XyzColorIntegratorComputeSpectrumColor(
     _Out_ PCOLOR3 color
     )
 {
+    float_t values[3];
     ISTATUS status = SpectrumSample(spectrum,
                                     X_WAVELENGTH,
-                                    &color->x);
+                                    values + 0);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -141,7 +142,7 @@ XyzColorIntegratorComputeSpectrumColor(
 
     status = SpectrumSample(spectrum,
                             Y_WAVELENGTH,
-                            &color->y);
+                            values + 1);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -150,12 +151,14 @@ XyzColorIntegratorComputeSpectrumColor(
 
     status = SpectrumSample(spectrum,
                             Z_WAVELENGTH,
-                            &color->z);
+                            values + 2);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
+
+    *color = ColorCreate(COLOR_SPACE_XYZ, values);
 
     return ISTATUS_SUCCESS;
 }
@@ -167,9 +170,10 @@ XyzColorIntegratorComputeReflectorColor(
     _Out_ PCOLOR3 color
     )
 {
+    float_t values[3];
     ISTATUS status = ReflectorReflect(reflector,
                                       X_WAVELENGTH,
-                                      &color->x);
+                                      values + 0);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -178,7 +182,7 @@ XyzColorIntegratorComputeReflectorColor(
 
     status = ReflectorReflect(reflector,
                               Y_WAVELENGTH,
-                              &color->y);
+                              values + 1);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -187,12 +191,14 @@ XyzColorIntegratorComputeReflectorColor(
 
     status = ReflectorReflect(reflector,
                               Z_WAVELENGTH,
-                              &color->z);
+                              values + 2);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
+
+    *color = ColorCreate(COLOR_SPACE_XYZ, values);
 
     return ISTATUS_SUCCESS;
 }

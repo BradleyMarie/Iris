@@ -61,6 +61,16 @@ cc_library(
 )
 
 cc_library(
+    name = "color_spectra",
+    srcs = ["color_spectra.c"],
+    hdrs = ["color_spectra.h"],
+    deps = [
+        ":color_extrapolator",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_material",
     srcs = ["constant_material.c"],
     hdrs = ["constant_material.h"],
@@ -273,16 +283,6 @@ cc_library(
     hdrs = ["reflector_texture.h"],
     deps = [
         ":reflector_texture_vtable",
-    ],
-)
-
-cc_library(
-    name = "rgb_spectra",
-    srcs = ["rgb_spectra.c"],
-    hdrs = ["rgb_spectra.h"],
-    deps = [
-        ":color_extrapolator",
-        "//iris_physx",
     ],
 )
 

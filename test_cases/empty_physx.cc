@@ -101,7 +101,7 @@ TEST(EmptyPhysx, ListScene)
     bool equals;
     status = ExactlyEqualsPfmFile(framebuffer,
                                   "test_results/blank.pfm",
-                                  PFM_PIXEL_FORMAT_XYZ,
+                                  COLOR_SPACE_XYZ,
                                   &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
     EXPECT_TRUE(equals);
@@ -193,7 +193,7 @@ TEST(EmptyPhysx, KdTreeScene)
     bool equals;
     status = ExactlyEqualsPfmFile(framebuffer,
                                   "test_results/blank.pfm",
-                                  PFM_PIXEL_FORMAT_XYZ,
+                                  COLOR_SPACE_XYZ,
                                   &equals);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
     EXPECT_TRUE(equals);

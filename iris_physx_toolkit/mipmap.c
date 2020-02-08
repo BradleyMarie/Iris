@@ -163,8 +163,10 @@ ReflectorMipmapAllocateFromFloats(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
+        COLOR3 color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, textels[i]);
+
         ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                           textels[i],
+                                                           color,
                                                            result->textels + i);
 
         if (status != ISTATUS_SUCCESS)
@@ -231,13 +233,15 @@ ReflectorMipmapAllocateFromBytes(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        float_t rgb[3];
-        rgb[0] = (float_t)textels[i][0] / (float_t)UCHAR_MAX;
-        rgb[1] = (float_t)textels[i][1] / (float_t)UCHAR_MAX;
-        rgb[2] = (float_t)textels[i][2] / (float_t)UCHAR_MAX;
+        float_t values[3];
+        values[0] = (float_t)textels[i][0] / (float_t)UCHAR_MAX;
+        values[1] = (float_t)textels[i][1] / (float_t)UCHAR_MAX;
+        values[2] = (float_t)textels[i][2] / (float_t)UCHAR_MAX;
+
+        COLOR3 color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
 
         ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                           rgb,
+                                                           color,
                                                            result->textels + i);
 
         if (status != ISTATUS_SUCCESS)

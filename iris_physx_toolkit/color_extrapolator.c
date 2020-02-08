@@ -34,14 +34,14 @@ Abstract:
 //
 
 typedef struct _REFLECTOR_LIST_ENTRY {
-    float_t color[3];
+    COLOR3 color;
     PREFLECTOR reflector;
 } REFLECTOR_LIST_ENTRY, *PREFLECTOR_LIST_ENTRY;
 
 typedef const REFLECTOR_LIST_ENTRY *PCREFLECTOR_LIST_ENTRY;
 
 typedef struct _SPECTRUM_LIST_ENTRY {
-    float_t color[3];
+    COLOR3 color;
     PSPECTRUM spectrum;
 } SPECTRUM_LIST_ENTRY, *PSPECTRUM_LIST_ENTRY;
 
@@ -69,7 +69,7 @@ ColorExtrapolatorSetSpectrumEntryEmpty(
     _Inout_ PSPECTRUM_LIST_ENTRY entry
     )
 {
-    entry->color[0] = (float_t)-1.0;
+    entry->color.color_space = (COLOR_SPACE)-1;
 }
 
 static
@@ -79,7 +79,7 @@ ColorExtrapolatorSetReflectorEntryEmpty(
     _Inout_ PREFLECTOR_LIST_ENTRY entry
     )
 {
-    entry->color[0] = (float_t)-1.0;
+    entry->color.color_space = (COLOR_SPACE)-1;
 }
 
 static
@@ -89,7 +89,7 @@ ColorExtrapolatorIsSpectrumEntryEmpty(
     _In_ PCSPECTRUM_LIST_ENTRY entry
     )
 {
-    return entry->color[0] < (float_t)0.0;
+    return entry->color.color_space == (COLOR_SPACE)-1;
 }
 
 static
@@ -99,7 +99,7 @@ ColorExtrapolatorIsReflectorEntryEmpty(
     _In_ PCREFLECTOR_LIST_ENTRY entry
     )
 {
-    return entry->color[0] < (float_t)0.0;
+    return entry->color.color_space == (COLOR_SPACE)-1;
 }
 
 static
@@ -107,17 +107,17 @@ inline
 size_t
 ColorExtrapolatorSpectrumProbeStart(
     _In_ size_t list_capacity,
-    _In_ const float_t color[3]
+    _In_ COLOR3 color
     )
 {
     size_t hash;
     if (sizeof(PCSPECTRUM) == 4)
     {
-        MurmurHash3_x86_32(color, sizeof(float_t) * 3, HASH_SEED, &hash);
+        MurmurHash3_x86_32(&color, sizeof(COLOR3), HASH_SEED, &hash);
     }
     else if (sizeof(PCSPECTRUM) == 8)
     {
-        hash = MurmurHash64A(color, sizeof(float_t) * 3, HASH_SEED);
+        hash = MurmurHash64A(&color, sizeof(COLOR3), HASH_SEED);
     }
     else
     {
@@ -133,17 +133,17 @@ inline
 size_t
 ColorExtrapolatorReflectorProbeStart(
     _In_ size_t list_capacity,
-    _In_ const float_t color[3]
+    _In_ COLOR3 color
     )
 {
     size_t hash;
     if (sizeof(PCREFLECTOR) == 4)
     {
-        MurmurHash3_x86_32(color, sizeof(float_t) * 3, HASH_SEED, &hash);
+        MurmurHash3_x86_32(&color, sizeof(COLOR3), HASH_SEED, &hash);
     }
     else if (sizeof(PCREFLECTOR) == 8)
     {
-        hash = MurmurHash64A(color, sizeof(float_t) * 3, HASH_SEED);
+        hash = MurmurHash64A(&color, sizeof(COLOR3), HASH_SEED);
     }
     else
     {
@@ -159,7 +159,7 @@ inline
 bool
 ColorExtrapolatorFindSpectrum(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ size_t *index
     )
 {
@@ -167,9 +167,10 @@ ColorExtrapolatorFindSpectrum(
         color_extrapolator->spectrum_list_capacity, color);
     for (;;)
     {
-        if (color_extrapolator->spectrum_list[*index].color[0] == color[0] &&
-            color_extrapolator->spectrum_list[*index].color[1] == color[1] &&
-            color_extrapolator->spectrum_list[*index].color[2] == color[2])
+        if (color_extrapolator->spectrum_list[*index].color.values[0] == color.values[0] &&
+            color_extrapolator->spectrum_list[*index].color.values[1] == color.values[1] &&
+            color_extrapolator->spectrum_list[*index].color.values[2] == color.values[2] &&
+            color_extrapolator->spectrum_list[*index].color.color_space == color.color_space)
         {
             return true;
         }
@@ -196,7 +197,7 @@ inline
 bool
 ColorExtrapolatorFindReflector(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ size_t *index
     )
 {
@@ -204,9 +205,10 @@ ColorExtrapolatorFindReflector(
         color_extrapolator->reflector_list_capacity, color);
     for (;;)
     {
-        if (color_extrapolator->reflector_list[*index].color[0] == color[0] &&
-            color_extrapolator->reflector_list[*index].color[1] == color[1] &&
-            color_extrapolator->reflector_list[*index].color[2] == color[2])
+        if (color_extrapolator->reflector_list[*index].color.values[0] == color.values[0] &&
+            color_extrapolator->reflector_list[*index].color.values[1] == color.values[1] &&
+            color_extrapolator->reflector_list[*index].color.values[2] == color.values[2] &&
+            color_extrapolator->reflector_list[*index].color.color_space == color.color_space)
         {
             return true;
         }
@@ -233,7 +235,7 @@ inline
 bool
 ColorExtrapolatorFindSpectrumEntry(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PCSPECTRUM_LIST_ENTRY *entry
     )
 {
@@ -252,7 +254,7 @@ inline
 bool
 ColorExtrapolatorFindReflectorEntry(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PCREFLECTOR_LIST_ENTRY *entry
     )
 {
@@ -272,7 +274,7 @@ void
 ColorExtrapolatorInsertSpectrum(
     _Inout_updates_(list_size) PSPECTRUM_LIST_ENTRY list,
     _In_ size_t list_size,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _In_ PSPECTRUM spectrum
     )
 {
@@ -281,9 +283,7 @@ ColorExtrapolatorInsertSpectrum(
     {
         if (ColorExtrapolatorIsSpectrumEntryEmpty(list + index))
         {
-            list[index].color[0] = color[0];
-            list[index].color[1] = color[1];
-            list[index].color[2] = color[2];
+            list[index].color = color;
             list[index].spectrum = spectrum;
             return;
         }
@@ -303,7 +303,7 @@ void
 ColorExtrapolatorInsertReflector(
     _Inout_updates_(list_size) PREFLECTOR_LIST_ENTRY list,
     _In_ size_t list_size,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _In_ PREFLECTOR reflector
     )
 {
@@ -312,9 +312,7 @@ ColorExtrapolatorInsertReflector(
     {
         if (ColorExtrapolatorIsReflectorEntryEmpty(list + index))
         {
-            list[index].color[0] = color[0];
-            list[index].color[1] = color[1];
-            list[index].color[2] = color[2];
+            list[index].color = color;
             list[index].reflector = reflector;
             return;
         }
@@ -557,7 +555,7 @@ ColorExtrapolatorAllocate(
 ISTATUS
 ColorExtrapolatorComputeSpectrum(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PSPECTRUM *spectrum
     )
 {
@@ -566,10 +564,7 @@ ColorExtrapolatorComputeSpectrum(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (color == NULL ||
-        !isfinite(color[0]) || color[0] < (float_t)0.0 ||
-        !isfinite(color[1]) || color[1] < (float_t)0.0 ||
-        !isfinite(color[2]) || color[2] < (float_t)0.0)
+    if (!ColorValidate(color))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -627,7 +622,7 @@ ColorExtrapolatorComputeSpectrum(
 ISTATUS
 ColorExtrapolatorComputeReflector(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
-    _In_ const float_t color[3],
+    _In_ COLOR3 color,
     _Out_ PREFLECTOR *reflector
     )
 {
@@ -636,10 +631,7 @@ ColorExtrapolatorComputeReflector(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (color == NULL ||
-        !isfinite(color[0]) || color[0] < (float_t)0.0 ||
-        !isfinite(color[1]) || color[1] < (float_t)0.0 ||
-        !isfinite(color[2]) || color[2] < (float_t)0.0)
+    if (!ColorValidate(color))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }

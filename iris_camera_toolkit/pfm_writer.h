@@ -25,16 +25,11 @@ extern "C" {
 // Functions
 //
 
-typedef enum _PFM_PIXEL_FORMAT {
-    PFM_PIXEL_FORMAT_XYZ,
-    PFM_PIXEL_FORMAT_SRGB,
-} PFM_PIXEL_FORMAT;
-
 ISTATUS
 WriteToPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format
+    _In_ COLOR_SPACE color_space
     );
 
 #if __cplusplus 

@@ -64,7 +64,7 @@ ISTATUS
 CheckEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ COLOR_SPACE color_space,
     _In_ float_t epsilon,
     _Out_ bool *result
     )
@@ -81,11 +81,6 @@ CheckEqualsPfmFile(
     if (filename == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (pixel_format > PFM_PIXEL_FORMAT_SRGB)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     FILE *file = fopen(filename, "rb");
@@ -144,8 +139,8 @@ CheckEqualsPfmFile(
     {
         for (size_t j = 0; j < num_columns; j++)
         {
-            float x;
-            if (fread(&x, sizeof(float), 1, file) != 1)
+            float values[3];
+            if (fread(values, sizeof(float), 3, file) != 3)
             {
                 fclose(file);
                 return ISTATUS_IO_ERROR;
@@ -153,65 +148,20 @@ CheckEqualsPfmFile(
 
             if (swap_bytes)
             {
-                SwapBytes(&x, sizeof(float));
+                SwapBytes(values + 0, sizeof(float));
+                SwapBytes(values + 1, sizeof(float));
+                SwapBytes(values + 2, sizeof(float));
             }
 
-            float y;
-            if (fread(&y, sizeof(float), 1, file) != 1)
-            {
-                fclose(file);
-                return ISTATUS_IO_ERROR;
-            }
-
-            if (swap_bytes)
-            {
-                SwapBytes(&y, sizeof(float));
-            }
-
-            float z;
-            if (fread(&z, sizeof(float), 1, file) != 1)
-            {
-                fclose(file);
-                return ISTATUS_IO_ERROR;
-            }
-
-            if (swap_bytes)
-            {
-                SwapBytes(&z, sizeof(float));
-            }
+            COLOR3 file_color = ColorCreate(color_space, values);
 
             COLOR3 pixel_color;
             FramebufferGetPixel(framebuffer, j, num_rows - i - 1, &pixel_color);
+            pixel_color = ColorConvert(pixel_color, color_space);
 
-            float transformed_x, transformed_y, transformed_z;
-            if (pixel_format == PFM_PIXEL_FORMAT_XYZ)
-            {
-                transformed_x = (float)pixel_color.x;
-                transformed_y = (float)pixel_color.y;
-                transformed_z = (float)pixel_color.z;
-            }
-            else // pixel_format == PFM_PIXEL_FORMAT_SRGB
-            {
-                transformed_x = 3.2404542f * (float)pixel_color.x -
-                                1.5371385f * (float)pixel_color.y -
-                                0.4985314f * (float)pixel_color.z;
-
-                transformed_y = -0.969266f * (float)pixel_color.x +
-                                1.8760108f * (float)pixel_color.y +
-                                0.0415560f * (float)pixel_color.z;
-
-                transformed_z = 0.0556434f * (float)pixel_color.x -
-                                0.2040259f * (float)pixel_color.y +
-                                1.0572252f * (float)pixel_color.z;
-            }
-
-            transformed_x = fmaxf(0.0f, transformed_x);
-            transformed_y = fmaxf(0.0f, transformed_y);
-            transformed_z = fmaxf(0.0f, transformed_z);
-
-            if (fabs((float)transformed_x - x) > epsilon ||
-                fabs((float)transformed_y - y) > epsilon ||
-                fabs((float)transformed_z - z) > epsilon)
+            if (fabs(file_color.values[0] - pixel_color.values[0]) > epsilon ||
+                fabs(file_color.values[1] - pixel_color.values[1]) > epsilon ||
+                fabs(file_color.values[2] - pixel_color.values[2]) > epsilon)
             {
                 if (fclose(file) == EOF)
                 {
@@ -241,7 +191,7 @@ ISTATUS
 ExactlyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ COLOR_SPACE color_space,
     _Out_ bool *result
     )
 {
@@ -252,7 +202,7 @@ ExactlyEqualsPfmFile(
 
     ISTATUS status = CheckEqualsPfmFile(framebuffer,
                                         filename,
-                                        pixel_format,
+                                        color_space,
                                         (float_t)0.0,
                                         result);
 
@@ -263,7 +213,7 @@ ISTATUS
 ApproximatelyEqualsPfmFile(
     _In_ PCFRAMEBUFFER framebuffer,
     _In_z_ const char* filename,
-    _In_ PFM_PIXEL_FORMAT pixel_format,
+    _In_ COLOR_SPACE color_space,
     _In_ float_t epsilon,
     _Out_ bool *result
     )
@@ -280,7 +230,7 @@ ApproximatelyEqualsPfmFile(
 
     ISTATUS status = CheckEqualsPfmFile(framebuffer,
                                         filename,
-                                        pixel_format,
+                                        color_space,
                                         epsilon,
                                         result);
 
