@@ -12,6 +12,7 @@ cc_library(
 
 cc_library(
     name = "color",
+    srcs = ["color.c"],
     hdrs = ["color.h"],
     deps = [
         "//iris",

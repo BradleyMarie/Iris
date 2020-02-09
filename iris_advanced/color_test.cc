@@ -89,7 +89,6 @@ TEST(ColorTest, ColorTestCreate)
 
 TEST(ColorTest, ColorTestCreateBlack)
 {
-    float values[3] = {1.0f, 2.0f, 3.0f};
     COLOR3 actual = ColorCreateBlack();
 
     COLOR3 expected;
