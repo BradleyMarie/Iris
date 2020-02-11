@@ -45,4 +45,18 @@ ColorLoadFromBytes(
     _Out_ PCOLOR3 color
     );
 
+ISTATUS
+ColorLoadLuminanceFromFloats(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_ const float values[3],
+    _Out_ float_t *luma
+    );
+
+ISTATUS
+ColorLoadLuminanceFromBytes(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_ const unsigned char values[3],
+    _Out_ float_t *luma
+    );
+
 #endif // _IRIS_ADVANCED_TOOLKIT_COLOR_IO_

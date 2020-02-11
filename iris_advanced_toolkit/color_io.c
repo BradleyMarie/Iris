@@ -107,3 +107,47 @@ ColorLoadFromBytes(
 
     return ColorLoadFromFloats(color_format, float_values, color);
 }
+
+ISTATUS
+ColorLoadLuminanceFromFloats(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_ const float values[3],
+    _Out_ float_t *luma
+    )
+{
+    COLOR3 color;
+    ISTATUS status = ColorLoadFromFloats(color_format,
+                                         values,
+                                         &color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *luma = fmin(color.values[1], (float_t)1.0);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorLoadLuminanceFromBytes(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_ const unsigned char values[3],
+    _Out_ float_t *luma
+    )
+{
+    COLOR3 color;
+    ISTATUS status = ColorLoadFromBytes(color_format,
+                                        values,
+                                        &color);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *luma = fmin(color.values[1], (float_t)1.0);
+
+    return ISTATUS_SUCCESS;
+}

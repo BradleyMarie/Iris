@@ -616,17 +616,17 @@ FloatMipmapAllocateFromFloatTuples(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        COLOR3 color;
-        ISTATUS status = ColorLoadFromFloats(color_format, textels[i], &color);
+        float_t luma;
+        ISTATUS status = ColorLoadLuminanceFromFloats(color_format,
+                                                      textels[i],
+                                                      &luma);
 
         if (status != ISTATUS_SUCCESS)
         {
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
 
-        color = ColorConvert(color, COLOR_SPACE_XYZ);
-
-        result->textels[i] = color.values[1];
+        result->textels[i] = luma;
     }
 
     *mipmap = result;
@@ -681,17 +681,17 @@ FloatMipmapAllocateFromByteTuples(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        COLOR3 color;
-        ISTATUS status = ColorLoadFromBytes(color_format, textels[i], &color);
+        float_t luma;
+        ISTATUS status = ColorLoadLuminanceFromBytes(color_format,
+                                                     textels[i],
+                                                     &luma);
 
         if (status != ISTATUS_SUCCESS)
         {
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
 
-        color = ColorConvert(color, COLOR_SPACE_XYZ);
-
-        result->textels[i] = color.values[1];
+        result->textels[i] = luma;
     }
 
     *mipmap = result;
