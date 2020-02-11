@@ -198,6 +198,7 @@ cc_library(
     hdrs = ["mipmap.h"],
     deps = [
         ":color_extrapolator",
+        "//iris_advanced_toolkit:color_io",
         "//iris_physx",
     ],
 )
@@ -246,6 +247,7 @@ cc_library(
     hdrs = ["png_mipmap.h"],
     deps = [
         ":mipmap",
+        "//iris_advanced_toolkit:color_io",
         "//third_party/stb:stb_image",
     ],
 )

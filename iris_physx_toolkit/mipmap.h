@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_TOOLKIT_MIPMAP_
 #define _IRIS_PHYSX_TOOLKIT_MIPMAP_
 
+#include "iris_advanced_toolkit/color_io.h"
 #include "iris_physx_toolkit/color_extrapolator.h"
 
 #if __cplusplus 
@@ -44,6 +45,7 @@ typedef const REFLECTOR_MIPMAP *PCREFLECTOR_MIPMAP;
 
 ISTATUS
 ReflectorMipmapAllocateFromFloats(
+    _In_ COLOR_IO_FORMAT color_format,
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
@@ -54,6 +56,7 @@ ReflectorMipmapAllocateFromFloats(
 
 ISTATUS
 ReflectorMipmapAllocateFromBytes(
+    _In_ COLOR_IO_FORMAT color_format,
     _In_reads_(height * width) unsigned char textels[][3],
     _In_ size_t width,
     _In_ size_t height,
@@ -103,6 +106,26 @@ FloatMipmapAllocateFromFloats(
 ISTATUS
 FloatMipmapAllocateFromBytes(
     _In_reads_(height * width) unsigned char textels[],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    );
+
+ISTATUS
+FloatMipmapAllocateFromFloatTuples(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(height * width) float_t textels[][3],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    );
+
+ISTATUS
+FloatMipmapAllocateFromByteTuples(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(height * width) unsigned char textels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,

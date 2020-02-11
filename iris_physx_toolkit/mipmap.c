@@ -95,6 +95,7 @@ ReflectorMipmapAllocate(
 
 ISTATUS
 ReflectorMipmapAllocateFromFloats(
+    _In_ COLOR_IO_FORMAT color_format,
     _In_reads_(height * width) float_t textels[][3],
     _In_ size_t width,
     _In_ size_t height,
@@ -105,34 +106,34 @@ ReflectorMipmapAllocateFromFloats(
 {
     if (textels == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (width == 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (height == 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (wrap_mode != WRAP_MODE_REPEAT &&
         wrap_mode != WRAP_MODE_BLACK &&
         wrap_mode != WRAP_MODE_CLAMP)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (color_extrapolator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (mipmap == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     PREFLECTOR_MIPMAP result;
@@ -145,29 +146,17 @@ ReflectorMipmapAllocateFromFloats(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        if (!isfinite(textels[i][0]) || textels[i][0] < (float_t)0.0)
+        COLOR3 color;
+        ISTATUS status = ColorLoadFromFloats(color_format, textels[i], &color);
+
+        if (status != ISTATUS_SUCCESS)
         {
-            ReflectorMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_00;
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
 
-        if (!isfinite(textels[i][1]) || textels[i][1] < (float_t)0.0)
-        {
-            ReflectorMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_00;
-        }
-
-        if (!isfinite(textels[i][2]) || textels[i][2] < (float_t)0.0)
-        {
-            ReflectorMipmapFree(result);
-            return ISTATUS_INVALID_ARGUMENT_00;
-        }
-
-        COLOR3 color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, textels[i]);
-
-        ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                           color,
-                                                           result->textels + i);
+        status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                                   color,
+                                                   result->textels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -183,6 +172,7 @@ ReflectorMipmapAllocateFromFloats(
 
 ISTATUS
 ReflectorMipmapAllocateFromBytes(
+    _In_ COLOR_IO_FORMAT color_format,
     _In_reads_(height * width) unsigned char textels[][3],
     _In_ size_t width,
     _In_ size_t height,
@@ -193,34 +183,34 @@ ReflectorMipmapAllocateFromBytes(
 {
     if (textels == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (width == 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (height == 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (wrap_mode != WRAP_MODE_REPEAT &&
         wrap_mode != WRAP_MODE_BLACK &&
         wrap_mode != WRAP_MODE_CLAMP)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (color_extrapolator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     if (mipmap == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     PREFLECTOR_MIPMAP result;
@@ -233,16 +223,17 @@ ReflectorMipmapAllocateFromBytes(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        float_t values[3];
-        values[0] = (float_t)textels[i][0] / (float_t)UCHAR_MAX;
-        values[1] = (float_t)textels[i][1] / (float_t)UCHAR_MAX;
-        values[2] = (float_t)textels[i][2] / (float_t)UCHAR_MAX;
+        COLOR3 color;
+        ISTATUS status = ColorLoadFromBytes(color_format, textels[i], &color);
 
-        COLOR3 color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, values);
+        if (status != ISTATUS_SUCCESS)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
 
-        ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                           color,
-                                                           result->textels + i);
+        status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                                   color,
+                                                   result->textels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -571,6 +562,136 @@ FloatMipmapAllocateFromBytes(
     for (size_t i = 0; i < width * height; i++)
     {
         result->textels[i] = (float_t)textels[i] / (float_t)UCHAR_MAX;
+    }
+
+    *mipmap = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapAllocateFromFloatTuples(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(height * width) float_t textels[][3],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    )
+{
+    if (textels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    PFLOAT_MIPMAP result;
+    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        COLOR3 color;
+        ISTATUS status = ColorLoadFromFloats(color_format, textels[i], &color);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        color = ColorConvert(color, COLOR_SPACE_XYZ);
+
+        result->textels[i] = color.values[1];
+    }
+
+    *mipmap = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapAllocateFromByteTuples(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(height * width) unsigned char textels[][3],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PFLOAT_MIPMAP *mipmap
+    )
+{
+    if (textels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    PFLOAT_MIPMAP result;
+    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        COLOR3 color;
+        ISTATUS status = ColorLoadFromBytes(color_format, textels[i], &color);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+        }
+
+        color = ColorConvert(color, COLOR_SPACE_XYZ);
+
+        result->textels[i] = color.values[1];
     }
 
     *mipmap = result;

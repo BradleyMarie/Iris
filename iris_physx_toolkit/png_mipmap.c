@@ -61,7 +61,8 @@ PngReflectorMipmapAllocate(
         return ISTATUS_IO_ERROR;
     }
 
-    ISTATUS status = ReflectorMipmapAllocateFromBytes(data,
+    ISTATUS status = ReflectorMipmapAllocateFromBytes(COLOR_IO_FORMAT_SRGB,
+                                                      data,
                                                       x,
                                                       y,
                                                       wrap_mode,
@@ -98,18 +99,20 @@ PngFloatMipmapAllocate(
     }
 
     int x, y, n;
-    unsigned char *data = stbi_load(filename, &x, &y, &n, 1);
+    unsigned char (*data)[3] =
+        (unsigned char (*)[3])stbi_load(filename, &x, &y, &n, 3);
 
     if (data == NULL)
     {
         return ISTATUS_IO_ERROR;
     }
 
-    ISTATUS status = FloatMipmapAllocateFromBytes(data,
-                                                  x,
-                                                  y,
-                                                  wrap_mode,
-                                                  mipmap);
+    ISTATUS status = FloatMipmapAllocateFromByteTuples(COLOR_IO_FORMAT_SRGB,
+                                                       data,
+                                                       x,
+                                                       y,
+                                                       wrap_mode,
+                                                       mipmap);
 
     free(data);
 

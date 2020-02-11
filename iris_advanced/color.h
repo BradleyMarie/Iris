@@ -23,7 +23,7 @@ Abstract:
 
 typedef enum _COLOR_SPACE {
     COLOR_SPACE_XYZ         = 0,
-    COLOR_SPACE_LINEAR_SRGB = 1
+    COLOR_SPACE_LINEAR_SRGB = 1,
 } COLOR_SPACE, *PCOLOR_SPACE;
 
 typedef const COLOR_SPACE *PCCOLOR_SPACE;
