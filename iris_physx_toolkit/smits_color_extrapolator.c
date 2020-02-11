@@ -805,6 +805,9 @@ SmitsColorExtrapolatorComputeReflector(
     PCRGB_COLOR_EXTRAPOLATOR extrapolator = (PCRGB_COLOR_EXTRAPOLATOR)context;
 
     color = ColorConvert(color, COLOR_SPACE_LINEAR_SRGB);
+    color.values[0] = fmin(color.values[0], 1.0f);
+    color.values[1] = fmin(color.values[1], 1.0f);
+    color.values[2] = fmin(color.values[2], 1.0f);
 
     float_t *spd;
     ISTATUS status =
