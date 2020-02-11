@@ -74,9 +74,9 @@ ColorLoadFromFloats(
     }
 
     float_t float_values[3];
-    float_values[0] = SrgbToLinearSrgb(values[0]);
-    float_values[1] = SrgbToLinearSrgb(values[1]);
-    float_values[2] = SrgbToLinearSrgb(values[2]);
+    float_values[0] = SrgbToLinearSrgb((float_t)values[0]);
+    float_values[1] = SrgbToLinearSrgb((float_t)values[1]);
+    float_values[2] = SrgbToLinearSrgb((float_t)values[2]);
 
     *color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, float_values);
 
@@ -125,7 +125,10 @@ ColorLoadLuminanceFromFloats(
         return status;
     }
 
-    *luma = fmin(color.values[1], (float_t)1.0);
+    color = ColorConvert(color, COLOR_SPACE_XYZ);
+    color = ColorClamp(color, 1.0f);
+
+    *luma = (float_t)color.values[1];
 
     return ISTATUS_SUCCESS;
 }
@@ -147,7 +150,10 @@ ColorLoadLuminanceFromBytes(
         return status;
     }
 
-    *luma = fmin(color.values[1], (float_t)1.0);
+    color = ColorConvert(color, COLOR_SPACE_XYZ);
+    color = ColorClamp(color, 1.0f);
+
+    *luma = (float_t)color.values[1];
 
     return ISTATUS_SUCCESS;
 }

@@ -220,9 +220,9 @@ ColorColorExtrapolatorComputeSpectrum(
     color = ColorConvert(color, *color_space);
 
     COLOR_SPECTRUM color_spectrum;
-    color_spectrum.values[0] = color.values[0];
-    color_spectrum.values[1] = color.values[1];
-    color_spectrum.values[2] = color.values[2];
+    color_spectrum.values[0] = (float_t)color.values[0];
+    color_spectrum.values[1] = (float_t)color.values[1];
+    color_spectrum.values[2] = (float_t)color.values[2];
 
     ISTATUS status = SpectrumAllocate(&color_spectrum_vtable,
                                       &color_spectrum,
@@ -244,13 +244,16 @@ ColorColorExtrapolatorComputeReflector(
     PCCOLOR_SPACE color_space = (PCCOLOR_SPACE)context;
 
     COLOR3 xyz = ColorConvert(color, COLOR_SPACE_XYZ);
+    xyz = ColorClamp(xyz, 1.0f);
+
     color = ColorConvert(color, *color_space);
+    color = ColorClamp(color, 1.0f);
 
     COLOR_REFLECTOR color_reflector;
-    color_reflector.values[0] = fmin(color.values[0], (float_t)1.0);
-    color_reflector.values[1] = fmin(color.values[1], (float_t)1.0);
-    color_reflector.values[2] = fmin(color.values[2], (float_t)1.0);
-    color_reflector.albedo = fmin(xyz.values[1], (float_t)1.0);
+    color_reflector.values[0] = (float_t)color.values[0];
+    color_reflector.values[1] = (float_t)color.values[1];
+    color_reflector.values[2] = (float_t)color.values[2];
+    color_reflector.albedo = (float_t)xyz.values[1];
 
     ISTATUS status = ReflectorAllocate(&color_reflector_vtable,
                                        &color_reflector,

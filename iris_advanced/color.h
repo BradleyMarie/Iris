@@ -108,6 +108,23 @@ ColorScale(
     return product;
 }
 
+static
+inline
+COLOR3
+ColorClamp(
+    _In_ COLOR3 color,
+    _In_ float max
+    )
+{
+    assert(0.0f <= max);
+
+    color.values[0] = fminf(color.values[0], max);
+    color.values[1] = fminf(color.values[1], max);
+    color.values[2] = fminf(color.values[2], max);
+
+    return color;
+}
+
 COLOR3
 ColorToXyz(
     _In_ COLOR3 color

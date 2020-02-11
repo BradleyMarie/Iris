@@ -112,6 +112,19 @@ TEST(ColorTest, ColorScaleByScalar)
     EXPECT_EQ(expected, actual);
 }
 
+TEST(ColorTest, ColorClamp)
+{
+    float initial_xyz_values[3] = {1.0f, 2.0f, 3.0f};
+    COLOR3 actual_xyz_color = ColorCreate(COLOR_SPACE_XYZ, initial_xyz_values);
+    actual_xyz_color = ColorClamp(actual_xyz_color, 1.0f);
+
+    float expected_xyz_values[3] = {1.0f, 1.0f, 1.0f};
+    COLOR3 expected_xyz_color = ColorCreate(COLOR_SPACE_XYZ,
+                                            expected_xyz_values);
+
+    EXPECT_EQ(expected_xyz_color, actual_xyz_color);
+}
+
 TEST(ColorTest, ColorToXyzXyz)
 {
     float xyz_values[3] = {1.0f, 2.0f, 3.0f};
