@@ -422,6 +422,21 @@ IrisCameraRender(
         }
     }
 
+    size_t num_columns, num_rows;
+    FramebufferGetSize(framebuffer,
+                       &num_columns,
+                       &num_rows);
+
+    ISTATUS status = ImageSamplerPrepareImageSamples(image_sampler,
+                                                     rng,
+                                                     num_columns,
+                                                     num_rows);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     RENDER_THREAD_SHARED_STATE shared_state;
     shared_state.camera = camera;
     shared_state.camera_to_world = camera_to_world;
@@ -438,12 +453,7 @@ IrisCameraRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    size_t num_columns, num_rows;
-    FramebufferGetSize(framebuffer,
-                       &num_columns,
-                       &num_rows);
     size_t num_pixels = num_columns * num_rows;
-
     size_t num_chunks = num_pixels / CHUNK_SIZE;
 
     if (num_pixels % CHUNK_SIZE != 0)
@@ -477,11 +487,11 @@ IrisCameraRender(
     }
 
     PRENDER_THREAD_CONTEXT thread_contexts;
-    ISTATUS status = IrisCameraAllocateThreadState(number_of_threads,
-                                                   &shared_state,
-                                                   image_sampler,
-                                                   sample_tracer,
-                                                   &thread_contexts);
+    status = IrisCameraAllocateThreadState(number_of_threads,
+                                           &shared_state,
+                                           image_sampler,
+                                           sample_tracer,
+                                           &thread_contexts);
 
     if (status != ISTATUS_SUCCESS)
     {

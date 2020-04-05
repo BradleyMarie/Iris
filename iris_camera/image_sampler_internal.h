@@ -33,6 +33,35 @@ struct _IMAGE_SAMPLER {
 static
 inline
 ISTATUS
+ImageSamplerPrepareImageSamples(
+    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
+    _Inout_ PRANDOM rng,
+    _In_ size_t num_columns,
+    _In_ size_t num_rows
+    )
+{
+    assert(image_sampler != NULL);
+    assert(rng != NULL);
+    assert(num_columns != 0);
+    assert(num_rows != 0);
+
+    if (image_sampler->vtable->prepare_image_samples_routine == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status =
+        image_sampler->vtable->prepare_image_samples_routine(image_sampler->data,
+                                                             rng,
+                                                             num_columns,
+                                                             num_rows);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
 ImageSamplerPreparePixelSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _Inout_ PRANDOM rng,

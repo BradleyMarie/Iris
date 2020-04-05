@@ -269,6 +269,7 @@ GridImageSamplerDuplicate(
 //
 
 static const IMAGE_SAMPLER_VTABLE grid_image_sampler_vtable = {
+    NULL,
     GridImageSamplerPreparePixelSamples,
     GridImageSamplerNextSample,
     GridImageSamplerDuplicate,
