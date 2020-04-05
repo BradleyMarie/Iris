@@ -18,7 +18,7 @@ Abstract:
 
 #include "iris_camera/camera.h"
 #include "iris_camera/framebuffer.h"
-#include "iris_camera/pixel_sampler.h"
+#include "iris_camera/image_sampler.h"
 #include "iris_camera/sample_tracer.h"
 
 //
@@ -29,7 +29,7 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA camera,
     _In_opt_ PCMATRIX camera_to_world,
-    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
@@ -41,7 +41,7 @@ ISTATUS
 IrisCameraRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_opt_ PCMATRIX camera_to_world,
-    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,

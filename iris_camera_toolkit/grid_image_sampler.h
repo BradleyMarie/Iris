@@ -4,11 +4,11 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    grid_pixel_sampler.h
+    grid_image_sampler.h
 
 Abstract:
 
-    Creates a pixel sampler which samples the lens and pixel using a grid super
+    Creates an image sampler which samples the lens and pixel using a grid super
     sampling algorithm with optional jittering.
     
     The number of U and V samples can be controlled independently for both the
@@ -19,8 +19,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_CAMERA_TOOLKIT_GRID_PIXEL_SAMPLER_
-#define _IRIS_CAMERA_TOOLKIT_GRID_PIXEL_SAMPLER_
+#ifndef _IRIS_CAMERA_TOOLKIT_GRID_IMAGE_SAMPLER_
+#define _IRIS_CAMERA_TOOLKIT_GRID_IMAGE_SAMPLER_
 
 #include "iris_camera/iris_camera.h"
 
@@ -33,18 +33,18 @@ extern "C" {
 //
 
 ISTATUS
-GridPixelSamplerAllocate(
+GridImageSamplerAllocate(
     _In_ uint16_t pixel_samples_u,
     _In_ uint16_t pixel_samples_v,
     _In_ bool jitter_pixel_samples,
     _In_ uint16_t lens_samples_u,
     _In_ uint16_t lens_samples_v,
     _In_ bool jitter_lens_samples,
-    _Out_ PPIXEL_SAMPLER *pixel_sampler
+    _Out_ PIMAGE_SAMPLER *image_sampler
     );
 
 #if __cplusplus 
 }
 #endif // __cplusplus
 
-#endif // _IRIS_CAMERA_TOOLKIT_GRID_PIXEL_SAMPLER_
+#endif // _IRIS_CAMERA_TOOLKIT_GRID_IMAGE_SAMPLER_

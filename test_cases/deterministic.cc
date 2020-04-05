@@ -17,7 +17,7 @@ Abstract:
 #include <vector>
 
 #include "iris_advanced_toolkit/pcg_random.h"
-#include "iris_camera_toolkit/grid_pixel_sampler.h"
+#include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/cie_color_integrator.h"
@@ -43,9 +43,9 @@ TestRender(
     _In_ PCOLOR_INTEGRATOR color_integrator
     )
 {
-    PPIXEL_SAMPLER pixel_sampler;
+    PIMAGE_SAMPLER pixel_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+        GridImageSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
@@ -121,7 +121,7 @@ TestRender(
         }
     }
 
-    PixelSamplerFree(pixel_sampler);
+    ImageSamplerFree(pixel_sampler);
     SampleTracerFree(sample_tracer);
     RandomFree(rng0);
     RandomFree(rng1);

@@ -14,7 +14,7 @@ cc_test(
     shard_count = 4,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",
@@ -41,7 +41,7 @@ cc_test(
     linkstatic = 1,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:cie_color_integrator",
@@ -71,7 +71,7 @@ cc_test(
     linkstatic = 1,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:cie_color_integrator",
@@ -100,7 +100,7 @@ cc_test(
     srcs = ["deterministic.cc"],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:cie_color_integrator",
@@ -128,7 +128,7 @@ cc_test(
     ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:kd_tree_scene",
@@ -152,7 +152,7 @@ cc_test(
     ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",
@@ -183,7 +183,7 @@ cc_test(
     shard_count = 42,
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:orthographic_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:attenuated_reflector",
@@ -210,7 +210,7 @@ cc_test(
     ],
     deps = [
         "//iris_advanced_toolkit:pcg_random",
-        "//iris_camera_toolkit:grid_pixel_sampler",
+        "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
         "//iris_physx_toolkit:constant_material",

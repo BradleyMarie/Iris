@@ -4,7 +4,7 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    pixel_sampler.c
+    image_sampler.c
 
 Abstract:
 
@@ -16,20 +16,20 @@ Abstract:
 #include <string.h>
 
 #include "common/alloc.h"
-#include "iris_camera/pixel_sampler_internal.h"
-#include "iris_camera/pixel_sampler.h"
+#include "iris_camera/image_sampler_internal.h"
+#include "iris_camera/image_sampler.h"
 
 //
 // Functions
 //
 
 ISTATUS
-PixelSamplerAllocate(
-    _In_ PCPIXEL_SAMPLER_VTABLE vtable,
+ImageSamplerAllocate(
+    _In_ PCIMAGE_SAMPLER_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PPIXEL_SAMPLER *pixel_sampler
+    _Out_ PIMAGE_SAMPLER *image_sampler
     )
 {
     if (vtable == NULL)
@@ -56,15 +56,15 @@ PixelSamplerAllocate(
         }
     }
 
-    if (pixel_sampler == NULL)
+    if (image_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     void *data_allocation;
-    bool success = AlignedAllocWithHeader(sizeof(PIXEL_SAMPLER),
-                                          alignof(PIXEL_SAMPLER),
-                                          (void **)pixel_sampler,
+    bool success = AlignedAllocWithHeader(sizeof(IMAGE_SAMPLER),
+                                          alignof(IMAGE_SAMPLER),
+                                          (void **)image_sampler,
                                           data_size,
                                           data_alignment,
                                           &data_allocation);
@@ -74,8 +74,8 @@ PixelSamplerAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    (*pixel_sampler)->vtable = vtable;
-    (*pixel_sampler)->data = data_allocation;
+    (*image_sampler)->vtable = vtable;
+    (*image_sampler)->data = data_allocation;
 
     if (data_size != 0)
     {
@@ -86,19 +86,19 @@ PixelSamplerAllocate(
 }
 
 void
-PixelSamplerFree(
-    _In_opt_ _Post_invalid_ PPIXEL_SAMPLER pixel_sampler
+ImageSamplerFree(
+    _In_opt_ _Post_invalid_ PIMAGE_SAMPLER image_sampler
     )
 {
-    if (pixel_sampler == NULL)
+    if (image_sampler == NULL)
     {
         return;
     }
 
-    if (pixel_sampler->vtable->free_routine != NULL)
+    if (image_sampler->vtable->free_routine != NULL)
     {
-        pixel_sampler->vtable->free_routine(pixel_sampler->data);
+        image_sampler->vtable->free_routine(image_sampler->data);
     }
 
-    free(pixel_sampler);
+    free(image_sampler);
 }

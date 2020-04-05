@@ -4,16 +4,16 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    pixel_sampler_vtable.h
+    image_sampler_vtable.h
 
 Abstract:
 
-    The vtable for a pixel sampler.
+    The vtable for a image sampler.
 
 --*/
 
-#ifndef _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_
-#define _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_
+#ifndef _IRIS_CAMERA_IMAGE_SAMPLER_VTABLE_
+#define _IRIS_CAMERA_IMAGE_SAMPLER_VTABLE_
 
 #include "common/free_routine.h"
 #include "iris_advanced/iris_advanced.h"
@@ -22,12 +22,12 @@ Abstract:
 // Types
 //
 
-typedef struct _PIXEL_SAMPLER PIXEL_SAMPLER, *PPIXEL_SAMPLER;
-typedef const PIXEL_SAMPLER *PCPIXEL_SAMPLER;
+typedef struct _IMAGE_SAMPLER IMAGE_SAMPLER, *PIMAGE_SAMPLER;
+typedef const IMAGE_SAMPLER *PCIMAGE_SAMPLER;
 
 typedef
 ISTATUS
-(*PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE)(
+(*PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE)(
     _In_ void *context,
     _Inout_ PRANDOM rng,
     _In_ float_t pixel_min_u,
@@ -43,7 +43,7 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PPIXEL_SAMPLER_GET_SAMPLE_ROUTINE)(
+(*PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _Inout_ PRANDOM rng,
     _In_ size_t sample_index,
@@ -55,18 +55,18 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PPIXEL_SAMPLER_DUPLICATE_ROUTINE)(
+(*PIMAGE_SAMPLER_DUPLICATE_ROUTINE)(
     _In_opt_ const void *context,
-    _Out_ PPIXEL_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *duplicate
     );
 
-typedef struct _PIXEL_SAMPLER_VTABLE {
-    PPIXEL_SAMPLER_PREPARE_SAMPLES_ROUTINE prepare_samples_routine;
-    PPIXEL_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
-    PPIXEL_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
+typedef struct _IMAGE_SAMPLER_VTABLE {
+    PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE prepare_pixel_samples_routine;
+    PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
+    PIMAGE_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
-} PIXEL_SAMPLER_VTABLE, *PPIXEL_SAMPLER_VTABLE;
+} IMAGE_SAMPLER_VTABLE, *PIMAGE_SAMPLER_VTABLE;
 
-typedef const PIXEL_SAMPLER_VTABLE *PCPIXEL_SAMPLER_VTABLE;
+typedef const IMAGE_SAMPLER_VTABLE *PCIMAGE_SAMPLER_VTABLE;
 
-#endif // _IRIS_CAMERA_PIXEL_SAMPLER_VTABLE_
+#endif // _IRIS_CAMERA_IMAGE_SAMPLER_VTABLE_

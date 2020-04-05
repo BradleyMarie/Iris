@@ -50,43 +50,43 @@ cc_library(
 )
 
 cc_library(
+    name = "image_sampler",
+    srcs = ["image_sampler.c"],
+    hdrs = ["image_sampler.h"],
+    deps = [
+        ":image_sampler_internal",
+        ":image_sampler_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "image_sampler_internal",
+    hdrs = ["image_sampler_internal.h"],
+    deps = [
+        ":image_sampler_vtable",
+    ],
+)
+
+cc_library(
+    name = "image_sampler_vtable",
+    hdrs = ["image_sampler_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//iris_advanced",
+    ],
+)
+
+cc_library(
     name = "iris_camera",
     hdrs = ["iris_camera.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":camera",
         ":framebuffer",
-        ":pixel_sampler",
+        ":image_sampler",
         ":render",
         ":sample_tracer",
-        "//iris_advanced",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler",
-    srcs = ["pixel_sampler.c"],
-    hdrs = ["pixel_sampler.h"],
-    deps = [
-        ":pixel_sampler_internal",
-        ":pixel_sampler_vtable",
-        "//common:alloc",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler_internal",
-    hdrs = ["pixel_sampler_internal.h"],
-    deps = [
-        ":pixel_sampler_vtable",
-    ],
-)
-
-cc_library(
-    name = "pixel_sampler_vtable",
-    hdrs = ["pixel_sampler_vtable.h"],
-    deps = [
-        "//common:free_routine",
         "//iris_advanced",
     ],
 )
@@ -100,8 +100,8 @@ cc_library(
         ":camera_internal",
         ":framebuffer",
         ":framebuffer_internal",
-        ":pixel_sampler",
-        ":pixel_sampler_internal",
+        ":image_sampler",
+        ":image_sampler_internal",
         ":sample_tracer",
         ":sample_tracer_internal",
         "//common:pointer_list",

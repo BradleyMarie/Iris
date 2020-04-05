@@ -16,7 +16,7 @@ Abstract:
 #include <vector>
 
 #include "iris_advanced_toolkit/pcg_random.h"
-#include "iris_camera_toolkit/grid_pixel_sampler.h"
+#include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/cie_color_integrator.h"
@@ -46,9 +46,9 @@ TestRenderSingleThreaded(
     _In_ const std::string& file_name
     )
 {
-    PPIXEL_SAMPLER pixel_sampler;
+    PIMAGE_SAMPLER image_sampler;
     ISTATUS status =
-        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+        GridImageSamplerAllocate(1, 1, false, 1, 1, false, &image_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;
@@ -83,7 +83,7 @@ TestRenderSingleThreaded(
 
     status = IrisCameraRenderSingleThreaded(camera,
                                             nullptr,
-                                            pixel_sampler,
+                                            image_sampler,
                                             sample_tracer,
                                             rng,
                                             framebuffer,
@@ -99,7 +99,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
     EXPECT_TRUE(equals);
 
-    PixelSamplerFree(pixel_sampler);
+    ImageSamplerFree(image_sampler);
     RandomFree(rng);
     ColorIntegratorRelease(color_integrator);
     SampleTracerFree(sample_tracer);

@@ -15,7 +15,7 @@ Abstract:
 #include <string>
 
 #include "iris_advanced_toolkit/pcg_random.h"
-#include "iris_camera_toolkit/grid_pixel_sampler.h"
+#include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/constant_material.h"
@@ -47,9 +47,9 @@ TestRenderSingleThreaded(
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PPIXEL_SAMPLER pixel_sampler;
+    PIMAGE_SAMPLER image_sampler;
     status =
-        GridPixelSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+        GridImageSamplerAllocate(1, 1, false, 1, 1, false, &image_sampler);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PRANDOM rng;
@@ -84,7 +84,7 @@ TestRenderSingleThreaded(
 
     status = IrisCameraRenderSingleThreaded(camera,
                                             nullptr,
-                                            pixel_sampler,
+                                            image_sampler,
                                             sample_tracer,
                                             rng,
                                             framebuffer,
@@ -101,7 +101,7 @@ TestRenderSingleThreaded(
     EXPECT_TRUE(equals);
 
     CameraFree(camera);
-    PixelSamplerFree(pixel_sampler);
+    ImageSamplerFree(image_sampler);
     RandomFree(rng);
     SampleTracerFree(sample_tracer);
     FramebufferFree(framebuffer);

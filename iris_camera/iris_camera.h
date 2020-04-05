@@ -23,7 +23,7 @@ extern "C" {
 
 #include "iris_camera/camera.h"
 #include "iris_camera/framebuffer.h"
-#include "iris_camera/pixel_sampler.h"
+#include "iris_camera/image_sampler.h"
 #include "iris_camera/render.h"
 #include "iris_camera/sample_tracer.h"
 

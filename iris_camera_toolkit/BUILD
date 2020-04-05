@@ -3,9 +3,9 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "grid_pixel_sampler",
-    srcs = ["grid_pixel_sampler.c"],
-    hdrs = ["grid_pixel_sampler.h"],
+    name = "grid_image_sampler",
+    srcs = ["grid_image_sampler.c"],
+    hdrs = ["grid_image_sampler.h"],
     deps = [
         "//iris_camera",
     ],

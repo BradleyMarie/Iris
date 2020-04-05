@@ -21,7 +21,7 @@ Abstract:
 #include "common/pointer_list.h"
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/framebuffer_internal.h"
-#include "iris_camera/pixel_sampler_internal.h"
+#include "iris_camera/image_sampler_internal.h"
 #include "iris_camera/render.h"
 #include "iris_camera/sample_tracer_internal.h"
 
@@ -36,7 +36,7 @@ Abstract:
 //
 
 typedef struct _RENDER_THREAD_LOCAL_STATE {
-    PPIXEL_SAMPLER pixel_sampler;
+    PIMAGE_SAMPLER image_sampler;
     PSAMPLE_TRACER sample_tracer;
     ISTATUS status;
 } RENDER_THREAD_LOCAL_STATE, *PRENDER_THREAD_LOCAL_STATE;
@@ -76,7 +76,7 @@ IrisCameraFreeThreadState(
 
     for (size_t i = 1; i < num_threads; i++)
     {
-        PixelSamplerFree(thread_state[i].local.pixel_sampler);
+        ImageSamplerFree(thread_state[i].local.image_sampler);
         SampleTracerFree(thread_state[i].local.sample_tracer);
     }
 
@@ -88,13 +88,13 @@ ISTATUS
 IrisCameraAllocateThreadState(
     _In_ size_t num_threads,
     _In_ PRENDER_THREAD_SHARED_STATE shared_state,
-    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Outptr_result_buffer_(num_threads) PRENDER_THREAD_CONTEXT *thread_state
     )
 {
     assert(num_threads != 0);
-    assert(pixel_sampler != NULL);
+    assert(image_sampler != NULL);
     assert(sample_tracer != NULL);
     assert(thread_state != NULL);
 
@@ -107,15 +107,15 @@ IrisCameraAllocateThreadState(
     }
 
     result[0].shared = shared_state;
-    result[0].local.pixel_sampler = pixel_sampler;
+    result[0].local.image_sampler = image_sampler;
     result[0].local.sample_tracer = sample_tracer;
 
     for (size_t i = 1; i < num_threads; i++)
     {
         result[i].shared = shared_state;
 
-        ISTATUS status = PixelSamplerDuplicate(pixel_sampler,
-                                               &result[i].local.pixel_sampler);
+        ISTATUS status = ImageSamplerDuplicate(image_sampler,
+                                               &result[i].local.image_sampler);
         
         if (status != ISTATUS_SUCCESS)
         {
@@ -170,17 +170,17 @@ IrisCameraRenderPixel(
 
     size_t num_samples;
     ISTATUS status =
-        PixelSamplerPrepareSamples(context->local.pixel_sampler,
-                                   rng,
-                                   pixel_u_min,
-                                   pixel_u_max,
-                                   pixel_v_min,
-                                   pixel_v_max,
-                                   context->shared->camera->lens_min_u,
-                                   context->shared->camera->lens_max_u,
-                                   context->shared->camera->lens_min_v,
-                                   context->shared->camera->lens_max_v,
-                                   &num_samples);
+        ImageSamplerPreparePixelSamples(context->local.image_sampler,
+                                        rng,
+                                        pixel_u_min,
+                                        pixel_u_max,
+                                        pixel_v_min,
+                                        pixel_v_max,
+                                        context->shared->camera->lens_min_u,
+                                        context->shared->camera->lens_max_u,
+                                        context->shared->camera->lens_min_v,
+                                        context->shared->camera->lens_max_v,
+                                        &num_samples);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -201,7 +201,7 @@ IrisCameraRenderPixel(
 
         float_t pixel_u, pixel_v, lens_u, lens_v;
         ISTATUS status =
-            PixelSamplerGetSample(context->local.pixel_sampler,
+            ImageSamplerGetSample(context->local.image_sampler,
                                   rng,
                                   index,
                                   &pixel_u,
@@ -368,7 +368,7 @@ ISTATUS
 IrisCameraRender(
     _In_ PCCAMERA camera,
     _In_opt_ PCMATRIX camera_to_world,
-    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
@@ -381,7 +381,7 @@ IrisCameraRender(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (pixel_sampler == NULL)
+    if (image_sampler == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -479,7 +479,7 @@ IrisCameraRender(
     PRENDER_THREAD_CONTEXT thread_contexts;
     ISTATUS status = IrisCameraAllocateThreadState(number_of_threads,
                                                    &shared_state,
-                                                   pixel_sampler,
+                                                   image_sampler,
                                                    sample_tracer,
                                                    &thread_contexts);
 
@@ -543,7 +543,7 @@ ISTATUS
 IrisCameraRenderSingleThreaded(
     _In_ PCCAMERA camera,
     _In_opt_ PCMATRIX camera_to_world,
-    _Inout_ PPIXEL_SAMPLER pixel_sampler,
+    _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
@@ -552,7 +552,7 @@ IrisCameraRenderSingleThreaded(
 {
     ISTATUS status = IrisCameraRender(camera,
                                       camera_to_world,
-                                      pixel_sampler,
+                                      image_sampler,
                                       sample_tracer,
                                       rng,
                                       framebuffer,
