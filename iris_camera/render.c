@@ -172,6 +172,8 @@ IrisCameraRenderPixel(
     ISTATUS status =
         ImageSamplerPreparePixelSamples(context->local.image_sampler,
                                         rng,
+                                        pixel_column,
+                                        pixel_row,
                                         pixel_u_min,
                                         pixel_u_max,
                                         pixel_v_min,

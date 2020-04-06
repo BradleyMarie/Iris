@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Implements a grid pixel sampler.
+    Implements a grid image sampler.
 
 --*/
 
@@ -52,10 +52,13 @@ typedef const GRID_IMAGE_SAMPLER *PCGRID_IMAGE_SAMPLER;
 // Static Functions
 //
 
+static
 ISTATUS
 GridImageSamplerPreparePixelSamples(
     _In_ void *context,
     _Inout_ PRANDOM rng,
+    _In_ size_t column,
+    _In_ size_t row,
     _In_ float_t pixel_min_u,
     _In_ float_t pixel_max_u,
     _In_ float_t pixel_min_v,
@@ -135,6 +138,7 @@ GridImageSamplerPreparePixelSamples(
     return ISTATUS_SUCCESS;
 }
 
+static
 ISTATUS
 GridImageSamplerNextSample(
     _In_ const void *context,
@@ -244,6 +248,7 @@ GridImageSamplerNextSample(
     return ISTATUS_SUCCESS;
 }
 
+static
 ISTATUS
 GridImageSamplerDuplicate(
     _In_opt_ const void *context,

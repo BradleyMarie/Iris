@@ -12,6 +12,15 @@ cc_library(
 )
 
 cc_library(
+    name = "halton_image_sampler",
+    srcs = ["halton_image_sampler.c"],
+    hdrs = ["halton_image_sampler.h"],
+    deps = [
+        "//iris_camera",
+    ],
+)
+
+cc_library(
     name = "orthographic_camera",
     srcs = ["orthographic_camera.c"],
     hdrs = ["orthographic_camera.h"],

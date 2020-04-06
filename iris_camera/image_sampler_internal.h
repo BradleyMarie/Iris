@@ -65,6 +65,8 @@ ISTATUS
 ImageSamplerPreparePixelSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _Inout_ PRANDOM rng,
+    _In_ size_t column,
+    _In_ size_t row,
     _In_ float_t pixel_min_u,
     _In_ float_t pixel_max_u,
     _In_ float_t pixel_min_v,
@@ -95,6 +97,8 @@ ImageSamplerPreparePixelSamples(
     ISTATUS status =
         image_sampler->vtable->prepare_pixel_samples_routine(image_sampler->data,
                                                              rng,
+                                                             column,
+                                                             row,
                                                              pixel_min_u,
                                                              pixel_max_u,
                                                              pixel_min_v,
