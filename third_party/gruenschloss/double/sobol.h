@@ -18,19 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef SOBOL_H
-#define SOBOL_H
+#ifndef SOBOL_DOUBLE_H
+#define SOBOL_DOUBLE_H
 
-#include <cassert>
+#include <assert.h>
 
-namespace sobol {
+#define SOBOL_DOUBLE_DEFAULT_SCRAMBLE 0ULL
 
-struct Matrices
-{
-    static const unsigned num_dimensions = 1024;
-    static const unsigned size = 52;
-    static const unsigned long long matrices[];
-};
+#define SOBOL_DOUBLE_NUM_DIMENSIONS 1024
+#define SOBOL_DOUBLE_SIZE 52
+#define SOBOL_DOUBLE_MATRIX_SIZE (SOBOL_DOUBLE_NUM_DIMENSIONS * SOBOL_DOUBLE_SIZE)
+
+const extern unsigned long long sobol_double_matrices[SOBOL_DOUBLE_MATRIX_SIZE];
 
 // Compute one component of the Sobol'-sequence, where the component
 // corresponds to the dimension parameter, and the index specifies
@@ -38,23 +37,21 @@ struct Matrices
 // to permute elementary intervals, and might be chosen randomly to
 // generate a randomized QMC sequence. Only the Matrices::size least
 // significant bits of the scramble value are used.
-inline double sample(
+static inline double sobol_double_sample(
     unsigned long long index,
     const unsigned dimension,
-    const unsigned long long scramble = 0ULL)
+    const unsigned long long scramble)
 {
-    assert(dimension < Matrices::num_dimensions);
+    assert(dimension < SOBOL_DOUBLE_NUM_DIMENSIONS);
 
-    unsigned long long result = scramble & ~-(1ULL << Matrices::size);
-    for (unsigned i = dimension * Matrices::size; index; index >>= 1, ++i)
+    unsigned long long result = scramble & ~-(1ULL << SOBOL_DOUBLE_SIZE);
+    for (unsigned i = dimension * SOBOL_DOUBLE_SIZE; index; index >>= 1, ++i)
     {
         if (index & 1)
-            result ^= Matrices::matrices[i];
+            result ^= sobol_double_matrices[i];
     }
 
-    return result * (1.0 / (1ULL << Matrices::size));
+    return result * (1.0 / (1ULL << SOBOL_DOUBLE_SIZE));
 }
-
-} // namespace sobol
 
 #endif

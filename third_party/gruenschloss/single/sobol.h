@@ -18,42 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef SOBOL_H
-#define SOBOL_H
+#ifndef SOBOL_SINGLE_H
+#define SOBOL_SINGLE_H
 
-#include <cassert>
+#include <assert.h>
 
-namespace sobol {
+#define SOBOL_SINGLE_DEFAULT_SCRAMBLE 0U
 
-struct Matrices
-{
-    static const unsigned num_dimensions = 1024;
-    static const unsigned size = 52;
-    static const unsigned matrices[];
-};
+#define SOBOL_SINGLE_NUM_DIMENSIONS 1024
+#define SOBOL_SINGLE_SIZE 52
+#define SOBOL_SINGLE_MATRIX_SIZE (SOBOL_SINGLE_NUM_DIMENSIONS * SOBOL_SINGLE_SIZE)
+
+const extern unsigned sobol_single_matrices[SOBOL_SINGLE_MATRIX_SIZE];
 
 // Compute one component of the Sobol'-sequence, where the component
 // corresponds to the dimension parameter, and the index specifies
 // the point inside the sequence. The scramble parameter can be used
 // to permute elementary intervals, and might be chosen randomly to
 // generate a randomized QMC sequence.
-inline float sample(
+static inline float sobol_single_sample(
     unsigned long long index,
     const unsigned dimension,
-    const unsigned scramble = 0U)
+    const unsigned scramble)
 {
-    assert(dimension < Matrices::num_dimensions);
+    assert(dimension < SOBOL_SINGLE_NUM_DIMENSIONS);
 
     unsigned result = scramble;
-    for (unsigned i = dimension * Matrices::size; index; index >>= 1, ++i)
+    for (unsigned i = dimension * SOBOL_SINGLE_SIZE; index; index >>= 1, ++i)
     {
         if (index & 1)
-            result ^= Matrices::matrices[i];
+            result ^= sobol_single_matrices[i];
     }
 
     return result * (1.f / (1ULL << 32));
 }
-
-} // namespace sobol
 
 #endif

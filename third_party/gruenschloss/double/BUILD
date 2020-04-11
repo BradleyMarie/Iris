@@ -6,6 +6,6 @@ licenses(["notice"])
 
 cc_library(
     name = "sobol",
-    srcs = ["sobol.cc"],
+    srcs = ["sobol.c"],
     hdrs = ["sobol.h"],
 )

@@ -28,12 +28,7 @@
 
 #include "sobol.h"
 
-namespace sobol {
-
-const unsigned Matrices::num_dimensions;
-const unsigned Matrices::size;
-
-const unsigned Matrices::matrices[Matrices::num_dimensions * Matrices::size] =
+const unsigned sobol_single_matrices[SOBOL_SINGLE_MATRIX_SIZE] =
 {
     0x80000000U,
     0x40000000U,
@@ -53284,5 +53279,3 @@ const unsigned Matrices::matrices[Matrices::num_dimensions * Matrices::size] =
     0x34a32b93U,
     0x1397876eU,
 };
-
-} // namespace sobol
