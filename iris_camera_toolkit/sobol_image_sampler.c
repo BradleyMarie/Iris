@@ -202,6 +202,8 @@ SobolImageSamplerPreparePixelSamples(
     image_sampler->lens_delta_u = lens_max_u - lens_min_u;
     image_sampler->lens_delta_v = lens_max_v - lens_min_v;
 
+    *num_samples = (size_t)image_sampler->samples_per_pixel;
+
     return ISTATUS_SUCCESS;
 }
 
