@@ -147,6 +147,8 @@ IrisCameraRenderPixel(
     _Inout_ PRANDOM rng,
     _In_ float_t pixel_u_width,
     _In_ float_t pixel_v_width,
+    _In_ size_t num_columns,
+    _In_ size_t num_rows,
     _In_ size_t pixel_column,
     _In_ size_t pixel_row
     )
@@ -168,12 +170,32 @@ IrisCameraRenderPixel(
                               context->shared->camera->image_max_v);
     float_t pixel_v_min = pixel_v_max + pixel_v_width;
 
+    size_t in_order_column;
+    if (pixel_u_width < (float_t)0.0)
+    {
+        in_order_column = num_columns - pixel_column - 1;
+    }
+    else
+    {
+        in_order_column = pixel_column;
+    }
+
+    size_t in_order_row;
+    if (pixel_v_width < (float_t)0.0)
+    {
+        in_order_row = num_rows - pixel_row - 1;
+    }
+    else
+    {
+        in_order_row = pixel_row;
+    }
+
     size_t num_samples;
     ISTATUS status =
         ImageSamplerPreparePixelSamples(context->local.image_sampler,
                                         rng,
-                                        pixel_column,
-                                        pixel_row,
+                                        in_order_column,
+                                        in_order_row,
                                         pixel_u_min,
                                         pixel_u_max,
                                         pixel_v_min,
@@ -328,6 +350,8 @@ IrisCameraRenderThread(
                                             rng,
                                             pixel_u_width,
                                             pixel_v_width,
+                                            num_columns,
+                                            num_rows,
                                             column,
                                             row);
 

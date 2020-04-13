@@ -32,15 +32,19 @@ Abstract:
 //
 
 typedef struct _SOBOL_IMAGE_SAMPLER {
-    uint16_t samples_per_pixel;
+    double to_pixel_u;
+    double to_pixel_v;
     uint64_t logical_resolution_dimension;
     uint64_t logical_resolution_dimension_log2;
+    size_t num_columns;
+    size_t num_rows;
     size_t current_column;
     size_t current_row;
     float_t lens_min_u;
     float_t lens_delta_u;
     float_t lens_min_v;
     float_t lens_delta_v;
+    uint16_t samples_per_pixel;
 } SOBOL_IMAGE_SAMPLER, *PSOBOL_IMAGE_SAMPLER;
 
 typedef const SOBOL_IMAGE_SAMPLER *PCSOBOL_IMAGE_SAMPLER;
@@ -171,6 +175,8 @@ SobolImageSamplerPrepareImageSamples(
         RoundUpToPowerOfTwo(max_dimension);
     image_sampler->logical_resolution_dimension_log2 =
         UInt64Log2(image_sampler->logical_resolution_dimension);
+    image_sampler->num_columns = num_columns;
+    image_sampler->num_rows = num_rows;
 
     return ISTATUS_SUCCESS;
 }
@@ -194,6 +200,13 @@ SobolImageSamplerPreparePixelSamples(
     )
 {
     PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
+
+    image_sampler->to_pixel_u =
+        (double)image_sampler->logical_resolution_dimension /
+        (double)image_sampler->num_columns;
+    image_sampler->to_pixel_v =
+        (double)image_sampler->logical_resolution_dimension /
+        (double)image_sampler->num_rows;
 
     image_sampler->current_column = column;
     image_sampler->current_row = row;
@@ -227,15 +240,15 @@ SobolImageSamplerNextSample(
                            image_sampler->current_row,
                            sample_index);
 
-    *pixel_sample_u =
-        (float_t)sobol_double_sample(sobol_sample_index,
-                                     PIXEL_U_DIMENSION,
-                                     SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
+    *pixel_sample_u = (float_t)(image_sampler->to_pixel_u *
+        sobol_double_sample(sobol_sample_index,
+                            PIXEL_U_DIMENSION,
+                            SOBOL_DOUBLE_DEFAULT_SCRAMBLE));
 
-    *pixel_sample_v =
-        (float_t)sobol_double_sample(sobol_sample_index,
-                                     PIXEL_V_DIMENSION,
-                                     SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
+    *pixel_sample_v = (float_t)(image_sampler->to_pixel_v *
+        sobol_double_sample(sobol_sample_index,
+                            PIXEL_V_DIMENSION,
+                            SOBOL_DOUBLE_DEFAULT_SCRAMBLE));
 
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
