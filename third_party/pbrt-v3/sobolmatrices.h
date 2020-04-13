@@ -23,27 +23,17 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(_MSC_VER)
-#define NOMINMAX
-#pragma once
-#endif
-
 #ifndef PBRT_CORE_SOBOLMATRICES_H
 #define PBRT_CORE_SOBOLMATRICES_H
 
 // core/sobolmatrices.h*
-#include "pbrt.h"
-
-namespace pbrt {
+#include <stdint.h>
 
 // Sobol Matrix Declarations
-static PBRT_CONSTEXPR int NumSobolDimensions = 1024;
-static PBRT_CONSTEXPR int SobolMatrixSize = 52;
-extern const uint32_t SobolMatrices32[NumSobolDimensions * SobolMatrixSize];
-extern const uint64_t SobolMatrices64[NumSobolDimensions * SobolMatrixSize];
-extern const uint64_t VdCSobolMatrices[][SobolMatrixSize];
-extern const uint64_t VdCSobolMatricesInv[][SobolMatrixSize];
+#define SOBOL_MATRIX_SIZE 52
+#define NUM_SOBOL_MATRICES 26
 
-}  // namespace pbrt
+extern const uint64_t VdCSobolMatrices[NUM_SOBOL_MATRICES][SOBOL_MATRIX_SIZE];
+extern const uint64_t VdCSobolMatricesInv[NUM_SOBOL_MATRICES][SOBOL_MATRIX_SIZE];
 
 #endif  // PBRT_CORE_SOBOLMATRICES_H
