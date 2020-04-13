@@ -16,6 +16,7 @@ cc_library(
     srcs = ["halton_image_sampler.c"],
     hdrs = ["halton_image_sampler.h"],
     deps = [
+        "//common:safe_math",
         "//iris_camera",
     ],
 )
@@ -44,6 +45,17 @@ cc_library(
     hdrs = ["pinhole_camera.h"],
     deps = [
         "//iris_camera",
+    ],
+)
+
+cc_library(
+    name = "sobol_image_sampler",
+    srcs = ["sobol_image_sampler.c"],
+    hdrs = ["sobol_image_sampler.h"],
+    deps = [
+        "//iris_camera",
+        "//third_party/gruenschloss/double:sobol",
+        "//third_party/pbrt-v3:sobolmatrices",
     ],
 )
 
