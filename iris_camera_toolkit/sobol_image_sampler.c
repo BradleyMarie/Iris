@@ -44,7 +44,7 @@ typedef struct _SOBOL_IMAGE_SAMPLER {
     float_t lens_delta_u;
     float_t lens_min_v;
     float_t lens_delta_v;
-    uint16_t samples_per_pixel;
+    uint32_t samples_per_pixel;
 } SOBOL_IMAGE_SAMPLER, *PSOBOL_IMAGE_SAMPLER;
 
 typedef const SOBOL_IMAGE_SAMPLER *PCSOBOL_IMAGE_SAMPLER;

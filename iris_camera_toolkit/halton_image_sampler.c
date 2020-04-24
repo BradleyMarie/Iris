@@ -40,7 +40,7 @@ const static long double one_minus_epsilon = 1.0L - LDBL_EPSILON;
 //
 
 typedef struct _HALTON_IMAGE_SAMPLER {
-    uint16_t samples_per_pixel;
+    uint32_t samples_per_pixel;
     uint64_t sample_space_num_columns;
     uint64_t sample_space_num_columns_num_digits;
     uint64_t sample_space_column_multiplicative_inverse;
