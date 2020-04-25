@@ -18,6 +18,7 @@ cc_library(
     deps = [
         "//common:safe_math",
         "//iris_camera",
+        "//third_party/gruenschloss/halton:halton_enum",
     ],
 )
 

@@ -17,6 +17,7 @@ Abstract:
 
 #include "common/safe_math.h"
 #include "iris_camera_toolkit/halton_image_sampler.h"
+#include "third_party/gruenschloss/halton/halton_enum.h"
 
 //
 // Defines
@@ -40,15 +41,9 @@ const static long double one_minus_epsilon = 1.0L - LDBL_EPSILON;
 //
 
 typedef struct _HALTON_IMAGE_SAMPLER {
+    Halton_enum halton_enum;
+    unsigned current_sample_index;
     uint32_t samples_per_pixel;
-    uint64_t sample_space_num_columns;
-    uint64_t sample_space_num_columns_num_digits;
-    uint64_t sample_space_column_multiplicative_inverse;
-    uint64_t sample_space_num_rows;
-    uint64_t sample_space_num_rows_num_digits;
-    uint64_t sample_space_row_multiplicative_inverse;
-    uint64_t pixel_sample_period;
-    uint64_t current_sample_index;
     float_t lens_min_u;
     float_t lens_delta_u;
     float_t lens_min_v;
@@ -60,43 +55,6 @@ typedef const HALTON_IMAGE_SAMPLER *PCHALTON_IMAGE_SAMPLER;
 //
 // Static Functions
 //
-
-
-static
-void
-ExtendedGcd(
-    _In_ uint64_t a,
-    _In_ uint64_t b,
-    _In_ uint64_t *x,
-    _In_ uint64_t *y
-    )
-{
-    if (b == 0)
-    {
-        *x = 1;
-        *y = 0;
-        return;
-    }
-
-    uint64_t xp, yp;
-    ExtendedGcd(b, a % b, &xp, &yp);
-
-    uint64_t d = a / b;
-    *x = yp;
-    *y = xp - (d * yp);
-}
-
-static
-uint64_t
-MultiplicativeInverse(
-    _In_ uint64_t a,
-    _In_ uint64_t n
-    )
-{
-    uint64_t x, y;
-    ExtendedGcd(a, n, &x, &y);
-    return x % n;
-}
 
 static
 inline
@@ -170,55 +128,6 @@ HaltonSequenceCompute(
 }
 
 static
-inline
-uint64_t
-InverseRadicalInverse(
-    _In_ uint64_t radical_inverse,
-    _In_ uint64_t base,
-    _In_ uint64_t num_digits
-    )
-{
-    uint64_t index = 0;
-    for (int i = 0; i < num_digits; i++)
-    {
-        uint64_t numeral = radical_inverse % base;
-        radical_inverse /= base;
-        index = index * base + numeral;
-    }
-
-    return index;
-}
-
-static
-ISTATUS
-HaltonComputeSampleSpaceDimensionSize(
-    _In_ uint64_t framebuffer_dimension_size,
-    _In_ uint64_t base,
-    _Out_ uint64_t *sample_space_dimension_size,
-    _Out_ uint64_t *sample_space_dimension_size_num_digits
-    )
-{
-    *sample_space_dimension_size = 1;
-    *sample_space_dimension_size_num_digits = 0;
-
-    while (*sample_space_dimension_size < framebuffer_dimension_size)
-    {
-        bool success = CheckedMultiplySizeT(*sample_space_dimension_size,
-                                            base,
-                                            sample_space_dimension_size);
-
-        if (!success)
-        {
-            return ISTATUS_INTEGER_OVERFLOW;
-        }
-
-        *sample_space_dimension_size_num_digits += 1;
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-static
 ISTATUS
 HaltonImageSamplerPrepareImageSamples(
     _In_ void *context,
@@ -229,55 +138,8 @@ HaltonImageSamplerPrepareImageSamples(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    ISTATUS status =
-        HaltonComputeSampleSpaceDimensionSize(num_columns,
-                                              COLUMN_BASE,
-                                              &image_sampler->sample_space_num_columns,
-                                              &image_sampler->sample_space_num_columns_num_digits);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status =
-        HaltonComputeSampleSpaceDimensionSize(num_rows,
-                                              ROW_BASE,
-                                              &image_sampler->sample_space_num_rows,
-                                              &image_sampler->sample_space_num_rows_num_digits);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    bool success =
-        CheckedMultiplySizeT(image_sampler->sample_space_num_columns,
-                             image_sampler->sample_space_num_rows,
-                             &image_sampler->pixel_sample_period);
-
-    if (!success)
-    {
-        return ISTATUS_INTEGER_OVERFLOW;
-    }
-
-    size_t unused;
-    success = CheckedMultiplySizeT(image_sampler->pixel_sample_period,
-                                   image_sampler->samples_per_pixel,
-                                   &unused);
-
-    if (!success)
-    {
-        return ISTATUS_INTEGER_OVERFLOW;
-    }
-
-    image_sampler->sample_space_column_multiplicative_inverse =
-        MultiplicativeInverse(image_sampler->sample_space_num_rows,
-                              image_sampler->sample_space_num_columns);
-
-    image_sampler->sample_space_row_multiplicative_inverse =
-        MultiplicativeInverse(image_sampler->sample_space_num_columns,
-                              image_sampler->sample_space_num_rows);
+    image_sampler->halton_enum = halton_enum((unsigned int)num_columns,
+                                             (unsigned int)num_rows);
 
     return ISTATUS_SUCCESS;
 }
@@ -302,25 +164,10 @@ HaltonImageSamplerPreparePixelSamples(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    uint64_t column_offset = InverseRadicalInverse(column,
-                                                   COLUMN_BASE,
-                                                   image_sampler->sample_space_num_columns_num_digits);
-
-    image_sampler->current_sample_index =
-        column_offset *
-        (image_sampler->pixel_sample_period / image_sampler->sample_space_num_columns) *
-        image_sampler->sample_space_column_multiplicative_inverse;
-
-    uint64_t row_offset = InverseRadicalInverse(row,
-                                                ROW_BASE,
-                                                image_sampler->sample_space_num_rows_num_digits);
-
-    image_sampler->current_sample_index +=
-        row_offset *
-        (image_sampler->pixel_sample_period / image_sampler->sample_space_num_rows) *
-        image_sampler->sample_space_row_multiplicative_inverse;
-
-    image_sampler->current_sample_index %= image_sampler->pixel_sample_period;
+    image_sampler->current_sample_index = get_index(&image_sampler->halton_enum,
+                                                    0,
+                                                    column,
+                                                    row);
 
     image_sampler->lens_min_u = lens_min_u;
     image_sampler->lens_min_v = lens_min_v;
@@ -346,16 +193,17 @@ HaltonImageSamplerNextSample(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    uint64_t halton_offset = image_sampler->pixel_sample_period * sample_index;
-    uint64_t halton_index = image_sampler->current_sample_index + halton_offset;
+    unsigned index =
+        image_sampler->current_sample_index +
+        image_sampler->halton_enum.m_increment * (unsigned)sample_index;
 
-    *pixel_sample_u = (float_t)HaltonSequenceCompute(halton_index, COLUMN_BASE);
-    *pixel_sample_v = (float_t)HaltonSequenceCompute(halton_index, ROW_BASE);
+    *pixel_sample_u = (float_t)HaltonSequenceCompute((uint64_t)index, COLUMN_BASE);
+    *pixel_sample_v = (float_t)HaltonSequenceCompute((uint64_t)index, ROW_BASE);
 
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
         float_t value =
-            (float_t)HaltonSequenceCompute(halton_index, LENS_U_BASE);
+            (float_t)HaltonSequenceCompute((uint64_t)index, LENS_U_BASE);
         *lens_sample_u = fma(value,
                              image_sampler->lens_delta_u,
                              image_sampler->lens_min_u);
@@ -368,7 +216,7 @@ HaltonImageSamplerNextSample(
     if (image_sampler->lens_delta_v != (float_t)0.0)
     {
         double_t value =
-            (float_t)HaltonSequenceCompute(halton_index, LENS_V_BASE);
+            (float_t)HaltonSequenceCompute((uint64_t)index, LENS_V_BASE);
         *lens_sample_v = fma(value,
                              image_sampler->lens_delta_v,
                              image_sampler->lens_min_v);
