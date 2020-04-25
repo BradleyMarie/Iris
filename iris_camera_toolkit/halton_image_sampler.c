@@ -104,7 +104,8 @@ HaltonSequenceCompute(
         } int_to_double;
 
         int_to_double.as_int = ReverseBits64(index) >> 12;
-        int_to_double.as_int |= 0x3FC0000000000000;
+        int_to_double.as_int |= 0x3FF0000000000000;
+        int_to_double.as_double -= 1.0;
 
         return (double_t)int_to_double.as_double;
     }
