@@ -44,6 +44,8 @@ typedef struct _HALTON_IMAGE_SAMPLER {
     Halton_enum halton_enum;
     unsigned current_sample_index;
     uint32_t samples_per_pixel;
+    double_t to_pixel_u;
+    double_t to_pixel_v;
     float_t lens_min_u;
     float_t lens_delta_u;
     float_t lens_min_v;
@@ -142,6 +144,11 @@ HaltonImageSamplerPrepareImageSamples(
     image_sampler->halton_enum = halton_enum((unsigned int)num_columns,
                                              (unsigned int)num_rows);
 
+    image_sampler->to_pixel_u =
+        (double_t)image_sampler->halton_enum.m_scale_x / (double_t)num_columns;
+    image_sampler->to_pixel_v =
+        (double_t)image_sampler->halton_enum.m_scale_y / (double_t)num_rows;
+
     return ISTATUS_SUCCESS;
 }
 
@@ -198,8 +205,11 @@ HaltonImageSamplerNextSample(
         image_sampler->current_sample_index +
         image_sampler->halton_enum.m_increment * (unsigned)sample_index;
 
-    *pixel_sample_u = (float_t)HaltonSequenceCompute((uint64_t)index, COLUMN_BASE);
-    *pixel_sample_v = (float_t)HaltonSequenceCompute((uint64_t)index, ROW_BASE);
+    double_t halton_u = HaltonSequenceCompute((uint64_t)index, COLUMN_BASE);
+    *pixel_sample_u = (float_t)(halton_u * image_sampler->to_pixel_u);
+
+    double_t halton_v = HaltonSequenceCompute((uint64_t)index, ROW_BASE);
+    *pixel_sample_v = (float_t)(halton_v * image_sampler->to_pixel_v);
 
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
