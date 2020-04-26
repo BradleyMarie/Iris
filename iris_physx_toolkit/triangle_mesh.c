@@ -392,13 +392,26 @@ TriangleComputeTextureCoordinates(
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
-    _Out_ float_t uv[2]
+    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
+    _Out_ const void **texture_coordinates
     )
 {
     PCTRIANGLE triangle = (PCTRIANGLE)context;
     PCTRIANGLE_MESH mesh = triangle->mesh;
     PCTRIANGLE_MESH_ADDITIONAL_DATA hit_data =
         (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
+
+    ISTATUS status = TextureCoordinateAllocatorAllocate(allocator,
+                                                        sizeof(float[2]),
+                                                        alignof(float[2]),
+                                                        (void**)texture_coordinates);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float *uv = (float*)*texture_coordinates;
 
     uv[0] = mesh->texture_coordinates[triangle->v0][0] *
             hit_data->barycentric_coordinates[0];

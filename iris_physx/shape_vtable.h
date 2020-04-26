@@ -19,6 +19,7 @@ Abstract:
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/material.h"
 #include "iris_physx/normal_map.h"
+#include "iris_physx/texture_coordinate_allocator.h"
 
 //
 // Types
@@ -110,7 +111,8 @@ ISTATUS
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
-    _Out_ float_t uv[2]
+    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
+    _Out_ const void **texture_coordinates
     );
 
 typedef struct _SHAPE_VTABLE {

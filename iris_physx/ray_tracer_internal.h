@@ -19,6 +19,8 @@ Abstract:
 #include "iris_physx/bsdf_allocator_internal.h"
 #include "iris_physx/reflector_compositor.h"
 #include "iris_physx/reflector_compositor_internal.h"
+#include "iris_physx/texture_coordinate_allocator.h"
+#include "iris_physx/texture_coordinate_allocator_internal.h"
 
 //
 // Types
@@ -31,6 +33,7 @@ struct _SHAPE_RAY_TRACER {
     float_t minimum_distance;
     REFLECTOR_COMPOSITOR reflector_compositor;
     BSDF_ALLOCATOR bsdf_allocator;
+    TEXTURE_COORDINATE_ALLOCATOR texture_coordinate_allocator;
 };
 
 //
@@ -69,6 +72,8 @@ ShapeRayTracerInitialize(
     }
 
     BsdfAllocatorInitialize(&shape_ray_tracer->bsdf_allocator);
+    TextureCoordinateAllocatorInitialize(
+        &shape_ray_tracer->texture_coordinate_allocator);
 
     return true;
 }
@@ -93,6 +98,8 @@ ShapeRayTracerConfigure(
 
     ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
     BsdfAllocatorClear(&shape_ray_tracer->bsdf_allocator);
+    TextureCoordinateAllocatorClear(
+        &shape_ray_tracer->texture_coordinate_allocator);
 }
 
 static
@@ -119,6 +126,8 @@ ShapeRayTracerDestroy(
     RayTracerFree(shape_ray_tracer->ray_tracer);
     ReflectorCompositorDestroy(&shape_ray_tracer->reflector_compositor);
     BsdfAllocatorDestroy(&shape_ray_tracer->bsdf_allocator);
+    TextureCoordinateAllocatorDestroy(
+        &shape_ray_tracer->texture_coordinate_allocator);
 }
 
 #endif // _IRIS_PHYSX_RAY_TRACER_INTERNAL_

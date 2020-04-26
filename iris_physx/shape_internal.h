@@ -246,13 +246,13 @@ ShapeComputeTextureCoordinates(
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
-    _Out_ float_t uv_scratch_space[2],
+    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
     _Out_ const void **texture_coordinates
     )
 {
     assert(shape != NULL);
     assert(PointValidate(hit_point));
-    assert(uv_scratch_space != NULL);
+    assert(allocator != NULL);
     assert(texture_coordinates != NULL);
 
     if (shape->vtable->compute_texture_coordinates != NULL)
@@ -262,9 +262,8 @@ ShapeComputeTextureCoordinates(
                                                        hit_point,
                                                        face_hit,
                                                        additional_data,
-                                                       uv_scratch_space);
-
-        *texture_coordinates = uv_scratch_space;
+                                                       allocator,
+                                                       texture_coordinates);
 
         return status;
     }
