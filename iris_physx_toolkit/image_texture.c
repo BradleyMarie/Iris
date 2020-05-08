@@ -16,6 +16,7 @@ Abstract:
 #include <stdlib.h>
 
 #include "iris_physx_toolkit/image_texture.h"
+#include "iris_physx_toolkit/uv_texture_coordinate.h"
 
 //
 // Types
@@ -46,10 +47,10 @@ ImageFloatTextureSample(
     )
 {
     PFLOAT_IMAGE_TEXTURE texture = (PFLOAT_IMAGE_TEXTURE)context;
-    const float *uv = (const float*)texture_coordinates;
+    PCUV_TEXTURE_COORDINATE uv = (PCUV_TEXTURE_COORDINATE)texture_coordinates;
 
-    float_t u = fma(uv[0], texture->u_scalar, texture->u_offset);
-    float_t v = fma(uv[1], texture->v_scalar, texture->v_offset);
+    float_t u = fma(uv->uv[0], texture->u_scalar, texture->u_offset);
+    float_t v = fma(uv->uv[1], texture->v_scalar, texture->v_offset);
 
     ISTATUS status = FloatMipmapLookup(texture->mipmap,
                                        u,
@@ -172,10 +173,10 @@ ImageReflectorTextureSample(
     )
 {
     PREFLECTOR_IMAGE_TEXTURE texture = (PREFLECTOR_IMAGE_TEXTURE)context;
-    const float *uv = (const float*)texture_coordinates;
+    PCUV_TEXTURE_COORDINATE uv = (PCUV_TEXTURE_COORDINATE)texture_coordinates;
 
-    float_t u = fma(uv[0], texture->u_scalar, texture->u_offset);
-    float_t v = fma(uv[1], texture->v_scalar, texture->v_offset);
+    float_t u = fma(uv->uv[0], texture->u_scalar, texture->u_offset);
+    float_t v = fma(uv->uv[1], texture->v_scalar, texture->v_offset);
 
     ISTATUS status = ReflectorMipmapLookup(texture->mipmap,
                                            u,

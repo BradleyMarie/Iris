@@ -132,6 +132,7 @@ cc_library(
         ":float_texture",
         ":mipmap",
         ":reflector_texture",
+        ":uv_texture_coordinate",
     ],
 )
 
@@ -343,6 +344,7 @@ cc_library(
     hdrs = ["triangle_mesh.h"],
     deps = [
         ":triangle",
+        ":uv_texture_coordinate",
         "//iris_physx",
     ],
 )
@@ -351,6 +353,14 @@ cc_library(
     name = "uniform_reflector",
     srcs = ["uniform_reflector.c"],
     hdrs = ["uniform_reflector.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "uv_texture_coordinate",
+    hdrs = ["uv_texture_coordinate.h"],
     deps = [
         "//iris_physx",
     ],

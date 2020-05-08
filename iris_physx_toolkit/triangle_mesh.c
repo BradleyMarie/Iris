@@ -18,6 +18,7 @@ Abstract:
 #include <string.h>
 
 #include "iris_physx_toolkit/triangle_mesh.h"
+#include "iris_physx_toolkit/uv_texture_coordinate.h"
 
 //
 // Constants
@@ -401,39 +402,40 @@ TriangleComputeTextureCoordinates(
     PCTRIANGLE_MESH_ADDITIONAL_DATA hit_data =
         (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
 
-    ISTATUS status = TextureCoordinateAllocatorAllocate(allocator,
-                                                        sizeof(float[2]),
-                                                        alignof(float[2]),
-                                                        (void**)texture_coordinates);
+    ISTATUS status =
+        TextureCoordinateAllocatorAllocate(allocator,
+                                           sizeof(UV_TEXTURE_COORDINATE),
+                                           alignof(UV_TEXTURE_COORDINATE),
+                                           (void**)texture_coordinates);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float *uv = (float*)*texture_coordinates;
+    PUV_TEXTURE_COORDINATE uv = (PUV_TEXTURE_COORDINATE)*texture_coordinates;
 
-    uv[0] = mesh->texture_coordinates[triangle->v0][0] *
-            hit_data->barycentric_coordinates[0];
+    uv->uv[0] = mesh->texture_coordinates[triangle->v0][0] *
+                hit_data->barycentric_coordinates[0];
 
-    uv[1] = mesh->texture_coordinates[triangle->v0][1] *
-            hit_data->barycentric_coordinates[0];
+    uv->uv[1] = mesh->texture_coordinates[triangle->v0][1] *
+                hit_data->barycentric_coordinates[0];
 
-    uv[0] = fma(mesh->texture_coordinates[triangle->v1][0],
-                hit_data->barycentric_coordinates[1],
-                uv[0]);
+    uv->uv[0] = fma(mesh->texture_coordinates[triangle->v1][0],
+                    hit_data->barycentric_coordinates[1],
+                    uv->uv[0]);
 
-    uv[1] = fma(mesh->texture_coordinates[triangle->v1][1],
-                hit_data->barycentric_coordinates[1],
-                uv[1]);
+    uv->uv[1] = fma(mesh->texture_coordinates[triangle->v1][1],
+                    hit_data->barycentric_coordinates[1],
+                    uv->uv[1]);
 
-    uv[0] = fma(mesh->texture_coordinates[triangle->v2][0],
-                hit_data->barycentric_coordinates[2],
-                uv[0]);
+    uv->uv[0] = fma(mesh->texture_coordinates[triangle->v2][0],
+                    hit_data->barycentric_coordinates[2],
+                    uv->uv[0]);
 
-    uv[1] = fma(mesh->texture_coordinates[triangle->v2][1],
-                hit_data->barycentric_coordinates[2],
-                uv[1]);
+    uv->uv[1] = fma(mesh->texture_coordinates[triangle->v2][1],
+                    hit_data->barycentric_coordinates[2],
+                    uv->uv[1]);
 
     return ISTATUS_SUCCESS;
 }
