@@ -27,9 +27,10 @@ ISTATUS
 (*PNORMAL_MAP_COMPUTE_ROUTINE)(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     );
 
 typedef struct _NORMAL_MAP_VTABLE {

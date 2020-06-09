@@ -23,8 +23,12 @@ Abstract:
 
 typedef struct _UV_TEXTURE_COORDINATE {
     float_t uv[2];
-    VECTOR3 dpdu;
-    VECTOR3 dpdv;
+    VECTOR3 dp_du;
+    VECTOR3 dp_dv;
+    float_t du_dx;
+    float_t du_dy;
+    float_t dv_dx;
+    float_t dv_dy;
 } UV_TEXTURE_COORDINATE, *PUV_TEXTURE_COORDINATE;
 
 typedef const UV_TEXTURE_COORDINATE *PCUV_TEXTURE_COORDINATE;

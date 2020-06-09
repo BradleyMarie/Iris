@@ -21,6 +21,17 @@ cc_library(
 )
 
 cc_library(
+    name = "bump_map",
+    srcs = ["bump_map.c"],
+    hdrs = ["bump_map.h"],
+    deps = [
+        ":float_texture",
+        ":uv_texture_coordinate",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "constant_emissive_material",
     srcs = ["constant_emissive_material.c"],
     hdrs = ["constant_emissive_material.h"],

@@ -194,6 +194,29 @@ ShapeComputeShadingNormal(
     assert(PointValidate(hit_point));
     assert(normal != NULL);
 
+    if (shape->vtable->compute_shading_normal_routine != NULL)
+    {
+        ISTATUS status =
+            shape->vtable->compute_shading_normal_routine(shape->data,
+                                                          hit_point,
+                                                          face_hit,
+                                                          additional_data,
+                                                          normal);
+
+        return status;
+    }
+
+    VECTOR3 geometry_normal;
+    ISTATUS status = shape->vtable->compute_normal_routine(shape->data,
+                                                           hit_point,
+                                                           face_hit,
+                                                           &geometry_normal);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     if (shape->vtable->get_normal_map_routine != NULL)
     {
         PCNORMAL_MAP normal_map;
@@ -210,6 +233,7 @@ ShapeComputeShadingNormal(
         {
             status = NormalMapCompute(normal_map,
                                       hit_point,
+                                      geometry_normal,
                                       additional_data,
                                       texture_coordinates,
                                       normal);
@@ -217,25 +241,12 @@ ShapeComputeShadingNormal(
             return status;
         }
     }
-
-    if (shape->vtable->compute_shading_normal_routine != NULL)
+    else
     {
-        ISTATUS status =
-            shape->vtable->compute_shading_normal_routine(shape->data,
-                                                          hit_point,
-                                                          face_hit,
-                                                          additional_data,
-                                                          normal);
-
-        return status;
+        *normal = geometry_normal;
     }
 
-    ISTATUS status = shape->vtable->compute_normal_routine(shape->data,
-                                                           hit_point,
-                                                           face_hit,
-                                                           normal);
-
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 static
