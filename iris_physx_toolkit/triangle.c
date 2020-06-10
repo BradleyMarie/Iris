@@ -313,6 +313,24 @@ TriangleComputeNormal(
 
 static
 ISTATUS
+TriangleGetNormalMap(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCNORMAL_MAP *normal_map
+    )
+{
+    if (face_hit > TRIANGLE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *normal_map = NULL;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 TriangleGetMaterial(
     _In_opt_ const void *context, 
     _In_ uint32_t face_hit,
@@ -499,9 +517,8 @@ static const SHAPE_VTABLE triangle_vtable = {
     TriangleTrace,
     TriangleComputeBounds,
     TriangleComputeNormal,
+    TriangleGetNormalMap,
     TriangleGetMaterial,
-    NULL,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -513,12 +530,11 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     TriangleTrace,
     TriangleComputeBounds,
     TriangleComputeNormal,
+    TriangleGetNormalMap,
     TriangleGetMaterial,
     EmissiveTriangleGetEmissiveMaterial,
     EmissiveTriangleSampleFace,
     EmissiveTriangleComputePdfBySolidArea,
-    NULL,
-    NULL,
     NULL,
     EmissiveTriangleFree
 };

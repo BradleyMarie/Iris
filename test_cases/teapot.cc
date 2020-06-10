@@ -27,6 +27,7 @@ Abstract:
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
+#include "iris_physx_toolkit/triangle_mesh_normal_map.h"
 #include "iris_physx_toolkit/triangle_mesh.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/teapot.h"
@@ -159,10 +160,11 @@ TEST(TeapotTest, FlatShadedTeapot)
     status = TriangleMeshAllocate(
         teapot_vertices,
         nullptr,
-        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
+        nullptr,
+        nullptr,
         material,
         nullptr,
         nullptr,
@@ -235,14 +237,22 @@ TEST(TeapotTest, SmoothShadedTeapot)
     PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
     bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
+    PNORMAL_MAP front_normal_map;
+    status = TriangleMeshNormalMapAllocate(teapot_normals,
+                                           TEAPOT_VERTEX_COUNT,
+                                           &front_normal_map,
+                                           nullptr);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
     size_t triangles_allocated;
     status = TriangleMeshAllocate(
         teapot_vertices,
-        teapot_normals,
         nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
+        front_normal_map,
+        nullptr,
         material,
         nullptr,
         nullptr,
@@ -271,6 +281,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
+    NormalMapRelease(front_normal_map);
     MaterialRelease(material);
     LightRelease(light);
     SceneRelease(scene);

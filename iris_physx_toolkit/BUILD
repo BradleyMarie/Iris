@@ -350,6 +350,16 @@ cc_library(
 )
 
 cc_library(
+    name = "triangle_mesh_normal_map",
+    srcs = ["triangle_mesh_normal_map.c"],
+    hdrs = ["triangle_mesh_normal_map.h"],
+    deps = [
+        ":triangle_mesh",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "triangle_mesh",
     srcs = ["triangle_mesh.c"],
     hdrs = ["triangle_mesh.h"],

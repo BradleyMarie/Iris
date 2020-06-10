@@ -639,7 +639,6 @@ static const SHAPE_VTABLE difference_vtable = {
     NULL,
     NULL,
     NULL,
-    NULL,
     ConstructiveSolidShapeFree
 };
 
@@ -653,14 +652,12 @@ static const SHAPE_VTABLE intersection_vtable = {
     NULL,
     NULL,
     NULL,
-    NULL,
     ConstructiveSolidShapeFree
 };
 
 static const SHAPE_VTABLE union_vtable = {
     UnionShapeTrace,
     UnionShapeComputeBounds,
-    NULL,
     NULL,
     NULL,
     NULL,

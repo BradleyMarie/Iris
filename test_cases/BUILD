@@ -220,6 +220,7 @@ cc_test(
         "//iris_physx_toolkit:point_light",
         "//iris_physx_toolkit:sample_tracer",
         "//iris_physx_toolkit:triangle_mesh",
+        "//iris_physx_toolkit:triangle_mesh_normal_map",
         "//test_util:pfm",
         "//test_util:spectra",
         "//test_util:teapot",

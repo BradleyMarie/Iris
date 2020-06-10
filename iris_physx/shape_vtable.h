@@ -53,6 +53,14 @@ ISTATUS
 
 typedef
 ISTATUS
+(*PSHAPE_GET_NORMAL_MAP)(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCNORMAL_MAP *normal_map
+    );
+
+typedef
+ISTATUS
 (*PSHAPE_GET_MATERIAL_ROUTINE)(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
@@ -88,24 +96,6 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PSHAPE_COMPUTE_SHADING_NORMAL)(
-    _In_opt_ const void *context,
-    _In_ POINT3 hit_point,
-    _In_ uint32_t face_hit,
-    _In_ const void *additional_data,
-    _Out_ PVECTOR3 normal
-    );
-
-typedef
-ISTATUS
-(*PSHAPE_GET_NORMAL_MAP)(
-    _In_opt_ const void *context,
-    _In_ uint32_t face_hit,
-    _Outptr_ PCNORMAL_MAP *normal_map
-    );
-
-typedef
-ISTATUS
 (*PSHAPE_COMPUTE_TEXTURE_COORDINATES)(
     _In_opt_ const void *context,
     _In_ POINT3 hit_point,
@@ -119,12 +109,11 @@ typedef struct _SHAPE_VTABLE {
     PSHAPE_TRACE_ROUTINE trace_routine;
     PSHAPE_COMPUTE_BOUNDS_ROUTINE compute_bounds_routine;
     PSHAPE_COMPUTE_NORMAL_ROUTINE compute_normal_routine;
+    PSHAPE_GET_NORMAL_MAP get_normal_map_routine;
     PSHAPE_GET_MATERIAL_ROUTINE get_material_routine;
     PSHAPE_GET_EMISSIVE_MATERIAL_ROUTINE get_emissive_material_routine;
     PSHAPE_SAMPLE_FACE sample_face_routine;
     PSHAPE_COMPUTE_PDF_BY_SOLID_ANGLE compute_pdf_by_solid_angle_routine;
-    PSHAPE_COMPUTE_SHADING_NORMAL compute_shading_normal_routine;
-    PSHAPE_GET_NORMAL_MAP get_normal_map_routine;
     PSHAPE_COMPUTE_TEXTURE_COORDINATES compute_texture_coordinates;
     PFREE_ROUTINE free_routine;
 } SHAPE_VTABLE, *PSHAPE_VTABLE;

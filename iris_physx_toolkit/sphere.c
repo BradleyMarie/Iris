@@ -190,6 +190,24 @@ SphereComputeNormal(
 
 static
 ISTATUS
+SphereGetNormalMap(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCNORMAL_MAP *normal_map
+    )
+{
+    if (face_hit > SPHERE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *normal_map = NULL;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 SphereGetMaterial(
     _In_opt_ const void *context, 
     _In_ uint32_t face_hit,
@@ -334,9 +352,8 @@ static const SHAPE_VTABLE sphere_vtable = {
     SphereTrace,
     SphereComputeBounds,
     SphereComputeNormal,
+    SphereGetNormalMap,
     SphereGetMaterial,
-    NULL,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -348,12 +365,11 @@ static const SHAPE_VTABLE emissive_sphere_vtable = {
     SphereTrace,
     SphereComputeBounds,
     SphereComputeNormal,
+    SphereGetNormalMap,
     SphereGetMaterial,
     EmissiveSphereGetEmissiveMaterial,
     EmissiveSphereSampleFace,
     EmissiveSphereComputePdfBySolidArea,
-    NULL,
-    NULL,
     NULL,
     EmissiveSphereFree
 };
