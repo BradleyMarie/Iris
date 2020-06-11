@@ -112,13 +112,10 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
-    RAY_DIFFERENTIAL model_ray_differential =
-        RayDifferentialMatrixInverseMultiply(model_to_world,
-                                             *process_context->ray_differential);
-
     const void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
-                                            &model_ray_differential,
+                                            model_to_world,
+                                            process_context->ray_differential,
                                             hit_context->distance,
                                             hit_context->front_face,
                                             hit_context->additional_data,

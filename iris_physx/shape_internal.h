@@ -227,7 +227,8 @@ inline
 ISTATUS
 ShapeComputeTextureCoordinates(
     _In_ PCSHAPE shape,
-    _In_ PCRAY_DIFFERENTIAL to_shape,
+    _In_ PCMATRIX model_to_world,
+    _In_ PCRAY_DIFFERENTIAL world_to_shape,
     _In_ float_t distance,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
@@ -236,7 +237,7 @@ ShapeComputeTextureCoordinates(
     )
 {
     assert(shape != NULL);
-    assert(to_shape != NULL);
+    assert(world_to_shape != NULL);
     assert(isfinite(distance));
     assert((float_t)0.0 < distance);
     assert(allocator != NULL);
@@ -244,9 +245,12 @@ ShapeComputeTextureCoordinates(
 
     if (shape->vtable->compute_texture_coordinates != NULL)
     {
+        RAY_DIFFERENTIAL model_ray_differential =
+            RayDifferentialMatrixInverseMultiply(model_to_world, *world_to_shape);
+
         ISTATUS status =
             shape->vtable->compute_texture_coordinates(shape->data,
-                                                       to_shape,
+                                                       &model_ray_differential,
                                                        distance,
                                                        face_hit,
                                                        additional_data,
