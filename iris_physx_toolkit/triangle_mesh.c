@@ -376,7 +376,8 @@ TriangleGetNormalMap(
 ISTATUS
 TriangleComputeTextureCoordinates(
     _In_opt_ const void *context,
-    _In_ POINT3 hit_point,
+    _In_ PCRAY_DIFFERENTIAL to_shape,
+    _In_ float_t distance,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,

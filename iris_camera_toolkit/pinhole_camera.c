@@ -34,14 +34,13 @@ typedef const PINHOLE_CAMERA *PCPINHOLE_CAMERA;
 //
 
 static
-ISTATUS
+RAY
 PinholeCameraGenerateRay(
     _In_ const void *context,
     _In_ float_t image_u,
     _In_ float_t image_v,
     _In_ float_t lens_u,
-    _In_ float_t lens_v,
-    _Out_ PRAY ray
+    _In_ float_t lens_v
     )
 {
     PCPINHOLE_CAMERA pinhole_camera = (PCPINHOLE_CAMERA)context;
@@ -57,7 +56,43 @@ PinholeCameraGenerateRay(
     VECTOR3 camera_direction = PointSubtract(pinhole_camera->location,
                                              frame_origin);
 
-    *ray = RayCreate(pinhole_camera->location, camera_direction);
+    RAY ray = RayCreate(pinhole_camera->location, camera_direction);
+
+    return ray;
+}
+
+static
+ISTATUS
+PinholeCameraGenerateRayDifferential(
+    _In_ const void *context,
+    _In_ float_t image_u,
+    _In_ float_t image_v,
+    _In_ float_t lens_u,
+    _In_ float_t lens_v,
+    _In_ float_t dimage_u_dx,
+    _In_ float_t dimage_v_dy,
+    _Out_ PRAY_DIFFERENTIAL ray_differential
+    )
+{
+    RAY ray = PinholeCameraGenerateRay(context,
+                                       image_u,
+                                       image_v,
+                                       lens_u,
+                                       lens_v);
+
+    RAY rx = PinholeCameraGenerateRay(context,
+                                      image_u + dimage_u_dx,
+                                      image_v,
+                                      lens_u,
+                                      lens_v);
+
+    RAY ry = PinholeCameraGenerateRay(context,
+                                      image_u,
+                                      image_v + dimage_v_dy,
+                                      lens_u,
+                                      lens_v);
+
+    *ray_differential = RayDifferentialCreate(ray, rx, ry);
 
     return ISTATUS_SUCCESS;
 }
@@ -67,7 +102,7 @@ PinholeCameraGenerateRay(
 //
 
 static const CAMERA_VTABLE pinhole_camera_vtable = {
-    PinholeCameraGenerateRay,
+    PinholeCameraGenerateRayDifferential,
     NULL
 };
 

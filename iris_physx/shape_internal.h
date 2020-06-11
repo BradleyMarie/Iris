@@ -162,7 +162,7 @@ ShapeComputePdfBySolidAngle(
     )
 {
     assert(shape != NULL);
-    assert(to_shape);
+    assert(to_shape != NULL);
     assert(isfinite(distance));
     assert((float_t)0.0 < distance);
     assert(RayValidate(*to_shape));
@@ -227,7 +227,8 @@ inline
 ISTATUS
 ShapeComputeTextureCoordinates(
     _In_ PCSHAPE shape,
-    _In_ POINT3 hit_point,
+    _In_ PCRAY_DIFFERENTIAL to_shape,
+    _In_ float_t distance,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
@@ -235,7 +236,9 @@ ShapeComputeTextureCoordinates(
     )
 {
     assert(shape != NULL);
-    assert(PointValidate(hit_point));
+    assert(to_shape != NULL);
+    assert(isfinite(distance));
+    assert((float_t)0.0 < distance);
     assert(allocator != NULL);
     assert(texture_coordinates != NULL);
 
@@ -243,7 +246,8 @@ ShapeComputeTextureCoordinates(
     {
         ISTATUS status =
             shape->vtable->compute_texture_coordinates(shape->data,
-                                                       hit_point,
+                                                       to_shape,
+                                                       distance,
                                                        face_hit,
                                                        additional_data,
                                                        allocator,

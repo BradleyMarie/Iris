@@ -39,7 +39,7 @@ typedef const SHAPE_RAY_TRACER *PCSHAPE_RAY_TRACER;
 ISTATUS
 ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
-    _In_ RAY ray,
+    _In_ RAY_DIFFERENTIAL ray_differential,
     _Outptr_result_maybenull_ PCSPECTRUM *light,
     _Outptr_result_maybenull_ PCBSDF *bsdf,
     _Out_ PPOINT3 hit_point,

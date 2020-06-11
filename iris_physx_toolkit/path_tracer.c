@@ -42,7 +42,7 @@ static
 ISTATUS
 PathTracerIntegrate(
     _In_opt_ const void *context,
-    _In_ PCRAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ PCLIGHT_SAMPLER light_sampler,
     _Inout_ PLIGHT_SAMPLE_LIST light_sample_list,
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
@@ -57,7 +57,7 @@ PathTracerIntegrate(
 
     float_t path_throughput = (float_t)1.0;
     bool add_light_emissions = true;
-    RAY trace_ray = *ray;
+    RAY_DIFFERENTIAL trace_ray_differential = *ray_differential;
     uint8_t bounces = 0;
 
     for (;;)
@@ -67,7 +67,7 @@ PathTracerIntegrate(
         PCBSDF bsdf;
         PCSPECTRUM emitted_light;
         ISTATUS status = ShapeRayTracerTrace(ray_tracer,
-                                             trace_ray,
+                                             trace_ray_differential,
                                              &emitted_light,
                                              &bsdf,
                                              &hit_point,
@@ -130,7 +130,7 @@ PathTracerIntegrate(
             status = SampleDirectLighting(light,
                                           bsdf,
                                           hit_point,
-                                          trace_ray.direction,
+                                          trace_ray_differential.ray.direction,
                                           surface_normal,
                                           shading_normal,
                                           rng,
@@ -171,15 +171,16 @@ PathTracerIntegrate(
         }
 
         bool transmitted;
+        VECTOR3 next_direction;
         float_t bsdf_pdf;
         status = BsdfSample(bsdf,
-                            trace_ray.direction,
+                            trace_ray_differential.ray.direction,
                             surface_normal,
                             rng,
                             allocator,
                             path_tracer->reflectors + bounces,
                             &transmitted,
-                            &trace_ray.direction,
+                            &next_direction,
                             &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
@@ -202,7 +203,7 @@ PathTracerIntegrate(
         }
 
         float_t attenuation = VectorPositiveDotProduct(shading_normal,
-                                                       trace_ray.direction,
+                                                       next_direction,
                                                        transmitted);
         path_throughput *= albedo * attenuation;
 
@@ -245,7 +246,10 @@ PathTracerIntegrate(
             add_light_emissions = true;
         }
 
-        trace_ray.origin = hit_point;
+        RAY next_ray = RayCreate(hit_point, next_direction);
+        trace_ray_differential =
+            RayDifferentialCreateWithoutDifferentials(next_ray);
+
         bounces += 1;
     }
 

@@ -34,7 +34,7 @@ static
 ISTATUS
 PhysxSampleTracerTraceRay(
     _In_opt_ void *context,
-    _In_ PCRAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
@@ -45,7 +45,7 @@ PhysxSampleTracerTraceRay(
     ISTATUS status =
         IntegratorIntegrate(physx_sample_tracer->integrator,
                             rng,
-                            *ray,
+                            *ray_differential,
                             epsilon,
                             color);
 

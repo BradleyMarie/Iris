@@ -46,6 +46,7 @@ cc_library(
         ":bounding_box",
         ":color",
         ":random",
+        ":ray_differential",
         "//iris",
     ],
 )
@@ -66,6 +67,24 @@ cc_test(
     srcs = ["random_test.cc"],
     deps = [
         ":random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ray_differential",
+    hdrs = ["ray_differential.h"],
+    deps = [
+        "//iris",
+    ],
+)
+
+cc_test(
+    name = "ray_differential_test",
+    srcs = ["ray_differential_test.cc"],
+    deps = [
+        ":ray_differential",
+        "//test_util:equality",
         "@com_google_googletest//:gtest_main",
     ],
 )

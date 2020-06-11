@@ -29,7 +29,7 @@ typedef
 ISTATUS
 (*PSAMPLE_TRACER_TRACE_ROUTINE)(
     _In_opt_ void *context,
-    _In_ PCRAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color

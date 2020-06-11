@@ -24,6 +24,7 @@ Abstract:
 //
 
 typedef struct _SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT {
+    PCRAY_DIFFERENTIAL ray_differential;
     PSHAPE_RAY_TRACER shape_ray_tracer;
     PCSPECTRUM light;
     PCBSDF bsdf;
@@ -111,9 +112,14 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
+    RAY_DIFFERENTIAL model_ray_differential =
+        RayDifferentialMatrixInverseMultiply(model_to_world,
+                                             *process_context->ray_differential);
+
     const void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
-                                            model_hit_point,
+                                            &model_ray_differential,
+                                            hit_context->distance,
                                             hit_context->front_face,
                                             hit_context->additional_data,
                                             &process_context->shape_ray_tracer->texture_coordinate_allocator,
@@ -190,7 +196,7 @@ ShapeRayTracerProcessHit(
 ISTATUS
 ShapeRayTracerTrace(
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,
-    _In_ RAY ray,
+    _In_ RAY_DIFFERENTIAL ray_differential,
     _Outptr_result_maybenull_ PCSPECTRUM *light,
     _Outptr_result_maybenull_ PCBSDF *bsdf,
     _Out_ PPOINT3 hit_point,
@@ -203,7 +209,7 @@ ShapeRayTracerTrace(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!RayValidate(ray))
+    if (!RayDifferentialValidate(ray_differential))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -234,13 +240,14 @@ ShapeRayTracerTrace(
     }
 
     SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT context;
+    context.ray_differential = &ray_differential;
     context.shape_ray_tracer = ray_tracer;
     context.light = NULL;
     context.bsdf = NULL;
 
     ISTATUS status =
         RayTracerTraceClosestHitWithCoordinates(ray_tracer->ray_tracer,
-                                                ray,
+                                                ray_differential.ray,
                                                 ray_tracer->minimum_distance,
                                                 ray_tracer->trace_routine,
                                                 ray_tracer->trace_context,

@@ -26,7 +26,7 @@ cc_library(
     hdrs = ["camera_vtable.h"],
     deps = [
         "//common:free_routine",
-        "//iris",
+        "//iris_advanced",
     ],
 )
 

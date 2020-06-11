@@ -34,7 +34,7 @@ typedef
 ISTATUS
 (*PINTEGRATOR_INTEGRATE_ROUTINE)(
     _In_opt_ const void *context,
-    _In_ PCRAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ PCLIGHT_SAMPLER light_sampler,
     _Inout_ PLIGHT_SAMPLE_LIST light_sample_list,
     _Inout_ PSHAPE_RAY_TRACER ray_tracer,

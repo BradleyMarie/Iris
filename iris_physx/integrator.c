@@ -54,7 +54,7 @@ IntegratorIntegrateInternal(
     _In_ PCSCENE scene,
     _In_ PCLIGHT_SAMPLER light_sampler,
     _Inout_ PRANDOM rng,
-    _In_ RAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ float_t epsilon,
     _Out_ PCSPECTRUM *spectrum
     )
@@ -81,7 +81,7 @@ IntegratorIntegrateInternal(
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (!RayValidate(ray))
+    if (!RayDifferentialValidate(*ray_differential))
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
@@ -109,7 +109,7 @@ IntegratorIntegrateInternal(
 
     ISTATUS status =
         integrator->vtable->integrate_routine(integrator->data,
-                                              &ray,
+                                              ray_differential,
                                               light_sampler,
                                               &integrator->light_sample_list,
                                               &integrator->shape_ray_tracer,
@@ -276,7 +276,7 @@ ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _Inout_ PRANDOM rng,
-    _In_ RAY ray,
+    _In_ RAY_DIFFERENTIAL ray_differential,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     )
@@ -286,7 +286,7 @@ IntegratorIntegrate(
                                                  integrator->scene,
                                                  integrator->light_sampler,
                                                  rng,
-                                                 ray,
+                                                 &ray_differential,
                                                  epsilon,
                                                  &spectrum);
 

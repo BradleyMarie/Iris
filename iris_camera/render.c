@@ -240,13 +240,15 @@ IrisCameraRenderPixel(
             return false;
         }
 
-        RAY camera_ray;
-        status = CameraGenerateRay(context->shared->camera,
-                                   pixel_u,
-                                   pixel_v,
-                                   lens_u,
-                                   lens_v,
-                                   &camera_ray);
+        RAY_DIFFERENTIAL camera_ray_differential;
+        status = CameraGenerateRayDifferential(context->shared->camera,
+                                               pixel_u,
+                                               pixel_v,
+                                               lens_u,
+                                               lens_v,
+                                               pixel_u_width,
+                                               pixel_v_width,
+                                               &camera_ray_differential);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -255,13 +257,15 @@ IrisCameraRenderPixel(
             return false;
         }
 
-        RAY world_ray = RayMatrixMultiply(context->shared->camera_to_world,
-                                          camera_ray);
-        world_ray.direction = VectorNormalize(world_ray.direction, NULL, NULL);
+        RAY_DIFFERENTIAL world_ray_differential =
+            RayDifferentialMatrixMultiply(context->shared->camera_to_world,
+                                          camera_ray_differential);
+        world_ray_differential =
+            RayDifferentialNormalize(world_ray_differential);
 
         COLOR3 sample_color;
         status = SampleTracerTrace(context->local.sample_tracer,
-                                   &world_ray,
+                                   &world_ray_differential,
                                    rng,
                                    context->shared->epsilon,
                                    &sample_color);

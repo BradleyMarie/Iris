@@ -35,22 +35,22 @@ inline
 ISTATUS
 SampleTracerTrace(
     _In_ struct _SAMPLE_TRACER *tracer,
-    _In_ PCRAY ray,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ PRANDOM rng,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     )
 {
     assert(tracer != NULL);
-    assert(ray != NULL);
-    assert(RayValidate(*ray));
+    assert(ray_differential != NULL);
+    assert(RayDifferentialValidate(*ray_differential));
     assert(rng != NULL);
     assert(isfinite(epsilon));
     assert((float_t)0.0 <= epsilon);
     assert(color != NULL);
 
     ISTATUS status = tracer->vtable->trace_routine(tracer->data,
-                                                   ray,
+                                                   ray_differential,
                                                    rng,
                                                    epsilon,
                                                    color);

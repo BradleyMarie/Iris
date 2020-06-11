@@ -46,7 +46,7 @@ ISTATUS
 IntegratorIntegrate(
     _Inout_ PINTEGRATOR integrator,
     _Inout_ PRANDOM rng,
-    _In_ RAY ray,
+    _In_ RAY_DIFFERENTIAL ray_differential,
     _In_ float_t epsilon,
     _Out_ PCOLOR3 color
     );
