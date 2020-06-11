@@ -184,15 +184,17 @@ ISTATUS
 ShapeComputeShadingNormal(
     _In_ PCSHAPE shape,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     )
 {
     assert(shape != NULL);
     assert(PointValidate(hit_point));
-    assert(normal != NULL);
+    assert(VectorValidate(geometry_normal));
+    assert(shading_normal != NULL);
 
     PCNORMAL_MAP normal_map;
     ISTATUS status = shape->vtable->get_normal_map_routine(shape->data,
@@ -206,37 +208,16 @@ ShapeComputeShadingNormal(
 
     if (normal_map == NULL)
     {
-        status = shape->vtable->compute_normal_routine(shape->data,
-                                                       hit_point,
-                                                       face_hit,
-                                                       normal);
-
-        return status;
+        *shading_normal = geometry_normal;
+        return ISTATUS_SUCCESS;
     }
 
     status = NormalMapCompute(normal_map,
                               hit_point,
+                              geometry_normal,
                               additional_data,
                               texture_coordinates,
-                              normal);
-
-    if (normal_map->vtable->coordinate_space == NORMAL_MODEL_COORDINATE_SPACE)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 geometry_normal;
-    status = shape->vtable->compute_normal_routine(shape->data,
-                                                   hit_point,
-                                                   face_hit,
-                                                   &geometry_normal);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    // TODO: Transform to model space
+                              shading_normal);
 
     return status;
 }

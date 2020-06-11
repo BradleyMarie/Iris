@@ -41,9 +41,10 @@ ISTATUS
 TriangleMeshNormalMapCompute(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     )
 {
     PCTRIANGLE_MESH_NORMAL_MAP normal_map = (PTRIANGLE_MESH_NORMAL_MAP)context;
@@ -57,20 +58,21 @@ TriangleMeshNormalMapCompute(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    *normal = VectorScale(normal_map->normals[hit_data->mesh_vertex_indices[0]],
-                          hit_data->barycentric_coordinates[0]);
+    *shading_normal =
+        VectorScale(normal_map->normals[hit_data->mesh_vertex_indices[0]],
+                    hit_data->barycentric_coordinates[0]);
 
-    *normal =
-        VectorAddScaled(*normal,
+    *shading_normal =
+        VectorAddScaled(*shading_normal,
                         normal_map->normals[hit_data->mesh_vertex_indices[1]],
                         hit_data->barycentric_coordinates[1]);
 
-    *normal =
-        VectorAddScaled(*normal,
+    *shading_normal =
+        VectorAddScaled(*shading_normal,
                         normal_map->normals[hit_data->mesh_vertex_indices[2]],
                         hit_data->barycentric_coordinates[2]);
 
-    *normal = VectorNormalize(*normal, NULL, NULL);
+    *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);
 
     return ISTATUS_SUCCESS;
 }
@@ -80,18 +82,20 @@ ISTATUS
 TriangleMeshNormalMapComputeBack(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     )
 {
     ISTATUS status = TriangleMeshNormalMapCompute(context,
                                                   hit_point,
+                                                  geometry_normal,
                                                   additional_data,
                                                   texture_coordinates,
-                                                  normal);
+                                                  shading_normal);
 
-    *normal = VectorNegate(*normal);
+    *shading_normal = VectorNegate(*shading_normal);
 
     return status;
 }
@@ -116,13 +120,11 @@ TriangleMeshNormalMapFree(
 //
 
 static const NORMAL_MAP_VTABLE front_triangle_mesh_normal_map_vtable = {
-    NORMAL_MODEL_COORDINATE_SPACE,
     TriangleMeshNormalMapCompute,
     TriangleMeshNormalMapFree
 };
 
 static const NORMAL_MAP_VTABLE back_triangle_mesh_normal_map_vtable = {
-    NORMAL_MODEL_COORDINATE_SPACE,
     TriangleMeshNormalMapComputeBack,
     TriangleMeshNormalMapFree
 };

@@ -127,6 +127,7 @@ ShapeRayTracerProcessHit(
     VECTOR3 model_shading_normal;
     status = ShapeComputeShadingNormal(shape,
                                        model_hit_point,
+                                       model_surface_normal,
                                        hit_context->front_face,
                                        hit_context->additional_data,
                                        texture_coordinates,

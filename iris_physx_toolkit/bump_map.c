@@ -42,9 +42,10 @@ ISTATUS
 BumpMapCompute(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     )
 {
     PCBUMP_MAP bump_map = (PBUMP_MAP)context;
@@ -64,9 +65,10 @@ BumpMapCompute(
     }
 
     POINT3 displaced_hit_point0 =
-        PointCreate((float_t)0.0, (float_t)0.0, displacement);
+        PointVectorAddScaled(hit_point, geometry_normal, displacement);
 
-    float_t du = fabs(uv_coordinates->du_dx) + fabs(uv_coordinates->du_dy);
+    float_t du =
+        fabs(uv_coordinates->du_dx) + fabs(uv_coordinates->du_dy);
 
     if (du == (float_t)0.0)
     {
@@ -77,15 +79,15 @@ BumpMapCompute(
         du *= (float_t)0.5;
     }
 
-    POINT3 hit_point1 =
-        PointVectorAddScaled(hit_point, uv_coordinates->dp_du, du);
-
     UV_TEXTURE_COORDINATE modified_coords;
     modified_coords.uv[0] = uv_coordinates->uv[0] + du;
     modified_coords.uv[1] = uv_coordinates->uv[1];
     modified_coords.du_dy = uv_coordinates->du_dy;
     modified_coords.dv_dx = uv_coordinates->dv_dx;
     modified_coords.dv_dy = uv_coordinates->dv_dy;
+
+    POINT3 hit_point1 =
+        PointVectorAddScaled(hit_point, uv_coordinates->dp_du, du);
 
     float_t displacement_u;
     status = FloatTextureSample(bump_map->texture,
@@ -101,12 +103,12 @@ BumpMapCompute(
 
     // Assume flat surface
     POINT3 displaced_hit_point1 =
-        PointCreate(du, (float_t)0.0, displacement_u);
+        PointVectorAddScaled(hit_point1, geometry_normal, displacement);
 
     float_t dv =
         fabs(uv_coordinates->dv_dx) + fabs(uv_coordinates->dv_dy);
 
-    if (dv == (float_t)0.0f)
+    if (dv == (float_t)0.0)
     {
         dv = MINIMUM_DERIVATIVE;
     }
@@ -135,13 +137,18 @@ BumpMapCompute(
 
     // Assume flat surface
     POINT3 displaced_hit_point2 =
-        PointCreate((float_t)0.0, dv, displacement_v);
+        PointVectorAddScaled(hit_point2, geometry_normal, displacement);
 
     VECTOR3 dp_du = PointSubtract(displaced_hit_point1, displaced_hit_point0);
     VECTOR3 dp_dv = PointSubtract(displaced_hit_point2, displaced_hit_point0);
 
-    *normal = VectorCrossProduct(dp_du, dp_dv);
-    *normal = VectorNormalize(*normal, NULL, NULL);
+    *shading_normal = VectorCrossProduct(dp_du, dp_dv);
+    *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);
+
+    if (VectorDotProduct(geometry_normal, *shading_normal) < (float_t)0.0)
+    {
+        *shading_normal = VectorNegate(*shading_normal);
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -162,7 +169,6 @@ BumpMapFree(
 //
 
 static const NORMAL_MAP_VTABLE bump_map_vtable = {
-    NORMAL_TANGENT_COORDINATE_SPACE,
     BumpMapCompute,
     BumpMapFree
 };

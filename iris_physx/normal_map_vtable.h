@@ -19,15 +19,6 @@ Abstract:
 #include "iris/iris.h"
 
 //
-// Enums
-//
-
-typedef enum _NORMAL_COORDINATE_SPACE {
-    NORMAL_MODEL_COORDINATE_SPACE = 0,
-    NORMAL_TANGENT_COORDINATE_SPACE = 1
-} NORMAL_COORDINATE_SPACE;
-
-//
 // Types
 //
 
@@ -36,13 +27,13 @@ ISTATUS
 (*PNORMAL_MAP_COMPUTE_ROUTINE)(
     _In_ const void *context,
     _In_ POINT3 hit_point,
+    _In_ VECTOR3 geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 normal
+    _Out_ PVECTOR3 shading_normal
     );
 
 typedef struct _NORMAL_MAP_VTABLE {
-    NORMAL_COORDINATE_SPACE coordinate_space;
     PNORMAL_MAP_COMPUTE_ROUTINE compute_routine;
     PFREE_ROUTINE free_routine;
 } NORMAL_MAP_VTABLE, *PNORMAL_MAP_VTABLE;
