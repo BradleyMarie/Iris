@@ -376,8 +376,9 @@ TriangleGetNormalMap(
 ISTATUS
 TriangleComputeTextureCoordinates(
     _In_opt_ const void *context,
-    _In_ PCRAY_DIFFERENTIAL to_shape,
-    _In_ float_t distance,
+    _In_ PCPOINT3 hit_point,
+    _In_ PCVECTOR3 surface_normal,
+    _In_ PCRAY_DIFFERENTIAL ray_differential,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
@@ -400,29 +401,80 @@ TriangleComputeTextureCoordinates(
         return status;
     }
 
-    PUV_TEXTURE_COORDINATE uv = (PUV_TEXTURE_COORDINATE)*texture_coordinates;
+    PUV_TEXTURE_COORDINATE uv_coordinates =
+        (PUV_TEXTURE_COORDINATE)*texture_coordinates;
 
-    uv->uv[0] = mesh->texture_coordinates[triangle->v0][0] *
-                hit_data->barycentric_coordinates[0];
+    float_t uv[2];
+    uv[0] = mesh->texture_coordinates[triangle->v0][0] *
+            hit_data->barycentric_coordinates[0];
 
-    uv->uv[1] = mesh->texture_coordinates[triangle->v0][1] *
-                hit_data->barycentric_coordinates[0];
+    uv[1] = mesh->texture_coordinates[triangle->v0][1] *
+            hit_data->barycentric_coordinates[0];
 
-    uv->uv[0] = fma(mesh->texture_coordinates[triangle->v1][0],
-                    hit_data->barycentric_coordinates[1],
-                    uv->uv[0]);
+    uv[0] = fma(mesh->texture_coordinates[triangle->v1][0],
+                hit_data->barycentric_coordinates[1],
+                uv[0]);
 
-    uv->uv[1] = fma(mesh->texture_coordinates[triangle->v1][1],
-                    hit_data->barycentric_coordinates[1],
-                    uv->uv[1]);
+    uv[1] = fma(mesh->texture_coordinates[triangle->v1][1],
+                hit_data->barycentric_coordinates[1],
+                uv[1]);
 
-    uv->uv[0] = fma(mesh->texture_coordinates[triangle->v2][0],
-                    hit_data->barycentric_coordinates[2],
-                    uv->uv[0]);
+    uv[0] = fma(mesh->texture_coordinates[triangle->v2][0],
+                hit_data->barycentric_coordinates[2],
+                uv[0]);
 
-    uv->uv[1] = fma(mesh->texture_coordinates[triangle->v2][1],
-                    hit_data->barycentric_coordinates[2],
-                    uv->uv[1]);
+    uv[1] = fma(mesh->texture_coordinates[triangle->v2][1],
+                hit_data->barycentric_coordinates[2],
+                uv[1]);
+
+    if (!ray_differential->has_differentials)
+    {
+        UVTextureCoordinateInitializeWithoutDerivatives(uv_coordinates, uv);
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t duv02[2];
+    duv02[0] = mesh->texture_coordinates[triangle->v0][0] -
+               mesh->texture_coordinates[triangle->v2][0];
+    duv02[1] = mesh->texture_coordinates[triangle->v0][1] -
+               mesh->texture_coordinates[triangle->v2][1];
+
+    float_t duv12[2];
+    duv12[0] = mesh->texture_coordinates[triangle->v1][0] -
+               mesh->texture_coordinates[triangle->v2][0];
+    duv12[1] = mesh->texture_coordinates[triangle->v1][1] -
+               mesh->texture_coordinates[triangle->v2][1];
+
+    float_t determinant = duv02[0] * duv12[1] - duv02[1] * duv12[0];
+    if (fabs(determinant) < (float_t)0.0000001)
+    {
+        UVTextureCoordinateInitializeWithoutDerivatives(uv_coordinates, uv);
+        return ISTATUS_SUCCESS;
+    }
+
+    VECTOR3 dp02 = PointSubtract(mesh->vertices[triangle->v0],
+                                 mesh->vertices[triangle->v2]);
+
+    VECTOR3 dp12 = PointSubtract(mesh->vertices[triangle->v1],
+                                 mesh->vertices[triangle->v2]);
+
+    float_t inverse_determinant = (float_t)1.0 / determinant;
+
+    VECTOR3 dp_du = VectorSubtract(VectorScale(dp02, duv12[1]),
+                                   VectorScale(dp12, duv02[1]));
+    dp_du = VectorScale(dp_du, inverse_determinant);
+
+    VECTOR3 dp_dv = VectorSubtract(VectorScale(dp12, duv02[0]),
+                                   VectorScale(dp02, duv12[0]));
+    dp_dv = VectorScale(dp_du, inverse_determinant);
+
+    UVTextureCoordinateInitialize(uv_coordinates,
+                                  uv,
+                                  dp_du,
+                                  dp_dv,
+                                  *ray_differential,
+                                  *hit_point,
+                                  *surface_normal);
 
     return ISTATUS_SUCCESS;
 }

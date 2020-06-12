@@ -228,8 +228,9 @@ ISTATUS
 ShapeComputeTextureCoordinates(
     _In_ PCSHAPE shape,
     _In_ PCMATRIX model_to_world,
-    _In_ PCRAY_DIFFERENTIAL world_to_shape,
-    _In_ float_t distance,
+    _In_ POINT3 model_hit_point,
+    _In_ VECTOR3 model_surface_normal,
+    _In_ RAY_DIFFERENTIAL world_ray_differential,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
@@ -237,21 +238,22 @@ ShapeComputeTextureCoordinates(
     )
 {
     assert(shape != NULL);
-    assert(world_to_shape != NULL);
-    assert(isfinite(distance));
-    assert((float_t)0.0 < distance);
+    assert(PointValidate(model_hit_point));
+    assert(VectorValidate(model_surface_normal));
     assert(allocator != NULL);
     assert(texture_coordinates != NULL);
 
     if (shape->vtable->compute_texture_coordinates != NULL)
     {
         RAY_DIFFERENTIAL model_ray_differential =
-            RayDifferentialMatrixInverseMultiply(model_to_world, *world_to_shape);
+            RayDifferentialMatrixInverseMultiply(model_to_world,
+                                                 world_ray_differential);
 
         ISTATUS status =
             shape->vtable->compute_texture_coordinates(shape->data,
+                                                       &model_hit_point,
+                                                       &model_surface_normal,
                                                        &model_ray_differential,
-                                                       distance,
                                                        face_hit,
                                                        additional_data,
                                                        allocator,

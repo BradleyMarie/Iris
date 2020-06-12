@@ -115,8 +115,9 @@ ShapeRayTracerProcessHit(
     const void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
                                             model_to_world,
-                                            process_context->ray_differential,
-                                            hit_context->distance,
+                                            model_hit_point,
+                                            model_surface_normal,
+                                            *process_context->ray_differential,
                                             hit_context->front_face,
                                             hit_context->additional_data,
                                             &process_context->shape_ray_tracer->texture_coordinate_allocator,
