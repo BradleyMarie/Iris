@@ -104,7 +104,7 @@ ISTATUS
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
-    _Out_ const void **texture_coordinates
+    _Out_ void **texture_coordinates
     );
 
 typedef struct _SHAPE_VTABLE {

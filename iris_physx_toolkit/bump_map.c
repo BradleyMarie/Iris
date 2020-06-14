@@ -52,6 +52,12 @@ BumpMapCompute(
     PCUV_TEXTURE_COORDINATE uv_coordinates =
         (PCUV_TEXTURE_COORDINATE)texture_coordinates;
 
+    if (!uv_coordinates->has_derivatives)
+    {
+        *shading_normal = geometry_normal;
+        return ISTATUS_SUCCESS;
+    }
+
     float_t displacement;
     ISTATUS status = FloatTextureSample(bump_map->texture,
                                         hit_point,
@@ -63,9 +69,6 @@ BumpMapCompute(
     {
         return status;
     }
-
-    POINT3 displaced_hit_point0 =
-        PointVectorAddScaled(hit_point, geometry_normal, displacement);
 
     float_t du =
         fabs(uv_coordinates->du_dx) + fabs(uv_coordinates->du_dy);
@@ -101,10 +104,6 @@ BumpMapCompute(
         return status;
     }
 
-    // Assume flat surface
-    POINT3 displaced_hit_point1 =
-        PointVectorAddScaled(hit_point1, geometry_normal, displacement);
-
     float_t dv =
         fabs(uv_coordinates->dv_dx) + fabs(uv_coordinates->dv_dy);
 
@@ -136,8 +135,12 @@ BumpMapCompute(
     }
 
     // Assume flat surface
+    POINT3 displaced_hit_point0 =
+        PointVectorAddScaled(hit_point, geometry_normal, displacement);
+    POINT3 displaced_hit_point1 =
+        PointVectorAddScaled(hit_point1, geometry_normal, displacement_u);
     POINT3 displaced_hit_point2 =
-        PointVectorAddScaled(hit_point2, geometry_normal, displacement);
+        PointVectorAddScaled(hit_point2, geometry_normal, displacement_v);
 
     VECTOR3 dp_du = PointSubtract(displaced_hit_point1, displaced_hit_point0);
     VECTOR3 dp_dv = PointSubtract(displaced_hit_point2, displaced_hit_point0);

@@ -32,7 +32,7 @@ TextureCoordinateAllocatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (allocation)
+    if (allocation == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -53,6 +53,7 @@ TextureCoordinateAllocatorAllocate(
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
     }
 
+    void *data;
     bool success = DynamicMemoryAllocatorAllocate(&allocator->allocator,
                                                   NULL,
                                                   size,
@@ -60,7 +61,7 @@ TextureCoordinateAllocatorAllocate(
                                                   allocation,
                                                   0,
                                                   0,
-                                                  NULL);
+                                                  &data);
 
     if (!success)
     {

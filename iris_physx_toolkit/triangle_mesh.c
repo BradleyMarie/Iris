@@ -382,7 +382,7 @@ TriangleComputeTextureCoordinates(
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
-    _Out_ const void **texture_coordinates
+    _Out_ void **texture_coordinates
     )
 {
     PCTRIANGLE triangle = (PCTRIANGLE)context;
@@ -394,7 +394,7 @@ TriangleComputeTextureCoordinates(
         TextureCoordinateAllocatorAllocate(allocator,
                                            sizeof(UV_TEXTURE_COORDINATE),
                                            alignof(UV_TEXTURE_COORDINATE),
-                                           (void**)texture_coordinates);
+                                           texture_coordinates);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -466,7 +466,7 @@ TriangleComputeTextureCoordinates(
 
     VECTOR3 dp_dv = VectorSubtract(VectorScale(dp12, duv02[0]),
                                    VectorScale(dp02, duv12[0]));
-    dp_dv = VectorScale(dp_du, inverse_determinant);
+    dp_dv = VectorScale(dp_dv, inverse_determinant);
 
     UVTextureCoordinateInitialize(uv_coordinates,
                                   uv,

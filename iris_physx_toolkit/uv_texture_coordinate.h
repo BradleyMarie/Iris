@@ -29,6 +29,7 @@ typedef struct _UV_TEXTURE_COORDINATE {
     float_t du_dy;
     float_t dv_dx;
     float_t dv_dy;
+    bool has_derivatives;
 } UV_TEXTURE_COORDINATE, *PUV_TEXTURE_COORDINATE;
 
 typedef const UV_TEXTURE_COORDINATE *PCUV_TEXTURE_COORDINATE;
@@ -60,34 +61,28 @@ UVTextureCoordinateInitialize(
     assert(VectorValidate(surface_normal));
 
     coordinate->uv[0] = uv[0];
-    coordinate->uv[0] = uv[1];
+    coordinate->uv[1] = uv[1];
     coordinate->dp_du = dp_du;
     coordinate->dp_dv = dp_dv;
+    coordinate->has_derivatives = true;
 
     VECTOR3 to_origin = VectorCreate(hit_point.x, hit_point.y, hit_point.z);
-    float_t d = VectorDotProduct(surface_normal, to_origin);
+    float_t distance = VectorDotProduct(surface_normal, to_origin);
 
     to_origin = VectorCreate(ray_differential.rx.origin.x,
                              ray_differential.rx.origin.y,
                              ray_differential.rx.origin.z);
     float_t tx =
-        -(VectorDotProduct(surface_normal, to_origin) - d) /
+        -(VectorDotProduct(surface_normal, to_origin) - distance) /
         VectorDotProduct(surface_normal, ray_differential.rx.direction);
 
     if (!isfinite(tx))
     {
-        coordinate->dp_du = VectorCreate((float_t)0.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0);
-
-        coordinate->dp_dv = VectorCreate((float_t)0.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0);
-
         coordinate->du_dx = (float_t)0.0;
-        coordinate->du_dx = (float_t)0.0;
+        coordinate->dv_dx = (float_t)0.0;
+        coordinate->du_dy = (float_t)0.0;
         coordinate->dv_dy = (float_t)0.0;
-        coordinate->dv_dy = (float_t)0.0;
+        return;
     }
 
     POINT3 px = RayEndpoint(ray_differential.rx, tx);
@@ -96,23 +91,16 @@ UVTextureCoordinateInitialize(
                              ray_differential.ry.origin.y,
                              ray_differential.ry.origin.z);
     float_t ty =
-        -(VectorDotProduct(surface_normal, to_origin) - d) /
+        -(VectorDotProduct(surface_normal, to_origin) - distance) /
         VectorDotProduct(surface_normal, ray_differential.ry.direction);
 
     if (!isfinite(ty))
     {
-        coordinate->dp_du = VectorCreate((float_t)0.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0);
-
-        coordinate->dp_dv = VectorCreate((float_t)0.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0);
-
         coordinate->du_dx = (float_t)0.0;
-        coordinate->du_dx = (float_t)0.0;
+        coordinate->dv_dx = (float_t)0.0;
+        coordinate->du_dy = (float_t)0.0;
         coordinate->dv_dy = (float_t)0.0;
-        coordinate->dv_dy = (float_t)0.0;
+        return;
     }
 
     POINT3 py = RayEndpoint(ray_differential.ry, ty);
@@ -163,6 +151,7 @@ UVTextureCoordinateInitialize(
         coordinate->dv_dx = (float_t)0.0;
         coordinate->du_dy = (float_t)0.0;
         coordinate->dv_dy = (float_t)0.0;
+        return;
     }
 
     float_t du_dx = (a[1][1] * b_x[0] - a[0][1] * b_x[1]) / determinant;
@@ -189,8 +178,8 @@ UVTextureCoordinateInitialize(
     }
     else
     {
-        coordinate->du_dy = du_dx;
-        coordinate->dv_dy = dv_dx;
+        coordinate->du_dy = du_dy;
+        coordinate->dv_dy = dv_dy;
     }
 }
 
@@ -207,13 +196,8 @@ UVTextureCoordinateInitializeWithoutDerivatives(
     assert(isfinite(uv[0]) && isfinite(uv[1]));
 
     coordinate->uv[0] = uv[0];
-    coordinate->uv[0] = uv[1];
-    coordinate->dp_du = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-    coordinate->dp_dv = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-    coordinate->du_dx = (float_t)0.0;
-    coordinate->du_dx = (float_t)0.0;
-    coordinate->dv_dy = (float_t)0.0;
-    coordinate->dv_dy = (float_t)0.0;
+    coordinate->uv[1] = uv[1];
+    coordinate->has_derivatives = false;
 }
 
 #endif // _IRIS_PHYSX_TOOLKIT_UV_TEXTURE_COORDINATE_

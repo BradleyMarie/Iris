@@ -112,7 +112,7 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
-    const void *texture_coordinates;
+    void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
                                             model_to_world,
                                             model_hit_point,
