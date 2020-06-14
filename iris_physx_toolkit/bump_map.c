@@ -134,16 +134,13 @@ BumpMapCompute(
         return status;
     }
 
-    // Assume flat surface
-    POINT3 displaced_hit_point0 =
-        PointVectorAddScaled(hit_point, geometry_normal, displacement);
-    POINT3 displaced_hit_point1 =
-        PointVectorAddScaled(hit_point1, geometry_normal, displacement_u);
-    POINT3 displaced_hit_point2 =
-        PointVectorAddScaled(hit_point2, geometry_normal, displacement_v);
+    displacement_u = (displacement_u - displacement) / du;
+    VECTOR3 dp_du = VectorAdd(uv_coordinates->dp_du,
+                              VectorScale(geometry_normal, displacement_u));
 
-    VECTOR3 dp_du = PointSubtract(displaced_hit_point1, displaced_hit_point0);
-    VECTOR3 dp_dv = PointSubtract(displaced_hit_point2, displaced_hit_point0);
+    displacement_v = (displacement_v - displacement) / dv;
+    VECTOR3 dp_dv = VectorAdd(uv_coordinates->dp_dv,
+                              VectorScale(geometry_normal, displacement_v));
 
     *shading_normal = VectorCrossProduct(dp_du, dp_dv);
     *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);
