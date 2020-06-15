@@ -182,7 +182,7 @@ ProductReflectorTextureSample(
     }
 
     PCREFLECTOR multiplicand1;
-    status = ReflectorTextureSample(texture->multiplicand0,
+    status = ReflectorTextureSample(texture->multiplicand1,
                                     model_hit_point,
                                     additional_data,
                                     texture_coordinates,
