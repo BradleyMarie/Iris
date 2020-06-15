@@ -56,7 +56,7 @@ ProductFloatTextureSample(
         return status;
     }
 
-    status = FloatTextureSample(texture->multiplicand0,
+    status = FloatTextureSample(texture->multiplicand1,
                                 model_hit_point,
                                 additional_data,
                                 texture_coordinates,
@@ -122,11 +122,11 @@ ProductFloatTextureAllocate(
     product_texture.multiplicand0 = multiplicand0;
     product_texture.multiplicand1 = multiplicand1;
 
-    ISTATUS status  = FloatTextureAllocate(&product_float_texture_vtable,
-                                           &product_texture,
-                                           sizeof(PRODUCT_FLOAT_TEXTURE),
-                                           alignof(PRODUCT_FLOAT_TEXTURE),
-                                           product);
+    ISTATUS status = FloatTextureAllocate(&product_float_texture_vtable,
+                                          &product_texture,
+                                          sizeof(PRODUCT_FLOAT_TEXTURE),
+                                          alignof(PRODUCT_FLOAT_TEXTURE),
+                                          product);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -252,11 +252,11 @@ ProductReflectorTextureAllocate(
     product_texture.multiplicand0 = multiplicand0;
     product_texture.multiplicand1 = multiplicand1;
 
-    ISTATUS status  = ReflectorTextureAllocate(&product_reflector_texture_vtable,
-                                           &product_texture,
-                                           sizeof(PRODUCT_REFLECTOR_TEXTURE),
-                                           alignof(PRODUCT_REFLECTOR_TEXTURE),
-                                           product);
+    ISTATUS status = ReflectorTextureAllocate(&product_reflector_texture_vtable,
+                                              &product_texture,
+                                              sizeof(PRODUCT_REFLECTOR_TEXTURE),
+                                              alignof(PRODUCT_REFLECTOR_TEXTURE),
+                                              product);
 
     if (status != ISTATUS_SUCCESS)
     {
