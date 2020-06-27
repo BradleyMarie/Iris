@@ -94,6 +94,7 @@ static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
 static const float_t inv_pi = (float_t)0.31830988618379067153776752674503;
 static const float_t pi = (float_t)3.14159265358979323846264338327950;
 
+static
 ISTATUS
 CosineSampleHemisphere(
     _In_ VECTOR3 surface_normal,
