@@ -16,6 +16,7 @@ Abstract:
 
 #include "iris_physx_toolkit/matte_material.h"
 #include "iris_physx_toolkit/lambertian_bsdf.h"
+#include "iris_physx_toolkit/oren_nayar_bsdf.h"
 
 //
 // Types
@@ -23,6 +24,7 @@ Abstract:
 
 typedef struct _MATTE_MATERIAL {
     PREFLECTOR_TEXTURE diffuse;
+    PFLOAT_TEXTURE sigma;
 } MATTE_MATERIAL, *PMATTE_MATERIAL;
 
 typedef const MATTE_MATERIAL *PCMATTE_MATERIAL;
@@ -58,9 +60,31 @@ MatteMaterialSample(
         return status;
     }
 
-    status = LambertianReflectorAllocateWithAllocator(bsdf_allocator,
-                                                      reflector,
-                                                      bsdf);
+    float_t sigma;
+    status = FloatTextureSample(matte_material->sigma,
+                                model_hit_point,
+                                additional_data,
+                                texture_coordinates,
+                                &sigma);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (sigma == (float_t)0.0)
+    {
+        status = LambertianReflectorAllocateWithAllocator(bsdf_allocator,
+                                                          reflector,
+                                                          bsdf);
+    }
+    else
+    {
+        status = OrenNayarReflectorAllocateWithAllocator(bsdf_allocator,
+                                                         reflector,
+                                                         sigma,
+                                                         bsdf);
+    }
 
     return status;
 }
@@ -92,10 +116,16 @@ static const MATERIAL_VTABLE matte_material_vtable = {
 ISTATUS
 MatteMaterialAllocate(
     _In_ PREFLECTOR_TEXTURE diffuse,
+    _In_ PFLOAT_TEXTURE sigma,
     _Out_ PMATERIAL *material
     )
 {
     if (diffuse == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (sigma == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -107,6 +137,7 @@ MatteMaterialAllocate(
 
     MATTE_MATERIAL matte_material;
     matte_material.diffuse = diffuse;
+    matte_material.sigma = sigma;
 
     ISTATUS status = MaterialAllocate(&matte_material_vtable,
                                       &matte_material,
@@ -120,6 +151,7 @@ MatteMaterialAllocate(
     }
 
     ReflectorTextureRetain(diffuse);
+    FloatTextureRetain(sigma);
 
     return ISTATUS_SUCCESS;
 }

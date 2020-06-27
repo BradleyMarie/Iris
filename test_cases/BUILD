@@ -213,6 +213,7 @@ cc_test(
         "//iris_camera_toolkit:grid_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit:all_light_sampler",
+        "//iris_physx_toolkit:attenuated_reflector",
         "//iris_physx_toolkit:constant_material",
         "//iris_physx_toolkit:kd_tree_scene",
         "//iris_physx_toolkit:lambertian_bsdf",

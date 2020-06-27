@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_TOOLKIT_MATTE_MATERIAL_
 #define _IRIS_PHYSX_TOOLKIT_MATTE_MATERIAL_
 
+#include "iris_physx_toolkit/float_texture.h"
 #include "iris_physx_toolkit/reflector_texture.h"
 
 #if __cplusplus 
@@ -28,6 +29,7 @@ extern "C" {
 ISTATUS
 MatteMaterialAllocate(
     _In_ PREFLECTOR_TEXTURE diffuse,
+    _In_ PFLOAT_TEXTURE sigma,
     _Out_ PMATERIAL *material
     );
 

@@ -170,7 +170,6 @@ cc_library(
     srcs = ["lambertian_bsdf.c"],
     hdrs = ["lambertian_bsdf.h"],
     deps = [
-        ":attenuated_reflector",
         "//iris_physx",
     ],
 )
@@ -199,7 +198,9 @@ cc_library(
     srcs = ["matte_material.c"],
     hdrs = ["matte_material.h"],
     deps = [
+        ":float_texture",
         ":lambertian_bsdf",
+        ":oren_nayar_bsdf",
         ":reflector_texture",
     ],
 )
@@ -237,6 +238,15 @@ cc_library(
     name = "one_light_sampler",
     srcs = ["one_light_sampler.c"],
     hdrs = ["one_light_sampler.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "oren_nayar_bsdf",
+    srcs = ["oren_nayar_bsdf.c"],
+    hdrs = ["oren_nayar_bsdf.h"],
     deps = [
         "//iris_physx",
     ],
