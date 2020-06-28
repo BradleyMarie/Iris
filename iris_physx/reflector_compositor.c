@@ -530,3 +530,31 @@ ReflectorCompositorMultiplyReflectors(
 
     return ISTATUS_SUCCESS;
 }
+
+ISTATUS
+ReflectorCompositorAddReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _In_ PCREFLECTOR addend0,
+    _In_ PCREFLECTOR addend1,
+    _Out_ PCREFLECTOR *sum
+    )
+{
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (sum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    // TODO: Implement an actual sum reflector if this ends up being hot.
+    ISTATUS status = ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                                addend0,
+                                                                addend1,
+                                                                (float_t)1.0,
+                                                                sum);
+
+    return status;
+}

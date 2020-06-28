@@ -193,11 +193,10 @@ AggregateBsdfComputeReflectance(
             continue;
         }
 
-        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
-                                                            *reflector,
-                                                            bsdf_reflector,
-                                                            (float_t)1.0,
-                                                            reflector);
+        status = ReflectorCompositorAddReflectors(compositor,
+                                                  *reflector,
+                                                  bsdf_reflector,
+                                                  reflector);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -251,11 +250,10 @@ AggregateBsdfComputeReflectanceWithPdf(
 
         matching_bsdfs += 1;
 
-        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
-                                                            *reflector,
-                                                            bsdf_reflector,
-                                                            (float_t)1.0,
-                                                            reflector);
+        status = ReflectorCompositorAddReflectors(compositor,
+                                                  *reflector,
+                                                  bsdf_reflector,
+                                                  reflector);
 
         if (status != ISTATUS_SUCCESS)
         {

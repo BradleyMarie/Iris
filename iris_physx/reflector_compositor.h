@@ -57,4 +57,12 @@ ReflectorCompositorMultiplyReflectors(
     _Out_ PCREFLECTOR *product
     );
 
+ISTATUS
+ReflectorCompositorAddReflectors(
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _In_ PCREFLECTOR addend0,
+    _In_ PCREFLECTOR addend1,
+    _Out_ PCREFLECTOR *sum
+    );
+
 #endif // _IRIS_PHYSX_REFLECTOR_COMPOSITOR_
