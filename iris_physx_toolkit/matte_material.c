@@ -116,15 +116,10 @@ static const MATERIAL_VTABLE matte_material_vtable = {
 ISTATUS
 MatteMaterialAllocate(
     _In_opt_ PREFLECTOR_TEXTURE diffuse,
-    _In_ PFLOAT_TEXTURE sigma,
+    _In_opt_ PFLOAT_TEXTURE sigma,
     _Out_ PMATERIAL *material
     )
 {
-    if (sigma == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (material == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;

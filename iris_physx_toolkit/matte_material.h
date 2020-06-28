@@ -29,7 +29,7 @@ extern "C" {
 ISTATUS
 MatteMaterialAllocate(
     _In_opt_ PREFLECTOR_TEXTURE diffuse,
-    _In_ PFLOAT_TEXTURE sigma,
+    _In_opt_ PFLOAT_TEXTURE sigma,
     _Out_ PMATERIAL *material
     );
 
