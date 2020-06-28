@@ -91,18 +91,13 @@ ColorIntegratorAllocate(
 ISTATUS
 ColorIntegratorComputeSpectrumColor(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCSPECTRUM spectrum,
+    _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
 {
     if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (spectrum == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (color == NULL)
@@ -120,18 +115,13 @@ ColorIntegratorComputeSpectrumColor(
 ISTATUS
 ColorIntegratorComputeReflectorColor(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
     )
 {
     if (color_integrator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (color == NULL)

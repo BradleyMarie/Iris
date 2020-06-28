@@ -39,13 +39,18 @@ inline
 ISTATUS
 ColorIntegratorComputeSpectrumColorStatic(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCSPECTRUM spectrum,
+    _In_opt_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
 {
     assert(color_integrator != NULL);
-    assert(spectrum != NULL);
     assert(color != NULL);
+
+    if (spectrum == NULL)
+    {
+        *color = ColorCreateBlack();
+        return ISTATUS_SUCCESS;
+    }
 
     ISTATUS status =
         color_integrator->vtable->compute_spectrum_color_routine(
@@ -59,13 +64,18 @@ inline
 ISTATUS
 ColorIntegratorComputeReflectorColorStatic(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
     )
 {
     assert(color_integrator != NULL);
-    assert(reflector != NULL);
     assert(color != NULL);
+
+    if (reflector == NULL)
+    {
+        *color = ColorCreateBlack();
+        return ISTATUS_SUCCESS;
+    }
 
     ISTATUS status =
         color_integrator->vtable->compute_reflector_color_routine(

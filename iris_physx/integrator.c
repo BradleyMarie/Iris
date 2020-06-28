@@ -295,12 +295,6 @@ IntegratorIntegrate(
         return status;
     }
 
-    if (spectrum == NULL)
-    {
-        *color = ColorCreateBlack();
-        return ISTATUS_SUCCESS;
-    }
-
     status =
         ColorIntegratorComputeSpectrumColorStatic(integrator->color_integrator,
                                                   spectrum,

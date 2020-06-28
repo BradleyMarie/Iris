@@ -27,7 +27,7 @@ typedef
 ISTATUS
 (*PCOLOR_INTEGRATOR_COMPUTE_SPECTRUM_COLOR_ROUTINE)(
     _In_ const void *context,
-    _In_opt_ PCSPECTRUM spectrum,
+    _In_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     );
 
@@ -35,7 +35,7 @@ typedef
 ISTATUS
 (*PCOLOR_INTEGRATOR_COMPUTE_REFLECTOR_COLOR_ROUTINE)(
     _In_ const void *context,
-    _In_opt_ PCREFLECTOR spectrum,
+    _In_ PCREFLECTOR spectrum,
     _Out_ PCOLOR3 color
     );
 
