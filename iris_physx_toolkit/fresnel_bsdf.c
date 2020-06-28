@@ -181,23 +181,13 @@ static const BSDF_VTABLE perfect_specular_reflector_vtable = {
 
 ISTATUS
 SpecularDielectricBsdfAllocate(
-    _In_ PREFLECTOR reflected,
-    _In_ PREFLECTOR transmitted,
+    _In_opt_ PREFLECTOR reflected,
+    _In_opt_ PREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PBSDF *bsdf
     )
 {
-    if (reflected == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (transmitted == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (!isfinite(refractive_index_incident) ||
         refractive_index_incident < (float_t)1.0)
     {
@@ -213,6 +203,12 @@ SpecularDielectricBsdfAllocate(
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (reflected == NULL && transmitted == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     float_t ratio = refractive_index_incident / refractive_index_transmitted;
@@ -245,8 +241,8 @@ SpecularDielectricBsdfAllocate(
 ISTATUS
 SpecularDielectricBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflected,
-    _In_ PCREFLECTOR transmitted,
+    _In_opt_ PCREFLECTOR reflected,
+    _In_opt_ PCREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PCBSDF *bsdf
@@ -255,16 +251,6 @@ SpecularDielectricBsdfAllocateWithAllocator(
     if (bsdf_allocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (reflected == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (transmitted == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (!isfinite(refractive_index_incident) ||
@@ -282,6 +268,12 @@ SpecularDielectricBsdfAllocateWithAllocator(
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (reflected == NULL && transmitted == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     float_t ratio = refractive_index_incident / refractive_index_transmitted;

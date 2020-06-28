@@ -27,8 +27,8 @@ extern "C" {
 
 ISTATUS
 SpecularDielectricBsdfAllocate(
-    _In_ PREFLECTOR reflected,
-    _In_ PREFLECTOR transmitted,
+    _In_opt_ PREFLECTOR reflected,
+    _In_opt_ PREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PBSDF *bsdf
@@ -37,8 +37,8 @@ SpecularDielectricBsdfAllocate(
 ISTATUS
 SpecularDielectricBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflected,
-    _In_ PCREFLECTOR transmitted,
+    _In_opt_ PCREFLECTOR reflected,
+    _In_opt_ PCREFLECTOR transmitted,
     _In_ float_t refractive_index_incident,
     _In_ float_t refractive_index_transmitted,
     _Out_ PCBSDF *bsdf
