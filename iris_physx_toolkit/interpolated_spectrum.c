@@ -231,6 +231,22 @@ InterpolatedSpectrumAllocate(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
+    bool is_black = true;
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        if (intensities[i] != (float_t)0.0)
+        {
+            is_black = false;
+            break;
+        }
+    }
+
+    if (is_black)
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     INTERPOLATED_SPECTRUM interpolated_spectrum;
     interpolated_spectrum.wavelengths = calloc(num_samples, sizeof(float_t));
 
@@ -315,6 +331,22 @@ InterpolatedReflectorAllocate(
     if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    bool is_black = true;
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        if (reflectances[i] != (float_t)0.0)
+        {
+            is_black = false;
+            break;
+        }
+    }
+
+    if (is_black)
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     INTERPOLATED_REFLECTOR interpolated_reflector;
