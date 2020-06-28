@@ -3,6 +3,15 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "aggregate_bsdf",
+    srcs = ["aggregate_bsdf.c"],
+    hdrs = ["aggregate_bsdf.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "all_light_sampler",
     srcs = ["all_light_sampler.c"],
     hdrs = ["all_light_sampler.h"],

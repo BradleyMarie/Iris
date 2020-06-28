@@ -148,82 +148,6 @@ DeltaBsdfLighting(
 
 static
 ISTATUS
-LightLighting(
-    _In_ PCSPECTRUM light_spectrum,
-    _In_ float_t light_pdf,
-    _In_ PCBSDF bsdf,
-    _In_ VECTOR3 to_hit_point,
-    _In_ VECTOR3 surface_normal,
-    _In_ VECTOR3 shading_normal,
-    _In_ VECTOR3 to_light,
-    _Inout_ PSPECTRUM_COMPOSITOR spectrum_compositor,
-    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
-    _Out_ PCSPECTRUM *spectrum
-    )
-{
-    assert(light_spectrum != NULL);
-    assert((float_t)0.0 < light_pdf);
-    assert(isfinite(light_pdf));
-    assert(bsdf != NULL);
-    assert(VectorValidate(to_hit_point));
-    assert(VectorValidate(surface_normal));
-    assert(VectorValidate(to_light));
-    assert(spectrum_compositor != NULL);
-    assert(reflector_compositor != NULL);
-    assert(spectrum != NULL);
-
-    float_t light_sample_falloff = VectorDotProduct(shading_normal, to_light);
-
-    bool bsdf_computed_transmitted;
-    if (light_sample_falloff < (float_t)0.0)
-    {
-        light_sample_falloff = -light_sample_falloff;
-        bsdf_computed_transmitted = true;
-    }
-    else
-    {
-        bsdf_computed_transmitted = false;
-    }
-
-    PCREFLECTOR bsdf_computed_reflector;
-    float_t bsdf_computed_pdf;
-    ISTATUS status = BsdfComputeReflectanceWithPdf(bsdf,
-                                                   to_hit_point,
-                                                   surface_normal,
-                                                   to_light,
-                                                   bsdf_computed_transmitted,
-                                                   reflector_compositor,
-                                                   &bsdf_computed_reflector,
-                                                   &bsdf_computed_pdf);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if ((float_t)0.0 < bsdf_computed_pdf && isfinite(bsdf_computed_pdf))
-    {
-        float_t light_sample_weight = PowerHeuristic(light_pdf, bsdf_computed_pdf);
-
-        float_t light_sample_attenuation =
-            (light_sample_falloff * light_sample_weight) / light_pdf;
-
-        status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
-                                                       light_spectrum,
-                                                       bsdf_computed_reflector,
-                                                       light_sample_attenuation,
-                                                       spectrum);
-    }
-    else
-    {
-        *spectrum = NULL;
-    }
-
-    return status;
-}
-
-static
-ISTATUS
 BsdfLighting(
     _In_ PCLIGHT light,
     _In_ PCBSDF bsdf,
@@ -429,22 +353,6 @@ SampleDirectLighting(
 
     if (status != ISTATUS_SUCCESS)
     {
-        return status;
-    }
-
-    if (bsdf_sampled_pdf <= (float_t)0.0)
-    {
-        status = LightLighting(light_sampled_spectrum,
-                               light_sampled_pdf,
-                               bsdf,
-                               to_hit_point,
-                               surface_normal,
-                               shading_normal,
-                               light_sampled_direction,
-                               spectrum_compositor,
-                               reflector_compositor,
-                               spectrum);
-
         return status;
     }
 

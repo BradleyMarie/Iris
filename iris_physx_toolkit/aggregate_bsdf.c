@@ -1,0 +1,430 @@
+/*++
+
+Copyright (c) 2020 Brad Weinberger
+
+Module Name:
+
+    aggregate_bsdf.c
+
+Abstract:
+
+    Implements a Aggregate BSDF.
+
+--*/
+
+#include <stdalign.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "iris_physx_toolkit/aggregate_bsdf.h"
+
+//
+// Defines
+//
+
+#define NUM_SUPPORTED_BSDFS 8
+
+//
+// Static Asserts
+//
+
+static_assert(sizeof(size_t) == sizeof(PBSDF), "size mismatch");
+
+//
+// Types
+//
+
+_Struct_size_bytes_((1 + num_bsdfs) * sizeof(PBSDF))
+typedef struct _AGGREGATE_BSDF {
+    size_t num_bsdfs;
+    _Field_size_(num_bsdfs) PBSDF bsdfs[];
+} AGGREGATE_BSDF, *PAGGREGATE_BSDF;
+
+typedef const AGGREGATE_BSDF *PCAGGREGATE_BSDF;
+
+//
+// Static Functions
+//
+
+static
+ISTATUS
+AggregateReflectorSample(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
+    _Out_ PVECTOR3 outgoing,
+    _Out_ float_t *pdf
+    )
+{
+    PCAGGREGATE_BSDF aggregate_bsdf = (PCAGGREGATE_BSDF)context;
+
+    size_t sampled_index;
+    ISTATUS status = RandomGenerateIndex(rng,
+                                         aggregate_bsdf->num_bsdfs,
+                                         &sampled_index);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = BsdfSample(aggregate_bsdf->bsdfs[sampled_index],
+                        incoming,
+                        normal,
+                        rng,
+                        compositor,
+                        reflector,
+                        transmitted,
+                        outgoing,
+                        pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    bool specular;
+    if (isinf(*pdf))
+    {
+        specular = true;
+        *pdf = (float_t)1.0;
+    }
+    else
+    {
+        specular = false;
+    }
+
+    size_t matching_bsdfs = 1;
+    for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
+    {
+        if (i == sampled_index)
+        {
+            continue;
+        }
+
+        PCREFLECTOR bsdf_reflector;
+        float_t bsdf_pdf;
+        status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
+                                               incoming,
+                                               normal,
+                                               *outgoing,
+                                               *transmitted,
+                                               compositor,
+                                               &bsdf_reflector,
+                                               &bsdf_pdf);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (bsdf_pdf <= (float_t)0.0)
+        {
+            continue;
+        }
+
+        matching_bsdfs += 1;
+
+        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                            *reflector,
+                                                            bsdf_reflector,
+                                                            (float_t)1.0,
+                                                            reflector);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (isinf(bsdf_pdf))
+        {
+            *pdf += (float_t)1.0;
+        }
+        else
+        {
+            *pdf += bsdf_pdf;
+            specular = false;
+        }
+    }
+
+    if (specular)
+    {
+        *pdf = INFINITY;
+    }
+    else if (matching_bsdfs > 0)
+    {
+        *pdf /= matching_bsdfs;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+AggregateReflectorComputeReflectance(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 normal,
+    _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    PCAGGREGATE_BSDF aggregate_bsdf = (PCAGGREGATE_BSDF)context;
+
+    *reflector = NULL;
+    for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
+    {
+        PCREFLECTOR bsdf_reflector;
+        float_t bsdf_pdf;
+        ISTATUS status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
+                                                       incoming,
+                                                       normal,
+                                                       outgoing,
+                                                       transmitted,
+                                                       compositor,
+                                                       &bsdf_reflector,
+                                                       &bsdf_pdf);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (bsdf_pdf <= (float_t)0.0)
+        {
+            continue;
+        }
+
+        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                            *reflector,
+                                                            bsdf_reflector,
+                                                            (float_t)1.0,
+                                                            reflector);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+AggregateReflectorComputeReflectanceWithPdf(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 normal,
+    _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ float_t *pdf
+    )
+{
+    PCAGGREGATE_BSDF aggregate_bsdf = (PCAGGREGATE_BSDF)context;
+
+    size_t matching_bsdfs = 0;
+    *reflector = NULL;
+    *pdf = (float_t)0.0;
+    for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
+    {
+        PCREFLECTOR bsdf_reflector;
+        float_t bsdf_pdf;
+        ISTATUS status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
+                                                       incoming,
+                                                       normal,
+                                                       outgoing,
+                                                       transmitted,
+                                                       compositor,
+                                                       &bsdf_reflector,
+                                                       &bsdf_pdf);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        if (bsdf_pdf <= (float_t)0.0)
+        {
+            continue;
+        }
+
+        matching_bsdfs += 1;
+
+        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                            *reflector,
+                                                            bsdf_reflector,
+                                                            (float_t)1.0,
+                                                            reflector);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *pdf += bsdf_pdf;
+    }
+
+    if (matching_bsdfs > 1)
+    {
+        *pdf /= matching_bsdfs;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+void
+AggregateReflectorFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PAGGREGATE_BSDF aggregate_bsdf = (PAGGREGATE_BSDF)context;
+
+    for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
+    {
+        BsdfRelease(aggregate_bsdf->bsdfs[i]);
+    }
+}
+
+//
+// Static Variables
+//
+
+static const BSDF_VTABLE aggregate_bsdf_vtable = {
+    AggregateReflectorSample,
+    AggregateReflectorComputeReflectance,
+    AggregateReflectorComputeReflectanceWithPdf,
+    AggregateReflectorFree
+};
+
+//
+// Functions
+//
+
+ISTATUS
+AggregateBsdfAllocate(
+    _In_reads_(num_bsdfs) PBSDF *bsdfs,
+    _In_ size_t num_bsdfs,
+    _Out_ PBSDF *bsdf
+    )
+{
+    if (bsdfs == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_bsdfs == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        if (bsdfs[i] == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+    }
+
+    PAGGREGATE_BSDF aggregate_bsdf =
+        (PAGGREGATE_BSDF)calloc(1 + num_bsdfs, sizeof(size_t));
+
+    if (aggregate_bsdf == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    aggregate_bsdf->num_bsdfs = num_bsdfs;
+    memcpy(aggregate_bsdf->bsdfs, bsdfs, sizeof(PBSDF) * num_bsdfs);
+
+    ISTATUS status = BsdfAllocate(&aggregate_bsdf_vtable,
+                                  aggregate_bsdf,
+                                  sizeof(PBSDF) * (1 + num_bsdfs),
+                                  alignof(AGGREGATE_BSDF),
+                                  bsdf);
+
+    free(aggregate_bsdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        BsdfRetain(bsdfs[i]);
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+AggregateBsdfAllocateWithAllocator(
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
+    _In_reads_(num_bsdfs) PCBSDF *bsdfs,
+    _In_ size_t num_bsdfs,
+    _Out_ PCBSDF *bsdf
+    )
+{
+    if (bsdf_allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (bsdfs == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (num_bsdfs == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        if (bsdfs[i] == NULL)
+        {
+            return ISTATUS_INVALID_ARGUMENT_01;
+        }
+    }
+
+    if (NUM_SUPPORTED_BSDFS < num_bsdfs)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t temporary_space[1 + NUM_SUPPORTED_BSDFS];
+    PAGGREGATE_BSDF aggregate_bsdf = (PAGGREGATE_BSDF)(void *)&temporary_space;
+
+    aggregate_bsdf->num_bsdfs = num_bsdfs;
+    memcpy(aggregate_bsdf->bsdfs, bsdfs, sizeof(PBSDF) * num_bsdfs);
+
+    ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
+                                           &aggregate_bsdf_vtable,
+                                           aggregate_bsdf,
+                                           sizeof(PBSDF) * (1 + num_bsdfs),
+                                           alignof(AGGREGATE_BSDF),
+                                           bsdf);
+
+    return status; 
+}

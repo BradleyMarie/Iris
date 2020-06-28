@@ -188,11 +188,6 @@ PathTracerIntegrate(
             return status;
         }
 
-        if (bsdf_pdf <= (float_t)0.0)
-        {
-            break;
-        }
-
         float_t albedo;
         status = ReflectorGetAlbedo(path_tracer->reflectors[bounces],
                                     &albedo);
