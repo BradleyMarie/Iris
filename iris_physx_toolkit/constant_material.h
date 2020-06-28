@@ -28,7 +28,7 @@ extern "C" {
 
 ISTATUS
 ConstantMaterialAllocate(
-    _In_ PBSDF bsdf,
+    _In_opt_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     );
 

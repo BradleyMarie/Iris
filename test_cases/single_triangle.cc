@@ -77,12 +77,7 @@ TriangleMaterialSample(
                                                  reflector,
                                                  bsdf);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
@@ -105,27 +100,12 @@ static const MATERIAL_VTABLE triangle_material_vtable = {
 
 ISTATUS
 TriangleMaterialAllocate(
-    _In_ PREFLECTOR reflector0,
-    _In_ PREFLECTOR reflector1,
-    _In_ PREFLECTOR reflector2,
+    _In_opt_ PREFLECTOR reflector0,
+    _In_opt_ PREFLECTOR reflector1,
+    _In_opt_ PREFLECTOR reflector2,
     _Out_ PMATERIAL *material
     )
 {
-    if (reflector0 == nullptr)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (reflector1 == nullptr)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (reflector2 == nullptr)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
     if (material == nullptr)
     {
         return ISTATUS_INVALID_ARGUMENT_01;

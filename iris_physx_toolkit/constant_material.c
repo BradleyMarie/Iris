@@ -75,18 +75,19 @@ static const MATERIAL_VTABLE constant_material_vtable = {
 
 ISTATUS
 ConstantMaterialAllocate(
-    _In_ PBSDF bsdf,
+    _In_opt_ PBSDF bsdf,
     _Out_ PMATERIAL *material
     )
 {
-    if (bsdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (material == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (bsdf == NULL)
+    {
+        *material = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     CONSTANT_MATERIAL constant_material;
