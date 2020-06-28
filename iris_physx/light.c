@@ -249,7 +249,17 @@ LightComputeEmissiveWithPdf(
                                                          spectrum,
                                                          pdf);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (isinf(*pdf))
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 void

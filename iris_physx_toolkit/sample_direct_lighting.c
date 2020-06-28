@@ -230,7 +230,7 @@ BsdfLighting(
         return status;
     }
 
-    if ((float_t)0.0 < light_computed_pdf && isfinite(light_computed_pdf))
+    if ((float_t)0.0 < light_computed_pdf)
     {
         float_t bsdf_sample_falloff =
             VectorPositiveDotProduct(shading_normal,
@@ -401,7 +401,7 @@ SampleDirectLighting(
         return status;
     }
 
-    if ((float_t)0.0 < bsdf_computed_pdf && isfinite(bsdf_computed_pdf))
+    if ((float_t)0.0 < bsdf_computed_pdf)
     {
         float_t light_sample_falloff =
             VectorPositiveDotProduct(shading_normal,
@@ -446,7 +446,7 @@ SampleDirectLighting(
         return status;
     }
 
-    if ((float_t)0.0 < light_computed_pdf && isfinite(light_computed_pdf))
+    if ((float_t)0.0 < light_computed_pdf)
     {
         float_t bsdf_sample_falloff =
             VectorPositiveDotProduct(shading_normal,

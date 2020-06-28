@@ -140,15 +140,8 @@ AggregateReflectorSample(
             return status;
         }
 
-        if (isinf(bsdf_pdf))
-        {
-            *pdf += (float_t)1.0;
-        }
-        else
-        {
-            *pdf += bsdf_pdf;
-            specular = false;
-        }
+        *pdf += bsdf_pdf;
+        specular = false;
     }
 
     if (specular)
