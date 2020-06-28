@@ -28,15 +28,15 @@ extern "C" {
 
 ISTATUS
 ProductFloatTextureAllocate(
-    _In_ PFLOAT_TEXTURE multiplicand0,
-    _In_ PFLOAT_TEXTURE multiplicand1,
+    _In_opt_ PFLOAT_TEXTURE multiplicand0,
+    _In_opt_ PFLOAT_TEXTURE multiplicand1,
     _Out_ PFLOAT_TEXTURE *product
     );
 
 ISTATUS
 ProductReflectorTextureAllocate(
-    _In_ PREFLECTOR_TEXTURE multiplicand0,
-    _In_ PREFLECTOR_TEXTURE multiplicand1,
+    _In_opt_ PREFLECTOR_TEXTURE multiplicand0,
+    _In_opt_ PREFLECTOR_TEXTURE multiplicand1,
     _Out_ PREFLECTOR_TEXTURE *product
     );
 

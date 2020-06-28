@@ -77,6 +77,12 @@ ConstantFloatTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (value == (float_t)0.0)
+    {
+        *texture = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     CONSTANT_FLOAT_TEXTURE constant_texture;
     constant_texture.value = value;
 
@@ -156,14 +162,20 @@ ConstantReflectorTextureAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
+    if (reflector == NULL)
+    {
+        *texture = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     CONSTANT_REFLECTOR_TEXTURE constant_texture;
     constant_texture.reflector = reflector;
 
-    ISTATUS status  = ReflectorTextureAllocate(&constant_reflector_texture_vtable,
-                                               &constant_texture,
-                                               sizeof(PCONSTANT_REFLECTOR_TEXTURE),
-                                               alignof(PCONSTANT_REFLECTOR_TEXTURE),
-                                               texture);
+    ISTATUS status = ReflectorTextureAllocate(&constant_reflector_texture_vtable,
+                                              &constant_texture,
+                                              sizeof(PCONSTANT_REFLECTOR_TEXTURE),
+                                              alignof(PCONSTANT_REFLECTOR_TEXTURE),
+                                              texture);
 
     if (status != ISTATUS_SUCCESS)
     {

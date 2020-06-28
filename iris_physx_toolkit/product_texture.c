@@ -98,24 +98,20 @@ static const FLOAT_TEXTURE_VTABLE product_float_texture_vtable = {
 
 ISTATUS
 ProductFloatTextureAllocate(
-    _In_ PFLOAT_TEXTURE multiplicand0,
-    _In_ PFLOAT_TEXTURE multiplicand1,
+    _In_opt_ PFLOAT_TEXTURE multiplicand0,
+    _In_opt_ PFLOAT_TEXTURE multiplicand1,
     _Out_ PFLOAT_TEXTURE *product
     )
 {
-    if (multiplicand0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (multiplicand1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (product == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (multiplicand0 == NULL || multiplicand1 == NULL)
+    {
+        *product = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     PRODUCT_FLOAT_TEXTURE product_texture;
@@ -136,7 +132,7 @@ ProductFloatTextureAllocate(
     FloatTextureRetain(multiplicand0);
     FloatTextureRetain(multiplicand1);
 
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 //
@@ -228,24 +224,20 @@ static const REFLECTOR_TEXTURE_VTABLE product_reflector_texture_vtable = {
 
 ISTATUS
 ProductReflectorTextureAllocate(
-    _In_ PREFLECTOR_TEXTURE multiplicand0,
-    _In_ PREFLECTOR_TEXTURE multiplicand1,
+    _In_opt_ PREFLECTOR_TEXTURE multiplicand0,
+    _In_opt_ PREFLECTOR_TEXTURE multiplicand1,
     _Out_ PREFLECTOR_TEXTURE *product
     )
 {
-    if (multiplicand0 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (multiplicand1 == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (product == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (multiplicand0 == NULL || multiplicand1 == NULL)
+    {
+        *product = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     PRODUCT_REFLECTOR_TEXTURE product_texture;
@@ -266,5 +258,5 @@ ProductReflectorTextureAllocate(
     ReflectorTextureRetain(multiplicand0);
     ReflectorTextureRetain(multiplicand1);
 
-    return status;
+    return ISTATUS_SUCCESS;
 }
