@@ -60,24 +60,32 @@ DeltaLightLighting(
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
-    PCREFLECTOR reflector;
+    float_t falloff = VectorDotProduct(shading_normal, to_light);
+
     bool transmitted;
+    if (falloff < (float_t)0.0)
+    {
+        falloff = -falloff;
+        transmitted = true;
+    }
+    else
+    {
+        transmitted = false;
+    }
+
+    PCREFLECTOR reflector;
     ISTATUS status = BsdfComputeReflectance(bsdf,
                                             to_hit_point,
                                             surface_normal,
                                             to_light,
+                                            transmitted,
                                             reflector_compositor,
-                                            &reflector,
-                                            &transmitted);
+                                            &reflector);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
-
-    float_t falloff = VectorPositiveDotProduct(shading_normal,
-                                               to_light,
-                                               transmitted);
 
     status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
                                                    light_spectrum,
@@ -164,16 +172,28 @@ LightLighting(
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
-    PCREFLECTOR bsdf_computed_reflector;
+    float_t light_sample_falloff = VectorDotProduct(shading_normal, to_light);
+
     bool bsdf_computed_transmitted;
+    if (light_sample_falloff < (float_t)0.0)
+    {
+        light_sample_falloff = -light_sample_falloff;
+        bsdf_computed_transmitted = true;
+    }
+    else
+    {
+        bsdf_computed_transmitted = false;
+    }
+
+    PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
     ISTATUS status = BsdfComputeReflectanceWithPdf(bsdf,
                                                    to_hit_point,
                                                    surface_normal,
                                                    to_light,
+                                                   bsdf_computed_transmitted,
                                                    reflector_compositor,
                                                    &bsdf_computed_reflector,
-                                                   &bsdf_computed_transmitted,
                                                    &bsdf_computed_pdf);
 
     if (status != ISTATUS_SUCCESS)
@@ -183,11 +203,6 @@ LightLighting(
 
     if ((float_t)0.0 < bsdf_computed_pdf && isfinite(bsdf_computed_pdf))
     {
-        float_t light_sample_falloff =
-            VectorPositiveDotProduct(shading_normal,
-                                     to_light,
-                                     bsdf_computed_transmitted);
-
         float_t light_sample_weight = PowerHeuristic(light_pdf, bsdf_computed_pdf);
 
         float_t light_sample_attenuation =
@@ -448,16 +463,29 @@ SampleDirectLighting(
         return status;
     }
 
-    PCREFLECTOR bsdf_computed_reflector;
+    float_t light_sample_falloff = VectorDotProduct(shading_normal,
+                                                    light_sampled_direction);
+
     bool bsdf_computed_transmitted;
+    if (light_sample_falloff < (float_t)0.0)
+    {
+        light_sample_falloff = -light_sample_falloff;
+        bsdf_computed_transmitted = true;
+    }
+    else
+    {
+        bsdf_computed_transmitted = false;
+    }
+
+    PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
     status = BsdfComputeReflectanceWithPdf(bsdf,
                                            to_hit_point,
                                            surface_normal,
                                            light_sampled_direction,
+                                           bsdf_computed_transmitted,
                                            reflector_compositor,
                                            &bsdf_computed_reflector,
-                                           &bsdf_computed_transmitted,
                                            &bsdf_computed_pdf);
 
     if (status != ISTATUS_SUCCESS)

@@ -124,13 +124,12 @@ SpecularDielectricBsdfComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted
+    _Out_ PCREFLECTOR *reflector
     )
 {
     *reflector = NULL;
-    *transmitted = false;
 
     return ISTATUS_SUCCESS;
 }
@@ -142,9 +141,9 @@ SpecularDielectricBsdfComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {

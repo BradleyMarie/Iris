@@ -161,9 +161,9 @@ BsdfComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted
+    _Out_ PCREFLECTOR *reflector
     )
 {
     if (bsdf == NULL)
@@ -188,15 +188,10 @@ BsdfComputeReflectance(
 
     if (compositor == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (reflector == NULL)
-    {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (transmitted == NULL)
+    if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -205,9 +200,9 @@ BsdfComputeReflectance(
                                                                incoming,
                                                                surface_normal,
                                                                outgoing,
+                                                               transmitted,
                                                                compositor,
-                                                               reflector,
-                                                               transmitted);
+                                                               reflector);
 
     return status;
 }
@@ -218,9 +213,9 @@ BsdfComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {
@@ -246,15 +241,10 @@ BsdfComputeReflectanceWithPdf(
 
     if (compositor == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (reflector == NULL)
-    {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (transmitted == NULL)
+    if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -269,9 +259,9 @@ BsdfComputeReflectanceWithPdf(
                                                            incoming,
                                                            surface_normal,
                                                            outgoing,
+                                                           transmitted,
                                                            compositor,
                                                            reflector,
-                                                           transmitted,
                                                            pdf);
 
     return status;

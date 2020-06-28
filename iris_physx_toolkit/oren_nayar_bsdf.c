@@ -254,11 +254,17 @@ OrenNayarReflectorComputeReflectance(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted
+    _Out_ PCREFLECTOR *reflector
     )
 {
+    if (transmitted)
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     PCOREN_NAYAR_BSDF oren_nayar_bsdf = (PCOREN_NAYAR_BSDF)context;
 
     float_t reflectance = OrenNayarComputeReflectance(oren_nayar_bsdf,
@@ -272,14 +278,7 @@ OrenNayarReflectorComputeReflectance(
                                               reflectance,
                                               reflector);
 
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *transmitted = false;
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 static
@@ -289,12 +288,18 @@ OrenNayarReflectorComputeReflectanceWithPdf(
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
     _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
     _Out_ float_t *pdf
     )
 {
+    if (transmitted)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
     PCOREN_NAYAR_BSDF oren_nayar_bsdf = (PCOREN_NAYAR_BSDF)context;
 
     float_t reflectance = OrenNayarComputeReflectance(oren_nayar_bsdf,
@@ -313,7 +318,6 @@ OrenNayarReflectorComputeReflectanceWithPdf(
         return status;
     }
 
-    *transmitted = false;
     *pdf = VectorBoundedDotProduct(outgoing, normal) * inv_pi;
 
     return ISTATUS_SUCCESS;
