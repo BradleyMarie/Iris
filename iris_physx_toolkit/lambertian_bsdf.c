@@ -265,18 +265,19 @@ static const BSDF_VTABLE lambertian_bsdf_vtable = {
 
 ISTATUS
 LambertianBsdfAllocate(
-    _In_ PREFLECTOR reflector,
+    _In_opt_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     )
 {
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     LAMBERTIAN_BSDF lambertian_bsdf;
@@ -301,7 +302,7 @@ LambertianBsdfAllocate(
 ISTATUS
 LambertianBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf
     )
 {
@@ -310,14 +311,15 @@ LambertianBsdfAllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     LAMBERTIAN_BSDF lambertian_bsdf;

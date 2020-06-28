@@ -27,14 +27,14 @@ extern "C" {
 
 ISTATUS
 LambertianBsdfAllocate(
-    _In_ PREFLECTOR reflector,
+    _In_opt_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
 LambertianBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf
     );
 

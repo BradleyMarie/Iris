@@ -117,18 +117,19 @@ static const BSDF_VTABLE mirror_bsdf_vtable = {
 
 ISTATUS
 MirrorBsdfAllocate(
-    _In_ PREFLECTOR reflector,
+    _In_opt_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     )
 {
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     MIRROR_BSDF mirror_bsdf;
@@ -153,7 +154,7 @@ MirrorBsdfAllocate(
 ISTATUS
 MirrorBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf
     )
 {
@@ -162,14 +163,15 @@ MirrorBsdfAllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     MIRROR_BSDF mirror_bsdf;

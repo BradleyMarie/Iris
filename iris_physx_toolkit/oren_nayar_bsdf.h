@@ -27,7 +27,7 @@ extern "C" {
 
 ISTATUS
 OrenNayarBsdfAllocate(
-    _In_ PREFLECTOR reflector,
+    _In_opt_ PREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PBSDF *bsdf
     );
@@ -35,7 +35,7 @@ OrenNayarBsdfAllocate(
 ISTATUS
 OrenNayarBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PCBSDF *bsdf
     );

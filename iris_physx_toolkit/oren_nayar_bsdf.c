@@ -351,16 +351,11 @@ static const BSDF_VTABLE oren_nayar_bsdf_vtable = {
 
 ISTATUS
 OrenNayarBsdfAllocate(
-    _In_ PREFLECTOR reflector,
+    _In_opt_ PREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PBSDF *bsdf
     )
 {
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (!isfinite(sigma))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
@@ -369,6 +364,12 @@ OrenNayarBsdfAllocate(
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     OREN_NAYAR_BSDF oren_nayar_bsdf;
@@ -393,7 +394,7 @@ OrenNayarBsdfAllocate(
 ISTATUS
 OrenNayarBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PCBSDF *bsdf
     )
@@ -401,11 +402,6 @@ OrenNayarBsdfAllocateWithAllocator(
     if (bsdf_allocator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (!isfinite(sigma))
@@ -416,6 +412,12 @@ OrenNayarBsdfAllocateWithAllocator(
     if (bsdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (reflector == NULL)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     OREN_NAYAR_BSDF oren_nayar_bsdf;
