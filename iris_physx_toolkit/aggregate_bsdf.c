@@ -14,7 +14,6 @@ Abstract:
 
 #include <stdalign.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "iris_physx_toolkit/aggregate_bsdf.h"
 
@@ -325,14 +324,6 @@ AggregateBsdfAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    for (size_t i = 0; i < num_bsdfs; i++)
-    {
-        if (bsdfs[i] == NULL)
-        {
-            return ISTATUS_INVALID_ARGUMENT_00;
-        }
-    }
-
     PAGGREGATE_BSDF aggregate_bsdf =
         (PAGGREGATE_BSDF)calloc(1 + num_bsdfs, sizeof(size_t));
 
@@ -341,12 +332,27 @@ AggregateBsdfAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    aggregate_bsdf->num_bsdfs = num_bsdfs;
-    memcpy(aggregate_bsdf->bsdfs, bsdfs, sizeof(PBSDF) * num_bsdfs);
+    size_t inserted_bsdfs = 0;
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        if (bsdfs[i] != NULL)
+        {
+            aggregate_bsdf->bsdfs[inserted_bsdfs++] = bsdfs[i];
+        }
+    }
+
+    if (inserted_bsdfs == 0)
+    {
+        free(aggregate_bsdf);
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    aggregate_bsdf->num_bsdfs = inserted_bsdfs;
 
     ISTATUS status = BsdfAllocate(&aggregate_bsdf_vtable,
                                   aggregate_bsdf,
-                                  sizeof(PBSDF) * (1 + num_bsdfs),
+                                  sizeof(PBSDF) * (1 + inserted_bsdfs),
                                   alignof(AGGREGATE_BSDF),
                                   bsdf);
 
@@ -393,14 +399,6 @@ AggregateBsdfAllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    for (size_t i = 0; i < num_bsdfs; i++)
-    {
-        if (bsdfs[i] == NULL)
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-    }
-
     if (NUM_SUPPORTED_BSDFS < num_bsdfs)
     {
         return ISTATUS_ALLOCATION_FAILED;
@@ -409,13 +407,27 @@ AggregateBsdfAllocateWithAllocator(
     size_t temporary_space[1 + NUM_SUPPORTED_BSDFS];
     PAGGREGATE_BSDF aggregate_bsdf = (PAGGREGATE_BSDF)(void *)&temporary_space;
 
-    aggregate_bsdf->num_bsdfs = num_bsdfs;
-    memcpy(aggregate_bsdf->bsdfs, bsdfs, sizeof(PBSDF) * num_bsdfs);
+    size_t inserted_bsdfs = 0;
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        if (bsdfs[i] != NULL)
+        {
+            aggregate_bsdf->bsdfs[inserted_bsdfs++] = (PBSDF)bsdfs[i];
+        }
+    }
+
+    if (inserted_bsdfs == 0)
+    {
+        *bsdf = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    aggregate_bsdf->num_bsdfs = inserted_bsdfs;
 
     ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
                                            &aggregate_bsdf_vtable,
                                            aggregate_bsdf,
-                                           sizeof(PBSDF) * (1 + num_bsdfs),
+                                           sizeof(PBSDF) * (1 + inserted_bsdfs),
                                            alignof(AGGREGATE_BSDF),
                                            bsdf);
 
