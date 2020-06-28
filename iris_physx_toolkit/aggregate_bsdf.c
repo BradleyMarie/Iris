@@ -47,7 +47,7 @@ typedef const AGGREGATE_BSDF *PCAGGREGATE_BSDF;
 
 static
 ISTATUS
-AggregateReflectorSample(
+AggregateBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -157,7 +157,7 @@ AggregateReflectorSample(
 
 static
 ISTATUS
-AggregateReflectorComputeReflectance(
+AggregateBsdfComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -210,7 +210,7 @@ AggregateReflectorComputeReflectance(
 
 static
 ISTATUS
-AggregateReflectorComputeReflectanceWithPdf(
+AggregateBsdfComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -275,7 +275,7 @@ AggregateReflectorComputeReflectanceWithPdf(
 
 static
 void
-AggregateReflectorFree(
+AggregateBsdfFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -292,10 +292,10 @@ AggregateReflectorFree(
 //
 
 static const BSDF_VTABLE aggregate_bsdf_vtable = {
-    AggregateReflectorSample,
-    AggregateReflectorComputeReflectance,
-    AggregateReflectorComputeReflectanceWithPdf,
-    AggregateReflectorFree
+    AggregateBsdfSample,
+    AggregateBsdfComputeReflectance,
+    AggregateBsdfComputeReflectanceWithPdf,
+    AggregateBsdfFree
 };
 
 //

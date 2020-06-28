@@ -574,6 +574,12 @@ ColorExtrapolatorComputeSpectrum(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
+    if (ColorIsBlack(color))
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     PCSPECTRUM_LIST_ENTRY entry;
     bool found = ColorExtrapolatorFindSpectrumEntry(color_extrapolator,
                                                     color,
@@ -639,6 +645,12 @@ ColorExtrapolatorComputeReflector(
     if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (ColorIsBlack(color))
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
     }
 
     PCREFLECTOR_LIST_ENTRY entry;

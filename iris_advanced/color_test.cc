@@ -125,6 +125,16 @@ TEST(ColorTest, ColorClamp)
     EXPECT_EQ(expected_xyz_color, actual_xyz_color);
 }
 
+TEST(ColorTest, ColorIsBlack)
+{
+    float initial_values[3] = {0.0f, 0.0f, 0.0f};
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, initial_values);
+    EXPECT_TRUE(ColorIsBlack(color));
+
+    color.color_space = COLOR_SPACE_LINEAR_SRGB;
+    EXPECT_TRUE(ColorIsBlack(color));
+}
+
 TEST(ColorTest, ColorToXyzXyz)
 {
     float xyz_values[3] = {1.0f, 2.0f, 3.0f};

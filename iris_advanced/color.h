@@ -125,6 +125,11 @@ ColorClamp(
     return color;
 }
 
+bool
+ColorIsBlack(
+    _In_ COLOR3 color
+    );
+
 COLOR3
 ColorToXyz(
     _In_ COLOR3 color

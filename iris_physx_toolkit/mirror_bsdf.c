@@ -32,7 +32,7 @@ typedef const MIRROR_BSDF *PCMIRROR_BSDF;
 
 static
 ISTATUS
-MirrorReflectorSample(
+MirrorBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -56,7 +56,7 @@ MirrorReflectorSample(
 
 static
 ISTATUS
-MirrorReflectorComputeReflectance(
+MirrorBsdfComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -73,7 +73,7 @@ MirrorReflectorComputeReflectance(
 
 static
 ISTATUS
-MirrorReflectorComputeReflectanceWithPdf(
+MirrorBsdfComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -91,7 +91,7 @@ MirrorReflectorComputeReflectanceWithPdf(
 
 static
 void
-MirrorReflectorFree(
+MirrorBsdfFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -105,10 +105,10 @@ MirrorReflectorFree(
 //
 
 static const BSDF_VTABLE mirror_bsdf_vtable = {
-    MirrorReflectorSample,
-    MirrorReflectorComputeReflectance,
-    MirrorReflectorComputeReflectanceWithPdf,
-    MirrorReflectorFree
+    MirrorBsdfSample,
+    MirrorBsdfComputeReflectance,
+    MirrorBsdfComputeReflectanceWithPdf,
+    MirrorBsdfFree
 };
 
 //
@@ -116,7 +116,7 @@ static const BSDF_VTABLE mirror_bsdf_vtable = {
 //
 
 ISTATUS
-MirrorReflectorAllocate(
+MirrorBsdfAllocate(
     _In_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     )
@@ -151,7 +151,7 @@ MirrorReflectorAllocate(
 }
 
 ISTATUS
-MirrorReflectorAllocateWithAllocator(
+MirrorBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf
