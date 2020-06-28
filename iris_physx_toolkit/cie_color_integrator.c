@@ -1965,7 +1965,7 @@ CieColorIntegratorComputeSpectrumColor(
 ISTATUS
 CieColorIntegratorComputeReflectiveSpectrumColor(
     _In_ const void *context,
-    _In_opt_ PCSPECTRUM spectrum,
+    _In_ PCSPECTRUM spectrum,
     _Out_ PCOLOR3 color
     )
 {
@@ -2002,7 +2002,7 @@ CieColorIntegratorComputeReflectiveSpectrumColor(
 ISTATUS
 CieColorIntegratorComputeReflectorColor(
     _In_ const void *context,
-    _In_opt_ PCREFLECTOR reflector,
+    _In_ PCREFLECTOR reflector,
     _Out_ PCOLOR3 color
     )
 {
