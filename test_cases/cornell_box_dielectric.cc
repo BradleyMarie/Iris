@@ -193,7 +193,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ReflectorRelease(interpolated_white_reflector);
 
     PBSDF white_bsdf;
-    status = LambertianReflectorAllocate(white_reflector, &white_bsdf);
+    status = LambertianBsdfAllocate(white_reflector, &white_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL white_material;
@@ -222,7 +222,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ReflectorRelease(interpolated_red_reflector);
 
     PBSDF red_bsdf;
-    status = LambertianReflectorAllocate(red_reflector, &red_bsdf);
+    status = LambertianBsdfAllocate(red_reflector, &red_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL red_material;
@@ -251,7 +251,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ReflectorRelease(interpolated_green_reflector);
 
     PBSDF green_bsdf;
-    status = LambertianReflectorAllocate(green_reflector, &green_bsdf);
+    status = LambertianBsdfAllocate(green_reflector, &green_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL green_material;

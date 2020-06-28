@@ -26,14 +26,14 @@ extern "C" {
 //
 
 ISTATUS
-OrenNayarReflectorAllocate(
+OrenNayarBsdfAllocate(
     _In_ PREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-OrenNayarReflectorAllocateWithAllocator(
+OrenNayarBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
     _In_ float_t sigma,

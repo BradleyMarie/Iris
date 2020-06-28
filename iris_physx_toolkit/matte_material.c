@@ -74,16 +74,16 @@ MatteMaterialSample(
 
     if (sigma == (float_t)0.0)
     {
-        status = LambertianReflectorAllocateWithAllocator(bsdf_allocator,
-                                                          reflector,
-                                                          bsdf);
+        status = LambertianBsdfAllocateWithAllocator(bsdf_allocator,
+                                                     reflector,
+                                                     bsdf);
     }
     else
     {
-        status = OrenNayarReflectorAllocateWithAllocator(bsdf_allocator,
-                                                         reflector,
-                                                         sigma,
-                                                         bsdf);
+        status = OrenNayarBsdfAllocateWithAllocator(bsdf_allocator,
+                                                    reflector,
+                                                    sigma,
+                                                    bsdf);
     }
 
     return status;

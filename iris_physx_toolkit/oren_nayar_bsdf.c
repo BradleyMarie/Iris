@@ -204,7 +204,7 @@ OrenNayarComputeReflectance(
 
 static
 ISTATUS
-OrenNayarReflectorSample(
+OrenNayarBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -249,7 +249,7 @@ OrenNayarReflectorSample(
 
 static
 ISTATUS
-OrenNayarReflectorComputeReflectance(
+OrenNayarBsdfComputeReflectance(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -283,7 +283,7 @@ OrenNayarReflectorComputeReflectance(
 
 static
 ISTATUS
-OrenNayarReflectorComputeReflectanceWithPdf(
+OrenNayarBsdfComputeReflectanceWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -325,7 +325,7 @@ OrenNayarReflectorComputeReflectanceWithPdf(
 
 static
 void
-OrenNayarReflectorFree(
+OrenNayarBsdfFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -339,10 +339,10 @@ OrenNayarReflectorFree(
 //
 
 static const BSDF_VTABLE oren_nayar_bsdf_vtable = {
-    OrenNayarReflectorSample,
-    OrenNayarReflectorComputeReflectance,
-    OrenNayarReflectorComputeReflectanceWithPdf,
-    OrenNayarReflectorFree
+    OrenNayarBsdfSample,
+    OrenNayarBsdfComputeReflectance,
+    OrenNayarBsdfComputeReflectanceWithPdf,
+    OrenNayarBsdfFree
 };
 
 //
@@ -350,7 +350,7 @@ static const BSDF_VTABLE oren_nayar_bsdf_vtable = {
 //
 
 ISTATUS
-OrenNayarReflectorAllocate(
+OrenNayarBsdfAllocate(
     _In_ PREFLECTOR reflector,
     _In_ float_t sigma,
     _Out_ PBSDF *bsdf
@@ -391,7 +391,7 @@ OrenNayarReflectorAllocate(
 }
 
 ISTATUS
-OrenNayarReflectorAllocateWithAllocator(
+OrenNayarBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_ PCREFLECTOR reflector,
     _In_ float_t sigma,

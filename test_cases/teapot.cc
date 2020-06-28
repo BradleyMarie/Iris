@@ -134,7 +134,7 @@ TEST(TeapotTest, FlatShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -216,7 +216,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;

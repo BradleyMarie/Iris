@@ -125,7 +125,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -194,7 +194,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -268,7 +268,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;
@@ -342,7 +342,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
-    status = LambertianReflectorAllocate(reflector, &bsdf);
+    status = LambertianBsdfAllocate(reflector, &bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PLIGHT light;

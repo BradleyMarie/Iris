@@ -173,7 +173,7 @@ TEST(DeterministicTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF white_bsdf;
-    status = LambertianReflectorAllocate(white_reflector, &white_bsdf);
+    status = LambertianBsdfAllocate(white_reflector, &white_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL white_material;
@@ -188,7 +188,7 @@ TEST(DeterministicTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF red_bsdf;
-    status = LambertianReflectorAllocate(red_reflector, &red_bsdf);
+    status = LambertianBsdfAllocate(red_reflector, &red_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL red_material;
@@ -203,7 +203,7 @@ TEST(DeterministicTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF green_bsdf;
-    status = LambertianReflectorAllocate(green_reflector, &green_bsdf);
+    status = LambertianBsdfAllocate(green_reflector, &green_bsdf);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PMATERIAL green_material;
