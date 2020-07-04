@@ -133,15 +133,10 @@ DeltaBsdfLighting(
         return status;
     }
 
-    float_t falloff = VectorPositiveDotProduct(shading_normal,
-                                               outgoing_direction,
-                                               transmitted);
-
-    status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
-                                                   light_spectrum,
-                                                   reflector,
-                                                   falloff,
-                                                   spectrum);
+    status = SpectrumCompositorReflect(spectrum_compositor,
+                                       light_spectrum,
+                                       reflector,
+                                       spectrum);
 
     return status;
 }

@@ -86,16 +86,7 @@ AggregateBsdfSample(
         return status;
     }
 
-    bool specular;
-    if (isinf(*pdf))
-    {
-        specular = true;
-        *pdf = (float_t)1.0;
-    }
-    else
-    {
-        specular = false;
-    }
+    bool specular = isinf(*pdf);
 
     size_t matching_bsdfs = 1;
     for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
@@ -126,28 +117,38 @@ AggregateBsdfSample(
             continue;
         }
 
+        if (specular)
+        {
+            float_t falloff = VectorPositiveDotProduct(normal,
+                                                       *outgoing,
+                                                       transmitted);
+
+            float_t inv_falloff = (float_t)1.0 / falloff;
+
+            status = ReflectorCompositorAttenuateReflector(compositor,
+                                                           *reflector,
+                                                           inv_falloff,
+                                                           reflector);
+
+            *pdf = (float_t)1.0 + bsdf_pdf;
+
+            specular = false;
+        }
+
         matching_bsdfs += 1;
 
-        status = ReflectorCompositorAttenuatedAddReflectors(compositor,
-                                                            *reflector,
-                                                            bsdf_reflector,
-                                                            (float_t)1.0,
-                                                            reflector);
+        status = ReflectorCompositorAddReflectors(compositor,
+                                                  *reflector,
+                                                  bsdf_reflector,
+                                                  reflector);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
-
-        *pdf += bsdf_pdf;
-        specular = false;
     }
 
-    if (specular)
-    {
-        *pdf = INFINITY;
-    }
-    else if (matching_bsdfs > 0)
+    if (matching_bsdfs > 1)
     {
         *pdf /= matching_bsdfs;
     }

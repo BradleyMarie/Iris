@@ -422,3 +422,31 @@ SpectrumCompositorAttenuateReflection(
 
     return status;
 }
+
+ISTATUS
+SpectrumCompositorReflect(
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_opt_ PCSPECTRUM spectrum,
+    _In_opt_ PCREFLECTOR reflector,
+    _Out_ PCSPECTRUM *reflected_spectrum
+    )
+{
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (reflected_spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    // TODO: Implement an actual reflected spectrum if this ends up being hot.
+    ISTATUS status = SpectrumCompositorAttenuateReflection(compositor,
+                                                           spectrum,
+                                                           reflector,
+                                                           (float_t)1.0,
+                                                           reflected_spectrum);
+
+    return status;
+}

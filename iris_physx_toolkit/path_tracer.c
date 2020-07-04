@@ -197,15 +197,21 @@ PathTracerIntegrate(
             return status;
         }
 
-        float_t attenuation = VectorPositiveDotProduct(shading_normal,
-                                                       next_direction,
-                                                       transmitted);
-        path_throughput *= albedo * attenuation;
+        path_throughput *= albedo;
 
+        float_t attenuation;
         if (isfinite(bsdf_pdf))
         {
-            path_throughput /= bsdf_pdf;
+            attenuation = VectorPositiveDotProduct(shading_normal,
+                                                   next_direction,
+                                                   transmitted);
             attenuation /= bsdf_pdf;
+
+            path_throughput *= attenuation;
+        }
+        else
+        {
+            attenuation = (float_t)1.0;
         }
 
         if (path_tracer->min_bounces < bounces)
