@@ -98,6 +98,7 @@ MatteMaterialFree(
     PMATTE_MATERIAL matte_material = (PMATTE_MATERIAL)context;
 
     ReflectorTextureRelease(matte_material->diffuse);
+    FloatTextureRelease(matte_material->sigma);
 }
 
 //
@@ -122,7 +123,7 @@ MatteMaterialAllocate(
 {
     if (material == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (diffuse == NULL)

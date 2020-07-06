@@ -759,3 +759,24 @@ TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
                                            bsdf);
     return status;
 }
+
+float_t
+TrowbridgeReitzRoughnessToAlpha(
+    _In_ float_t roughness
+    )
+{
+    roughness = fmax(roughness, (float_t)1e-3);
+    float_t x = log(roughness);
+    float_t x_2 = x * x;
+    float_t x_3 = x_2 * x;
+    float_t x_4 = x_2 * x_2;
+
+    float_t result =
+        (float_t)1.62142 +
+        (float_t)0.819955 * x +
+        (float_t)0.1734 * x_2 +
+        (float_t)0.0171201 * x_3 +
+        (float_t)0.000640711 * x_4;
+
+    return result;
+}

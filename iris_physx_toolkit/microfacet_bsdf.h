@@ -46,6 +46,11 @@ TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
     _Out_ PCBSDF *bsdf
     );
 
+float_t
+TrowbridgeReitzRoughnessToAlpha(
+    _In_ float_t roughness
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus

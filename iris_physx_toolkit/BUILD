@@ -282,6 +282,20 @@ cc_library(
 )
 
 cc_library(
+    name = "plastic_material",
+    srcs = ["plastic_material.c"],
+    hdrs = ["plastic_material.h"],
+    deps = [
+        ":aggregate_bsdf",
+        ":float_texture",
+        ":lambertian_bsdf",
+        ":microfacet_bsdf",
+        ":reflector_texture",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "png_mipmap",
     srcs = ["png_mipmap.c"],
     hdrs = ["png_mipmap.h"],
