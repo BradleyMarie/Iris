@@ -32,45 +32,12 @@ typedef const LAMBERTIAN_BSDF *PCLAMBERTIAN_BSDF;
 
 static
 VECTOR3
-CreateOrthogonalVector(
-    _In_ VECTOR3 vector
-    )
-{
-    VECTOR_AXIS shortest = VectorDiminishedAxis(vector);
-
-    VECTOR3 unit_vector;
-    switch (shortest)
-    {
-        case VECTOR_X_AXIS:
-            unit_vector = VectorCreate((float_t)1.0,
-                                       (float_t)0.0,
-                                       (float_t)0.0);
-            break;
-        case VECTOR_Y_AXIS:
-            unit_vector = VectorCreate((float_t)0.0,
-                                       (float_t)1.0,
-                                       (float_t)0.0);
-            break;
-        case VECTOR_Z_AXIS:
-            unit_vector = VectorCreate((float_t)0.0,
-                                       (float_t)0.0,
-                                       (float_t)1.0);
-            break;
-    }
-
-    VECTOR3 orthogonal = VectorCrossProduct(vector, unit_vector);
-
-    return VectorNormalize(orthogonal, NULL, NULL);
-}
-
-static
-VECTOR3
 TransformVector(
     _In_ VECTOR3 surface_normal,
     _In_ VECTOR3 vector
     )
 {
-    VECTOR3 orthogonal = CreateOrthogonalVector(surface_normal);
+    VECTOR3 orthogonal = VectorCreateOrthogonal(surface_normal);
     VECTOR3 cross_product = VectorCrossProduct(surface_normal, orthogonal);
 
     float_t x = orthogonal.x * vector.x + 
@@ -87,9 +54,6 @@ TransformVector(
 
     return VectorCreate(x, y, z);
 }
-
-static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
-static const float_t inv_pi = (float_t)0.31830988618379067153776752674503;
 
 static
 ISTATUS
@@ -114,7 +78,10 @@ CosineSampleHemisphere(
     }
 
     float_t theta;
-    status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)two_pi, &theta);
+    status = RandomGenerateFloat(rng,
+                                 (float_t)0.0,
+                                 (float_t)iris_two_pi,
+                                 &theta);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -157,7 +124,7 @@ LambertianBsdfSample(
     status =
         ReflectorCompositorAttenuateReflector(compositor,
                                               lambertian_bsdf->reflector,
-                                              inv_pi,
+                                              iris_inv_pi,
                                               reflector);
 
     if (status != ISTATUS_SUCCESS)
@@ -166,7 +133,7 @@ LambertianBsdfSample(
     }
 
     *transmitted = false;
-    *pdf = VectorBoundedDotProduct(*outgoing, normal) * inv_pi;
+    *pdf = VectorBoundedDotProduct(*outgoing, normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }
@@ -194,7 +161,7 @@ LambertianBsdfComputeReflectance(
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
                                               lambertian_bsdf->reflector,
-                                              inv_pi,
+                                              iris_inv_pi,
                                               reflector);
 
     return status;
@@ -224,7 +191,7 @@ LambertianBsdfComputeReflectanceWithPdf(
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
                                               lambertian_bsdf->reflector,
-                                              inv_pi,
+                                              iris_inv_pi,
                                               reflector);
 
     if (status != ISTATUS_SUCCESS)
@@ -232,7 +199,7 @@ LambertianBsdfComputeReflectanceWithPdf(
         return status;
     }
 
-    *pdf = VectorBoundedDotProduct(outgoing, normal) * inv_pi;
+    *pdf = VectorBoundedDotProduct(outgoing, normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }

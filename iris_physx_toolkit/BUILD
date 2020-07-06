@@ -235,6 +235,15 @@ cc_library(
 )
 
 cc_library(
+    name = "microfacet_bsdf",
+    srcs = ["microfacet_bsdf.c"],
+    hdrs = ["microfacet_bsdf.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "mirror_bsdf",
     srcs = ["mirror_bsdf.c"],
     hdrs = ["mirror_bsdf.h"],

@@ -214,6 +214,71 @@ TEST(VectorTest, VectorBoundedDotProduct)
     EXPECT_EQ((float_t) 0.0, VectorBoundedDotProduct(v0, v2));
 }
 
+TEST(VectorTest, VectorClampedDotProduct)
+{
+    VECTOR3 v0 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) 2.0);
+    VECTOR3 v1 = VectorCreate((float_t) 4.0, (float_t) 3.0, (float_t) 2.0);
+    EXPECT_EQ((float_t) 1.0, VectorClampedDotProduct(v0, v1));
+
+    VECTOR3 v2 = VectorCreate((float_t) -4.0, (float_t) -3.0, (float_t) -2.0);
+    EXPECT_EQ((float_t) 0.0, VectorClampedDotProduct(v0, v2));
+}
+
+TEST(VectorTest, VectorCodirectionalAngleProperties)
+{
+    VECTOR3 v0 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) 2.0);
+
+    float_t cosine, cosine_squared, sine, sine_squared, tangent;
+    VectorCodirectionalAngleProperties(v0,
+                                       v0,
+                                       &cosine,
+                                       &cosine_squared,
+                                       &sine,
+                                       &sine_squared,
+                                       &tangent);
+
+    EXPECT_EQ((float_t) 1.0, cosine);
+    EXPECT_EQ((float_t) 1.0, cosine_squared);
+    EXPECT_EQ((float_t) 0.0, sine);
+    EXPECT_EQ((float_t) 0.0, sine_squared);
+    EXPECT_EQ((float_t) 0.0, tangent);
+
+    VECTOR3 v1 = VectorCreate((float_t) 0.0, (float_t) -1.0, (float_t) -2.0);
+
+    VectorCodirectionalAngleProperties(v0,
+                                       v1,
+                                       &cosine,
+                                       &cosine_squared,
+                                       &sine,
+                                       &sine_squared,
+                                       &tangent);
+
+    EXPECT_EQ((float_t) 0.0, cosine);
+    EXPECT_EQ((float_t) 0.0, cosine_squared);
+    EXPECT_EQ((float_t) 1.0, sine);
+    EXPECT_EQ((float_t) 1.0, sine_squared);
+    EXPECT_EQ((float_t) INFINITY, tangent);
+
+    VECTOR3 v3 = VectorCreate((float_t) 0.707106781186,
+                              (float_t) 0.707106781186,
+                              (float_t) 0.0);
+    VECTOR3 v4 = VectorCreate((float_t) 1.0, (float_t) 0.0, (float_t) 0.0);
+
+    VectorCodirectionalAngleProperties(v3,
+                                       v4,
+                                       &cosine,
+                                       &cosine_squared,
+                                       &sine,
+                                       &sine_squared,
+                                       &tangent);
+
+    EXPECT_NEAR((float_t) 0.707106781186, cosine, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.5, cosine_squared, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.707106781186, sine, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.5, sine_squared, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 1.0, tangent, (float_t) 0.0001);
+}
+
 TEST(VectorTest, VectorPositiveDotProduct)
 {
     VECTOR3 v0 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) 2.0);
@@ -224,4 +289,27 @@ TEST(VectorTest, VectorPositiveDotProduct)
     VECTOR3 v2 = VectorCreate((float_t) -4.0, (float_t) -3.0, (float_t) -2.0);
     EXPECT_EQ((float_t) 0.0, VectorPositiveDotProduct(v0, v2, false));
     EXPECT_EQ((float_t) 7.0, VectorPositiveDotProduct(v0, v2, true));
+}
+
+TEST(VectorTest, VectorCreateOrthogonal)
+{
+    float_t small = (float_t)0.0000001;
+
+    VECTOR3 v0 = VectorCreate((float_t) 1.0, (float_t) small, (float_t) 0.0);
+    VECTOR3 e0 = VectorCreateOrthogonal(v0);
+    EXPECT_NEAR((float_t) 0.0, e0.x, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) -1.0, e0.y, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.0, e0.z, (float_t) 0.0001);
+
+    VECTOR3 v1 = VectorCreate((float_t) 0.0, (float_t) 1.0, (float_t) small);
+    VECTOR3 e1 = VectorCreateOrthogonal(v1);
+    EXPECT_NEAR((float_t) 0.0, e1.x, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.0, e1.y, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) -1.0, e1.z, (float_t) 0.0001);
+
+    VECTOR3 v2 = VectorCreate((float_t) small, (float_t) 0.0, (float_t) 1.0);
+    VECTOR3 e2 = VectorCreateOrthogonal(v2);
+    EXPECT_NEAR((float_t) -1.0, e2.x, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.0, e2.y, (float_t) 0.0001);
+    EXPECT_NEAR((float_t) 0.0, e2.z, (float_t) 0.0001);
 }

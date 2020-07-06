@@ -230,6 +230,18 @@ VectorBoundedDotProduct(
 static
 inline
 float_t
+VectorClampedDotProduct(
+    _In_ VECTOR3 operand0,
+    _In_ VECTOR3 operand1
+    )
+{
+    float_t bounded_dot_product = VectorBoundedDotProduct(operand0, operand1);
+    return fmin(bounded_dot_product, (float_t)1.0);
+}
+
+static
+inline
+float_t
 VectorPositiveDotProduct(
     _In_ VECTOR3 operand0,
     _In_ VECTOR3 operand1,
@@ -244,6 +256,54 @@ VectorPositiveDotProduct(
     }
 
     return fmax((float_t)0.0, dp);
+}
+
+static
+inline
+void
+VectorCodirectionalAngleProperties(
+    _In_ VECTOR3 operand0,
+    _In_ VECTOR3 operand1,
+    _Out_opt_ float_t *cosine,
+    _Out_opt_ float_t *cosine_squared,
+    _Out_opt_ float_t *sine,
+    _Out_opt_ float_t *sine_squared,
+    _Out_opt_ float_t *tangent
+    )
+{
+    float_t working_value = VectorClampedDotProduct(operand0, operand1);
+    float_t cosine_temp = working_value;
+
+    if (cosine != NULL)
+    {
+        *cosine = working_value;
+    }
+
+    working_value *= working_value;
+
+    if (cosine_squared != NULL)
+    {
+        *cosine_squared = working_value;
+    }
+
+    working_value = (float_t)1.0 - working_value;
+
+    if (sine_squared != NULL)
+    {
+        *sine_squared = working_value;
+    }
+
+    working_value = sqrt(working_value);
+
+    if (sine != NULL)
+    {
+        *sine = working_value;
+    }
+
+    if (tangent != NULL)
+    {
+        *tangent = working_value / cosine_temp;
+    }
 }
 
 static
@@ -320,6 +380,40 @@ VectorDiminishedAxis(
     {
         return VECTOR_Z_AXIS;
     }
+}
+
+static
+inline
+VECTOR3
+VectorCreateOrthogonal(
+    _In_ VECTOR3 vector
+    )
+{
+    VECTOR_AXIS shortest = VectorDiminishedAxis(vector);
+
+    VECTOR3 unit_vector;
+    switch (shortest)
+    {
+        case VECTOR_X_AXIS:
+            unit_vector = VectorCreate((float_t)1.0,
+                                       (float_t)0.0,
+                                       (float_t)0.0);
+            break;
+        case VECTOR_Y_AXIS:
+            unit_vector = VectorCreate((float_t)0.0,
+                                       (float_t)1.0,
+                                       (float_t)0.0);
+            break;
+        case VECTOR_Z_AXIS:
+            unit_vector = VectorCreate((float_t)0.0,
+                                       (float_t)0.0,
+                                       (float_t)1.0);
+            break;
+    }
+
+    VECTOR3 orthogonal = VectorCrossProduct(vector, unit_vector);
+
+    return VectorNormalize(orthogonal, NULL, NULL);
 }
 
 static

@@ -10,6 +10,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "bounding_box_test",
+    srcs = ["bounding_box_test.cc"],
+    deps = [
+        ":bounding_box",
+        "//test_util:equality",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "color",
     srcs = ["color.c"],
@@ -28,13 +38,12 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "bounding_box_test",
-    srcs = ["bounding_box_test.cc"],
+cc_library(
+    name = "constants",
+    srcs = ["constants.c"],
+    hdrs = ["constants.h"],
     deps = [
-        ":bounding_box",
-        "//test_util:equality",
-        "@com_google_googletest//:gtest_main",
+        "//iris",
     ],
 )
 
@@ -45,6 +54,7 @@ cc_library(
     deps = [
         ":bounding_box",
         ":color",
+        ":constants",
         ":random",
         ":ray_differential",
         "//iris",
