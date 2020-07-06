@@ -35,6 +35,54 @@ typedef const TR_DIELECTRIC *PCTR_DIELECTRIC;
 //
 
 static
+inline
+void
+VectorAngleProperties(
+    _In_ VECTOR3 operand0,
+    _In_ VECTOR3 operand1,
+    _Out_opt_ float_t *cosine,
+    _Out_opt_ float_t *cosine_squared,
+    _Out_opt_ float_t *sine,
+    _Out_opt_ float_t *sine_squared,
+    _Out_opt_ float_t *tangent
+    )
+{
+    float_t working_value = VectorDotProduct(operand0, operand1);
+    float_t cosine_temp = working_value;
+
+    if (cosine != NULL)
+    {
+        *cosine = working_value;
+    }
+
+    working_value *= working_value;
+
+    if (cosine_squared != NULL)
+    {
+        *cosine_squared = working_value;
+    }
+
+    working_value = (float_t)1.0 - working_value;
+
+    if (sine_squared != NULL)
+    {
+        *sine_squared = working_value;
+    }
+
+    working_value = sqrt(working_value);
+
+    if (sine != NULL)
+    {
+        *sine = working_value;
+    }
+
+    if (tangent != NULL)
+    {
+        *tangent = working_value / cosine_temp;
+    }
+}
+
+static
 float_t
 FresnelDielectric(
     _In_ float_t cos_theta_i,
@@ -93,11 +141,11 @@ TrowbridgeReitzSample11(
     float_t g1 = (float_t)2.0 / ((float_t)1.0 + sqrt((float_t)1.0 + (float_t)1.0 / (a * a)));
 
     float_t A = 2 * u / g1 - (float_t)1.0;
-    float_t tmp = fmax((float_t)1.0 / (A * A - (float_t)1.0), (float_t)1e10);
+    float_t tmp = fmin((float_t)1.0 / (A * A - (float_t)1.0), (float_t)1e10);
 
     float_t b = tan_theta;
     float_t d = sqrt(
-        fmax(b * b * tmp * tmp - (a * a - b * b) * tmp, (float_t)0.0));
+        fmax(b * b * tmp * tmp - (A * A - b * b) * tmp, (float_t)0.0));
     float_t slope_x_1 = b * tmp - d;
     float_t slope_x_2 = b * tmp + d;
 
@@ -154,32 +202,24 @@ TrowbridgeReitzLambda(
     }
 
     float_t cos_squared_phi, sin_squared_phi;
-    VectorCodirectionalAngleProperties(vector,
-                                       orthogonal,
-                                       NULL,
-                                       &cos_squared_phi,
-                                       NULL,
-                                       &sin_squared_phi,
-                                       NULL);
+    VectorAngleProperties(vector,
+                          orthogonal,
+                          NULL,
+                          &cos_squared_phi,
+                          NULL,
+                          &sin_squared_phi,
+                          NULL);
 
     float_t alpha_squared =
-        cos_squared_phi * alpha_x * alpha_y +
-        sin_squared_phi * alpha_x * alpha_y;
+        cos_squared_phi * alpha_x * alpha_x +
+        sin_squared_phi * alpha_y * alpha_y;
     float_t alpha = sqrt(alpha_squared);
 
-    float_t a = (float_t)1.0 / (alpha * tan_theta);
+    float_t alpha_tan_theta = alpha * tan_theta;
+    float_t numerator =
+        (float_t)-1.0 + sqrt((float_t)1.0 + alpha_tan_theta * alpha_tan_theta);
 
-    if (a >= (float_t)1.6)
-    {
-        return (float_t)0.0;
-    }
-
-    float_t a_sq = a * a;
-    float_t result =
-        ((float_t)1.0 - (float_t)1.259 * a + (float_t)0.396 * a_sq) /
-        ((float_t)3.535 * a + (float_t)2.181 * a_sq);
-
-    return result;
+    return (float_t)0.5 * numerator;
 }
 
 static
@@ -242,20 +282,24 @@ TrowbridgeReitzD(
     float_t cos_4_theta = cos_squared_theta * cos_squared_theta;
 
     float_t cos_squared_phi, sin_squared_phi;
-    VectorCodirectionalAngleProperties(half_angle,
-                                       normal,
-                                       NULL,
-                                       &cos_squared_phi,
-                                       NULL,
-                                       &sin_squared_phi,
-                                       NULL);
+    VectorAngleProperties(half_angle,
+                          orthogonal,
+                          NULL,
+                          &cos_squared_phi,
+                          NULL,
+                          &sin_squared_phi,
+                          NULL);
 
-    float_t exponent = -tan_squared_theta;
+    float_t exponent = tan_squared_theta;
     exponent *= (cos_squared_phi / (alpha_x * alpha_x)) +
                 (sin_squared_phi / (alpha_y * alpha_y));
-    exponent /= iris_pi * alpha_x * alpha_y * cos_4_theta;
 
-    return exp(exponent);
+    float_t one_plus_e = (float_t)1.0 + exponent;
+    float_t one_plus_e_squared = one_plus_e * one_plus_e;
+    float_t denomimator =
+        iris_pi * alpha_x * alpha_y * cos_4_theta * one_plus_e_squared;
+
+    return (float_t)1.0 / denomimator;
 }
 
 static
@@ -313,13 +357,18 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     VECTOR3 cross_product = VectorCrossProduct(normal, orthogonal);
 
     float_t cos_phi, sin_phi;
-    VectorCodirectionalAngleProperties(incoming,
-                                       orthogonal,
-                                       &cos_phi,
-                                       NULL,
-                                       &sin_phi,
-                                       NULL,
-                                       NULL);
+    VectorAngleProperties(incoming,
+                          orthogonal,
+                          &cos_phi,
+                          NULL,
+                          &sin_phi,
+                          NULL,
+                          NULL);
+
+    if (VectorDotProduct(incoming, cross_product) < (float_t)0.0)
+    {
+        sin_phi = -sin_phi;
+    }
 
     float_t tmp = cos_phi * slope_x - sin_phi * slope_y;
     slope_y = sin_phi * slope_x + cos_phi * slope_y;
@@ -379,7 +428,14 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
                               half_angle_cos_theta_o,
                               lambda_o,
                               microfacet_d);
-    assert((float_t)0.0 < *pdf);
+
+    *transmitted = false;
+
+    if (*pdf == (float_t)0.0)
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t half_angle_cos_theta_i = VectorBoundedDotProduct(incoming,
                                                              half_angle);

@@ -126,14 +126,15 @@ ReflectorGetAlbedo(
     _Out_ float_t *albedo
     )
 {
-    if (reflector == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
     if (albedo == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (reflector == NULL)
+    {
+        *albedo = (float_t)0.0;
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = ReflectorGetAlbedoInline(reflector, albedo);

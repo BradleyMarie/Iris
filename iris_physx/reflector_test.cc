@@ -241,10 +241,6 @@ TEST(ReflectorTest, ReflectorGetAlbedoErrors)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     float_t albedo;
-    status = ReflectorGetAlbedo(NULL, &albedo);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
-    EXPECT_FALSE(encountered);
-
     status = ReflectorGetAlbedo(reflector, NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
@@ -272,6 +268,11 @@ TEST(ReflectorTest, ReflectorGetAlbedo)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     float_t albedo;
+    status = ReflectorGetAlbedo(NULL, &albedo);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, albedo);
+    EXPECT_FALSE(encountered);
+
     status = ReflectorGetAlbedo(reflector, &albedo);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, albedo);
