@@ -274,6 +274,8 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 {
     PCTR_DIELECTRIC microfacet_bsdf = (PCTR_DIELECTRIC)context;
 
+    incoming = VectorNegate(incoming);
+
     float_t u;
     ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &u);
 
@@ -429,6 +431,8 @@ TrowbridgeReitzDielectricReflectionBsdfComputeReflectance(
         return ISTATUS_SUCCESS;
     }
 
+    incoming = VectorNegate(incoming);
+
     float_t cos_theta_i = VectorBoundedDotProduct(incoming, normal);
 
     if (cos_theta_i == (float_t)0.0)
@@ -520,6 +524,8 @@ TrowbridgeReitzDielectricReflectionBsdfComputeReflectanceWithPdf(
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
+
+    incoming = VectorNegate(incoming);
 
     float_t cos_theta_i = VectorBoundedDotProduct(incoming, normal);
 
