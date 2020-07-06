@@ -27,7 +27,7 @@ typedef struct _PLASTIC_MATERIAL {
     PREFLECTOR_TEXTURE diffuse;
     PREFLECTOR_TEXTURE specular;
     PFLOAT_TEXTURE roughness;
-    bool remap_roughness
+    bool remap_roughness;
 } PLASTIC_MATERIAL, *PPLASTIC_MATERIAL;
 
 typedef const PLASTIC_MATERIAL *PCPLASTIC_MATERIAL;
