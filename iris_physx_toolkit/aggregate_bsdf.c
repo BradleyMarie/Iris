@@ -368,6 +368,14 @@ AggregateBsdfAllocate(
         return ISTATUS_SUCCESS;
     }
 
+    if (inserted_bsdfs == 1)
+    {
+        *bsdf = aggregate_bsdf->bsdfs[0];
+        free(aggregate_bsdf);
+        BsdfRetain(*bsdf);
+        return ISTATUS_SUCCESS;
+    }
+
     aggregate_bsdf->num_bsdfs = inserted_bsdfs;
 
     ISTATUS status = BsdfAllocate(&aggregate_bsdf_vtable,
@@ -439,6 +447,12 @@ AggregateBsdfAllocateWithAllocator(
     if (inserted_bsdfs == 0)
     {
         *bsdf = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (inserted_bsdfs == 1)
+    {
+        *bsdf = aggregate_bsdf->bsdfs[0];
         return ISTATUS_SUCCESS;
     }
 
