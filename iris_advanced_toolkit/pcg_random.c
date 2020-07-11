@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 
 #include "iris_advanced_toolkit/pcg_random.h"
-#include "third_party/pcg_c_basic/pcg_basic.h"
+#include "pcg_basic.h"
 
 //
 // Types

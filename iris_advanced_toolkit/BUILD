@@ -17,6 +17,6 @@ cc_library(
     hdrs = ["pcg_random.h"],
     deps = [
         "//iris_advanced",
-        "//third_party/pcg_c_basic:pcg_basic",
+        "@pcg_c_basic//:pcg_basic",
     ],
 )
