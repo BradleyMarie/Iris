@@ -318,6 +318,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 {
     PCTR_DIELECTRIC microfacet_bsdf = (PCTR_DIELECTRIC)context;
 
+    VECTOR3 original_incoming = incoming;
     incoming = VectorNegate(incoming);
 
     float_t u;
@@ -393,11 +394,12 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
                 cross_product.z * slope_y +
                 normal.z * slope_z;
 
-    *outgoing = VectorCreate(x, y, z);
-    *outgoing = VectorNormalize(*outgoing, NULL, NULL);
+    VECTOR3 half_angle = VectorCreate(x, y, z);
+    half_angle = VectorNormalize(half_angle, NULL, NULL);
+
+    *outgoing = VectorReflect(original_incoming, half_angle);
 
     float_t cos_theta_o = VectorBoundedDotProduct(*outgoing, normal);
-    VECTOR3 half_angle = VectorHalfAngle(incoming, *outgoing);
 
     if (half_angle.x == (float_t)0.0 ||
         half_angle.y == (float_t)0.0 ||
@@ -431,7 +433,9 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
     *transmitted = false;
 
-    if (*pdf == (float_t)0.0)
+    if (*pdf == (float_t)0.0 ||
+        cos_theta_i <= (float_t)0.0 ||
+        cos_theta_o <= (float_t)0.0)
     {
         *reflector = NULL;
         return ISTATUS_SUCCESS;
