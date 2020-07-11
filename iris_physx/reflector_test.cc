@@ -240,7 +240,6 @@ TEST(ReflectorTest, ReflectorGetAlbedoErrors)
                                        &reflector);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    float_t albedo;
     status = ReflectorGetAlbedo(reflector, NULL);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
     EXPECT_FALSE(encountered);
