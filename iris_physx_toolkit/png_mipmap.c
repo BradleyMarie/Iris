@@ -16,7 +16,7 @@ Abstract:
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
-#include "third_party/stb/stb_image.h"
+#include "stb_image.h"
 
 //
 // Functions

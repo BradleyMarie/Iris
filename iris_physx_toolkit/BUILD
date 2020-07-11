@@ -302,7 +302,7 @@ cc_library(
     deps = [
         ":mipmap",
         "//iris_advanced_toolkit:color_io",
-        "//third_party/stb:stb_image",
+        "@stb//:stb_image",
     ],
 )
 
