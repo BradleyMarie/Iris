@@ -86,9 +86,19 @@ AggregateBsdfSample(
         return status;
     }
 
-    bool specular = isinf(*pdf);
+    bool specular;
+    size_t matching_bsdfs;
+    if (*pdf <= (float_t)0.0)
+    {
+        specular = false;
+        matching_bsdfs = 0;
+    }
+    else
+    {
+        specular = isinf(*pdf);
+        matching_bsdfs = 1;
+    }
 
-    size_t matching_bsdfs = 1;
     for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
     {
         if (i == sampled_index)
@@ -121,7 +131,14 @@ AggregateBsdfSample(
         {
             float_t falloff = VectorPositiveDotProduct(normal,
                                                        *outgoing,
-                                                       transmitted);
+                                                       *transmitted);
+
+            if (falloff <= (float_t)0.0)
+            {
+                *reflector = NULL;
+                *pdf = (float_t)0.0;
+                return ISTATUS_SUCCESS;
+            }
 
             float_t inv_falloff = (float_t)1.0 / falloff;
 
@@ -133,6 +150,10 @@ AggregateBsdfSample(
             *pdf = (float_t)1.0 + bsdf_pdf;
 
             specular = false;
+        }
+        else
+        {
+            *pdf += bsdf_pdf;
         }
 
         matching_bsdfs += 1;
