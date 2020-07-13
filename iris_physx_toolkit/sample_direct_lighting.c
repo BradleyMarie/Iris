@@ -40,7 +40,7 @@ PowerHeuristic(
 static
 ISTATUS
 DeltaLightLighting(
-    _In_ PCSPECTRUM light_spectrum,
+    _In_opt_ PCSPECTRUM light_spectrum,
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 to_hit_point,
     _In_ VECTOR3 surface_normal,
@@ -51,7 +51,6 @@ DeltaLightLighting(
     _Out_ PCSPECTRUM *spectrum
     )
 {
-    assert(light_spectrum != NULL);
     assert(bsdf != NULL);
     assert(VectorValidate(to_hit_point));
     assert(VectorValidate(surface_normal));
@@ -59,6 +58,12 @@ DeltaLightLighting(
     assert(spectrum_compositor != NULL);
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
+
+    if (light_spectrum == NULL)
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t falloff = VectorDotProduct(shading_normal, to_light);
 
@@ -100,7 +105,7 @@ static
 ISTATUS
 DeltaBsdfLighting(
     _In_ PCLIGHT light,
-    _In_ PCREFLECTOR reflector,
+    _In_opt_ PCREFLECTOR reflector,
     _In_ bool transmitted,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 shading_normal,
@@ -111,13 +116,18 @@ DeltaBsdfLighting(
     )
 {
     assert(light != NULL);
-    assert(reflector != NULL);
     assert(PointValidate(hit_point));
     assert(VectorValidate(shading_normal));
     assert(VectorValidate(outgoing_direction));
     assert(visibility_tester != NULL);
     assert(spectrum_compositor != NULL);
     assert(spectrum != NULL);
+
+    if (reflector == NULL)
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     RAY to_light = RayCreate(hit_point, outgoing_direction);
 
@@ -144,7 +154,7 @@ DeltaBsdfLighting(
 static
 ISTATUS
 LightLighting(
-    _In_ PCSPECTRUM light_spectrum,
+    _In_opt_ PCSPECTRUM light_spectrum,
     _In_ float_t light_pdf,
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 to_hit_point,
@@ -156,7 +166,6 @@ LightLighting(
     _Out_ PCSPECTRUM *spectrum
     )
 {
-    assert(light_spectrum != NULL);
     assert((float_t)0.0 < light_pdf);
     assert(isfinite(light_pdf));
     assert(bsdf != NULL);
@@ -166,6 +175,12 @@ LightLighting(
     assert(spectrum_compositor != NULL);
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
+
+    if (light_spectrum == NULL)
+    {
+        *spectrum = NULL;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t light_sample_falloff = VectorDotProduct(shading_normal, to_light);
 
@@ -221,7 +236,10 @@ static
 ISTATUS
 BsdfLighting(
     _In_ PCLIGHT light,
-    _In_ PCBSDF bsdf,
+    _In_opt_ PCREFLECTOR bsdf_sampled_reflector,
+    _In_ bool bsdf_sampled_transmitted,
+    _In_ VECTOR3 bsdf_sampled_direction,
+    _In_ float_t bsdf_sampled_pdf,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 to_hit_point,
     _In_ VECTOR3 surface_normal,
@@ -234,7 +252,9 @@ BsdfLighting(
     )
 {
     assert(light != NULL);
-    assert(bsdf != NULL);
+    assert(VectorValidate(bsdf_sampled_direction));
+    assert(isfinite(bsdf_sampled_pdf));
+    assert((float_t)0.0 < bsdf_sampled_pdf);
     assert(PointValidate(hit_point));
     assert(VectorValidate(to_hit_point));
     assert(VectorValidate(surface_normal));
@@ -245,56 +265,22 @@ BsdfLighting(
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
-    PCREFLECTOR bsdf_sampled_reflector;
-    bool bsdf_sampled_transmitted;
-    VECTOR3 bsdf_sampled_direction;
-    float_t bsdf_sampled_pdf;
-    ISTATUS status = BsdfSample(bsdf,
-                                to_hit_point,
-                                surface_normal,
-                                rng,
-                                reflector_compositor,
-                                &bsdf_sampled_reflector,
-                                &bsdf_sampled_transmitted,
-                                &bsdf_sampled_direction,
-                                &bsdf_sampled_pdf);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (bsdf_sampled_pdf <= (float_t)0.0)
+    if (bsdf_sampled_reflector == NULL)
     {
         *spectrum = NULL;
         return ISTATUS_SUCCESS;
-    }
-
-    if (isinf(bsdf_sampled_pdf))
-    {
-        status = DeltaBsdfLighting(light,
-                                   bsdf_sampled_reflector,
-                                   bsdf_sampled_transmitted,
-                                   hit_point,
-                                   shading_normal,
-                                   bsdf_sampled_direction,
-                                   visibility_tester,
-                                   spectrum_compositor,
-                                   spectrum);
-
-        return status;
     }
 
     RAY bsdf_sampled_to_light = RayCreate(hit_point, bsdf_sampled_direction);
 
     PCSPECTRUM light_computed_spectrum;
     float_t light_computed_pdf;
-    status = LightComputeEmissiveWithPdf(light,
-                                         bsdf_sampled_to_light,
-                                         visibility_tester,
-                                         spectrum_compositor,
-                                         &light_computed_spectrum,
-                                         &light_computed_pdf);
+    ISTATUS status = LightComputeEmissiveWithPdf(light,
+                                                 bsdf_sampled_to_light,
+                                                 visibility_tester,
+                                                 spectrum_compositor,
+                                                 &light_computed_spectrum,
+                                                 &light_computed_pdf);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -376,23 +362,6 @@ SampleDirectLighting(
         return status;
     }
 
-    if (light_sampled_pdf <= (float_t)0.0)
-    {
-        status = BsdfLighting(light,
-                              bsdf,
-                              hit_point,
-                              to_hit_point,
-                              surface_normal,
-                              shading_normal,
-                              rng,
-                              visibility_tester,
-                              spectrum_compositor,
-                              reflector_compositor,
-                              spectrum);
-
-        return status;
-    }
-
     if (isinf(light_sampled_pdf))
     {
         status = DeltaLightLighting(light_sampled_spectrum,
@@ -427,6 +396,41 @@ SampleDirectLighting(
         return status;
     }
 
+    if (isinf(bsdf_sampled_pdf))
+    {
+        status = DeltaBsdfLighting(light,
+                                   bsdf_sampled_reflector,
+                                   bsdf_sampled_transmitted,
+                                   hit_point,
+                                   shading_normal,
+                                   bsdf_sampled_direction,
+                                   visibility_tester,
+                                   spectrum_compositor,
+                                   spectrum);
+
+        return status;
+    }
+
+    if (light_sampled_pdf <= (float_t)0.0)
+    {
+        status = BsdfLighting(light,
+                              bsdf_sampled_reflector,
+                              bsdf_sampled_transmitted,
+                              bsdf_sampled_direction,
+                              bsdf_sampled_pdf,
+                              hit_point,
+                              to_hit_point,
+                              surface_normal,
+                              shading_normal,
+                              rng,
+                              visibility_tester,
+                              spectrum_compositor,
+                              reflector_compositor,
+                              spectrum);
+
+        return status;
+    }
+
     if (bsdf_sampled_pdf <= (float_t)0.0)
     {
         status = LightLighting(light_sampled_spectrum,
@@ -439,21 +443,6 @@ SampleDirectLighting(
                                spectrum_compositor,
                                reflector_compositor,
                                spectrum);
-
-        return status;
-    }
-
-    if (isinf(bsdf_sampled_pdf))
-    {
-        status = DeltaBsdfLighting(light,
-                                   bsdf_sampled_reflector,
-                                   bsdf_sampled_transmitted,
-                                   hit_point,
-                                   shading_normal,
-                                   bsdf_sampled_direction,
-                                   visibility_tester,
-                                   spectrum_compositor,
-                                   spectrum);
 
         return status;
     }
