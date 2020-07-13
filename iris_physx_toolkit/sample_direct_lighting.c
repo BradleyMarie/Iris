@@ -166,7 +166,7 @@ LightLighting(
     _Out_ PCSPECTRUM *spectrum
     )
 {
-    assert((float_t)0.0 < light_pdf);
+    assert((float_t)0.0 <= light_pdf);
     assert(isfinite(light_pdf));
     assert(bsdf != NULL);
     assert(VectorValidate(to_hit_point));
@@ -176,7 +176,7 @@ LightLighting(
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
-    if (light_spectrum == NULL)
+    if (light_pdf == (float_t)0.0 || light_spectrum == NULL)
     {
         *spectrum = NULL;
         return ISTATUS_SUCCESS;
@@ -254,7 +254,7 @@ BsdfLighting(
     assert(light != NULL);
     assert(VectorValidate(bsdf_sampled_direction));
     assert(isfinite(bsdf_sampled_pdf));
-    assert((float_t)0.0 < bsdf_sampled_pdf);
+    assert((float_t)0.0 <= bsdf_sampled_pdf);
     assert(PointValidate(hit_point));
     assert(VectorValidate(to_hit_point));
     assert(VectorValidate(surface_normal));
@@ -265,7 +265,7 @@ BsdfLighting(
     assert(reflector_compositor != NULL);
     assert(spectrum != NULL);
 
-    if (bsdf_sampled_reflector == NULL)
+    if (bsdf_sampled_pdf == (float_t)0.0 || bsdf_sampled_reflector == NULL)
     {
         *spectrum = NULL;
         return ISTATUS_SUCCESS;
