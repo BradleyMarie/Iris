@@ -234,7 +234,7 @@ TrowbridgeReitzPdf(
     _In_ float_t d
     )
 {
-    assert((float_t)0.0 <= half_angle_cos_theta_o);
+    assert((float_t)0.0 < half_angle_cos_theta_o);
 
     float_t g1 = (float_t)1.0 / ((float_t)1.0 + lambda_o);
     return d * g1 * half_angle_cos_theta_o / cos_theta_o;
@@ -397,13 +397,19 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     VECTOR3 half_angle = VectorCreate(x, y, z);
     half_angle = VectorNormalize(half_angle, NULL, NULL);
 
+    if (half_angle.x == (float_t)0.0 ||
+        half_angle.y == (float_t)0.0 ||
+        half_angle.z == (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
     *outgoing = VectorReflect(original_incoming, half_angle);
 
     float_t cos_theta_o = VectorBoundedDotProduct(*outgoing, normal);
 
-    if (half_angle.x == (float_t)0.0 ||
-        half_angle.y == (float_t)0.0 ||
-        half_angle.z == (float_t)0.0)
+    if (cos_theta_o == (float_t)0.0)
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
@@ -433,9 +439,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
     *transmitted = false;
 
-    if (*pdf == (float_t)0.0 ||
-        cos_theta_i <= (float_t)0.0 ||
-        cos_theta_o <= (float_t)0.0)
+    if (*pdf == (float_t)0.0 || cos_theta_i <= (float_t)0.0)
     {
         *reflector = NULL;
         return ISTATUS_SUCCESS;
