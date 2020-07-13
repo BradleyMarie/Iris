@@ -178,6 +178,8 @@ TriangleMeshNormalMapAllocate(
 
     memcpy(normal_map.normals, normals, num_vertices * sizeof(VECTOR3));
 
+    normal_map.num_vertices = num_vertices;
+
     if (front_normal_map == NULL)
     {
         ISTATUS status =
