@@ -140,7 +140,7 @@ VectorPermuteZDominant(
 
 static
 ISTATUS
-TriangleTrace(
+TriangleMeshTriangleTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
@@ -277,7 +277,7 @@ TriangleTrace(
 
 static
 ISTATUS
-TriangleComputeBounds(
+TriangleMeshTriangleComputeBounds(
     _In_ const void *context,
     _In_opt_ PCMATRIX model_to_world,
     _Out_ PBOUNDING_BOX world_bounds
@@ -309,7 +309,7 @@ TriangleComputeBounds(
 
 static
 ISTATUS
-TriangleComputeNormal(
+TriangleMeshTriangleComputeNormal(
     _In_ const void *context,
     _In_ POINT3 hit_point,
     _In_ uint32_t face_hit,
@@ -337,7 +337,7 @@ TriangleComputeNormal(
 
 static
 ISTATUS
-TriangleGetMaterial(
+TriangleMeshTriangleGetMaterial(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Outptr_result_maybenull_ PCMATERIAL *material
@@ -356,7 +356,7 @@ TriangleGetMaterial(
 
 static
 ISTATUS
-TriangleGetNormalMap(
+TriangleMeshTriangleGetNormalMap(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Outptr_ PCNORMAL_MAP *normal_map
@@ -374,7 +374,7 @@ TriangleGetNormalMap(
 }
 
 ISTATUS
-TriangleComputeTextureCoordinates(
+TriangleMeshTriangleComputeTextureCoordinates(
     _In_opt_ const void *context,
     _In_ PCPOINT3 hit_point,
     _In_ PCVECTOR3 surface_normal,
@@ -498,7 +498,7 @@ TriangleMeshFree(
 
 static
 void
-TriangleFree(
+TriangleMeshTriangleFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
@@ -512,7 +512,7 @@ TriangleFree(
 
 static
 bool
-TriangleInitialize(
+TriangleMeshTriangleInitialize(
     _In_ PTRIANGLE_MESH mesh,
     _In_ uint32_t v0,
     _In_ uint32_t v1,
@@ -558,7 +558,7 @@ TriangleInitialize(
 
 static
 ISTATUS
-EmissiveTriangleGetEmissiveMaterial(
+EmissiveTriangleMeshTriangleGetEmissiveMaterial(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Outptr_result_maybenull_ PCEMISSIVE_MATERIAL *emissive_material
@@ -577,7 +577,7 @@ EmissiveTriangleGetEmissiveMaterial(
 
 static
 ISTATUS
-EmissiveTriangleSampleFace(
+EmissiveTriangleMeshTriangleSampleFace(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
     _Inout_ PRANDOM rng,
@@ -623,7 +623,7 @@ EmissiveTriangleSampleFace(
 }
 
 ISTATUS
-EmissiveTriangleComputePdfBySolidArea(
+EmissiveTriangleMeshTriangleComputePdfBySolidArea(
     _In_opt_ const void *context,
     _In_ PCRAY to_shape,
     _In_ float_t distance,
@@ -651,55 +651,55 @@ EmissiveTriangleComputePdfBySolidArea(
 //
 
 static const SHAPE_VTABLE triangle_vtable = {
-    TriangleTrace,
-    TriangleComputeBounds,
-    TriangleComputeNormal,
-    TriangleGetNormalMap,
-    TriangleGetMaterial,
+    TriangleMeshTriangleTrace,
+    TriangleMeshTriangleComputeBounds,
+    TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetNormalMap,
+    TriangleMeshTriangleGetMaterial,
     NULL,
     NULL,
     NULL,
     NULL,
-    TriangleFree
+    TriangleMeshTriangleFree
 };
 
 static const SHAPE_VTABLE emissive_triangle_vtable = {
-    TriangleTrace,
-    TriangleComputeBounds,
-    TriangleComputeNormal,
-    TriangleGetNormalMap,
-    TriangleGetMaterial,
-    EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFace,
-    EmissiveTriangleComputePdfBySolidArea,
+    TriangleMeshTriangleTrace,
+    TriangleMeshTriangleComputeBounds,
+    TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetNormalMap,
+    TriangleMeshTriangleGetMaterial,
+    EmissiveTriangleMeshTriangleGetEmissiveMaterial,
+    EmissiveTriangleMeshTriangleSampleFace,
+    EmissiveTriangleMeshTriangleComputePdfBySolidArea,
     NULL,
-    TriangleFree
+    TriangleMeshTriangleFree
 };
 
 static const SHAPE_VTABLE triangle_uvs_vtable = {
-    TriangleTrace,
-    TriangleComputeBounds,
-    TriangleComputeNormal,
-    TriangleGetNormalMap,
-    TriangleGetMaterial,
+    TriangleMeshTriangleTrace,
+    TriangleMeshTriangleComputeBounds,
+    TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetNormalMap,
+    TriangleMeshTriangleGetMaterial,
     NULL,
     NULL,
     NULL,
-    TriangleComputeTextureCoordinates,
-    TriangleFree
+    TriangleMeshTriangleComputeTextureCoordinates,
+    TriangleMeshTriangleFree
 };
 
 static const SHAPE_VTABLE emissive_triangle_uvs_vtable = {
-    TriangleTrace,
-    TriangleComputeBounds,
-    TriangleComputeNormal,
-    TriangleGetNormalMap,
-    TriangleGetMaterial,
-    EmissiveTriangleGetEmissiveMaterial,
-    EmissiveTriangleSampleFace,
-    EmissiveTriangleComputePdfBySolidArea,
-    TriangleComputeTextureCoordinates,
-    TriangleFree
+    TriangleMeshTriangleTrace,
+    TriangleMeshTriangleComputeBounds,
+    TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetNormalMap,
+    TriangleMeshTriangleGetMaterial,
+    EmissiveTriangleMeshTriangleGetEmissiveMaterial,
+    EmissiveTriangleMeshTriangleSampleFace,
+    EmissiveTriangleMeshTriangleComputePdfBySolidArea,
+    TriangleMeshTriangleComputeTextureCoordinates,
+    TriangleMeshTriangleFree
 };
 
 //
@@ -873,13 +873,13 @@ TriangleAllocateInternal(
     assert(shape != NULL);
 
     TRIANGLE triangle;
-    bool success = TriangleInitialize(mesh,
-                                      v0,
-                                      v1,
-                                      v2,
-                                      mesh_face_index,
-                                      NULL,
-                                      &triangle);
+    bool success = TriangleMeshTriangleInitialize(mesh,
+                                                  v0,
+                                                  v1,
+                                                  v2,
+                                                  mesh_face_index,
+                                                  NULL,
+                                                  &triangle);
 
     if (!success)
     {
@@ -918,13 +918,13 @@ EmissiveTriangleAllocateInternal(
     )
 {
     EMISSIVE_TRIANGLE emissive_triangle;
-    bool success = TriangleInitialize(mesh,
-                                      v0,
-                                      v1,
-                                      v2,
-                                      mesh_face_index,
-                                      &emissive_triangle.area,
-                                      &emissive_triangle.triangle);
+    bool success = TriangleMeshTriangleInitialize(mesh,
+                                                  v0,
+                                                  v1,
+                                                  v2,
+                                                  mesh_face_index,
+                                                  &emissive_triangle.area,
+                                                  &emissive_triangle.triangle);
 
     if (!success)
     {
