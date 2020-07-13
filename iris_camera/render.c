@@ -160,14 +160,12 @@ IrisCameraRenderPixel(
     assert(isfinite(pixel_v_width));
     assert((float_t)0.0 > pixel_v_width);
 
-    float_t pixel_u_min = fma((float_t)pixel_column,
-                              pixel_u_width,
-                              context->shared->camera->image_min_u);
+    float_t pixel_u_min =
+        context->shared->camera->image_min_u + (float_t)pixel_column * pixel_u_width;
     float_t pixel_u_max = pixel_u_min + pixel_u_width;
 
-    float_t pixel_v_max = fma((float_t)pixel_row,
-                              pixel_v_width,
-                              context->shared->camera->image_max_v);
+    float_t pixel_v_max =
+        context->shared->camera->image_max_v + (float_t)pixel_row * pixel_v_width;
     float_t pixel_v_min = pixel_v_max + pixel_v_width;
 
     size_t in_order_column;

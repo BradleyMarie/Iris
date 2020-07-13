@@ -256,9 +256,8 @@ SobolImageSamplerNextSample(
             (float_t)sobol_double_sample(sobol_sample_index,
                                          LENS_U_DIMENSION,
                                          SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
-        *lens_sample_u = fma(value,
-                             image_sampler->lens_delta_u,
-                             image_sampler->lens_min_u);
+        *lens_sample_u =
+            image_sampler->lens_min_u + image_sampler->lens_delta_u * value;
     }
     else
     {
@@ -271,9 +270,8 @@ SobolImageSamplerNextSample(
             (float_t)sobol_double_sample(sobol_sample_index,
                                          LENS_V_DIMENSION,
                                          SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
-        *lens_sample_v = fma(value,
-                             image_sampler->lens_delta_v,
-                             image_sampler->lens_min_v);
+        *lens_sample_v =
+            image_sampler->lens_min_v + image_sampler->lens_delta_v * value;
     }
     else
     {

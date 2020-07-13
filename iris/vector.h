@@ -114,9 +114,9 @@ VectorAddScaled(
 {
     assert(isfinite(scalar));
 
-    float_t x = fma(scalar, addend1.x, addend0.x);
-    float_t y = fma(scalar, addend1.y, addend0.y);
-    float_t z = fma(scalar, addend1.z, addend0.z);
+    float_t x = addend0.x + addend1.x * scalar;
+    float_t y = addend0.y + addend1.y * scalar;
+    float_t z = addend0.z + addend1.z * scalar;
 
     return VectorCreate(x, y, z);
 }

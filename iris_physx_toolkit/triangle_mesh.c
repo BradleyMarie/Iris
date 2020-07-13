@@ -184,12 +184,12 @@ TriangleMeshTriangleTrace(
     float_t shear_x = -direction.x / direction.z;
     float_t shear_y = -direction.y / direction.z;
 
-    v0.x = fma(shear_x, v0.z, v0.x);
-    v0.y = fma(shear_y, v0.z, v0.y);
-    v1.x = fma(shear_x, v1.z, v1.x);
-    v1.y = fma(shear_y, v1.z, v1.y);
-    v2.x = fma(shear_x, v2.z, v2.x);
-    v2.y = fma(shear_y, v2.z, v2.y);
+    v0.x += shear_x * v0.z;
+    v0.y += shear_y * v0.z;
+    v1.x += shear_x * v1.z;
+    v1.y += shear_y * v1.z;
+    v2.x += shear_x * v2.z;
+    v2.y += shear_y * v2.z;
 
     TRIANGLE_MESH_ADDITIONAL_DATA data;
     data.barycentric_coordinates[0] = v1.x * v2.y - v1.y * v2.x;
@@ -411,21 +411,17 @@ TriangleMeshTriangleComputeTextureCoordinates(
     uv[1] = mesh->texture_coordinates[triangle->v0][1] *
             hit_data->barycentric_coordinates[0];
 
-    uv[0] = fma(mesh->texture_coordinates[triangle->v1][0],
-                hit_data->barycentric_coordinates[1],
-                uv[0]);
+    uv[0] += mesh->texture_coordinates[triangle->v1][0] *
+             hit_data->barycentric_coordinates[1];
 
-    uv[1] = fma(mesh->texture_coordinates[triangle->v1][1],
-                hit_data->barycentric_coordinates[1],
-                uv[1]);
+    uv[1] += mesh->texture_coordinates[triangle->v1][1] *
+             hit_data->barycentric_coordinates[1];
 
-    uv[0] = fma(mesh->texture_coordinates[triangle->v2][0],
-                hit_data->barycentric_coordinates[2],
-                uv[0]);
+    uv[0] += mesh->texture_coordinates[triangle->v2][0] *
+             hit_data->barycentric_coordinates[2];
 
-    uv[1] = fma(mesh->texture_coordinates[triangle->v2][1],
-                hit_data->barycentric_coordinates[2],
-                uv[1]);
+    uv[1] += mesh->texture_coordinates[triangle->v2][1] *
+             hit_data->barycentric_coordinates[2];
 
     if (!ray_differential->has_differentials)
     {

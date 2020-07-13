@@ -49,8 +49,8 @@ ImageFloatTextureSample(
     PFLOAT_IMAGE_TEXTURE texture = (PFLOAT_IMAGE_TEXTURE)context;
     PCUV_TEXTURE_COORDINATE uv = (PCUV_TEXTURE_COORDINATE)texture_coordinates;
 
-    float_t u = fma(uv->uv[0], texture->u_scalar, texture->u_offset);
-    float_t v = fma(uv->uv[1], texture->v_scalar, texture->v_offset);
+    float_t u = texture->u_offset + uv->uv[0] * texture->u_scalar;
+    float_t v = texture->v_offset + uv->uv[1] * texture->v_scalar;
 
     ISTATUS status = FloatMipmapLookup(texture->mipmap,
                                        u,
@@ -175,8 +175,8 @@ ImageReflectorTextureSample(
     PREFLECTOR_IMAGE_TEXTURE texture = (PREFLECTOR_IMAGE_TEXTURE)context;
     PCUV_TEXTURE_COORDINATE uv = (PCUV_TEXTURE_COORDINATE)texture_coordinates;
 
-    float_t u = fma(uv->uv[0], texture->u_scalar, texture->u_offset);
-    float_t v = fma(uv->uv[1], texture->v_scalar, texture->v_offset);
+    float_t u = texture->u_offset + uv->uv[0] * texture->u_scalar;
+    float_t v = texture->v_offset + uv->uv[1] * texture->v_scalar;
 
     ISTATUS status = ReflectorMipmapLookup(texture->mipmap,
                                            u,

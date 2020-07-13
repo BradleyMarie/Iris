@@ -111,9 +111,9 @@ PointVectorAddScaled(
 {
     assert(isfinite(scalar));
 
-    float_t x = fma(scalar, vector.x, point.x);
-    float_t y = fma(scalar, vector.y, point.y);
-    float_t z = fma(scalar, vector.z, point.z);
+    float_t x = point.x + vector.x * scalar;
+    float_t y = point.y + vector.y * scalar;
+    float_t z = point.z + vector.z * scalar;
 
     return PointCreate(x, y, z);
 }

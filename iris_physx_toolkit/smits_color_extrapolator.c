@@ -638,7 +638,7 @@ SmitsColorExtrapolatorResample(
     float_t higher_value = sampled_values[result_index];
     float_t lower_value = sampled_values[result_index - 1];
 
-    return fma(parameter, higher_value - lower_value, lower_value);
+    return lower_value + (higher_value - lower_value) * parameter;
 }
 
 static
@@ -668,7 +668,7 @@ SmitsColorExtrapolatorScaledAdd(
 {
     for (size_t i = 0; i < num_samples; i++)
     {
-        output[i] = fma(scalar, scaled[i], addend[i]);
+        output[i] = addend[i] + scaled[i] * scalar;
     }
 }
 

@@ -1952,9 +1952,9 @@ CieColorIntegratorComputeSpectrumColor(
             return status;
         }
 
-        values[0] = fma(intensity, cie_x_bar[i], values[0]);
-        values[1] = fma(intensity, cie_y_bar[i], values[1]);
-        values[2] = fma(intensity, cie_z_bar[i], values[2]);
+        values[0] += intensity * cie_x_bar[i];
+        values[1] += intensity * cie_y_bar[i];
+        values[2] += intensity * cie_z_bar[i];
     }
 
     *color = ColorCreate(COLOR_SPACE_XYZ, values);
@@ -1985,9 +1985,9 @@ CieColorIntegratorComputeReflectiveSpectrumColor(
             return status;
         }
 
-        values[0] = fma(intensity, cie_x_bar[i], values[0]);
-        values[1] = fma(intensity, cie_y_bar[i], values[1]);
-        values[2] = fma(intensity, cie_z_bar[i], values[2]);
+        values[0] += intensity * cie_x_bar[i];
+        values[1] += intensity * cie_y_bar[i];
+        values[2] += intensity * cie_z_bar[i];
     }
 
     values[0] /= cie_y_integral;
@@ -2022,9 +2022,9 @@ CieColorIntegratorComputeReflectorColor(
             return status;
         }
 
-        values[0] = fma(intensity, cie_x_bar[i], values[0]);
-        values[1] = fma(intensity, cie_y_bar[i], values[1]);
-        values[2] = fma(intensity, cie_z_bar[i], values[2]);
+        values[0] += intensity * cie_x_bar[i];
+        values[1] += intensity * cie_y_bar[i];
+        values[2] += intensity * cie_z_bar[i];
     }
 
     values[0] /= cie_y_integral;

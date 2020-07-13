@@ -50,9 +50,7 @@ PermutedCongruentialRandomGenerateFloat(
     int_to_float.as_int |= 0x3F800000;
     int_to_float.as_float -= 1.0f;
 
-    *result = fma(maximum - minimum,
-                  (float_t)int_to_float.as_float,
-                  minimum);
+    *result = minimum + (maximum - minimum) * (float_t)int_to_float.as_float;
 
     return ISTATUS_SUCCESS;
 }

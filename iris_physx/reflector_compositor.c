@@ -102,9 +102,8 @@ AttenuatedSumReflectorReflect(
         return status;
     }
 
-    *reflectance = fma(reflector->attenuation,
-                       attenuated_reflectance,
-                       added_reflectance);
+    *reflectance =
+        added_reflectance + attenuated_reflectance * reflector->attenuation;
 
     return ISTATUS_SUCCESS;
 }
@@ -135,9 +134,8 @@ AttenuatedSumReflectorGetAlbedo(
         return status;
     }
 
-    *reflectance = fma(reflector->attenuation,
-                       *reflectance,
-                       added_albedo);
+    *reflectance =
+        added_albedo + *reflectance * reflector->attenuation;
 
     return ISTATUS_SUCCESS;
 }

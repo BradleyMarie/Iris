@@ -215,9 +215,8 @@ HaltonImageSamplerNextSample(
     {
         float_t value =
             (float_t)HaltonSequenceCompute((uint64_t)index, LENS_U_BASE);
-        *lens_sample_u = fma(value,
-                             image_sampler->lens_delta_u,
-                             image_sampler->lens_min_u);
+        *lens_sample_u =
+             image_sampler->lens_min_u + image_sampler->lens_delta_u * value;
     }
     else
     {
@@ -228,9 +227,8 @@ HaltonImageSamplerNextSample(
     {
         double_t value =
             (float_t)HaltonSequenceCompute((uint64_t)index, LENS_V_BASE);
-        *lens_sample_v = fma(value,
-                             image_sampler->lens_delta_v,
-                             image_sampler->lens_min_v);
+        *lens_sample_v =
+            image_sampler->lens_min_v + image_sampler->lens_delta_v * value;
     }
     else
     {

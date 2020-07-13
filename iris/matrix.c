@@ -170,8 +170,7 @@ Float4x4InverseInitialize(
             inverse[j][best_column] = (float_t)0.0;
             for (size_t k = 0; k < 4; k++)
             {
-                inverse[j][k] =
-                    fma(scalar, inverse[best_column][k], inverse[j][k]);
+                inverse[j][k] += scalar * inverse[best_column][k];
             }
         }
     }

@@ -102,7 +102,7 @@ Interpolate(
 
     float_t higher_value = values[result_index];
     float_t lower_value = values[result_index - 1];
-    return fma(parameter, higher_value - lower_value, lower_value);
+    return lower_value + (higher_value - lower_value) * parameter;
 }
 
 static
@@ -398,8 +398,8 @@ InterpolatedReflectorAllocate(
     for (size_t i = 0; i < num_samples - 1; i++)
     {
         float_t width = (wavelengths[i + 1] - wavelengths[i]) * (float_t)0.5;
-        total_area = fma(reflectances[i], width, total_area);
-        total_area = fma(reflectances[i + 1], width, total_area);
+        total_area += reflectances[i] * width;
+        total_area += reflectances[i + 1] * width;
     }
 
     float_t average_reflectance =
