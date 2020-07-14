@@ -104,18 +104,6 @@ HitAllocatorGetData(
 static
 inline
 void
-HitAllocatorFreeAll(
-    _Inout_ struct _HIT_ALLOCATOR *allocator
-    )
-{
-    assert(allocator != NULL);
-
-    DynamicMemoryAllocatorFreeAll(&allocator->allocator);
-}
-
-static
-inline
-void
 HitAllocatorFreeAllExcept(
     _Inout_ struct _HIT_ALLOCATOR *allocator,
     _In_ PDYNAMIC_ALLOCATION allocation_handle

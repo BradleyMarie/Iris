@@ -19,18 +19,12 @@ Abstract:
 #include "iris/hit_allocator_internal.h"
 
 //
-// Extern Data
-//
-
-extern const FULL_HIT_CONTEXT empty_hit;
-
-//
 // Types
 //
 
 struct _HIT_TESTER {
     struct _HIT_ALLOCATOR hit_allocator;
-    PCFULL_HIT_CONTEXT closest_hit;
+    PFULL_HIT_CONTEXT closest_hit;
     RAY world_ray;
     float_t minimum_distance;
 };
@@ -52,7 +46,27 @@ HitTesterInitialize(
 
     HitAllocatorInitialize(&hit_tester->hit_allocator);
 
-    hit_tester->closest_hit = &empty_hit;
+    PFULL_HIT_CONTEXT hit_context;
+    PDYNAMIC_ALLOCATION allocation_handle;
+    void *additional_data_dest;
+    bool success = DynamicMemoryAllocatorAllocate(&hit_tester->hit_allocator.allocator,
+                                                  &allocation_handle,
+                                                  sizeof(FULL_HIT_CONTEXT),
+                                                  alignof(FULL_HIT_CONTEXT),
+                                                  (void **)&hit_context,
+                                                  0,
+                                                  0,
+                                                  &additional_data_dest);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    hit_context->hit.distance = INFINITY;
+    hit_context->allocation_handle = allocation_handle;
+
+    hit_tester->closest_hit = hit_context;
     hit_tester->minimum_distance = (float_t)0.0;
 
     return true;
@@ -72,9 +86,11 @@ HitTesterReset(
     assert(isfinite(minimum_distance));
     assert((float_t)0.0 <= minimum_distance);
 
-    HitAllocatorFreeAll(&hit_tester->hit_allocator);
+    HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
+                              hit_tester->closest_hit->allocation_handle);
 
-    hit_tester->closest_hit = &empty_hit;
+    hit_tester->closest_hit->hit.distance = INFINITY;
+
     hit_tester->world_ray = world_ray;
     hit_tester->minimum_distance = minimum_distance;
 }

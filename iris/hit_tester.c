@@ -47,15 +47,8 @@ HitTesterCollectHitsAndUpdateClosestHit(
         hit = hit->next;
     } while (hit != NULL);
 
-    if (hit_tester->closest_hit != &empty_hit)
-    {
-        HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
-                                  hit_tester->closest_hit->allocation_handle);
-    }
-    else
-    {
-        HitAllocatorFreeAll(&hit_tester->hit_allocator);
-    }
+    HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
+                              hit_tester->closest_hit->allocation_handle);
 
     return ISTATUS_SUCCESS;
 }
@@ -105,26 +98,11 @@ HitTesterTestWorldInternal(
         hit = hit->next;
     } while (hit != NULL);
 
-    if (hit_tester->closest_hit != &empty_hit)
-    {
-        HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
-                                  hit_tester->closest_hit->allocation_handle);
-    }
-    else
-    {
-        HitAllocatorFreeAll(&hit_tester->hit_allocator);
-    }
+    HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
+                              hit_tester->closest_hit->allocation_handle);
 
     return ISTATUS_SUCCESS;
 }
-
-//
-// Data
-//
-
-const FULL_HIT_CONTEXT empty_hit = {
-    .hit = { NULL, (float_t)INFINITY }
-};
 
 //
 // Functions

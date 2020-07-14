@@ -214,7 +214,7 @@ RayTracerTraceClosestHit(
     }
 
     PCFULL_HIT_CONTEXT closest = ray_tracer->hit_tester.closest_hit;
-    if (closest != &empty_hit)
+    if (closest->hit.distance != INFINITY)
     {
         status = process_hit_routine(process_hit_context, &closest->context);
     }
@@ -247,7 +247,7 @@ RayTracerTraceClosestHitWithCoordinates(
     }
 
     PCFULL_HIT_CONTEXT closest = ray_tracer->hit_tester.closest_hit;
-    if (closest != &empty_hit)
+    if (closest->hit.distance != INFINITY)
     {
         status = RayTracerProcessHitWithContext(ray,
                                                 closest,

@@ -706,19 +706,24 @@ TEST(HitAllocatorTest, HitAllocatorTestRepeatedAllocation)
         EXPECT_EQ(entry.second, full_hit->model_hit_point);
     }
 
-    nexts.clear();
-    distances.clear();
-    front_faces.clear();
-    back_faces.clear();
-    hit_points.clear();
-    no_hit_points.clear();
-    data.clear();
-    data_sizes.clear();
-    hits_in_order.clear();
-    HitAllocatorFreeAll(&allocator);
+    for (size_t i = 1; i < hits_in_order.size(); i++)
+    {
+        nexts.erase(hits_in_order[i]);
+        distances.erase(hits_in_order[i]);
+        front_faces.erase(hits_in_order[i]);
+        back_faces.erase(hits_in_order[i]);
+        hit_points.erase(hits_in_order[i]);
+        no_hit_points.erase(hits_in_order[i]);
+        data.erase(hits_in_order[i]);
+        data_sizes.erase(hits_in_order[i]);
+    }
+
+    hits_in_order.resize(1);
+
+    HitAllocatorFreeAllExcept(&allocator, reinterpret_cast<PCFULL_HIT_CONTEXT>(hits_in_order.back())->allocation_handle);
 
     last = nullptr;
-    for (uintptr_t i = 0; i < 2000; i++)
+    for (uintptr_t i = 1; i < 2000; i++)
     {
         size_t datum_size = 0;
         if (should_do_action(rng) != 1)

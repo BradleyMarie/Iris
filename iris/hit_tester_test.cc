@@ -647,12 +647,12 @@ TEST(HitTesterTest, HitTesterCheckWorldHits)
     RAY ray = RayCreate(origin, direction);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunWorldHitTest(&tester, (float_t)0.0);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunWorldHitTest(&tester, (float_t)0.0);
     
@@ -772,32 +772,32 @@ TEST(HitTesterTest, HitTesterCheckPremultipliedHits)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
     
@@ -923,37 +923,37 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
@@ -1183,32 +1183,32 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsPremultiplied)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, nullptr);
 
@@ -1340,37 +1340,37 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsTransformed)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world_2);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, nullptr);
 
     HitTesterReset(&tester, ray, (float_t)0.0);
-    EXPECT_EQ(&empty_hit, tester.closest_hit);
+    EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
