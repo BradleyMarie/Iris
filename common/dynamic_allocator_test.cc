@@ -29,8 +29,8 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorInitialize)
 {
     DYNAMIC_MEMORY_ALLOCATOR allocator;
     DynamicMemoryAllocatorInitialize(&allocator);
-    ASSERT_EQ(NULL, allocator.last_allocation);
-    ASSERT_EQ(NULL, allocator.next_allocation);
+    ASSERT_EQ(NULL, allocator.tail.next);
+    ASSERT_EQ(NULL, allocator.head.prev);
 
     DynamicMemoryAllocatorDestroy(&allocator);
 }

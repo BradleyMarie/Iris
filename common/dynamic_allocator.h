@@ -38,9 +38,9 @@ typedef struct _DYNAMIC_ALLOCATION {
 } DYNAMIC_ALLOCATION, *PDYNAMIC_ALLOCATION;
 
 typedef struct _DYNAMIC_MEMORY_ALLOCATOR {
-    PDYNAMIC_ALLOCATION first_allocation;
-    PDYNAMIC_ALLOCATION last_allocation;
     PDYNAMIC_ALLOCATION next_allocation;
+    DYNAMIC_ALLOCATION head;
+    DYNAMIC_ALLOCATION tail;
 } DYNAMIC_MEMORY_ALLOCATOR, *PDYNAMIC_MEMORY_ALLOCATOR;
 
 //
@@ -56,9 +56,13 @@ DynamicMemoryAllocatorInitialize(
 {
     assert(allocator != NULL);
 
-    allocator->first_allocation = NULL;
-    allocator->last_allocation = NULL;
-    allocator->next_allocation = NULL;
+    allocator->next_allocation = &allocator->tail;
+    allocator->head.size = 0;
+    allocator->head.prev = NULL;
+    allocator->head.next = &allocator->tail;
+    allocator->tail.size = 0;
+    allocator->tail.prev = &allocator->head;
+    allocator->tail.next = NULL;
 }
 
 _Check_return_
@@ -88,10 +92,10 @@ DynamicMemoryAllocatorAllocate(
     assert(data_size == 0 || (data_alignment & (data_alignment - 1)) == 0);
     assert(data_size == 0 || data_size % data_alignment == 0);
 
-    if (allocator->next_allocation != NULL)
+    if (allocator->next_allocation != &allocator->tail)
     {
-        PDYNAMIC_ALLOCATION next_prev = allocator->next_allocation->prev;
-        PDYNAMIC_ALLOCATION next_next = allocator->next_allocation->next;
+        PDYNAMIC_ALLOCATION prev = allocator->next_allocation->prev;
+        PDYNAMIC_ALLOCATION next = allocator->next_allocation->next;
 
         void *allocation_header;
         size_t allocation_size;
@@ -118,27 +122,11 @@ DynamicMemoryAllocatorAllocate(
 
         if (allocator->next_allocation != result)
         {
-            if (next_prev != NULL)
-            {
-                next_prev->next = result;
-            }
-            else
-            {
-                allocator->first_allocation = result;
-            }
-
-            if (next_next != NULL)
-            {
-                next_next->prev = result;
-            }
-            else
-            {
-                allocator->last_allocation = result;
-            }
-
+            prev->next = result;
+            next->prev = result;
             result->size = allocation_size;
-            result->next = next_next;
-            result->prev = next_prev;
+            result->prev = prev;
+            result->next = next;
         }
 
         if (allocation_handle != NULL)
@@ -150,8 +138,6 @@ DynamicMemoryAllocatorAllocate(
     }
     else
     {
-        PDYNAMIC_ALLOCATION next_prev = allocator->last_allocation;
-
         void *allocation_header;
         size_t allocation_size;
         bool ok = AlignedAllocWithTwoHeaders(sizeof(DYNAMIC_ALLOCATION),
@@ -173,25 +159,18 @@ DynamicMemoryAllocatorAllocate(
         PDYNAMIC_ALLOCATION result =
             (PDYNAMIC_ALLOCATION)allocation_header;
 
-        if (next_prev != NULL)
-        {
-            next_prev->next = result;
-        }
-        else
-        {
-            allocator->first_allocation = result;
-        }
-
-        allocator->last_allocation = result;
+        PDYNAMIC_ALLOCATION prev = allocator->tail.prev;
+        PDYNAMIC_ALLOCATION next = &allocator->tail;
+        prev->next = result;
+        next->prev = result;
+        result->size = allocation_size;
+        result->next = next;
+        result->prev = prev;
 
         if (allocation_handle != NULL)
         {
             *allocation_handle = result;
         }
-
-        result->size = allocation_size;
-        result->next = NULL;
-        result->prev = next_prev;
     }
 
     return true;
@@ -206,7 +185,7 @@ DynamicMemoryAllocatorFreeAll(
 {
     assert(allocator != NULL);
 
-    allocator->next_allocation = allocator->first_allocation;
+    allocator->next_allocation = allocator->head.next;
 }
 
 static
@@ -220,28 +199,17 @@ DynamicMemoryAllocatorFreeAllExcept(
     assert(allocator != NULL);
     assert(allocation != NULL);
 
-    if (allocator->first_allocation != allocation)
-    {
-        if (allocator->last_allocation != allocation)
-        {
-            allocation->next->prev = allocation->prev;
-            allocation->prev->next = allocation->next;
-        }
-        else
-        {
-            allocator->last_allocation = allocation->prev;
-            allocation->prev->next = NULL;
-        }
+    allocation->prev->next = allocation->next;
+    allocation->next->prev = allocation->prev;
 
-        allocator->first_allocation->prev = allocation;
+    PDYNAMIC_ALLOCATION next = allocator->head.next;
+    allocation->next = next;
+    allocation->prev = &allocator->head;
 
-        allocation->next = allocator->first_allocation;
-        allocation->prev = NULL;
+    next->prev = allocation;
+    allocator->head.next = allocation;
 
-        allocator->first_allocation = allocation;
-    }
-
-    allocator->next_allocation = allocation->next;
+    allocator->next_allocation = next;
 }
 
 static
@@ -253,16 +221,17 @@ DynamicMemoryAllocatorDestroy(
 {
     assert(allocator != NULL);
 
-    allocator->next_allocation = NULL;
-
-    PDYNAMIC_ALLOCATION next_allocation = allocator->first_allocation;
-
-    while (next_allocation != NULL)
+    PDYNAMIC_ALLOCATION next_allocation = allocator->head.next;
+    while (next_allocation != &allocator->tail)
     {
         PDYNAMIC_ALLOCATION temp = next_allocation->next;
         free(next_allocation);
         next_allocation = temp;
     }
+
+    allocator->next_allocation = NULL;
+    allocator->head.next = &allocator->tail;
+    allocator->tail.prev = &allocator->head;
 }
 
 #endif // _COMMON_DYNAMIC_ALLOCATOR_
