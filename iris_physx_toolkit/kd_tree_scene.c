@@ -1115,9 +1115,11 @@ KdTreeTraceTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
+
     for (;;)
     {
-        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
 
         if (closest_hit < node_min)
         {
@@ -1131,7 +1133,8 @@ KdTreeTraceTree(
             if (num_shapes == 1)
             {
                 uint32_t index = node->split_or_index.index;
-                ISTATUS status = KdTreeTraceShape(hit_tester, shapes + index);
+                ISTATUS status = KdTreeTraceShape(hit_tester,
+                                                  shapes + index);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -1241,9 +1244,11 @@ KdTreeTraceTransformedTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
+
     for (;;)
     {
-        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
 
         if (closest_hit < node_min)
         {
@@ -1368,9 +1373,11 @@ KdTreeTraceWorldTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
+
     for (;;)
     {
-        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
 
         if (closest_hit < node_min)
         {

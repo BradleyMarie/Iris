@@ -517,7 +517,9 @@ TEST(HitTesterTest, HitTesterSortHits)
         EXPECT_EQ(ISTATUS_SUCCESS, status);
     }
 
-    float_t closest_hit = HitTesterClosestHit(&tester);
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, closest_hit);
 
     HitTesterDestroy(&tester);
@@ -579,7 +581,8 @@ void RunWorldHitTest(
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
@@ -590,7 +593,8 @@ void RunWorldHitTest(
                                         &second_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
@@ -601,7 +605,8 @@ void RunWorldHitTest(
                                         &third_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
@@ -612,7 +617,8 @@ void RunWorldHitTest(
                                         &fourth_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestWorldGeometry(tester,
@@ -621,7 +627,8 @@ void RunWorldHitTest(
                                         nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
@@ -668,7 +675,8 @@ void RunPremultipliedHitTest(
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
@@ -680,7 +688,8 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
@@ -692,7 +701,8 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
@@ -704,7 +714,8 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestPremultipliedGeometry(tester,
@@ -720,7 +731,8 @@ void RunPremultipliedHitTest(
         EXPECT_TRUE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
@@ -728,7 +740,8 @@ void RunPremultipliedHitTest(
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
 }
@@ -809,7 +822,8 @@ void RunTransformedHitTest(
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
@@ -821,7 +835,8 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
@@ -833,7 +848,8 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
@@ -845,7 +861,8 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestTransformedGeometry(tester,
@@ -855,7 +872,8 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     if (matrix == nullptr)
@@ -863,7 +881,8 @@ void RunTransformedHitTest(
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
@@ -872,7 +891,8 @@ void RunTransformedHitTest(
         EXPECT_FALSE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
 }
@@ -1062,7 +1082,8 @@ RunPremultipliedHitTestBase(
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
@@ -1075,7 +1096,8 @@ RunPremultipliedHitTestBase(
                                    true);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
@@ -1088,7 +1110,8 @@ RunPremultipliedHitTestBase(
                                    true);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
@@ -1101,7 +1124,8 @@ RunPremultipliedHitTestBase(
                                    true);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestGeometry(tester,
@@ -1118,7 +1142,8 @@ RunPremultipliedHitTestBase(
         EXPECT_TRUE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
@@ -1126,7 +1151,8 @@ RunPremultipliedHitTestBase(
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
 }
@@ -1209,7 +1235,8 @@ RunTransformedHitTestBase(
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
     float_t closest_hit;
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
     int second_hit_data = 0;
@@ -1222,7 +1249,8 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
@@ -1235,7 +1263,8 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
@@ -1248,7 +1277,8 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     status = HitTesterTestGeometry(tester,
@@ -1259,7 +1289,8 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    closest_hit = HitTesterClosestHit(tester);
+    status = HitTesterClosestHit(tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     if (matrix == nullptr)
@@ -1267,7 +1298,8 @@ RunTransformedHitTestBase(
         EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
@@ -1276,7 +1308,8 @@ RunTransformedHitTestBase(
         EXPECT_FALSE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        closest_hit = HitTesterClosestHit(tester);
+        status = HitTesterClosestHit(tester, &closest_hit);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
 }
@@ -1342,4 +1375,32 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsTransformed)
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
     MatrixRelease(model_to_world_2);
+}
+
+TEST(HitTesterTest, HitTesterClosestHitErrors)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(nullptr, &closest_hit);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterClosestHit(&tester, nullptr);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    HitTesterDestroy(&tester);
+}
+
+TEST(HitTesterTest, HitTesterClosestEmpty)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_TRUE(std::isinf(closest_hit));
+
+    HitTesterDestroy(&tester);
 }

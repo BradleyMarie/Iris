@@ -167,12 +167,16 @@ ShapeHitTesterTestNestedShape(
 
 static
 inline
-float_t
+ISTATUS
 ShapeHitTesterClosestHit(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _Out_ float_t *distance
     )
 {
-    return HitTesterClosestHit(hit_tester);
+    ISTATUS status = HitTesterClosestHit(hit_tester,
+                                         distance);
+
+    return status;
 }
 
 #endif // _IRIS_PHYSX_HIT_TESTER_

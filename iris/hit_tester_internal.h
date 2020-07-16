@@ -23,8 +23,8 @@ Abstract:
 //
 
 struct _HIT_TESTER {
-    PFULL_HIT_CONTEXT closest_hit;
     struct _HIT_ALLOCATOR hit_allocator;
+    PFULL_HIT_CONTEXT closest_hit;
     RAY world_ray;
     float_t minimum_distance;
 };
