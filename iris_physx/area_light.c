@@ -58,7 +58,7 @@ VisibilityTesterTraceSingleShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *shape_context = ((const void **)shape)[1];
+    const void *shape_context = ShapeGetData(shape);
     ISTATUS status = HitTesterTestWorldGeometry(hit_tester,
                                                 test_routine,
                                                 shape_context,

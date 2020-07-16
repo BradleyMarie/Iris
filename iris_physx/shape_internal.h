@@ -35,13 +35,24 @@ extern const NORMAL_MAP shading_normal_map;
 
 struct _SHAPE {
     PCSHAPE_VTABLE vtable;
-    void *data;
     atomic_uintmax_t reference_count;
 };
 
 //
 // Functions
 //
+
+static
+inline
+void*
+ShapeGetData(
+    _In_ PCSHAPE shape
+    )
+{
+    assert(shape != NULL);
+
+    return (void*)((const void **)shape + 2);
+}
 
 static
 inline
@@ -58,7 +69,8 @@ ShapeTrace(
     assert(allocator != NULL);
     assert(hit != NULL);
 
-    ISTATUS status = shape->vtable->trace_routine(shape->data,
+    const void* data = ShapeGetData(shape);
+    ISTATUS status = shape->vtable->trace_routine(data,
                                                   ray,
                                                   allocator,
                                                   hit);
@@ -80,7 +92,8 @@ ShapeComputeNormal(
     assert(PointValidate(hit_point));
     assert(surface_normal != NULL);
 
-    ISTATUS status = shape->vtable->compute_normal_routine(shape->data,
+    const void* data = ShapeGetData(shape);
+    ISTATUS status = shape->vtable->compute_normal_routine(data,
                                                            hit_point,
                                                            face_hit,
                                                            surface_normal);
@@ -100,7 +113,8 @@ ShapeGetMaterial(
     assert(shape != NULL);
     assert(material != NULL);
 
-    ISTATUS status = shape->vtable->get_material_routine(shape->data,
+    const void* data = ShapeGetData(shape);
+    ISTATUS status = shape->vtable->get_material_routine(data,
                                                          face_hit,
                                                          material);
 
@@ -119,8 +133,9 @@ ShapeGetEmissiveMaterial(
     assert(shape != NULL);
     assert(emissive_material != NULL);
 
+    const void* data = ShapeGetData(shape);
     ISTATUS status =
-        shape->vtable->get_emissive_material_routine(shape->data,
+        shape->vtable->get_emissive_material_routine(data,
                                                      face_hit,
                                                      emissive_material);
 
@@ -141,8 +156,9 @@ ShapeSampleFace(
     assert(rng != NULL);
     assert(sampled_point != NULL);
 
+    const void* data = ShapeGetData(shape);
     ISTATUS status =
-        shape->vtable->sample_face_routine(shape->data,
+        shape->vtable->sample_face_routine(data,
                                            face_hit,
                                            rng,
                                            sampled_point);
@@ -168,8 +184,9 @@ ShapeComputePdfBySolidAngle(
     assert(RayValidate(*to_shape));
     assert(pdf != NULL);
 
+    const void* data = ShapeGetData(shape);
     ISTATUS status =
-        shape->vtable->compute_pdf_by_solid_angle_routine(shape->data,
+        shape->vtable->compute_pdf_by_solid_angle_routine(data,
                                                           to_shape,
                                                           distance,
                                                           face_hit,
@@ -196,8 +213,10 @@ ShapeComputeShadingNormal(
     assert(VectorValidate(geometry_normal));
     assert(shading_normal != NULL);
 
+    const void* data = ShapeGetData(shape);
+
     PCNORMAL_MAP normal_map;
-    ISTATUS status = shape->vtable->get_normal_map_routine(shape->data,
+    ISTATUS status = shape->vtable->get_normal_map_routine(data,
                                                            face_hit,
                                                            &normal_map);
 
@@ -249,8 +268,9 @@ ShapeComputeTextureCoordinates(
             RayDifferentialMatrixInverseMultiply(model_to_world,
                                                  world_ray_differential);
 
+        const void* data = ShapeGetData(shape);
         ISTATUS status =
-            shape->vtable->compute_texture_coordinates(shape->data,
+            shape->vtable->compute_texture_coordinates(data,
                                                        &model_hit_point,
                                                        &model_surface_normal,
                                                        &model_ray_differential,

@@ -55,6 +55,11 @@ ShapeAllocate(
         {
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_02;
         }
+
+        if (data_alignment != alignof(PCSHAPE_VTABLE))
+        {
+            return ISTATUS_INVALID_ARGUMENT_03;
+        }
     }
 
     if (shape == NULL)
@@ -75,8 +80,13 @@ ShapeAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    if (data_allocation != ShapeGetData(*shape))
+    {
+        free(shape);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     (*shape)->vtable = vtable;
-    (*shape)->data = data_allocation;
     (*shape)->reference_count = 1;
 
     if (data_size != 0)
@@ -104,7 +114,8 @@ ShapeComputeBounds(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    ISTATUS status = shape->vtable->compute_bounds_routine(shape->data,
+    const void* data = ShapeGetData(shape);
+    ISTATUS status = shape->vtable->compute_bounds_routine(data,
                                                            model_to_world,
                                                            world_bounds);
 
@@ -138,7 +149,8 @@ ShapeRelease(
     {
         if (shape->vtable->free_routine != NULL)
         {
-            shape->vtable->free_routine(shape->data);
+            void* data = ShapeGetData(shape);
+            shape->vtable->free_routine(data);
         }
     
         free(shape);

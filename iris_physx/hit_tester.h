@@ -45,7 +45,7 @@ ShapeHitTesterTestWorldShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *context = ((const void **)shape)[1];
+    const void *context = (const void*)((const void **)shape + 2);
     ISTATUS status = HitTesterTestWorldGeometry(hit_tester,
                                                 test_routine,
                                                 context,
@@ -70,7 +70,7 @@ ShapeHitTesterTestPremultipliedShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *context = ((const void **)shape)[1];
+    const void *context = (const void*)((const void **)shape + 2);
     ISTATUS status = HitTesterTestPremultipliedGeometry(hit_tester,
                                                         test_routine,
                                                         context,
@@ -96,7 +96,7 @@ ShapeHitTesterTestTransformedShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *context = ((const void **)shape)[1];
+    const void *context = (const void*)((const void **)shape + 2);
     ISTATUS status = HitTesterTestTransformedGeometry(hit_tester,
                                                       test_routine,
                                                       context,
@@ -123,7 +123,7 @@ ShapeHitTesterTestShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *context = ((const void **)shape)[1];
+    const void *context = (const void*)((const void **)shape + 2);
     ISTATUS status = HitTesterTestGeometry(hit_tester,
                                            test_routine,
                                            context,
@@ -155,7 +155,7 @@ ShapeHitTesterTestNestedShape(
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
         (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
-    const void *context = ((const void **)shape)[1];
+    const void *context = (const void*)((const void **)shape + 2);
     ISTATUS status = HitTesterTestNestedGeometry(hit_allocator,
                                                  test_routine,
                                                  context,
