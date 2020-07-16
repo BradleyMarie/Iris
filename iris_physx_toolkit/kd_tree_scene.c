@@ -1115,12 +1115,9 @@ KdTreeTraceTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
+    float_t closest_hit = INFINITY;
     for (;;)
     {
-        float_t closest_hit;
-        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
         if (closest_hit < node_min)
         {
             break;
@@ -1140,6 +1137,8 @@ KdTreeTraceTree(
                 {
                     return status;
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1155,6 +1154,8 @@ KdTreeTraceTree(
                         return status;
                     }
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
 
             if (queue_size == 0)
@@ -1244,12 +1245,9 @@ KdTreeTraceTransformedTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
+    float_t closest_hit = INFINITY;
     for (;;)
     {
-        float_t closest_hit;
-        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
         if (closest_hit < node_min)
         {
             break;
@@ -1269,6 +1267,8 @@ KdTreeTraceTransformedTree(
                 {
                     return status;
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1284,6 +1284,8 @@ KdTreeTraceTransformedTree(
                         return status;
                     }
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
 
             if (queue_size == 0)
@@ -1373,12 +1375,9 @@ KdTreeTraceWorldTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
+    float_t closest_hit = INFINITY;
     for (;;)
     {
-        float_t closest_hit;
-        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
         if (closest_hit < node_min)
         {
             break;
@@ -1398,6 +1397,8 @@ KdTreeTraceWorldTree(
                 {
                     return status;
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1413,6 +1414,8 @@ KdTreeTraceWorldTree(
                         return status;
                     }
                 }
+
+                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
             }
 
             if (queue_size == 0)
