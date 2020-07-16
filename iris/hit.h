@@ -27,8 +27,8 @@ Abstract:
 //
 
 typedef struct _HIT {
-    struct _HIT *next;
     float_t distance;
+    struct _HIT *next;
 } HIT, *PHIT;
 
 typedef const HIT *PCHIT;

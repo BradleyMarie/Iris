@@ -119,10 +119,27 @@ HitTesterTestNestedGeometry(
     _Out_ PHIT *hits
     );
 
+static
+inline
 ISTATUS
 HitTesterClosestHit(
     _In_ PCHIT_TESTER hit_tester,
     _Out_ float_t *distance
-    );
+    )
+{
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (distance == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *distance = **(const float_t**)(const void*)hit_tester;
+
+    return ISTATUS_SUCCESS;
+}
 
 #endif // _IRIS_HIT_TESTER_

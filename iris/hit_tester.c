@@ -213,24 +213,3 @@ HitTesterTestNestedGeometry(
 
     return status;
 }
-
-ISTATUS
-HitTesterClosestHit(
-    _In_ PCHIT_TESTER hit_tester,
-    _Out_ float_t *distance
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (distance == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    *distance = hit_tester->closest_hit->hit.distance;
-
-    return ISTATUS_SUCCESS;
-}
