@@ -1115,16 +1115,9 @@ KdTreeTraceTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
     for (;;)
     {
-        float_t closest_hit;
-        ISTATUS status = ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
 
         if (closest_hit < node_min)
         {
@@ -1138,7 +1131,7 @@ KdTreeTraceTree(
             if (num_shapes == 1)
             {
                 uint32_t index = node->split_or_index.index;
-                status = KdTreeTraceShape(hit_tester, shapes + index);
+                ISTATUS status = KdTreeTraceShape(hit_tester, shapes + index);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -1151,8 +1144,8 @@ KdTreeTraceTree(
                 const uint32_t *node_indices = all_indices + index;
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
-                    status = KdTreeTraceShape(hit_tester,
-                                              shapes + node_indices[i]);
+                    ISTATUS status = KdTreeTraceShape(hit_tester,
+                                                      shapes + node_indices[i]);
 
                     if (status != ISTATUS_SUCCESS)
                     {
@@ -1248,16 +1241,9 @@ KdTreeTraceTransformedTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
     for (;;)
     {
-        float_t closest_hit;
-        ISTATUS status = ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
 
         if (closest_hit < node_min)
         {
@@ -1271,8 +1257,8 @@ KdTreeTraceTransformedTree(
             if (num_shapes == 1)
             {
                 uint32_t index = node->split_or_index.index;
-                status = KdTreeTraceTransformedShape(hit_tester,
-                                                     shapes + index);
+                ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
+                                                             shapes + index);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -1285,8 +1271,8 @@ KdTreeTraceTransformedTree(
                 const uint32_t *node_indices = all_indices + index;
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
-                    status = KdTreeTraceTransformedShape(hit_tester,
-                                                         shapes + node_indices[i]);
+                    ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
+                                                                 shapes + node_indices[i]);
 
                     if (status != ISTATUS_SUCCESS)
                     {
@@ -1382,16 +1368,9 @@ KdTreeTraceWorldTree(
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-
     for (;;)
     {
-        float_t closest_hit;
-        ISTATUS status = ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
+        float_t closest_hit = ShapeHitTesterClosestHit(hit_tester);
 
         if (closest_hit < node_min)
         {
@@ -1405,7 +1384,8 @@ KdTreeTraceWorldTree(
             if (num_shapes == 1)
             {
                 uint32_t index = node->split_or_index.index;
-                status = KdTreeTraceWorldShape(hit_tester, shapes[index]);
+                ISTATUS status = KdTreeTraceWorldShape(hit_tester,
+                                                       shapes[index]);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -1418,8 +1398,8 @@ KdTreeTraceWorldTree(
                 const uint32_t *node_indices = all_indices + index;
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
-                    status = KdTreeTraceWorldShape(hit_tester,
-                                                   shapes[node_indices[i]]);
+                    ISTATUS status = KdTreeTraceWorldShape(hit_tester,
+                                                           shapes[node_indices[i]]);
 
                     if (status != ISTATUS_SUCCESS)
                     {
