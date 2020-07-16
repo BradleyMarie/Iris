@@ -905,10 +905,25 @@ typedef struct _SHAPE_AND_DATA {
 
 typedef const SHAPE_AND_DATA *PCSHAPE_AND_DATA;
 
+typedef struct _SHAPE_AND_TRANSFORM {
+    PSHAPE shape;
+    PMATRIX model_to_world;
+} SHAPE_AND_TRANSFORM, *PSHAPE_AND_TRANSFORM;
+
+typedef const SHAPE_AND_TRANSFORM *PCSHAPE_AND_TRANSFORM;
+
+typedef union _SHAPES_POINTER {
+    PSHAPE_AND_DATA shape_and_data;
+    PSHAPE_AND_TRANSFORM shape_and_transform;
+    PSHAPE *shapes;
+} SHAPES_POINTER, *PSHAPES_POINTER;
+
+typedef const SHAPES_POINTER *PCSHAPES_POINTER;
+
 typedef struct _KD_TREE_SCENE {
     KD_TREE_NODE *nodes;
     uint32_t *indices;
-    PSHAPE_AND_DATA shapes;
+    SHAPES_POINTER shapes;
     uint32_t num_shapes;
     BOUNDING_BOX scene_bounds;
 } KD_TREE_SCENE, *PKD_TREE_SCENE;
@@ -1005,6 +1020,35 @@ KdTreeTraceShape(
                                              shape_and_data->shape,
                                              shape_and_data->model_to_world,
                                              shape_and_data->premultiplied);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+KdTreeTraceTransformedShape(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE_AND_TRANSFORM shape_and_transform
+    )
+{
+    ISTATUS status =
+        ShapeHitTesterTestTransformedShape(hit_tester,
+                                           shape_and_transform->shape,
+                                           shape_and_transform->model_to_world);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+KdTreeTraceWorldShape(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE shape
+    )
+{
+    ISTATUS status = ShapeHitTesterTestWorldShape(hit_tester, shape);
 
     return status;
 }
@@ -1171,6 +1215,264 @@ KdTreeTraceTree(
 }
 
 static
+inline
+ISTATUS
+KdTreeTraceTransformedTree(
+    _In_ const KD_TREE_NODE node[],
+    _In_ const uint32_t all_indices[],
+    _In_ const SHAPE_AND_TRANSFORM shapes[],
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ BOUNDING_BOX scene_bounds,
+    _In_ RAY ray
+    )
+{
+    POINT3 ray_origin = ray.origin;
+    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
+                        (float_t)1.0 / ray.direction.y,
+                        (float_t)1.0 / ray.direction.z };
+
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(scene_bounds,
+                                           ray.origin,
+                                           inv_dir,
+                                           &node_min,
+                                           &node_max);
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+
+    for (;;)
+    {
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+        if (closest_hit < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
+                                                             shapes + index);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
+                                                                 shapes + node_indices[i]);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray_origin, split_axis);
+        float_t direction = inv_dir[split_axis];
+
+        float_t split = KdTreeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+inline
+ISTATUS
+KdTreeTraceWorldTree(
+    _In_ const KD_TREE_NODE node[],
+    _In_ const uint32_t all_indices[],
+    _In_ SHAPE** const shapes,
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ BOUNDING_BOX scene_bounds,
+    _In_ RAY ray
+    )
+{
+    POINT3 ray_origin = ray.origin;
+    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
+                        (float_t)1.0 / ray.direction.y,
+                        (float_t)1.0 / ray.direction.z };
+
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(scene_bounds,
+                                           ray.origin,
+                                           inv_dir,
+                                           &node_min,
+                                           &node_max);
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+
+    for (;;)
+    {
+        float_t closest_hit;
+        ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+        if (closest_hit < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                ISTATUS status = KdTreeTraceWorldShape(hit_tester,
+                                                       shapes[index]);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    ISTATUS status = KdTreeTraceWorldShape(hit_tester,
+                                                           shapes[node_indices[i]]);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray_origin, split_axis);
+        float_t direction = inv_dir[split_axis];
+
+        float_t split = KdTreeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
 size_t
 Log2(
     _In_ size_t value
@@ -1209,7 +1511,7 @@ KdTreeSceneTrace(
 
     ISTATUS status = KdTreeTraceTree(kd_tree->nodes,
                                      kd_tree->indices,
-                                     kd_tree->shapes,
+                                     kd_tree->shapes.shape_and_data,
                                      hit_tester,
                                      kd_tree->scene_bounds,
                                      ray);
@@ -1227,13 +1529,98 @@ KdTreeSceneFree(
 
     for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
     {
-        ShapeRelease(kd_tree_scene->shapes[i].shape);
-        MatrixRelease(kd_tree_scene->shapes[i].model_to_world);
+        ShapeRelease(kd_tree_scene->shapes.shape_and_data[i].shape);
+        MatrixRelease(kd_tree_scene->shapes.shape_and_data[i].model_to_world);
     }
 
     free(kd_tree_scene->nodes);
     free(kd_tree_scene->indices);
-    free(kd_tree_scene->shapes);
+    free(kd_tree_scene->shapes.shape_and_data);
+}
+
+static
+ISTATUS
+KdTreeTransformedSceneTrace(
+    _In_opt_ const void *context,
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ RAY ray
+    )
+{
+    assert(context != NULL);
+    assert(hit_tester != NULL);
+    assert(RayValidate(ray));
+
+    PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+
+    ISTATUS status = KdTreeTraceTransformedTree(kd_tree->nodes,
+                                                kd_tree->indices,
+                                                kd_tree->shapes.shape_and_transform,
+                                                hit_tester,
+                                                kd_tree->scene_bounds,
+                                                ray);
+
+    return status;
+}
+
+static
+void
+KdTreeTransformedSceneFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PKD_TREE_SCENE kd_tree_scene = (PKD_TREE_SCENE)context;
+
+    for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
+    {
+        ShapeRelease(kd_tree_scene->shapes.shape_and_transform[i].shape);
+        MatrixRelease(kd_tree_scene->shapes.shape_and_transform[i].model_to_world);
+    }
+
+    free(kd_tree_scene->nodes);
+    free(kd_tree_scene->indices);
+    free(kd_tree_scene->shapes.shape_and_transform);
+}
+
+static
+ISTATUS
+KdTreeWorldSceneTrace(
+    _In_opt_ const void *context,
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ RAY ray
+    )
+{
+    assert(context != NULL);
+    assert(hit_tester != NULL);
+    assert(RayValidate(ray));
+
+    PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+
+    ISTATUS status = KdTreeTraceWorldTree(kd_tree->nodes,
+                                          kd_tree->indices,
+                                          kd_tree->shapes.shapes,
+                                          hit_tester,
+                                          kd_tree->scene_bounds,
+                                          ray);
+
+    return status;
+}
+
+static
+void
+KdTreeWorldSceneFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PKD_TREE_SCENE kd_tree_scene = (PKD_TREE_SCENE)context;
+
+    for (size_t i = 0; i < kd_tree_scene->num_shapes; i++)
+    {
+        ShapeRelease(kd_tree_scene->shapes.shapes[i]);
+    }
+
+    free(kd_tree_scene->nodes);
+    free(kd_tree_scene->indices);
+    free(kd_tree_scene->shapes.shapes);
 }
 
 //
@@ -1243,6 +1630,16 @@ KdTreeSceneFree(
 static const SCENE_VTABLE kd_tree_scene_vtable = {
     KdTreeSceneTrace,
     KdTreeSceneFree
+};
+
+static const SCENE_VTABLE kd_tree_transformed_scene_vtable = {
+    KdTreeTransformedSceneTrace,
+    KdTreeTransformedSceneFree
+};
+
+static const SCENE_VTABLE kd_tree_world_scene_vtable = {
+    KdTreeWorldSceneTrace,
+    KdTreeWorldSceneFree
 };
 
 //
@@ -1345,16 +1742,6 @@ KdTreeSceneAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    PSHAPE_AND_DATA data = calloc(num_shapes, sizeof(SHAPE_AND_DATA));
-
-    if (data == NULL)
-    {
-        UncompressedKdTreeFree(uncompressed_node);
-        free(nodes);
-        free(indices);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     status = KdTreeBuild(uncompressed_node,
                          nodes,
                          indices);
@@ -1365,18 +1752,95 @@ KdTreeSceneAllocate(
     {
         free(nodes);
         free(indices);
-        free(data);
         return status;
+    }
+
+    bool premultiply_needed = false;
+    bool transform_needed = false;
+    for (size_t i = 0; i < num_shapes; i++)
+    {
+        if (premultiplied[i])
+        {
+            premultiply_needed = true;
+        }
+
+        if (transforms[i] != NULL)
+        {
+            transform_needed = true;
+        }
+
+        if (premultiply_needed && transform_needed)
+        {
+            break;
+        }
     }
 
     KD_TREE_SCENE result;
     result.nodes = nodes;
     result.indices = indices;
-    result.shapes = data;
     result.num_shapes = num_shapes;
     result.scene_bounds = scene_bounds;
 
-    status = SceneAllocate(&kd_tree_scene_vtable,
+    PCSCENE_VTABLE vtable;
+    void *data;
+    if (!transform_needed)
+    {
+        data = calloc(num_shapes, sizeof(PSHAPE));
+
+        if (data == NULL)
+        {
+            free(nodes);
+            free(indices);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        vtable = &kd_tree_world_scene_vtable;
+        result.shapes.shapes = data;
+        memcpy(data, shapes, sizeof(PSHAPE) * num_shapes);
+    }
+    else if (!premultiply_needed)
+    {
+        data = calloc(num_shapes, sizeof(SHAPE_AND_TRANSFORM));
+
+        if (data == NULL)
+        {
+            free(nodes);
+            free(indices);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        vtable = &kd_tree_transformed_scene_vtable;
+        result.shapes.shape_and_transform = data;
+
+        for (size_t i = 0; i < num_shapes; i++)
+        {
+            result.shapes.shape_and_transform[i].shape = shapes[i];
+            result.shapes.shape_and_transform[i].model_to_world = transforms[i];
+        }
+    }
+    else
+    {
+        data = calloc(num_shapes, sizeof(SHAPE_AND_DATA));
+
+        if (data == NULL)
+        {
+            free(nodes);
+            free(indices);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        result.shapes.shape_and_data = data;
+        vtable = &kd_tree_scene_vtable;
+
+        for (size_t i = 0; i < num_shapes; i++)
+        {
+            result.shapes.shape_and_data[i].shape = shapes[i];
+            result.shapes.shape_and_data[i].model_to_world = transforms[i];
+            result.shapes.shape_and_data[i].premultiplied = premultiplied[i];
+        }
+    }
+
+    status = SceneAllocate(vtable,
                            &result,
                            sizeof(KD_TREE_SCENE),
                            alignof(KD_TREE_SCENE),
@@ -1392,12 +1856,8 @@ KdTreeSceneAllocate(
 
     for (size_t i = 0; i < num_shapes; i++)
     {
-        data[i].shape = shapes[i];
-        data[i].model_to_world = transforms[i];
-        data[i].premultiplied = premultiplied[i];
-
-        ShapeRetain(data[i].shape);
-        MatrixRetain(data[i].model_to_world);
+        ShapeRetain(shapes[i]);
+        MatrixRetain(transforms[i]);
     }
 
     return ISTATUS_SUCCESS;
