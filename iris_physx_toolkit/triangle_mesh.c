@@ -24,7 +24,7 @@ Abstract:
 // Constants
 //
 
-#define TRIANGLE_DEGENERATE_THRESHOLD (float_t)0.001
+#define TRIANGLE_DEGENERATE_THRESHOLD (float_t)0.000001
 
 //
 // Types
