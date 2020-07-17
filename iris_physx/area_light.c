@@ -377,6 +377,14 @@ AreaLightSample(
                                               sampled_point);
 
     *to_light = PointSubtract(world_sampled_point, hit_point);
+
+    float_t dp = VectorDotProduct(*to_light, surface_normal);
+    if (dp <= (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
     *to_light = VectorNormalize(*to_light, NULL, NULL);
 
     RAY world_ray_to_light = RayCreate(hit_point, *to_light);
