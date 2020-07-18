@@ -348,11 +348,6 @@ PathTracerAllocate(
     _Out_ PINTEGRATOR *integrator
     )
 {
-    if (max_bounces < min_bounces)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-
     if (!isfinite(min_termination_probability) ||
         min_termination_probability < (float_t)0.0 ||
         (float_t)1.0 < min_termination_probability)
