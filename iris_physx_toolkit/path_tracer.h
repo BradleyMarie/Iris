@@ -30,6 +30,7 @@ PathTracerAllocate(
     _In_ uint8_t min_bounces,
     _In_ uint8_t max_bounces,
     _In_ float_t min_termination_probability,
+    _In_ float_t roulette_threshold,
     _Out_ PINTEGRATOR *integrator
     );
 

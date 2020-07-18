@@ -28,6 +28,7 @@ typedef struct _PATH_TRACER {
     _Field_size_(max_bounces) PCREFLECTOR *reflectors;
     _Field_size_(max_bounces) float_t *attenuations;
     float_t min_termination_probability;
+    float_t roulette_threshold;
     uint8_t min_bounces;
     uint8_t max_bounces;
 } PATH_TRACER, *PPATH_TRACER;
@@ -220,7 +221,8 @@ PathTracerIntegrate(
             attenuation = (float_t)1.0;
         }
 
-        if (path_tracer->min_bounces < bounces)
+        if (path_tracer->min_bounces < bounces &&
+            path_throughput < path_tracer->roulette_threshold)
         {
             float_t random_value;
             status = RandomGenerateFloat(rng,
@@ -304,6 +306,7 @@ PathTracerDuplicate(
         PathTracerAllocate(path_tracer->min_bounces,
                            path_tracer->max_bounces,
                            path_tracer->min_termination_probability,
+                           path_tracer->roulette_threshold,
                            duplicate);
 
     return status;
@@ -341,6 +344,7 @@ PathTracerAllocate(
     _In_ uint8_t min_bounces,
     _In_ uint8_t max_bounces,
     _In_ float_t min_termination_probability,
+    _In_ float_t roulette_threshold,
     _Out_ PINTEGRATOR *integrator
     )
 {
@@ -356,9 +360,14 @@ PathTracerAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (integrator == NULL)
+    if (!isgreaterequal(roulette_threshold, (float_t)0.0))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (integrator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     size_t num_spectra;
@@ -399,6 +408,7 @@ PathTracerAllocate(
     path_tracer.reflectors = reflectors;
     path_tracer.attenuations = attenuations;
     path_tracer.min_termination_probability = min_termination_probability;
+    path_tracer.roulette_threshold = roulette_threshold;
     path_tracer.min_bounces = min_bounces;
     path_tracer.max_bounces = max_bounces;
 

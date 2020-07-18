@@ -187,7 +187,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(0, 0, (float_t)0.0, &path_tracer);
+    status = PathTracerAllocate(0, 0, (float_t)0.0, INFINITY, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;

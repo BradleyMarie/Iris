@@ -50,7 +50,7 @@ TEST(EmptyPhysx, ListScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(8, 8, (float_t)0.0, &path_tracer);
+    status = PathTracerAllocate(8, 8, (float_t)0.0, INFINITY, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape = nullptr;
@@ -142,7 +142,7 @@ TEST(EmptyPhysx, KdTreeScene)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(8, 8, (float_t)0.0, &path_tracer);
+    status = PathTracerAllocate(8, 8, (float_t)0.0, INFINITY, &path_tracer);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape = nullptr;
