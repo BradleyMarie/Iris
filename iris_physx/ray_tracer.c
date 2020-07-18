@@ -247,6 +247,7 @@ ShapeRayTracerTrace(
         RayTracerTraceClosestHitWithCoordinates(ray_tracer->ray_tracer,
                                                 ray_differential.ray,
                                                 ray_tracer->minimum_distance,
+                                                INFINITY,
                                                 ray_tracer->trace_routine,
                                                 ray_tracer->trace_context,
                                                 ShapeRayTracerProcessHit,

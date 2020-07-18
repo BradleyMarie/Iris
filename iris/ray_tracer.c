@@ -37,6 +37,7 @@ RayTracerValidateArugumentsAndTrace(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ const void *process_hit_routine,
@@ -58,17 +59,30 @@ RayTracerValidateArugumentsAndTrace(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (trace_routine == NULL)
+    if (maximum_distance <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (process_hit_routine == NULL)
+    if (trace_routine == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_05;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    HitTesterReset(&ray_tracer->hit_tester, ray, minimum_distance);
+    if (process_hit_routine == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (maximum_distance <= minimum_distance)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    HitTesterReset(&ray_tracer->hit_tester,
+                   ray,
+                   minimum_distance,
+                   maximum_distance);
 
     ISTATUS status = trace_routine(trace_context,
                                    &ray_tracer->hit_tester,
@@ -194,6 +208,7 @@ RayTracerTraceClosestHit(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ PRAY_TRACER_PROCESS_HIT_ROUTINE process_hit_routine,
@@ -203,6 +218,7 @@ RayTracerTraceClosestHit(
     ISTATUS status = RayTracerValidateArugumentsAndTrace(ray_tracer,
                                                          ray,
                                                          minimum_distance,
+                                                         maximum_distance,
                                                          trace_routine,
                                                          trace_context,
                                                          process_hit_routine,
@@ -227,6 +243,7 @@ RayTracerTraceClosestHitWithCoordinates(
     _Inout_ PRAY_TRACER ray_tracer,
     _In_ RAY ray,
     _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ PRAY_TRACER_PROCESS_HIT_WITH_COORDINATES_ROUTINE process_hit_routine,
@@ -236,6 +253,7 @@ RayTracerTraceClosestHitWithCoordinates(
     ISTATUS status = RayTracerValidateArugumentsAndTrace(ray_tracer,
                                                          ray,
                                                          minimum_distance,
+                                                         maximum_distance,
                                                          trace_routine,
                                                          trace_context,
                                                          process_hit_routine,

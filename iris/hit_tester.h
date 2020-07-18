@@ -120,6 +120,12 @@ HitTesterTestNestedGeometry(
     );
 
 ISTATUS
+HitTesterFarthestHitAllowed(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    );
+
+ISTATUS
 HitTesterClosestHit(
     _In_ PCHIT_TESTER hit_tester,
     _Out_ float_t *distance

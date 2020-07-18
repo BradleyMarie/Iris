@@ -320,7 +320,7 @@ ProcessHitWithCoordinatesRoutine(
     {
         ADD_FAILURE();
     }
-    
+
     return ISTATUS_SUCCESS;
 }
 
@@ -346,10 +346,12 @@ TEST(RayTracerTest, RayTracerTraceClosestHitErrors)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
+    float_t maximum_distance = INFINITY;
 
     ISTATUS status = RayTracerTraceClosestHit(nullptr,
                                               ray,
                                               minimum_distance,
+                                              maximum_distance,
                                               TraceSceneRoutine,
                                               &geometry_data,
                                               ProcessHitRoutine,
@@ -360,6 +362,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitErrors)
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutine,
@@ -370,6 +373,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitErrors)
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       (float_t)-1.0f,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutine,
@@ -379,42 +383,77 @@ TEST(RayTracerTest, RayTracerTraceClosestHitErrors)
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       INFINITY,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutine,
                                       nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
-    
+
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
-                                      nullptr,
+                                      (float_t)-1.0f,
+                                      TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutine,
                                       nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
-    
+
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
+                                      (float_t)0.0f,
+                                      TraceSceneRoutine,
+                                      &geometry_data,
+                                      ProcessHitRoutine,
+                                      nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = RayTracerTraceClosestHit(ray_tracer,
+                                      ray,
+                                      (float_t)1.0,
+                                      (float_t)0.5f,
+                                      TraceSceneRoutine,
+                                      &geometry_data,
+                                      ProcessHitRoutine,
+                                      nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_00, status);
+
+    status = RayTracerTraceClosestHit(ray_tracer,
+                                      ray,
+                                      minimum_distance,
+                                      maximum_distance,
+                                      nullptr,
+                                      &geometry_data,
+                                      ProcessHitRoutine,
+                                      nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_04, status);
+
+    status = RayTracerTraceClosestHit(ray_tracer,
+                                      ray,
+                                      minimum_distance,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       nullptr,
                                       nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_05, status);
-    
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_06, status);
+
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutineReturnError,
                                       nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_30, status);
-    
+
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
+                                      maximum_distance,
                                       TraceSceneRoutineReturnError,
                                       &geometry_data,
                                       ProcessHitRoutineReturnError,
@@ -433,10 +472,12 @@ TEST(RayTracerTest, RayTracerTraceClosestHitEmpty)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
-    
+    float_t maximum_distance = INFINITY;
+
     ISTATUS status = RayTracerTraceClosestHit(ray_tracer,
                                               ray,
                                               minimum_distance,
+                                              maximum_distance,
                                               TraceSceneRoutineEmpty,
                                               nullptr,
                                               ProcessHitRoutineReturnError,
@@ -455,6 +496,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHit)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
+    float_t maximum_distance = INFINITY;
     ProcessHitData process_data;
     process_data.scalar_dist_1 = geometry_data[5].matrix;
     process_data.scalar_dist_2 = geometry_data[4].matrix;
@@ -464,26 +506,28 @@ TEST(RayTracerTest, RayTracerTraceClosestHit)
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
     process_data.distance = 1.0;
-    
+
     ISTATUS status = RayTracerTraceClosestHit(ray_tracer,
                                               ray,
                                               minimum_distance,
+                                              maximum_distance,
                                               TraceSceneRoutine,
                                               &geometry_data,
                                               ProcessHitRoutine,
                                               &process_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(1u, process_data.hits_processed);
-    
+
     minimum_distance = 1.5;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 0;
     process_data.sorted = true;
     process_data.distance = 2.0;
-    
+
     status = RayTracerTraceClosestHit(ray_tracer,
                                       ray,
                                       minimum_distance,
+                                      maximum_distance,
                                       TraceSceneRoutine,
                                       &geometry_data,
                                       ProcessHitRoutine,
@@ -504,10 +548,12 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
+    float_t maximum_distance = INFINITY;
 
     ISTATUS status = RayTracerTraceClosestHitWithCoordinates(nullptr,
                                                              ray,
                                                              minimum_distance,
+                                                             maximum_distance,
                                                              TraceSceneRoutine,
                                                              &geometry_data,
                                                              ProcessHitWithCoordinatesRoutine,
@@ -518,6 +564,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutine,
@@ -528,6 +575,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      (float_t)-1.0f,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutine,
@@ -537,33 +585,67 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      INFINITY,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutine,
                                                      nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_02, status);
-    
+
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
-                                                     nullptr,
+                                                     (float_t)-1.0f,
+                                                     TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutine,
                                                      nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
-    
+
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
+                                                     (float_t)0.0f,
+                                                     TraceSceneRoutine,
+                                                     &geometry_data,
+                                                     ProcessHitWithCoordinatesRoutine,
+                                                     nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
+                                                     ray,
+                                                     (float_t)1.0,
+                                                     (float_t)0.5f,
+                                                     TraceSceneRoutine,
+                                                     &geometry_data,
+                                                     ProcessHitWithCoordinatesRoutine,
+                                                     nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_00, status);
+
+    status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
+                                                     ray,
+                                                     minimum_distance,
+                                                     maximum_distance,
+                                                     nullptr,
+                                                     &geometry_data,
+                                                     ProcessHitWithCoordinatesRoutine,
+                                                     nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_04, status);
+
+    status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
+                                                     ray,
+                                                     minimum_distance,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      nullptr,
                                                      nullptr);
-    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_05, status);
-    
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_06, status);
+
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutineReturnError,
@@ -573,6 +655,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesErrors)
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
+                                                     maximum_distance,
                                                      TraceSceneRoutineReturnError,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutineReturnError,
@@ -591,10 +674,12 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinatesEmpty)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
-    
+    float_t maximum_distance = INFINITY;
+
     ISTATUS status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                              ray,
                                                              minimum_distance,
+                                                             maximum_distance,
                                                              TraceSceneRoutineEmpty,
                                                              nullptr,
                                                              ProcessHitWithCoordinatesRoutineReturnError,
@@ -613,6 +698,7 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinates)
     RAY ray = CreateWorldRay();
 
     float_t minimum_distance = 0.0;
+    float_t maximum_distance = INFINITY;
     ProcessHitData process_data;
     process_data.scalar_dist_1 = geometry_data[5].matrix;
     process_data.scalar_dist_2 = geometry_data[4].matrix;
@@ -622,26 +708,28 @@ TEST(RayTracerTest, RayTracerTraceClosestHitWithCoordinates)
     process_data.last_hit_to_process = 6;
     process_data.sorted = true;
     process_data.distance = 1.0;
-    
+
     ISTATUS status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                              ray,
                                                              minimum_distance,
+                                                             maximum_distance,
                                                              TraceSceneRoutine,
                                                              &geometry_data,
                                                              ProcessHitWithCoordinatesRoutine,
                                                              &process_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(1u, process_data.hits_processed);
-    
+
     minimum_distance = 1.5;
     process_data.hits_processed = 0;
     process_data.last_hit_to_process = 0;
     process_data.sorted = true;
     process_data.distance = 2.0;
-    
+
     status = RayTracerTraceClosestHitWithCoordinates(ray_tracer,
                                                      ray,
                                                      minimum_distance,
+                                                     maximum_distance,
                                                      TraceSceneRoutine,
                                                      &geometry_data,
                                                      ProcessHitWithCoordinatesRoutine,

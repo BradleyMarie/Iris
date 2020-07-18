@@ -78,7 +78,8 @@ HitTesterTestGeometryInternal(
     do
     {
         if (hit_tester->minimum_distance <= hit->distance &&
-            hit_tester->closest_hit->hit.distance > hit->distance)
+            hit->distance <= hit_tester->maximum_distance &&
+            hit->distance < hit_tester->closest_hit->hit.distance)
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
             full_hit_context->model_to_world = model_to_world;
@@ -212,6 +213,27 @@ HitTesterTestNestedGeometry(
     HitAllocatorSetData(hit_allocator, original_data);
 
     return status;
+}
+
+ISTATUS
+HitTesterFarthestHitAllowed(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    )
+{
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (distance == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *distance = hit_tester->maximum_distance;
+
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS

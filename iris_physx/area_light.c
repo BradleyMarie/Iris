@@ -163,6 +163,7 @@ VisibilityTesterTestSingleAreaLight(
         RayTracerTraceClosestHit(visibility_tester->ray_tracer,
                                  ray,
                                  visibility_tester->epsilon,
+                                 INFINITY,
                                  VisibilityTesterTraceSingleShape,
                                  area_light->trace_shape,
                                  area_light->process_hit_routine,

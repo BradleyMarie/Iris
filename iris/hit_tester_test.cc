@@ -201,7 +201,7 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
@@ -212,7 +212,7 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     ISTATUS status = HitTesterTestWorldGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -270,7 +270,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
@@ -288,7 +288,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     status = HitTesterTestPremultipliedGeometry(&tester,
                                                 CheckGeometryContext,
                                                 &params,
@@ -381,7 +381,7 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
 
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
@@ -399,7 +399,7 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     status = HitTesterTestTransformedGeometry(&tester,
                                               CheckGeometryContext,
                                               &params,
@@ -434,7 +434,7 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
                                       (float_t) 0.0, 
                                       (float_t) 0.0);
     VECTOR3 model_direction = VectorCreate((float_t) 4.0,
-                                           (float_t) 5.0, 
+                                           (float_t) 5.0,
                                            (float_t) 6.0);
     params.ray = RayCreate(model_origin, model_direction);
 
@@ -500,11 +500,11 @@ TEST(HitTesterTest, HitTesterSortHits)
 
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
 
     int hit_data = 0;
     for (int i = 1; i <= 1000; i++)
@@ -521,6 +521,45 @@ TEST(HitTesterTest, HitTesterSortHits)
     ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, closest_hit);
+
+    HitTesterDestroy(&tester);
+}
+
+TEST(HitTesterTest, HitTesterRejectHits)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    VECTOR3 direction = VectorCreate((float_t) 4.0,
+                                     (float_t) 5.0,
+                                     (float_t) 6.0);
+    RAY ray = RayCreate(origin, direction);
+
+    HitTesterReset(&tester, ray, (float_t)10.0, (float_t)20.0);
+
+    int hit_data = 0;
+    for (int i = 1; i <= 1000; i++)
+    {
+        float_t distance = (float_t)(1001 - i);
+        ISTATUS status = HitTesterTestWorldGeometry(&tester,
+                                                    AllocateHitAtDistance,
+                                                    &distance,
+                                                    &hit_data);
+        EXPECT_EQ(ISTATUS_SUCCESS, status);
+
+        if ((float_t)10.0 <= distance && distance <= (float_t)20.0)
+        {
+            float_t closest_hit;
+            status = HitTesterClosestHit(&tester, &closest_hit);
+            EXPECT_EQ(distance, closest_hit);
+        }
+    }
+
+    float_t closest_hit;
+    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)10.0, closest_hit);
 
     HitTesterDestroy(&tester);
 }
@@ -642,16 +681,16 @@ TEST(HitTesterTest, HitTesterCheckWorldHits)
 
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunWorldHitTest(&tester, (float_t)0.0);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunWorldHitTest(&tester, (float_t)0.0);
@@ -753,7 +792,7 @@ TEST(HitTesterTest, HitTesterCheckPremultipliedHits)
 
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
@@ -771,32 +810,32 @@ TEST(HitTesterTest, HitTesterCheckPremultipliedHits)
                                        &model_to_world_2);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTest(&tester, (float_t)0.0, nullptr);
@@ -904,7 +943,7 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
 
     POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
     VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0, 
+                                     (float_t) 5.0,
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
@@ -922,37 +961,37 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
                                        &model_to_world_2);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTest(&tester, 0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     HitTesterDestroy(&tester);
@@ -985,7 +1024,7 @@ TEST(HitTesterTest, HitTesterTestGeometryErrors)
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     status = HitTesterTestGeometry(&tester,
                                    CheckGeometryContext,
                                    &params,
@@ -1182,32 +1221,32 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsPremultiplied)
                                        &model_to_world_2);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunPremultipliedHitTestBase(&tester, (float_t)0.0, nullptr);
@@ -1339,37 +1378,37 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsTransformed)
                                        &model_to_world_2);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, model_to_world_2);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     RunTransformedHitTestBase(&tester, 0.0, nullptr);
 
-    HitTesterReset(&tester, ray, (float_t)0.0);
+    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
     EXPECT_EQ(INFINITY, tester.closest_hit->hit.distance);
 
     HitTesterDestroy(&tester);
@@ -1401,6 +1440,46 @@ TEST(HitTesterTest, HitTesterClosestEmpty)
     ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     ASSERT_TRUE(std::isinf(closest_hit));
+
+    HitTesterDestroy(&tester);
+}
+
+TEST(HitTesterTest, HitTesterFarthestHitAllowedErrors)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t farthest_hit;
+    ISTATUS status = HitTesterFarthestHitAllowed(nullptr, &farthest_hit);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterFarthestHitAllowed(&tester, nullptr);
+    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    HitTesterDestroy(&tester);
+}
+
+TEST(HitTesterTest, HitTesterFarthestHitAllowed)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    float_t farthest_hit;
+    ISTATUS status = HitTesterFarthestHitAllowed(&tester, &farthest_hit);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_TRUE((float_t)0.0 < farthest_hit && std::isinf(farthest_hit));
+
+    POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    VECTOR3 direction = VectorCreate((float_t) 4.0,
+                                     (float_t) 5.0,
+                                     (float_t) 6.0);
+    RAY ray = RayCreate(origin, direction);
+
+    HitTesterReset(&tester, ray, (float_t)0.0, (float_t)10.0);
+
+    status = HitTesterFarthestHitAllowed(&tester, &farthest_hit);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_TRUE((float_t)10.0);
 
     HitTesterDestroy(&tester);
 }

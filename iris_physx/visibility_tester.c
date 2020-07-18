@@ -25,24 +25,7 @@ VisibilityTesterProcessHit(
     _In_ PCHIT_CONTEXT hit_context
     )
 {
-    PDISTANCE_AND_RESULT distance_and_result = (PDISTANCE_AND_RESULT)context;
-
-    if (hit_context->distance <= distance_and_result->distance)
-    {
-        *distance_and_result->visible = false;
-    }
-    
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
-VisibilityTesterProcessHitAnyDistance(
-    _Inout_opt_ void *context,
-    _In_ PCHIT_CONTEXT hit_context
-    )
-{
-    bool *visible = (bool *)context;
+    bool *visible = (bool*)context;
 
     *visible = false;
     
@@ -112,14 +95,14 @@ VisibilityTesterTestAnyDistance(
     }
 
     *visible = true;
-
     ISTATUS status = RayTracerTraceClosestHit(
         visibility_tester->ray_tracer,
         ray,
         visibility_tester->epsilon,
+        INFINITY,
         visibility_tester->trace_routine,
         visibility_tester->trace_context,
-        VisibilityTesterProcessHitAnyDistance,
+        VisibilityTesterProcessHit,
         visible);
 
     return status;

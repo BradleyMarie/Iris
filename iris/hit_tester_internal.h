@@ -27,6 +27,7 @@ struct _HIT_TESTER {
     PFULL_HIT_CONTEXT closest_hit;
     RAY world_ray;
     float_t minimum_distance;
+    float_t maximum_distance;
 };
 
 //
@@ -68,6 +69,7 @@ HitTesterInitialize(
 
     hit_tester->closest_hit = hit_context;
     hit_tester->minimum_distance = (float_t)0.0;
+    hit_tester->maximum_distance = INFINITY;
 
     return true;
 }
@@ -78,13 +80,16 @@ void
 HitTesterReset(
     _Inout_ struct _HIT_TESTER *hit_tester,
     _In_ RAY world_ray,
-    _In_ float_t minimum_distance
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance
     )
 {
     assert(hit_tester != NULL);
     assert(RayValidate(world_ray));
     assert(isfinite(minimum_distance));
     assert((float_t)0.0 <= minimum_distance);
+    assert((float_t)0.0 < maximum_distance);
+    assert(minimum_distance < maximum_distance);
 
     HitAllocatorFreeAllExcept(&hit_tester->hit_allocator,
                               hit_tester->closest_hit->allocation_handle);
@@ -93,6 +98,7 @@ HitTesterReset(
 
     hit_tester->world_ray = world_ray;
     hit_tester->minimum_distance = minimum_distance;
+    hit_tester->maximum_distance = maximum_distance;
 }
 
 static

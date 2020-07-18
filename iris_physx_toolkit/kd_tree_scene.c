@@ -1113,12 +1113,14 @@ KdTreeTraceTree(
         return ISTATUS_SUCCESS;
     }
 
+    float_t farthest_object_allowed;
+    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-    float_t closest_hit = INFINITY;
     for (;;)
     {
-        if (closest_hit < node_min)
+        if (farthest_object_allowed < node_min)
         {
             break;
         }
@@ -1138,7 +1140,11 @@ KdTreeTraceTree(
                     return status;
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1155,7 +1161,11 @@ KdTreeTraceTree(
                     }
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
 
             if (queue_size == 0)
@@ -1243,12 +1253,14 @@ KdTreeTraceTransformedTree(
         return ISTATUS_SUCCESS;
     }
 
+    float_t farthest_object_allowed;
+    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-    float_t closest_hit = INFINITY;
     for (;;)
     {
-        if (closest_hit < node_min)
+        if (farthest_object_allowed < node_min)
         {
             break;
         }
@@ -1268,7 +1280,11 @@ KdTreeTraceTransformedTree(
                     return status;
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1285,7 +1301,11 @@ KdTreeTraceTransformedTree(
                     }
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
 
             if (queue_size == 0)
@@ -1373,12 +1393,14 @@ KdTreeTraceWorldTree(
         return ISTATUS_SUCCESS;
     }
 
+    float_t farthest_object_allowed;
+    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
-    float_t closest_hit = INFINITY;
     for (;;)
     {
-        if (closest_hit < node_min)
+        if (farthest_object_allowed < node_min)
         {
             break;
         }
@@ -1398,7 +1420,11 @@ KdTreeTraceWorldTree(
                     return status;
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1415,7 +1441,11 @@ KdTreeTraceWorldTree(
                     }
                 }
 
+                float_t closest_hit;
                 ShapeHitTesterClosestHit(hit_tester, &closest_hit);
+
+                farthest_object_allowed = fmin(farthest_object_allowed,
+                                               closest_hit);
             }
 
             if (queue_size == 0)

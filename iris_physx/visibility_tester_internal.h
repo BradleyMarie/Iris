@@ -28,11 +28,6 @@ struct _VISIBILITY_TESTER {
     float_t epsilon;
 };
 
-typedef struct _DISTANCE_AND_RESULT {
-    float_t distance;
-    bool *visible;
-} DISTANCE_AND_RESULT, *PDISTANCE_AND_RESULT;
-
 //
 // Extern Functions
 //
@@ -107,31 +102,27 @@ VisibilityTesterTestInline(
     assert((float_t)0.0 <= distance_to_object);
     assert(visible != NULL);
 
-    *visible = true;
-
     if (distance_to_object <= visibility_tester->epsilon)
     {
         return ISTATUS_SUCCESS;
     }
 
-    DISTANCE_AND_RESULT distance_and_result;
-    distance_and_result.distance =
-        distance_to_object - visibility_tester->epsilon;
+    float_t farthest_hit = distance_to_object - visibility_tester->epsilon;
 
-    if (distance_and_result.distance <= visibility_tester->epsilon)
+    if (farthest_hit <= visibility_tester->epsilon)
     {
         return ISTATUS_SUCCESS;
     }
 
-    distance_and_result.visible = visible;
-
+    *visible = true;
     ISTATUS status = RayTracerTraceClosestHit(visibility_tester->ray_tracer,
                                               ray,
                                               visibility_tester->epsilon,
+                                              farthest_hit,
                                               visibility_tester->trace_routine,
                                               visibility_tester->trace_context,
                                               VisibilityTesterProcessHit,
-                                              &distance_and_result);
+                                              visible);
 
     return status;
 }
