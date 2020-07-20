@@ -4,7 +4,7 @@ Copyright (c) 2020 Brad Weinberger
 
 Module Name:
 
-    framebuffer.h
+    framebuffer.c
 
 Abstract:
 
@@ -22,7 +22,7 @@ Abstract:
 // Defines
 //
 
-#define FRAMEBUFFER_DATA_ALIGNMENT 128
+#define FRAMEBUFFER_ROW_ALIGNMENT 128
 
 //
 // Functions
@@ -50,19 +50,33 @@ FramebufferAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    size_t num_pixels;
+    size_t row_size;
     bool success = CheckedMultiplySizeT(num_columns,
-                                        num_rows,
-                                        &num_pixels);
+                                        sizeof(COLOR3),
+                                        &row_size);
 
     if (!success)
     {
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    size_t byte_over = row_size % FRAMEBUFFER_ROW_ALIGNMENT;
+    if (byte_over != 0)
+    {
+        size_t to_add = FRAMEBUFFER_ROW_ALIGNMENT - byte_over;
+        success = CheckedAddSizeT(row_size,
+                                  to_add,
+                                  &row_size);
+
+        if (!success)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+    }
+
     size_t num_bytes;
-    success = CheckedMultiplySizeT(num_pixels,
-                                   sizeof(COLOR3),
+    success = CheckedMultiplySizeT(row_size,
+                                   num_rows,
                                    &num_bytes);
 
     if (!success)
@@ -78,7 +92,7 @@ FramebufferAllocate(
     }
 
     result->data =
-        (PCOLOR3)aligned_alloc(FRAMEBUFFER_DATA_ALIGNMENT, num_bytes);
+        (char *)aligned_alloc(FRAMEBUFFER_ROW_ALIGNMENT, num_bytes);
 
     if (result->data == NULL)
     {
@@ -86,13 +100,18 @@ FramebufferAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    for (size_t i = 0; i < num_pixels; i++)
-    {
-        result->data[i] = ColorCreateBlack();
-    }
-
+    result->row_size = row_size;
     result->num_columns = num_columns;
     result->num_rows = num_rows;
+
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        PCOLOR3 row = (void *)(result->data + i * row_size);
+        for (size_t j = 0; j < num_columns; j++)
+        {
+            row[j] = ColorCreateBlack();
+        }
+    }
 
     *framebuffer = result;
 
@@ -155,7 +174,9 @@ FramebufferGetPixel(
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    *color = framebuffer->data[framebuffer->num_columns * row + column];
+    PCCOLOR3 row_data =
+        (const void *)(framebuffer->data + row * framebuffer->row_size);
+    *color = row_data[column];
 
     return ISTATUS_SUCCESS;
 }

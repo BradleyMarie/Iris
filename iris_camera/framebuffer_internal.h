@@ -22,7 +22,8 @@ Abstract:
 //
 
 struct _FRAMEBUFFER {
-    _Field_size_(num_columns * num_rows) PCOLOR3 data;
+    _Field_size_bytes_(row_size_bytes * num_rows) char *data;
+    size_t row_size;
     size_t num_columns;
     size_t num_rows;
 };
@@ -46,7 +47,9 @@ FramebufferSetPixel(
     assert(row < framebuffer->num_rows);
     assert(ColorValidate(color));
 
-    framebuffer->data[framebuffer->num_columns * row + column] = color;
+    PCOLOR3 row_data =
+        (void *)(framebuffer->data + row * framebuffer->row_size);
+    row_data[column] = color;
 }
 
 #endif // _IRIS_CAMERA_FRAMEBUFFER_INTERNAL_

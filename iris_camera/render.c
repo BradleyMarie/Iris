@@ -48,7 +48,7 @@ typedef struct _RENDER_THREAD_SHARED_STATE {
     POINTER_LIST rngs;
     float_t epsilon;
     atomic_bool cancelled;
-    atomic_size_t pixel;
+    atomic_size_t chunk;
 } RENDER_THREAD_SHARED_STATE, *PRENDER_THREAD_SHARED_STATE;
 
 typedef const RENDER_THREAD_SHARED_STATE *PCRENDER_THREAD_SHARED_STATE;
@@ -306,7 +306,14 @@ IrisCameraRenderThread(
     FramebufferGetSize(thread_context->shared->framebuffer,
                        &num_columns,
                        &num_rows);
-    size_t num_pixels = num_columns * num_rows;
+
+    size_t num_chunks = num_columns / CHUNK_SIZE;
+    if (num_columns % CHUNK_SIZE != 0)
+    {
+        num_chunks += 1;
+    }
+
+    num_chunks *= num_rows;
 
     float_t image_u_width = thread_context->shared->camera->image_max_u -
                             thread_context->shared->camera->image_min_u;
@@ -316,37 +323,32 @@ IrisCameraRenderThread(
                             thread_context->shared->camera->image_max_v;
     float_t pixel_v_width = image_v_width / (float_t)num_rows;
 
-    size_t chunk_start =
-        atomic_load_explicit(&thread_context->shared->pixel,
+    size_t chunk =
+        atomic_load_explicit(&thread_context->shared->chunk,
                              memory_order_relaxed);
 
-    while (chunk_start < num_pixels)
+    while (chunk < num_chunks)
     {
-        size_t pixels_remaining = num_pixels - chunk_start;
-        size_t chunk_size =
-            (pixels_remaining < CHUNK_SIZE) ? pixels_remaining : CHUNK_SIZE;
-        size_t chunk_end = chunk_start + chunk_size;
-
         bool success =
-            atomic_compare_exchange_weak(&thread_context->shared->pixel,
-                                         &chunk_start,
-                                         chunk_end);
+            atomic_compare_exchange_weak(&thread_context->shared->chunk,
+                                         &chunk,
+                                         chunk + 1);
 
         if (!success)
         {
             continue;
         }
 
-        size_t chunk_index = chunk_start / CHUNK_SIZE;
-
-        for (size_t i = chunk_start; i < chunk_end; i++)
+        size_t row = chunk % num_rows;
+        size_t column_chunk = chunk / num_rows;
+        size_t column_base = column_chunk * CHUNK_SIZE;
+        for (size_t column = column_base;
+             column < column_base + CHUNK_SIZE && column < num_columns;
+             column++)
         {
-            size_t column = i % num_columns;
-            size_t row = i / num_columns;
-
             PRANDOM rng =
                 PointerListRetrieveAtIndex(&thread_context->shared->rngs,
-                                           chunk_index);
+                                           chunk);
 
             success = IrisCameraRenderPixel(thread_context,
                                             rng,
@@ -359,13 +361,13 @@ IrisCameraRenderThread(
 
             if (!success)
             {
-                atomic_store(&thread_context->shared->pixel, num_pixels);
+                atomic_store(&thread_context->shared->chunk, num_chunks);
                 return NULL;
             }
         }
 
-        chunk_start =
-            atomic_load_explicit(&thread_context->shared->pixel,
+        chunk =
+            atomic_load_explicit(&thread_context->shared->chunk,
                                  memory_order_relaxed);
     }
 
@@ -471,7 +473,7 @@ IrisCameraRender(
     shared_state.framebuffer = framebuffer;
     shared_state.epsilon = epsilon;
     shared_state.cancelled = false;
-    shared_state.pixel = 0;
+    shared_state.chunk = 0;
 
     bool success = PointerListInitialize(&shared_state.rngs);
 
@@ -481,13 +483,13 @@ IrisCameraRender(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    size_t num_pixels = num_columns * num_rows;
-    size_t num_chunks = num_pixels / CHUNK_SIZE;
-
-    if (num_pixels % CHUNK_SIZE != 0)
+    size_t num_chunks = num_columns / CHUNK_SIZE;
+    if (num_columns % CHUNK_SIZE != 0)
     {
         num_chunks += 1;
     }
+
+    num_chunks *= num_rows;
 
     success = PointerListPrepareToAddPointers(&shared_state.rngs, num_chunks);
 
