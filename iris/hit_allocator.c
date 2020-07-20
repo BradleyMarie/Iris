@@ -94,16 +94,12 @@ HitAllocatorAllocateInternal(
     hit_context->context.distance = distance;
     hit_context->context.front_face = front_face;
     hit_context->context.back_face = back_face;
+    hit_context->context.additional_data = additional_data_dest;
     hit_context->context.additional_data_size = additional_data_size;
 
     if (additional_data_size != 0)
     {
         memcpy(additional_data_dest, additional_data, additional_data_size);
-        hit_context->context.additional_data = additional_data_dest;
-    }
-    else
-    {
-        hit_context->context.additional_data = NULL;
     }
 
     hit_context->allocation_handle = allocation_handle;

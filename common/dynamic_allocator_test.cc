@@ -47,15 +47,21 @@ TEST(DynamicMemoryAllocatorTest, DynamicMemoryAllocatorAllocate)
     {
         int *header;
         int *data;
+        size_t data_size = (i % 2 == 0) ? 0 : size;
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
                                                    nullptr,
                                                    size,
                                                    alignof(int),
                                                    (void **)&header,
-                                                   (i % 2 == 0) ? 0 : size,
+                                                   data_size,
                                                    alignof(int),
                                                    (void **)&data));
-        
+
+        if (data_size == 0)
+        {
+            EXPECT_EQ(nullptr, data);
+        }
+
         *header = i;
         if (data)
         {
