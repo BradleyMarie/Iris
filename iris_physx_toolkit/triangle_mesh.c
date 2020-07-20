@@ -100,16 +100,6 @@ PointPermuteYDominant(
 
 static
 inline
-POINT3
-PointPermuteZDominant(
-    _In_ POINT3 point
-    )
-{
-    return PointCreate(point.y, point.x, point.z);
-}
-
-static
-inline
 VECTOR3
 VectorPermuteXDominant(
     _In_ VECTOR3 vector
@@ -126,16 +116,6 @@ VectorPermuteYDominant(
     )
 {
     return VectorCreate(vector.x, vector.z, vector.y);
-}
-
-static
-inline
-VECTOR3
-VectorPermuteZDominant(
-    _In_ VECTOR3 vector
-    )
-{
-    return VectorCreate(vector.y, vector.x, vector.z);
 }
 
 static
@@ -174,10 +154,7 @@ TriangleMeshTriangleTrace(
             v2 = PointPermuteYDominant(v2);
             break;
         case VECTOR_Z_AXIS:
-            direction = VectorPermuteZDominant(ray->direction);
-            v0 = PointPermuteZDominant(v0);
-            v1 = PointPermuteZDominant(v1);
-            v2 = PointPermuteZDominant(v2);
+            direction = ray->direction;
             break;
     }
 
@@ -191,38 +168,26 @@ TriangleMeshTriangleTrace(
     v2.x += shear_x * v2.z;
     v2.y += shear_y * v2.z;
 
-    TRIANGLE_MESH_ADDITIONAL_DATA data;
-    data.barycentric_coordinates[0] = v1.x * v2.y - v1.y * v2.x;
-    data.barycentric_coordinates[1] = v2.x * v0.y - v2.y * v0.x;
-    data.barycentric_coordinates[2] = v0.x * v1.y - v0.y * v1.x;
+    float_t b0 = v1.x * v2.y - v1.y * v2.x;
+    float_t b1 = v2.x * v0.y - v2.y * v0.x;
+    float_t b2 = v0.x * v1.y - v0.y * v1.x;
 
 #if FLT_EVAL_METHOD == 0
-    if (data.barycentric_coordinates[0] == (float_t)0.0 ||
-        data.barycentric_coordinates[1] == (float_t)0.0 ||
-        data.barycentric_coordinates[2] == (float_t)0.0)
+    if (b0 == (float_t)0.0 || b1 == (float_t)0.0 || b2 == (float_t)0.0)
     {
-        data.barycentric_coordinates[0] =
-            ((double_t)v1.x * (double_t)v2.y - (double_t)v1.y * (double_t)v2.x);
-        data.barycentric_coordinates[1] =
-            ((double_t)v2.x * (double_t)v0.y - (double_t)v2.y * (double_t)v0.x);
-        data.barycentric_coordinates[2] =
-            ((double_t)v0.x * (double_t)v1.y - (double_t)v0.y * (double_t)v1.x);
+        b0 = ((double_t)v1.x * (double_t)v2.y - (double_t)v1.y * (double_t)v2.x);
+        b1 = ((double_t)v2.x * (double_t)v0.y - (double_t)v2.y * (double_t)v0.x);
+        b2 = ((double_t)v0.x * (double_t)v1.y - (double_t)v0.y * (double_t)v1.x);
     }
 #endif
 
-    if ((data.barycentric_coordinates[0] < (float_t)0.0 ||
-         data.barycentric_coordinates[1] < (float_t)0.0 ||
-         data.barycentric_coordinates[2] < (float_t)0.0) &&
-        (data.barycentric_coordinates[0] > (float_t)0.0 ||
-         data.barycentric_coordinates[1] > (float_t)0.0 ||
-         data.barycentric_coordinates[2] > (float_t)0.0))
+    if ((b0 < (float_t)0.0 || b1 < (float_t)0.0 || b2 < (float_t)0.0) &&
+        (b0 > (float_t)0.0 || b1 > (float_t)0.0 || b2 > (float_t)0.0))
     {
         return ISTATUS_NO_INTERSECTION;
     }
 
-    float_t determinant = data.barycentric_coordinates[0] +
-                          data.barycentric_coordinates[1] +
-                          data.barycentric_coordinates[2];
+    float_t determinant = b0 + b1 + b2;
 
     if (determinant == (float_t)0.0)
     {
@@ -234,15 +199,15 @@ TriangleMeshTriangleTrace(
     v1.z = v1.z * shear_z;
     v2.z = v2.z * shear_z;
 
-    float_t distance = data.barycentric_coordinates[0] * v0.z +
-                       data.barycentric_coordinates[1] * v1.z +
-                       data.barycentric_coordinates[2] * v2.z;
+    float_t distance = b0 * v0.z + b1* v1.z + b2 * v2.z;
 
     float_t inverse_determinant = (float_t)1.0 / determinant;
     distance *= inverse_determinant;
-    data.barycentric_coordinates[0] *= inverse_determinant;
-    data.barycentric_coordinates[1] *= inverse_determinant;
-    data.barycentric_coordinates[2] *= inverse_determinant;
+
+    TRIANGLE_MESH_ADDITIONAL_DATA data;
+    data.barycentric_coordinates[0] = b0 * inverse_determinant;
+    data.barycentric_coordinates[1] = b1 * inverse_determinant;
+    data.barycentric_coordinates[2] = b2 * inverse_determinant;
     data.mesh_vertex_indices[0] = (size_t)triangle->v0;
     data.mesh_vertex_indices[1] = (size_t)triangle->v1;
     data.mesh_vertex_indices[2] = (size_t)triangle->v2;
