@@ -138,28 +138,33 @@ TriangleMeshTriangleTrace(
 
     VECTOR_AXIS dominant_axis = VectorDominantAxis(ray->direction);
 
-    VECTOR3 direction;
+    float_t shear_x, shear_y, direction_z;
     switch (dominant_axis)
     {
         case VECTOR_X_AXIS:
-            direction = VectorPermuteXDominant(ray->direction);
             v0 = PointPermuteXDominant(v0);
             v1 = PointPermuteXDominant(v1);
             v2 = PointPermuteXDominant(v2);
+
+            shear_x = -ray->direction.z / ray->direction.x;
+            shear_y = -ray->direction.y / ray->direction.x;
+            direction_z = ray->direction.x;
             break;
         case VECTOR_Y_AXIS:
-            direction = VectorPermuteYDominant(ray->direction);
             v0 = PointPermuteYDominant(v0);
             v1 = PointPermuteYDominant(v1);
             v2 = PointPermuteYDominant(v2);
+
+            shear_x = -ray->direction.x / ray->direction.y;
+            shear_y = -ray->direction.z / ray->direction.y;
+            direction_z = ray->direction.y;
             break;
         case VECTOR_Z_AXIS:
-            direction = ray->direction;
+            shear_x = -ray->direction.x / ray->direction.z;
+            shear_y = -ray->direction.y / ray->direction.z;
+            direction_z = ray->direction.z;
             break;
     }
-
-    float_t shear_x = -direction.x / direction.z;
-    float_t shear_y = -direction.y / direction.z;
 
     v0.x += shear_x * v0.z;
     v0.y += shear_y * v0.z;
@@ -194,7 +199,7 @@ TriangleMeshTriangleTrace(
         return ISTATUS_NO_INTERSECTION;
     }
 
-    float_t shear_z = (float_t)1.0 / direction.z;
+    float_t shear_z = (float_t)1.0 / direction_z;
     v0.z = v0.z * shear_z;
     v1.z = v1.z * shear_z;
     v2.z = v2.z * shear_z;

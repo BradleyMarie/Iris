@@ -140,31 +140,33 @@ TriangleTrace(
 
     VECTOR_AXIS dominant_axis = VectorDominantAxis(ray->direction);
 
-    VECTOR3 direction;
+    float_t shear_x, shear_y, direction_z;
     switch (dominant_axis)
     {
         case VECTOR_X_AXIS:
-            direction = VectorPermuteXDominant(ray->direction);
             v0 = PointPermuteXDominant(v0);
             v1 = PointPermuteXDominant(v1);
             v2 = PointPermuteXDominant(v2);
+
+            shear_x = -ray->direction.z / ray->direction.x;
+            shear_y = -ray->direction.y / ray->direction.x;
+            direction_z = ray->direction.x;
             break;
         case VECTOR_Y_AXIS:
-            direction = VectorPermuteYDominant(ray->direction);
             v0 = PointPermuteYDominant(v0);
             v1 = PointPermuteYDominant(v1);
             v2 = PointPermuteYDominant(v2);
+
+            shear_x = -ray->direction.x / ray->direction.y;
+            shear_y = -ray->direction.z / ray->direction.y;
+            direction_z = ray->direction.y;
             break;
         case VECTOR_Z_AXIS:
-            direction = VectorPermuteZDominant(ray->direction);
-            v0 = PointPermuteZDominant(v0);
-            v1 = PointPermuteZDominant(v1);
-            v2 = PointPermuteZDominant(v2);
+            shear_x = -ray->direction.x / ray->direction.z;
+            shear_y = -ray->direction.y / ray->direction.z;
+            direction_z = ray->direction.z;
             break;
     }
-
-    float_t shear_x = -direction.x / direction.z;
-    float_t shear_y = -direction.y / direction.z;
 
     v0.x += shear_x * v0.z;
     v0.y += shear_y * v0.z;
@@ -173,58 +175,46 @@ TriangleTrace(
     v2.x += shear_x * v2.z;
     v2.y += shear_y * v2.z;
 
-    TRIANGLE_ADDITIONAL_DATA data;
-    data.barycentric_coordinates[0] = v1.x * v2.y - v1.y * v2.x;
-    data.barycentric_coordinates[1] = v2.x * v0.y - v2.y * v0.x;
-    data.barycentric_coordinates[2] = v0.x * v1.y - v0.y * v1.x;
+    float_t b0 = v1.x * v2.y - v1.y * v2.x;
+    float_t b1 = v2.x * v0.y - v2.y * v0.x;
+    float_t b2 = v0.x * v1.y - v0.y * v1.x;
 
 #if FLT_EVAL_METHOD == 0
-    if (data.barycentric_coordinates[0] == (float_t)0.0 ||
-        data.barycentric_coordinates[1] == (float_t)0.0 ||
-        data.barycentric_coordinates[2] == (float_t)0.0)
+    if (b0 == (float_t)0.0 || b1 == (float_t)0.0 || b2 == (float_t)0.0)
     {
-        data.barycentric_coordinates[0] =
-            ((double_t)v1.x * (double_t)v2.y - (double_t)v1.y * (double_t)v2.x);
-        data.barycentric_coordinates[1] =
-            ((double_t)v2.x * (double_t)v0.y - (double_t)v2.y * (double_t)v0.x);
-        data.barycentric_coordinates[2] =
-            ((double_t)v0.x * (double_t)v1.y - (double_t)v0.y * (double_t)v1.x);
+        b0 = ((double_t)v1.x * (double_t)v2.y - (double_t)v1.y * (double_t)v2.x);
+        b1 = ((double_t)v2.x * (double_t)v0.y - (double_t)v2.y * (double_t)v0.x);
+        b2 = ((double_t)v0.x * (double_t)v1.y - (double_t)v0.y * (double_t)v1.x);
     }
 #endif
 
-    if ((data.barycentric_coordinates[0] < (float_t)0.0 ||
-         data.barycentric_coordinates[1] < (float_t)0.0 ||
-         data.barycentric_coordinates[2] < (float_t)0.0) &&
-        (data.barycentric_coordinates[0] > (float_t)0.0 ||
-         data.barycentric_coordinates[1] > (float_t)0.0 ||
-         data.barycentric_coordinates[2] > (float_t)0.0))
+    if ((b0 < (float_t)0.0 || b1 < (float_t)0.0 || b2 < (float_t)0.0) &&
+        (b0 > (float_t)0.0 || b1 > (float_t)0.0 || b2 > (float_t)0.0))
     {
         return ISTATUS_NO_INTERSECTION;
     }
 
-    float_t determinant = data.barycentric_coordinates[0] +
-                          data.barycentric_coordinates[1] +
-                          data.barycentric_coordinates[2];
+    float_t determinant = b0 + b1 + b2;
 
     if (determinant == (float_t)0.0)
     {
         return ISTATUS_NO_INTERSECTION;
     }
 
-    float_t shear_z = (float_t)1.0 / direction.z;
+    float_t shear_z = (float_t)1.0 / direction_z;
     v0.z = v0.z * shear_z;
     v1.z = v1.z * shear_z;
     v2.z = v2.z * shear_z;
 
-    float_t distance = data.barycentric_coordinates[0] * v0.z +
-                       data.barycentric_coordinates[1] * v1.z +
-                       data.barycentric_coordinates[2] * v2.z;
+    float_t distance = b0 * v0.z + b1* v1.z + b2 * v2.z;
 
     float_t inverse_determinant = (float_t)1.0 / determinant;
     distance *= inverse_determinant;
-    data.barycentric_coordinates[0] *= inverse_determinant;
-    data.barycentric_coordinates[1] *= inverse_determinant;
-    data.barycentric_coordinates[2] *= inverse_determinant;
+
+    TRIANGLE_ADDITIONAL_DATA data;
+    data.barycentric_coordinates[0] = b0 * inverse_determinant;
+    data.barycentric_coordinates[1] = b1 * inverse_determinant;
+    data.barycentric_coordinates[2] = b2 * inverse_determinant;
 
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
 
