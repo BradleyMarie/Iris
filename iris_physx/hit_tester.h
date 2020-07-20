@@ -33,6 +33,17 @@ typedef const SHAPE_HIT_TESTER *PCSHAPE_HIT_TESTER;
 static
 inline
 ISTATUS
+ShapeHitTesterFarthestHitAllowed(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    )
+{
+    return HitTesterFarthestHitAllowed(hit_tester, distance);
+}
+
+static
+inline
+ISTATUS
 ShapeHitTesterTestWorldShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
     _In_ PCSHAPE shape
@@ -134,6 +145,122 @@ ShapeHitTesterTestShape(
     return status;
 }
 
+
+
+static
+inline
+ISTATUS
+ShapeHitTesterTestWorldShapeWithLimit(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE shape,
+    _Out_opt_ float_t *farthest_hit_allowed
+    )
+{
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = (const void*)((const void **)shape + 2);
+    ISTATUS status = HitTesterTestWorldGeometryWithLimit(hit_tester,
+                                                         test_routine,
+                                                         context,
+                                                         shape,
+                                                         farthest_hit_allowed);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeHitTesterTestPremultipliedShapeWithLimit(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE shape,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *farthest_hit_allowed
+    )
+{
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = (const void*)((const void **)shape + 2);
+    ISTATUS status =
+        HitTesterTestPremultipliedGeometryWithLimit(hit_tester,
+                                                    test_routine,
+                                                    context,
+                                                    shape,
+                                                    model_to_world,
+                                                    farthest_hit_allowed);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeHitTesterTestTransformedShapeWithLimit(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE shape,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *farthest_hit_allowed
+    )
+{
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = (const void*)((const void **)shape + 2);
+    ISTATUS status =
+        HitTesterTestTransformedGeometryWithLimit(hit_tester,
+                                                  test_routine,
+                                                  context,
+                                                  shape,
+                                                  model_to_world,
+                                                  farthest_hit_allowed);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeHitTesterTestShapeWithLimit(
+    _Inout_ PSHAPE_HIT_TESTER hit_tester,
+    _In_ PCSHAPE shape,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied,
+    _Out_opt_ float_t *farthest_hit_allowed
+    )
+{
+    if (shape == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
+        (PHIT_TESTER_TEST_GEOMETRY_ROUTINE)((const void ***)shape)[0][0];
+    const void *context = (const void*)((const void **)shape + 2);
+    ISTATUS status = HitTesterTestGeometryWithLimit(hit_tester,
+                                                    test_routine,
+                                                    context,
+                                                    shape,
+                                                    model_to_world,
+                                                    premultiplied,
+                                                    farthest_hit_allowed);
+
+    return status;
+}
+
 static
 inline
 ISTATUS
@@ -161,20 +288,6 @@ ShapeHitTesterTestNestedShape(
                                                  context,
                                                  shape,
                                                  hits);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-ShapeHitTesterClosestHit(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _Out_ float_t *distance
-    )
-{
-    ISTATUS status = HitTesterClosestHit(hit_tester,
-                                         distance);
 
     return status;
 }

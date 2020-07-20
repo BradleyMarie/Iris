@@ -75,6 +75,12 @@ ISTATUS
 //
 
 ISTATUS
+HitTesterFarthestHitAllowed(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    );
+
+ISTATUS
 HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
@@ -111,24 +117,52 @@ HitTesterTestGeometry(
     );
 
 ISTATUS
+HitTesterTestWorldGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    );
+
+ISTATUS
+HitTesterTestPremultipliedGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    );
+
+ISTATUS
+HitTesterTestTransformedGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    );
+
+ISTATUS
+HitTesterTestGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    );
+
+ISTATUS
 HitTesterTestNestedGeometry(
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
     _Out_ PHIT *hits
-    );
-
-ISTATUS
-HitTesterFarthestHitAllowed(
-    _In_ PCHIT_TESTER hit_tester,
-    _Out_ float_t *distance
-    );
-
-ISTATUS
-HitTesterClosestHit(
-    _In_ PCHIT_TESTER hit_tester,
-    _Out_ float_t *distance
     );
 
 #endif // _IRIS_HIT_TESTER_

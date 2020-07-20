@@ -174,7 +174,7 @@ CheckGeometryContext(
     return param->status_to_return;
 }
 
-TEST(HitTesterTest, HitTesterTestWorldGeometryErrors)
+TEST(HitTesterTest, HitTesterTestWorldGeometryArgumentErrors)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
@@ -189,6 +189,20 @@ TEST(HitTesterTest, HitTesterTestWorldGeometryErrors)
                                         nullptr,
                                         nullptr,
                                         nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = HitTesterTestWorldGeometryWithLimit(nullptr,
+                                                 CheckGeometryContext,
+                                                 nullptr,
+                                                 nullptr,
+                                                 nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterTestWorldGeometryWithLimit(&tester,
+                                                 nullptr,
+                                                 nullptr,
+                                                 nullptr,
+                                                 nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
@@ -241,7 +255,7 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     HitTesterDestroy(&tester);
 }
 
-TEST(HitTesterTest, HitTesterTestPremultipliedGeometryErrors)
+TEST(HitTesterTest, HitTesterTestPremultipliedGeometryArgumentErrors)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
@@ -258,6 +272,22 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometryErrors)
                                                 nullptr,
                                                 nullptr,
                                                 nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = HitTesterTestPremultipliedGeometryWithLimit(nullptr,
+                                                         CheckGeometryContext,
+                                                         nullptr,
+                                                         nullptr,
+                                                         nullptr,
+                                                         nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterTestPremultipliedGeometryWithLimit(&tester,
+                                                         nullptr,
+                                                         nullptr,
+                                                         nullptr,
+                                                         nullptr,
+                                                         nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);   
@@ -352,7 +382,7 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     MatrixRelease(model_to_world);
 }
 
-TEST(HitTesterTest, HitTesterTestTransformedGeometryErrors)
+TEST(HitTesterTest, HitTesterTestTransformedGeometryArgumentErrors)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
@@ -369,6 +399,22 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometryErrors)
                                               nullptr,
                                               nullptr,
                                               nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = HitTesterTestTransformedGeometryWithLimit(nullptr,
+                                                       CheckGeometryContext,
+                                                       nullptr,
+                                                       nullptr,
+                                                       nullptr,
+                                                       nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterTestTransformedGeometryWithLimit(&tester,
+                                                       nullptr,
+                                                       nullptr,
+                                                       nullptr,
+                                                       nullptr,
+                                                       nullptr);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
@@ -518,7 +564,7 @@ TEST(HitTesterTest, HitTesterSortHits)
     }
 
     float_t closest_hit;
-    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    ISTATUS status = HitTesterFarthestHitAllowed(&tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)1.0, closest_hit);
 
@@ -551,13 +597,13 @@ TEST(HitTesterTest, HitTesterRejectHits)
         if ((float_t)10.0 <= distance && distance <= (float_t)20.0)
         {
             float_t closest_hit;
-            status = HitTesterClosestHit(&tester, &closest_hit);
+            status = HitTesterFarthestHitAllowed(&tester, &closest_hit);
             EXPECT_EQ(distance, closest_hit);
         }
     }
 
     float_t closest_hit;
-    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    ISTATUS status = HitTesterFarthestHitAllowed(&tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)10.0, closest_hit);
 
@@ -611,16 +657,19 @@ void RunWorldHitTest(
     _In_ float_t min_distance
     )
 {
+    float_t farthest_hit_allowed = INFINITY;
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestWorldGeometry(tester,
-                                                AllocateTwoHitAtDistance,
-                                                &first_distance,
-                                                &first_hit_data);
+    ISTATUS status = HitTesterTestWorldGeometryWithLimit(tester,
+                                                         AllocateTwoHitAtDistance,
+                                                         &first_distance,
+                                                         &first_hit_data,
+                                                         &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
     float_t closest_hit;
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
@@ -632,31 +681,34 @@ void RunWorldHitTest(
                                         &second_hit_data);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateTwoHitAtDistance,
-                                        &third_distance,
-                                        &third_hit_data);
+    status = HitTesterTestWorldGeometryWithLimit(tester,
+                                                 AllocateTwoHitAtDistance,
+                                                 &third_distance,
+                                                 &third_hit_data,
+                                                 nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestWorldGeometry(tester,
-                                        AllocateHitAtDistance,
-                                        &fourth_distance,
-                                        &fourth_hit_data);
+    status = HitTesterTestWorldGeometryWithLimit(tester,
+                                                 AllocateHitAtDistance,
+                                                 &fourth_distance,
+                                                 &fourth_hit_data,
+                                                 &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
@@ -666,11 +718,12 @@ void RunWorldHitTest(
                                         nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
-    EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+    EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                &third_hit_data == tester->closest_hit->context.data);
     EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 }
 
@@ -704,17 +757,20 @@ void RunPremultipliedHitTest(
     _In_ PCMATRIX matrix
     )
 {
+    float_t farthest_hit_allowed = INFINITY;
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestPremultipliedGeometry(tester,
-                                                        AllocateTwoHitAtDistance,
-                                                        &first_distance,
-                                                        &first_hit_data,
-                                                        matrix);
+    ISTATUS status = HitTesterTestPremultipliedGeometryWithLimit(tester,
+                                                                 AllocateTwoHitAtDistance,
+                                                                 &first_distance,
+                                                                 &first_hit_data,
+                                                                 matrix,
+                                                                 &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
     float_t closest_hit;
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
@@ -727,33 +783,36 @@ void RunPremultipliedHitTest(
                                                 matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestPremultipliedGeometry(tester,
-                                                AllocateTwoHitAtDistance,
-                                                &third_distance,
-                                                &third_hit_data,
-                                                matrix);
+    status = HitTesterTestPremultipliedGeometryWithLimit(tester,
+                                                         AllocateTwoHitAtDistance,
+                                                         &third_distance,
+                                                         &third_hit_data,
+                                                         matrix,
+                                                         nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestPremultipliedGeometry(tester,
-                                                AllocateHitAtDistance,
-                                                &fourth_distance,
-                                                &fourth_hit_data,
-                                                matrix);
+    status = HitTesterTestPremultipliedGeometryWithLimit(tester,
+                                                         AllocateHitAtDistance,
+                                                         &fourth_distance,
+                                                         &fourth_hit_data,
+                                                         matrix,
+                                                         &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
@@ -766,20 +825,22 @@ void RunPremultipliedHitTest(
 
     if (matrix != nullptr)
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_TRUE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
@@ -851,17 +912,20 @@ void RunTransformedHitTest(
     _In_ PCMATRIX matrix
     )
 {
+    float_t farthest_hit_allowed = INFINITY;
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestTransformedGeometry(tester,
-                                                      AllocateTwoHitAtDistance,
-                                                      &first_distance,
-                                                      &first_hit_data,
-                                                      matrix);
+    ISTATUS status = HitTesterTestTransformedGeometryWithLimit(tester,
+                                                               AllocateTwoHitAtDistance,
+                                                               &first_distance,
+                                                               &first_hit_data,
+                                                               matrix,
+                                                               &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
     float_t closest_hit;
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
@@ -874,33 +938,36 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestTransformedGeometry(tester,
-                                              AllocateTwoHitAtDistance,
-                                              &third_distance,
-                                              &third_hit_data,
-                                              matrix);
+    status = HitTesterTestTransformedGeometryWithLimit(tester,
+                                                       AllocateTwoHitAtDistance,
+                                                       &third_distance,
+                                                       &third_hit_data,
+                                                       matrix,
+                                                       nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestTransformedGeometry(tester,
-                                              AllocateHitAtDistance,
-                                              &fourth_distance,
-                                              &fourth_hit_data,
-                                              matrix);
+    status = HitTesterTestTransformedGeometryWithLimit(tester,
+                                                       AllocateHitAtDistance,
+                                                       &fourth_distance,
+                                                       &fourth_hit_data,
+                                                       matrix,
+                                                       &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
@@ -911,26 +978,28 @@ void RunTransformedHitTest(
                                               matrix);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     if (matrix == nullptr)
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_FALSE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
@@ -997,6 +1066,48 @@ TEST(HitTesterTest, HitTesterCheckTransformedHits)
     HitTesterDestroy(&tester);
     MatrixRelease(model_to_world);
     MatrixRelease(model_to_world_2);
+}
+
+TEST(HitTesterTest, HitTesterTestGeometryArgumentErrors)
+{
+    HIT_TESTER tester;
+    ASSERT_TRUE(HitTesterInitialize(&tester));
+
+    ISTATUS status = HitTesterTestGeometry(nullptr,
+                                           CheckGeometryContext,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr,
+                                           false);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterTestGeometry(&tester,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr,
+                                   false);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    status = HitTesterTestGeometryWithLimit(nullptr,
+                                            CheckGeometryContext,
+                                            nullptr,
+                                            nullptr,
+                                            nullptr,
+                                            false,
+                                            nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = HitTesterTestGeometryWithLimit(&tester,
+                                            nullptr,
+                                            nullptr,
+                                            nullptr,
+                                            nullptr,
+                                            false,
+                                            nullptr);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
+
+    HitTesterDestroy(&tester);
 }
 
 TEST(HitTesterTest, HitTesterTestGeometryErrors)
@@ -1110,18 +1221,21 @@ RunPremultipliedHitTestBase(
     _In_ PCMATRIX matrix
     )
 {
+    float_t farthest_hit_allowed = INFINITY;
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestGeometry(tester,
-                                           AllocateTwoHitAtDistance,
-                                           &first_distance,
-                                           &first_hit_data,
-                                           matrix,
-                                           true);
+    ISTATUS status = HitTesterTestGeometryWithLimit(tester,
+                                                    AllocateTwoHitAtDistance,
+                                                    &first_distance,
+                                                    &first_hit_data,
+                                                    matrix,
+                                                    true,
+                                                    &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
     float_t closest_hit;
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
@@ -1135,35 +1249,38 @@ RunPremultipliedHitTestBase(
                                    true);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &third_distance,
-                                   &third_hit_data,
-                                   matrix,
-                                   true);
+    status = HitTesterTestGeometryWithLimit(tester,
+                                            AllocateTwoHitAtDistance,
+                                            &third_distance,
+                                            &third_hit_data,
+                                            matrix,
+                                            true,
+                                            nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateHitAtDistance,
-                                   &fourth_distance,
-                                   &fourth_hit_data,
-                                   matrix,
-                                   true);
+    status = HitTesterTestGeometryWithLimit(tester,
+                                            AllocateHitAtDistance,
+                                            &fourth_distance,
+                                            &fourth_hit_data,
+                                            matrix,
+                                            true,
+                                            &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
@@ -1177,20 +1294,22 @@ RunPremultipliedHitTestBase(
 
     if (matrix != nullptr)
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_TRUE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
@@ -1263,18 +1382,21 @@ RunTransformedHitTestBase(
     _In_ PCMATRIX matrix
     )
 {
+    float_t farthest_hit_allowed = INFINITY;
     int first_hit_data = 0;
     float_t first_distance = (float_t)1.0 + min_distance;
-    ISTATUS status = HitTesterTestGeometry(tester,
-                                           AllocateTwoHitAtDistance,
-                                           &first_distance,
-                                           &first_hit_data,
-                                           matrix,
-                                           false);
+    ISTATUS status = HitTesterTestGeometryWithLimit(tester,
+                                                    AllocateTwoHitAtDistance,
+                                                    &first_distance,
+                                                    &first_hit_data,
+                                                    matrix,
+                                                    false,
+                                                    &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
     float_t closest_hit;
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(first_distance, closest_hit);
 
@@ -1288,35 +1410,38 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int third_hit_data = 0;
     float_t third_distance = (float_t)-1.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateTwoHitAtDistance,
-                                   &third_distance,
-                                   &third_hit_data,
-                                   matrix,
-                                   false);
+    status = HitTesterTestGeometryWithLimit(tester,
+                                            AllocateTwoHitAtDistance,
+                                            &third_distance,
+                                            &third_hit_data,
+                                            matrix,
+                                            false,
+                                            nullptr);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     int fourth_hit_data = 0;
     float_t fourth_distance = (float_t)4.0 + min_distance;
-    status = HitTesterTestGeometry(tester,
-                                   AllocateHitAtDistance,
-                                   &fourth_distance,
-                                   &fourth_hit_data,
-                                   matrix,
-                                   false);
+    status = HitTesterTestGeometryWithLimit(tester,
+                                            AllocateHitAtDistance,
+                                            &fourth_distance,
+                                            &fourth_hit_data,
+                                            matrix,
+                                            false,
+                                            &farthest_hit_allowed);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, farthest_hit_allowed);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
@@ -1328,26 +1453,28 @@ RunTransformedHitTestBase(
                                    false);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 
-    status = HitTesterClosestHit(tester, &closest_hit);
+    status = HitTesterFarthestHitAllowed(tester, &closest_hit);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ(second_distance, closest_hit);
 
     if (matrix == nullptr)
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_EQ(NULL, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
     else
     {
-        EXPECT_EQ(&second_hit_data, tester->closest_hit->context.data);
+        EXPECT_TRUE(&second_hit_data == tester->closest_hit->context.data ||
+                    &third_hit_data == tester->closest_hit->context.data);
         EXPECT_FALSE(tester->closest_hit->premultiplied);
         EXPECT_EQ(matrix, tester->closest_hit->model_to_world);
 
-        status = HitTesterClosestHit(tester, &closest_hit);
+        status = HitTesterFarthestHitAllowed(tester, &closest_hit);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
         EXPECT_EQ(second_distance, closest_hit);
     }
@@ -1416,16 +1543,16 @@ TEST(HitTesterTest, HitTesterCheckGeometryHitsTransformed)
     MatrixRelease(model_to_world_2);
 }
 
-TEST(HitTesterTest, HitTesterClosestHitErrors)
+TEST(HitTesterTest, HitTesterFarthestHitAllowedArgumentErrors)
 {
     HIT_TESTER tester;
     ASSERT_TRUE(HitTesterInitialize(&tester));
 
     float_t closest_hit;
-    ISTATUS status = HitTesterClosestHit(nullptr, &closest_hit);
+    ISTATUS status = HitTesterFarthestHitAllowed(nullptr, &closest_hit);
     ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
 
-    status = HitTesterClosestHit(&tester, nullptr);
+    status = HitTesterFarthestHitAllowed(&tester, nullptr);
     ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
 
     HitTesterDestroy(&tester);
@@ -1437,49 +1564,9 @@ TEST(HitTesterTest, HitTesterClosestEmpty)
     ASSERT_TRUE(HitTesterInitialize(&tester));
 
     float_t closest_hit;
-    ISTATUS status = HitTesterClosestHit(&tester, &closest_hit);
+    ISTATUS status = HitTesterFarthestHitAllowed(&tester, &closest_hit);
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     ASSERT_TRUE(std::isinf(closest_hit));
-
-    HitTesterDestroy(&tester);
-}
-
-TEST(HitTesterTest, HitTesterFarthestHitAllowedErrors)
-{
-    HIT_TESTER tester;
-    ASSERT_TRUE(HitTesterInitialize(&tester));
-
-    float_t farthest_hit;
-    ISTATUS status = HitTesterFarthestHitAllowed(nullptr, &farthest_hit);
-    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
-
-    status = HitTesterFarthestHitAllowed(&tester, nullptr);
-    ASSERT_EQ(ISTATUS_INVALID_ARGUMENT_01, status);
-
-    HitTesterDestroy(&tester);
-}
-
-TEST(HitTesterTest, HitTesterFarthestHitAllowed)
-{
-    HIT_TESTER tester;
-    ASSERT_TRUE(HitTesterInitialize(&tester));
-
-    float_t farthest_hit;
-    ISTATUS status = HitTesterFarthestHitAllowed(&tester, &farthest_hit);
-    ASSERT_EQ(ISTATUS_SUCCESS, status);
-    ASSERT_TRUE((float_t)0.0 < farthest_hit && std::isinf(farthest_hit));
-
-    POINT3 origin = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
-    VECTOR3 direction = VectorCreate((float_t) 4.0,
-                                     (float_t) 5.0,
-                                     (float_t) 6.0);
-    RAY ray = RayCreate(origin, direction);
-
-    HitTesterReset(&tester, ray, (float_t)0.0, (float_t)10.0);
-
-    status = HitTesterFarthestHitAllowed(&tester, &farthest_hit);
-    ASSERT_EQ(ISTATUS_SUCCESS, status);
-    ASSERT_TRUE((float_t)10.0);
 
     HitTesterDestroy(&tester);
 }

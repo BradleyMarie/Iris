@@ -30,7 +30,8 @@ HitTesterTestGeometryInternal(
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
     _In_opt_ PCMATRIX model_to_world,
-    _In_ bool premultiplied
+    _In_ bool premultiplied,
+    _Out_ float_t *maybe_farthest_hit_allowed
     )
 {
     if (hit_tester == NULL)
@@ -78,13 +79,18 @@ HitTesterTestGeometryInternal(
     do
     {
         if (hit_tester->minimum_distance <= hit->distance &&
-            hit->distance <= hit_tester->maximum_distance &&
-            hit->distance < hit_tester->closest_hit->hit.distance)
+            hit->distance <= hit_tester->maximum_distance)
         {
             PFULL_HIT_CONTEXT full_hit_context = (PFULL_HIT_CONTEXT)(void *)hit;
             full_hit_context->model_to_world = model_to_world;
             full_hit_context->premultiplied = premultiplied;
             hit_tester->closest_hit = full_hit_context;
+            hit_tester->maximum_distance = hit->distance;
+
+            if (maybe_farthest_hit_allowed != NULL)
+            {
+                *maybe_farthest_hit_allowed = hit->distance;
+            }
         }
 
         hit = hit->next;
@@ -101,6 +107,27 @@ HitTesterTestGeometryInternal(
 //
 
 ISTATUS
+HitTesterFarthestHitAllowed(
+    _In_ PCHIT_TESTER hit_tester,
+    _Out_ float_t *distance
+    )
+{
+    if (hit_tester == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (distance == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *distance = hit_tester->maximum_distance;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
 HitTesterTestWorldGeometry(
     _Inout_ PHIT_TESTER hit_tester,
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
@@ -113,7 +140,8 @@ HitTesterTestWorldGeometry(
                                                    geometry_data,
                                                    hit_data,
                                                    NULL,
-                                                   false);
+                                                   false,
+                                                   NULL);
 
     return status;
 }
@@ -132,7 +160,8 @@ HitTesterTestPremultipliedGeometry(
                                                    geometry_data,
                                                    hit_data,
                                                    model_to_world,
-                                                   true);
+                                                   true,
+                                                   NULL);
 
     return status;
 }
@@ -151,7 +180,8 @@ HitTesterTestTransformedGeometry(
                                                    geometry_data,
                                                    hit_data,
                                                    model_to_world,
-                                                   false);
+                                                   false,
+                                                   NULL);
 
     return status;
 }
@@ -171,7 +201,92 @@ HitTesterTestGeometry(
                                                    geometry_data,
                                                    hit_data,
                                                    model_to_world,
-                                                   premultiplied);
+                                                   premultiplied,
+                                                   NULL);
+
+    return status;
+}
+
+ISTATUS
+HitTesterTestWorldGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    )
+{
+    ISTATUS status = HitTesterTestGeometryInternal(hit_tester,
+                                                   test_routine,
+                                                   geometry_data,
+                                                   hit_data,
+                                                   NULL,
+                                                   false,
+                                                   maybe_farthest_hit_allowed);
+
+    return status;
+}
+
+ISTATUS
+HitTesterTestPremultipliedGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    )
+{
+    ISTATUS status = HitTesterTestGeometryInternal(hit_tester,
+                                                   test_routine,
+                                                   geometry_data,
+                                                   hit_data,
+                                                   model_to_world,
+                                                   true,
+                                                   maybe_farthest_hit_allowed);
+
+    return status;
+}
+
+ISTATUS
+HitTesterTestTransformedGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    )
+{
+    ISTATUS status = HitTesterTestGeometryInternal(hit_tester,
+                                                   test_routine,
+                                                   geometry_data,
+                                                   hit_data,
+                                                   model_to_world,
+                                                   false,
+                                                   maybe_farthest_hit_allowed);
+
+    return status;
+}
+
+ISTATUS
+HitTesterTestGeometryWithLimit(
+    _Inout_ PHIT_TESTER hit_tester,
+    _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
+    _In_opt_ const void *geometry_data,
+    _In_opt_ const void *hit_data,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ bool premultiplied,
+    _Out_opt_ float_t *maybe_farthest_hit_allowed
+    )
+{
+    ISTATUS status = HitTesterTestGeometryInternal(hit_tester,
+                                                   test_routine,
+                                                   geometry_data,
+                                                   hit_data,
+                                                   model_to_world,
+                                                   premultiplied,
+                                                   maybe_farthest_hit_allowed);
 
     return status;
 }
@@ -213,46 +328,4 @@ HitTesterTestNestedGeometry(
     HitAllocatorSetData(hit_allocator, original_data);
 
     return status;
-}
-
-ISTATUS
-HitTesterFarthestHitAllowed(
-    _In_ PCHIT_TESTER hit_tester,
-    _Out_ float_t *distance
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (distance == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    *distance = hit_tester->maximum_distance;
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
-HitTesterClosestHit(
-    _In_ PCHIT_TESTER hit_tester,
-    _Out_ float_t *distance
-    )
-{
-    if (hit_tester == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (distance == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    *distance = hit_tester->closest_hit->hit.distance;
-
-    return ISTATUS_SUCCESS;
 }

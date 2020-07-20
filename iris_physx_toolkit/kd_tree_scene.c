@@ -1013,13 +1013,16 @@ inline
 ISTATUS
 KdTreeTraceShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE_AND_DATA shape_and_data
+    _In_ PCSHAPE_AND_DATA shape_and_data,
+    _Out_ float_t *farthest_hit_allowed
     )
 {
-    ISTATUS status = ShapeHitTesterTestShape(hit_tester,
-                                             shape_and_data->shape,
-                                             shape_and_data->model_to_world,
-                                             shape_and_data->premultiplied);
+    ISTATUS status =
+        ShapeHitTesterTestShapeWithLimit(hit_tester,
+                                         shape_and_data->shape,
+                                         shape_and_data->model_to_world,
+                                         shape_and_data->premultiplied,
+                                         farthest_hit_allowed);
 
     return status;
 }
@@ -1029,13 +1032,15 @@ inline
 ISTATUS
 KdTreeTraceTransformedShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE_AND_TRANSFORM shape_and_transform
+    _In_ PCSHAPE_AND_TRANSFORM shape_and_transform,
+    _Out_ float_t *farthest_hit_allowed
     )
 {
     ISTATUS status =
-        ShapeHitTesterTestTransformedShape(hit_tester,
-                                           shape_and_transform->shape,
-                                           shape_and_transform->model_to_world);
+        ShapeHitTesterTestTransformedShapeWithLimit(hit_tester,
+                                                    shape_and_transform->shape,
+                                                    shape_and_transform->model_to_world,
+                                                    farthest_hit_allowed);
 
     return status;
 }
@@ -1045,10 +1050,14 @@ inline
 ISTATUS
 KdTreeTraceWorldShape(
     _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE shape
+    _In_ PCSHAPE shape,
+    _Out_ float_t *farthest_hit_allowed
     )
 {
-    ISTATUS status = ShapeHitTesterTestWorldShape(hit_tester, shape);
+    ISTATUS status =
+        ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
+                                              shape,
+                                              farthest_hit_allowed);
 
     return status;
 }
@@ -1114,7 +1123,7 @@ KdTreeTraceTree(
     }
 
     float_t farthest_object_allowed;
-    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
@@ -1133,18 +1142,13 @@ KdTreeTraceTree(
             {
                 uint32_t index = node->split_or_index.index;
                 ISTATUS status = KdTreeTraceShape(hit_tester,
-                                                  shapes + index);
+                                                  shapes + index,
+                                                  &farthest_object_allowed);
 
                 if (status != ISTATUS_SUCCESS)
                 {
                     return status;
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1153,19 +1157,14 @@ KdTreeTraceTree(
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
                     ISTATUS status = KdTreeTraceShape(hit_tester,
-                                                      shapes + node_indices[i]);
+                                                      shapes + node_indices[i],
+                                                      &farthest_object_allowed);
 
                     if (status != ISTATUS_SUCCESS)
                     {
                         return status;
                     }
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
 
             if (queue_size == 0)
@@ -1273,18 +1272,13 @@ KdTreeTraceTransformedTree(
             {
                 uint32_t index = node->split_or_index.index;
                 ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
-                                                             shapes + index);
+                                                             shapes + index,
+                                                             &farthest_object_allowed);
 
                 if (status != ISTATUS_SUCCESS)
                 {
                     return status;
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1293,19 +1287,14 @@ KdTreeTraceTransformedTree(
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
                     ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
-                                                                 shapes + node_indices[i]);
+                                                                 shapes + node_indices[i],
+                                                                 &farthest_object_allowed);
 
                     if (status != ISTATUS_SUCCESS)
                     {
                         return status;
                     }
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
 
             if (queue_size == 0)
@@ -1394,7 +1383,7 @@ KdTreeTraceWorldTree(
     }
 
     float_t farthest_object_allowed;
-    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
 
     WORK_ITEM work_queue[MAX_TREE_DEPTH];
     size_t queue_size = 0;
@@ -1413,18 +1402,13 @@ KdTreeTraceWorldTree(
             {
                 uint32_t index = node->split_or_index.index;
                 ISTATUS status = KdTreeTraceWorldShape(hit_tester,
-                                                       shapes[index]);
+                                                       shapes[index],
+                                                       &farthest_object_allowed);
 
                 if (status != ISTATUS_SUCCESS)
                 {
                     return status;
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
             else if (num_shapes != 0)
             {
@@ -1433,19 +1417,14 @@ KdTreeTraceWorldTree(
                 for (uint32_t i = 0; i < num_shapes; i++)
                 {
                     ISTATUS status = KdTreeTraceWorldShape(hit_tester,
-                                                           shapes[node_indices[i]]);
+                                                           shapes[node_indices[i]],
+                                                           &farthest_object_allowed);
 
                     if (status != ISTATUS_SUCCESS)
                     {
                         return status;
                     }
                 }
-
-                float_t closest_hit;
-                ShapeHitTesterClosestHit(hit_tester, &closest_hit);
-
-                farthest_object_allowed = fmin(farthest_object_allowed,
-                                               closest_hit);
             }
 
             if (queue_size == 0)
