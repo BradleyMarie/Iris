@@ -278,9 +278,12 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
     std::map<char *, std::string> header_values;
     std::map<char *, std::string> data_values;
 
+    const size_t kHeaderAlignment = 256;
+    const size_t kHeaderSize = 512;
+
     for (int i = 0; i < 1000; i++)
     {
-        size_t header_size = size_generator(rng);
+        size_t header_size = kHeaderSize;
 
         size_t datum_size;
         if (should_do_data_generator(rng) != 1)
@@ -297,13 +300,13 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
                                                    nullptr,
                                                    header_size,
-                                                   GetAlignment(header_size),
+                                                   kHeaderAlignment,
                                                    (void **)&header,
                                                    datum_size,
                                                    GetAlignment(datum_size),
                                                    (void **)&datum));
 
-        EXPECT_EQ(0u, (uintptr_t)header % GetAlignment(header_size));
+        EXPECT_EQ(0u, (uintptr_t)header % kHeaderAlignment);
         EXPECT_EQ(0u, (uintptr_t)datum % GetAlignment(datum_size));
 
         std::string header_value = GenerateRandomString(header_size, &rng);
@@ -339,7 +342,7 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
 
     for (int i = 0; i < 2000; i++)
     {
-        size_t header_size = size_generator(rng);
+        size_t header_size = kHeaderSize;
 
         size_t datum_size;
         if (should_do_data_generator(rng) != 1)
@@ -356,13 +359,13 @@ TEST(DynamicMemoryAllocatorTest, RandomAllocationTest)
         ASSERT_TRUE(DynamicMemoryAllocatorAllocate(&allocator,
                                                    nullptr,
                                                    header_size,
-                                                   GetAlignment(header_size),
+                                                   kHeaderAlignment,
                                                    (void **)&header,
                                                    datum_size,
                                                    GetAlignment(datum_size),
                                                    (void **)&datum));
 
-        EXPECT_EQ(0u, (uintptr_t)header % GetAlignment(header_size));
+        EXPECT_EQ(0u, (uintptr_t)header % kHeaderAlignment);
         EXPECT_EQ(0u, (uintptr_t)datum % GetAlignment(datum_size));
 
         std::string header_value = GenerateRandomString(header_size, &rng);

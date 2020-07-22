@@ -38,7 +38,8 @@ LayoutNewAllocation(
     _In_reads_(number_of_elements) size_t element_alignments[],
     _Out_writes_(number_of_elements) size_t element_placements[],
     _Out_ size_t *size,
-    _Out_ size_t *alignment)
+    _Out_ size_t *alignment
+    )
 {
     assert(number_of_elements != 0);
     assert(element_sizes != NULL);
@@ -120,7 +121,8 @@ LayoutAllocation(
     _In_ size_t number_of_elements,
     _In_reads_(number_of_members) size_t element_sizes[],
     _In_reads_(number_of_elements) size_t element_alignments[],
-    _Out_writes_(number_of_elements) uintptr_t element_placements[])
+    _Out_writes_(number_of_elements) void **element_placements[]
+    )
 {
     assert(base_address != (uintptr_t)NULL);
     assert(allocation_size != 0);
@@ -133,19 +135,82 @@ LayoutAllocation(
     assert(element_sizes[0] % element_alignments[0] == 0);
     assert((element_alignments[0] & (element_alignments[0] - 1)) == 0);
 
-    if ((base_address & (element_alignments[0] - 1)) != 0 ||
-        allocation_size < element_sizes[0])
+    assert((base_address & (element_alignments[0] - 1)) == 0);
+    assert(element_sizes[0] <= allocation_size);
+
+    if (element_sizes[0] != 0)
+    {
+        *element_placements[0] = (void*)base_address;
+    }
+    else
+    {
+        *element_placements[0] = NULL;
+    }
+
+    size_t size = element_sizes[0];
+    uintptr_t last_placement = base_address;
+
+    if (number_of_elements == 1)
+    {
+        return true;
+    }
+
+    assert(element_alignments[1] != 0);
+    assert(element_sizes[1] % element_alignments[1] == 0);
+    assert((element_alignments[1] & (element_alignments[1] - 1)) == 0);
+
+    bool success = CheckedAddSizeT(size,
+                                   element_sizes[1],
+                                   &size);
+
+    if (!success)
     {
         return false;
     }
 
-    element_placements[0] = base_address;
-    size_t size = element_sizes[0];
+    uintptr_t next_placement = last_placement + element_sizes[0];
 
-    for (size_t i = 1; i < number_of_elements; i++)
+    if (element_alignments[0] < element_alignments[1] && element_sizes[1] != 0)
+    {
+        size_t bytes_past_alignment =
+            next_placement & (element_alignments[1] - 1);
+
+        if (bytes_past_alignment != 0)
+        {
+            size_t last_entry_padding =
+                element_alignments[1] - bytes_past_alignment;
+
+            success = CheckedAddSizeT(size,
+                                      last_entry_padding,
+                                      &size);
+
+            if (!success)
+            {
+                return false;
+            }
+
+            assert(size <= allocation_size);
+
+            next_placement += last_entry_padding;
+        }
+    }
+
+    if (element_sizes[1] != 0)
+    {
+        *element_placements[1] = (void*)next_placement;
+    }
+    else
+    {
+        *element_placements[1] = NULL;
+    }
+
+    last_placement = next_placement;
+
+    for (size_t i = 2; i < number_of_elements; i++)
     {
         if (element_sizes[i] == 0)
         {
+            *element_placements[i] = NULL;
             continue;
         }
 
@@ -167,8 +232,7 @@ LayoutAllocation(
             return false;
         }
 
-        uintptr_t next_placement =
-            element_placements[i - 1] + element_sizes[i - 1];
+        next_placement = last_placement + element_sizes[i - 1];
 
         size_t bytes_past_alignment =
             next_placement & (element_alignments[i] - 1);
@@ -195,7 +259,8 @@ LayoutAllocation(
             next_placement += last_entry_padding;
         }
 
-        element_placements[i] = next_placement;
+        *element_placements[i] = (void*)next_placement;
+        last_placement = next_placement;
     }
 
     return true;
@@ -212,7 +277,8 @@ AlignedAllocWithHeader(
     _Outptr_result_bytebuffer_to_(header_size, 0) void **header,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Outptr_result_bytebuffer_to_(data_size, 0) void **data)
+    _Outptr_result_bytebuffer_to_(data_size, 0) void **data
+    )
 {
     assert(header_size != 0);
     assert(header_alignment != 0);
@@ -277,7 +343,8 @@ AlignedAllocWithTwoHeaders(
     _In_ size_t data_size,
     _In_ size_t data_alignment,
     _Outptr_result_bytebuffer_to_(data_size, 0) void **data,
-    _Out_ size_t *actual_allocation_size)
+    _Out_ size_t *actual_allocation_size
+    )
 {
     assert(first_header_size != 0);
     assert(first_header_alignment != 0);
@@ -354,7 +421,8 @@ AlignedResizeWithTwoHeaders(
     _In_ size_t data_size,
     _In_ size_t data_alignment,
     _Outptr_result_bytebuffer_to_(data_size, 0) void **data,
-    _Out_ size_t *actual_allocation_size)
+    _Out_ size_t *actual_allocation_size
+    )
 {
     assert(original != NULL);
     assert(original_size != 0);
@@ -377,7 +445,7 @@ AlignedResizeWithTwoHeaders(
     size_t sizes[] = {first_header_size, second_header_size, data_size};
     size_t alignments[] =
         {first_header_alignment, second_header_alignment, data_alignment};
-    uintptr_t placements[3] = { 0, 0, 0 };
+    void **placements[3] = { first_header, second_header, data };
 
     bool success = LayoutAllocation((uintptr_t)original,
                                     original_size,
@@ -388,20 +456,7 @@ AlignedResizeWithTwoHeaders(
 
     if (success)
     {
-        *first_header = (void *)placements[0];
-        *second_header = (void *)placements[1];
-
-        if (data_size != 0)
-        {
-            *data = (void *)placements[2];
-        }
-        else
-        {
-            *data = NULL;
-        }
-
         *actual_allocation_size = original_size;
-
         return true;
     }
 

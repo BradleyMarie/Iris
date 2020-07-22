@@ -100,7 +100,7 @@ TEST(AllocTest, LayoutNewAllocationSucceedsThreeElementsPaddingNeeded)
     size_t placements[] = { 0, 0, 0 };
     size_t size, alignment;
 
-    EXPECT_TRUE(LayoutNewAllocation(3, 
+    EXPECT_TRUE(LayoutNewAllocation(3,
                                     sizes,
                                     alignments,
                                     placements,
@@ -134,7 +134,9 @@ TEST(AllocTest, LayoutAllocationOneElementSucceeds)
     uintptr_t original_allocation_size = 4096;
     size_t alignments[] = { 1 };
     size_t sizes[] = { 32 };
-    size_t placements[] = { 0 };
+
+    void *first;
+    void** placements[] = { &first };
 
     EXPECT_TRUE(LayoutAllocation(original_allocation,
                                  original_allocation_size,
@@ -142,39 +144,7 @@ TEST(AllocTest, LayoutAllocationOneElementSucceeds)
                                  sizes,
                                  alignments,
                                  placements));
-    EXPECT_EQ(4096u, placements[0]);
-}
-
-TEST(AllocTest, LayoutAllocationOneElementFailsTooSmall)
-{
-    uintptr_t original_allocation = 4096;
-    uintptr_t original_allocation_size = 4096;
-    size_t alignments[] = { 1 };
-    size_t sizes[] = { 4097 };
-    size_t placements[] = { 0 };
-
-    EXPECT_FALSE(LayoutAllocation(original_allocation,
-                                  original_allocation_size,
-                                  1, 
-                                  sizes,
-                                  alignments,
-                                  placements));
-}
-
-TEST(AllocTest, LayoutAllocationOneElementFailsMisaligned)
-{
-    uintptr_t original_allocation = 17;
-    uintptr_t original_allocation_size = 4096;
-    size_t alignments[] = { 16 };
-    size_t sizes[] = { 4096 };
-    size_t placements[] = { 0 };
-
-    EXPECT_FALSE(LayoutAllocation(original_allocation,
-                                  original_allocation_size,
-                                  1, 
-                                  sizes,
-                                  alignments,
-                                  placements));
+    EXPECT_EQ(4096u, (uintptr_t)first);
 }
 
 TEST(AllocTest, LayoutAllocationTwoElementsSucceeds)
@@ -183,7 +153,9 @@ TEST(AllocTest, LayoutAllocationTwoElementsSucceeds)
     uintptr_t original_allocation_size = 4096;
     size_t alignments[] = { 16, 32 };
     size_t sizes[] = { 48, 128 };
-    size_t placements[] = { 0, 0 };
+
+    void *first, *second;
+    void **placements[] = { &first, &second };
 
     EXPECT_TRUE(LayoutAllocation(original_allocation,
                                  original_allocation_size,
@@ -191,8 +163,8 @@ TEST(AllocTest, LayoutAllocationTwoElementsSucceeds)
                                  sizes,
                                  alignments,
                                  placements));
-    EXPECT_EQ(4096u, placements[0]);
-    EXPECT_EQ(4160u, placements[1]);
+    EXPECT_EQ(4096u, (uintptr_t)first);
+    EXPECT_EQ(4160u, (uintptr_t)second);
 }
 
 TEST(AllocTest, LayoutAllocationTwoElementsSucceedsWithPadding)
@@ -201,7 +173,9 @@ TEST(AllocTest, LayoutAllocationTwoElementsSucceedsWithPadding)
     uintptr_t original_allocation_size = 4096;
     size_t alignments[] = { 8, 32 };
     size_t sizes[] = { 40, 128 };
-    size_t placements[] = { 0, 0 };
+
+    void *first, *second;
+    void **placements[] = { &first, &second };
 
     EXPECT_TRUE(LayoutAllocation(original_allocation,
                                  original_allocation_size,
@@ -209,24 +183,8 @@ TEST(AllocTest, LayoutAllocationTwoElementsSucceedsWithPadding)
                                  sizes,
                                  alignments,
                                  placements));
-    EXPECT_EQ(8u, placements[0]);
-    EXPECT_EQ(64u, placements[1]);
-}
-
-TEST(AllocTest, LayoutAllocationTwoElementsFailsTooSmall)
-{
-    uintptr_t original_allocation = 4096;
-    uintptr_t original_allocation_size = 128;
-    size_t alignments[] = { 16, 32 };
-    size_t sizes[] = { 48, 128 };
-    size_t placements[] = { 0, 0 };
-
-    EXPECT_FALSE(LayoutAllocation(original_allocation,
-                                  original_allocation_size,
-                                  2, 
-                                  sizes,
-                                  alignments,
-                                  placements));
+    EXPECT_EQ(8u, (uintptr_t)first);
+    EXPECT_EQ(64u, (uintptr_t)second);
 }
 
 TEST(AllocTest, LayoutAllocationThreeElementsSucceeds)
@@ -235,17 +193,19 @@ TEST(AllocTest, LayoutAllocationThreeElementsSucceeds)
     uintptr_t original_allocation_size = 4096;
     size_t alignments[] = { 16, 32, 8 };
     size_t sizes[] = { 48, 128, 8 };
-    size_t placements[] = { 0, 0, 0 };
+
+    void *first, *second, *third;
+    void **placements[] = { &first, &second, &third };
 
     EXPECT_TRUE(LayoutAllocation(original_allocation,
                                  original_allocation_size,
-                                 3, 
+                                 3,
                                  sizes,
                                  alignments,
                                  placements));
-    EXPECT_EQ(16u, placements[0]);
-    EXPECT_EQ(64u, placements[1]);
-    EXPECT_EQ(192u, placements[2]);
+    EXPECT_EQ(16u, (uintptr_t)first);
+    EXPECT_EQ(64u, (uintptr_t)second);
+    EXPECT_EQ(192u, (uintptr_t)third);
 }
 
 TEST(AllocTest, LayoutAllocationThreeElementsSucceedsWithPadding)
@@ -254,17 +214,19 @@ TEST(AllocTest, LayoutAllocationThreeElementsSucceedsWithPadding)
     uintptr_t original_allocation_size = 4096;
     size_t alignments[] = { 8, 32, 128 };
     size_t sizes[] = { 40, 128, 256 };
-    size_t placements[] = { 0, 0, 0 };
+
+    void *first, *second, *third;
+    void **placements[] = { &first, &second, &third };
 
     EXPECT_TRUE(LayoutAllocation(original_allocation,
                                  original_allocation_size,
-                                 3, 
+                                 3,
                                  sizes,
                                  alignments,
                                  placements));
-    EXPECT_EQ(8u, placements[0]);
-    EXPECT_EQ(64u, placements[1]);
-    EXPECT_EQ(256u, placements[2]);
+    EXPECT_EQ(8u, (uintptr_t)first);
+    EXPECT_EQ(64u, (uintptr_t)second);
+    EXPECT_EQ(256u, (uintptr_t)third);
 }
 
 TEST(AllocTest, LayoutAllocationThreeElementsFailsTooSmall)
@@ -273,14 +235,37 @@ TEST(AllocTest, LayoutAllocationThreeElementsFailsTooSmall)
     uintptr_t original_allocation_size = 256;
     size_t alignments[] = { 8, 32, 128 };
     size_t sizes[] = { 40, 128, 256 };
-    size_t placements[] = { 0, 0, 0 };
+
+    void *first, *second, *third;
+    void **placements[] = { &first, &second, &third };
 
     EXPECT_FALSE(LayoutAllocation(original_allocation,
                                   original_allocation_size,
-                                  3, 
+                                  3,
                                   sizes,
                                   alignments,
                                   placements));
+}
+
+TEST(AllocTest, LayoutAllocationThreeElementsSucceedsSizeZeroNull)
+{
+    uintptr_t original_allocation = 8;
+    uintptr_t original_allocation_size = 4096;
+    size_t alignments[] = { 8, 32, 128 };
+    size_t sizes[] = { 40, 128, 0 };
+
+    void *first, *second, *third;
+    void **placements[] = { &first, &second, &third };
+
+    EXPECT_TRUE(LayoutAllocation(original_allocation,
+                                 original_allocation_size,
+                                 3,
+                                 sizes,
+                                 alignments,
+                                 placements));
+    EXPECT_EQ(8u, (uintptr_t)first);
+    EXPECT_EQ(64u, (uintptr_t)second);
+    EXPECT_EQ(0u, (uintptr_t)third);
 }
 
 TEST(AllocTest, AlignedAllocWithHeaderNoData)
@@ -672,8 +657,8 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersResizeNeeded)
     EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
     EXPECT_LE(560u, actual_allocation_size);
 
-    data_size = 0;
-    first_header_size = 1024;
+    first_header_size = 256;
+    data_size = 768;
 
     ASSERT_TRUE(AlignedResizeWithTwoHeaders(first_header,
                                             actual_allocation_size,
@@ -693,11 +678,14 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersResizeNeeded)
               (uintptr_t)second_header - (uintptr_t)first_header);
     EXPECT_TRUE(second_header != NULL);
     EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data == NULL);
+    EXPECT_TRUE(data != NULL);
+    EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
+    EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
     EXPECT_LE(1056u, actual_allocation_size);
 
     first_header_size = 32;
-    second_header_size = 2048;
+    second_header_size = 1024;
+    data_size = 1024;
 
     ASSERT_TRUE(AlignedResizeWithTwoHeaders(first_header,
                                             actual_allocation_size,
@@ -717,7 +705,9 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersResizeNeeded)
               (uintptr_t)second_header - (uintptr_t)first_header);
     EXPECT_TRUE(second_header != NULL);
     EXPECT_TRUE((uintptr_t)second_header % second_header_alignment == 0);
-    EXPECT_TRUE(data == NULL);
+    EXPECT_TRUE(data != NULL);
+    EXPECT_TRUE((uintptr_t)data % data_alignment == 0);
+    EXPECT_LE(second_header_size, (uintptr_t)data - (uintptr_t)second_header);
     EXPECT_LE(2080u, actual_allocation_size);
 
     free(first_header);
@@ -761,7 +751,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithoutDataFails)
                                              data_alignment,
                                              &data,
                                              &actual_allocation_size));
-    ASSERT_EQ(original_header, first_header);
 
     ASSERT_FALSE(AlignedResizeWithTwoHeaders(first_header,
                                              actual_allocation_size,
@@ -775,7 +764,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithoutDataFails)
                                              data_alignment,
                                              &data,
                                              &actual_allocation_size));
-    ASSERT_EQ(original_header, first_header);
 
     free(original_header);
 }
@@ -789,7 +777,7 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithDataFails)
     size_t second_header_alignment = 16;
     void *second_header;
     size_t data_size = 128;
-    size_t data_alignment = 16;
+    size_t data_alignment = 1;
     void *data;
     size_t actual_allocation_size;
 
@@ -805,7 +793,7 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithDataFails)
                                            &actual_allocation_size));
     void* original_header = first_header;
 
-    first_header_size = SIZE_MAX;
+    data_size = SIZE_MAX;
     ASSERT_FALSE(AlignedResizeWithTwoHeaders(first_header,
                                              actual_allocation_size,
                                              first_header_size,
@@ -818,7 +806,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithDataFails)
                                              data_alignment,
                                              &data,
                                              &actual_allocation_size));
-    ASSERT_EQ(original_header, first_header);
 
     ASSERT_FALSE(AlignedResizeWithTwoHeaders(first_header,
                                              actual_allocation_size,
@@ -832,7 +819,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithDataFails)
                                              data_alignment,
                                              &data,
                                              &actual_allocation_size));
-    ASSERT_EQ(original_header, first_header);
 
     ASSERT_FALSE(AlignedResizeWithTwoHeaders(first_header,
                                              actual_allocation_size,
@@ -846,7 +832,6 @@ TEST(AllocTest, AlignedResizeWithTwoHeadersWithDataFails)
                                              first_header_alignment,
                                              &first_header,
                                              &actual_allocation_size));
-    ASSERT_EQ(original_header, first_header);
 
     free(original_header);
 }

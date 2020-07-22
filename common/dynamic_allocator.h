@@ -8,8 +8,8 @@ Module Name:
 
 Abstract:
 
-    An allocator for making quick allocations of a arbitrary size. This allocator 
-    is neither intended to be efficient nor general purpose.
+    An allocator for making quick allocations of a base plus an arbitrary size.
+    This allocator is neither intended to be efficient nor general purpose.
 
     The allocator is implemented using an array of pointers to blocks of memory.
     When a new allocation is requested, the allocator grabs the next pointer off
