@@ -14,10 +14,23 @@ Abstract:
 
 #include "iris/hit_allocator.h"
 
+#include <float.h>
+#include <stdalign.h>
 #include <string.h>
 
 #include "iris/full_hit_context.h"
 #include "iris/hit_allocator_internal.h"
+
+//
+// Types for Specialized Copies
+//
+
+typedef struct _TRIANGLE_DATA {
+    float_t barycentric_coordinates[3];
+    size_t mesh_vertex_indices[3];
+} TRIANGLE_DATA, *PTRIANGLE_DATA;
+
+typedef const TRIANGLE_DATA *PCTRIANGLE_DATA;
 
 //
 // Static Functions
@@ -97,7 +110,14 @@ HitAllocatorAllocateInternal(
     hit_context->context.additional_data = additional_data_dest;
     hit_context->context.additional_data_size = additional_data_size;
 
-    if (additional_data_size != 0)
+    if (additional_data_size == sizeof(TRIANGLE_DATA) &&
+        additional_data_alignment == alignof(TRIANGLE_DATA))
+    {
+        PCTRIANGLE_DATA source = (PCTRIANGLE_DATA)additional_data;
+        PTRIANGLE_DATA dest = (PTRIANGLE_DATA)additional_data_dest;
+        *dest = *source;
+    }
+    else if (additional_data_size != 0)
     {
         memcpy(additional_data_dest, additional_data, additional_data_size);
     }

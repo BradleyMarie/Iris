@@ -387,6 +387,7 @@ cc_library(
     srcs = ["triangle.c"],
     hdrs = ["triangle.h"],
     deps = [
+        ":triangle_mesh",
         "//iris_physx",
     ],
 )
@@ -406,7 +407,6 @@ cc_library(
     srcs = ["triangle_mesh.c"],
     hdrs = ["triangle_mesh.h"],
     deps = [
-        ":triangle",
         ":uv_texture_coordinate",
         "//iris_physx",
     ],
