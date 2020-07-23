@@ -210,8 +210,6 @@ BoundingBoxOverlaps(
     return overlaps;
 }
 
-__attribute__((optimize("-ffinite-math-only")))
-__attribute__((always_inline))
 static
 inline
 bool
@@ -230,25 +228,28 @@ BoundingBoxIntersect(
     float_t tx1 = (box.corners[0].x - ray.origin.x) * ray.direction.x;
     float_t tx2 = (box.corners[1].x - ray.origin.x) * ray.direction.x;
 
-    float_t min = fmin(tx1, tx2);
-    float_t max = fmax(tx1, tx2);
+    float_t min = (tx1 < tx2) ? tx1 : tx2;
+    float_t max = (tx1 > tx2) ? tx1 : tx2;
 
     float_t ty1 = (box.corners[0].y - ray.origin.y) * ray.direction.y;
     float_t ty2 = (box.corners[1].y - ray.origin.y) * ray.direction.y;
 
-    min = fmax(min, fmin(ty1, ty2));
-    max = fmin(max, fmax(ty1, ty2));
+    float_t local_min = (ty1 < ty2) ? ty1 : ty2;
+    float_t local_max = (ty1 > ty2) ? ty1 : ty2;
+
+    min = (min > local_min) ? min : local_min;
+    max = (max < local_max) ? max : local_max;
 
     float_t tz1 = (box.corners[0].z - ray.origin.z) * ray.direction.z;
     float_t tz2 = (box.corners[1].z - ray.origin.z) * ray.direction.z;
 
-    min = fmax(min, fmin(tz1, tz2));
-    max = fmin(max, fmax(tz1, tz2));
+    local_min = (tz1 < tz2) ? tz1 : tz2;
+    local_max = (tz1 > tz2) ? tz1 : tz2;
 
-    if (max < min)
-    {
-        return false;
-    }
+    min = (min > local_min) ? min : local_min;
+    max = (max < local_max) ? max : local_max;
+
+    bool result = min <= max;
 
     if (inverse_direction)
     {
@@ -265,7 +266,7 @@ BoundingBoxIntersect(
         *second_hit = max;
     }
 
-    return true;
+    return result;
 }
 
 #endif // _IRIS_ADVANCED_BOUNDING_BOX_
