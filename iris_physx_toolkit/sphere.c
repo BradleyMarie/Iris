@@ -293,7 +293,8 @@ EmissiveSphereSampleFace(
     float_t r = sqrt(fmax((float_t)0.0, sphere->sphere.radius_squared - z * z));
     float_t phi = two_pi * v;
 
-    *sampled_point = PointCreate(r * cos(phi), r * sin(phi), z);
+    VECTOR3 offset = VectorCreate(r * cos(phi), r * sin(phi), z);
+    *sampled_point = PointVectorAdd(sphere->sphere.center, offset);
 
     return ISTATUS_SUCCESS;
 }
