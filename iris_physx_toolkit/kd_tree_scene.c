@@ -1565,7 +1565,7 @@ KdTreeSceneAllocate(
 
     float_t max_depth =
         round((float_t)8.0 + (float_t)1.3 * (float_t)Log2(num_shapes));
-    max_depth = fmin((float_t)MAX_TREE_DEPTH, max_depth);
+    max_depth = IMin((float_t)MAX_TREE_DEPTH, max_depth);
 
     BOUNDING_BOX scene_bounds;
     PUNCOMPRESSED_NODE uncompressed_node;

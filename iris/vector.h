@@ -190,8 +190,8 @@ VectorLength(
     _In_ VECTOR3 vector
     )
 {
-    float_t DotProduct = VectorDotProduct(vector, vector);
-    return sqrt(DotProduct);
+    float_t dp = VectorDotProduct(vector, vector);
+    return sqrt(dp);
 }
 
 static
@@ -219,12 +219,35 @@ VectorValidate(
 static
 inline
 float_t
+IMax(
+    _In_ float_t left,
+    _In_ float_t right
+    )
+{
+    return (left < right) ? right : left;
+}
+
+static
+inline
+float_t
+IMin(
+    _In_ float_t left,
+    _In_ float_t right
+    )
+{
+    return (left < right) ? left : right;
+}
+
+static
+inline
+float_t
 VectorBoundedDotProduct(
     _In_ VECTOR3 operand0,
     _In_ VECTOR3 operand1
     )
 {
-    return fmax((float_t)0.0, VectorDotProduct(operand0, operand1));
+    float_t dp = VectorDotProduct(operand0, operand1);
+    return IMax((float_t)0.0, dp);
 }
 
 static
@@ -235,8 +258,8 @@ VectorClampedDotProduct(
     _In_ VECTOR3 operand1
     )
 {
-    float_t bounded_dot_product = VectorBoundedDotProduct(operand0, operand1);
-    return fmin(bounded_dot_product, (float_t)1.0);
+    float_t dp = VectorBoundedDotProduct(operand0, operand1);
+    return IMin(dp, (float_t)1.0);
 }
 
 static
@@ -255,7 +278,7 @@ VectorPositiveDotProduct(
         dp = -dp;
     }
 
-    return fmax((float_t)0.0, dp);
+    return IMax((float_t)0.0, dp);
 }
 
 static

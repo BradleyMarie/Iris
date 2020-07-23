@@ -102,17 +102,17 @@ ColorConvert(
     result.values[0] = color.values[0] * conversion_matrices[index][0][0] +
                        color.values[1] * conversion_matrices[index][0][1] +
                        color.values[2] * conversion_matrices[index][0][2];
-    result.values[0] = fmaxf(0.0f, result.values[0]);
+    result.values[0] = IMax(0.0f, result.values[0]); // was fmaxf
 
     result.values[1] = color.values[0] * conversion_matrices[index][1][0] +
                        color.values[1] * conversion_matrices[index][1][1] +
                        color.values[2] * conversion_matrices[index][1][2];
-    result.values[1] = fmaxf(0.0f, result.values[1]);
+    result.values[1] = IMax(0.0f, result.values[1]); // was fmaxf
 
     result.values[2] = color.values[0] * conversion_matrices[index][2][0] +
                        color.values[1] * conversion_matrices[index][2][1] +
                        color.values[2] * conversion_matrices[index][2][2];
-    result.values[2] = fmaxf(0.0f, result.values[2]);
+    result.values[2] = IMax(0.0f, result.values[2]); // was fmaxf
 
     result.color_space = target;
     assert(ColorValidate(result));

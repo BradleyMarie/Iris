@@ -92,16 +92,16 @@ inline
 COLOR3
 ColorScale(
     _In_ COLOR3 color,
-    _In_ float scalar
+    _In_ float_t scalar
     )
 {
     assert(isfinite(scalar));
     assert((float_t)0.0 <= scalar);
 
     COLOR3 product;
-    product.values[0] = color.values[0] * scalar;
-    product.values[1] = color.values[1] * scalar;
-    product.values[2] = color.values[2] * scalar;
+    product.values[0] = (float_t)color.values[0] * scalar;
+    product.values[1] = (float_t)color.values[1] * scalar;
+    product.values[2] = (float_t)color.values[2] * scalar;
     product.color_space = color.color_space;
     assert(ColorValidate(product));
 
@@ -118,9 +118,9 @@ ColorClamp(
 {
     assert(0.0f <= max);
 
-    color.values[0] = fminf(color.values[0], max);
-    color.values[1] = fminf(color.values[1], max);
-    color.values[2] = fminf(color.values[2], max);
+    color.values[0] = IMin(color.values[0], max); // was fminf
+    color.values[1] = IMin(color.values[1], max); // was fminf
+    color.values[2] = IMin(color.values[2], max); // was fminf
 
     return color;
 }

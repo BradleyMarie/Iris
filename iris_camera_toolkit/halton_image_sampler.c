@@ -127,7 +127,7 @@ HaltonSequenceCompute(
 
     double_t result = (double_t)reversed_numerals * inverse_base_product;
 
-    return fmin(result, one_minus_epsilon);
+    return IMin(result, one_minus_epsilon);
 }
 
 static

@@ -185,7 +185,7 @@ GridImageSamplerNextSample(
         sample_index % image_sampler->current_pixel_samples_u;
     pixel_jitter_u +=
         image_sampler->pixel_min_u + (float_t)pixel_u_index * image_sampler->pixel_sample_width_u;
-    *pixel_sample_u = fmax(fmin(pixel_jitter_u, image_sampler->pixel_max_u),
+    *pixel_sample_u = IMax(IMin(pixel_jitter_u, image_sampler->pixel_max_u),
                            image_sampler->pixel_min_u);
     size_t sample_divisor = image_sampler->current_pixel_samples_u;
 
@@ -193,7 +193,7 @@ GridImageSamplerNextSample(
         (sample_index / sample_divisor) % image_sampler->current_pixel_samples_v;
     pixel_jitter_v +=
         image_sampler->pixel_min_v + (float_t)pixel_v_index * image_sampler->pixel_sample_width_v;
-    *pixel_sample_v = fmax(fmin(pixel_jitter_v, image_sampler->pixel_max_v),
+    *pixel_sample_v = IMax(IMin(pixel_jitter_v, image_sampler->pixel_max_v),
                            image_sampler->pixel_min_v);
     sample_divisor *= image_sampler->current_pixel_samples_v;
 
@@ -230,7 +230,7 @@ GridImageSamplerNextSample(
         (sample_index / sample_divisor) % image_sampler->current_lens_samples_u;
     lens_jitter_u +=
         image_sampler->lens_min_u + (float_t)lens_u_index * image_sampler->lens_sample_width_u;
-    *lens_sample_u = fmax(fmin(pixel_jitter_u, image_sampler->lens_max_u),
+    *lens_sample_u = IMax(IMin(pixel_jitter_u, image_sampler->lens_max_u),
                            image_sampler->lens_min_u);
     sample_divisor *= image_sampler->current_lens_samples_u;
 
@@ -238,7 +238,7 @@ GridImageSamplerNextSample(
         (sample_index / sample_divisor) % image_sampler->current_lens_samples_v;
     lens_jitter_v +=
         image_sampler->lens_min_v + (float_t)lens_v_index * image_sampler->lens_sample_width_v;
-    *lens_sample_v = fmax(fmin(lens_jitter_v, image_sampler->lens_max_v),
+    *lens_sample_v = IMax(IMin(lens_jitter_v, image_sampler->lens_max_v),
                           image_sampler->lens_min_v);
 
     return ISTATUS_SUCCESS;

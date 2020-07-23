@@ -77,14 +77,14 @@ BoundingBoxEnvelop(
     _In_ POINT3 point
     )
 {
-    float_t min_x = fmin(box.corners[0].x, point.x);
-    float_t min_y = fmin(box.corners[0].y, point.y);
-    float_t min_z = fmin(box.corners[0].z, point.z);
+    float_t min_x = IMin(box.corners[0].x, point.x);
+    float_t min_y = IMin(box.corners[0].y, point.y);
+    float_t min_z = IMin(box.corners[0].z, point.z);
     POINT3 corner0 = PointCreate(min_x, min_y, min_z);
 
-    float_t max_x = fmax(box.corners[1].x, point.x);
-    float_t max_y = fmax(box.corners[1].y, point.y);
-    float_t max_z = fmax(box.corners[1].z, point.z);
+    float_t max_x = IMax(box.corners[1].x, point.x);
+    float_t max_y = IMax(box.corners[1].y, point.y);
+    float_t max_z = IMax(box.corners[1].z, point.z);
     POINT3 corner1 = PointCreate(max_x, max_y, max_z);
 
     return BoundingBoxCreate(corner0, corner1);
@@ -111,32 +111,14 @@ BoundingBoxIntersection(
     _In_ BOUNDING_BOX box1
     )
 {
-    float_t min_x = fmax(box0.corners[0].x, box1.corners[0].x);
-    float_t min_y = fmax(box0.corners[0].y, box1.corners[0].y);
-    float_t min_z = fmax(box0.corners[0].z, box1.corners[0].z);
+    float_t min_x = IMax(box0.corners[0].x, box1.corners[0].x);
+    float_t min_y = IMax(box0.corners[0].y, box1.corners[0].y);
+    float_t min_z = IMax(box0.corners[0].z, box1.corners[0].z);
     POINT3 corner0 = PointCreate(min_x, min_y, min_z);
 
-    float_t max_x = fmin(box0.corners[1].x, box1.corners[1].x);
-
-    if (max_x < min_x)
-    {
-        return BoundingBoxCreate(corner0, corner0);
-    }
-
-    float_t max_y = fmin(box0.corners[1].y, box1.corners[1].y);
-
-    if (max_y < min_y)
-    {
-        return BoundingBoxCreate(corner0, corner0);
-    }
-
-    float_t max_z = fmin(box0.corners[1].z, box1.corners[1].z);
-
-    if (max_z < min_z)
-    {
-        return BoundingBoxCreate(corner0, corner0);
-    }
-
+    float_t max_x = IMin(box0.corners[1].x, box1.corners[1].x);
+    float_t max_y = IMin(box0.corners[1].y, box1.corners[1].y);
+    float_t max_z = IMin(box0.corners[1].z, box1.corners[1].z);
     POINT3 corner1 = PointCreate(max_x, max_y, max_z);
 
     return BoundingBoxCreate(corner0, corner1);
@@ -228,26 +210,26 @@ BoundingBoxIntersect(
     float_t tx1 = (box.corners[0].x - ray.origin.x) * ray.direction.x;
     float_t tx2 = (box.corners[1].x - ray.origin.x) * ray.direction.x;
 
-    float_t min = (tx1 < tx2) ? tx1 : tx2;
-    float_t max = (tx1 > tx2) ? tx1 : tx2;
+    float_t min = IMin(tx1, tx2);
+    float_t max = IMax(tx1, tx2);
 
     float_t ty1 = (box.corners[0].y - ray.origin.y) * ray.direction.y;
     float_t ty2 = (box.corners[1].y - ray.origin.y) * ray.direction.y;
 
-    float_t local_min = (ty1 < ty2) ? ty1 : ty2;
-    float_t local_max = (ty1 > ty2) ? ty1 : ty2;
+    float_t local_min = IMin(ty1, ty2);
+    float_t local_max = IMax(ty1, ty2);
 
-    min = (min > local_min) ? min : local_min;
-    max = (max < local_max) ? max : local_max;
+    min = IMax(min, local_min);
+    max = IMin(max, local_max);
 
     float_t tz1 = (box.corners[0].z - ray.origin.z) * ray.direction.z;
     float_t tz2 = (box.corners[1].z - ray.origin.z) * ray.direction.z;
 
-    local_min = (tz1 < tz2) ? tz1 : tz2;
-    local_max = (tz1 > tz2) ? tz1 : tz2;
+    local_min = IMin(tz1, tz2);
+    local_max = IMax(tz1, tz2);
 
-    min = (min > local_min) ? min : local_min;
-    max = (max < local_max) ? max : local_max;
+    min = IMax(min, local_min);
+    max = IMin(max, local_max);
 
     bool result = min <= max;
 

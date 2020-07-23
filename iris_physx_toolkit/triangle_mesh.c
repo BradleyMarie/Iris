@@ -262,14 +262,14 @@ TriangleMeshTriangleComputeBounds(
     POINT3 world_v2 = PointMatrixMultiply(
         model_to_world, triangle->mesh->vertices[triangle->v2]);
 
-    float_t min_x = fmin(world_v0.x, fmin(world_v1.x, world_v2.x));
-    float_t min_y = fmin(world_v0.y, fmin(world_v1.y, world_v2.y));
-    float_t min_z = fmin(world_v0.z, fmin(world_v1.z, world_v2.z));
+    float_t min_x = IMin(world_v0.x, IMin(world_v1.x, world_v2.x));
+    float_t min_y = IMin(world_v0.y, IMin(world_v1.y, world_v2.y));
+    float_t min_z = IMin(world_v0.z, IMin(world_v1.z, world_v2.z));
     POINT3 bottom = PointCreate(min_x, min_y, min_z);
 
-    float_t max_x = fmax(world_v0.x, fmax(world_v1.x, world_v2.x));
-    float_t max_y = fmax(world_v0.y, fmax(world_v1.y, world_v2.y));
-    float_t max_z = fmax(world_v0.z, fmax(world_v1.z, world_v2.z));
+    float_t max_x = IMax(world_v0.x, IMax(world_v1.x, world_v2.x));
+    float_t max_y = IMax(world_v0.y, IMax(world_v1.y, world_v2.y));
+    float_t max_z = IMax(world_v0.z, IMax(world_v1.z, world_v2.z));
     POINT3 top = PointCreate(max_x, max_y, max_z);
 
     *world_bounds = BoundingBoxCreate(bottom, top);

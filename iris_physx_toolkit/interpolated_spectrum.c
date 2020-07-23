@@ -406,7 +406,7 @@ InterpolatedReflectorAllocate(
         total_area / (wavelengths[num_samples - 1] - wavelengths[0]);
 
     interpolated_reflector.albedo =
-        fmax((float_t)0.0, fmin(average_reflectance, (float_t)1.0));
+        IMax((float_t)0.0, IMin(average_reflectance, (float_t)1.0));
 
     ISTATUS status = ReflectorAllocate(&interpolated_reflector_vtable,
                                        &interpolated_reflector,

@@ -333,8 +333,8 @@ ReflectorMipmapLookup(
     }
     else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
     {
-        s = fmin(fmax((float_t)0.0, s), (float_t)1.0);
-        t = fmin(fmax((float_t)0.0, t), (float_t)1.0);
+        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
+        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
     }
     else if (s < (float_t)0.0 || (float_t)1.0 < s ||
              t < (float_t)0.0 || (float_t)1.0 < t)
@@ -779,8 +779,8 @@ FloatMipmapLookup(
     }
     else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
     {
-        s = fmin(fmax((float_t)0.0, s), (float_t)1.0);
-        t = fmin(fmax((float_t)0.0, t), (float_t)1.0);
+        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
+        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
     }
     else if (s < (float_t)0.0 || (float_t)1.0 < s ||
              t < (float_t)0.0 || (float_t)1.0 < t)

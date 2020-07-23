@@ -53,7 +53,7 @@ SpecularDielectricBsdfSample(
 
     float_t cos_theta_incident = -VectorDotProduct(incoming, normal);
     float_t sin_squared_theta_incident =
-        fmax((float_t)0.0, (float_t)1.0 - cos_theta_incident * cos_theta_incident);
+        IMax((float_t)0.0, (float_t)1.0 - cos_theta_incident * cos_theta_incident);
 
     float_t sin_squared_theta_transmitted =
         specular_dielectric->refractive_ratio_squared *

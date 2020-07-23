@@ -744,7 +744,7 @@ SmitsColorExtrapolatorCreateSpd(
 
     for (size_t i = 0; i < num_samples; i++)
     {
-        temp[i] = fmax((float_t)0.0, temp[i]);
+        temp[i] = IMax((float_t)0.0, temp[i]);
     }
 
     *output = temp;

@@ -96,7 +96,7 @@ FresnelDielectric(
     assert(isfinite(eta_t));
     assert((float_t)0.0 < eta_t);
 
-    cos_theta_i = fmin(cos_theta_i, (float_t)1.0);
+    cos_theta_i = IMin(cos_theta_i, (float_t)1.0);
     float_t sin_theta_i = sqrt((float_t)1.0 - cos_theta_i * cos_theta_i);
     float_t sin_theta_t = eta_i / eta_t * sin_theta_i;
 
@@ -141,11 +141,11 @@ TrowbridgeReitzSample11(
     float_t g1 = (float_t)2.0 / ((float_t)1.0 + sqrt((float_t)1.0 + (float_t)1.0 / (a * a)));
 
     float_t A = 2 * u / g1 - (float_t)1.0;
-    float_t tmp = fmin((float_t)1.0 / (A * A - (float_t)1.0), (float_t)1e10);
+    float_t tmp = IMin((float_t)1.0 / (A * A - (float_t)1.0), (float_t)1e10);
 
     float_t b = tan_theta;
     float_t d = sqrt(
-        fmax(b * b * tmp * tmp - (A * A - b * b) * tmp, (float_t)0.0));
+        IMax(b * b * tmp * tmp - (A * A - b * b) * tmp, (float_t)0.0));
     float_t slope_x_1 = b * tmp - d;
     float_t slope_x_2 = b * tmp + d;
 
@@ -835,7 +835,7 @@ TrowbridgeReitzRoughnessToAlpha(
     _In_ float_t roughness
     )
 {
-    roughness = fmax(roughness, (float_t)1e-3);
+    roughness = IMax(roughness, (float_t)1e-3);
     float_t x = log(roughness);
     float_t x_2 = x * x;
     float_t x_3 = x_2 * x;

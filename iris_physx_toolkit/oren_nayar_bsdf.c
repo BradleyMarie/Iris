@@ -143,7 +143,7 @@ OrenNayarComputeReflectance(
         float_t cosine_phi_o = VectorDotProduct(outgoing, perpendicular);
         float_t sine_phi_o = (float_t)1.0 - cosine_phi_o * cosine_phi_o;
         float_t d_cos = cosine_phi_i * cosine_phi_o + sine_phi_i * sine_phi_o;
-        max_cosine = fmax((float_t)0.0, d_cos);
+        max_cosine = IMax((float_t)0.0, d_cos);
     }
     else
     {

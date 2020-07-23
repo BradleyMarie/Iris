@@ -290,7 +290,7 @@ EmissiveSphereSampleFace(
     }
 
     float_t z = sphere->radius - (float_t)2.0 * sphere->radius * u;
-    float_t r = sqrt(fmax((float_t)0.0, sphere->sphere.radius_squared - z * z));
+    float_t r = sqrt(IMax((float_t)0.0, sphere->sphere.radius_squared - z * z));
     float_t phi = two_pi * v;
 
     VECTOR3 offset = VectorCreate(r * cos(phi), r * sin(phi), z);
@@ -323,7 +323,7 @@ EmissiveSphereComputePdfBySolidArea(
     float_t sin_theta_squared =
         sphere->sphere.radius_squared / distance_to_center_squared;
     float_t cos_theta_squared =
-        fmax((float_t)0.0, (float_t)1.0 - sin_theta_squared);
+        IMax((float_t)0.0, (float_t)1.0 - sin_theta_squared);
     float_t cos_theta = sqrt(cos_theta_squared);
 
     *pdf = (float_t)1.0 / (two_pi * ((float_t)1.0 - cos_theta));

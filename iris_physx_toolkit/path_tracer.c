@@ -235,7 +235,7 @@ PathTracerIntegrate(
                 return status;
             }
 
-            float_t cutoff = fmax(path_tracer->min_termination_probability,
+            float_t cutoff = IMax(path_tracer->min_termination_probability,
                                   (float_t)1.0 - path_throughput);
 
             if (random_value < cutoff)
