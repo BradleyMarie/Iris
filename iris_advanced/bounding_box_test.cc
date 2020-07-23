@@ -277,3 +277,50 @@ TEST(BoundingBoxTest, BoundingBoxOverlaps)
         }
     }
 }
+
+TEST(BoundingBoxTest, BoundingBoxIntersectFails)
+{
+    POINT3 point0 = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -1.0);
+    POINT3 point1 = PointCreate((float_t) 1.0, (float_t) 0.0, (float_t) 0.0);
+    BOUNDING_BOX box = BoundingBoxCreate(point0, point1);
+
+    POINT3 origin = PointCreate((float_t) -1.0, (float_t) -1.0, (float_t) -2.0);
+    VECTOR3 dir = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
+    RAY ray = RayCreate(origin, dir);
+
+    EXPECT_FALSE(BoundingBoxIntersect(box, ray, NULL, NULL, NULL));
+}
+
+TEST(BoundingBoxTest, BoundingBoxIntersectInsideSucceeds)
+{
+    POINT3 point0 = PointCreate((float_t)-1.0, (float_t)-1.0, (float_t)-1.0);
+    POINT3 point1 = PointCreate((float_t)1.0, (float_t)1.0, (float_t)1.0);
+    BOUNDING_BOX box = BoundingBoxCreate(point0, point1);
+
+    POINT3 origin = PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
+    VECTOR3 dir = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
+    RAY ray = RayCreate(origin, dir);
+
+    VECTOR3 inv_dir;
+    float_t closer, farther;
+    EXPECT_TRUE(BoundingBoxIntersect(box, ray, &inv_dir, &closer, &farther));
+    EXPECT_EQ((float_t)-1.0, closer);
+    EXPECT_EQ((float_t)1.0, farther);
+}
+
+TEST(BoundingBoxTest, BoundingBoxIntersectOutsideSucceeds)
+{
+    POINT3 point0 = PointCreate((float_t)-1.0, (float_t)-1.0, (float_t)-1.0);
+    POINT3 point1 = PointCreate((float_t)1.0, (float_t)1.0, (float_t)1.0);
+    BOUNDING_BOX box = BoundingBoxCreate(point0, point1);
+
+    POINT3 origin = PointCreate((float_t)0.0, (float_t)0.0, (float_t)-2.0);
+    VECTOR3 dir = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
+    RAY ray = RayCreate(origin, dir);
+
+    VECTOR3 inv_dir;
+    float_t closer, farther;
+    EXPECT_TRUE(BoundingBoxIntersect(box, ray, &inv_dir, &closer, &farther));
+    EXPECT_EQ((float_t)1.0, closer);
+    EXPECT_EQ((float_t)3.0, farther);
+}

@@ -948,7 +948,19 @@ PointGetElement(
     _In_ uint32_t axis
     )
 {
-    float_t *elements = &point.x;
+    const float_t *elements = &point.x;
+    return elements[axis];
+}
+
+static
+inline
+float_t
+VectorGetElement(
+    _In_ VECTOR3 vector,
+    _In_ uint32_t axis
+    )
+{
+    const float_t *elements = &vector.x;
     return elements[axis];
 }
 
@@ -1008,501 +1020,6 @@ KdTreeChildIndex(
     return node->flags_and_num_shapes_or_child & ~(LEAF << 30);
 }
 
-static
-inline
-ISTATUS
-KdTreeTraceShape(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE_AND_DATA shape_and_data,
-    _Out_ float_t *farthest_hit_allowed
-    )
-{
-    ISTATUS status =
-        ShapeHitTesterTestShapeWithLimit(hit_tester,
-                                         shape_and_data->shape,
-                                         shape_and_data->model_to_world,
-                                         shape_and_data->premultiplied,
-                                         farthest_hit_allowed);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-KdTreeTraceTransformedShape(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE_AND_TRANSFORM shape_and_transform,
-    _Out_ float_t *farthest_hit_allowed
-    )
-{
-    ISTATUS status =
-        ShapeHitTesterTestTransformedShapeWithLimit(hit_tester,
-                                                    shape_and_transform->shape,
-                                                    shape_and_transform->model_to_world,
-                                                    farthest_hit_allowed);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-KdTreeTraceWorldShape(
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ PCSHAPE shape,
-    _Out_ float_t *farthest_hit_allowed
-    )
-{
-    ISTATUS status =
-        ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
-                                              shape,
-                                              farthest_hit_allowed);
-
-    return status;
-}
-
-static
-inline
-bool
-BoundingBoxIntersect(
-    _In_ BOUNDING_BOX box,
-    _In_ POINT3 origin,
-    _In_ float inverted_direction[3],
-    _Out_ float_t *min,
-    _Out_ float_t *max
-    )
-{
-    float_t tx1 = (box.corners[0].x - origin.x) * inverted_direction[0];
-    float_t tx2 = (box.corners[1].x - origin.x) * inverted_direction[0];
-
-    *min = fmin(tx1, tx2);
-    *max = fmax(tx1, tx2);
-
-    float_t ty1 = (box.corners[0].y - origin.y) * inverted_direction[1];
-    float_t ty2 = (box.corners[1].y - origin.y) * inverted_direction[1];
-
-    *min = fmax(*min, fmin(ty1, ty2));
-    *max = fmin(*max, fmax(ty1, ty2));
-
-    float_t tz1 = (box.corners[0].z - origin.z) * inverted_direction[2];
-    float_t tz2 = (box.corners[1].z - origin.z) * inverted_direction[2];
-
-    *min = fmax(*min, fmin(tz1, tz2));
-    *max = fmin(*max, fmax(tz1, tz2));
-
-    return *min <= *max;
-}
-
-static
-inline
-ISTATUS
-KdTreeTraceTree(
-    _In_ const KD_TREE_NODE node[],
-    _In_ const uint32_t all_indices[],
-    _In_ const SHAPE_AND_DATA shapes[],
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ BOUNDING_BOX scene_bounds,
-    _In_ RAY ray
-    )
-{
-    POINT3 ray_origin = ray.origin;
-    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
-                        (float_t)1.0 / ray.direction.y,
-                        (float_t)1.0 / ray.direction.z };
-
-    float_t node_min, node_max;
-    bool intersects = BoundingBoxIntersect(scene_bounds,
-                                           ray.origin,
-                                           inv_dir,
-                                           &node_min,
-                                           &node_max);
-    if (!intersects)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t farthest_object_allowed;
-    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
-
-    WORK_ITEM work_queue[MAX_TREE_DEPTH];
-    size_t queue_size = 0;
-    for (;;)
-    {
-        if (farthest_object_allowed < node_min)
-        {
-            break;
-        }
-
-        if (KdTreeNodeIsLeaf(node))
-        {
-            uint32_t num_shapes = KdTreeLeafSize(node);
-
-            if (num_shapes == 1)
-            {
-                uint32_t index = node->split_or_index.index;
-                ISTATUS status = KdTreeTraceShape(hit_tester,
-                                                  shapes + index,
-                                                  &farthest_object_allowed);
-
-                if (status != ISTATUS_SUCCESS)
-                {
-                    return status;
-                }
-            }
-            else if (num_shapes != 0)
-            {
-                uint32_t index = node->split_or_index.index;
-                const uint32_t *node_indices = all_indices + index;
-                for (uint32_t i = 0; i < num_shapes; i++)
-                {
-                    ISTATUS status = KdTreeTraceShape(hit_tester,
-                                                      shapes + node_indices[i],
-                                                      &farthest_object_allowed);
-
-                    if (status != ISTATUS_SUCCESS)
-                    {
-                        return status;
-                    }
-                }
-            }
-
-            if (queue_size == 0)
-            {
-                break;
-            }
-
-            queue_size -= 1;
-            node = work_queue[queue_size].node;
-            node_min = work_queue[queue_size].min;
-            node_max = work_queue[queue_size].max;
-            continue;
-        }
-
-        uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray_origin, split_axis);
-        float_t direction = inv_dir[split_axis];
-
-        float_t split = KdTreeSplit(node);
-        float_t plane_distance = (split - origin) * direction;
-
-        PCKD_TREE_NODE below_child = node + 1;
-        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
-
-        PCKD_TREE_NODE close_child, far_child;
-        if (origin < split || (origin == split && direction <= (float_t)0.0))
-        {
-            close_child = below_child;
-            far_child = above_child;
-        }
-        else
-        {
-            close_child = above_child;
-            far_child = below_child;
-        }
-
-        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
-        {
-            node = close_child;
-        }
-        else if (plane_distance < node_min)
-        {
-            node = far_child;
-        }
-        else
-        {
-            work_queue[queue_size].node = far_child;
-            work_queue[queue_size].min = plane_distance;
-            work_queue[queue_size].max = node_max;
-            queue_size += 1;
-
-            node = close_child;
-            node_max = plane_distance;
-        }
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-inline
-ISTATUS
-KdTreeTraceTransformedTree(
-    _In_ const KD_TREE_NODE node[],
-    _In_ const uint32_t all_indices[],
-    _In_ const SHAPE_AND_TRANSFORM shapes[],
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ BOUNDING_BOX scene_bounds,
-    _In_ RAY ray
-    )
-{
-    POINT3 ray_origin = ray.origin;
-    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
-                        (float_t)1.0 / ray.direction.y,
-                        (float_t)1.0 / ray.direction.z };
-
-    float_t node_min, node_max;
-    bool intersects = BoundingBoxIntersect(scene_bounds,
-                                           ray.origin,
-                                           inv_dir,
-                                           &node_min,
-                                           &node_max);
-    if (!intersects)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t farthest_object_allowed;
-    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
-
-    WORK_ITEM work_queue[MAX_TREE_DEPTH];
-    size_t queue_size = 0;
-    for (;;)
-    {
-        if (farthest_object_allowed < node_min)
-        {
-            break;
-        }
-
-        if (KdTreeNodeIsLeaf(node))
-        {
-            uint32_t num_shapes = KdTreeLeafSize(node);
-
-            if (num_shapes == 1)
-            {
-                uint32_t index = node->split_or_index.index;
-                ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
-                                                             shapes + index,
-                                                             &farthest_object_allowed);
-
-                if (status != ISTATUS_SUCCESS)
-                {
-                    return status;
-                }
-            }
-            else if (num_shapes != 0)
-            {
-                uint32_t index = node->split_or_index.index;
-                const uint32_t *node_indices = all_indices + index;
-                for (uint32_t i = 0; i < num_shapes; i++)
-                {
-                    ISTATUS status = KdTreeTraceTransformedShape(hit_tester,
-                                                                 shapes + node_indices[i],
-                                                                 &farthest_object_allowed);
-
-                    if (status != ISTATUS_SUCCESS)
-                    {
-                        return status;
-                    }
-                }
-            }
-
-            if (queue_size == 0)
-            {
-                break;
-            }
-
-            queue_size -= 1;
-            node = work_queue[queue_size].node;
-            node_min = work_queue[queue_size].min;
-            node_max = work_queue[queue_size].max;
-            continue;
-        }
-
-        uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray_origin, split_axis);
-        float_t direction = inv_dir[split_axis];
-
-        float_t split = KdTreeSplit(node);
-        float_t plane_distance = (split - origin) * direction;
-
-        PCKD_TREE_NODE below_child = node + 1;
-        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
-
-        PCKD_TREE_NODE close_child, far_child;
-        if (origin < split || (origin == split && direction <= (float_t)0.0))
-        {
-            close_child = below_child;
-            far_child = above_child;
-        }
-        else
-        {
-            close_child = above_child;
-            far_child = below_child;
-        }
-
-        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
-        {
-            node = close_child;
-        }
-        else if (plane_distance < node_min)
-        {
-            node = far_child;
-        }
-        else
-        {
-            work_queue[queue_size].node = far_child;
-            work_queue[queue_size].min = plane_distance;
-            work_queue[queue_size].max = node_max;
-            queue_size += 1;
-
-            node = close_child;
-            node_max = plane_distance;
-        }
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-inline
-ISTATUS
-KdTreeTraceWorldTree(
-    _In_ const KD_TREE_NODE node[],
-    _In_ const uint32_t all_indices[],
-    _In_ SHAPE** const shapes,
-    _Inout_ PSHAPE_HIT_TESTER hit_tester,
-    _In_ BOUNDING_BOX scene_bounds,
-    _In_ RAY ray
-    )
-{
-    POINT3 ray_origin = ray.origin;
-    float inv_dir[] = { (float_t)1.0 / ray.direction.x,
-                        (float_t)1.0 / ray.direction.y,
-                        (float_t)1.0 / ray.direction.z };
-
-    float_t node_min, node_max;
-    bool intersects = BoundingBoxIntersect(scene_bounds,
-                                           ray.origin,
-                                           inv_dir,
-                                           &node_min,
-                                           &node_max);
-    if (!intersects)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t farthest_object_allowed;
-    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
-
-    WORK_ITEM work_queue[MAX_TREE_DEPTH];
-    size_t queue_size = 0;
-    for (;;)
-    {
-        if (farthest_object_allowed < node_min)
-        {
-            break;
-        }
-
-        if (KdTreeNodeIsLeaf(node))
-        {
-            uint32_t num_shapes = KdTreeLeafSize(node);
-
-            if (num_shapes == 1)
-            {
-                uint32_t index = node->split_or_index.index;
-                ISTATUS status = KdTreeTraceWorldShape(hit_tester,
-                                                       shapes[index],
-                                                       &farthest_object_allowed);
-
-                if (status != ISTATUS_SUCCESS)
-                {
-                    return status;
-                }
-            }
-            else if (num_shapes != 0)
-            {
-                uint32_t index = node->split_or_index.index;
-                const uint32_t *node_indices = all_indices + index;
-                for (uint32_t i = 0; i < num_shapes; i++)
-                {
-                    ISTATUS status = KdTreeTraceWorldShape(hit_tester,
-                                                           shapes[node_indices[i]],
-                                                           &farthest_object_allowed);
-
-                    if (status != ISTATUS_SUCCESS)
-                    {
-                        return status;
-                    }
-                }
-            }
-
-            if (queue_size == 0)
-            {
-                break;
-            }
-
-            queue_size -= 1;
-            node = work_queue[queue_size].node;
-            node_min = work_queue[queue_size].min;
-            node_max = work_queue[queue_size].max;
-            continue;
-        }
-
-        uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray_origin, split_axis);
-        float_t direction = inv_dir[split_axis];
-
-        float_t split = KdTreeSplit(node);
-        float_t plane_distance = (split - origin) * direction;
-
-        PCKD_TREE_NODE below_child = node + 1;
-        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
-
-        PCKD_TREE_NODE close_child, far_child;
-        if (origin < split || (origin == split && direction <= (float_t)0.0))
-        {
-            close_child = below_child;
-            far_child = above_child;
-        }
-        else
-        {
-            close_child = above_child;
-            far_child = below_child;
-        }
-
-        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
-        {
-            node = close_child;
-        }
-        else if (plane_distance < node_min)
-        {
-            node = far_child;
-        }
-        else
-        {
-            work_queue[queue_size].node = far_child;
-            work_queue[queue_size].min = plane_distance;
-            work_queue[queue_size].max = node_max;
-            queue_size += 1;
-
-            node = close_child;
-            node_max = plane_distance;
-        }
-    }
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-size_t
-Log2(
-    _In_ size_t value
-    )
-{
-    for (size_t i = (sizeof(size_t) * 8); i != 0; i--)
-    {
-        if (value & ((size_t)1 << ((sizeof(size_t) * 8) - 1)))
-        {
-            return i - 1;
-        }
-
-        value <<= 1;
-    }
-
-    return 0;
-}
-
 //
 // Scene Functions
 //
@@ -1515,20 +1032,132 @@ KdTreeSceneTrace(
     _In_ RAY ray
     )
 {
-    assert(context != NULL);
-    assert(hit_tester != NULL);
-    assert(RayValidate(ray));
-
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+    PCKD_TREE_NODE node = kd_tree->nodes;
+    const uint32_t *all_indices = kd_tree->indices;
+    PCSHAPE_AND_DATA shapes = kd_tree->shapes.shape_and_data;
 
-    ISTATUS status = KdTreeTraceTree(kd_tree->nodes,
-                                     kd_tree->indices,
-                                     kd_tree->shapes.shape_and_data,
-                                     hit_tester,
-                                     kd_tree->scene_bounds,
-                                     ray);
+    VECTOR3 inverse_direction;
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(kd_tree->scene_bounds,
+                                           ray,
+                                           &inverse_direction,
+                                           &node_min,
+                                           &node_max);
 
-    return status;
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t farthest_object_allowed;
+    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+    for (;;)
+    {
+        if (farthest_object_allowed < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                PCSHAPE_AND_DATA shape = shapes + index;
+                ISTATUS status =
+                    ShapeHitTesterTestShapeWithLimit(hit_tester,
+                                                     shape->shape,
+                                                     shape->model_to_world,
+                                                     shape->premultiplied,
+                                                     &farthest_object_allowed);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    PCSHAPE_AND_DATA shape = shapes + node_indices[i];
+                    ISTATUS status =
+                        ShapeHitTesterTestShapeWithLimit(hit_tester,
+                                                         shape->shape,
+                                                         shape->model_to_world,
+                                                         shape->premultiplied,
+                                                         &farthest_object_allowed);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray.origin, split_axis);
+        float_t direction = VectorGetElement(inverse_direction, split_axis);
+
+        float_t split = KdTreeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -1558,20 +1187,130 @@ KdTreeTransformedSceneTrace(
     _In_ RAY ray
     )
 {
-    assert(context != NULL);
-    assert(hit_tester != NULL);
-    assert(RayValidate(ray));
-
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+    PCKD_TREE_NODE node = kd_tree->nodes;
+    const uint32_t *all_indices = kd_tree->indices;
+    PCSHAPE_AND_TRANSFORM shapes = kd_tree->shapes.shape_and_transform;
 
-    ISTATUS status = KdTreeTraceTransformedTree(kd_tree->nodes,
-                                                kd_tree->indices,
-                                                kd_tree->shapes.shape_and_transform,
-                                                hit_tester,
-                                                kd_tree->scene_bounds,
-                                                ray);
+    VECTOR3 inverse_direction;
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(kd_tree->scene_bounds,
+                                           ray,
+                                           &inverse_direction,
+                                           &node_min,
+                                           &node_max);
 
-    return status;
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t farthest_object_allowed;
+    HitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+    for (;;)
+    {
+        if (farthest_object_allowed < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                PCSHAPE_AND_TRANSFORM shape = shapes + index;
+                ISTATUS status =
+                    ShapeHitTesterTestTransformedShapeWithLimit(hit_tester,
+                                                                shape->shape,
+                                                                shape->model_to_world,
+                                                                &farthest_object_allowed);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    PCSHAPE_AND_TRANSFORM shape = shapes + node_indices[i];
+                    ISTATUS status =
+                        ShapeHitTesterTestTransformedShapeWithLimit(hit_tester,
+                                                                    shape->shape,
+                                                                    shape->model_to_world,
+                                                                    &farthest_object_allowed);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray.origin, split_axis);
+        float_t direction = VectorGetElement(inverse_direction, split_axis);
+
+        float_t split = KdTreeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -1601,20 +1340,126 @@ KdTreeWorldSceneTrace(
     _In_ RAY ray
     )
 {
-    assert(context != NULL);
-    assert(hit_tester != NULL);
-    assert(RayValidate(ray));
-
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
+    PCKD_TREE_NODE node = kd_tree->nodes;
+    const uint32_t *all_indices = kd_tree->indices;
+    SHAPE **const shapes = kd_tree->shapes.shapes;\
 
-    ISTATUS status = KdTreeTraceWorldTree(kd_tree->nodes,
-                                          kd_tree->indices,
-                                          kd_tree->shapes.shapes,
-                                          hit_tester,
-                                          kd_tree->scene_bounds,
-                                          ray);
+    VECTOR3 inverse_direction;
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(kd_tree->scene_bounds,
+                                           ray,
+                                           &inverse_direction,
+                                           &node_min,
+                                           &node_max);
 
-    return status;
+    if (!intersects)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t farthest_object_allowed;
+    ShapeHitTesterFarthestHitAllowed(hit_tester, &farthest_object_allowed);
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+    for (;;)
+    {
+        if (farthest_object_allowed < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                ISTATUS status =
+                    ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
+                                                          shapes[index],
+                                                          &farthest_object_allowed);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    ISTATUS status =
+                        ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
+                                                              shapes[node_indices[i]],
+                                                              &farthest_object_allowed);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray.origin, split_axis);
+        float_t direction = VectorGetElement(inverse_direction, split_axis);
+
+        float_t split = KdTreeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -1653,6 +1498,29 @@ static const SCENE_VTABLE kd_tree_world_scene_vtable = {
     KdTreeWorldSceneTrace,
     KdTreeWorldSceneFree
 };
+
+//
+// Static Functions
+//
+
+static
+size_t
+Log2(
+    _In_ size_t value
+    )
+{
+    for (size_t i = (sizeof(size_t) * 8); i != 0; i--)
+    {
+        if (value & ((size_t)1 << ((sizeof(size_t) * 8) - 1)))
+        {
+            return i - 1;
+        }
+
+        value <<= 1;
+    }
+
+    return 0;
+}
 
 //
 // Public Functions

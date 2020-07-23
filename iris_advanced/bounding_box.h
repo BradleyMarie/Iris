@@ -210,4 +210,62 @@ BoundingBoxOverlaps(
     return overlaps;
 }
 
+__attribute__((optimize("-ffinite-math-only")))
+__attribute__((always_inline))
+static
+inline
+bool
+BoundingBoxIntersect(
+    _In_ BOUNDING_BOX box,
+    _In_ RAY ray,
+    _Out_opt_ PVECTOR3 inverse_direction,
+    _Out_opt_ float_t *first_hit,
+    _Out_opt_ float_t *second_hit
+    )
+{
+    ray.direction.x = (float_t)1.0 / ray.direction.x;
+    ray.direction.y = (float_t)1.0 / ray.direction.y;
+    ray.direction.z = (float_t)1.0 / ray.direction.z;
+
+    float_t tx1 = (box.corners[0].x - ray.origin.x) * ray.direction.x;
+    float_t tx2 = (box.corners[1].x - ray.origin.x) * ray.direction.x;
+
+    float_t min = fmin(tx1, tx2);
+    float_t max = fmax(tx1, tx2);
+
+    float_t ty1 = (box.corners[0].y - ray.origin.y) * ray.direction.y;
+    float_t ty2 = (box.corners[1].y - ray.origin.y) * ray.direction.y;
+
+    min = fmax(min, fmin(ty1, ty2));
+    max = fmin(max, fmax(ty1, ty2));
+
+    float_t tz1 = (box.corners[0].z - ray.origin.z) * ray.direction.z;
+    float_t tz2 = (box.corners[1].z - ray.origin.z) * ray.direction.z;
+
+    min = fmax(min, fmin(tz1, tz2));
+    max = fmin(max, fmax(tz1, tz2));
+
+    if (max < min)
+    {
+        return false;
+    }
+
+    if (inverse_direction)
+    {
+        *inverse_direction = ray.direction;
+    }
+
+    if (first_hit)
+    {
+        *first_hit = min;
+    }
+
+    if (second_hit)
+    {
+        *second_hit = max;
+    }
+
+    return true;
+}
+
 #endif // _IRIS_ADVANCED_BOUNDING_BOX_
