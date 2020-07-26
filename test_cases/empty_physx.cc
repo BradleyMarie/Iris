@@ -95,6 +95,7 @@ TEST(EmptyPhysx, ListScene)
                                             sample_tracer,
                                             rng,
                                             framebuffer,
+                                            nullptr,
                                             (float_t)0.0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -187,6 +188,7 @@ TEST(EmptyPhysx, KdTreeScene)
                                             sample_tracer,
                                             rng,
                                             framebuffer,
+                                            nullptr,
                                             (float_t)0.0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

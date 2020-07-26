@@ -92,6 +92,34 @@ cc_library(
 )
 
 cc_library(
+    name = "progress_reporter",
+    srcs = ["progress_reporter.c"],
+    hdrs = ["progress_reporter.h"],
+    deps = [
+        ":progress_reporter_internal",
+        ":progress_reporter_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "progress_reporter_internal",
+    hdrs = ["progress_reporter_internal.h"],
+    deps = [
+        ":progress_reporter_vtable",
+    ],
+)
+
+cc_library(
+    name = "progress_reporter_vtable",
+    hdrs = ["progress_reporter_vtable.h"],
+    deps = [
+        "//common:free_routine",
+        "//iris_advanced",
+    ],
+)
+
+cc_library(
     name = "render",
     srcs = ["render.c"],
     hdrs = ["render.h"],
@@ -102,6 +130,8 @@ cc_library(
         ":framebuffer_internal",
         ":image_sampler",
         ":image_sampler_internal",
+        ":progress_reporter",
+        ":progress_reporter_internal",
         ":sample_tracer",
         ":sample_tracer_internal",
         "//common:pointer_list",

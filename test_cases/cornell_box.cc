@@ -84,6 +84,7 @@ TestRenderSingleThreaded(
                                             sample_tracer,
                                             rng,
                                             framebuffer,
+                                            nullptr,
                                             (float_t)0.01);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

@@ -80,6 +80,7 @@ TestRender(
                                             sample_tracer,
                                             rng0,
                                             framebuffer0,
+                                            nullptr,
                                             (float_t)0.01);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -101,6 +102,7 @@ TestRender(
                               sample_tracer,
                               rng1,
                               framebuffer1,
+                              nullptr,
                               (float_t)0.01,
                               num_threads);
     ASSERT_EQ(status, ISTATUS_SUCCESS);

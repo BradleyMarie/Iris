@@ -19,6 +19,7 @@ Abstract:
 #include "iris_camera/camera.h"
 #include "iris_camera/framebuffer.h"
 #include "iris_camera/image_sampler.h"
+#include "iris_camera/progress_reporter.h"
 #include "iris_camera/sample_tracer.h"
 
 //
@@ -33,6 +34,7 @@ IrisCameraRender(
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
+    _Inout_opt_ PPROGRESS_REPORTER progress_reporter,
     _In_ float_t epsilon,
     _In_ size_t number_of_threads
     );
@@ -45,6 +47,7 @@ IrisCameraRenderSingleThreaded(
     _Inout_ PSAMPLE_TRACER sample_tracer,
     _Inout_ PRANDOM rng,
     _Inout_ PFRAMEBUFFER framebuffer,
+    _Inout_opt_ PPROGRESS_REPORTER progress_reporter,
     _In_ float_t epsilon
     );
 
