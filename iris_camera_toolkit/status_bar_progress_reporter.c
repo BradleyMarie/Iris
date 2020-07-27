@@ -18,6 +18,10 @@ Abstract:
 #include <string.h>
 #include <time.h>
 
+// TODO: Do this in a cross platform way
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 #include "iris_camera_toolkit/status_bar_progress_reporter.h"
 
 //
@@ -187,25 +191,21 @@ StatusBarProgressReporterAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    char *columns = getenv("COLUMNS");
+    struct winsize window;
+    int result = ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 
-    unsigned long int num_columns;
-    if (columns != NULL)
+    if (result < 0)
     {
-        num_columns = strtoul(columns, NULL, 10);
-    }
-    else
-    {
-        num_columns = DEFAULT_CONSOLE_WIDTH;
+        window.ws_col = DEFAULT_CONSOLE_WIDTH;
     }
 
-    if (num_columns < BAR_RESERVED_CHARACTERS)
+    if (window.ws_col < BAR_RESERVED_CHARACTERS)
     {
         status_bar.bar_width = 0;
     }
     else
     {
-        status_bar.bar_width = num_columns - BAR_RESERVED_CHARACTERS;
+        status_bar.bar_width = window.ws_col - BAR_RESERVED_CHARACTERS;
     }
 
     if (status_bar.bar_width < status_bar.label_size)
