@@ -28,7 +28,7 @@ typedef const PROGRESS_REPORTER *PCPROGRESS_REPORTER;
 typedef
 ISTATUS
 (*PPROGRESS_REPORTER_REPORT)(
-    _In_opt_ const void *context,
+    _Inout_opt_ void *context,
     _In_ size_t num_pixels,
     _In_ size_t pixels_rendered
     );

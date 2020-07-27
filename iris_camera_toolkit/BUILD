@@ -61,6 +61,15 @@ cc_library(
 )
 
 cc_library(
+    name = "status_bar_progress_reporter",
+    srcs = ["status_bar_progress_reporter.c"],
+    hdrs = ["status_bar_progress_reporter.h"],
+    deps = [
+        "//iris_camera",
+    ],
+)
+
+cc_library(
     name = "thin_lens_camera",
     srcs = ["thin_lens_camera.c"],
     hdrs = ["thin_lens_camera.h"],
