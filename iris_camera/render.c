@@ -117,7 +117,7 @@ IrisCameraAllocateThreadState(
     for (size_t i = 1; i < num_threads; i++)
     {
         result[i].shared = shared_state;
-        result[0].local.progress_reporter = NULL;
+        result[i].local.progress_reporter = NULL;
 
         ISTATUS status = ImageSamplerDuplicate(image_sampler,
                                                &result[i].local.image_sampler);
@@ -390,18 +390,6 @@ IrisCameraRenderThread(
                                  memory_order_relaxed);
     }
 
-    if (progress_reporter != NULL)
-    {
-        ISTATUS status = ProgressReporterReport(progress_reporter,
-                                                num_pixels,
-                                                num_pixels);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            thread_context->local.status = status;
-        }
-    }
-
     return 0;
 }
 
@@ -489,6 +477,8 @@ IrisCameraRender(
                        &num_columns,
                        &num_rows);
 
+    size_t num_pixels = num_rows * num_columns;
+
     ISTATUS status = ImageSamplerPrepareImageSamples(image_sampler,
                                                      rng,
                                                      num_columns,
@@ -566,9 +556,7 @@ IrisCameraRender(
 
     if (progress_reporter != NULL)
     {
-        status = ProgressReporterReport(progress_reporter,
-                                        num_rows * num_columns,
-                                        0);
+        status = ProgressReporterReport(progress_reporter, num_pixels, 0);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -623,6 +611,18 @@ IrisCameraRender(
     IrisCameraFreeRngs(&shared_state.rngs);
     PointerListDestroy(&shared_state.rngs);
     free(threads);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (progress_reporter != NULL)
+    {
+        status = ProgressReporterReport(progress_reporter,
+                                        num_pixels,
+                                        num_pixels);
+    }
 
     return status;
 }
