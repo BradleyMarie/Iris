@@ -390,6 +390,18 @@ IrisCameraRenderThread(
                                  memory_order_relaxed);
     }
 
+    if (progress_reporter != NULL)
+    {
+        ISTATUS status = ProgressReporterReport(progress_reporter,
+                                                num_pixels,
+                                                num_pixels);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            thread_context->local.status = status;
+        }
+    }
+
     return 0;
 }
 

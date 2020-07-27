@@ -57,7 +57,7 @@ StatusBarProgressReporterReport(
     time_t current_time = time(NULL);
 
     double time_elapsed, pixels_per_second;
-    if (num_pixels == 0)
+    if (pixels_rendered == 0)
     {
         status_bar->start_time = current_time;
         status_bar->last_update_time = current_time;
@@ -68,7 +68,7 @@ StatusBarProgressReporterReport(
     {
         status_bar->last_update_time = current_time;
         time_elapsed =
-            difftime(current_time, status_bar->last_update_time);
+            difftime(current_time, status_bar->start_time);
         pixels_per_second =
             (double)pixels_rendered / time_elapsed;
     }
@@ -107,7 +107,7 @@ StatusBarProgressReporterReport(
     }
     else if (pixels_rendered == num_pixels)
     {
-        printf(" (%.0fs)       ", time_elapsed);
+        printf(" (%.0fs)       \n", time_elapsed);
     }
     else
     {
@@ -116,6 +116,8 @@ StatusBarProgressReporterReport(
             IMax(0.0, estimated_render_time - time_elapsed);
         printf(" (%.0fs|%.0fs) ", time_elapsed, estimated_time_remaining);
     }
+
+    fflush(stdout);
 
     return ISTATUS_SUCCESS;
 }
