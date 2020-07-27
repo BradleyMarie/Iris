@@ -58,9 +58,10 @@ StatusBarProgressReporterReport(
     time_t current_time = time(NULL);
 
     double time_elapsed, pixels_per_second;
-    bool first_draw;
+    bool first_draw, time_advanced;
     if (pixels_rendered == 0)
     {
+        time_advanced = false;
         status_bar->start_time = current_time;
         status_bar->last_update_time = current_time;
         time_elapsed = 0.0;
@@ -69,6 +70,7 @@ StatusBarProgressReporterReport(
     }
     else
     {
+        time_advanced = status_bar->last_update_time != current_time;
         status_bar->last_update_time = current_time;
         time_elapsed =
             difftime(current_time, status_bar->start_time);
@@ -80,7 +82,8 @@ StatusBarProgressReporterReport(
     double progress = (double)pixels_rendered / (double)num_pixels;
     unsigned long int bar_progress = (double)status_bar->bar_width * progress;
 
-    if (!first_draw && bar_progress == status_bar->current_bar_size)
+    if (!first_draw && !time_advanced &&
+        bar_progress == status_bar->current_bar_size)
     {
         return ISTATUS_SUCCESS;
     }
