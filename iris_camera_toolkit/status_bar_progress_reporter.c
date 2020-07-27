@@ -37,6 +37,7 @@ typedef struct _STATUS_BAR_PROGRESS_REPORTER {
     size_t label_size;
     time_t start_time;
     time_t last_update_time;
+    unsigned long int current_bar_size;
     unsigned long int bar_width;
 } STATUS_BAR_PROGRESS_REPORTER, *PSTATUS_BAR_PROGRESS_REPORTER;
 
@@ -57,34 +58,40 @@ StatusBarProgressReporterReport(
     time_t current_time = time(NULL);
 
     double time_elapsed, pixels_per_second;
+    bool first_draw;
     if (pixels_rendered == 0)
     {
         status_bar->start_time = current_time;
         status_bar->last_update_time = current_time;
         time_elapsed = 0.0;
         pixels_per_second = 0.0;
+        first_draw = true;
     }
-    else if (current_time != status_bar->last_update_time)
+    else
     {
         status_bar->last_update_time = current_time;
         time_elapsed =
             difftime(current_time, status_bar->start_time);
         pixels_per_second =
             (double)pixels_rendered / time_elapsed;
-    }
-    else
-    {
-        return ISTATUS_SUCCESS;
+        first_draw = false;
     }
 
     double progress = (double)pixels_rendered / (double)num_pixels;
     unsigned long int bar_progress = (double)status_bar->bar_width * progress;
 
+    if (!first_draw && bar_progress == status_bar->current_bar_size)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    status_bar->current_bar_size = bar_progress;
+
     printf("\r%s: [", status_bar->label);
 
     for (unsigned long int i = 0; i < bar_progress; i++)
     {
-        if (i + 1 == bar_progress || pixels_rendered == num_pixels)
+        if (i + 1 != bar_progress || pixels_rendered == num_pixels)
         {
             printf("=");
         }
