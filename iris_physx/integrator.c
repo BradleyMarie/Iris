@@ -238,8 +238,7 @@ IntegratorPrepare(
     _Inout_ PINTEGRATOR integrator,
     _In_ PSCENE scene,
     _In_ PLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator,
-    _In_ bool precompute_colors
+    _In_ PCOLOR_INTEGRATOR color_integrator
     )
 {
     if (integrator == NULL)

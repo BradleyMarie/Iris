@@ -174,8 +174,7 @@ TestRender(
     status = IntegratorPrepare(path_tracer,
                                scene,
                                light_sampler,
-                               color_integrator,
-                               true);
+                               color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PFRAMEBUFFER framebuffer;
