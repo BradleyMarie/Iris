@@ -326,6 +326,16 @@ cc_library(
 )
 
 cc_library(
+    name = "reflective_color_integrator",
+    srcs = ["reflective_color_integrator.c"],
+    hdrs = ["reflective_color_integrator.h"],
+    deps = [
+        ":interpolated_spectrum",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "reflector_texture_vtable",
     hdrs = ["reflector_texture_vtable.h"],
     deps = [
