@@ -221,7 +221,7 @@ InterpolatedSpectrumAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (num_samples == 1)
+    if (num_samples == 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
