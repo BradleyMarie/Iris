@@ -28,7 +28,6 @@ extern "C" {
 
 ISTATUS
 CieColorIntegratorAllocate(
-    _In_ bool always_compute_reflective,
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     );
 

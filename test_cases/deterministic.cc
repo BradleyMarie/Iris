@@ -163,7 +163,7 @@ AddQuadToScene(
 TEST(DeterministicTest, CornellBox)
 {
     PCOLOR_INTEGRATOR color_integrator;
-    ISTATUS status = CieColorIntegratorAllocate(false, &color_integrator);
+    ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR white_reflector;

@@ -1963,43 +1963,6 @@ CieColorIntegratorComputeSpectrumColor(
 }
 
 ISTATUS
-CieColorIntegratorComputeReflectiveSpectrumColor(
-    _In_ const void *context,
-    _In_ PCSPECTRUM spectrum,
-    _Out_ PCOLOR3 color
-    )
-{
-    float_t values[3] = { (float_t)0.0, (float_t)0.0, (float_t)0.0 };
-
-    // The values of cie_x_bar, cie_y_bar, and cie_z_bar have been adjusted
-    // so that this computes the riemann sum using the trapezoidal rule.
-    for (uint16_t i = 0; i < NUM_CIE_SAMPLES; i++)
-    {
-        float_t intensity;
-        ISTATUS status = SpectrumSample(spectrum,
-                                        cie_wavelengths[i],
-                                        &intensity);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-
-        values[0] += intensity * cie_x_bar[i];
-        values[1] += intensity * cie_y_bar[i];
-        values[2] += intensity * cie_z_bar[i];
-    }
-
-    values[0] /= cie_y_integral;
-    values[1] /= cie_y_integral;
-    values[2] /= cie_y_integral;
-
-    *color = ColorCreate(COLOR_SPACE_XYZ, values);
-
-    return ISTATUS_SUCCESS;
-}
-
-ISTATUS
 CieColorIntegratorComputeReflectorColor(
     _In_ const void *context,
     _In_ PCREFLECTOR reflector,
@@ -2040,12 +2003,6 @@ CieColorIntegratorComputeReflectorColor(
 // Static Data
 //
 
-static const COLOR_INTEGRATOR_VTABLE cie_color_reflective_integrator_vtable = {
-    CieColorIntegratorComputeReflectiveSpectrumColor,
-    CieColorIntegratorComputeReflectorColor,
-    NULL
-};
-
 static const COLOR_INTEGRATOR_VTABLE cie_color_integrator_vtable = {
     CieColorIntegratorComputeSpectrumColor,
     CieColorIntegratorComputeReflectorColor,
@@ -2058,27 +2015,16 @@ static const COLOR_INTEGRATOR_VTABLE cie_color_integrator_vtable = {
 
 ISTATUS
 CieColorIntegratorAllocate(
-    _In_ bool always_compute_reflective,
     _Out_ PCOLOR_INTEGRATOR *color_integrator
     )
 {
     if (color_integrator == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    PCCOLOR_INTEGRATOR_VTABLE vtable;
-    if (always_compute_reflective)
-    {
-        vtable = &cie_color_reflective_integrator_vtable;
-    }
-    else
-    {
-        vtable = &cie_color_integrator_vtable;
+        return ISTATUS_INVALID_ARGUMENT_00;
     }
 
     ISTATUS status =
-        ColorIntegratorAllocate(vtable,
+        ColorIntegratorAllocate(&cie_color_integrator_vtable,
                                 NULL,
                                 0,
                                 0,

@@ -139,7 +139,7 @@ AddQuadToScene(
 TEST(CornellBoxDielectricTest, CornellBox)
 {
     PCOLOR_INTEGRATOR color_integrator;
-    ISTATUS status = CieColorIntegratorAllocate(false, &color_integrator);
+    ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR perfect_reflector;

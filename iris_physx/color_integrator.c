@@ -86,8 +86,6 @@ ColorIntegratorAllocate(
     return ISTATUS_SUCCESS;
 }
 
-
-
 ISTATUS
 ColorIntegratorComputeSpectrumColor(
     _In_ const struct _COLOR_INTEGRATOR *color_integrator,
