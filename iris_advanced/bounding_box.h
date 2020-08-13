@@ -8,7 +8,9 @@ Module Name:
 
 Abstract:
 
-    An axis-aligned bounding box.
+    An axis-aligned bounding box. Note, the ray-box intersection may return some
+    false positives and should not be used in cases where absolute accuracy is
+    required.
 
 --*/
 

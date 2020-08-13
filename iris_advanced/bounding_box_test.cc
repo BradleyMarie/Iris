@@ -324,3 +324,16 @@ TEST(BoundingBoxTest, BoundingBoxIntersectOutsideSucceeds)
     EXPECT_EQ((float_t)1.0, closer);
     EXPECT_EQ((float_t)3.0, farther);
 }
+
+TEST(BoundingBoxTest, BoundingBoxIntersectFalsePositive)
+{
+    POINT3 point0 = PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0);
+    POINT3 point1 = PointCreate((float_t)1.0, (float_t)0.0, (float_t)1.0);
+    BOUNDING_BOX box = BoundingBoxCreate(point0, point1);
+
+    POINT3 origin = PointCreate((float_t)0.0, (float_t)-1.0, (float_t)0.0);
+    VECTOR3 dir = VectorCreate((float_t)-0.0, (float_t)1.0, (float_t)1.0);
+    RAY ray = RayCreate(origin, dir);
+
+    EXPECT_TRUE(BoundingBoxIntersect(box, ray, nullptr, nullptr, nullptr));
+}
