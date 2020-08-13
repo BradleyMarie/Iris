@@ -231,8 +231,6 @@ BoundingBoxIntersect(
     min = IMax(min, local_min);
     max = IMin(max, local_max);
 
-    bool result = min <= max;
-
     if (inverse_direction)
     {
         *inverse_direction = ray.direction;
@@ -248,7 +246,7 @@ BoundingBoxIntersect(
         *second_hit = max;
     }
 
-    return result;
+    return min < max;
 }
 
 #endif // _IRIS_ADVANCED_BOUNDING_BOX_
