@@ -25,7 +25,7 @@ Abstract:
 //
 
 struct _REFLECTOR_MIPMAP {
-    _Field_size_(width * height) PREFLECTOR *textels;
+    _Field_size_(width * height) PREFLECTOR *texels;
     WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
@@ -77,7 +77,7 @@ ReflectorMipmapAllocate(
         return false;
     }
 
-    result->textels = spectra;
+    result->texels = spectra;
     result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
@@ -96,7 +96,7 @@ ReflectorMipmapAllocate(
 ISTATUS
 ReflectorMipmapAllocateFromFloats(
     _In_ COLOR_IO_FORMAT color_format,
-    _In_reads_(height * width) float_t textels[][3],
+    _In_reads_(height * width) float_t texels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
@@ -104,7 +104,7 @@ ReflectorMipmapAllocateFromFloats(
     _Out_ PREFLECTOR_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -147,7 +147,7 @@ ReflectorMipmapAllocateFromFloats(
     for (size_t i = 0; i < width * height; i++)
     {
         COLOR3 color;
-        ISTATUS status = ColorLoadFromFloats(color_format, textels[i], &color);
+        ISTATUS status = ColorLoadFromFloats(color_format, texels[i], &color);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -156,7 +156,7 @@ ReflectorMipmapAllocateFromFloats(
 
         status = ColorExtrapolatorComputeReflector(color_extrapolator,
                                                    color,
-                                                   result->textels + i);
+                                                   result->texels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -173,7 +173,7 @@ ReflectorMipmapAllocateFromFloats(
 ISTATUS
 ReflectorMipmapAllocateFromBytes(
     _In_ COLOR_IO_FORMAT color_format,
-    _In_reads_(height * width) unsigned char textels[][3],
+    _In_reads_(height * width) unsigned char texels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
@@ -181,7 +181,7 @@ ReflectorMipmapAllocateFromBytes(
     _Out_ PREFLECTOR_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -224,7 +224,7 @@ ReflectorMipmapAllocateFromBytes(
     for (size_t i = 0; i < width * height; i++)
     {
         COLOR3 color;
-        ISTATUS status = ColorLoadFromBytes(color_format, textels[i], &color);
+        ISTATUS status = ColorLoadFromBytes(color_format, texels[i], &color);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -233,7 +233,7 @@ ReflectorMipmapAllocateFromBytes(
 
         status = ColorExtrapolatorComputeReflector(color_extrapolator,
                                                    color,
-                                                   result->textels + i);
+                                                   result->texels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -358,7 +358,7 @@ ReflectorMipmapLookup(
         y -= 1;
     }
 
-    *reflector = mipmap->textels[y * mipmap->width + x];
+    *reflector = mipmap->texels[y * mipmap->width + x];
 
     return ISTATUS_SUCCESS;
 }
@@ -376,10 +376,10 @@ ReflectorMipmapFree(
     size_t num_pixels = mipmap->width * mipmap->height;
     for (size_t i = 0; i < num_pixels; i++)
     {
-        ReflectorRelease(mipmap->textels[i]);
+        ReflectorRelease(mipmap->texels[i]);
     }
 
-    free(mipmap->textels);
+    free(mipmap->texels);
     free(mipmap);
 }
 
@@ -388,7 +388,7 @@ ReflectorMipmapFree(
 //
 
 struct _FLOAT_MIPMAP {
-    _Field_size_(width * height) float_t *textels;
+    _Field_size_(width * height) float_t *texels;
     WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
@@ -439,7 +439,7 @@ FloatMipmapAllocate(
         return false;
     }
 
-    result->textels = spectra;
+    result->texels = spectra;
     result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
@@ -457,14 +457,14 @@ FloatMipmapAllocate(
 
 ISTATUS
 FloatMipmapAllocateFromFloats(
-    _In_reads_(height * width) float_t textels[],
+    _In_reads_(height * width) float_t texels[],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -501,13 +501,13 @@ FloatMipmapAllocateFromFloats(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        if (!isfinite(textels[i]) || textels[i] < (float_t)0.0)
+        if (!isfinite(texels[i]) || texels[i] < (float_t)0.0)
         {
             FloatMipmapFree(result);
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        result->textels[i] = textels[i];
+        result->texels[i] = texels[i];
     }
 
     *mipmap = result;
@@ -517,14 +517,14 @@ FloatMipmapAllocateFromFloats(
 
 ISTATUS
 FloatMipmapAllocateFromBytes(
-    _In_reads_(height * width) unsigned char textels[],
+    _In_reads_(height * width) unsigned char texels[],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -561,7 +561,7 @@ FloatMipmapAllocateFromBytes(
 
     for (size_t i = 0; i < width * height; i++)
     {
-        result->textels[i] = (float_t)textels[i] / (float_t)UCHAR_MAX;
+        result->texels[i] = (float_t)texels[i] / (float_t)UCHAR_MAX;
     }
 
     *mipmap = result;
@@ -572,14 +572,14 @@ FloatMipmapAllocateFromBytes(
 ISTATUS
 FloatMipmapAllocateFromFloatTuples(
     _In_ COLOR_IO_FORMAT color_format,
-    _In_reads_(height * width) float_t textels[][3],
+    _In_reads_(height * width) float_t texels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -618,7 +618,7 @@ FloatMipmapAllocateFromFloatTuples(
     {
         float_t luma;
         ISTATUS status = ColorLoadLuminanceFromFloats(color_format,
-                                                      textels[i],
+                                                      texels[i],
                                                       &luma);
 
         if (status != ISTATUS_SUCCESS)
@@ -626,7 +626,7 @@ FloatMipmapAllocateFromFloatTuples(
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
 
-        result->textels[i] = luma;
+        result->texels[i] = luma;
     }
 
     *mipmap = result;
@@ -637,14 +637,14 @@ FloatMipmapAllocateFromFloatTuples(
 ISTATUS
 FloatMipmapAllocateFromByteTuples(
     _In_ COLOR_IO_FORMAT color_format,
-    _In_reads_(height * width) unsigned char textels[][3],
+    _In_reads_(height * width) unsigned char texels[][3],
     _In_ size_t width,
     _In_ size_t height,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
 {
-    if (textels == NULL)
+    if (texels == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -683,7 +683,7 @@ FloatMipmapAllocateFromByteTuples(
     {
         float_t luma;
         ISTATUS status = ColorLoadLuminanceFromBytes(color_format,
-                                                     textels[i],
+                                                     texels[i],
                                                      &luma);
 
         if (status != ISTATUS_SUCCESS)
@@ -691,7 +691,7 @@ FloatMipmapAllocateFromByteTuples(
             return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
         }
 
-        result->textels[i] = luma;
+        result->texels[i] = luma;
     }
 
     *mipmap = result;
@@ -804,7 +804,7 @@ FloatMipmapLookup(
         y -= 1;
     }
 
-    *value = mipmap->textels[y * mipmap->width + x];
+    *value = mipmap->texels[y * mipmap->width + x];
 
     return ISTATUS_SUCCESS;
 }
@@ -819,6 +819,6 @@ FloatMipmapFree(
         return;
     }
 
-    free(mipmap->textels);
+    free(mipmap->texels);
     free(mipmap);
 }
