@@ -184,6 +184,15 @@ cc_library(
 )
 
 cc_library(
+    name = "lanczos_upscale",
+    srcs = ["lanczos_upscale.c"],
+    hdrs = ["lanczos_upscale.h"],
+    deps = [
+        "//iris_advanced",
+    ],
+)
+
+cc_library(
     name = "list_scene",
     srcs = ["list_scene.c"],
     hdrs = ["list_scene.h"],
@@ -300,6 +309,7 @@ cc_library(
     srcs = ["png_mipmap.c"],
     hdrs = ["png_mipmap.h"],
     deps = [
+        ":lanczos_upscale",
         ":mipmap",
         "//iris_advanced_toolkit:color_io",
         "@stb//:stb_image",

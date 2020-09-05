@@ -109,12 +109,12 @@ ReflectorMipmapAllocateFromFloats(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -186,12 +186,12 @@ ReflectorMipmapAllocateFromBytes(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -469,12 +469,12 @@ FloatMipmapAllocateFromFloats(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -529,12 +529,12 @@ FloatMipmapAllocateFromBytes(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -584,12 +584,12 @@ FloatMipmapAllocateFromFloatTuples(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -649,12 +649,12 @@ FloatMipmapAllocateFromByteTuples(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width == 0)
+    if (width == 0 || (width & (width - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height == 0)
+    if (height == 0 || (height & (height - 1)) != 0)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }

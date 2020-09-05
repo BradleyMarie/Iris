@@ -18,6 +18,8 @@ Abstract:
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
+#include "iris_physx_toolkit/lanczos_upscale.h"
+
 //
 // Functions
 //
@@ -61,13 +63,27 @@ PngReflectorMipmapAllocate(
         return ISTATUS_IO_ERROR;
     }
 
-    ISTATUS status = ReflectorMipmapAllocateFromBytes(COLOR_IO_FORMAT_SRGB,
-                                                      data,
-                                                      x,
-                                                      y,
-                                                      wrap_mode,
-                                                      color_extrapolator,
-                                                      mipmap);
+    size_t new_x, new_y;
+    ISTATUS status = LanczosUpscaleByteTuples(data,
+                                              (size_t)x,
+                                              (size_t)y,
+                                              &data,
+                                              &new_x,
+                                              &new_y);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(data);
+        return status;
+    }
+
+    status = ReflectorMipmapAllocateFromBytes(COLOR_IO_FORMAT_SRGB,
+                                              data,
+                                              new_x,
+                                              new_y,
+                                              wrap_mode,
+                                              color_extrapolator,
+                                              mipmap);
 
     free(data);
 
@@ -107,12 +123,26 @@ PngFloatMipmapAllocate(
         return ISTATUS_IO_ERROR;
     }
 
-    ISTATUS status = FloatMipmapAllocateFromByteTuples(COLOR_IO_FORMAT_SRGB,
-                                                       data,
-                                                       x,
-                                                       y,
-                                                       wrap_mode,
-                                                       mipmap);
+    size_t new_x, new_y;
+    ISTATUS status = LanczosUpscaleByteTuples(data,
+                                              (size_t)x,
+                                              (size_t)y,
+                                              &data,
+                                              &new_x,
+                                              &new_y);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(data);
+        return status;
+    }
+
+    status = FloatMipmapAllocateFromByteTuples(COLOR_IO_FORMAT_SRGB,
+                                               data,
+                                               new_x,
+                                               new_y,
+                                               wrap_mode,
+                                               mipmap);
 
     free(data);
 
