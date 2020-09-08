@@ -14,6 +14,8 @@ Abstract:
 
 #include "iris_advanced_toolkit/color_io.h"
 
+#include "stdlib.h"
+
 //
 // Static Functions
 //
@@ -154,6 +156,202 @@ ColorLoadLuminanceFromByteTuple(
     color = ColorClamp(color, 1.0f);
 
     *luma = (float_t)color.values[1];
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorLoadFromFloatTupleArray(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(length) const float values[][3],
+    _In_ size_t length,
+    _Outptr_result_buffer_(length) PCOLOR3 *colors
+    )
+{
+    if (colors == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (length == 0)
+    {
+        *colors = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (values == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PCOLOR3 result = (PCOLOR3)calloc(length, sizeof(COLOR3));
+
+    if (result == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < length; i++)
+    {
+        ISTATUS status = ColorLoadFromFloatTuple(color_format,
+                                                 values[i],
+                                                 result + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(result);
+            return status;
+        }
+    }
+
+    *colors = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorLoadFromByteTupleArray(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(length) const unsigned char values[][3],
+    _In_ size_t length,
+    _Outptr_result_buffer_(length) PCOLOR3 *colors
+    )
+{
+    if (colors == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (length == 0)
+    {
+        *colors = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (values == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PCOLOR3 result = (PCOLOR3)calloc(length, sizeof(COLOR3));
+
+    if (result == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < length; i++)
+    {
+        ISTATUS status = ColorLoadFromByteTuple(color_format,
+                                                values[i],
+                                                result + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(result);
+            return status;
+        }
+    }
+
+    *colors = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorLoadLuminanceFromFloatTupleArray(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(length) const float values[][3],
+    _In_ size_t length,
+    _Outptr_result_buffer_(length) float_t **lumas
+    )
+{
+    if (lumas == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (length == 0)
+    {
+        *lumas = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (values == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    float_t *result = (float_t *)calloc(length, sizeof(float_t));
+
+    if (result == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < length; i++)
+    {
+        ISTATUS status = ColorLoadLuminanceFromFloatTuple(color_format,
+                                                          values[i],
+                                                          result + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(result);
+            return status;
+        }
+    }
+
+    *lumas = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorLoadLuminanceFromByteTupleArray(
+    _In_ COLOR_IO_FORMAT color_format,
+    _In_reads_(length) const unsigned char values[][3],
+    _In_ size_t length,
+    _Outptr_result_buffer_(length) float_t **lumas
+    )
+{
+    if (lumas == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (length == 0)
+    {
+        *lumas = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (values == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    float_t *result = (float_t *)calloc(length, sizeof(float_t));
+
+    if (result == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < length; i++)
+    {
+        ISTATUS status = ColorLoadLuminanceFromByteTuple(color_format,
+                                                         values[i],
+                                                         result + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(result);
+            return status;
+        }
+    }
+
+    *lumas = result;
 
     return ISTATUS_SUCCESS;
 }
