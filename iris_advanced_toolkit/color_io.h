@@ -32,28 +32,28 @@ typedef const COLOR_IO_FORMAT *PCCOLOR_IO_FORMAT;
 //
 
 ISTATUS
-ColorLoadFromFloats(
+ColorLoadFromFloatTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const float values[3],
     _Out_ PCOLOR3 color
     );
 
 ISTATUS
-ColorLoadFromBytes(
+ColorLoadFromByteTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const unsigned char values[3],
     _Out_ PCOLOR3 color
     );
 
 ISTATUS
-ColorLoadLuminanceFromFloats(
+ColorLoadLuminanceFromFloatTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const float values[3],
     _Out_ float_t *luma
     );
 
 ISTATUS
-ColorLoadLuminanceFromBytes(
+ColorLoadLuminanceFromByteTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const unsigned char values[3],
     _Out_ float_t *luma

@@ -147,7 +147,9 @@ ReflectorMipmapAllocateFromFloats(
     for (size_t i = 0; i < width * height; i++)
     {
         COLOR3 color;
-        ISTATUS status = ColorLoadFromFloats(color_format, texels[i], &color);
+        ISTATUS status = ColorLoadFromFloatTuple(color_format,
+                                                 texels[i],
+                                                 &color);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -224,7 +226,9 @@ ReflectorMipmapAllocateFromBytes(
     for (size_t i = 0; i < width * height; i++)
     {
         COLOR3 color;
-        ISTATUS status = ColorLoadFromBytes(color_format, texels[i], &color);
+        ISTATUS status = ColorLoadFromByteTuple(color_format,
+                                                texels[i],
+                                                &color);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -617,9 +621,9 @@ FloatMipmapAllocateFromFloatTuples(
     for (size_t i = 0; i < width * height; i++)
     {
         float_t luma;
-        ISTATUS status = ColorLoadLuminanceFromFloats(color_format,
-                                                      texels[i],
-                                                      &luma);
+        ISTATUS status = ColorLoadLuminanceFromFloatTuple(color_format,
+                                                          texels[i],
+                                                          &luma);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -682,9 +686,9 @@ FloatMipmapAllocateFromByteTuples(
     for (size_t i = 0; i < width * height; i++)
     {
         float_t luma;
-        ISTATUS status = ColorLoadLuminanceFromBytes(color_format,
-                                                     texels[i],
-                                                     &luma);
+        ISTATUS status = ColorLoadLuminanceFromByteTuple(color_format,
+                                                         texels[i],
+                                                         &luma);
 
         if (status != ISTATUS_SUCCESS)
         {

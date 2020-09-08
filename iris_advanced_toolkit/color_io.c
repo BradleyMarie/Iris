@@ -36,7 +36,7 @@ SrgbToLinearSrgb(
 //
 
 ISTATUS
-ColorLoadFromFloats(
+ColorLoadFromFloatTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const float values[3],
     _Out_ PCOLOR3 color
@@ -84,7 +84,7 @@ ColorLoadFromFloats(
 }
 
 ISTATUS
-ColorLoadFromBytes(
+ColorLoadFromByteTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const unsigned char values[3],
     _Out_ PCOLOR3 color
@@ -105,20 +105,20 @@ ColorLoadFromBytes(
     float_values[1] = (float_t)values[1] / (float_t)255.0;
     float_values[2] = (float_t)values[2] / (float_t)255.0;
 
-    return ColorLoadFromFloats(color_format, float_values, color);
+    return ColorLoadFromFloatTuple(color_format, float_values, color);
 }
 
 ISTATUS
-ColorLoadLuminanceFromFloats(
+ColorLoadLuminanceFromFloatTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const float values[3],
     _Out_ float_t *luma
     )
 {
     COLOR3 color;
-    ISTATUS status = ColorLoadFromFloats(color_format,
-                                         values,
-                                         &color);
+    ISTATUS status = ColorLoadFromFloatTuple(color_format,
+                                             values,
+                                             &color);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -134,16 +134,16 @@ ColorLoadLuminanceFromFloats(
 }
 
 ISTATUS
-ColorLoadLuminanceFromBytes(
+ColorLoadLuminanceFromByteTuple(
     _In_ COLOR_IO_FORMAT color_format,
     _In_ const unsigned char values[3],
     _Out_ float_t *luma
     )
 {
     COLOR3 color;
-    ISTATUS status = ColorLoadFromBytes(color_format,
-                                        values,
-                                        &color);
+    ISTATUS status = ColorLoadFromByteTuple(color_format,
+                                            values,
+                                            &color);
 
     if (status != ISTATUS_SUCCESS)
     {
