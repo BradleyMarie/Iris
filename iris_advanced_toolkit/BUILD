@@ -12,6 +12,15 @@ cc_library(
 )
 
 cc_library(
+    name = "lanczos_upscale",
+    srcs = ["lanczos_upscale.c"],
+    hdrs = ["lanczos_upscale.h"],
+    deps = [
+        "//iris_advanced",
+    ],
+)
+
+cc_library(
     name = "pcg_random",
     srcs = ["pcg_random.c"],
     hdrs = ["pcg_random.h"],

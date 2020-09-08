@@ -18,7 +18,7 @@ Abstract:
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
-#include "iris_physx_toolkit/lanczos_upscale.h"
+#include "iris_advanced_toolkit/lanczos_upscale.h"
 
 //
 // Functions
@@ -63,29 +63,41 @@ PngReflectorMipmapAllocate(
         return ISTATUS_IO_ERROR;
     }
 
-    size_t new_x, new_y;
-    ISTATUS status = LanczosUpscaleByteTuples(data,
-                                              (size_t)x,
-                                              (size_t)y,
-                                              &data,
-                                              &new_x,
-                                              &new_y);
+    PCOLOR3 colors;
+    ISTATUS status = ColorLoadFromByteTupleArray(COLOR_IO_FORMAT_SRGB,
+                                                 data,
+                                                 x * y,
+                                                 &colors);
+
+    free(data);
 
     if (status != ISTATUS_SUCCESS)
     {
-        free(data);
         return status;
     }
 
-    status = ReflectorMipmapAllocateFromBytes(COLOR_IO_FORMAT_SRGB,
-                                              data,
-                                              new_x,
-                                              new_y,
-                                              wrap_mode,
-                                              color_extrapolator,
-                                              mipmap);
+    size_t new_x, new_y;
+    status = LanczosUpscaleColors(colors,
+                                  (size_t)x,
+                                  (size_t)y,
+                                  &colors,
+                                  &new_x,
+                                  &new_y);
 
-    free(data);
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(colors);
+        return status;
+    }
+
+    status = ReflectorMipmapAllocate(colors,
+                                     new_x,
+                                     new_y,
+                                     wrap_mode,
+                                     color_extrapolator,
+                                     mipmap);
+
+    free(colors);
 
     return status;
 }
@@ -118,33 +130,40 @@ PngFloatMipmapAllocate(
     unsigned char (*data)[3] =
         (unsigned char (*)[3])stbi_load(filename, &x, &y, &n, 3);
 
-    if (data == NULL)
-    {
-        return ISTATUS_IO_ERROR;
-    }
+    PCOLOR3 colors;
+    ISTATUS status = ColorLoadFromByteTupleArray(COLOR_IO_FORMAT_SRGB,
+                                                 data,
+                                                 x * y,
+                                                 &colors);
 
-    size_t new_x, new_y;
-    ISTATUS status = LanczosUpscaleByteTuples(data,
-                                              (size_t)x,
-                                              (size_t)y,
-                                              &data,
-                                              &new_x,
-                                              &new_y);
+    free(data);
 
     if (status != ISTATUS_SUCCESS)
     {
-        free(data);
         return status;
     }
 
-    status = FloatMipmapAllocateFromByteTuples(COLOR_IO_FORMAT_SRGB,
-                                               data,
-                                               new_x,
-                                               new_y,
-                                               wrap_mode,
-                                               mipmap);
+    size_t new_x, new_y;
+    status = LanczosUpscaleColors(colors,
+                                  (size_t)x,
+                                  (size_t)y,
+                                  &colors,
+                                  &new_x,
+                                  &new_y);
 
-    free(data);
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(colors);
+        return status;
+    }
+
+    status = FloatMipmapAllocateFromLuma(colors,
+                                         new_x,
+                                         new_y,
+                                         wrap_mode,
+                                         mipmap);
+
+    free(colors);
 
     return status;
 }
