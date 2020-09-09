@@ -67,6 +67,7 @@ Abstract:
 
 #define _Ret_
 #define _Ret_opt_
+#define _Ret_writes_maybenull_(size)
 #define _Ret_range_(min, max)
 #define _Return_type_success_(expr)
 

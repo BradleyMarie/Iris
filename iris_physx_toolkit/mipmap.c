@@ -24,18 +24,99 @@ Abstract:
 // Types
 //
 
-struct _REFLECTOR_MIPMAP {
+typedef struct _REFLECTOR_MIPMAP_LEVEL {
     _Field_size_(width * height) PREFLECTOR *texels;
+    size_t width;
+    size_t height;
+} REFLECTOR_MIPMAP_LEVEL, *PREFLECTOR_MIPMAP_LEVEL;
+
+typedef const struct REFLECTOR_MIPMAP_LEVEL *PCREFLECTOR_MIPMAP_LEVEL;
+
+struct _REFLECTOR_MIPMAP {
+    _Field_size_(num_levels) PREFLECTOR_MIPMAP_LEVEL levels;
+    size_t num_levels;
     WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
-    size_t width;
-    size_t height;
 };
 
 //
 // Static Functions
 //
+
+static
+inline
+size_t
+SizeTLog2(
+    _In_ size_t value
+    )
+{
+    assert(value != 0 && (value & (value - 1)) == 0);
+
+    value >>= 1;
+
+    size_t result = 0;
+    while (value != 0)
+    {
+        value >>= 1;
+        result += 1;
+    }
+
+    return result;
+}
+
+_Ret_writes_maybenull_(width * height / 4)
+static
+PCOLOR3
+DownsampleColors(
+    _In_reads_(width * height) PCCOLOR3 texels,
+    _In_ size_t width,
+    _In_ size_t height
+    )
+{
+    assert(texels != NULL);
+    assert(width != 0 && (width & (width - 1)) == 0);
+    assert(height != 0 && (height & (height - 1)) == 0);
+
+    size_t new_width = width / 2;
+    size_t new_height = height / 2;
+
+    PCOLOR3 colors = (PCOLOR3)calloc(new_width * new_height, sizeof(COLOR3));
+
+    if (colors == NULL)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < new_height; i++)
+    {
+        for (size_t j = 0; j < new_width; j++)
+        {
+            size_t source_row = i * 2;
+            size_t source_column = j * 2;
+
+            COLOR3 color = texels[source_row * height + source_column];
+
+            color = ColorAdd(color,
+                             texels[source_row * height + source_column + 1],
+                             color.color_space);
+
+            source_row += 1;
+
+            color = ColorAdd(color,
+                             texels[source_row * height + source_column],
+                             color.color_space);
+
+            color = ColorAdd(color,
+                             texels[source_row * height + source_column + 1],
+                             color.color_space);
+
+            colors[i * new_width + j] = ColorScale(color, (float_t)0.25);
+        }
+    }
+
+    return colors;
+}
 
 static
 bool
@@ -69,20 +150,52 @@ ReflectorMipmapAllocateInternal(
         return false;
     }
 
-    PREFLECTOR *spectra = (PREFLECTOR*)calloc(num_pixels, sizeof(PREFLECTOR));
+    size_t width_log_2 = SizeTLog2(width);
+    size_t height_log_2 = SizeTLog2(width);
 
-    if (spectra == NULL)
+    size_t num_levels = 1;
+    if (width_log_2 < height_log_2)
+    {
+        num_levels += width_log_2;
+    }
+    else
+    {
+        num_levels += height_log_2;
+    }
+
+    PREFLECTOR_MIPMAP_LEVEL levels =
+        (PREFLECTOR_MIPMAP_LEVEL)calloc(num_levels, sizeof(REFLECTOR_MIPMAP_LEVEL));
+
+    if (levels == NULL)
     {
         free(result);
         return false;
     }
 
-    result->texels = spectra;
+    result->levels = levels;
+    result->num_levels = num_levels;
     result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
-    result->width = width;
-    result->height = height;
+
+    for (size_t i = 0; i < num_levels; i++)
+    {
+        PREFLECTOR *texels =
+            (PREFLECTOR*)calloc(width * height, sizeof(PREFLECTOR));
+
+        if (texels == NULL)
+        {
+            ReflectorMipmapFree(result);
+            return false;
+        }
+
+        levels[i].texels = texels;
+        levels[i].width = width;
+        levels[i].height = height;
+
+        width /= 2;
+        height /= 2;
+    }
 
     *mipmap = result;
 
@@ -156,7 +269,7 @@ ReflectorMipmapAllocate(
 
         ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
                                                            texels[i],
-                                                           result->texels + i);
+                                                           result->levels[0].texels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -164,6 +277,43 @@ ReflectorMipmapAllocate(
             return status;
         }
     }
+
+    PCOLOR3 working = NULL;
+    PCCOLOR3 working_const = texels;
+    for (size_t i = 1; i < result->num_levels; i++)
+    {
+        PCOLOR3 new_working = DownsampleColors(working_const, width, height);
+
+        free(working);
+
+        if (new_working == NULL)
+        {
+            ReflectorMipmapFree(result);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        working_const = new_working;
+        working = new_working;
+
+        size_t num_samples = result->levels[i].height * result->levels[i].width;
+
+        for (size_t j = 0; j < num_samples; j++)
+        {
+            ISTATUS status =
+                ColorExtrapolatorComputeReflector(color_extrapolator,
+                                                  working[i],
+                                                  result->levels[i].texels + i);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                free(working);
+                ReflectorMipmapFree(result);
+                return status;
+            }
+        }
+    }
+
+    free(working);
 
     *mipmap = result;
 
@@ -269,19 +419,19 @@ ReflectorMipmapLookup(
 
     size_t x = (size_t)floor(mipmap->width_fp * s);
 
-    if (x == mipmap->width)
+    if (x == mipmap->levels[0].width)
     {
         x -= 1;
     }
 
     size_t y = (size_t)floor(mipmap->height_fp * t);
 
-    if (y == mipmap->height)
+    if (y == mipmap->levels[0].height)
     {
         y -= 1;
     }
 
-    *reflector = mipmap->texels[y * mipmap->width + x];
+    *reflector = mipmap->levels[0].texels[y * mipmap->levels[0].width + x];
 
     return ISTATUS_SUCCESS;
 }
@@ -296,13 +446,19 @@ ReflectorMipmapFree(
         return;
     }
 
-    size_t num_pixels = mipmap->width * mipmap->height;
-    for (size_t i = 0; i < num_pixels; i++)
+    for (size_t i = 0; i < mipmap->num_levels; i++)
     {
-        ReflectorRelease(mipmap->texels[i]);
+        for (size_t j = 0;
+             j < mipmap->levels[i].height * mipmap->levels[i].width;
+             j++)
+        {
+            ReflectorRelease(mipmap->levels[i].texels[j]);
+        }
+
+        free(mipmap->levels[i].texels);
     }
 
-    free(mipmap->texels);
+    free(mipmap->levels);
     free(mipmap);
 }
 
@@ -310,13 +466,20 @@ ReflectorMipmapFree(
 // Types
 //
 
-struct _FLOAT_MIPMAP {
+typedef struct _FLOAT_MIPMAP_LEVEL {
     _Field_size_(width * height) float_t *texels;
+    size_t width;
+    size_t height;
+} FLOAT_MIPMAP_LEVEL, *PFLOAT_MIPMAP_LEVEL;
+
+typedef const struct FLOAT_MIPMAP_LEVEL *PCFLOAT_MIPMAP_LEVEL;
+
+struct _FLOAT_MIPMAP {
+    _Field_size_(num_levels) PFLOAT_MIPMAP_LEVEL levels;
+    size_t num_levels;
     WRAP_MODE wrap_mode;
     float_t width_fp;
     float_t height_fp;
-    size_t width;
-    size_t height;
 };
 
 //
@@ -347,31 +510,107 @@ FloatMipmapAllocate(
         return false;
     }
 
-    PFLOAT_MIPMAP result = (PFLOAT_MIPMAP)malloc(sizeof(FLOAT_MIPMAP));
+    PFLOAT_MIPMAP result =
+        (PFLOAT_MIPMAP)malloc(sizeof(FLOAT_MIPMAP));
 
     if (result == NULL)
     {
         return false;
     }
 
-    float_t *spectra = (float_t*)calloc(num_pixels, sizeof(float_t));
+    size_t width_log_2 = SizeTLog2(width);
+    size_t height_log_2 = SizeTLog2(width);
 
-    if (spectra == NULL)
+    size_t num_levels = 1;
+    if (width_log_2 < height_log_2)
+    {
+        num_levels += width_log_2;
+    }
+    else
+    {
+        num_levels += height_log_2;
+    }
+
+    PFLOAT_MIPMAP_LEVEL levels =
+        (PFLOAT_MIPMAP_LEVEL)calloc(num_levels, sizeof(FLOAT_MIPMAP_LEVEL));
+
+    if (levels == NULL)
     {
         free(result);
         return false;
     }
 
-    result->texels = spectra;
+    result->levels = levels;
+    result->num_levels = num_levels;
     result->wrap_mode = wrap_mode;
     result->width_fp = (float_t)width;
     result->height_fp = (float_t)height;
-    result->width = width;
-    result->height = height;
+
+    for (size_t i = 0; i < num_levels; i++)
+    {
+        float_t *texels =
+            (float_t*)calloc(width * height, sizeof(float_t));
+
+        if (texels == NULL)
+        {
+            FloatMipmapFree(result);
+            return false;
+        }
+
+        levels[i].texels = texels;
+        levels[i].width = width;
+        levels[i].height = height;
+
+        width >>= 1;
+        height >>= 1;
+    }
 
     *mipmap = result;
 
     return true;
+}
+
+_Ret_writes_maybenull_(width * height / 4)
+static
+float_t*
+DownsampleFloats(
+    _In_reads_(width * height) const float_t *texels,
+    _In_ size_t width,
+    _In_ size_t height
+    )
+{
+    assert(texels != NULL);
+    assert(width != 0 && (width & (width - 1)) == 0);
+    assert(height != 0 && (height & (height - 1)) == 0);
+
+    size_t new_width = width / 2;
+    size_t new_height = height / 2;
+
+    float_t *values = (float_t*)calloc(new_width * new_height, sizeof(float_t));
+
+    if (values == NULL)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < new_height; i++)
+    {
+        for (size_t j = 0; j < new_width; j++)
+        {
+            size_t source_row = i * 2;
+            size_t source_column = j * 2;
+
+            float_t value =
+                texels[source_row * height + source_column] +
+                texels[source_row * height + source_column + 1] +
+                texels[source_row * (height + 1) + source_column] +
+                texels[source_row * (height + 1) + source_column + 1];
+
+            values[i * new_width + j] = value * (float_t)0.25;
+        }
+    }
+
+    return values;
 }
 
 //
@@ -430,8 +669,35 @@ FloatMipmapAllocateFromFloats(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        result->texels[i] = texels[i];
+        result->levels[0].texels[i] = texels[i];
     }
+
+    float_t *working = NULL;
+    const float_t *working_const = texels;
+    for (size_t i = 1; i < result->num_levels; i++)
+    {
+        float_t *new_working = DownsampleFloats(working_const, width, height);
+
+        free(working);
+
+        if (new_working == NULL)
+        {
+            FloatMipmapFree(result);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        working_const = new_working;
+        working = new_working;
+
+        for (size_t j = 0;
+             j < result->levels[i].height * result->levels[i].width;
+             j++)
+        {
+            result->levels[i].texels[i] = working[i];
+        }
+    }
+
+    free(working);
 
     *mipmap = result;
 
@@ -491,8 +757,35 @@ FloatMipmapAllocateFromLuma(
         }
 
         COLOR3 color = ColorConvert(texels[i], COLOR_SPACE_XYZ);
-        result->texels[i] = color.values[1];
+        result->levels[0].texels[i] = color.values[1];
     }
+
+    float_t *working = NULL;
+    const float_t *working_const = result->levels[0].texels;
+    for (size_t i = 1; i < result->num_levels; i++)
+    {
+        float_t *new_working = DownsampleFloats(working_const, width, height);
+
+        free(working);
+
+        if (new_working == NULL)
+        {
+            FloatMipmapFree(result);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        working_const = new_working;
+        working = new_working;
+
+        for (size_t j = 0;
+             j < result->levels[i].height * result->levels[i].width;
+             j++)
+        {
+            result->levels[i].texels[i] = working[i];
+        }
+    }
+
+    free(working);
 
     *mipmap = result;
 
@@ -592,19 +885,19 @@ FloatMipmapLookup(
 
     size_t x = (size_t)floor(mipmap->width_fp * s);
 
-    if (x == mipmap->width)
+    if (x == mipmap->levels[0].width)
     {
         x -= 1;
     }
 
     size_t y = (size_t)floor(mipmap->height_fp * t);
 
-    if (y == mipmap->height)
+    if (y == mipmap->levels[0].height)
     {
         y -= 1;
     }
 
-    *value = mipmap->texels[y * mipmap->width + x];
+    *value = mipmap->levels[0].texels[y * mipmap->levels[0].width + x];
 
     return ISTATUS_SUCCESS;
 }
@@ -619,6 +912,11 @@ FloatMipmapFree(
         return;
     }
 
-    free(mipmap->texels);
+    for (size_t i = 0; i < mipmap->num_levels; i++)
+    {
+        free(mipmap->levels[i].texels);
+    }
+
+    free(mipmap->levels);
     free(mipmap);
 }
