@@ -28,6 +28,10 @@ typedef struct _REFLECTOR_MIPMAP_LEVEL {
     _Field_size_(width * height) PREFLECTOR *texels;
     size_t width;
     size_t height;
+    float_t width_fp;
+    float_t height_fp;
+    float_t texel_width;
+    float_t texel_height;
 } REFLECTOR_MIPMAP_LEVEL, *PREFLECTOR_MIPMAP_LEVEL;
 
 typedef const struct REFLECTOR_MIPMAP_LEVEL *PCREFLECTOR_MIPMAP_LEVEL;
@@ -35,9 +39,9 @@ typedef const struct REFLECTOR_MIPMAP_LEVEL *PCREFLECTOR_MIPMAP_LEVEL;
 struct _REFLECTOR_MIPMAP {
     _Field_size_(num_levels) PREFLECTOR_MIPMAP_LEVEL levels;
     size_t num_levels;
+    TEXTURE_FILTERING_ALGORITHM texture_filtering;
     WRAP_MODE wrap_mode;
-    float_t width_fp;
-    float_t height_fp;
+    float_t last_level_index_fp;
 };
 
 //
@@ -63,6 +67,17 @@ SizeTLog2(
     }
 
     return result;
+}
+
+static
+inline
+float_t
+FloatTLog2(
+    _In_ float_t value
+    )
+{
+    float_t inv_log2 = (float_t)1.442695040888963387004650940071;
+    return log(value) * inv_log2;
 }
 
 _Ret_writes_maybenull_(width * height / 4)
@@ -119,10 +134,282 @@ DownsampleColors(
 }
 
 static
+PCREFLECTOR
+ReflectorMipmapLookupTexel(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t
+    )
+{
+    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
+    {
+#if FLT_EVAL_METHOD	== 0
+        float s_intpart, t_intpart;
+        s = modff(s, &s_intpart);
+        t = modff(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 1
+        double s_intpart, t_intpart;
+        s = modf(s, &s_intpart);
+        t = modf(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 2
+        long double s_intpart, t_intpart;
+        s = modfl(s, &s_intpart);
+        t = modfl(t, &t_intpart);
+#endif
+
+        if (s < (float_t)0.0)
+        {
+            s = (float_t)1.0 + s;
+        }
+
+        if (t < (float_t)0.0)
+        {
+            t = (float_t)1.0 + t;
+        }
+    }
+    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    {
+        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
+        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
+    }
+    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
+             t < (float_t)0.0 || (float_t)1.0 < t)
+    {
+        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
+        return NULL;
+    }
+
+    size_t x = (size_t)floor(mipmap->levels[level].width_fp * s);
+
+    if (x == mipmap->levels[level].width)
+    {
+        x -= 1;
+    }
+
+    size_t y = (size_t)floor(mipmap->levels[level].height_fp * t);
+
+    if (y == mipmap->levels[level].height)
+    {
+        y -= 1;
+    }
+
+    return mipmap->levels[level].texels[y * mipmap->levels[level].width + x];
+}
+
+static
+ISTATUS
+ReflectorMipmapLookupWithTriangleFilter(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    if (mipmap->num_levels <= level)
+    {
+        level = mipmap->num_levels - 1;
+    }
+
+    float_t scaled_s = s * mipmap->levels[level].width_fp;
+    float_t scaled_t = t * mipmap->levels[level].height_fp;
+
+    float_t scaled_s0 = floor(scaled_s - (float_t)0.5) + (float_t)0.5;
+    float_t scaled_t0 = floor(scaled_t - (float_t)0.5) + (float_t)0.5;
+
+    float_t s0 = scaled_s0 * mipmap->levels[level].texel_width;
+    float_t t0 = scaled_t0 * mipmap->levels[level].texel_height;
+
+    float_t ds = scaled_s - scaled_s0;
+    float_t dt = scaled_t - scaled_t0;
+
+    float_t one_minus_ds = (float_t)1.0 - ds;
+    float_t one_minus_dt = (float_t)1.0 - dt;
+
+    float_t s1 = s0 + mipmap->levels[level].texel_width;
+    float_t t1 = t0 + mipmap->levels[level].texel_height;
+
+    PCREFLECTOR texel = ReflectorMipmapLookupTexel(mipmap, level, s0, t0);
+
+    PCREFLECTOR result;
+    ISTATUS status =
+        ReflectorCompositorAttenuateReflector(compositor,
+                                              texel,
+                                              one_minus_ds * one_minus_dt,
+                                              &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = ReflectorMipmapLookupTexel(mipmap, level, s0, t1);
+
+    status =
+        ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                   result,
+                                                   texel,
+                                                   one_minus_ds * dt,
+                                                   &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = ReflectorMipmapLookupTexel(mipmap, level, s1, t0);
+
+    status =
+        ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                   result,
+                                                   texel,
+                                                   ds * one_minus_dt,
+                                                   &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = ReflectorMipmapLookupTexel(mipmap, level, s1, t1);
+
+    status =
+        ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                   result,
+                                                   texel,
+                                                   ds * dt,
+                                                   reflector);
+
+    return status;
+}
+
+ISTATUS
+ReflectorMipmapLookupTextureFilteringNone(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    *reflector = ReflectorMipmapLookupTexel(mipmap, 0, s, t);
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+ReflectorMipmapLookupTextureFilteringTrilinear(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
+    float_t level =
+        mipmap->last_level_index_fp - FloatTLog2(fmax(max, (float_t)1e-8));
+
+    if (level < (float_t)0.0)
+    {
+        ISTATUS status =
+            ReflectorMipmapLookupWithTriangleFilter(mipmap,
+                                                    0,
+                                                    s,
+                                                    t,
+                                                    compositor,
+                                                    reflector);
+
+        return status;
+    }
+
+    if (level >= mipmap->last_level_index_fp)
+    {
+        ISTATUS status =
+            ReflectorMipmapLookupWithTriangleFilter(mipmap,
+                                                    mipmap->num_levels - 1,
+                                                    s,
+                                                    t,
+                                                    compositor,
+                                                    reflector);
+
+        return status;
+    }
+
+#if FLT_EVAL_METHOD	== 0
+    float delta, level0;
+    delta = modff(level, &level0);
+#elif FLT_EVAL_METHOD == 1
+    double delta, level0;
+    delta = modf(level, &level0);
+#elif FLT_EVAL_METHOD == 2
+    long double delta, level0;
+    delta = modfl(level, &level0);
+#endif
+
+    PCREFLECTOR reflector0;
+    ISTATUS status =
+        ReflectorMipmapLookupWithTriangleFilter(mipmap,
+                                                (size_t)level0,
+                                                s,
+                                                t,
+                                                compositor,
+                                                &reflector0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PCREFLECTOR reflector1;
+    status =
+        ReflectorMipmapLookupWithTriangleFilter(mipmap,
+                                                (size_t)level0 + 1,
+                                                s,
+                                                t,
+                                                compositor,
+                                                &reflector1);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorCompositorAttenuateReflector(compositor,
+                                                   reflector0,
+                                                   delta,
+                                                   &reflector0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorCompositorAttenuatedAddReflectors(compositor,
+                                                        reflector0,
+                                                        reflector1,
+                                                        (float_t)1.0 - delta,
+                                                        reflector);
+
+    return status;
+}
+
+static
 bool
 ReflectorMipmapAllocateInternal(
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PREFLECTOR_MIPMAP *mipmap
     )
@@ -130,6 +417,8 @@ ReflectorMipmapAllocateInternal(
     assert(width != 0);
     assert(height != 0);
     assert(mipmap != NULL);
+    assert(texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
     assert(wrap_mode == WRAP_MODE_REPEAT ||
            wrap_mode == WRAP_MODE_BLACK ||
            wrap_mode == WRAP_MODE_CLAMP);
@@ -174,9 +463,9 @@ ReflectorMipmapAllocateInternal(
 
     result->levels = levels;
     result->num_levels = num_levels;
+    result->texture_filtering = texture_filtering;
     result->wrap_mode = wrap_mode;
-    result->width_fp = (float_t)width;
-    result->height_fp = (float_t)height;
+    result->last_level_index_fp = num_levels - 1;
 
     for (size_t i = 0; i < num_levels; i++)
     {
@@ -192,6 +481,10 @@ ReflectorMipmapAllocateInternal(
         levels[i].texels = texels;
         levels[i].width = width;
         levels[i].height = height;
+        levels[i].width_fp = (float_t)width;
+        levels[i].height_fp = (float_t)height;
+        levels[i].texel_width = (float_t)1.0 / (float_t)width;
+        levels[i].texel_height = (float_t)1.0 / (float_t)height;
 
         width /= 2;
         height /= 2;
@@ -211,6 +504,7 @@ ReflectorMipmapAllocate(
     _In_reads_(height * width) const COLOR3 texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
@@ -231,26 +525,33 @@ ReflectorMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (color_extrapolator == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (mipmap == NULL)
+    if (color_extrapolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     PREFLECTOR_MIPMAP result;
     bool success = ReflectorMipmapAllocateInternal(width,
                                                    height,
+                                                   texture_filtering,
                                                    wrap_mode,
                                                    &result);
 
@@ -378,62 +679,35 @@ ReflectorMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_08;
     }
 
-    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
+    if (mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE)
     {
-#if FLT_EVAL_METHOD	== 0
-        float s_intpart, t_intpart;
-        s = modff(s, &s_intpart);
-        t = modff(t, &t_intpart);
-#elif FLT_EVAL_METHOD == 1
-        double s_intpart, t_intpart;
-        s = modf(s, &s_intpart);
-        t = modf(t, &t_intpart);
-#elif FLT_EVAL_METHOD == 2
-        long double s_intpart, t_intpart;
-        s = modfl(s, &s_intpart);
-        t = modfl(t, &t_intpart);
-#endif
+        ISTATUS status =
+            ReflectorMipmapLookupTextureFilteringNone(mipmap,
+                                                      s,
+                                                      t,
+                                                      dsdx,
+                                                      dsdy,
+                                                      dtdx,
+                                                      dtdy,
+                                                      compositor,
+                                                      reflector);
 
-        if (s < (float_t)0.0)
-        {
-            s = (float_t)1.0 + s;
-        }
-
-        if (t < (float_t)0.0)
-        {
-            t = (float_t)1.0 + t;
-        }
-    }
-    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
-    {
-        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
-        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
-    }
-    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
-             t < (float_t)0.0 || (float_t)1.0 < t)
-    {
-        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
+        return status;
     }
 
-    size_t x = (size_t)floor(mipmap->width_fp * s);
+    assert(mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
+    ISTATUS status =
+        ReflectorMipmapLookupTextureFilteringTrilinear(mipmap,
+                                                        s,
+                                                        t,
+                                                        dsdx,
+                                                        dsdy,
+                                                        dtdx,
+                                                        dtdy,
+                                                        compositor,
+                                                        reflector);
 
-    if (x == mipmap->levels[0].width)
-    {
-        x -= 1;
-    }
-
-    size_t y = (size_t)floor(mipmap->height_fp * t);
-
-    if (y == mipmap->levels[0].height)
-    {
-        y -= 1;
-    }
-
-    *reflector = mipmap->levels[0].texels[y * mipmap->levels[0].width + x];
-
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 void
@@ -470,6 +744,10 @@ typedef struct _FLOAT_MIPMAP_LEVEL {
     _Field_size_(width * height) float_t *texels;
     size_t width;
     size_t height;
+    float_t width_fp;
+    float_t height_fp;
+    float_t texel_width;
+    float_t texel_height;
 } FLOAT_MIPMAP_LEVEL, *PFLOAT_MIPMAP_LEVEL;
 
 typedef const struct FLOAT_MIPMAP_LEVEL *PCFLOAT_MIPMAP_LEVEL;
@@ -477,9 +755,9 @@ typedef const struct FLOAT_MIPMAP_LEVEL *PCFLOAT_MIPMAP_LEVEL;
 struct _FLOAT_MIPMAP {
     _Field_size_(num_levels) PFLOAT_MIPMAP_LEVEL levels;
     size_t num_levels;
+    TEXTURE_FILTERING_ALGORITHM texture_filtering;
     WRAP_MODE wrap_mode;
-    float_t width_fp;
-    float_t height_fp;
+    float_t last_level_index_fp;
 };
 
 //
@@ -491,6 +769,7 @@ bool
 FloatMipmapAllocate(
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
@@ -498,6 +777,8 @@ FloatMipmapAllocate(
     assert(width != 0);
     assert(height != 0);
     assert(mipmap != NULL);
+    assert(texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
     assert(wrap_mode == WRAP_MODE_REPEAT ||
            wrap_mode == WRAP_MODE_BLACK ||
            wrap_mode == WRAP_MODE_CLAMP);
@@ -542,9 +823,9 @@ FloatMipmapAllocate(
 
     result->levels = levels;
     result->num_levels = num_levels;
+    result->texture_filtering = texture_filtering;
     result->wrap_mode = wrap_mode;
-    result->width_fp = (float_t)width;
-    result->height_fp = (float_t)height;
+    result->last_level_index_fp = num_levels - 1;
 
     for (size_t i = 0; i < num_levels; i++)
     {
@@ -560,6 +841,10 @@ FloatMipmapAllocate(
         levels[i].texels = texels;
         levels[i].width = width;
         levels[i].height = height;
+        levels[i].width_fp = (float_t)width;
+        levels[i].height_fp = (float_t)height;
+        levels[i].texel_width = (float_t)1.0 / (float_t)width;
+        levels[i].texel_height = (float_t)1.0 / (float_t)height;
 
         width >>= 1;
         height >>= 1;
@@ -613,6 +898,184 @@ DownsampleFloats(
     return values;
 }
 
+static
+float_t
+FloatMipmapLookupTexel(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t
+    )
+{
+    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
+    {
+#if FLT_EVAL_METHOD	== 0
+        float s_intpart, t_intpart;
+        s = modff(s, &s_intpart);
+        t = modff(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 1
+        double s_intpart, t_intpart;
+        s = modf(s, &s_intpart);
+        t = modf(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 2
+        long double s_intpart, t_intpart;
+        s = modfl(s, &s_intpart);
+        t = modfl(t, &t_intpart);
+#endif
+
+        if (s < (float_t)0.0)
+        {
+            s = (float_t)1.0 + s;
+        }
+
+        if (t < (float_t)0.0)
+        {
+            t = (float_t)1.0 + t;
+        }
+    }
+    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    {
+        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
+        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
+    }
+    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
+             t < (float_t)0.0 || (float_t)1.0 < t)
+    {
+        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
+        return (float_t)0.0;
+    }
+
+    size_t x = (size_t)floor(mipmap->levels[level].width_fp * s);
+
+    if (x == mipmap->levels[level].width)
+    {
+        x -= 1;
+    }
+
+    size_t y = (size_t)floor(mipmap->levels[level].height_fp * t);
+
+    if (y == mipmap->levels[level].height)
+    {
+        y -= 1;
+    }
+
+    return mipmap->levels[level].texels[y * mipmap->levels[level].width + x];
+}
+
+static
+float_t
+FloatMipmapLookupWithTriangleFilter(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t
+    )
+{
+    if (mipmap->num_levels <= level)
+    {
+        level = mipmap->num_levels - 1;
+    }
+
+    float_t scaled_s = s * mipmap->levels[level].width_fp;
+    float_t scaled_t = t * mipmap->levels[level].height_fp;
+
+    float_t scaled_s0 = floor(scaled_s - (float_t)0.5) + (float_t)0.5;
+    float_t scaled_t0 = floor(scaled_t - (float_t)0.5) + (float_t)0.5;
+
+    float_t s0 = scaled_s0 * mipmap->levels[level].texel_width;
+    float_t t0 = scaled_t0 * mipmap->levels[level].texel_height;
+
+    float_t ds = scaled_s - scaled_s0;
+    float_t dt = scaled_t - scaled_t0;
+
+    float_t one_minus_ds = (float_t)1.0 - ds;
+    float_t one_minus_dt = (float_t)1.0 - dt;
+
+    float_t s1 = s0 + mipmap->levels[level].texel_width;
+    float_t t1 = t0 + mipmap->levels[level].texel_height;
+
+    float_t result =
+        (one_minus_ds * one_minus_dt * FloatMipmapLookupTexel(mipmap, level, s0, t0)) +
+        (one_minus_ds * dt * FloatMipmapLookupTexel(mipmap, level, s0, t1)) +
+        (ds * one_minus_dt * FloatMipmapLookupTexel(mipmap, level, s1, t0)) +
+        (ds * dt * FloatMipmapLookupTexel(mipmap, level, s1, t1));
+
+    return result;
+}
+
+static
+void
+FloatMipmapLookupTextureFilteringNone(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _Out_ float_t *value
+    )
+{
+    *value = FloatMipmapLookupTexel(mipmap, 0, s, t);
+}
+
+static
+void
+FloatMipmapLookupTextureFilteringTrilinear(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _Out_ float_t *value
+    )
+{
+    float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
+    float_t level =
+        mipmap->last_level_index_fp - FloatTLog2(fmax(max, (float_t)1e-8));
+
+    if (level < (float_t)0.0)
+    {
+        *value = FloatMipmapLookupWithTriangleFilter(mipmap, 0, s, t);
+    }
+    else if (level >= mipmap->last_level_index_fp)
+    {
+        *value = FloatMipmapLookupWithTriangleFilter(mipmap,
+                                                     mipmap->num_levels - 1,
+                                                     s,
+                                                     t);
+    }
+    else
+    {
+#if FLT_EVAL_METHOD	== 0
+        float delta, level0;
+        delta = modff(level, &level0);
+#elif FLT_EVAL_METHOD == 1
+        double delta, level0;
+        delta = modf(level, &level0);
+#elif FLT_EVAL_METHOD == 2
+        long double delta, level0;
+        delta = modfl(level, &level0);
+#endif
+
+        float_t value0 =
+            FloatMipmapLookupWithTriangleFilter(mipmap,
+                                                (size_t)level0,
+                                                s,
+                                                t);
+
+        float_t value1 =
+            FloatMipmapLookupWithTriangleFilter(mipmap,
+                                                (size_t)level0 + 1,
+                                                s,
+                                                t);
+
+        *value = delta * value0 + ((float_t)1.0 - delta) * value1;
+    }
+}
+
 //
 // Functions
 //
@@ -622,6 +1085,7 @@ FloatMipmapAllocateFromFloats(
     _In_reads_(height * width) const float_t texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
@@ -641,20 +1105,30 @@ FloatMipmapAllocateFromFloats(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (mipmap == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     PFLOAT_MIPMAP result;
-    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
+    bool success = FloatMipmapAllocate(width,
+                                       height,
+                                       texture_filtering,
+                                       wrap_mode,
+                                       &result);
 
     if (!success)
     {
@@ -709,6 +1183,7 @@ FloatMipmapAllocateFromLuma(
     _In_reads_(height * width) const COLOR3 texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
@@ -728,20 +1203,30 @@ FloatMipmapAllocateFromLuma(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (mipmap == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
     PFLOAT_MIPMAP result;
-    bool success = FloatMipmapAllocate(width, height, wrap_mode, &result);
+    bool success = FloatMipmapAllocate(width,
+                                       height,
+                                       texture_filtering,
+                                       wrap_mode,
+                                       &result);
 
     if (!success)
     {
@@ -844,60 +1329,29 @@ FloatMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
+    if (mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE)
     {
-#if FLT_EVAL_METHOD	== 0
-        float s_intpart, t_intpart;
-        s = modff(s, &s_intpart);
-        t = modff(t, &t_intpart);
-#elif FLT_EVAL_METHOD == 1
-        double s_intpart, t_intpart;
-        s = modf(s, &s_intpart);
-        t = modf(t, &t_intpart);
-#elif FLT_EVAL_METHOD == 2
-        long double s_intpart, t_intpart;
-        s = modfl(s, &s_intpart);
-        t = modfl(t, &t_intpart);
-#endif
-
-        if (s < (float_t)0.0)
-        {
-            s = (float_t)1.0 + s;
-        }
-
-        if (t < (float_t)0.0)
-        {
-            t = (float_t)1.0 + t;
-        }
+        FloatMipmapLookupTextureFilteringNone(mipmap,
+                                              s,
+                                              t,
+                                              dsdx,
+                                              dsdy,
+                                              dtdx,
+                                              dtdy,
+                                              value);
     }
-    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    else
     {
-        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
-        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
+        assert(mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
+        FloatMipmapLookupTextureFilteringTrilinear(mipmap,
+                                                   s,
+                                                   t,
+                                                   dsdx,
+                                                   dsdy,
+                                                   dtdx,
+                                                   dtdy,
+                                                   value);
     }
-    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
-             t < (float_t)0.0 || (float_t)1.0 < t)
-    {
-        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
-        *value = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    size_t x = (size_t)floor(mipmap->width_fp * s);
-
-    if (x == mipmap->levels[0].width)
-    {
-        x -= 1;
-    }
-
-    size_t y = (size_t)floor(mipmap->height_fp * t);
-
-    if (y == mipmap->levels[0].height)
-    {
-        y -= 1;
-    }
-
-    *value = mipmap->levels[0].texels[y * mipmap->levels[0].width + x];
 
     return ISTATUS_SUCCESS;
 }

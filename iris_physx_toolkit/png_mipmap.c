@@ -27,6 +27,7 @@ Abstract:
 ISTATUS
 PngReflectorMipmapAllocate(
     _In_z_ const char* filename,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
@@ -37,21 +38,27 @@ PngReflectorMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (color_extrapolator == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap == NULL)
+    if (color_extrapolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     int x, y, n;
@@ -93,6 +100,7 @@ PngReflectorMipmapAllocate(
     status = ReflectorMipmapAllocate(colors,
                                      new_x,
                                      new_y,
+                                     texture_filtering,
                                      wrap_mode,
                                      color_extrapolator,
                                      mipmap);
@@ -105,6 +113,7 @@ PngReflectorMipmapAllocate(
 ISTATUS
 PngFloatMipmapAllocate(
     _In_z_ const char* filename,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
@@ -114,16 +123,22 @@ PngFloatMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (mipmap == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     int x, y, n;
@@ -160,6 +175,7 @@ PngFloatMipmapAllocate(
     status = FloatMipmapAllocateFromLuma(colors,
                                          new_x,
                                          new_y,
+                                         texture_filtering,
                                          wrap_mode,
                                          mipmap);
 

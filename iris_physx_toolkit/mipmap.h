@@ -26,6 +26,11 @@ extern "C" {
 // Enums
 //
 
+typedef enum _TEXTURE_FILTERING_ALGORITHM {
+    TEXTURE_FILTERING_ALGORITHM_NONE = 0,
+    TEXTURE_FILTERING_ALGORITHM_TRILINEAR = 1
+} TEXTURE_FILTERING_ALGORITHM;
+
 typedef enum _WRAP_MODE {
     WRAP_MODE_REPEAT = 0,
     WRAP_MODE_BLACK = 1,
@@ -48,6 +53,7 @@ ReflectorMipmapAllocate(
     _In_reads_(height * width) const COLOR3 texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
@@ -87,6 +93,7 @@ FloatMipmapAllocateFromFloats(
     _In_reads_(height * width) const float_t texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     );
@@ -96,6 +103,7 @@ FloatMipmapAllocateFromLuma(
     _In_reads_(height * width) const COLOR3 texels[],
     _In_ size_t width,
     _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     );
