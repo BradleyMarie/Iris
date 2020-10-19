@@ -55,10 +55,10 @@ ImageFloatTextureSample(
     ISTATUS status = FloatMipmapLookup(texture->mipmap,
                                        u,
                                        v,
-                                       (float_t)0.0,
-                                       (float_t)0.0, 
-                                       (float_t)0.0,
-                                       (float_t)0.0,
+                                       uv->du_dx * texture->u_scalar,
+                                       uv->du_dy * texture->u_scalar,
+                                       uv->dv_dx * texture->v_scalar,
+                                       uv->dv_dy * texture->v_scalar,
                                        value);
 
     return status;
@@ -181,10 +181,10 @@ ImageReflectorTextureSample(
     ISTATUS status = ReflectorMipmapLookup(texture->mipmap,
                                            u,
                                            v,
-                                           (float_t)0.0,
-                                           (float_t)0.0, 
-                                           (float_t)0.0,
-                                           (float_t)0.0,
+                                           uv->du_dx * texture->u_scalar,
+                                           uv->du_dy * texture->u_scalar,
+                                           uv->dv_dx * texture->v_scalar,
+                                           uv->dv_dy * texture->v_scalar,
                                            reflector_compositor,
                                            value);
 
