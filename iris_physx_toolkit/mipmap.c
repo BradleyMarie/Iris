@@ -321,7 +321,7 @@ ReflectorMipmapLookupTextureFilteringTrilinear(
 {
     float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
     float_t level =
-        mipmap->last_level_index_fp - FloatTLog2(fmax(max, (float_t)1e-8));
+        mipmap->last_level_index_fp + FloatTLog2(fmax(max, (float_t)1e-8));
 
     if (level < (float_t)0.0)
     {
@@ -1044,7 +1044,7 @@ FloatMipmapLookupTextureFilteringTrilinear(
 {
     float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
     float_t level =
-        mipmap->last_level_index_fp - FloatTLog2(fmax(max, (float_t)1e-8));
+        mipmap->last_level_index_fp + FloatTLog2(fmax(max, (float_t)1e-8));
 
     if (level < (float_t)0.0)
     {
