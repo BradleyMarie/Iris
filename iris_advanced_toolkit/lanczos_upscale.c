@@ -265,15 +265,23 @@ LanczosUpscaleColors(
                            weights,
                            &valid_weights);
 
-            COLOR3 new_value = ColorCreateBlack();
+            float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
-                COLOR3 scaled = ColorScale(texels[i * height + start_index + k],
-                                           weights[k]);
-                new_value = ColorAdd(new_value, scaled, target_color_space);
+                COLOR3 converted =
+                    ColorConvert(texels[i * height + start_index + k],
+                                 target_color_space);
+                values[0] = fma(converted.values[0], weights[k], values[0]);
+                values[1] = fma(converted.values[1], weights[k], values[1]);
+                values[2] = fma(converted.values[2], weights[k], values[2]);
             }
 
-            new_texels_buffer[i * *new_width + j] = new_value;
+            values[0] = fmax(values[0], (float_t)0.0);
+            values[1] = fmax(values[1], (float_t)0.0);
+            values[2] = fmax(values[2], (float_t)0.0);
+
+            new_texels_buffer[i * *new_width + j] =
+                ColorCreate(target_color_space, values);
         }
     }
 
@@ -291,16 +299,23 @@ LanczosUpscaleColors(
                            weights,
                            &valid_weights);
 
-            COLOR3 new_value = ColorCreateBlack();
+            float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
-                COLOR3 scaled =
-                    ColorScale(new_texels_buffer[j * *new_height + start_index + k],
-                               weights[k]);
-                new_value = ColorAdd(new_value, scaled, target_color_space);
+                COLOR3 converted =
+                    ColorConvert(new_texels_buffer[j * *new_height + start_index + k],
+                                 target_color_space);
+                values[0] = fma(converted.values[0], weights[k], values[0]);
+                values[1] = fma(converted.values[1], weights[k], values[1]);
+                values[2] = fma(converted.values[2], weights[k], values[2]);
             }
 
-            new_texels_buffer[j * *new_width + i] = new_value;
+            values[0] = fmax(values[0], (float_t)0.0);
+            values[1] = fmax(values[1], (float_t)0.0);
+            values[2] = fmax(values[2], (float_t)0.0);
+
+            new_texels_buffer[j * *new_width + i] =
+                ColorCreate(target_color_space, values);
         }
     }
 
@@ -405,7 +420,9 @@ LanczosUpscaleFloats(
             float_t new_value = (float_t)0.0;
             for (size_t k = 0; k < valid_weights; k++)
             {
-                new_value += texels[i * height + start_index + k] * weights[k];
+                new_value = fma(texels[i * height + start_index + k],
+                                weights[k],
+                                new_value);
             }
 
             new_texels_buffer[i * *new_width + j] = new_value;
@@ -429,8 +446,10 @@ LanczosUpscaleFloats(
             float_t new_value = (float_t)0.0;
             for (size_t k = 0; k < valid_weights; k++)
             {
-                new_value +=
-                    new_texels_buffer[j * *new_height + start_index + k] * weights[k];
+                new_value =
+                    fma(new_texels_buffer[j * *new_height + start_index + k],
+                        weights[k],
+                        new_value);
             }
 
             new_texels_buffer[j * *new_width + i] = new_value;
