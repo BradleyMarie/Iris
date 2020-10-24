@@ -86,47 +86,50 @@ PCOLOR3
 DownsampleColors(
     _In_reads_(width * height) PCCOLOR3 texels,
     _In_ size_t width,
-    _In_ size_t height
+    _In_ size_t height,
+    _In_ size_t *new_width,
+    _In_ size_t *new_height
     )
 {
     assert(texels != NULL);
     assert(width != 0 && (width & (width - 1)) == 0);
     assert(height != 0 && (height & (height - 1)) == 0);
 
-    size_t new_width = width / 2;
-    size_t new_height = height / 2;
+    *new_width = width / 2;
+    *new_height = height / 2;
 
-    PCOLOR3 colors = (PCOLOR3)calloc(new_width * new_height, sizeof(COLOR3));
+    PCOLOR3 colors =
+        (PCOLOR3)calloc(*new_width * *new_height, sizeof(COLOR3));
 
     if (colors == NULL)
     {
         return NULL;
     }
 
-    for (size_t i = 0; i < new_height; i++)
+    for (size_t i = 0; i < *new_height; i++)
     {
-        for (size_t j = 0; j < new_width; j++)
+        for (size_t j = 0; j < *new_width; j++)
         {
             size_t source_row = i * 2;
             size_t source_column = j * 2;
 
-            COLOR3 color = texels[source_row * height + source_column];
+            COLOR3 color = texels[source_row * width + source_column];
 
             color = ColorAdd(color,
-                             texels[source_row * height + source_column + 1],
+                             texels[source_row * width + source_column + 1],
                              color.color_space);
 
             source_row += 1;
 
             color = ColorAdd(color,
-                             texels[source_row * height + source_column],
+                             texels[source_row * width + source_column],
                              color.color_space);
 
             color = ColorAdd(color,
-                             texels[source_row * height + source_column + 1],
+                             texels[source_row * width + source_column + 1],
                              color.color_space);
 
-            colors[i * new_width + j] = ColorScale(color, (float_t)0.25);
+            colors[i * *new_width + j] = ColorScale(color, (float_t)0.25);
         }
     }
 
@@ -440,7 +443,7 @@ ReflectorMipmapAllocateInternal(
     }
 
     size_t width_log_2 = SizeTLog2(width);
-    size_t height_log_2 = SizeTLog2(width);
+    size_t height_log_2 = SizeTLog2(height);
 
     size_t num_levels = 1;
     if (width_log_2 < height_log_2)
@@ -583,7 +586,11 @@ ReflectorMipmapAllocate(
     PCCOLOR3 working_const = texels;
     for (size_t i = 1; i < result->num_levels; i++)
     {
-        PCOLOR3 new_working = DownsampleColors(working_const, width, height);
+        PCOLOR3 new_working = DownsampleColors(working_const,
+                                               result->levels[i - 1].width,
+                                               result->levels[i - 1].height,
+                                               &result->levels[i].width,
+                                               &result->levels[i].height);
 
         free(working);
 
@@ -602,8 +609,8 @@ ReflectorMipmapAllocate(
         {
             ISTATUS status =
                 ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                  working[i],
-                                                  result->levels[i].texels + i);
+                                                  working[j],
+                                                  result->levels[i].texels + j);
 
             if (status != ISTATUS_SUCCESS)
             {
@@ -800,7 +807,7 @@ FloatMipmapAllocate(
     }
 
     size_t width_log_2 = SizeTLog2(width);
-    size_t height_log_2 = SizeTLog2(width);
+    size_t height_log_2 = SizeTLog2(height);
 
     size_t num_levels = 1;
     if (width_log_2 < height_log_2)
@@ -861,37 +868,40 @@ float_t*
 DownsampleFloats(
     _In_reads_(width * height) const float_t *texels,
     _In_ size_t width,
-    _In_ size_t height
+    _In_ size_t height,
+    _Out_ size_t* new_height,
+    _Out_ size_t* new_width
     )
 {
     assert(texels != NULL);
     assert(width != 0 && (width & (width - 1)) == 0);
     assert(height != 0 && (height & (height - 1)) == 0);
 
-    size_t new_width = width / 2;
-    size_t new_height = height / 2;
+    *new_width = width / 2;
+    *new_height = height / 2;
 
-    float_t *values = (float_t*)calloc(new_width * new_height, sizeof(float_t));
+    float_t *values = 
+        (float_t*)calloc(*new_width * *new_height, sizeof(float_t));
 
     if (values == NULL)
     {
         return NULL;
     }
 
-    for (size_t i = 0; i < new_height; i++)
+    for (size_t i = 0; i < *new_height; i++)
     {
-        for (size_t j = 0; j < new_width; j++)
+        for (size_t j = 0; j < *new_width; j++)
         {
             size_t source_row = i * 2;
             size_t source_column = j * 2;
 
             float_t value =
-                texels[source_row * height + source_column] +
-                texels[source_row * height + source_column + 1] +
-                texels[source_row * (height + 1) + source_column] +
-                texels[source_row * (height + 1) + source_column + 1];
+                texels[source_row * width + source_column] +
+                texels[source_row * width + source_column + 1] +
+                texels[source_row * (width + 1) + source_column] +
+                texels[source_row * (width + 1) + source_column + 1];
 
-            values[i * new_width + j] = value * (float_t)0.25;
+            values[i * *new_width + j] = value * (float_t)0.25;
         }
     }
 
@@ -1150,7 +1160,11 @@ FloatMipmapAllocateFromFloats(
     const float_t *working_const = texels;
     for (size_t i = 1; i < result->num_levels; i++)
     {
-        float_t *new_working = DownsampleFloats(working_const, width, height);
+        float_t *new_working = DownsampleFloats(working_const, 
+                                                result->levels[i - 1].width,
+                                                result->levels[i - 1].height,
+                                                &result->levels[i].width,
+                                                &result->levels[i].height);
 
         free(working);
 
@@ -1167,7 +1181,7 @@ FloatMipmapAllocateFromFloats(
              j < result->levels[i].height * result->levels[i].width;
              j++)
         {
-            result->levels[i].texels[i] = working[i];
+            result->levels[i].texels[j] = working[j];
         }
     }
 
@@ -1249,7 +1263,11 @@ FloatMipmapAllocateFromLuma(
     const float_t *working_const = result->levels[0].texels;
     for (size_t i = 1; i < result->num_levels; i++)
     {
-        float_t *new_working = DownsampleFloats(working_const, width, height);
+        float_t *new_working = DownsampleFloats(working_const, 
+                                                result->levels[i - 1].width,
+                                                result->levels[i - 1].height,
+                                                &result->levels[i].width,
+                                                &result->levels[i].height);
 
         free(working);
 
@@ -1266,7 +1284,7 @@ FloatMipmapAllocateFromLuma(
              j < result->levels[i].height * result->levels[i].width;
              j++)
         {
-            result->levels[i].texels[i] = working[i];
+            result->levels[i].texels[j] = working[j];
         }
     }
 

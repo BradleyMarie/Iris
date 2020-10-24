@@ -140,17 +140,20 @@ ComputeWeights(
     for (size_t i = 0; start_index < (float_t)0.0 && num_weights != 0; i++)
     {
         start_index += (float_t)1.0;
+        num_weights -= 1;
     }
 
     for (size_t i = 0;
          (float_t)old_resolution <= start_index && num_weights != 0;
          i++) {
         start_index -= (float_t)1.0;
+        num_weights -= 1;
     }
 
     assert(num_weights != 0);
 
     *input_start_index = (size_t)start_index;
+    *valid_weights = num_weights;
 
     float_t sum_weights = (float_t)0.0;
     for (size_t i = 0; i < num_weights; i++)
