@@ -228,6 +228,9 @@ ReflectorMipmapLookupWithTriangleFilter(
     float_t ds = scaled_s - scaled_s0;
     float_t dt = scaled_t - scaled_t0;
 
+    ds = IMax((float_t)0.0, IMin(ds, (float_t)1.0));
+    dt = IMax((float_t)0.0, IMin(dt, (float_t)1.0));
+
     float_t one_minus_ds = (float_t)1.0 - ds;
     float_t one_minus_dt = (float_t)1.0 - dt;
 
@@ -1002,6 +1005,9 @@ FloatMipmapLookupWithTriangleFilter(
 
     float_t ds = scaled_s - scaled_s0;
     float_t dt = scaled_t - scaled_t0;
+
+    ds = IMax((float_t)0.0, IMin(ds, (float_t)1.0));
+    dt = IMax((float_t)0.0, IMin(dt, (float_t)1.0));
 
     float_t one_minus_ds = (float_t)1.0 - ds;
     float_t one_minus_dt = (float_t)1.0 - dt;
