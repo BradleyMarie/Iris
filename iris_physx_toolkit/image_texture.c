@@ -52,14 +52,29 @@ ImageFloatTextureSample(
     float_t u = texture->u_offset + uv->uv[0] * texture->u_scalar;
     float_t v = texture->v_offset + uv->uv[1] * texture->v_scalar;
 
-    ISTATUS status = FloatMipmapLookup(texture->mipmap,
-                                       u,
-                                       v,
-                                       uv->du_dx * texture->u_scalar,
-                                       uv->du_dy * texture->u_scalar,
-                                       uv->dv_dx * texture->v_scalar,
-                                       uv->dv_dy * texture->v_scalar,
-                                       value);
+    ISTATUS status;
+    if (uv->has_derivatives)
+    {
+        status = FloatMipmapLookup(texture->mipmap,
+                                   u,
+                                   v,
+                                   uv->du_dx * texture->u_scalar,
+                                   uv->du_dy * texture->u_scalar,
+                                   uv->dv_dx * texture->v_scalar,
+                                   uv->dv_dy * texture->v_scalar,
+                                   value);
+    }
+    else
+    {
+        status = FloatMipmapLookup(texture->mipmap,
+                                   u,
+                                   v,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   (float_t)0.0,
+                                   value);
+    }
 
     return status;
 }
@@ -178,15 +193,31 @@ ImageReflectorTextureSample(
     float_t u = texture->u_offset + uv->uv[0] * texture->u_scalar;
     float_t v = texture->v_offset + uv->uv[1] * texture->v_scalar;
 
-    ISTATUS status = ReflectorMipmapLookup(texture->mipmap,
-                                           u,
-                                           v,
-                                           uv->du_dx * texture->u_scalar,
-                                           uv->du_dy * texture->u_scalar,
-                                           uv->dv_dx * texture->v_scalar,
-                                           uv->dv_dy * texture->v_scalar,
-                                           reflector_compositor,
-                                           value);
+    ISTATUS status;
+    if (uv->has_derivatives)
+    {
+        status = ReflectorMipmapLookup(texture->mipmap,
+                                       u,
+                                       v,
+                                       uv->du_dx * texture->u_scalar,
+                                       uv->du_dy * texture->u_scalar,
+                                       uv->dv_dx * texture->v_scalar,
+                                       uv->dv_dy * texture->v_scalar,
+                                       reflector_compositor,
+                                       value);
+    }
+    else
+    {
+        status = ReflectorMipmapLookup(texture->mipmap,
+                                       u,
+                                       v,
+                                       (float_t)0.0,
+                                       (float_t)0.0,
+                                       (float_t)0.0,
+                                       (float_t)0.0,
+                                       reflector_compositor,
+                                       value);
+    }
 
     return status;
 }

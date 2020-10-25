@@ -319,9 +319,14 @@ ReflectorMipmapLookupTextureFilteringTrilinear(
     _Out_ PCREFLECTOR *reflector
     )
 {
+    dsdx = fabs(dsdx);
+    dsdy = fabs(dsdy);
+    dtdx = fabs(dtdx);
+    dtdy = fabs(dtdy);
+
     float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
     float_t level =
-        mipmap->last_level_index_fp + FloatTLog2(fmax(max, (float_t)1e-8));
+        mipmap->last_level_index_fp + FloatTLog2(IMax(max, (float_t)1e-8));
 
     if (level < (float_t)0.0)
     {
@@ -656,22 +661,22 @@ ReflectorMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (isnan(dsdx))
+    if (!isfinite(dsdx))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (isnan(dsdy))
+    if (!isfinite(dsdy))
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (isnan(dtdx))
+    if (!isfinite(dtdx))
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (isnan(dtdy))
+    if (!isfinite(dtdy))
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -1042,9 +1047,14 @@ FloatMipmapLookupTextureFilteringTrilinear(
     _Out_ float_t *value
     )
 {
+    dsdx = fabs(dsdx);
+    dsdy = fabs(dsdy);
+    dtdx = fabs(dtdx);
+    dtdy = fabs(dtdy);
+
     float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
     float_t level =
-        mipmap->last_level_index_fp + FloatTLog2(fmax(max, (float_t)1e-8));
+        mipmap->last_level_index_fp + FloatTLog2(IMax(max, (float_t)1e-8));
 
     if (level < (float_t)0.0)
     {
@@ -1322,22 +1332,22 @@ FloatMipmapLookup(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (isnan(dsdx))
+    if (!isfinite(dsdx))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (isnan(dsdy))
+    if (!isfinite(dsdy))
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (isnan(dtdx))
+    if (!isfinite(dtdx))
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (isnan(dtdy))
+    if (!isfinite(dtdy))
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
