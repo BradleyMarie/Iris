@@ -143,11 +143,12 @@ ComputeWeights(
         num_weights -= 1;
     }
 
-    for (size_t i = 0;
-         (float_t)old_resolution <= start_index && num_weights != 0;
-         i++) {
-        start_index -= (float_t)1.0;
-        num_weights -= 1;
+    for (size_t i = 0; i < num_weights; i++)
+    {
+        if (start_index + (float_t)i <= old_resolution)
+        {
+            num_weights -= 1;
+        }
     }
 
     assert(num_weights != 0);
@@ -235,13 +236,32 @@ LanczosUpscaleColors(
         return ISTATUS_SUCCESS;
     }
 
-    size_t num_pixels;
+    size_t staging_buffer_num_pixels;
     bool success = CheckedMultiplySizeT(*new_width,
-                                        *new_height,
-                                        &num_pixels);
+                                        height,
+                                        &staging_buffer_num_pixels);
 
     if (!success)
     {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PCOLOR3 staging_buffer =
+        (PCOLOR3)calloc(staging_buffer_num_pixels, sizeof(COLOR3));
+
+    if (staging_buffer == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t num_pixels;
+    success = CheckedMultiplySizeT(*new_width,
+                                   *new_height,
+                                   &num_pixels);
+
+    if (!success)
+    {
+        free(staging_buffer);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -272,7 +292,7 @@ LanczosUpscaleColors(
             for (size_t k = 0; k < valid_weights; k++)
             {
                 COLOR3 converted =
-                    ColorConvert(texels[i * height + start_index + k],
+                    ColorConvert(texels[i * width + start_index + k],
                                  target_color_space);
                 values[0] = fma(converted.values[0], weights[k], values[0]);
                 values[1] = fma(converted.values[1], weights[k], values[1]);
@@ -283,7 +303,7 @@ LanczosUpscaleColors(
             values[1] = fmax(values[1], (float_t)0.0);
             values[2] = fmax(values[2], (float_t)0.0);
 
-            new_texels_buffer[i * *new_width + j] =
+            staging_buffer[i * *new_width + j] =
                 ColorCreate(target_color_space, values);
         }
     }
@@ -306,7 +326,7 @@ LanczosUpscaleColors(
             for (size_t k = 0; k < valid_weights; k++)
             {
                 COLOR3 converted =
-                    ColorConvert(new_texels_buffer[j * *new_height + start_index + k],
+                    ColorConvert(staging_buffer[(start_index + k) * *new_width + i],
                                  target_color_space);
                 values[0] = fma(converted.values[0], weights[k], values[0]);
                 values[1] = fma(converted.values[1], weights[k], values[1]);
@@ -324,6 +344,7 @@ LanczosUpscaleColors(
 
     *new_texels = new_texels_buffer;
 
+    free(staging_buffer);
     free(texels);
 
     return ISTATUS_SUCCESS;
@@ -389,10 +410,28 @@ LanczosUpscaleFloats(
         return ISTATUS_SUCCESS;
     }
 
-    size_t num_pixels;
+    size_t staging_buffer_num_pixels;
     bool success = CheckedMultiplySizeT(*new_width,
-                                        *new_height,
-                                        &num_pixels);
+                                        height,
+                                        &staging_buffer_num_pixels);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    float_t *staging_buffer =
+        (float_t*)calloc(staging_buffer_num_pixels, sizeof(float_t));
+
+    if (staging_buffer == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    size_t num_pixels;
+    success = CheckedMultiplySizeT(*new_width,
+                                   *new_height,
+                                   &num_pixels);
 
     if (!success)
     {
@@ -423,12 +462,12 @@ LanczosUpscaleFloats(
             float_t new_value = (float_t)0.0;
             for (size_t k = 0; k < valid_weights; k++)
             {
-                new_value = fma(texels[i * height + start_index + k],
+                new_value = fma(texels[i * width + start_index + k],
                                 weights[k],
                                 new_value);
             }
 
-            new_texels_buffer[i * *new_width + j] = new_value;
+            staging_buffer[i * *new_width + j] = new_value;
         }
     }
 
@@ -450,7 +489,7 @@ LanczosUpscaleFloats(
             for (size_t k = 0; k < valid_weights; k++)
             {
                 new_value =
-                    fma(new_texels_buffer[j * *new_height + start_index + k],
+                    fma(staging_buffer[(start_index + k) * *new_width + i],
                         weights[k],
                         new_value);
             }
@@ -461,6 +500,7 @@ LanczosUpscaleFloats(
 
     *new_texels = new_texels_buffer;
 
+    free(staging_buffer);
     free(texels);
 
     return ISTATUS_SUCCESS;
