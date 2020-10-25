@@ -296,10 +296,6 @@ ReflectorMipmapLookupTextureFilteringNone(
     _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
-    _In_ float_t dsdx,
-    _In_ float_t dsdy,
-    _In_ float_t dtdx,
-    _In_ float_t dtdy,
     _In_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
     )
@@ -641,6 +637,50 @@ ReflectorMipmapLookup(
     _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
+    _In_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(s))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(t))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    ISTATUS status =
+        ReflectorMipmapLookupTextureFilteringNone(mipmap,
+                                                  s,
+                                                  t,
+                                                  compositor,
+                                                  reflector);
+
+    return status;
+}
+
+ISTATUS
+ReflectorMipmapFilteredLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
     _In_ float_t dsdx,
     _In_ float_t dsdy,
     _In_ float_t dtdx,
@@ -700,10 +740,6 @@ ReflectorMipmapLookup(
             ReflectorMipmapLookupTextureFilteringNone(mipmap,
                                                       s,
                                                       t,
-                                                      dsdx,
-                                                      dsdy,
-                                                      dtdx,
-                                                      dtdy,
                                                       compositor,
                                                       reflector);
 
@@ -1030,10 +1066,6 @@ FloatMipmapLookupTextureFilteringNone(
     _In_ PCFLOAT_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
-    _In_ float_t dsdx,
-    _In_ float_t dsdy,
-    _In_ float_t dtdx,
-    _In_ float_t dtdy,
     _Out_ float_t *value
     )
 {
@@ -1316,6 +1348,42 @@ FloatMipmapLookup(
     _In_ PCFLOAT_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
+    _Out_ float_t *value
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(s))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(t))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (value == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    FloatMipmapLookupTextureFilteringNone(mipmap,
+                                          s,
+                                          t,
+                                          value);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapFilteredLookup(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
     _In_ float_t dsdx,
     _In_ float_t dsdy,
     _In_ float_t dtdx,
@@ -1368,10 +1436,6 @@ FloatMipmapLookup(
         FloatMipmapLookupTextureFilteringNone(mipmap,
                                               s,
                                               t,
-                                              dsdx,
-                                              dsdy,
-                                              dtdx,
-                                              dtdy,
                                               value);
     }
     else

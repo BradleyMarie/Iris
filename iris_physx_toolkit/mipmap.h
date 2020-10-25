@@ -64,6 +64,15 @@ ReflectorMipmapLookup(
     _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
+    _In_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    );
+
+ISTATUS
+ReflectorMipmapFilteredLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
     _In_ float_t dsdx,
     _In_ float_t dsdy,
     _In_ float_t dtdx,
@@ -110,6 +119,14 @@ FloatMipmapAllocateFromLuma(
 
 ISTATUS
 FloatMipmapLookup(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _Out_ float_t *value
+    );
+
+ISTATUS
+FloatMipmapFilteredLookup(
     _In_ PCFLOAT_MIPMAP mipmap,
     _In_ float_t s,
     _In_ float_t t,
