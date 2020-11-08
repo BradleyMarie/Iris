@@ -82,12 +82,8 @@ BumpMapCompute(
         du *= (float_t)0.5;
     }
 
-    UV_TEXTURE_COORDINATE modified_coords;
+    UV_TEXTURE_COORDINATE modified_coords = *uv_coordinates;
     modified_coords.uv[0] = uv_coordinates->uv[0] + du;
-    modified_coords.uv[1] = uv_coordinates->uv[1];
-    modified_coords.du_dy = uv_coordinates->du_dy;
-    modified_coords.dv_dx = uv_coordinates->dv_dx;
-    modified_coords.dv_dy = uv_coordinates->dv_dy;
 
     POINT3 hit_point1 =
         PointVectorAddScaled(hit_point, uv_coordinates->dp_du, du);
