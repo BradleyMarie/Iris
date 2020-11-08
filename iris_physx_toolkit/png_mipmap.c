@@ -28,6 +28,7 @@ ISTATUS
 PngReflectorMipmapAllocate(
     _In_z_ const char* filename,
     _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
@@ -44,21 +45,26 @@ PngReflectorMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (!isfinite(max_anisotropy) || max_anisotropy <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (color_extrapolator == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (mipmap == NULL)
+    if (color_extrapolator == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     int x, y, n;
@@ -101,6 +107,7 @@ PngReflectorMipmapAllocate(
                                      new_x,
                                      new_y,
                                      texture_filtering,
+                                     max_anisotropy,
                                      wrap_mode,
                                      color_extrapolator,
                                      mipmap);
@@ -114,6 +121,7 @@ ISTATUS
 PngFloatMipmapAllocate(
     _In_z_ const char* filename,
     _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     )
@@ -129,16 +137,21 @@ PngFloatMipmapAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (wrap_mode != WRAP_MODE_REPEAT &&
-        wrap_mode != WRAP_MODE_BLACK &&
-        wrap_mode != WRAP_MODE_CLAMP)
+    if (!isfinite(max_anisotropy) || max_anisotropy <= (float_t)0.0)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap == NULL)
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     int x, y, n;
@@ -176,6 +189,7 @@ PngFloatMipmapAllocate(
                                          new_x,
                                          new_y,
                                          texture_filtering,
+                                         max_anisotropy,
                                          wrap_mode,
                                          mipmap);
 

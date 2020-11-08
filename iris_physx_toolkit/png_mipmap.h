@@ -29,6 +29,7 @@ ISTATUS
 PngReflectorMipmapAllocate(
     _In_z_ const char* filename,
     _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
     _In_ WRAP_MODE wrap_mode,
     _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _Out_ PREFLECTOR_MIPMAP *mipmap
@@ -38,6 +39,7 @@ ISTATUS
 PngFloatMipmapAllocate(
     _In_z_ const char* filename,
     _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
     _In_ WRAP_MODE wrap_mode,
     _Out_ PFLOAT_MIPMAP *mipmap
     );
