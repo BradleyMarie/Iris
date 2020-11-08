@@ -789,7 +789,8 @@ ReflectorMipmapAllocateInternal(
     assert(height != 0);
     assert(mipmap != NULL);
     assert(texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE ||
-           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_EWA);
     assert(isfinite(max_anisotropy) && (float_t)0.0 < max_anisotropy);
     assert(wrap_mode == WRAP_MODE_REPEAT ||
            wrap_mode == WRAP_MODE_BLACK ||
@@ -900,7 +901,8 @@ ReflectorMipmapAllocate(
     }
 
     if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
-        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -1219,7 +1221,8 @@ FloatMipmapAllocate(
     assert(height != 0);
     assert(mipmap != NULL);
     assert(texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE ||
-           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR);
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_EWA);
     assert(isfinite(max_anisotropy) && (float_t)0.0 < max_anisotropy);
     assert(wrap_mode == WRAP_MODE_REPEAT ||
            wrap_mode == WRAP_MODE_BLACK ||
@@ -1709,7 +1712,8 @@ FloatMipmapAllocateFromFloats(
     }
 
     if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
-        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
@@ -1818,7 +1822,8 @@ FloatMipmapAllocateFromLuma(
     }
 
     if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
-        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }

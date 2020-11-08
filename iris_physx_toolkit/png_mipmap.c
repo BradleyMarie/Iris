@@ -40,7 +40,8 @@ PngReflectorMipmapAllocate(
     }
 
     if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
-        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -132,7 +133,8 @@ PngFloatMipmapAllocate(
     }
 
     if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
-        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
