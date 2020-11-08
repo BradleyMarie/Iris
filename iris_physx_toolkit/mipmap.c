@@ -650,7 +650,7 @@ ReflectorMipmapEwa(
                     return status;
                 }
 
-                sum_weights =+ weight;
+                sum_weights += weight;
             }
         }
     }
@@ -1607,7 +1607,7 @@ FloatMipmapEwa(
 
                 float_t weight = ewa_lookup_table[index];
                 sum += value * weight;
-                sum_weights =+ weight;
+                sum_weights += weight;
             }
         }
     }
