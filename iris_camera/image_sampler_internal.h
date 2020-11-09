@@ -122,7 +122,9 @@ ImageSamplerGetSample(
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v
+    _Out_ float_t *lens_sample_v,
+    _Out_ float_t *dpixel_sample_u,
+    _Out_ float_t *dpixel_sample_v
     )
 {
     assert(image_sampler != NULL);
@@ -131,6 +133,8 @@ ImageSamplerGetSample(
     assert(pixel_sample_v != NULL);
     assert(lens_sample_u != NULL);
     assert(lens_sample_v != NULL);
+    assert(dpixel_sample_u != NULL);
+    assert(dpixel_sample_v != NULL);
 
     ISTATUS status =
         image_sampler->vtable->get_sample_routine(image_sampler->data,
@@ -139,7 +143,9 @@ ImageSamplerGetSample(
                                                   pixel_sample_u,
                                                   pixel_sample_v,
                                                   lens_sample_u,
-                                                  lens_sample_v);
+                                                  lens_sample_v,
+                                                  dpixel_sample_u,
+                                                  dpixel_sample_v);
 
     return status;
 }

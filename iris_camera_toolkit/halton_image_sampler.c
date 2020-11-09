@@ -50,6 +50,8 @@ typedef struct _HALTON_IMAGE_SAMPLER {
     float_t lens_delta_u;
     float_t lens_min_v;
     float_t lens_delta_v;
+    float_t dpixel_sample_u;
+    float_t dpixel_sample_v;
 } HALTON_IMAGE_SAMPLER, *PHALTON_IMAGE_SAMPLER;
 
 typedef const HALTON_IMAGE_SAMPLER *PCHALTON_IMAGE_SAMPLER;
@@ -149,6 +151,12 @@ HaltonImageSamplerPrepareImageSamples(
     image_sampler->to_pixel_v =
         (double_t)image_sampler->halton_enum.m_scale_y / (double_t)num_rows;
 
+    float_t sqrt_samples = sqrt((float_t)image_sampler->samples_per_pixel);
+    image_sampler->dpixel_sample_u =
+        (float_t)1.0 / ((float_t)num_columns * sqrt_samples);
+    image_sampler->dpixel_sample_v =
+        (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -196,7 +204,9 @@ HaltonImageSamplerNextSample(
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v
+    _Out_ float_t *lens_sample_v,
+    _Out_ float_t *dpixel_sample_u,
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
@@ -234,6 +244,9 @@ HaltonImageSamplerNextSample(
     {
         *lens_sample_v = image_sampler->lens_min_v;
     }
+
+    *dpixel_sample_u = image_sampler->dpixel_sample_u;
+    *dpixel_sample_v = image_sampler->dpixel_sample_v;
 
     return ISTATUS_SUCCESS;
 }

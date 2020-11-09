@@ -61,7 +61,9 @@ ISTATUS
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v
+    _Out_ float_t *lens_sample_v,
+    _Out_ float_t *dpixel_sample_u,
+    _Out_ float_t *dpixel_sample_v
     );
 
 typedef

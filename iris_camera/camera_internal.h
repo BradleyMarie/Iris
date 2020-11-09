@@ -61,16 +61,51 @@ CameraGenerateRayDifferential(
     assert(isfinite(dimage_v_dy));
     assert(ray_differential != NULL);
 
-    ISTATUS status = camera->vtable->generate_ray_differential_routine(camera->data,
-                                                                       image_u,
-                                                                       image_v,
-                                                                       lens_u,
-                                                                       lens_v,
-                                                                       dimage_u_dx,
-                                                                       dimage_v_dy,
-                                                                       ray_differential);
+    RAY ray;
+    ISTATUS status = camera->vtable->generate_ray_routine(camera->data,
+                                                          image_u,
+                                                          image_v,
+                                                          lens_u,
+                                                          lens_v,
+                                                          &ray);
 
-    return status;
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    RAY rx;
+    status = camera->vtable->generate_ray_routine(camera->data,
+                                                  image_u + dimage_u_dx,
+                                                  image_v,
+                                                  lens_u,
+                                                  lens_v,
+                                                  &rx);
+
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    RAY ry;
+    status = camera->vtable->generate_ray_routine(camera->data,
+                                                  image_u,
+                                                  image_v + dimage_v_dy,
+                                                  lens_u,
+                                                  lens_v,
+                                                  &ry);
+
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *ray_differential = RayDifferentialCreate(ray, rx, ry);
+
+    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_CAMERA_CAMERA_INTERNAL_

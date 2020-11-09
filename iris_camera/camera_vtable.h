@@ -20,19 +20,17 @@ Abstract:
 
 typedef
 ISTATUS
-(*PCAMERA_GENERATE_RAY_DIFFERENTIAL_ROUTINE)(
+(*PCAMERA_GENERATE_RAY_ROUTINE)(
     _In_ const void *context,
     _In_ float_t image_u,
     _In_ float_t image_v,
     _In_ float_t lens_u,
     _In_ float_t lens_v,
-    _In_ float_t dimage_u_dx,
-    _In_ float_t dimage_v_dy,
-    _Out_ PRAY_DIFFERENTIAL ray_differential
+    _Out_ PRAY ray
     );
 
 typedef struct _CAMERA_VTABLE {
-    PCAMERA_GENERATE_RAY_DIFFERENTIAL_ROUTINE generate_ray_differential_routine;
+    PCAMERA_GENERATE_RAY_ROUTINE generate_ray_routine;
     PFREE_ROUTINE free_routine;
 } CAMERA_VTABLE, *PCAMERA_VTABLE;
 

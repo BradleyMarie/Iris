@@ -147,7 +147,9 @@ GridImageSamplerNextSample(
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v
+    _Out_ float_t *lens_sample_v,
+    _Out_ float_t *dpixel_sample_u,
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
@@ -240,6 +242,9 @@ GridImageSamplerNextSample(
         image_sampler->lens_min_v + (float_t)lens_v_index * image_sampler->lens_sample_width_v;
     *lens_sample_v = IMax(IMin(lens_jitter_v, image_sampler->lens_max_v),
                           image_sampler->lens_min_v);
+
+    *dpixel_sample_u = image_sampler->pixel_sample_width_u;
+    *dpixel_sample_v = image_sampler->pixel_sample_width_v;
 
     return ISTATUS_SUCCESS;
 }

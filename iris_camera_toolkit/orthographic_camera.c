@@ -34,62 +34,28 @@ typedef const ORTHOGRAPHIC_CAMERA *PCORTHOGRAPHIC_CAMERA;
 //
 
 static
-RAY
+ISTATUS
 OrthographicCameraGenerateRay(
     _In_ const void *context,
     _In_ float_t image_u,
     _In_ float_t image_v,
     _In_ float_t lens_u,
-    _In_ float_t lens_v
+    _In_ float_t lens_v,
+    _Out_ PRAY ray
     )
 {
     PCORTHOGRAPHIC_CAMERA orthographic_camera = (PCORTHOGRAPHIC_CAMERA)context;
 
-    POINT3 frame_origin = PointVectorAddScaled(orthographic_camera->frame_corner,
-                                               orthographic_camera->frame_width,
-                                               image_u);
+    POINT3 frame_origin =
+        PointVectorAddScaled(orthographic_camera->frame_corner,
+                             orthographic_camera->frame_width,
+                             image_u);
 
     frame_origin = PointVectorAddScaled(frame_origin,
                                         orthographic_camera->frame_height,
                                         image_v);
 
-    RAY result = RayCreate(frame_origin, orthographic_camera->direction);
-
-    return result;
-}
-
-static
-ISTATUS
-OrthographicCameraGenerateRayDifferential(
-    _In_ const void *context,
-    _In_ float_t image_u,
-    _In_ float_t image_v,
-    _In_ float_t lens_u,
-    _In_ float_t lens_v,
-    _In_ float_t dimage_u_dx,
-    _In_ float_t dimage_v_dy,
-    _Out_ PRAY_DIFFERENTIAL ray_differential
-    )
-{
-    RAY ray = OrthographicCameraGenerateRay(context,
-                                            image_u,
-                                            image_v,
-                                            lens_u,
-                                            lens_v);
-
-    RAY rx = OrthographicCameraGenerateRay(context,
-                                           image_u + dimage_u_dx,
-                                           image_v,
-                                           lens_u,
-                                           lens_v);
-
-    RAY ry = OrthographicCameraGenerateRay(context,
-                                           image_u,
-                                           image_v + dimage_v_dy,
-                                           lens_u,
-                                           lens_v);
-
-    *ray_differential = RayDifferentialCreate(ray, rx, ry);
+    *ray = RayCreate(frame_origin, orthographic_camera->direction);
 
     return ISTATUS_SUCCESS;
 }
@@ -99,7 +65,7 @@ OrthographicCameraGenerateRayDifferential(
 //
 
 static const CAMERA_VTABLE orthographic_camera_vtable = {
-    OrthographicCameraGenerateRayDifferential,
+    OrthographicCameraGenerateRay,
     NULL
 };
 

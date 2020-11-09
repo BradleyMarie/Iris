@@ -44,6 +44,8 @@ typedef struct _SOBOL_IMAGE_SAMPLER {
     float_t lens_delta_u;
     float_t lens_min_v;
     float_t lens_delta_v;
+    float_t dpixel_sample_u;
+    float_t dpixel_sample_v;
     uint32_t samples_per_pixel;
 } SOBOL_IMAGE_SAMPLER, *PSOBOL_IMAGE_SAMPLER;
 
@@ -178,6 +180,12 @@ SobolImageSamplerPrepareImageSamples(
     image_sampler->num_columns = num_columns;
     image_sampler->num_rows = num_rows;
 
+    float_t sqrt_samples = sqrt((float_t)image_sampler->samples_per_pixel);
+    image_sampler->dpixel_sample_u =
+        (float_t)1.0 / ((float_t)num_columns * sqrt_samples);
+    image_sampler->dpixel_sample_v =
+        (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
+
     return ISTATUS_SUCCESS;
 }
 
@@ -229,7 +237,9 @@ SobolImageSamplerNextSample(
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v
+    _Out_ float_t *lens_sample_v,
+    _Out_ float_t *dpixel_sample_u,
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
@@ -277,6 +287,9 @@ SobolImageSamplerNextSample(
     {
         *lens_sample_v = image_sampler->lens_min_v;
     }
+
+    *dpixel_sample_u = image_sampler->dpixel_sample_u;
+    *dpixel_sample_v = image_sampler->dpixel_sample_v;
 
     return ISTATUS_SUCCESS;
 }

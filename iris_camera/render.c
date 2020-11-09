@@ -226,7 +226,7 @@ IrisCameraRenderPixel(
             return ISTATUS_SUCCESS;
         }
 
-        float_t pixel_u, pixel_v, lens_u, lens_v;
+        float_t pixel_u, pixel_v, lens_u, lens_v, dpixel_u, dpixel_v;
         ISTATUS status =
             ImageSamplerGetSample(context->local.image_sampler,
                                   rng,
@@ -234,7 +234,9 @@ IrisCameraRenderPixel(
                                   &pixel_u,
                                   &pixel_v,
                                   &lens_u,
-                                  &lens_v);
+                                  &lens_v,
+                                  &dpixel_u,
+                                  &dpixel_v);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -247,8 +249,8 @@ IrisCameraRenderPixel(
                                                pixel_v,
                                                lens_u,
                                                lens_v,
-                                               pixel_u_width,
-                                               pixel_v_width,
+                                               dpixel_u,
+                                               dpixel_v,
                                                &camera_ray_differential);
 
         if (status != ISTATUS_SUCCESS)

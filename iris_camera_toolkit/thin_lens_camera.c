@@ -36,13 +36,14 @@ typedef const THIN_LENS_CAMERA *PCTHIN_LENS_CAMERA;
 //
 
 static
-RAY
+ISTATUS
 ThinLensCameraGenerateRay(
     _In_ const void *context,
     _In_ float_t image_u,
     _In_ float_t image_v,
     _In_ float_t radius_squared,
-    _In_ float_t theta
+    _In_ float_t theta,
+    _Out_ PRAY ray
     )
 {
     PCTHIN_LENS_CAMERA thin_lens_camera = (PCTHIN_LENS_CAMERA)context;
@@ -70,43 +71,7 @@ ThinLensCameraGenerateRay(
     VECTOR3 camera_direction = PointSubtract(ray_origin,
                                              frame_origin);
 
-    RAY ray = RayCreate(ray_origin, camera_direction);
-
-    return ray;
-}
-
-static
-ISTATUS
-ThinLensCameraGenerateRayDifferential(
-    _In_ const void *context,
-    _In_ float_t image_u,
-    _In_ float_t image_v,
-    _In_ float_t radius_squared,
-    _In_ float_t theta,
-    _In_ float_t dimage_u_dx,
-    _In_ float_t dimage_v_dy,
-    _Out_ PRAY_DIFFERENTIAL ray_differential
-    )
-{
-    RAY ray = ThinLensCameraGenerateRay(context,
-                                        image_u,
-                                        image_v,
-                                        radius_squared,
-                                        theta);
-
-    RAY rx = ThinLensCameraGenerateRay(context,
-                                       image_u + dimage_u_dx,
-                                       image_v,
-                                       radius_squared,
-                                       theta);
-
-    RAY ry = ThinLensCameraGenerateRay(context,
-                                       image_u,
-                                       image_v + dimage_v_dy,
-                                       radius_squared,
-                                       theta);
-
-    *ray_differential = RayDifferentialCreate(ray, rx, ry);
+    *ray = RayCreate(ray_origin, camera_direction);
 
     return ISTATUS_SUCCESS;
 }
@@ -116,7 +81,7 @@ ThinLensCameraGenerateRayDifferential(
 //
 
 static const CAMERA_VTABLE thin_lens_camera_vtable = {
-    ThinLensCameraGenerateRayDifferential,
+    ThinLensCameraGenerateRay,
     NULL
 };
 
