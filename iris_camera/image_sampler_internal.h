@@ -117,35 +117,38 @@ inline
 ISTATUS
 ImageSamplerGetSample(
     _In_ const struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM rng,
+    _Inout_ PRANDOM pixel_rng,
     _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *dpixel_sample_v,
+    _Out_ PRANDOM *sample_rng
     )
 {
     assert(image_sampler != NULL);
-    assert(rng != NULL);
+    assert(pixel_rng != NULL);
     assert(pixel_sample_u != NULL);
     assert(pixel_sample_v != NULL);
     assert(lens_sample_u != NULL);
     assert(lens_sample_v != NULL);
     assert(dpixel_sample_u != NULL);
     assert(dpixel_sample_v != NULL);
+    assert(sample_rng != NULL);
 
     ISTATUS status =
         image_sampler->vtable->get_sample_routine(image_sampler->data,
-                                                  rng,
+                                                  pixel_rng,
                                                   sample_index,
                                                   pixel_sample_u,
                                                   pixel_sample_v,
                                                   lens_sample_u,
                                                   lens_sample_v,
                                                   dpixel_sample_u,
-                                                  dpixel_sample_v);
+                                                  dpixel_sample_v,
+                                                  sample_rng);
 
     return status;
 }

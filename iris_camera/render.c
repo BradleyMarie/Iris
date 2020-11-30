@@ -226,6 +226,7 @@ IrisCameraRenderPixel(
             return ISTATUS_SUCCESS;
         }
 
+        PRANDOM sample_rng;
         float_t pixel_u, pixel_v, lens_u, lens_v, dpixel_u, dpixel_v;
         ISTATUS status =
             ImageSamplerGetSample(context->local.image_sampler,
@@ -236,7 +237,8 @@ IrisCameraRenderPixel(
                                   &lens_u,
                                   &lens_v,
                                   &dpixel_u,
-                                  &dpixel_v);
+                                  &dpixel_v,
+                                  &sample_rng);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -267,7 +269,7 @@ IrisCameraRenderPixel(
         COLOR3 sample_color;
         status = SampleTracerTrace(context->local.sample_tracer,
                                    &world_ray_differential,
-                                   rng,
+                                   sample_rng,
                                    context->shared->epsilon,
                                    &sample_color);
 

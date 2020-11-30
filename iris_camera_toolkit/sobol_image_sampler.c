@@ -16,16 +16,160 @@ Abstract:
 
 #include "iris_camera_toolkit/sobol_image_sampler.h"
 #include "third_party/gruenschloss/double/sobol.h"
+#include "third_party/gruenschloss/single/sobol.h"
 #include "third_party/pbrt-v3/sobolmatrices.h"
 
 //
-// Defines
+// Sobol RNG Types
 //
 
-#define PIXEL_U_DIMENSION 0
-#define PIXEL_V_DIMENSION 1
-#define LENS_U_DIMENSION 2
-#define LENS_V_DIMENSION 3
+typedef struct _SOBOL_RANDOM {
+    unsigned long long sample_index;
+    unsigned dimension;
+} SOBOL_RANDOM, *PSOBOL_RANDOM;
+
+//
+// Sobol RNG Forward Declarations
+//
+
+ISTATUS
+SobolRandomAllocate(
+    _In_ unsigned long long sample_index,
+    _In_ unsigned dimension,
+    _Out_ PRANDOM *rng
+    );
+
+//
+// Sobol RNG Static Functions
+//
+
+static
+inline
+bool
+checked_sobol_single_sample(
+    _In_ unsigned long long index,
+    _In_ unsigned dimension,
+    _Out_ float_t *result
+    )
+{
+    if (dimension >= SOBOL_SINGLE_NUM_DIMENSIONS)
+    {
+        return false;
+    }
+
+    *result = sobol_single_sample(index,
+                                  dimension,
+                                  SOBOL_SINGLE_DEFAULT_SCRAMBLE);
+
+    return true;
+}
+
+static
+ISTATUS
+SobolRandomGenerateFloat(
+    _In_ void *context,
+    _In_ float_t minimum,
+    _In_ float_t maximum,
+    _Out_range_(minimum, maximum) float_t *result
+    )
+{
+    PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
+
+    float value;
+    bool success = checked_sobol_single_sample(sobol_random->sample_index,
+                                               sobol_random->dimension,
+                                               &value);
+
+    if (!success)
+    {
+        return ISTATUS_OUT_OF_ENTROPY;
+    }
+
+    sobol_random->dimension += 1;
+
+    *result = minimum + (maximum - minimum) * (float_t)value;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+SobolRandomGenerateIndex(
+    _In_ void *context,
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
+    )
+{
+    PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
+
+    float value;
+    bool success = checked_sobol_single_sample(sobol_random->sample_index,
+                                               sobol_random->dimension,
+                                               &value);
+
+    if (!success)
+    {
+        return ISTATUS_OUT_OF_ENTROPY;
+    }
+
+    sobol_random->dimension += 1;
+
+    *result = (float_t)upper_bound * (float_t)value;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+SobolRandomReplicate(
+    _In_opt_ void *context,
+    _Out_ PRANDOM *replica
+    )
+{
+    PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
+
+    ISTATUS status = SobolRandomAllocate(sobol_random->sample_index,
+                                         sobol_random->dimension,
+                                         replica);
+
+    return status;
+}
+
+//
+// Sobol RNG Static Variables
+//
+
+static const RANDOM_VTABLE sobol_vtable = {
+    SobolRandomGenerateFloat,
+    SobolRandomGenerateIndex,
+    SobolRandomReplicate,
+    NULL
+};
+
+//
+// Sobol RNG Static Functions
+//
+
+ISTATUS
+SobolRandomAllocate(
+    _In_ unsigned long long sample_index,
+    _In_ unsigned dimension,
+    _Out_ PRANDOM *rng
+    )
+{
+    assert(rng != NULL);
+
+    SOBOL_RANDOM sobol;
+    sobol.sample_index = sample_index;
+    sobol.dimension = dimension;
+
+    ISTATUS status = RandomAllocate(&sobol_vtable,
+                                    &sobol,
+                                    sizeof(SOBOL_RANDOM),
+                                    alignof(SOBOL_RANDOM),
+                                    rng);
+
+    return status;
+}
 
 //
 // Types
@@ -40,6 +184,7 @@ typedef struct _SOBOL_IMAGE_SAMPLER {
     size_t num_rows;
     size_t current_column;
     size_t current_row;
+    PRANDOM random;
     float_t lens_min_u;
     float_t lens_delta_u;
     float_t lens_min_v;
@@ -232,14 +377,15 @@ static
 ISTATUS
 SobolImageSamplerNextSample(
     _In_ const void *context,
-    _Inout_ PRANDOM rng,
+    _Inout_ PRANDOM pixel_rng,
     _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *dpixel_sample_v,
+    _Out_ PRANDOM *sample_rng
     )
 {
     PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
@@ -250,21 +396,22 @@ SobolImageSamplerNextSample(
                            image_sampler->current_row,
                            sample_index);
 
+    unsigned next_sample_dimension = 0;
     *pixel_sample_u = (float_t)(image_sampler->to_pixel_u *
         sobol_double_sample(sobol_sample_index,
-                            PIXEL_U_DIMENSION,
+                            next_sample_dimension++,
                             SOBOL_DOUBLE_DEFAULT_SCRAMBLE));
 
     *pixel_sample_v = (float_t)(image_sampler->to_pixel_v *
         sobol_double_sample(sobol_sample_index,
-                            PIXEL_V_DIMENSION,
+                            next_sample_dimension++,
                             SOBOL_DOUBLE_DEFAULT_SCRAMBLE));
 
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
         float_t value =
             (float_t)sobol_double_sample(sobol_sample_index,
-                                         LENS_U_DIMENSION,
+                                         next_sample_dimension++,
                                          SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
         *lens_sample_u =
             image_sampler->lens_min_u + image_sampler->lens_delta_u * value;
@@ -278,7 +425,7 @@ SobolImageSamplerNextSample(
     {
         float_t value =
             (float_t)sobol_double_sample(sobol_sample_index,
-                                         LENS_V_DIMENSION,
+                                         next_sample_dimension++,
                                          SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
         *lens_sample_v =
             image_sampler->lens_min_v + image_sampler->lens_delta_v * value;
@@ -288,8 +435,21 @@ SobolImageSamplerNextSample(
         *lens_sample_v = image_sampler->lens_min_v;
     }
 
+    RandomFree(image_sampler->random);
+
+    ISTATUS status = SobolRandomAllocate(sobol_sample_index,
+                                         next_sample_dimension,
+                                         &image_sampler->random);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        image_sampler->random = NULL;
+        return status;
+    }
+
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
+    *sample_rng = pixel_rng;
 
     return ISTATUS_SUCCESS;
 }
@@ -301,6 +461,17 @@ SobolImageSamplerDuplicate(
     _Out_ PIMAGE_SAMPLER *duplicate
     );
 
+static
+void
+SobolImageSamplerFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
+
+    RandomFree(image_sampler->random);
+}
+
 //
 // Static Variables
 //
@@ -310,7 +481,7 @@ static const IMAGE_SAMPLER_VTABLE sobol_image_sampler_vtable = {
     SobolImageSamplerPreparePixelSamples,
     SobolImageSamplerNextSample,
     SobolImageSamplerDuplicate,
-    NULL
+    SobolImageSamplerFree
 };
 
 //
@@ -356,6 +527,7 @@ SobolImageSamplerAllocate(
     }
 
     SOBOL_IMAGE_SAMPLER sobol_image_sampler;
+    sobol_image_sampler.random = NULL;
     sobol_image_sampler.samples_per_pixel = samples_per_pixel;
 
     ISTATUS status = ImageSamplerAllocate(&sobol_image_sampler_vtable,

@@ -56,14 +56,15 @@ typedef
 ISTATUS
 (*PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE)(
     _In_ const void *context,
-    _Inout_ PRANDOM rng,
+    _Inout_ PRANDOM pixel_rng,
     _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *dpixel_sample_v,
+    _Out_ PRANDOM *sample_rng
     );
 
 typedef

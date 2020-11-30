@@ -19,6 +19,7 @@ cc_library(
         "//common:safe_math",
         "//iris_camera",
         "//third_party/gruenschloss/halton:halton_enum",
+        "//third_party/gruenschloss/halton:halton_sampler",
     ],
 )
 
@@ -56,6 +57,7 @@ cc_library(
     deps = [
         "//iris_camera",
         "//third_party/gruenschloss/double:sobol",
+        "//third_party/gruenschloss/single:sobol",
         "//third_party/pbrt-v3:sobolmatrices",
     ],
 )

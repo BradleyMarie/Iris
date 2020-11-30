@@ -149,7 +149,8 @@ GridImageSamplerNextSample(
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *dpixel_sample_v,
+    _Out_ PRANDOM *sample_rng
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
@@ -245,6 +246,7 @@ GridImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->pixel_sample_width_u;
     *dpixel_sample_v = image_sampler->pixel_sample_width_v;
+    *sample_rng = rng;
 
     return ISTATUS_SUCCESS;
 }

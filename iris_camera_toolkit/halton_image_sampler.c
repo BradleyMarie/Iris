@@ -18,30 +18,173 @@ Abstract:
 #include "common/safe_math.h"
 #include "iris_camera_toolkit/halton_image_sampler.h"
 #include "third_party/gruenschloss/halton/halton_enum.h"
+#include "third_party/gruenschloss/halton/halton_sampler.h"
 
 //
-// Defines
+// Halton RNG Types
 //
 
-#define COLUMN_BASE 2
-#define ROW_BASE    3
-#define LENS_U_BASE 5
-#define LENS_V_BASE 7
+typedef struct _HALTON_RANDOM {
+    const Halton_sampler* halton_sampler;
+    unsigned sample_index;
+    unsigned dimension;
+} HALTON_RANDOM, *PHALTON_RANDOM;
 
-#if FLT_EVAL_METHOD	== 0
-const static double one_minus_epsilon = 1.0 - DBL_EPSILON;
-#elif FLT_EVAL_METHOD == 1
-const static double one_minus_epsilon = 1.0 - DBL_EPSILON;
-#elif FLT_EVAL_METHOD == 2
-const static long double one_minus_epsilon = 1.0L - LDBL_EPSILON;
-#endif
+//
+// Halton RNG Forward Declarations
+//
+
+ISTATUS
+HaltonRandomAllocateInternal(
+    _In_ const Halton_sampler* halton_sampler,
+    _In_ unsigned sample_index,
+    _In_ unsigned dimension,
+    _Out_ PRANDOM *rng
+    );
+
+//
+// Halton RNG Static Functions
+//
+
+static
+ISTATUS
+HaltonRandomGenerateFloat(
+    _In_ void *context,
+    _In_ float_t minimum,
+    _In_ float_t maximum,
+    _Out_range_(minimum, maximum) float_t *result
+    )
+{
+    PHALTON_RANDOM halton_random = (PHALTON_RANDOM)context;
+
+    float value;
+    bool success = checked_sample(halton_random->halton_sampler,
+                                  halton_random->dimension,
+                                  halton_random->sample_index,
+                                  &value);
+
+    if (!success)
+    {
+        return ISTATUS_OUT_OF_ENTROPY;
+    }
+
+    halton_random->dimension += 1;
+
+    *result = minimum + (maximum - minimum) * (float_t)value;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+HaltonRandomGenerateIndex(
+    _In_ void *context,
+    _In_ size_t upper_bound,
+    _Out_range_(0, upper_bound - 1) size_t *result
+    )
+{
+    PHALTON_RANDOM halton_random = (PHALTON_RANDOM)context;
+
+    float value;
+    bool success = checked_sample(halton_random->halton_sampler,
+                                  halton_random->dimension,
+                                  halton_random->sample_index,
+                                  &value);
+
+    if (!success)
+    {
+        return ISTATUS_OUT_OF_ENTROPY;
+    }
+
+    halton_random->dimension += 1;
+
+    *result = (float_t)upper_bound * (float_t)value;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+HaltonRandomReplicate(
+    _In_opt_ void *context,
+    _Out_ PRANDOM *replica
+    )
+{
+    PHALTON_RANDOM halton_random = (PHALTON_RANDOM)context;
+
+    ISTATUS status = HaltonRandomAllocateInternal(halton_random->halton_sampler,
+                                                  halton_random->sample_index,
+                                                  halton_random->dimension,
+                                                  replica);
+
+    return status;
+}
+
+//
+// Halton RNG Static Variables
+//
+
+static const RANDOM_VTABLE halton_vtable = {
+    HaltonRandomGenerateFloat,
+    HaltonRandomGenerateIndex,
+    HaltonRandomReplicate,
+    NULL
+};
+
+//
+// Halton RNG Static Functions
+//
+
+ISTATUS
+HaltonRandomAllocateInternal(
+    _In_ const Halton_sampler* halton_sampler,
+    _In_ unsigned sample_index,
+    _In_ unsigned dimension,
+    _Out_ PRANDOM *rng
+    )
+{
+    assert(halton_sampler != NULL);
+    assert(rng != NULL);
+
+    HALTON_RANDOM halton;
+    halton.halton_sampler = halton_sampler;
+    halton.sample_index = sample_index;
+    halton.dimension = dimension;
+
+    ISTATUS status = RandomAllocate(&halton_vtable,
+                                    &halton,
+                                    sizeof(HALTON_RANDOM),
+                                    alignof(HALTON_RANDOM),
+                                    rng);
+
+    return status;
+}
+
+ISTATUS
+HaltonRandomAllocate(
+    _In_ const Halton_sampler* halton_sampler,
+    _In_ unsigned sample_index,
+    _Out_ PRANDOM *rng
+    )
+{
+    assert(halton_sampler != NULL);
+    assert(rng != NULL);
+
+    ISTATUS status = HaltonRandomAllocateInternal(halton_sampler,
+                                                  sample_index,
+                                                  0,
+                                                  rng);
+
+    return status;
+}
 
 //
 // Types
 //
 
 typedef struct _HALTON_IMAGE_SAMPLER {
+    Halton_sampler halton_sampler;
     Halton_enum halton_enum;
+    PRANDOM random;
     unsigned current_sample_index;
     uint32_t samples_per_pixel;
     double_t to_pixel_u;
@@ -59,78 +202,6 @@ typedef const HALTON_IMAGE_SAMPLER *PCHALTON_IMAGE_SAMPLER;
 //
 // Static Functions
 //
-
-static
-inline
-uint32_t
-ReverseBits32(
-    _In_ uint32_t value
-    )
-{
-    value = (value << 16) | (value >> 16);
-    value = ((value & 0x00ff00ff) << 8) | ((value & 0xff00ff00) >> 8);
-    value = ((value & 0x0f0f0f0f) << 4) | ((value & 0xf0f0f0f0) >> 4);
-    value = ((value & 0x33333333) << 2) | ((value & 0xcccccccc) >> 2);
-    value = ((value & 0x55555555) << 1) | ((value & 0xaaaaaaaa) >> 1);
-
-    return value;
-}
-
-static
-inline
-uint64_t
-ReverseBits64(
-    _In_ uint64_t value
-    )
-{
-    uint64_t high = ReverseBits32((uint32_t)value);
-    uint64_t low = ReverseBits32((uint32_t)(value >> 32));
-    uint64_t result = (high << 32) | low;
-
-    return result;
-}
-
-static
-inline
-double_t
-HaltonSequenceCompute(
-    _In_ uint64_t index,
-    _In_ uint64_t base
-    )
-{
-    assert(base == 2 || base == 3 || base == 5 || base == 7);
-
-    if (base == 2)
-    {
-        union {
-            uint64_t as_int;
-            double as_double;
-        } int_to_double;
-
-        int_to_double.as_int = ReverseBits64(index) >> 12;
-        int_to_double.as_int |= 0x3FF0000000000000;
-        int_to_double.as_double -= 1.0;
-
-        return (double_t)int_to_double.as_double;
-    }
-
-    double_t inverse_base = 1.0 / (double_t)base;
-    uint64_t reversed_numerals = 0;
-    double_t inverse_base_product = 1.0;
-
-    while (index != 0)
-    {
-        uint64_t next = index / base;
-        uint64_t numeral = index - (next * base);
-        reversed_numerals = (reversed_numerals * base) + numeral;
-        inverse_base_product *= inverse_base;
-        index = next;
-    }
-
-    double_t result = (double_t)reversed_numerals * inverse_base_product;
-
-    return IMin(result, one_minus_epsilon);
-}
 
 static
 ISTATUS
@@ -185,6 +256,15 @@ HaltonImageSamplerPreparePixelSamples(
                                                     column,
                                                     row);
 
+    ISTATUS status = HaltonRandomAllocate(&image_sampler->halton_sampler,
+                                          image_sampler->current_sample_index,
+                                          &image_sampler->random);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     image_sampler->lens_min_u = lens_min_u;
     image_sampler->lens_min_v = lens_min_v;
     image_sampler->lens_delta_u = lens_max_u - lens_min_u;
@@ -199,34 +279,73 @@ static
 ISTATUS
 HaltonImageSamplerNextSample(
     _In_ const void *context,
-    _Inout_ PRANDOM rng,
+    _Inout_ PRANDOM pixel_rng,
     _In_ size_t sample_index,
     _Out_ float_t *pixel_sample_u,
     _Out_ float_t *pixel_sample_v,
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *dpixel_sample_v,
+    _Out_ PRANDOM *sample_rng
     )
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
+
+    RandomFree(image_sampler->random);
 
     unsigned index =
         image_sampler->current_sample_index +
         image_sampler->halton_enum.m_increment * (unsigned)sample_index;
 
-    double_t halton_u = HaltonSequenceCompute((uint64_t)index, COLUMN_BASE);
+    ISTATUS status = HaltonRandomAllocate(&image_sampler->halton_sampler,
+                                          index,
+                                          &image_sampler->random);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        image_sampler->random = NULL;
+        return status;
+    }
+
+    float_t halton_u;
+    status = RandomGenerateFloat(image_sampler->random,
+                                 (float_t)0.0,
+                                 (float_t)1.0,
+                                 &halton_u);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     *pixel_sample_u = (float_t)(halton_u * image_sampler->to_pixel_u);
 
-    double_t halton_v = HaltonSequenceCompute((uint64_t)index, ROW_BASE);
+    float_t halton_v;
+    status = RandomGenerateFloat(image_sampler->random,
+                                 (float_t)0.0,
+                                 (float_t)1.0,
+                                 &halton_v);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     *pixel_sample_v = (float_t)(halton_v * image_sampler->to_pixel_v);
 
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
-        float_t value =
-            (float_t)HaltonSequenceCompute((uint64_t)index, LENS_U_BASE);
-        *lens_sample_u =
-             image_sampler->lens_min_u + image_sampler->lens_delta_u * value;
+        float_t value;
+        status = RandomGenerateFloat(image_sampler->random,
+                                     image_sampler->lens_min_u,
+                                     image_sampler->lens_min_u + image_sampler->lens_delta_u,
+                                     &value);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
     }
     else
     {
@@ -235,10 +354,16 @@ HaltonImageSamplerNextSample(
 
     if (image_sampler->lens_delta_v != (float_t)0.0)
     {
-        double_t value =
-            (float_t)HaltonSequenceCompute((uint64_t)index, LENS_V_BASE);
-        *lens_sample_v =
-            image_sampler->lens_min_v + image_sampler->lens_delta_v * value;
+        float_t value;
+        status = RandomGenerateFloat(image_sampler->random,
+                                     image_sampler->lens_min_v,
+                                     image_sampler->lens_min_v + image_sampler->lens_delta_v,
+                                     &value);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
     }
     else
     {
@@ -247,6 +372,7 @@ HaltonImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
+    *sample_rng = image_sampler->random;
 
     return ISTATUS_SUCCESS;
 }
@@ -258,6 +384,17 @@ HaltonImageSamplerDuplicate(
     _Out_ PIMAGE_SAMPLER *duplicate
     );
 
+static
+void
+HaltonImageSamplerFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
+
+    RandomFree(image_sampler->random);
+}
+
 //
 // Static Variables
 //
@@ -267,7 +404,7 @@ static const IMAGE_SAMPLER_VTABLE halton_image_sampler_vtable = {
     HaltonImageSamplerPreparePixelSamples,
     HaltonImageSamplerNextSample,
     HaltonImageSamplerDuplicate,
-    NULL
+    HaltonImageSamplerFree
 };
 
 //
@@ -313,7 +450,10 @@ HaltonImageSamplerAllocate(
     }
 
     HALTON_IMAGE_SAMPLER halton_image_sampler;
+    halton_image_sampler.random = NULL;
     halton_image_sampler.samples_per_pixel = samples_per_pixel;
+
+    init_faure(&halton_image_sampler.halton_sampler);
 
     ISTATUS status = ImageSamplerAllocate(&halton_image_sampler_vtable,
                                           &halton_image_sampler,
