@@ -449,7 +449,7 @@ SobolImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
-    *sample_rng = pixel_rng;
+    *sample_rng = image_sampler->random;
 
     return ISTATUS_SUCCESS;
 }
