@@ -123,27 +123,27 @@ SampleSphereUniformly(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    float_t u;
-    ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &u);
+    float_t z;
+    ISTATUS status = RandomGenerateFloat(rng, -radius, radius, &z);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t v;
-    status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &v);
+    float_t phi;
+    status = RandomGenerateFloat(rng, (float_t)0.0f, iris_two_pi, &phi);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t z = radius - (float_t)2.0 * radius * u;
     float_t r = sqrt(IMax((float_t)0.0, radius * radius - z * z));
-    float_t phi = iris_two_pi * v;
+    float_t x = r * cos(phi);
+    float_t y = r * sin(phi);
 
-    *result = VectorCreate(r * cos(phi), r * sin(phi), z);
+    *result = VectorCreate(x, y, z);
 
     return ISTATUS_SUCCESS;
 }
