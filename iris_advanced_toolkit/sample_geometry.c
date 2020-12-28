@@ -92,8 +92,12 @@ SampleHemisphereWithCosineWeighting(
     }
 
     float_t radius = sqrt(radius_squared);
-    float_t x = radius * cos(theta);
-    float_t y = radius * sin(theta);
+
+    float_t sin_theta, cos_theta;
+    SinCos(theta, &sin_theta, &cos_theta);
+
+    float_t x = radius * cos_theta;
+    float_t y = radius * sin_theta;
 
     *result = VectorCreate(x, y, sqrt((float_t)1.0 - radius_squared));
     *result = TransformVector(surface_normal, *result);
@@ -140,8 +144,12 @@ SampleSphereUniformly(
     }
 
     float_t r = sqrt(IMax((float_t)0.0, radius * radius - z * z));
-    float_t x = r * cos(phi);
-    float_t y = r * sin(phi);
+
+    float_t sin_phi, cos_phi;
+    SinCos(phi, &sin_phi, &cos_phi);
+
+    float_t x = r * cos_phi;
+    float_t y = r * sin_phi;
 
     *result = VectorCreate(x, y, z);
 

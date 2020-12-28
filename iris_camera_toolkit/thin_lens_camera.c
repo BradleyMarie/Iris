@@ -57,8 +57,12 @@ ThinLensCameraGenerateRay(
                                         image_v);
 
     float_t radius = sqrt(radius_squared);
-    float_t lens_u = radius * cos(theta);
-    float_t lens_v = radius * sin(theta);
+
+    float_t sin_theta, cos_theta;
+    SinCos(theta, &sin_theta, &cos_theta);
+
+    float_t lens_u = radius * cos_theta;
+    float_t lens_v = radius * sin_theta;
 
     POINT3 ray_origin = PointVectorAddScaled(thin_lens_camera->location,
                                              thin_lens_camera->lens_radius_u,

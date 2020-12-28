@@ -132,8 +132,10 @@ TrowbridgeReitzSample11(
     if (cos_theta > (float_t)0.9999) {
         float_t r = sqrt(u / ((float_t)1.0 - u));
         float_t phi = iris_two_pi * v;
-        *slope_x = r * cos(phi);
-        *slope_y = r * sin(phi);
+        float_t sin_phi, cos_phi;
+        SinCos(phi, &sin_phi, &cos_phi);
+        *slope_x = r * cos_phi;
+        *slope_y = r * sin_phi;
         return;
     }
 

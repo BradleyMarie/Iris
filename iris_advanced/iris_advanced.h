@@ -23,7 +23,7 @@ extern "C" {
 
 #include "iris_advanced/bounding_box.h"
 #include "iris_advanced/color.h"
-#include "iris_advanced/constants.h"
+#include "iris_advanced/math.h"
 #include "iris_advanced/random.h"
 #include "iris_advanced/ray_differential.h"
 

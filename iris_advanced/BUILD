@@ -39,24 +39,24 @@ cc_test(
 )
 
 cc_library(
-    name = "constants",
-    srcs = ["constants.c"],
-    hdrs = ["constants.h"],
-    deps = [
-        "//iris",
-    ],
-)
-
-cc_library(
     name = "iris_advanced",
     hdrs = ["iris_advanced.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":bounding_box",
         ":color",
-        ":constants",
+        ":math",
         ":random",
         ":ray_differential",
+        "//iris",
+    ],
+)
+
+cc_library(
+    name = "math",
+    srcs = ["math.c"],
+    hdrs = ["math.h"],
+    deps = [
         "//iris",
     ],
 )
