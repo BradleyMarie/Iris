@@ -85,8 +85,6 @@ static const CAMERA_VTABLE thin_lens_camera_vtable = {
     NULL
 };
 
-static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
-
 //
 // Functions
 //
@@ -186,7 +184,7 @@ ThinLensCameraAllocate(
                                     (float_t)0.0,
                                     (float_t)1.0,
                                     (float_t)0.0,
-                                    (float_t)two_pi,
+                                    iris_two_pi,
                                     &thin_lens_camera,
                                     sizeof(THIN_LENS_CAMERA),
                                     alignof(THIN_LENS_CAMERA),
