@@ -742,8 +742,16 @@ MatrixAllocateRotation(
     VECTOR3 axis = VectorCreate(x, y, z);
     VECTOR3 normalized = VectorNormalize(axis, NULL, NULL);
 
-    float_t sin_theta = sin(theta);
-    float_t cos_theta = cos(theta);
+#if FLT_EVAL_METHOD	== 0
+    double expanded_theta = (double)theta;
+#elif FLT_EVAL_METHOD == 1
+    long double expanded_theta = (long double)theta;
+#elif FLT_EVAL_METHOD == 2
+    long double expanded_theta = (long double)theta;
+#endif
+
+    float_t sin_theta = sin(expanded_theta);
+    float_t cos_theta = cos(expanded_theta);
     float_t ic = (float_t) 1.0 - cos_theta;
 
     float_t m00 = normalized.x * normalized.x * ic + cos_theta;
