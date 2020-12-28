@@ -81,10 +81,7 @@ SampleHemisphereWithCosineWeighting(
     }
 
     float_t theta;
-    status = RandomGenerateFloat(rng,
-                                 (float_t)0.0,
-                                 (float_t)iris_two_pi,
-                                 &theta);
+    status = RandomGenerateFloat(rng, -iris_pi, iris_pi, &theta);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -136,7 +133,7 @@ SampleSphereUniformly(
     }
 
     float_t phi;
-    status = RandomGenerateFloat(rng, (float_t)0.0f, iris_two_pi, &phi);
+    status = RandomGenerateFloat(rng, -iris_pi, iris_pi, &phi);
 
     if (status != ISTATUS_SUCCESS)
     {

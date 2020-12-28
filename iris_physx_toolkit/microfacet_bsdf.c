@@ -131,7 +131,7 @@ TrowbridgeReitzSample11(
 {
     if (cos_theta > (float_t)0.9999) {
         float_t r = sqrt(u / ((float_t)1.0 - u));
-        float_t phi = iris_two_pi * v;
+        float_t phi = iris_pi * v;
         float_t sin_phi, cos_phi;
         SinCos(phi, &sin_phi, &cos_phi);
         *slope_x = r * cos_phi;
@@ -161,15 +161,15 @@ TrowbridgeReitzSample11(
     }
 
     float_t s;
-    if (v > 0.5f)
+    if ((float_t)0.0 <= v)
     {
         s = (float_t)1.0;
-        v = (float_t)2.0 * (v - (float_t)0.5);
+        v *= (float_t)2.0;
     }
     else
     {
         s = (float_t)-1.0;
-        v = (float_t)2.0 * ((float_t)0.5 - v);
+        v *= (float_t)-2.0;
     }
 
     float_t z =
@@ -332,7 +332,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     }
 
     float_t v;
-    status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &v);
+    status = RandomGenerateFloat(rng, (float_t)-0.5, (float_t)0.5, &v);
 
     if (status != ISTATUS_SUCCESS)
     {
