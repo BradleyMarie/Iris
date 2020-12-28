@@ -391,6 +391,7 @@ cc_library(
     srcs = ["sphere.c"],
     hdrs = ["sphere.h"],
     deps = [
+        "//iris_advanced_toolkit:sample_geometry",
         "//iris_physx",
     ],
 )

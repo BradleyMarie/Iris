@@ -14,6 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
+#include "iris_advanced_toolkit/sample_geometry.h"
 #include "iris_physx_toolkit/sphere.h"
 
 //
@@ -241,8 +242,6 @@ SphereFree(
 // Static Emissive Sphere Functions
 //
 
-static const float_t two_pi = (float_t)6.28318530717958647692528676655900;
-
 static
 ISTATUS
 EmissiveSphereGetEmissiveMaterial(
@@ -273,27 +272,14 @@ EmissiveSphereSampleFace(
 {
     PEMISSIVE_SPHERE sphere = (PEMISSIVE_SPHERE)context;
 
-    float_t u;
-    ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &u);
+    VECTOR3 offset;
+    ISTATUS status = SampleSphereUniformly(sphere->radius, rng, &offset);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    float_t v;
-    status = RandomGenerateFloat(rng, (float_t)0.0f, (float_t)1.0f, &v);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    float_t z = sphere->radius - (float_t)2.0 * sphere->radius * u;
-    float_t r = sqrt(IMax((float_t)0.0, sphere->sphere.radius_squared - z * z));
-    float_t phi = two_pi * v;
-
-    VECTOR3 offset = VectorCreate(r * cos(phi), r * sin(phi), z);
     *sampled_point = PointVectorAdd(sphere->sphere.center, offset);
 
     return ISTATUS_SUCCESS;
@@ -312,7 +298,7 @@ EmissiveSphereComputePdfBySolidArea(
 
     if (face_hit == SPHERE_BACK_FACE)
     {
-        float_t area = (float_t)2.0 * two_pi * sphere->sphere.radius_squared;
+        float_t area = (float_t)4.0 * iris_pi * sphere->sphere.radius_squared;
         *pdf = (float_t)1.0 / area;
         return ISTATUS_SUCCESS;
     }
@@ -326,7 +312,7 @@ EmissiveSphereComputePdfBySolidArea(
         IMax((float_t)0.0, (float_t)1.0 - sin_theta_squared);
     float_t cos_theta = sqrt(cos_theta_squared);
 
-    *pdf = (float_t)1.0 / (two_pi * ((float_t)1.0 - cos_theta));
+    *pdf = (float_t)1.0 / (iris_two_pi * ((float_t)1.0 - cos_theta));
 
     return ISTATUS_SUCCESS;
 }

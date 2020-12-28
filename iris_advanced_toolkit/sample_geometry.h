@@ -25,7 +25,14 @@ ISTATUS
 SampleHemisphereWithCosineWeighting(
     _In_ VECTOR3 surface_normal,
     _Inout_ PRANDOM rng,
-    _Out_ PVECTOR3 random_vector
+    _Out_ PVECTOR3 result
+    );
+
+ISTATUS
+SampleSphereUniformly(
+    _In_ float_t radius,
+    _Inout_ PRANDOM rng,
+    _Out_ PVECTOR3 result
     );
 
 #endif // _IRIS_ADVANCED_TOOLKIT_SAMPLE_GEOMETRY_
