@@ -179,6 +179,7 @@ cc_library(
     srcs = ["lambertian_bsdf.c"],
     hdrs = ["lambertian_bsdf.h"],
     deps = [
+        "//iris_advanced_toolkit:sample_geometry",
         "//iris_physx",
     ],
 )
@@ -266,6 +267,7 @@ cc_library(
     srcs = ["oren_nayar_bsdf.c"],
     hdrs = ["oren_nayar_bsdf.h"],
     deps = [
+        "//iris_advanced_toolkit:sample_geometry",
         "//iris_physx",
     ],
 )

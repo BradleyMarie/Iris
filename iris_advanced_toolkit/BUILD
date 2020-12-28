@@ -29,3 +29,12 @@ cc_library(
         "@pcg_c_basic//:pcg_basic",
     ],
 )
+
+cc_library(
+    name = "sample_geometry",
+    srcs = ["sample_geometry.c"],
+    hdrs = ["sample_geometry.h"],
+    deps = [
+        "//iris_advanced",
+    ],
+)

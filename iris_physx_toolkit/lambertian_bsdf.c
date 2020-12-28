@@ -14,6 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
+#include "iris_advanced_toolkit/sample_geometry.h"
 #include "iris_physx_toolkit/lambertian_bsdf.h"
 
 //
@@ -31,74 +32,6 @@ typedef const LAMBERTIAN_BSDF *PCLAMBERTIAN_BSDF;
 //
 
 static
-VECTOR3
-TransformVector(
-    _In_ VECTOR3 surface_normal,
-    _In_ VECTOR3 vector
-    )
-{
-    VECTOR3 orthogonal = VectorCreateOrthogonal(surface_normal);
-    VECTOR3 cross_product = VectorCrossProduct(surface_normal, orthogonal);
-
-    float_t x = orthogonal.x * vector.x + 
-                cross_product.x * vector.y +
-                surface_normal.x * vector.z;
-
-    float_t y = orthogonal.y * vector.x + 
-                cross_product.y * vector.y +
-                surface_normal.y * vector.z;
-
-    float_t z = orthogonal.z * vector.x + 
-                cross_product.z * vector.y +
-                surface_normal.z * vector.z;
-
-    return VectorCreate(x, y, z);
-}
-
-static
-ISTATUS
-CosineSampleHemisphere(
-    _In_ VECTOR3 surface_normal,
-    _Inout_ PRANDOM rng,
-    _Out_ PVECTOR3 random_vector
-    )
-{
-    assert(rng != NULL);
-    assert(random_vector != NULL);
-
-    float_t radius_squared;
-    ISTATUS status = RandomGenerateFloat(rng,
-                                         (float_t)0.0,
-                                         (float_t)1.0,
-                                         &radius_squared);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    float_t theta;
-    status = RandomGenerateFloat(rng,
-                                 (float_t)0.0,
-                                 (float_t)iris_two_pi,
-                                 &theta);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    float_t radius = sqrt(radius_squared);
-    float_t x = radius * cos(theta);
-    float_t y = radius * sin(theta);
-
-    VECTOR3 result = VectorCreate(x, y, sqrt((float_t)1.0 - radius_squared));
-    *random_vector = TransformVector(surface_normal, result);
-
-    return ISTATUS_SUCCESS;
-}
-
-static
 ISTATUS
 LambertianBsdfSample(
     _In_ const void *context,
@@ -114,7 +47,7 @@ LambertianBsdfSample(
 {
     PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
 
-    ISTATUS status = CosineSampleHemisphere(normal, rng, outgoing);
+    ISTATUS status = SampleHemisphereWithCosineWeighting(normal, rng, outgoing);
 
     if (status != ISTATUS_SUCCESS)
     {
