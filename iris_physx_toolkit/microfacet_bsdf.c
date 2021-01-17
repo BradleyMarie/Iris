@@ -129,7 +129,8 @@ TrowbridgeReitzSample11(
     _Out_ float_t *slope_y
     )
 {
-    if (cos_theta > (float_t)0.9999) {
+    if (cos_theta > (float_t)0.9999)
+    {
         float_t r = sqrt(u / ((float_t)1.0 - u));
         float_t phi = iris_pi * v;
         float_t sin_phi, cos_phi;
@@ -148,34 +149,19 @@ TrowbridgeReitzSample11(
     float_t b = tan_theta;
     float_t d = sqrt(
         IMax(b * b * tmp * tmp - (A * A - b * b) * tmp, (float_t)0.0));
-    float_t slope_x_1 = b * tmp - d;
-    float_t slope_x_2 = b * tmp + d;
 
-    if (A < (float_t)0.0 || slope_x_2 > (float_t)1.0 / tan_theta)
+    *slope_x = b * tmp + d;
+    if (A < (float_t)0.0 || *slope_x > (float_t)1.0 / tan_theta)
     {
-        *slope_x = slope_x_1;
-    }
-    else
-    {
-        *slope_x = slope_x_2;
+        *slope_x = b * tmp - d;
     }
 
-    float_t s;
-    if ((float_t)0.0 <= v)
-    {
-        s = (float_t)1.0;
-        v *= (float_t)2.0;
-    }
-    else
-    {
-        s = (float_t)-1.0;
-        v *= (float_t)-2.0;
-    }
+    float_t sv = (float_t)2.0 * fabs(v);
 
     float_t z =
-        (v * (v * (v * (float_t)0.27385 - (float_t)0.73369) + (float_t)0.46341)) /
-        (v * (v * (v * (float_t)0.093073 + (float_t)0.309420) - (float_t)1.000000) + (float_t)0.597999);
-    *slope_y = s * z * sqrt((float_t)1.0 + *slope_x * *slope_x);
+        (sv * (sv * (sv * (float_t)0.27385 - (float_t)0.73369) + (float_t)0.46341)) /
+        (sv * (sv * (sv * (float_t)0.093073 + (float_t)0.309420) - (float_t)1.000000) + (float_t)0.597999);
+    *slope_y = copysign(z * sqrt((float_t)1.0 + *slope_x * *slope_x), v);
 }
 
 static
