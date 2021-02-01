@@ -13,6 +13,8 @@ Abstract:
 --*/
 
 #include <stdalign.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "iris_camera_toolkit/sobol_image_sampler.h"
 #include "third_party/gruenschloss/double/sobol.h"
@@ -23,19 +25,25 @@ Abstract:
 // Sobol RNG Types
 //
 
-typedef struct _SOBOL_RANDOM {
+typedef struct _SOBOL_RANDOM_DATA {
     unsigned long long sample_index;
     unsigned dimension;
+} SOBOL_RANDOM_DATA, *PSOBOL_RANDOM_DATA;
+
+typedef struct _SOBOL_RANDOM {
+    PSOBOL_RANDOM_DATA data;
+    bool owned;
 } SOBOL_RANDOM, *PSOBOL_RANDOM;
 
 //
 // Sobol RNG Forward Declarations
 //
 
+static
 ISTATUS
 SobolRandomAllocate(
-    _In_ unsigned long long sample_index,
-    _In_ unsigned dimension,
+    _In_ PSOBOL_RANDOM_DATA data,
+    _In_ bool owned,
     _Out_ PRANDOM *rng
     );
 
@@ -76,8 +84,8 @@ SobolRandomGenerateFloat(
     PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
 
     float value;
-    bool success = checked_sobol_single_sample(sobol_random->sample_index,
-                                               sobol_random->dimension,
+    bool success = checked_sobol_single_sample(sobol_random->data->sample_index,
+                                               sobol_random->data->dimension,
                                                &value);
 
     if (!success)
@@ -85,7 +93,7 @@ SobolRandomGenerateFloat(
         return ISTATUS_OUT_OF_ENTROPY;
     }
 
-    sobol_random->dimension += 1;
+    sobol_random->data->dimension += 1;
 
     *result = minimum + (maximum - minimum) * (float_t)value;
 
@@ -103,8 +111,8 @@ SobolRandomGenerateIndex(
     PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
 
     float value;
-    bool success = checked_sobol_single_sample(sobol_random->sample_index,
-                                               sobol_random->dimension,
+    bool success = checked_sobol_single_sample(sobol_random->data->sample_index,
+                                               sobol_random->data->dimension,
                                                &value);
 
     if (!success)
@@ -112,13 +120,14 @@ SobolRandomGenerateIndex(
         return ISTATUS_OUT_OF_ENTROPY;
     }
 
-    sobol_random->dimension += 1;
+    sobol_random->data->dimension += 1;
 
     *result = (float_t)upper_bound * (float_t)value;
 
     return ISTATUS_SUCCESS;
 }
 
+static
 ISTATUS
 SobolRandomReplicate(
     _In_opt_ void *context,
@@ -127,11 +136,35 @@ SobolRandomReplicate(
 {
     PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
 
-    ISTATUS status = SobolRandomAllocate(sobol_random->sample_index,
-                                         sobol_random->dimension,
+    PSOBOL_RANDOM_DATA data =
+        (PSOBOL_RANDOM_DATA)malloc(sizeof(SOBOL_RANDOM_DATA));
+
+    if (data == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    memcpy(data, sobol_random->data, sizeof(SOBOL_RANDOM_DATA));
+
+    ISTATUS status = SobolRandomAllocate(data,
+                                         true,
                                          replica);
 
     return status;
+}
+
+static
+void
+SobolRandomFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PSOBOL_RANDOM sobol_random = (PSOBOL_RANDOM)context;
+
+    if (sobol_random->owned)
+    {
+        free(sobol_random->data);
+    }
 }
 
 //
@@ -142,25 +175,27 @@ static const RANDOM_VTABLE sobol_vtable = {
     SobolRandomGenerateFloat,
     SobolRandomGenerateIndex,
     SobolRandomReplicate,
-    NULL
+    SobolRandomFree
 };
 
 //
 // Sobol RNG Static Functions
 //
 
+static
 ISTATUS
 SobolRandomAllocate(
-    _In_ unsigned long long sample_index,
-    _In_ unsigned dimension,
+    _In_ PSOBOL_RANDOM_DATA data,
+    _In_ bool owned,
     _Out_ PRANDOM *rng
     )
 {
+    assert(data != NULL);
     assert(rng != NULL);
 
     SOBOL_RANDOM sobol;
-    sobol.sample_index = sample_index;
-    sobol.dimension = dimension;
+    sobol.data = data;
+    sobol.owned = owned;
 
     ISTATUS status = RandomAllocate(&sobol_vtable,
                                     &sobol,
@@ -185,6 +220,7 @@ typedef struct _SOBOL_IMAGE_SAMPLER {
     size_t current_column;
     size_t current_row;
     PRANDOM random;
+    SOBOL_RANDOM_DATA random_data;
     float_t lens_min_u;
     float_t lens_delta_u;
     float_t lens_min_v;
@@ -331,7 +367,14 @@ SobolImageSamplerPrepareImageSamples(
     image_sampler->dpixel_sample_v =
         (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
 
-    return ISTATUS_SUCCESS;
+    image_sampler->random_data.sample_index = 0;
+    image_sampler->random_data.dimension = 0;
+
+    ISTATUS status = SobolRandomAllocate(&image_sampler->random_data,
+                                         false,
+                                         &image_sampler->random);
+
+    return status;
 }
 
 static
@@ -435,17 +478,8 @@ SobolImageSamplerNextSample(
         *lens_sample_v = image_sampler->lens_min_v;
     }
 
-    RandomFree(image_sampler->random);
-
-    ISTATUS status = SobolRandomAllocate(sobol_sample_index,
-                                         next_sample_dimension,
-                                         &image_sampler->random);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        image_sampler->random = NULL;
-        return status;
-    }
+    image_sampler->random_data.sample_index = sobol_sample_index;
+    image_sampler->random_data.dimension = next_sample_dimension;
 
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
