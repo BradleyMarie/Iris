@@ -56,7 +56,6 @@ static
 ISTATUS
 GridImageSamplerPreparePixelSamples(
     _In_ void *context,
-    _Inout_ PRANDOM rng,
     _In_ size_t column,
     _In_ size_t row,
     _In_ float_t pixel_min_u,

@@ -346,7 +346,6 @@ static
 ISTATUS
 SobolImageSamplerPrepareImageSamples(
     _In_ void *context,
-    _Inout_ PRANDOM rng,
     _In_ size_t num_columns,
     _In_ size_t num_rows
     )
@@ -381,7 +380,6 @@ static
 ISTATUS
 SobolImageSamplerPreparePixelSamples(
     _In_ void *context,
-    _Inout_ PRANDOM rng,
     _In_ size_t column,
     _In_ size_t row,
     _In_ float_t pixel_min_u,

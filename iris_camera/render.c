@@ -196,7 +196,6 @@ IrisCameraRenderPixel(
     size_t num_samples;
     ISTATUS status =
         ImageSamplerPreparePixelSamples(context->local.image_sampler,
-                                        rng,
                                         in_order_column,
                                         in_order_row,
                                         pixel_u_min,
@@ -484,7 +483,6 @@ IrisCameraRender(
     size_t num_pixels = num_rows * num_columns;
 
     ISTATUS status = ImageSamplerPrepareImageSamples(image_sampler,
-                                                     rng,
                                                      num_columns,
                                                      num_rows);
 

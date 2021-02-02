@@ -35,13 +35,11 @@ inline
 ISTATUS
 ImageSamplerPrepareImageSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM rng,
     _In_ size_t num_columns,
     _In_ size_t num_rows
     )
 {
     assert(image_sampler != NULL);
-    assert(rng != NULL);
     assert(num_columns != 0);
     assert(num_rows != 0);
 
@@ -52,7 +50,6 @@ ImageSamplerPrepareImageSamples(
 
     ISTATUS status =
         image_sampler->vtable->prepare_image_samples_routine(image_sampler->data,
-                                                             rng,
                                                              num_columns,
                                                              num_rows);
 
@@ -64,7 +61,6 @@ inline
 ISTATUS
 ImageSamplerPreparePixelSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM rng,
     _In_ size_t column,
     _In_ size_t row,
     _In_ float_t pixel_min_u,
@@ -79,7 +75,6 @@ ImageSamplerPreparePixelSamples(
     )
 {
     assert(image_sampler != NULL);
-    assert(rng != NULL);
     assert(isfinite(pixel_min_u));
     assert(isfinite(pixel_max_u));
     assert(pixel_min_u <= pixel_max_u);
@@ -96,7 +91,6 @@ ImageSamplerPreparePixelSamples(
 
     ISTATUS status =
         image_sampler->vtable->prepare_pixel_samples_routine(image_sampler->data,
-                                                             rng,
                                                              column,
                                                              row,
                                                              pixel_min_u,
