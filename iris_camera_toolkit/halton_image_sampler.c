@@ -218,6 +218,34 @@ typedef const HALTON_IMAGE_SAMPLER *PCHALTON_IMAGE_SAMPLER;
 
 static
 ISTATUS
+HaltonImageSamplerPrepareRandom(
+    _In_ void *context,
+    _Inout_ PRANDOM seed_rng,
+    _Out_ PRANDOM *rng
+    )
+{
+    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
+
+    image_sampler->random_data.halton_sampler = &image_sampler->halton_sampler;
+    image_sampler->random_data.sample_index = 0;
+    image_sampler->random_data.dimension = 0;
+
+    ISTATUS status = HaltonRandomAllocate(&image_sampler->random_data,
+                                          false,
+                                          &image_sampler->random);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *rng = image_sampler->random;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 HaltonImageSamplerPrepareImageSamples(
     _In_ void *context,
     _In_ size_t num_columns,
@@ -240,15 +268,7 @@ HaltonImageSamplerPrepareImageSamples(
     image_sampler->dpixel_sample_v =
         (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
 
-    image_sampler->random_data.halton_sampler = &image_sampler->halton_sampler;
-    image_sampler->random_data.sample_index = 0;
-    image_sampler->random_data.dimension = 0;
-
-    ISTATUS status = HaltonRandomAllocate(&image_sampler->random_data,
-                                          false,
-                                          &image_sampler->random);
-
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -296,8 +316,7 @@ HaltonImageSamplerNextSample(
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v,
-    _Out_ PRANDOM *sample_rng
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
@@ -308,7 +327,7 @@ HaltonImageSamplerNextSample(
     image_sampler->random_data.dimension = 0;
 
     float_t halton_u;
-    ISTATUS status = RandomGenerateFloat(image_sampler->random,
+    ISTATUS status = RandomGenerateFloat(pixel_rng,
                                          (float_t)0.0,
                                          (float_t)1.0,
                                          &halton_u);
@@ -321,7 +340,7 @@ HaltonImageSamplerNextSample(
     *pixel_sample_u = (float_t)(halton_u * image_sampler->to_pixel_u);
 
     float_t halton_v;
-    status = RandomGenerateFloat(image_sampler->random,
+    status = RandomGenerateFloat(pixel_rng,
                                  (float_t)0.0,
                                  (float_t)1.0,
                                  &halton_v);
@@ -336,7 +355,7 @@ HaltonImageSamplerNextSample(
     if (image_sampler->lens_delta_u != (float_t)0.0)
     {
         float_t value;
-        status = RandomGenerateFloat(image_sampler->random,
+        status = RandomGenerateFloat(pixel_rng,
                                      image_sampler->lens_min_u,
                                      image_sampler->lens_min_u + image_sampler->lens_delta_u,
                                      &value);
@@ -354,7 +373,7 @@ HaltonImageSamplerNextSample(
     if (image_sampler->lens_delta_v != (float_t)0.0)
     {
         float_t value;
-        status = RandomGenerateFloat(image_sampler->random,
+        status = RandomGenerateFloat(pixel_rng,
                                      image_sampler->lens_min_v,
                                      image_sampler->lens_min_v + image_sampler->lens_delta_v,
                                      &value);
@@ -371,16 +390,15 @@ HaltonImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
-    *sample_rng = image_sampler->random;
 
     return ISTATUS_SUCCESS;
 }
 
 static
 ISTATUS
-HaltonImageSamplerDuplicate(
+HaltonImageSamplerReplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     );
 
 static
@@ -399,10 +417,11 @@ HaltonImageSamplerFree(
 //
 
 static const IMAGE_SAMPLER_VTABLE halton_image_sampler_vtable = {
+    HaltonImageSamplerPrepareRandom,
     HaltonImageSamplerPrepareImageSamples,
     HaltonImageSamplerPreparePixelSamples,
     HaltonImageSamplerNextSample,
-    HaltonImageSamplerDuplicate,
+    HaltonImageSamplerReplicate,
     HaltonImageSamplerFree
 };
 
@@ -412,9 +431,9 @@ static const IMAGE_SAMPLER_VTABLE halton_image_sampler_vtable = {
 
 static
 ISTATUS
-HaltonImageSamplerDuplicate(
+HaltonImageSamplerReplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     )
 {
     PCHALTON_IMAGE_SAMPLER halton_image_sampler = (PCHALTON_IMAGE_SAMPLER)context;
@@ -423,7 +442,7 @@ HaltonImageSamplerDuplicate(
                                           halton_image_sampler,
                                           sizeof(HALTON_IMAGE_SAMPLER),
                                           alignof(HALTON_IMAGE_SAMPLER),
-                                          duplicate);
+                                          replica);
 
     return status;
 }

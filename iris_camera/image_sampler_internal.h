@@ -33,6 +33,33 @@ struct _IMAGE_SAMPLER {
 static
 inline
 ISTATUS
+ImageSamplerPrepareRandom(
+    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
+    _Inout_ PRANDOM seed_rng,
+    _Out_ PRANDOM *rng
+    )
+{
+    assert(image_sampler != NULL);
+    assert(seed_rng != NULL);
+    assert(rng != NULL);
+
+    if (image_sampler->vtable->prepare_random_routine == NULL)
+    {
+        *rng = seed_rng;
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status =
+        image_sampler->vtable->prepare_random_routine(image_sampler->data,
+                                                      seed_rng,
+                                                      rng);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
 ImageSamplerPrepareImageSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _In_ size_t num_columns,
@@ -118,8 +145,7 @@ ImageSamplerGetSample(
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v,
-    _Out_ PRANDOM *sample_rng
+    _Out_ float_t *dpixel_sample_v
     )
 {
     assert(image_sampler != NULL);
@@ -130,7 +156,6 @@ ImageSamplerGetSample(
     assert(lens_sample_v != NULL);
     assert(dpixel_sample_u != NULL);
     assert(dpixel_sample_v != NULL);
-    assert(sample_rng != NULL);
 
     ISTATUS status =
         image_sampler->vtable->get_sample_routine(image_sampler->data,
@@ -141,8 +166,7 @@ ImageSamplerGetSample(
                                                   lens_sample_u,
                                                   lens_sample_v,
                                                   dpixel_sample_u,
-                                                  dpixel_sample_v,
-                                                  sample_rng);
+                                                  dpixel_sample_v);
 
     return status;
 }
@@ -150,17 +174,17 @@ ImageSamplerGetSample(
 static
 inline
 ISTATUS
-ImageSamplerDuplicate(
+ImageSamplerReplicate(
     _In_ const struct _IMAGE_SAMPLER *image_sampler,
-    _Out_ struct _IMAGE_SAMPLER **duplicate
+    _Out_ struct _IMAGE_SAMPLER **replica
     )
 {
     assert(image_sampler != NULL);
-    assert(duplicate != NULL);
+    assert(replica != NULL);
 
     ISTATUS status =
-        image_sampler->vtable->duplicate_routine(image_sampler->data,
-                                                 duplicate);
+        image_sampler->vtable->replicate_routine(image_sampler->data,
+                                                 replica);
 
     return status;
 }

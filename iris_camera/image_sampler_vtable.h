@@ -27,6 +27,14 @@ typedef const IMAGE_SAMPLER *PCIMAGE_SAMPLER;
 
 typedef
 ISTATUS
+(*PIMAGE_SAMPLER_PREPARE_RANDOM_ROUTINE)(
+    _In_ void *context,
+    _Inout_ PRANDOM seed_rng,
+    _Out_ PRANDOM *rng
+    );
+
+typedef
+ISTATUS
 (*PIMAGE_SAMPLER_PREPARE_IMAGE_SAMPLES_ROUTINE)(
     _In_ void *context,
     _In_ size_t num_columns,
@@ -61,22 +69,22 @@ ISTATUS
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v,
-    _Out_ PRANDOM *sample_rng
+    _Out_ float_t *dpixel_sample_v
     );
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_DUPLICATE_ROUTINE)(
+(*PIMAGE_SAMPLER_REPLICATE_ROUTINE)(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     );
 
 typedef struct _IMAGE_SAMPLER_VTABLE {
+    PIMAGE_SAMPLER_PREPARE_RANDOM_ROUTINE prepare_random_routine;
     PIMAGE_SAMPLER_PREPARE_IMAGE_SAMPLES_ROUTINE prepare_image_samples_routine;
     PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE prepare_pixel_samples_routine;
     PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
-    PIMAGE_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
+    PIMAGE_SAMPLER_REPLICATE_ROUTINE replicate_routine;
     PFREE_ROUTINE free_routine;
 } IMAGE_SAMPLER_VTABLE, *PIMAGE_SAMPLER_VTABLE;
 

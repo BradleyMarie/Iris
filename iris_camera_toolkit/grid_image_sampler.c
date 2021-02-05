@@ -148,8 +148,7 @@ GridImageSamplerNextSample(
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v,
-    _Out_ PRANDOM *sample_rng
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
@@ -245,16 +244,15 @@ GridImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->pixel_sample_width_u;
     *dpixel_sample_v = image_sampler->pixel_sample_width_v;
-    *sample_rng = rng;
 
     return ISTATUS_SUCCESS;
 }
 
 static
 ISTATUS
-GridImageSamplerDuplicate(
+GridImageSamplerReplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     )
 {
     PCGRID_IMAGE_SAMPLER grid_image_sampler = (PCGRID_IMAGE_SAMPLER)context;
@@ -266,7 +264,7 @@ GridImageSamplerDuplicate(
                                  grid_image_sampler->lens_samples_u,
                                  grid_image_sampler->lens_samples_v,
                                  grid_image_sampler->jitter_lens_samples,
-                                 duplicate);
+                                 replica);
 
     return status;
 }
@@ -277,9 +275,10 @@ GridImageSamplerDuplicate(
 
 static const IMAGE_SAMPLER_VTABLE grid_image_sampler_vtable = {
     NULL,
+    NULL,
     GridImageSamplerPreparePixelSamples,
     GridImageSamplerNextSample,
-    GridImageSamplerDuplicate,
+    GridImageSamplerReplicate,
     NULL
 };
 

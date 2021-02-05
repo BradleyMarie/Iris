@@ -344,6 +344,33 @@ SobolSequenceIndex(
 
 static
 ISTATUS
+SobolImageSamplerPrepareRandom(
+    _In_ void *context,
+    _Inout_ PRANDOM seed_rng,
+    _Out_ PRANDOM *rng
+    )
+{
+    PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
+
+    image_sampler->random_data.sample_index = 0;
+    image_sampler->random_data.dimension = 0;
+
+    ISTATUS status = SobolRandomAllocate(&image_sampler->random_data,
+                                         false,
+                                         &image_sampler->random);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *rng = image_sampler->random;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 SobolImageSamplerPrepareImageSamples(
     _In_ void *context,
     _In_ size_t num_columns,
@@ -366,14 +393,7 @@ SobolImageSamplerPrepareImageSamples(
     image_sampler->dpixel_sample_v =
         (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
 
-    image_sampler->random_data.sample_index = 0;
-    image_sampler->random_data.dimension = 0;
-
-    ISTATUS status = SobolRandomAllocate(&image_sampler->random_data,
-                                         false,
-                                         &image_sampler->random);
-
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -425,8 +445,7 @@ SobolImageSamplerNextSample(
     _Out_ float_t *lens_sample_u,
     _Out_ float_t *lens_sample_v,
     _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v,
-    _Out_ PRANDOM *sample_rng
+    _Out_ float_t *dpixel_sample_v
     )
 {
     PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
@@ -481,16 +500,15 @@ SobolImageSamplerNextSample(
 
     *dpixel_sample_u = image_sampler->dpixel_sample_u;
     *dpixel_sample_v = image_sampler->dpixel_sample_v;
-    *sample_rng = image_sampler->random;
 
     return ISTATUS_SUCCESS;
 }
 
 static
 ISTATUS
-SobolImageSamplerDuplicate(
+SobolImageSamplerReplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     );
 
 static
@@ -509,10 +527,11 @@ SobolImageSamplerFree(
 //
 
 static const IMAGE_SAMPLER_VTABLE sobol_image_sampler_vtable = {
+    SobolImageSamplerPrepareRandom,
     SobolImageSamplerPrepareImageSamples,
     SobolImageSamplerPreparePixelSamples,
     SobolImageSamplerNextSample,
-    SobolImageSamplerDuplicate,
+    SobolImageSamplerReplicate,
     SobolImageSamplerFree
 };
 
@@ -522,9 +541,9 @@ static const IMAGE_SAMPLER_VTABLE sobol_image_sampler_vtable = {
 
 static
 ISTATUS
-SobolImageSamplerDuplicate(
+SobolImageSamplerReplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *duplicate
+    _Out_ PIMAGE_SAMPLER *replica
     )
 {
     PCSOBOL_IMAGE_SAMPLER sobol_image_sampler = (PCSOBOL_IMAGE_SAMPLER)context;
@@ -533,7 +552,7 @@ SobolImageSamplerDuplicate(
                                           sobol_image_sampler,
                                           sizeof(SOBOL_IMAGE_SAMPLER),
                                           alignof(SOBOL_IMAGE_SAMPLER),
-                                          duplicate);
+                                          replica);
 
     return status;
 }
