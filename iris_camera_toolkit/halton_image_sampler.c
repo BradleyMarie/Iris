@@ -14,8 +14,9 @@ Abstract:
 
 #include <float.h>
 #include <stdalign.h>
-#include <string.h>
+#include <stdatomic.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common/safe_math.h"
 #include "iris_camera_toolkit/halton_image_sampler.h"
@@ -193,9 +194,14 @@ HaltonRandomAllocate(
 // Types
 //
 
-typedef struct _HALTON_IMAGE_SAMPLER {
+typedef struct _HALTON_DATA {
     Halton_sampler halton_sampler;
     Halton_enum halton_enum;
+    atomic_uintmax_t reference_count;
+} HALTON_DATA, *PHALTON_DATA;
+
+typedef struct _HALTON_IMAGE_SAMPLER {
+    PHALTON_DATA halton_data;
     HALTON_RANDOM_DATA random_data;
     unsigned current_sample_index;
     uint32_t samples_per_pixel;
@@ -225,13 +231,16 @@ HaltonImageSamplerPrepareImageSamples(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    image_sampler->halton_enum = halton_enum((unsigned int)num_columns,
-                                             (unsigned int)num_rows);
+    image_sampler->halton_data->halton_enum =
+        halton_enum((unsigned int)num_columns, (unsigned int)num_rows);
 
     image_sampler->to_pixel_u =
-        (double_t)image_sampler->halton_enum.m_scale_x / (double_t)num_columns;
+        (double_t)image_sampler->halton_data->halton_enum.m_scale_x /
+        (double_t)num_columns;
+
     image_sampler->to_pixel_v =
-        (double_t)image_sampler->halton_enum.m_scale_y / (double_t)num_rows;
+        (double_t)image_sampler->halton_data->halton_enum.m_scale_y /
+        (double_t)num_rows;
 
     float_t sqrt_samples = sqrt((float_t)image_sampler->samples_per_pixel);
     image_sampler->dpixel_sample_u =
@@ -251,7 +260,7 @@ HaltonImageSamplerPrepareRandom(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    image_sampler->random_data.halton_sampler = &image_sampler->halton_sampler;
+    image_sampler->random_data.halton_sampler = &image_sampler->halton_data->halton_sampler;
     image_sampler->random_data.sample_index = 0;
     image_sampler->random_data.dimension = 0;
 
@@ -281,10 +290,11 @@ HaltonImageSamplerPreparePixelSamples(
 {
     PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
 
-    image_sampler->current_sample_index = get_index(&image_sampler->halton_enum,
-                                                    0,
-                                                    column,
-                                                    row);
+    image_sampler->current_sample_index =
+        get_index(&image_sampler->halton_data->halton_enum,
+                  0,
+                  column,
+                  row);
 
     image_sampler->lens_min_u = lens_min_u;
     image_sampler->lens_min_v = lens_min_v;
@@ -314,7 +324,7 @@ HaltonImageSamplerNextSample(
 
     image_sampler->random_data.sample_index =
         image_sampler->current_sample_index +
-        image_sampler->halton_enum.m_increment * (unsigned)sample_index;
+        image_sampler->halton_data->halton_enum.m_increment * (unsigned)sample_index;
     image_sampler->random_data.dimension = 0;
 
     float_t halton_u;
@@ -392,6 +402,20 @@ HaltonImageSamplerReplicate(
     _Out_ PIMAGE_SAMPLER *replica
     );
 
+static
+void
+HaltonImageSamplerFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
+
+    if (atomic_fetch_sub(&image_sampler->halton_data->reference_count, 1) == 1)
+    {
+        free(image_sampler->halton_data);
+    }
+}
+
 //
 // Static Variables
 //
@@ -403,7 +427,7 @@ static const IMAGE_SAMPLER_VTABLE halton_image_sampler_vtable = {
     HaltonImageSamplerPreparePixelSamples,
     HaltonImageSamplerNextSample,
     HaltonImageSamplerReplicate,
-    NULL
+    HaltonImageSamplerFree
 };
 
 //
@@ -425,7 +449,14 @@ HaltonImageSamplerReplicate(
                                           alignof(HALTON_IMAGE_SAMPLER),
                                           replica);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    atomic_fetch_add(&halton_image_sampler->halton_data->reference_count, 1);
+
+    return ISTATUS_SUCCESS;
 }
 
 //
@@ -448,10 +479,19 @@ HaltonImageSamplerAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    HALTON_IMAGE_SAMPLER halton_image_sampler;
-    halton_image_sampler.samples_per_pixel = samples_per_pixel;
+    PHALTON_DATA halton_data = (PHALTON_DATA)malloc(sizeof(HALTON_DATA));
 
-    init_faure(&halton_image_sampler.halton_sampler);
+    if (halton_data == NULL)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    init_faure(&halton_data->halton_sampler);
+    halton_data->reference_count = 1;
+
+    HALTON_IMAGE_SAMPLER halton_image_sampler;
+    halton_image_sampler.halton_data = halton_data;
+    halton_image_sampler.samples_per_pixel = samples_per_pixel;
 
     ISTATUS status = ImageSamplerAllocate(&halton_image_sampler_vtable,
                                           &halton_image_sampler,
@@ -459,5 +499,11 @@ HaltonImageSamplerAllocate(
                                           alignof(HALTON_IMAGE_SAMPLER),
                                           image_sampler);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(halton_data);
+        return status;
+    }
+
+    return ISTATUS_SUCCESS;
 }
