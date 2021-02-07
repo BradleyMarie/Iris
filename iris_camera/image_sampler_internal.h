@@ -33,33 +33,6 @@ struct _IMAGE_SAMPLER {
 static
 inline
 ISTATUS
-ImageSamplerPrepareRandom(
-    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM seed_rng,
-    _Out_ PRANDOM *rng
-    )
-{
-    assert(image_sampler != NULL);
-    assert(seed_rng != NULL);
-    assert(rng != NULL);
-
-    if (image_sampler->vtable->prepare_random_routine == NULL)
-    {
-        *rng = seed_rng;
-        return ISTATUS_SUCCESS;
-    }
-
-    ISTATUS status =
-        image_sampler->vtable->prepare_random_routine(image_sampler->data,
-                                                      seed_rng,
-                                                      rng);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
 ImageSamplerPrepareImageSamples(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _In_ size_t num_columns,
@@ -79,6 +52,61 @@ ImageSamplerPrepareImageSamples(
         image_sampler->vtable->prepare_image_samples_routine(image_sampler->data,
                                                              num_columns,
                                                              num_rows);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ImageSamplerPrepareImageSeed(
+    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
+    _Inout_ PRANDOM seed_rng
+    )
+{
+    assert(image_sampler != NULL);
+    assert(seed_rng != NULL);
+
+    if (image_sampler->vtable->prepare_image_seed_routine == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status =
+        image_sampler->vtable->prepare_image_seed_routine(image_sampler->data,
+                                                          seed_rng);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ImageSamplerPrepareRandom(
+    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
+    _Inout_ PRANDOM *rng
+    )
+{
+    assert(image_sampler != NULL);
+    assert(rng != NULL);
+
+    if (image_sampler->vtable->prepare_random_routine == NULL)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    PRANDOM new_rng;
+    ISTATUS status =
+        image_sampler->vtable->prepare_random_routine(image_sampler->data,
+                                                      &new_rng);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    RandomFree(*rng);
+    *rng = new_rng;
 
     return status;
 }

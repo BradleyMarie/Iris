@@ -197,7 +197,6 @@ typedef struct _HALTON_IMAGE_SAMPLER {
     Halton_sampler halton_sampler;
     Halton_enum halton_enum;
     HALTON_RANDOM_DATA random_data;
-    PRANDOM random;
     unsigned current_sample_index;
     uint32_t samples_per_pixel;
     double_t to_pixel_u;
@@ -215,34 +214,6 @@ typedef const HALTON_IMAGE_SAMPLER *PCHALTON_IMAGE_SAMPLER;
 //
 // Static Functions
 //
-
-static
-ISTATUS
-HaltonImageSamplerPrepareRandom(
-    _In_ void *context,
-    _Inout_ PRANDOM seed_rng,
-    _Out_ PRANDOM *rng
-    )
-{
-    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
-
-    image_sampler->random_data.halton_sampler = &image_sampler->halton_sampler;
-    image_sampler->random_data.sample_index = 0;
-    image_sampler->random_data.dimension = 0;
-
-    ISTATUS status = HaltonRandomAllocate(&image_sampler->random_data,
-                                          false,
-                                          &image_sampler->random);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *rng = image_sampler->random;
-
-    return ISTATUS_SUCCESS;
-}
 
 static
 ISTATUS
@@ -269,6 +240,26 @@ HaltonImageSamplerPrepareImageSamples(
         (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
 
     return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+HaltonImageSamplerPrepareRandom(
+    _In_ void *context,
+    _Out_ PRANDOM *rng
+    )
+{
+    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
+
+    image_sampler->random_data.halton_sampler = &image_sampler->halton_sampler;
+    image_sampler->random_data.sample_index = 0;
+    image_sampler->random_data.dimension = 0;
+
+    ISTATUS status = HaltonRandomAllocate(&image_sampler->random_data,
+                                          false,
+                                          rng);
+
+    return status;
 }
 
 static
@@ -401,28 +392,18 @@ HaltonImageSamplerReplicate(
     _Out_ PIMAGE_SAMPLER *replica
     );
 
-static
-void
-HaltonImageSamplerFree(
-    _In_opt_ _Post_invalid_ void *context
-    )
-{
-    PHALTON_IMAGE_SAMPLER image_sampler = (PHALTON_IMAGE_SAMPLER)context;
-
-    RandomFree(image_sampler->random);
-}
-
 //
 // Static Variables
 //
 
 static const IMAGE_SAMPLER_VTABLE halton_image_sampler_vtable = {
-    HaltonImageSamplerPrepareRandom,
     HaltonImageSamplerPrepareImageSamples,
+    NULL,
+    HaltonImageSamplerPrepareRandom,
     HaltonImageSamplerPreparePixelSamples,
     HaltonImageSamplerNextSample,
     HaltonImageSamplerReplicate,
-    HaltonImageSamplerFree
+    NULL
 };
 
 //
@@ -468,7 +449,6 @@ HaltonImageSamplerAllocate(
     }
 
     HALTON_IMAGE_SAMPLER halton_image_sampler;
-    halton_image_sampler.random = NULL;
     halton_image_sampler.samples_per_pixel = samples_per_pixel;
 
     init_faure(&halton_image_sampler.halton_sampler);

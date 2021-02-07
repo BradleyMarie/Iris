@@ -18,7 +18,6 @@ Abstract:
 #include <stdlib.h>
 #include <threads.h>
 
-#include "common/pointer_list.h"
 #include "iris_camera/camera_internal.h"
 #include "iris_camera/framebuffer_internal.h"
 #include "iris_camera/image_sampler_internal.h"
@@ -46,9 +45,9 @@ typedef struct _RENDER_THREAD_SHARED_STATE {
     PCCAMERA camera;
     PCMATRIX camera_to_world;
     PFRAMEBUFFER framebuffer;
-    POINTER_LIST seed_rngs;
-    POINTER_LIST unowned_rngs;
-    POINTER_LIST image_samplers;
+    _Field_size_(num_chunks) PRANDOM *rngs;
+    _Field_size_(num_chunks) PIMAGE_SAMPLER *image_samplers;
+    size_t num_chunks;
     float_t epsilon;
     atomic_bool cancelled;
     atomic_size_t chunk;
@@ -342,12 +341,9 @@ IrisCameraRenderThread(
              column++)
         {
             PIMAGE_SAMPLER image_sampler =
-                PointerListRetrieveAtIndex(&thread_context->shared->image_samplers,
-                                           chunk);
+                thread_context->shared->image_samplers[chunk];
 
-            PRANDOM rng =
-                PointerListRetrieveAtIndex(&thread_context->shared->unowned_rngs,
-                                           chunk);
+            PRANDOM rng = thread_context->shared->rngs[chunk];
 
             ISTATUS status = IrisCameraRenderPixel(thread_context,
                                                    image_sampler,
@@ -391,33 +387,31 @@ IrisCameraRenderThread(
 
 void
 IrisCameraFreeImageSamplers(
-    _Inout_ PPOINTER_LIST image_sampler_list
+    _Inout_updates_(num_image_samplers) PIMAGE_SAMPLER *image_samplers,
+    _In_ size_t num_image_samplers
     )
 {
-    assert(image_sampler_list != NULL);
-
-    size_t num_image_samplers = PointerListGetSize(image_sampler_list);
+    assert(image_samplers != NULL);
 
     for (size_t i = 0; i < num_image_samplers; i++)
     {
-        PIMAGE_SAMPLER is = PointerListRetrieveAtIndex(image_sampler_list, i);
-        ImageSamplerFree(is);
+        ImageSamplerFree(image_samplers[i]);
+        image_samplers[i] = NULL;
     }
 }
 
 void
-IrisCameraFreeSeedRngs(
-    _Inout_ PPOINTER_LIST seed_rng_list
+IrisCameraFreeRngs(
+    _Inout_updates_(num_rngs) PRANDOM *rngs,
+    _In_ size_t num_rngs
     )
 {
-    assert(seed_rng_list != NULL);
+    assert(rngs != NULL);
 
-    size_t num_seed_rngs = PointerListGetSize(seed_rng_list);
-
-    for (size_t i = 0; i < num_seed_rngs; i++)
+    for (size_t i = 0; i < num_rngs; i++)
     {
-        PRANDOM rng = PointerListRetrieveAtIndex(seed_rng_list, i);
-        RandomFree(rng);
+        RandomFree(rngs[i]);
+        rngs[i] = NULL;
     }
 }
 
@@ -500,6 +494,13 @@ IrisCameraRender(
         return status;
     }
 
+    status = ImageSamplerPrepareImageSeed(image_sampler, rng);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     RENDER_THREAD_SHARED_STATE shared_state;
     shared_state.camera = camera;
     shared_state.camera_to_world = camera_to_world;
@@ -507,33 +508,6 @@ IrisCameraRender(
     shared_state.epsilon = epsilon;
     shared_state.cancelled = false;
     shared_state.chunk = 0;
-
-    bool success = PointerListInitialize(&shared_state.seed_rngs);
-
-    if (!success)
-    {
-        free(threads);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    success = PointerListInitialize(&shared_state.image_samplers);
-
-    if (!success)
-    {
-        PointerListDestroy(&shared_state.seed_rngs);
-        free(threads);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    success = PointerListInitialize(&shared_state.unowned_rngs);
-
-    if (!success)
-    {
-        PointerListDestroy(&shared_state.image_samplers);
-        PointerListDestroy(&shared_state.seed_rngs);
-        free(threads);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
 
     size_t num_chunks = num_columns / CHUNK_SIZE;
     if (num_columns % CHUNK_SIZE != 0)
@@ -543,40 +517,24 @@ IrisCameraRender(
 
     num_chunks *= num_rows;
 
-    success = PointerListPrepareToAddPointers(&shared_state.seed_rngs, num_chunks);
+    shared_state.rngs = calloc(num_chunks, sizeof(PRANDOM));
 
-    if (!success)
+    if (shared_state.rngs == NULL)
     {
-        PointerListDestroy(&shared_state.unowned_rngs);
-        PointerListDestroy(&shared_state.image_samplers);
-        PointerListDestroy(&shared_state.seed_rngs);
         free(threads);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    success = PointerListPrepareToAddPointers(&shared_state.image_samplers,
-                                              num_chunks);
+    shared_state.image_samplers = calloc(num_chunks, sizeof(PIMAGE_SAMPLER));
 
-    if (!success)
+    if (shared_state.image_samplers == NULL)
     {
-        PointerListDestroy(&shared_state.unowned_rngs);
-        PointerListDestroy(&shared_state.image_samplers);
-        PointerListDestroy(&shared_state.seed_rngs);
+        free(shared_state.rngs);
         free(threads);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    success = PointerListPrepareToAddPointers(&shared_state.unowned_rngs,
-                                              num_chunks);
-
-    if (!success)
-    {
-        PointerListDestroy(&shared_state.unowned_rngs);
-        PointerListDestroy(&shared_state.image_samplers);
-        PointerListDestroy(&shared_state.seed_rngs);
-        free(threads);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
+    shared_state.num_chunks = num_chunks;
 
     for (size_t i = 0; i < num_chunks; i++)
     {
@@ -585,14 +543,14 @@ IrisCameraRender(
 
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-            PointerListDestroy(&shared_state.image_samplers);
-            PointerListDestroy(&shared_state.seed_rngs);
+            IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+            free(shared_state.image_samplers);
+            free(shared_state.rngs);
             free(threads);
             return status;
         }
 
-        PointerListAddPointer(&shared_state.seed_rngs, replicated_rng);
+        shared_state.rngs[i] = replicated_rng;
     }
 
     for (size_t i = 0; i < num_chunks; i++)
@@ -603,42 +561,33 @@ IrisCameraRender(
 
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeImageSamplers(&shared_state.image_samplers);
-            IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-            PointerListDestroy(&shared_state.unowned_rngs);
-            PointerListDestroy(&shared_state.image_samplers);
-            PointerListDestroy(&shared_state.seed_rngs);
+            IrisCameraFreeImageSamplers(shared_state.image_samplers,
+                                        num_chunks);
+            IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+            free(shared_state.image_samplers);
+            free(shared_state.rngs);
             free(threads);
             return status;
         }
 
-        PointerListAddPointer(&shared_state.image_samplers,
-                              replicated_image_sampler);
+        shared_state.image_samplers[i] = replicated_image_sampler;
     }
 
     for (size_t i = 0; i < num_chunks; i++)
     {
-        PRANDOM seed_rng =
-            PointerListRetrieveAtIndex(&shared_state.seed_rngs, i);
-
-        PRANDOM unowned_rng;
         ISTATUS status = ImageSamplerPrepareRandom(image_sampler,
-                                                   seed_rng,
-                                                   &unowned_rng);
+                                                   shared_state.rngs + i);
 
         if (status != ISTATUS_SUCCESS)
         {
-            IrisCameraFreeImageSamplers(&shared_state.image_samplers);
-            IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-            PointerListDestroy(&shared_state.unowned_rngs);
-            PointerListDestroy(&shared_state.image_samplers);
-            PointerListDestroy(&shared_state.seed_rngs);
+            IrisCameraFreeImageSamplers(shared_state.image_samplers,
+                                        num_chunks);
+            IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+            free(shared_state.image_samplers);
+            free(shared_state.rngs);
             free(threads);
             return status;
         }
-
-        PointerListAddPointer(&shared_state.unowned_rngs,
-                              unowned_rng);
     }
 
     PRENDER_THREAD_CONTEXT thread_contexts;
@@ -650,11 +599,10 @@ IrisCameraRender(
 
     if (status != ISTATUS_SUCCESS)
     {
-        IrisCameraFreeImageSamplers(&shared_state.image_samplers);
-        IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-        PointerListDestroy(&shared_state.unowned_rngs);
-        PointerListDestroy(&shared_state.image_samplers);
-        PointerListDestroy(&shared_state.seed_rngs);
+        IrisCameraFreeImageSamplers(shared_state.image_samplers, num_chunks);
+        IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+        free(shared_state.image_samplers);
+        free(shared_state.rngs);
         free(threads);
         return status;
     }
@@ -666,11 +614,11 @@ IrisCameraRender(
         if (status != ISTATUS_SUCCESS)
         {
             IrisCameraFreeThreadState(number_of_threads, thread_contexts);
-            IrisCameraFreeImageSamplers(&shared_state.image_samplers);
-            IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-            PointerListDestroy(&shared_state.unowned_rngs);
-            PointerListDestroy(&shared_state.image_samplers);
-            PointerListDestroy(&shared_state.seed_rngs);
+            IrisCameraFreeImageSamplers(shared_state.image_samplers,
+                                        num_chunks);
+            IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+            free(shared_state.image_samplers);
+            free(shared_state.rngs);
             free(threads);
             return status;
         }
@@ -716,11 +664,10 @@ IrisCameraRender(
     }
 
     IrisCameraFreeThreadState(number_of_threads, thread_contexts);
-    IrisCameraFreeImageSamplers(&shared_state.image_samplers);
-    IrisCameraFreeSeedRngs(&shared_state.seed_rngs);
-    PointerListDestroy(&shared_state.unowned_rngs);
-    PointerListDestroy(&shared_state.image_samplers);
-    PointerListDestroy(&shared_state.seed_rngs);
+    IrisCameraFreeImageSamplers(shared_state.image_samplers, num_chunks);
+    IrisCameraFreeRngs(shared_state.rngs, num_chunks);
+    free(shared_state.image_samplers);
+    free(shared_state.rngs);
     free(threads);
 
     if (status != ISTATUS_SUCCESS)

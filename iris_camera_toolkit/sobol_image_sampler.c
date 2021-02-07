@@ -219,7 +219,6 @@ typedef struct _SOBOL_IMAGE_SAMPLER {
     size_t num_rows;
     size_t current_column;
     size_t current_row;
-    PRANDOM random;
     SOBOL_RANDOM_DATA random_data;
     float_t lens_min_u;
     float_t lens_delta_u;
@@ -344,33 +343,6 @@ SobolSequenceIndex(
 
 static
 ISTATUS
-SobolImageSamplerPrepareRandom(
-    _In_ void *context,
-    _Inout_ PRANDOM seed_rng,
-    _Out_ PRANDOM *rng
-    )
-{
-    PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
-
-    image_sampler->random_data.sample_index = 0;
-    image_sampler->random_data.dimension = 0;
-
-    ISTATUS status = SobolRandomAllocate(&image_sampler->random_data,
-                                         false,
-                                         &image_sampler->random);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    *rng = image_sampler->random;
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
 SobolImageSamplerPrepareImageSamples(
     _In_ void *context,
     _In_ size_t num_columns,
@@ -394,6 +366,25 @@ SobolImageSamplerPrepareImageSamples(
         (float_t)1.0 / ((float_t)num_rows * sqrt_samples);
 
     return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+SobolImageSamplerPrepareRandom(
+    _In_ void *context,
+    _Out_ PRANDOM *rng
+    )
+{
+    PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
+
+    image_sampler->random_data.sample_index = 0;
+    image_sampler->random_data.dimension = 0;
+
+    ISTATUS status = SobolRandomAllocate(&image_sampler->random_data,
+                                         false,
+                                         rng);
+
+    return status;
 }
 
 static
@@ -511,28 +502,18 @@ SobolImageSamplerReplicate(
     _Out_ PIMAGE_SAMPLER *replica
     );
 
-static
-void
-SobolImageSamplerFree(
-    _In_opt_ _Post_invalid_ void *context
-    )
-{
-    PSOBOL_IMAGE_SAMPLER image_sampler = (PSOBOL_IMAGE_SAMPLER)context;
-
-    RandomFree(image_sampler->random);
-}
-
 //
 // Static Variables
 //
 
 static const IMAGE_SAMPLER_VTABLE sobol_image_sampler_vtable = {
-    SobolImageSamplerPrepareRandom,
     SobolImageSamplerPrepareImageSamples,
+    NULL,
+    SobolImageSamplerPrepareRandom,
     SobolImageSamplerPreparePixelSamples,
     SobolImageSamplerNextSample,
     SobolImageSamplerReplicate,
-    SobolImageSamplerFree
+    NULL
 };
 
 //
@@ -578,7 +559,6 @@ SobolImageSamplerAllocate(
     }
 
     SOBOL_IMAGE_SAMPLER sobol_image_sampler;
-    sobol_image_sampler.random = NULL;
     sobol_image_sampler.samples_per_pixel = samples_per_pixel;
 
     ISTATUS status = ImageSamplerAllocate(&sobol_image_sampler_vtable,
