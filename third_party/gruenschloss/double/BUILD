@@ -9,6 +9,7 @@ cc_library(
     srcs = ["sobol.c"],
     hdrs = ["sobol.h"],
     visibility = [
+        "//iris_advanced_toolkit:__pkg__",
         "//iris_camera_toolkit:__pkg__",
     ],
 )

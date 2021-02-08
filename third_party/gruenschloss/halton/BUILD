@@ -8,6 +8,7 @@ cc_library(
     name = "halton_enum",
     hdrs = ["halton_enum.h"],
     visibility = [
+        "//iris_advanced_toolkit:__pkg__",
         "//iris_camera_toolkit:__pkg__",
     ],
 )
@@ -16,6 +17,7 @@ cc_library(
     name = "halton_sampler",
     hdrs = ["halton_sampler.h"],
     visibility = [
+        "//iris_advanced_toolkit:__pkg__",
         "//iris_camera_toolkit:__pkg__",
     ],
 )
