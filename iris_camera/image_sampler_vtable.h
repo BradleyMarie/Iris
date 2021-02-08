@@ -80,9 +80,9 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_REPLICATE_ROUTINE)(
+(*PIMAGE_SAMPLER_DUPLICATE_ROUTINE)(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *replica
+    _Out_ PIMAGE_SAMPLER *duplicate
     );
 
 typedef struct _IMAGE_SAMPLER_VTABLE {
@@ -91,7 +91,7 @@ typedef struct _IMAGE_SAMPLER_VTABLE {
     PIMAGE_SAMPLER_PREPARE_RANDOM_ROUTINE prepare_random_routine;
     PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE prepare_pixel_samples_routine;
     PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
-    PIMAGE_SAMPLER_REPLICATE_ROUTINE replicate_routine;
+    PIMAGE_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } IMAGE_SAMPLER_VTABLE, *PIMAGE_SAMPLER_VTABLE;
 

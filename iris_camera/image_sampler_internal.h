@@ -84,7 +84,7 @@ inline
 ISTATUS
 ImageSamplerPrepareRandom(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM *rng
+    _Out_ PRANDOM *rng
     )
 {
     assert(image_sampler != NULL);
@@ -92,21 +92,13 @@ ImageSamplerPrepareRandom(
 
     if (image_sampler->vtable->prepare_random_routine == NULL)
     {
+        *rng = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    PRANDOM new_rng;
     ISTATUS status =
         image_sampler->vtable->prepare_random_routine(image_sampler->data,
-                                                      &new_rng);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    RandomFree(*rng);
-    *rng = new_rng;
+                                                      rng);
 
     return status;
 }
@@ -202,17 +194,17 @@ ImageSamplerGetSample(
 static
 inline
 ISTATUS
-ImageSamplerReplicate(
+ImageSamplerDuplicate(
     _In_ const struct _IMAGE_SAMPLER *image_sampler,
-    _Out_ struct _IMAGE_SAMPLER **replica
+    _Out_ struct _IMAGE_SAMPLER **duplicate
     )
 {
     assert(image_sampler != NULL);
-    assert(replica != NULL);
+    assert(duplicate != NULL);
 
     ISTATUS status =
-        image_sampler->vtable->replicate_routine(image_sampler->data,
-                                                 replica);
+        image_sampler->vtable->duplicate_routine(image_sampler->data,
+                                                 duplicate);
 
     return status;
 }

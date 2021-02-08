@@ -249,9 +249,9 @@ GridImageSamplerNextSample(
 
 static
 ISTATUS
-GridImageSamplerReplicate(
+GridImageSamplerDuplicate(
     _In_opt_ const void *context,
-    _Out_ PIMAGE_SAMPLER *replica
+    _Out_ PIMAGE_SAMPLER *duplicate
     )
 {
     PCGRID_IMAGE_SAMPLER grid_image_sampler = (PCGRID_IMAGE_SAMPLER)context;
@@ -263,7 +263,7 @@ GridImageSamplerReplicate(
                                  grid_image_sampler->lens_samples_u,
                                  grid_image_sampler->lens_samples_v,
                                  grid_image_sampler->jitter_lens_samples,
-                                 replica);
+                                 duplicate);
 
     return status;
 }
@@ -278,7 +278,7 @@ static const IMAGE_SAMPLER_VTABLE grid_image_sampler_vtable = {
     NULL,
     GridImageSamplerPreparePixelSamples,
     GridImageSamplerNextSample,
-    GridImageSamplerReplicate,
+    GridImageSamplerDuplicate,
     NULL
 };
 

@@ -24,6 +24,7 @@ Abstract:
 
 typedef struct _LOW_DISCREPANCY_RANDOM {
     PLOW_DISCREPANCY_SEQUENCE sequence;
+    bool owned;
 } LOW_DISCREPANCY_RANDOM, *PLOW_DISCREPANCY_RANDOM;
 
 //
@@ -107,7 +108,10 @@ LowDiscrepancyRandomFree(
 {
     PLOW_DISCREPANCY_RANDOM random = (PLOW_DISCREPANCY_RANDOM)context;
 
-    LowDiscrepancySequenceFree(random->sequence);
+    if (random->owned)
+    {
+        LowDiscrepancySequenceFree(random->sequence);
+    }
 }
 
 //
@@ -143,6 +147,8 @@ LowDiscrepancyRandomReplicate(
         return status;
     }
 
+    next.owned = true;
+
     status = RandomAllocate(&low_discrepancy_vtable,
                             &next,
                             sizeof(LOW_DISCREPANCY_RANDOM),
@@ -164,6 +170,7 @@ LowDiscrepancyRandomAllocate(
 
     LOW_DISCREPANCY_RANDOM low_discrepancy;
     low_discrepancy.sequence = sequence;
+    low_discrepancy.owned = false;
 
     ISTATUS status = RandomAllocate(&low_discrepancy_vtable,
                                     &low_discrepancy,
@@ -386,7 +393,7 @@ LowDiscrepancyImageSamplerNextSample(
 
 static
 ISTATUS
-LowDiscrepancyImageSamplerReplicate(
+LowDiscrepancyImageSamplerDuplicate(
     _In_opt_ const void *context,
     _Out_ PIMAGE_SAMPLER *replica
     )
@@ -436,7 +443,7 @@ static const IMAGE_SAMPLER_VTABLE low_discrepancy_image_sampler_vtable = {
     LowDiscrepancyImageSamplerPrepareRandom,
     LowDiscrepancyImageSamplerPreparePixelSamples,
     LowDiscrepancyImageSamplerNextSample,
-    LowDiscrepancyImageSamplerReplicate,
+    LowDiscrepancyImageSamplerDuplicate,
     LowDiscrepancyImageSamplerFree
 };
 
