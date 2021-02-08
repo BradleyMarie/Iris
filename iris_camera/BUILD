@@ -134,7 +134,6 @@ cc_library(
         ":progress_reporter_internal",
         ":sample_tracer",
         ":sample_tracer_internal",
-        "//common:pointer_list",
     ],
 )
 
