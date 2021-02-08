@@ -61,7 +61,7 @@ ISTATUS
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
     _In_ float_t lens_max_v,
-    _Out_ size_t *num_samples
+    _Out_ uint32_t *num_samples
     );
 
 typedef

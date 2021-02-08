@@ -254,7 +254,7 @@ LowDiscrepancyImageSamplerPreparePixelSamples(
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
     _In_ float_t lens_max_v,
-    _Out_ size_t *num_samples
+    _Out_ uint32_t *num_samples
     )
 {
     PLOW_DISCREPANCY_IMAGE_SAMPLER image_sampler = (PLOW_DISCREPANCY_IMAGE_SAMPLER)context;
@@ -268,7 +268,7 @@ LowDiscrepancyImageSamplerPreparePixelSamples(
     image_sampler->lens_min_v = lens_min_v;
     image_sampler->lens_delta_v = lens_max_v - lens_min_v;
 
-    *num_samples = (size_t)image_sampler->samples_per_pixel;
+    *num_samples = image_sampler->samples_per_pixel;
 
     return ISTATUS_SUCCESS;
 }

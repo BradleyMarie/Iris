@@ -182,7 +182,7 @@ IrisCameraRenderPixel(
         in_order_row = pixel_row;
     }
 
-    size_t num_samples;
+    uint32_t num_samples;
     ISTATUS status =
         ImageSamplerPreparePixelSamples(image_sampler,
                                         in_order_column,
@@ -204,7 +204,7 @@ IrisCameraRenderPixel(
 
     COLOR3 pixel_color = ColorCreateBlack();
 
-    for (size_t index = 0; index < num_samples; index++)
+    for (uint32_t index = 0; index < num_samples; index++)
     {
         bool cancelled = atomic_load_explicit(&context->shared->cancelled,
                                               memory_order_relaxed);

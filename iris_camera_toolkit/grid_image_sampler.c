@@ -14,7 +14,6 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "common/safe_math.h"
 #include "iris_camera_toolkit/grid_image_sampler.h"
 
 //
@@ -66,7 +65,7 @@ GridImageSamplerPreparePixelSamples(
     _In_ float_t lens_max_u,
     _In_ float_t lens_min_v,
     _In_ float_t lens_max_v,
-    _Out_ size_t *num_samples
+    _Out_ uint32_t *num_samples
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
@@ -323,30 +322,10 @@ GridImageSamplerAllocate(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    size_t max_sample_count;
-    bool success = CheckedMultiplySizeT(pixel_samples_u,
-                                        pixel_samples_v,
-                                        &max_sample_count);
+    uint64_t max_sample_count =
+        pixel_samples_u * pixel_samples_v * lens_samples_u * lens_samples_v;
 
-    if (!success)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-
-    success = CheckedMultiplySizeT(max_sample_count,
-                                   lens_samples_u,
-                                   &max_sample_count);
-
-    if (!success)
-    {
-        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
-    }
-
-    success = CheckedMultiplySizeT(max_sample_count,
-                                   lens_samples_v,
-                                   &max_sample_count);
-
-    if (!success)
+    if (max_sample_count > UINT32_MAX)
     {
         return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
     }
