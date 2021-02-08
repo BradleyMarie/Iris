@@ -12,14 +12,12 @@ cc_library(
 )
 
 cc_library(
-    name = "halton_image_sampler",
-    srcs = ["halton_image_sampler.c"],
-    hdrs = ["halton_image_sampler.h"],
+    name = "low_discrepancy_image_sampler",
+    srcs = ["low_discrepancy_image_sampler.c"],
+    hdrs = ["low_discrepancy_image_sampler.h"],
     deps = [
-        "//common:safe_math",
-        "//iris_camera",
-        "//third_party/gruenschloss/halton:halton_enum",
-        "//third_party/gruenschloss/halton:halton_sampler",
+        "//iris_advanced_toolkit:low_discrepancy_sequence",
+        "//iris_camera"
     ],
 )
 
@@ -47,18 +45,6 @@ cc_library(
     hdrs = ["pinhole_camera.h"],
     deps = [
         "//iris_camera",
-    ],
-)
-
-cc_library(
-    name = "sobol_image_sampler",
-    srcs = ["sobol_image_sampler.c"],
-    hdrs = ["sobol_image_sampler.h"],
-    deps = [
-        "//iris_camera",
-        "//third_party/gruenschloss/double:sobol",
-        "//third_party/gruenschloss/single:sobol",
-        "//third_party/pbrt-v3:sobolmatrices",
     ],
 )
 

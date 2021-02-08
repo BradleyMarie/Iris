@@ -226,9 +226,15 @@ SobolSequenceNextFloat(
 {
     PSOBOL_SEQUENCE sobol_sequence = (PSOBOL_SEQUENCE)context;
  
+#if FLT_EVAL_METHOD == 0
     *value = sobol_single_sample(sobol_sequence->index,
                                  sobol_sequence->dimension,
                                  SOBOL_SINGLE_DEFAULT_SCRAMBLE);
+#else
+    *value = sobol_double_sample(sobol_sequence->index,
+                                 sobol_sequence->dimension,
+                                 SOBOL_DOUBLE_DEFAULT_SCRAMBLE);
+#endif
 
     sobol_sequence->dimension += 1;
 
