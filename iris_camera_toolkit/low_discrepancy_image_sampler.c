@@ -401,7 +401,7 @@ static const IMAGE_SAMPLER_VTABLE low_discrepancy_image_sampler_vtable = {
 
 ISTATUS
 LowDiscrepancyImageSamplerAllocate(
-    _In_ PLOW_DISCREPANCY_SEQUENCE sequence,
+    _In_ PCLOW_DISCREPANCY_SEQUENCE sequence,
     _In_ uint32_t samples_per_pixel,
     _Out_ PIMAGE_SAMPLER *image_sampler
     )
@@ -421,15 +421,28 @@ LowDiscrepancyImageSamplerAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    LOW_DISCREPANCY_IMAGE_SAMPLER low_discrepancy_image_sampler;
-    low_discrepancy_image_sampler.sequence = sequence;
-    low_discrepancy_image_sampler.samples_per_pixel = samples_per_pixel;
+    LOW_DISCREPANCY_IMAGE_SAMPLER sampler;
+    sampler.samples_per_pixel = samples_per_pixel;
 
-    ISTATUS status = ImageSamplerAllocate(&low_discrepancy_image_sampler_vtable,
-                                          &low_discrepancy_image_sampler,
-                                          sizeof(LOW_DISCREPANCY_IMAGE_SAMPLER),
-                                          alignof(LOW_DISCREPANCY_IMAGE_SAMPLER),
-                                          image_sampler);
+    ISTATUS status = LowDiscrepancySequenceDuplicate(sequence,
+                                                     &sampler.sequence);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ImageSamplerAllocate(&low_discrepancy_image_sampler_vtable,
+                                  &sampler,
+                                  sizeof(LOW_DISCREPANCY_IMAGE_SAMPLER),
+                                  alignof(LOW_DISCREPANCY_IMAGE_SAMPLER),
+                                  image_sampler);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        LowDiscrepancySequenceFree(sampler.sequence);
+        return status;
+    }
+
+    return ISTATUS_SUCCESS;
 }

@@ -29,7 +29,7 @@ extern "C" {
 
 ISTATUS
 LowDiscrepancyImageSamplerAllocate(
-    _In_ PLOW_DISCREPANCY_SEQUENCE sequence,
+    _In_ PCLOW_DISCREPANCY_SEQUENCE sequence,
     _In_ uint32_t samples_per_pixel,
     _Out_ PIMAGE_SAMPLER *image_sampler
     );
