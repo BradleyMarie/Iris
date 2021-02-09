@@ -25,13 +25,13 @@ struct _CAMERA {
     PCCAMERA_VTABLE vtable;
     void *data;
     float_t image_min_u;
-    float_t image_max_u;
+    float_t image_delta_u;
     float_t image_min_v;
-    float_t image_max_v;
+    float_t image_delta_v;
     float_t lens_min_u;
-    float_t lens_max_u;
+    float_t lens_delta_u;
     float_t lens_min_v;
-    float_t lens_max_v;
+    float_t lens_delta_v;
 };
 
 //
@@ -53,13 +53,20 @@ CameraGenerateRayDifferential(
     )
 {
     assert(camera != NULL);
-    assert(camera->lens_min_u <= lens_u);
-    assert(lens_u <= camera->lens_max_u);
-    assert(camera->lens_min_v <= lens_v);
-    assert(lens_v <= camera->lens_max_v);
+    assert((float_t)0.0 <= image_u && image_u <= (float_t)1.0);
+    assert((float_t)0.0 <= image_v && image_v <= (float_t)1.0);
+    assert((float_t)0.0 <= lens_u && lens_u <= (float_t)1.0);
+    assert((float_t)0.0 <= lens_v && lens_v <= (float_t)1.0);
     assert(isfinite(dimage_u_dx));
     assert(isfinite(dimage_v_dy));
     assert(ray_differential != NULL);
+
+    image_u = fma(image_u, camera->image_delta_u, camera->image_min_u);
+    image_v = fma(image_v, camera->image_delta_v, camera->image_min_v);
+    dimage_u_dx = fma(dimage_u_dx, camera->image_delta_u, camera->image_min_u);
+    dimage_v_dy = fma(dimage_v_dy, camera->image_delta_v, camera->image_min_v);
+    lens_u = fma(lens_u, camera->lens_delta_u, camera->lens_min_u);
+    lens_v = fma(lens_v, camera->lens_delta_v, camera->lens_min_v);
 
     RAY ray;
     ISTATUS status = camera->vtable->generate_ray_routine(camera->data,

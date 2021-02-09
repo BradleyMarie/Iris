@@ -188,20 +188,13 @@ LowDiscrepancyRandomAllocate(
 typedef struct _LOW_DISCREPANCY_IMAGE_SAMPLER {
     PLOW_DISCREPANCY_SEQUENCE sequence;
     uint32_t samples_per_pixel;
-    size_t num_columns;
-    size_t num_rows;
+    uint32_t sample_index;
     size_t column;
+    size_t num_columns;
     size_t row;
-    double_t pixel_min_u;
-    double_t pixel_delta_u;
-    double_t pixel_min_v;
-    double_t pixel_delta_v;
-    float_t lens_min_u;
-    float_t lens_delta_u;
-    float_t lens_min_v;
-    float_t lens_delta_v;
-    float_t dpixel_sample_u;
-    float_t dpixel_sample_v;
+    size_t num_rows;
+    float_t dpixel_u;
+    float_t dpixel_v;
 } LOW_DISCREPANCY_IMAGE_SAMPLER, *PLOW_DISCREPANCY_IMAGE_SAMPLER;
 
 typedef const LOW_DISCREPANCY_IMAGE_SAMPLER *PCLOW_DISCREPANCY_IMAGE_SAMPLER;
@@ -212,29 +205,7 @@ typedef const LOW_DISCREPANCY_IMAGE_SAMPLER *PCLOW_DISCREPANCY_IMAGE_SAMPLER;
 
 static
 ISTATUS
-LowDiscrepancyImageSamplerPrepareImageSamples(
-    _In_ void *context,
-    _In_ size_t num_columns,
-    _In_ size_t num_rows
-    )
-{
-    PLOW_DISCREPANCY_IMAGE_SAMPLER image_sampler = (PLOW_DISCREPANCY_IMAGE_SAMPLER)context;
-
-    image_sampler->num_columns = num_columns;
-    image_sampler->num_rows = num_rows;
-
-    double_t sqrt_samples = sqrt((double_t)image_sampler->samples_per_pixel);
-    image_sampler->dpixel_sample_u =
-        (float_t)((double_t)1.0 / ((double_t)num_columns * sqrt_samples));
-    image_sampler->dpixel_sample_v =
-        (float_t)((double_t)1.0 / ((double_t)num_rows * sqrt_samples));
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
-LowDiscrepancyImageSamplerPrepareRandom(
+LowDiscrepancyImageSamplerRandom(
     _In_ void *context,
     _Out_ PRANDOM *rng
     )
@@ -249,31 +220,28 @@ LowDiscrepancyImageSamplerPrepareRandom(
 
 static
 ISTATUS
-LowDiscrepancyImageSamplerPreparePixelSamples(
+LowDiscrepancyImageSamplerStart(
     _In_ void *context,
     _In_ size_t column,
+    _In_ size_t num_columns,
     _In_ size_t row,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
-    _In_ float_t lens_min_u,
-    _In_ float_t lens_max_u,
-    _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v,
+    _In_ size_t num_rows,
     _Out_ uint32_t *num_samples
     )
 {
     PLOW_DISCREPANCY_IMAGE_SAMPLER image_sampler = (PLOW_DISCREPANCY_IMAGE_SAMPLER)context;
 
-    image_sampler->pixel_min_u = (double_t)pixel_max_u;
-    image_sampler->pixel_delta_u = (double_t)pixel_max_u - (double_t)pixel_min_u;
-    image_sampler->pixel_min_v = (double_t)pixel_min_v;
-    image_sampler->pixel_delta_v = (double_t)pixel_max_v - (double_t)pixel_min_v;
-    image_sampler->lens_min_u = lens_max_u;
-    image_sampler->lens_delta_u = lens_max_u - lens_min_u;
-    image_sampler->lens_min_v = lens_min_v;
-    image_sampler->lens_delta_v = lens_max_v - lens_min_v;
+    image_sampler->column = column;
+    image_sampler->num_columns = num_columns;
+    image_sampler->row = row;
+    image_sampler->num_rows = num_rows;
+    image_sampler->sample_index = 0;
+
+    double_t sqrt_samples = sqrt((double_t)image_sampler->samples_per_pixel);
+    image_sampler->dpixel_u =
+        (float_t)((double_t)1.0 / ((double_t)num_columns * sqrt_samples));
+    image_sampler->dpixel_v =
+        (float_t)((double_t)1.0 / ((double_t)num_rows * sqrt_samples));
 
     *num_samples = image_sampler->samples_per_pixel;
 
@@ -282,16 +250,15 @@ LowDiscrepancyImageSamplerPreparePixelSamples(
 
 static
 ISTATUS
-LowDiscrepancyImageSamplerNextSample(
-    _In_ const void *context,
+LowDiscrepancyImageSamplerNext(
+    _In_ void *context,
     _Inout_ PRANDOM pixel_rng,
-    _In_ size_t sample_index,
-    _Out_ float_t *pixel_sample_u,
-    _Out_ float_t *pixel_sample_v,
-    _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v,
-    _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *pixel_u,
+    _Out_ float_t *pixel_v,
+    _Out_ float_t *dpixel_u,
+    _Out_ float_t *dpixel_v,
+    _Out_opt_ float_t *lens_u,
+    _Out_opt_ float_t *lens_v
     )
 {
     PLOW_DISCREPANCY_IMAGE_SAMPLER image_sampler = (PLOW_DISCREPANCY_IMAGE_SAMPLER)context;
@@ -302,7 +269,7 @@ LowDiscrepancyImageSamplerNextSample(
                                                         image_sampler->num_columns,
                                                         image_sampler->row,
                                                         image_sampler->num_rows,
-                                                        (uint32_t)sample_index,
+                                                        image_sampler->sample_index,
                                                         image_sampler->samples_per_pixel,
                                                         &sequence_index);
 
@@ -319,74 +286,52 @@ LowDiscrepancyImageSamplerNextSample(
         return status;
     }
 
-    double_t pixel_u;
+    double_t pixel_u_as_double;
     status = LowDiscrepancySequenceNextDouble(image_sampler->sequence,
-                                              &pixel_u);
+                                              &pixel_u_as_double);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    pixel_u = fma(pixel_u,
-                  image_sampler->pixel_delta_u,
-                  image_sampler->pixel_min_u);
-    *pixel_sample_u = (float_t)pixel_u;
+    *pixel_u = (float_t)pixel_u_as_double;
 
-    double_t pixel_v;
+    double_t pixel_v_as_double;
     status = LowDiscrepancySequenceNextDouble(image_sampler->sequence,
-                                              &pixel_v);
+                                              &pixel_v_as_double);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    pixel_v = fma(pixel_v,
-                  image_sampler->pixel_delta_v,
-                  image_sampler->pixel_min_v);
-    *pixel_sample_v = (float_t)pixel_v;
+    *pixel_v = (float_t)pixel_v_as_double;
 
-    if (image_sampler->lens_delta_u != (float_t)0.0)
+    *dpixel_u = image_sampler->dpixel_u;
+    *dpixel_v = image_sampler->dpixel_v;
+
+    if (lens_u != NULL)
     {
-        float_t value;
         status = LowDiscrepancySequenceNextFloat(image_sampler->sequence,
-                                                 &value);
+                                                 lens_u);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
-
-        *lens_sample_u = image_sampler->lens_min_u +
-                         image_sampler->lens_delta_u * value;
-    }
-    else
-    {
-        *lens_sample_u = image_sampler->lens_min_u;
     }
 
-    if (image_sampler->lens_delta_v != (float_t)0.0)
+    if (lens_v != NULL)
     {
-        float_t value;
         status = LowDiscrepancySequenceNextFloat(image_sampler->sequence,
-                                                 &value);
+                                                 lens_v);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
-
-        *lens_sample_u = image_sampler->lens_min_u +
-                         image_sampler->lens_delta_u * value;
     }
-    else
-    {
-        *lens_sample_v = image_sampler->lens_min_v;
-    }
-
-    *dpixel_sample_u = image_sampler->dpixel_sample_u;
-    *dpixel_sample_v = image_sampler->dpixel_sample_v;
 
     return ISTATUS_SUCCESS;
 }
@@ -438,11 +383,10 @@ LowDiscrepancyImageSamplerFree(
 //
 
 static const IMAGE_SAMPLER_VTABLE low_discrepancy_image_sampler_vtable = {
-    LowDiscrepancyImageSamplerPrepareImageSamples,
     NULL,
-    LowDiscrepancyImageSamplerPrepareRandom,
-    LowDiscrepancyImageSamplerPreparePixelSamples,
-    LowDiscrepancyImageSamplerNextSample,
+    LowDiscrepancyImageSamplerRandom,
+    LowDiscrepancyImageSamplerStart,
+    LowDiscrepancyImageSamplerNext,
     LowDiscrepancyImageSamplerDuplicate,
     LowDiscrepancyImageSamplerFree
 };

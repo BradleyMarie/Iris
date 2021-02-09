@@ -103,7 +103,7 @@ IrisCameraAllocateThreadState(
     assert(thread_state != NULL);
 
     PRANDOM rng;
-    ISTATUS status = ImageSamplerPrepareRandom(image_sampler, &rng);
+    ISTATUS status = ImageSamplerRandom(image_sampler, &rng);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -148,8 +148,8 @@ IrisCameraAllocateThreadState(
             return status;
         }
 
-        status = ImageSamplerPrepareRandom(result[i].local.image_sampler,
-                                           &result[i].local.image_sampler_rng);
+        status = ImageSamplerRandom(result[i].local.image_sampler,
+                                    &result[i].local.image_sampler_rng);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -171,72 +171,57 @@ IrisCameraRenderPixel(
     _Inout_ PRENDER_THREAD_CONTEXT context,
     _Inout_ PIMAGE_SAMPLER image_sampler,
     _Inout_ PRANDOM rng,
-    _In_ float_t pixel_u_width,
-    _In_ float_t pixel_v_width,
+    _In_ size_t column,
     _In_ size_t num_columns,
-    _In_ size_t num_rows,
-    _In_ size_t pixel_column,
-    _In_ size_t pixel_row
+    _In_ size_t row,
+    _In_ size_t num_rows
     )
 {
     assert(context != NULL);
     assert(image_sampler != NULL);
     assert(rng != NULL);
-    assert(isfinite(pixel_u_width));
-    assert((float_t)0.0 < pixel_u_width);
-    assert(isfinite(pixel_v_width));
-    assert((float_t)0.0 > pixel_v_width);
-
-    float_t pixel_u_min =
-        context->shared->camera->image_min_u + (float_t)pixel_column * pixel_u_width;
-    float_t pixel_u_max = pixel_u_min + pixel_u_width;
-
-    float_t pixel_v_max =
-        context->shared->camera->image_max_v + (float_t)pixel_row * pixel_v_width;
-    float_t pixel_v_min = pixel_v_max + pixel_v_width;
-
-    size_t in_order_column;
-    if (pixel_u_width < (float_t)0.0)
-    {
-        in_order_column = num_columns - pixel_column - 1;
-    }
-    else
-    {
-        in_order_column = pixel_column;
-    }
-
-    size_t in_order_row;
-    if (pixel_v_width < (float_t)0.0)
-    {
-        in_order_row = num_rows - pixel_row - 1;
-    }
-    else
-    {
-        in_order_row = pixel_row;
-    }
+    assert(num_columns != 0);
+    assert(column < num_columns);
+    assert(num_rows != 0);
+    assert(row < num_rows);
 
     uint32_t num_samples;
-    ISTATUS status =
-        ImageSamplerPreparePixelSamples(image_sampler,
-                                        in_order_column,
-                                        in_order_row,
-                                        pixel_u_min,
-                                        pixel_u_max,
-                                        pixel_v_min,
-                                        pixel_v_max,
-                                        context->shared->camera->lens_min_u,
-                                        context->shared->camera->lens_max_u,
-                                        context->shared->camera->lens_min_v,
-                                        context->shared->camera->lens_max_v,
-                                        &num_samples);
+    ISTATUS status = ImageSamplerStart(image_sampler,
+                                       column,
+                                       num_columns,
+                                       num_rows - row - 1,
+                                       num_rows,
+                                       &num_samples);
 
     if (status != ISTATUS_SUCCESS)
     {
         return status;
     }
 
-    COLOR3 pixel_color = ColorCreateBlack();
+    float_t lens_u = context->shared->camera->lens_min_u;
+    float_t lens_v = context->shared->camera->lens_min_v;
 
+    float_t *lens_u_ptr;
+    if (context->shared->camera->lens_delta_u != (float_t)0.0)
+    {
+        lens_u_ptr = &lens_u;
+    }
+    else
+    {
+        lens_u_ptr = NULL;
+    }
+
+    float_t *lens_v_ptr;
+    if (context->shared->camera->lens_delta_v != (float_t)0.0)
+    {
+        lens_v_ptr = &lens_v;
+    }
+    else
+    {
+        lens_v_ptr = NULL;
+    }
+
+    COLOR3 pixel_color = ColorCreateBlack();
     for (uint32_t index = 0; index < num_samples; index++)
     {
         bool cancelled = atomic_load_explicit(&context->shared->cancelled,
@@ -247,17 +232,15 @@ IrisCameraRenderPixel(
             return ISTATUS_SUCCESS;
         }
 
-        float_t pixel_u, pixel_v, lens_u, lens_v, dpixel_u, dpixel_v;
-        status =
-            ImageSamplerGetSample(image_sampler,
+        float_t pixel_u, pixel_v, dpixel_u, dpixel_v;
+        status = ImageSamplerNext(image_sampler,
                                   rng,
-                                  index,
                                   &pixel_u,
                                   &pixel_v,
-                                  &lens_u,
-                                  &lens_v,
                                   &dpixel_u,
-                                  &dpixel_v);
+                                  &dpixel_v,
+                                  lens_u_ptr,
+                                  lens_v_ptr);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -309,8 +292,8 @@ IrisCameraRenderPixel(
     }
 
     FramebufferSetPixel(context->shared->framebuffer,
-                        pixel_column,
-                        pixel_row,
+                        column,
+                        row,
                         pixel_color);
 
     return ISTATUS_SUCCESS;
@@ -341,14 +324,6 @@ IrisCameraRenderThread(
 
     size_t num_pixels = num_rows * num_columns;
     size_t pixels_per_chunk = num_pixels / num_chunks;
-
-    float_t image_u_width = thread_context->shared->camera->image_max_u -
-                            thread_context->shared->camera->image_min_u;
-    float_t pixel_u_width = image_u_width / (float_t)num_columns;
-
-    float_t image_v_width = thread_context->shared->camera->image_min_v -
-                            thread_context->shared->camera->image_max_v;
-    float_t pixel_v_width = image_v_width / (float_t)num_rows;
 
     size_t chunk =
         atomic_load_explicit(&thread_context->shared->chunk,
@@ -386,12 +361,10 @@ IrisCameraRenderThread(
             ISTATUS status = IrisCameraRenderPixel(thread_context,
                                                    thread_context->local.image_sampler,
                                                    rng,
-                                                   pixel_u_width,
-                                                   pixel_v_width,
-                                                   num_columns,
-                                                   num_rows,
                                                    column,
-                                                   row);
+                                                   num_columns,
+                                                   row,
+                                                   num_rows);
 
             if (status != ISTATUS_SUCCESS)
             {
@@ -508,16 +481,7 @@ IrisCameraRender(
 
     size_t num_pixels = num_rows * num_columns;
 
-    ISTATUS status = ImageSamplerPrepareImageSamples(image_sampler,
-                                                     num_columns,
-                                                     num_rows);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = ImageSamplerPrepareImageSeed(image_sampler, rng);
+    ISTATUS status = ImageSamplerSeed(image_sampler, rng);
 
     if (status != ISTATUS_SUCCESS)
     {

@@ -33,25 +33,21 @@ struct _IMAGE_SAMPLER {
 static
 inline
 ISTATUS
-ImageSamplerPrepareImageSamples(
+ImageSamplerSeed(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _In_ size_t num_columns,
-    _In_ size_t num_rows
+    _Inout_ PRANDOM rng
     )
 {
     assert(image_sampler != NULL);
-    assert(num_columns != 0);
-    assert(num_rows != 0);
+    assert(rng != NULL);
 
-    if (image_sampler->vtable->prepare_image_samples_routine == NULL)
+    if (image_sampler->vtable->seed_routine == NULL)
     {
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status =
-        image_sampler->vtable->prepare_image_samples_routine(image_sampler->data,
-                                                             num_columns,
-                                                             num_rows);
+    ISTATUS status = image_sampler->vtable->seed_routine(image_sampler->data,
+                                                         rng);
 
     return status;
 }
@@ -59,30 +55,7 @@ ImageSamplerPrepareImageSamples(
 static
 inline
 ISTATUS
-ImageSamplerPrepareImageSeed(
-    _Inout_ struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM seed_rng
-    )
-{
-    assert(image_sampler != NULL);
-    assert(seed_rng != NULL);
-
-    if (image_sampler->vtable->prepare_image_seed_routine == NULL)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    ISTATUS status =
-        image_sampler->vtable->prepare_image_seed_routine(image_sampler->data,
-                                                          seed_rng);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-ImageSamplerPrepareRandom(
+ImageSamplerRandom(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _Out_ PRANDOM *rng
     )
@@ -90,15 +63,14 @@ ImageSamplerPrepareRandom(
     assert(image_sampler != NULL);
     assert(rng != NULL);
 
-    if (image_sampler->vtable->prepare_random_routine == NULL)
+    if (image_sampler->vtable->random_routine == NULL)
     {
         *rng = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status =
-        image_sampler->vtable->prepare_random_routine(image_sampler->data,
-                                                      rng);
+    ISTATUS status = image_sampler->vtable->random_routine(image_sampler->data,
+                                                           rng);
 
     return status;
 }
@@ -106,49 +78,28 @@ ImageSamplerPrepareRandom(
 static
 inline
 ISTATUS
-ImageSamplerPreparePixelSamples(
+ImageSamplerStart(
     _Inout_ struct _IMAGE_SAMPLER *image_sampler,
     _In_ size_t column,
+    _In_ size_t num_columns,
     _In_ size_t row,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
-    _In_ float_t lens_min_u,
-    _In_ float_t lens_max_u,
-    _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v,
+    _In_ size_t num_rows,
     _Out_ uint32_t *num_samples
     )
 {
     assert(image_sampler != NULL);
-    assert(isfinite(pixel_min_u));
-    assert(isfinite(pixel_max_u));
-    assert(pixel_min_u <= pixel_max_u);
-    assert(isfinite(pixel_min_v));
-    assert(isfinite(pixel_max_v));
-    assert(pixel_min_v <= pixel_max_v);
-    assert(isfinite(lens_min_u));
-    assert(isfinite(lens_max_u));
-    assert(lens_min_u <= lens_max_u);
-    assert(isfinite(lens_min_v));
-    assert(isfinite(lens_max_v));
-    assert(lens_min_v <= lens_max_v);
+    assert(num_columns != 0);
+    assert(column < num_columns);
+    assert(num_rows != 0);
+    assert(row < num_rows);
     assert(num_samples != NULL);
 
-    ISTATUS status =
-        image_sampler->vtable->prepare_pixel_samples_routine(image_sampler->data,
-                                                             column,
-                                                             row,
-                                                             pixel_min_u,
-                                                             pixel_max_u,
-                                                             pixel_min_v,
-                                                             pixel_max_v,
-                                                             lens_min_u,
-                                                             lens_max_u,
-                                                             lens_min_v,
-                                                             lens_max_v,
-                                                             num_samples);
+    ISTATUS status = image_sampler->vtable->start_routine(image_sampler->data,
+                                                          column,
+                                                          num_columns,
+                                                          row,
+                                                          num_rows,
+                                                          num_samples);
 
     return status;
 }
@@ -156,37 +107,32 @@ ImageSamplerPreparePixelSamples(
 static
 inline
 ISTATUS
-ImageSamplerGetSample(
-    _In_ const struct _IMAGE_SAMPLER *image_sampler,
-    _Inout_ PRANDOM pixel_rng,
-    _In_ size_t sample_index,
-    _Out_ float_t *pixel_sample_u,
-    _Out_ float_t *pixel_sample_v,
-    _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v,
-    _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+ImageSamplerNext(
+    _In_ struct _IMAGE_SAMPLER *image_sampler,
+    _Inout_ PRANDOM rng,
+    _Out_ float_t *pixel_u,
+    _Out_ float_t *pixel_v,
+    _Out_ float_t *dpixel_u,
+    _Out_ float_t *dpixel_v,
+    _Out_opt_ float_t *lens_u,
+    _Out_opt_ float_t *lens_v
     )
 {
     assert(image_sampler != NULL);
-    assert(pixel_rng != NULL);
-    assert(pixel_sample_u != NULL);
-    assert(pixel_sample_v != NULL);
-    assert(lens_sample_u != NULL);
-    assert(lens_sample_v != NULL);
-    assert(dpixel_sample_u != NULL);
-    assert(dpixel_sample_v != NULL);
+    assert(rng != NULL);
+    assert(pixel_u != NULL);
+    assert(pixel_v != NULL);
+    assert(dpixel_u != NULL);
+    assert(dpixel_v != NULL);
 
-    ISTATUS status =
-        image_sampler->vtable->get_sample_routine(image_sampler->data,
-                                                  pixel_rng,
-                                                  sample_index,
-                                                  pixel_sample_u,
-                                                  pixel_sample_v,
-                                                  lens_sample_u,
-                                                  lens_sample_v,
-                                                  dpixel_sample_u,
-                                                  dpixel_sample_v);
+    ISTATUS status = image_sampler->vtable->next_routine(image_sampler->data,
+                                                         rng,
+                                                         pixel_u,
+                                                         pixel_v,
+                                                         dpixel_u,
+                                                         dpixel_v,
+                                                         lens_u,
+                                                         lens_v);
 
     return status;
 }

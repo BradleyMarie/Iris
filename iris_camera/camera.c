@@ -146,13 +146,13 @@ CameraAllocate(
     (*camera)->vtable = vtable;
     (*camera)->data = data_allocation;
     (*camera)->image_min_u = image_min_u;
-    (*camera)->image_max_u = image_max_u;
+    (*camera)->image_delta_u = image_max_u - image_min_u;
     (*camera)->image_min_v = image_min_v;
-    (*camera)->image_max_v = image_max_v;
+    (*camera)->image_delta_v = image_max_v - image_min_v;
     (*camera)->lens_min_u = lens_min_u;
-    (*camera)->lens_max_u = lens_max_u;
+    (*camera)->lens_delta_u = lens_max_u - lens_min_u;
     (*camera)->lens_min_v = lens_min_v;
-    (*camera)->lens_max_v = lens_max_v;
+    (*camera)->lens_delta_v = lens_max_v - lens_max_v;
 
     if (data_size != 0)
     {

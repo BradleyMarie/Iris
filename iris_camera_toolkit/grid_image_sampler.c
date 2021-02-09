@@ -25,18 +25,20 @@ typedef struct _GRID_IMAGE_SAMPLER {
     uint16_t pixel_samples_v;
     uint16_t lens_samples_u;
     uint16_t lens_samples_v;
-    float_t pixel_min_u;
-    float_t pixel_min_v;
-    float_t lens_min_u;
-    float_t lens_min_v;
-    float_t pixel_max_u;
-    float_t pixel_max_v;
-    float_t lens_max_u;
-    float_t lens_max_v;
-    float_t pixel_sample_width_u;
-    float_t pixel_sample_width_v;
-    float_t lens_sample_width_u;
-    float_t lens_sample_width_v;
+    uint16_t subpixel_u_index;
+    uint16_t subpixel_v_index;
+    uint16_t lens_u_index;
+    uint16_t lens_v_index;
+    float_t pixel_u_base;
+    float_t pixel_v_base;
+    float_t subpixel_u_width;
+    float_t subpixel_v_width;
+    float_t sublens_u_width;
+    float_t sublens_v_width;
+    float_t subpixel_u_center;
+    float_t subpixel_v_center;
+    float_t sublens_u_center;
+    float_t sublens_v_center;
     bool jitter_pixel_samples;
     bool jitter_lens_samples;
 } GRID_IMAGE_SAMPLER, *PGRID_IMAGE_SAMPLER;
@@ -49,76 +51,37 @@ typedef const GRID_IMAGE_SAMPLER *PCGRID_IMAGE_SAMPLER;
 
 static
 ISTATUS
-GridImageSampler2DOffsets(
-    _Inout_ PRANDOM rng,
-    _In_ float_t u_maximum,
-    _In_ float_t v_maximum,
-    _In_ bool jitter,
-    _Out_ float_t *u,
-    _Out_ float_t *v
-    )
-{
-    if (!jitter)
-    {
-        *u = (float_t)0.5 * u_maximum;
-        *v = (float_t)0.5 * v_maximum;
-        return ISTATUS_SUCCESS;
-    }
-
-    ISTATUS status = RandomGenerateFloat(rng,
-                                         (float_t)0.0,
-                                         u_maximum,
-                                         u);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    status = RandomGenerateFloat(rng,
-                                 (float_t)0.0,
-                                 v_maximum,
-                                 v);
-
-    return status;
-}
-
-static
-ISTATUS
-GridImageSamplerPreparePixelSamples(
+GridImageSamplerStart(
     _In_ void *context,
     _In_ size_t column,
+    _In_ size_t num_columns,
     _In_ size_t row,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
-    _In_ float_t lens_min_u,
-    _In_ float_t lens_max_u,
-    _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v,
+    _In_ size_t num_rows,
     _Out_ uint32_t *num_samples
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
 
-    image_sampler->pixel_min_u = pixel_min_u;
-    image_sampler->pixel_min_v = pixel_min_v;
-    image_sampler->lens_min_u = lens_min_u;
-    image_sampler->lens_min_v = lens_min_v;
-    image_sampler->pixel_max_u = pixel_max_u;
-    image_sampler->pixel_max_v = pixel_max_v;
-    image_sampler->lens_max_u = lens_max_u;
-    image_sampler->lens_max_v = lens_max_v;
+    image_sampler->subpixel_u_index = 0;
+    image_sampler->subpixel_v_index = 0;
+    image_sampler->lens_u_index = 0;
+    image_sampler->lens_v_index = 0;
 
-    image_sampler->pixel_sample_width_u =
-        (pixel_max_u - pixel_min_u) / (float_t)image_sampler->pixel_samples_u;
-    image_sampler->pixel_sample_width_v =
-        (pixel_max_v - pixel_min_v) / (float_t)image_sampler->pixel_samples_v;
-    image_sampler->lens_sample_width_u =
-        (lens_max_u - lens_min_u) / (float_t)image_sampler->lens_samples_u;
-    image_sampler->lens_sample_width_v =
-        (lens_max_v - lens_min_v) / (float_t)image_sampler->lens_samples_v;
+    image_sampler->pixel_u_base = (float_t)column / (float_t)num_columns;
+    image_sampler->pixel_v_base = (float_t)row / (float_t)num_rows;
+
+    float_t pixel_u_width = (float_t)1.0 / (float_t)num_columns;
+    image_sampler->subpixel_u_width =
+        pixel_u_width / (float_t)image_sampler->pixel_samples_u;
+
+    float_t pixel_v_width = (float_t)1.0 / (float_t)num_columns;
+    image_sampler->subpixel_v_width =
+        pixel_v_width / (float_t)image_sampler->pixel_samples_v;
+
+    image_sampler->subpixel_u_center =
+        (float_t)0.5 * image_sampler->subpixel_u_width;
+    image_sampler->subpixel_v_center =
+        (float_t)0.5 * image_sampler->subpixel_v_width;
 
     *num_samples = image_sampler->pixel_samples_u *
                    image_sampler->pixel_samples_v *
@@ -130,79 +93,129 @@ GridImageSamplerPreparePixelSamples(
 
 static
 ISTATUS
-GridImageSamplerNextSample(
-    _In_ const void *context,
+GridImageSamplerNext(
+    _In_ void *context,
     _Inout_ PRANDOM rng,
-    _In_ size_t sample_index,
-    _Out_ float_t *pixel_sample_u,
-    _Out_ float_t *pixel_sample_v,
-    _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v,
-    _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+    _Out_ float_t *pixel_u,
+    _Out_ float_t *pixel_v,
+    _Out_ float_t *dpixel_u,
+    _Out_ float_t *dpixel_v,
+    _Out_opt_ float_t *lens_u,
+    _Out_opt_ float_t *lens_v
     )
 {
     PGRID_IMAGE_SAMPLER image_sampler = (PGRID_IMAGE_SAMPLER)context;
 
-    float_t pixel_jitter_u, pixel_jitter_v;
-    ISTATUS status = GridImageSampler2DOffsets(rng,
-                                               image_sampler->pixel_sample_width_u,
-                                               image_sampler->pixel_sample_width_v,
-                                               image_sampler->jitter_pixel_samples,
-                                               &pixel_jitter_u,
-                                               &pixel_jitter_v);
-
-    if (status != ISTATUS_SUCCESS)
+    if (image_sampler->jitter_pixel_samples)
     {
-        return status;
+        ISTATUS status = RandomGenerateFloat(rng,
+                                             (float_t)0.0,
+                                             image_sampler->subpixel_u_width,
+                                             pixel_u);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        status = RandomGenerateFloat(rng,
+                                     (float_t)0.0,
+                                     image_sampler->subpixel_v_width,
+                                     pixel_v);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+    }
+    else
+    {
+        *pixel_u = image_sampler->subpixel_u_center;
+        *pixel_v = image_sampler->subpixel_v_center;
     }
 
-    float_t lens_jitter_u, lens_jitter_v;
-    status = GridImageSampler2DOffsets(rng,
-                                       image_sampler->lens_sample_width_u,
-                                       image_sampler->lens_sample_width_v,
-                                       image_sampler->jitter_lens_samples,
-                                       &lens_jitter_u,
-                                       &lens_jitter_v);
+    *pixel_u += fma((float_t)image_sampler->subpixel_u_index,
+                     image_sampler->subpixel_u_width,
+                     image_sampler->pixel_u_base);
 
-    if (status != ISTATUS_SUCCESS)
+    *pixel_v += fma((float_t)image_sampler->subpixel_v_index,
+                     image_sampler->subpixel_v_width,
+                     image_sampler->pixel_v_base);
+
+    *dpixel_u = image_sampler->subpixel_u_width;
+    *dpixel_v = image_sampler->subpixel_v_width;
+
+    if (lens_u != NULL)
     {
-        return status;
+        if (image_sampler->jitter_lens_samples)
+        {
+            ISTATUS status = RandomGenerateFloat(rng,
+                                                (float_t)0.0,
+                                                image_sampler->sublens_u_width,
+                                                lens_u);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+        }
+        else
+        {
+            *lens_u = image_sampler->sublens_u_center;
+        }
+
+        *lens_u += (float_t)image_sampler->subpixel_u_index *
+                image_sampler->subpixel_u_width;
     }
 
-    size_t pixel_u_index =
-        sample_index % image_sampler->pixel_samples_u;
-    pixel_jitter_u +=
-        image_sampler->pixel_min_u + (float_t)pixel_u_index * image_sampler->pixel_sample_width_u;
-    *pixel_sample_u = IMax(IMin(pixel_jitter_u, image_sampler->pixel_max_u),
-                           image_sampler->pixel_min_u);
-    size_t sample_divisor = image_sampler->pixel_samples_u;
+    if (lens_v != NULL)
+    {
+        if (image_sampler->jitter_lens_samples)
+        {
+            ISTATUS status = RandomGenerateFloat(rng,
+                                                (float_t)0.0,
+                                                image_sampler->sublens_v_width,
+                                                lens_v);
 
-    size_t pixel_v_index =
-        (sample_index / sample_divisor) % image_sampler->pixel_samples_v;
-    pixel_jitter_v +=
-        image_sampler->pixel_min_v + (float_t)pixel_v_index * image_sampler->pixel_sample_width_v;
-    *pixel_sample_v = IMax(IMin(pixel_jitter_v, image_sampler->pixel_max_v),
-                           image_sampler->pixel_min_v);
-    sample_divisor *= image_sampler->pixel_samples_v;
+            if (status != ISTATUS_SUCCESS)
+            {
+                return status;
+            }
+        }
+        else
+        {
+            *lens_v = image_sampler->sublens_v_center;
+        }
 
-    size_t lens_u_index =
-        (sample_index / sample_divisor) % image_sampler->lens_samples_u;
-    lens_jitter_u +=
-        image_sampler->lens_min_u + (float_t)lens_u_index * image_sampler->lens_sample_width_u;
-    *lens_sample_u = IMax(IMin(pixel_jitter_u, image_sampler->lens_max_u),
-                           image_sampler->lens_min_u);
-    sample_divisor *= image_sampler->lens_samples_u;
+        *lens_v += (float_t)image_sampler->subpixel_v_index *
+                image_sampler->subpixel_v_width;
+    }
 
-    size_t lens_v_index =
-        (sample_index / sample_divisor) % image_sampler->lens_samples_v;
-    lens_jitter_v +=
-        image_sampler->lens_min_v + (float_t)lens_v_index * image_sampler->lens_sample_width_v;
-    *lens_sample_v = IMax(IMin(lens_jitter_v, image_sampler->lens_max_v),
-                          image_sampler->lens_min_v);
+    image_sampler->subpixel_u_index += 1;
 
-    *dpixel_sample_u = image_sampler->pixel_sample_width_u;
-    *dpixel_sample_v = image_sampler->pixel_sample_width_v;
+    if (image_sampler->subpixel_u_index != image_sampler->pixel_samples_u)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    image_sampler->subpixel_u_index = 0;
+    image_sampler->subpixel_v_index += 1;
+
+    if (image_sampler->subpixel_v_index != image_sampler->pixel_samples_v)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    image_sampler->subpixel_v_index = 0;
+    image_sampler->lens_u_index += 1;
+
+    if (image_sampler->lens_u_index != image_sampler->lens_samples_u)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    image_sampler->lens_u_index = 0;
+    image_sampler->lens_v_index += 1;
 
     return ISTATUS_SUCCESS;
 }
@@ -235,9 +248,8 @@ GridImageSamplerDuplicate(
 static const IMAGE_SAMPLER_VTABLE grid_image_sampler_vtable = {
     NULL,
     NULL,
-    NULL,
-    GridImageSamplerPreparePixelSamples,
-    GridImageSamplerNextSample,
+    GridImageSamplerStart,
+    GridImageSamplerNext,
     GridImageSamplerDuplicate,
     NULL
 };
@@ -295,18 +307,12 @@ GridImageSamplerAllocate(
     grid_image_sampler.pixel_samples_v = pixel_samples_v;
     grid_image_sampler.lens_samples_u = lens_samples_u;
     grid_image_sampler.lens_samples_v = lens_samples_v;
-    grid_image_sampler.pixel_min_u = (float_t)0.0;
-    grid_image_sampler.pixel_min_v = (float_t)0.0;
-    grid_image_sampler.lens_min_u = (float_t)0.0;
-    grid_image_sampler.lens_min_v = (float_t)0.0;
-    grid_image_sampler.pixel_max_u = (float_t)1.0;
-    grid_image_sampler.pixel_max_v = (float_t)1.0;
-    grid_image_sampler.lens_max_u = (float_t)1.0;
-    grid_image_sampler.lens_max_v = (float_t)1.0;
-    grid_image_sampler.pixel_sample_width_u = (float_t)0.0;
-    grid_image_sampler.pixel_sample_width_v = (float_t)0.0;
-    grid_image_sampler.lens_sample_width_u = (float_t)0.0;
-    grid_image_sampler.lens_sample_width_v = (float_t)0.0;
+    grid_image_sampler.sublens_u_width = (float_t)1.0 / (float_t)lens_samples_u;
+    grid_image_sampler.sublens_v_width = (float_t)1.0 / (float_t)lens_samples_v;
+    grid_image_sampler.sublens_u_center =
+        (float_t)0.5 * grid_image_sampler.sublens_u_width;
+    grid_image_sampler.sublens_v_center =
+        (float_t)0.5 * grid_image_sampler.sublens_v_width;
     grid_image_sampler.jitter_pixel_samples = jitter_pixel_samples;
     grid_image_sampler.jitter_lens_samples = jitter_lens_samples;
 

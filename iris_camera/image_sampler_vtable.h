@@ -27,55 +27,40 @@ typedef const IMAGE_SAMPLER *PCIMAGE_SAMPLER;
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_PREPARE_IMAGE_SAMPLES_ROUTINE)(
+(*PIMAGE_SAMPLER_SEED_ROUTINE)(
     _In_ void *context,
-    _In_ size_t num_columns,
-    _In_ size_t num_rows
+    _Inout_ PRANDOM rng
     );
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_PREPARE_IMAGE_SEED_ROUTINE)(
+(*PIMAGE_SAMPLER_RANDOM_ROUTINE)(
     _In_ void *context,
-    _Inout_ PRANDOM seed_rng
+    _Out_ PRANDOM *rng
     );
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_PREPARE_RANDOM_ROUTINE)(
-    _In_ void *context,
-    _Inout_ PRANDOM *rng
-    );
-
-typedef
-ISTATUS
-(*PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE)(
+(*PIMAGE_SAMPLER_START_ROUTINE)(
     _In_ void *context,
     _In_ size_t column,
+    _In_ size_t num_columns,
     _In_ size_t row,
-    _In_ float_t pixel_min_u,
-    _In_ float_t pixel_max_u,
-    _In_ float_t pixel_min_v,
-    _In_ float_t pixel_max_v,
-    _In_ float_t lens_min_u,
-    _In_ float_t lens_max_u,
-    _In_ float_t lens_min_v,
-    _In_ float_t lens_max_v,
+    _In_ size_t num_rows,
     _Out_ uint32_t *num_samples
     );
 
 typedef
 ISTATUS
-(*PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE)(
-    _In_ const void *context,
-    _Inout_ PRANDOM pixel_rng,
-    _In_ size_t sample_index,
-    _Out_ float_t *pixel_sample_u,
-    _Out_ float_t *pixel_sample_v,
-    _Out_ float_t *lens_sample_u,
-    _Out_ float_t *lens_sample_v,
-    _Out_ float_t *dpixel_sample_u,
-    _Out_ float_t *dpixel_sample_v
+(*PIMAGE_SAMPLER_NEXT_ROUTINE)(
+    _In_ void *context,
+    _Inout_ PRANDOM rng,
+    _Out_ float_t *pixel_u,
+    _Out_ float_t *pixel_v,
+    _Out_ float_t *dpixel_u,
+    _Out_ float_t *dpixel_v,
+    _Out_opt_ float_t *lens_u,
+    _Out_opt_ float_t *lens_v
     );
 
 typedef
@@ -86,11 +71,10 @@ ISTATUS
     );
 
 typedef struct _IMAGE_SAMPLER_VTABLE {
-    PIMAGE_SAMPLER_PREPARE_IMAGE_SAMPLES_ROUTINE prepare_image_samples_routine;
-    PIMAGE_SAMPLER_PREPARE_IMAGE_SEED_ROUTINE prepare_image_seed_routine;
-    PIMAGE_SAMPLER_PREPARE_RANDOM_ROUTINE prepare_random_routine;
-    PIMAGE_SAMPLER_PREPARE_PIXEL_SAMPLES_ROUTINE prepare_pixel_samples_routine;
-    PIMAGE_SAMPLER_GET_SAMPLE_ROUTINE get_sample_routine;
+    PIMAGE_SAMPLER_SEED_ROUTINE seed_routine;
+    PIMAGE_SAMPLER_RANDOM_ROUTINE random_routine;
+    PIMAGE_SAMPLER_START_ROUTINE start_routine;
+    PIMAGE_SAMPLER_NEXT_ROUTINE next_routine;
     PIMAGE_SAMPLER_DUPLICATE_ROUTINE duplicate_routine;
     PFREE_ROUTINE free_routine;
 } IMAGE_SAMPLER_VTABLE, *PIMAGE_SAMPLER_VTABLE;
