@@ -54,6 +54,8 @@ LowDiscrepancyRandomGenerateFloat(
     value *= (maximum - minimum);
     value += minimum;
 
+    *result = value;
+
     return ISTATUS_SUCCESS;
 }
 
@@ -89,6 +91,8 @@ LowDiscrepancyRandomGenerateIndex(
     }
 
     value *= (float_t)upper_bound;
+
+    *result = (size_t)value;
 
     return ISTATUS_SUCCESS;
 }
