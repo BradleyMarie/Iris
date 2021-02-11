@@ -41,7 +41,7 @@ ColorToXyz(
     }
 
     size_t index = (size_t)color.color_space;
-    const float conversion_matrices[2][3][3] = {
+    static const float conversion_matrices[2][3][3] = {
         // COLOR_SPACE_XYZ
         { { 1.0000000f, 1.0000000f, 1.0000000f },
           { 1.0000000f, 1.0000000f, 1.0000000f },
@@ -87,7 +87,7 @@ ColorConvert(
     }
 
     size_t index = (size_t)target;
-    const float conversion_matrices[2][3][3] = {
+    static const float conversion_matrices[2][3][3] = {
         // COLOR_SPACE_XYZ
         { {  1.0000000f,  1.0000000f,  1.0000000f },
           {  1.0000000f,  1.0000000f,  1.0000000f },
