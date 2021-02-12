@@ -296,3 +296,17 @@ TEST(ColorTest, ColorAddXyzToLinearSrgbToLinearSrgb)
 
     EXPECT_THAT(expected, ApproximatelyEqualsColor(actual, 0.01f));
 }
+
+TEST(ColorTest, ColorToLumaXyz)
+{
+    float xyz_values[3] = {0.5f, 2.0f, 3.0f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    EXPECT_EQ(2.0f, ColorToLuma(xyz_color));
+}
+
+TEST(ColorTest, ColorToLumaLinearSrgb)
+{
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    EXPECT_NEAR(0.50000006f, ColorToLuma(srgb_color), 0.01f);
+}

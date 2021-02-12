@@ -15,23 +15,13 @@ Abstract:
 #include "iris_advanced/color.h"
 
 //
-// Functions
+// Static Functions
 //
 
-bool
-ColorIsBlack(
-    _In_ COLOR3 color
-    )
-{
-    bool result = color.values[0] == (float_t)0.0 &&
-                  color.values[1] == (float_t)0.0 &&
-                  color.values[2] == (float_t)0.0;
-
-    return result;
-}
-
+static
+inline
 COLOR3
-ColorToXyz(
+ColorToXyzInline(
     _In_ COLOR3 color
     )
 {
@@ -43,9 +33,9 @@ ColorToXyz(
     size_t index = (size_t)color.color_space;
     static const float conversion_matrices[2][3][3] = {
         // COLOR_SPACE_XYZ
-        { { 1.0000000f, 1.0000000f, 1.0000000f },
-          { 1.0000000f, 1.0000000f, 1.0000000f },
-          { 1.0000000f, 1.0000000f, 1.0000000f } },
+        { { 1.0000000f, 0.0000000f, 0.0000000f },
+          { 0.0000000f, 1.0000000f, 0.0000000f },
+          { 0.0000000f, 0.0000000f, 1.0000000f } },
         // COLOR_SPACE_LINEAR_SRGB
         { { 0.4124564f, 0.3575761f, 0.1804375f },
           { 0.2126729f, 0.7151522f, 0.0721750f },
@@ -66,6 +56,30 @@ ColorToXyz(
     assert(ColorValidate(result));
 
     return result;
+}
+
+//
+// Functions
+//
+
+bool
+ColorIsBlack(
+    _In_ COLOR3 color
+    )
+{
+    bool result = color.values[0] == (float_t)0.0 &&
+                  color.values[1] == (float_t)0.0 &&
+                  color.values[2] == (float_t)0.0;
+
+    return result;
+}
+
+COLOR3
+ColorToXyz(
+    _In_ COLOR3 color
+    )
+{
+    return ColorToXyzInline(color);
 }
 
 COLOR3
@@ -89,9 +103,9 @@ ColorConvert(
     size_t index = (size_t)target;
     static const float conversion_matrices[2][3][3] = {
         // COLOR_SPACE_XYZ
-        { {  1.0000000f,  1.0000000f,  1.0000000f },
-          {  1.0000000f,  1.0000000f,  1.0000000f },
-          {  1.0000000f,  1.0000000f,  1.0000000f } },
+        { {  1.0000000f,  0.0000000f,  0.0000000f },
+          {  0.0000000f,  1.0000000f,  0.0000000f },
+          {  0.0000000f,  0.0000000f,  1.0000000f } },
         // COLOR_SPACE_LINEAR_SRGB
         { {  3.2404542f, -1.5371385f, -0.4985314f },
           { -0.9692660f,  1.8760108f,  0.0415560f },
@@ -162,4 +176,13 @@ ColorAdd(
     sum.color_space = intermediate_color_space;
 
     return ColorConvert(sum, sum_color_space);
+}
+
+float_t
+ColorToLuma(
+    _In_ COLOR3 color
+    )
+{
+    COLOR3 xyz = ColorToXyzInline(color);
+    return xyz.values[1];
 }

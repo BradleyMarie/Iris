@@ -148,4 +148,9 @@ ColorAdd(
     _In_ COLOR_SPACE sum_color_space
     );
 
+float_t
+ColorToLuma(
+    _In_ COLOR3 color
+    );
+
 #endif // _IRIS_ADVANCED_COLOR_

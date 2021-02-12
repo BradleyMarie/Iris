@@ -1866,8 +1866,7 @@ FloatMipmapAllocateFromLuma(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        COLOR3 color = ColorConvert(texels[i], COLOR_SPACE_XYZ);
-        result->levels[0].texels[i] = color.values[1];
+        result->levels[0].texels[i] = ColorToLuma(texels[i]);
     }
 
     float_t *working = NULL;
