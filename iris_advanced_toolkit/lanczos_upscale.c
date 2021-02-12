@@ -108,6 +108,7 @@ UInt64Log2(
     return 0;
 }
 
+static
 void
 ComputeWeights(
     _In_ size_t old_resolution,
