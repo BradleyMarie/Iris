@@ -160,11 +160,11 @@ PngFloatMipmapAllocate(
     unsigned char (*data)[3] =
         (unsigned char (*)[3])stbi_load(filename, &x, &y, &n, 3);
 
-    PCOLOR3 colors;
-    ISTATUS status = ColorLoadFromByteTupleArray(COLOR_IO_FORMAT_SRGB,
-                                                 data,
-                                                 x * y,
-                                                 &colors);
+    float_t *luma;
+    ISTATUS status = ColorLoadLuminanceFromByteTupleArray(COLOR_IO_FORMAT_SRGB,
+                                                          data,
+                                                          x * y,
+                                                          &luma);
 
     free(data);
 
@@ -174,28 +174,28 @@ PngFloatMipmapAllocate(
     }
 
     size_t new_x, new_y;
-    status = LanczosUpscaleColors(colors,
+    status = LanczosUpscaleFloats(luma,
                                   (size_t)x,
                                   (size_t)y,
-                                  &colors,
+                                  &luma,
                                   &new_x,
                                   &new_y);
 
     if (status != ISTATUS_SUCCESS)
     {
-        free(colors);
+        free(luma);
         return status;
     }
 
-    status = FloatMipmapAllocateFromLuma(colors,
-                                         new_x,
-                                         new_y,
-                                         texture_filtering,
-                                         max_anisotropy,
-                                         wrap_mode,
-                                         mipmap);
+    status = FloatMipmapAllocateFromFloats(luma,
+                                           new_x,
+                                           new_y,
+                                           texture_filtering,
+                                           max_anisotropy,
+                                           wrap_mode,
+                                           mipmap);
 
-    free(colors);
+    free(luma);
 
     return status;
 }

@@ -310,3 +310,31 @@ TEST(ColorTest, ColorToLumaLinearSrgb)
     COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
     EXPECT_NEAR(0.50000006f, ColorToLuma(srgb_color), 0.01f);
 }
+
+TEST(ColorTest, ColorToClampedLumaXyz)
+{
+    float xyz_values[3] = {0.5f, 0.5f, 3.0f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    EXPECT_EQ(0.5f, ColorToClampedLuma(xyz_color, 1.0f));
+}
+
+TEST(ColorTest, ColorToClampedLumaXyzClamps)
+{
+    float xyz_values[3] = {0.5f, 2.0f, 3.0f};
+    COLOR3 xyz_color = ColorCreate(COLOR_SPACE_XYZ, xyz_values);
+    EXPECT_EQ(1.0f, ColorToClampedLuma(xyz_color, 1.0f));
+}
+
+TEST(ColorTest, ColorToClampedLumaLinearSrgb)
+{
+    float srgb_values[3] = {0.5f, 0.5f, 0.5f};
+    COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    EXPECT_NEAR(0.5000006f, ColorToClampedLuma(srgb_color, 1.0f), 0.01f);
+}
+
+TEST(ColorTest, ColorToClampedLumaLinearSrgbClamps)
+{
+    float srgb_values[3] = {2.5f, 2.5f, 2.5f};
+    COLOR3 srgb_color = ColorCreate(COLOR_SPACE_LINEAR_SRGB, srgb_values);
+    EXPECT_EQ(1.0f, ColorToClampedLuma(srgb_color, 1.0f));
+}

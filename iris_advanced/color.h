@@ -153,4 +153,10 @@ ColorToLuma(
     _In_ COLOR3 color
     );
 
+float_t
+ColorToClampedLuma(
+    _In_ COLOR3 color,
+    _In_ float_t max
+    );
+
 #endif // _IRIS_ADVANCED_COLOR_

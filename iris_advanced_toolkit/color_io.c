@@ -127,10 +127,7 @@ ColorLoadLuminanceFromFloatTuple(
         return status;
     }
 
-    color = ColorConvert(color, COLOR_SPACE_XYZ);
-    color = ColorClamp(color, 1.0f);
-
-    *luma = (float_t)color.values[1];
+    *luma = ColorToClampedLuma(color, (float_t)1.0f);
 
     return ISTATUS_SUCCESS;
 }
@@ -152,10 +149,7 @@ ColorLoadLuminanceFromByteTuple(
         return status;
     }
 
-    color = ColorConvert(color, COLOR_SPACE_XYZ);
-    color = ColorClamp(color, 1.0f);
-
-    *luma = (float_t)color.values[1];
+    *luma = ColorToClampedLuma(color, (float_t)1.0f);
 
     return ISTATUS_SUCCESS;
 }

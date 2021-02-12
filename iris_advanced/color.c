@@ -186,3 +186,13 @@ ColorToLuma(
     COLOR3 xyz = ColorToXyzInline(color);
     return xyz.values[1];
 }
+
+float_t
+ColorToClampedLuma(
+    _In_ COLOR3 color,
+    _In_ float_t max
+    )
+{
+    COLOR3 xyz = ColorToXyzInline(color);
+    return IMin(xyz.values[1], max);
+}

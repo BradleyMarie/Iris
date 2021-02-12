@@ -246,14 +246,11 @@ ColorColorExtrapolatorComputeReflector(
     color = ColorConvert(color, *color_space);
     color = ColorClamp(color, 1.0f);
 
-    float_t luma = ColorToLuma(color);
-    luma = IMin(luma, 1.0f);
-
     COLOR_REFLECTOR color_reflector;
     color_reflector.values[0] = color.values[0];
     color_reflector.values[1] = color.values[1];
     color_reflector.values[2] = color.values[2];
-    color_reflector.albedo = luma;
+    color_reflector.albedo = ColorToClampedLuma(color, (float_t)1.0f);
 
     ISTATUS status = ReflectorAllocate(&color_reflector_vtable,
                                        &color_reflector,
