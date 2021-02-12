@@ -89,6 +89,20 @@ ColorCreateBlack(
 
 static
 inline
+bool
+ColorIsBlack(
+    _In_ COLOR3 color
+    )
+{
+    bool result = color.values[0] == (float_t)0.0 &&
+                  color.values[1] == (float_t)0.0 &&
+                  color.values[2] == (float_t)0.0;
+
+    return result;
+}
+
+static
+inline
 COLOR3
 ColorScale(
     _In_ COLOR3 color,
@@ -124,11 +138,6 @@ ColorClamp(
 
     return color;
 }
-
-bool
-ColorIsBlack(
-    _In_ COLOR3 color
-    );
 
 COLOR3
 ColorToXyz(

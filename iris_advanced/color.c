@@ -62,18 +62,6 @@ ColorToXyzInline(
 // Functions
 //
 
-bool
-ColorIsBlack(
-    _In_ COLOR3 color
-    )
-{
-    bool result = color.values[0] == (float_t)0.0 &&
-                  color.values[1] == (float_t)0.0 &&
-                  color.values[2] == (float_t)0.0;
-
-    return result;
-}
-
 COLOR3
 ColorToXyz(
     _In_ COLOR3 color
