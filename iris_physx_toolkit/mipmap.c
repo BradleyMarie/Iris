@@ -942,6 +942,16 @@ ReflectorMipmapAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
+    ISTATUS status =
+        ColorExtrapolatorPrepareToComputeReflectors(color_extrapolator,
+                                                    width * height);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        ReflectorMipmapFree(result);
+        return status;
+    }
+
     for (size_t i = 0; i < width * height; i++)
     {
         if (!ColorValidate(texels[i]))
@@ -950,9 +960,9 @@ ReflectorMipmapAllocate(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        ISTATUS status = ColorExtrapolatorComputeReflector(color_extrapolator,
-                                                           texels[i],
-                                                           result->levels[0].texels + i);
+        status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                                   texels[i],
+                                                   result->levels[0].texels + i);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -984,9 +994,20 @@ ReflectorMipmapAllocate(
 
         size_t num_samples = result->levels[i].height * result->levels[i].width;
 
+        status =
+            ColorExtrapolatorPrepareToComputeReflectors(color_extrapolator,
+                                                        num_samples);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(working);
+            ReflectorMipmapFree(result);
+            return status;
+        }
+
         for (size_t j = 0; j < num_samples; j++)
         {
-            ISTATUS status =
+            status =
                 ColorExtrapolatorComputeReflector(color_extrapolator,
                                                   working[j],
                                                   result->levels[i].texels + j);

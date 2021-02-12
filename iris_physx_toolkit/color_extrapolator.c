@@ -365,21 +365,13 @@ ColorExtrapolatorInsertReflector(
 }
 
 static
+inline
 ISTATUS
-ColorExtrapolatorGrowSpectrumHashTable(
-    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator
+ColorExtrapolatorResizeSpectrumHashTable(
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t new_capacity
     )
 {
-    size_t new_capacity;
-    bool success = CheckedMultiplySizeT(color_extrapolator->spectrum_list_capacity,
-                                        LIST_GROWTH_FACTOR,
-                                        &new_capacity);
-    
-    if (!success)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     PSPECTRUM_LIST_ENTRY new_list =
         (PSPECTRUM_LIST_ENTRY)calloc(new_capacity, sizeof(SPECTRUM_LIST_ENTRY));
 
@@ -395,6 +387,11 @@ ColorExtrapolatorGrowSpectrumHashTable(
 
     for (size_t i = 0; i < color_extrapolator->spectrum_list_capacity; i++)
     {
+        if (ColorExtrapolatorIsSpectrumEntryEmpty(color_extrapolator->spectrum_list + i))
+        {
+            continue;
+        }
+
         ColorExtrapolatorInsertSpectrum(new_list,
                                         new_capacity,
                                         color_extrapolator->spectrum_list[i].color,
@@ -413,21 +410,13 @@ ColorExtrapolatorGrowSpectrumHashTable(
 }
 
 static
+inline
 ISTATUS
-ColorExtrapolatorGrowReflectorHashTable(
-    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator
+ColorExtrapolatorResizeReflectorHashTable(
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t new_capacity
     )
 {
-    size_t new_capacity;
-    bool success = CheckedMultiplySizeT(color_extrapolator->reflector_list_capacity,
-                                        LIST_GROWTH_FACTOR,
-                                        &new_capacity);
-    
-    if (!success)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     PREFLECTOR_LIST_ENTRY new_list =
         (PREFLECTOR_LIST_ENTRY)calloc(new_capacity, sizeof(REFLECTOR_LIST_ENTRY));
 
@@ -443,6 +432,11 @@ ColorExtrapolatorGrowReflectorHashTable(
 
     for (size_t i = 0; i < color_extrapolator->reflector_list_capacity; i++)
     {
+        if (ColorExtrapolatorIsReflectorEntryEmpty(color_extrapolator->reflector_list + i))
+        {
+            continue;
+        }
+
         ColorExtrapolatorInsertReflector(new_list,
                                          new_capacity,
                                          color_extrapolator->reflector_list[i].color,
@@ -458,6 +452,50 @@ ColorExtrapolatorGrowReflectorHashTable(
         ColorExtrapolatorComputeUsableCapacity(new_capacity);
 
     return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+ColorExtrapolatorGrowSpectrumHashTable(
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator
+    )
+{
+    size_t new_capacity;
+    bool success = CheckedMultiplySizeT(color_extrapolator->spectrum_list_capacity,
+                                        LIST_GROWTH_FACTOR,
+                                        &new_capacity);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    ISTATUS status = ColorExtrapolatorResizeSpectrumHashTable(color_extrapolator,
+                                                              new_capacity);
+
+    return status;
+}
+
+static
+ISTATUS
+ColorExtrapolatorGrowReflectorHashTable(
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator
+    )
+{
+    size_t new_capacity;
+    bool success = CheckedMultiplySizeT(color_extrapolator->reflector_list_capacity,
+                                        LIST_GROWTH_FACTOR,
+                                        &new_capacity);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    ISTATUS status = ColorExtrapolatorResizeReflectorHashTable(color_extrapolator,
+                                                               new_capacity);
+
+    return status;
 }
 
 //
@@ -558,6 +596,86 @@ ColorExtrapolatorAllocate(
     *color_extrapolator = result;
 
     return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ColorExtrapolatorPrepareToComputeSpectra(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t num_spectra
+    )
+{
+    if (color_extrapolator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    size_t usable_size = color_extrapolator->spectrum_list_usable_capacity;
+
+    if (num_spectra < usable_size)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    size_t new_capacity = color_extrapolator->spectrum_list_capacity;
+    while (usable_size < num_spectra)
+    {
+        bool success = CheckedMultiplySizeT(new_capacity,
+                                            LIST_GROWTH_FACTOR,
+                                            &new_capacity);
+
+        if (!success)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        usable_size = ColorExtrapolatorComputeUsableCapacity(new_capacity);
+    }
+
+    ISTATUS status =
+        ColorExtrapolatorResizeSpectrumHashTable(color_extrapolator,
+                                                 new_capacity);
+
+    return status;
+}
+
+ISTATUS
+ColorExtrapolatorPrepareToComputeReflectors(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t num_reflectors
+    )
+{
+    if (color_extrapolator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    size_t usable_size = color_extrapolator->reflector_list_usable_capacity;
+
+    if (num_reflectors < usable_size)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    size_t new_capacity = color_extrapolator->reflector_list_capacity;
+    while (usable_size < num_reflectors)
+    {
+        bool success = CheckedMultiplySizeT(new_capacity,
+                                            LIST_GROWTH_FACTOR,
+                                            &new_capacity);
+
+        if (!success)
+        {
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        usable_size = ColorExtrapolatorComputeUsableCapacity(new_capacity);
+    }
+
+    ISTATUS status =
+        ColorExtrapolatorResizeReflectorHashTable(color_extrapolator,
+                                                  new_capacity);
+
+    return status;
 }
 
 ISTATUS

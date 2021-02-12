@@ -42,6 +42,18 @@ ColorExtrapolatorAllocate(
     );
 
 ISTATUS
+ColorExtrapolatorPrepareToComputeSpectra(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t num_spectra
+    );
+
+ISTATUS
+ColorExtrapolatorPrepareToComputeReflectors(
+    _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _In_ size_t num_reflectors
+    );
+
+ISTATUS
 ColorExtrapolatorComputeSpectrum(
     _In_ PCOLOR_EXTRAPOLATOR color_extrapolator,
     _In_ COLOR3 color,
