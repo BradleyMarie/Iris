@@ -78,6 +78,30 @@ ColorExtrapolatorComputeUsableCapacity(
 
 static
 inline
+bool
+ColorExtrapolatorSpectrumListFull(
+    _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator
+    )
+{
+    size_t size = color_extrapolator->spectrum_list_size;
+    size_t capacity = color_extrapolator->spectrum_list_usable_capacity;
+    return size == capacity;
+}
+
+static
+inline
+bool
+ColorExtrapolatorReflectorListFull(
+    _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator
+    )
+{
+    size_t size = color_extrapolator->reflector_list_size;
+    size_t capacity = color_extrapolator->reflector_list_usable_capacity;
+    return size == capacity;
+}
+
+static
+inline
 void
 ColorExtrapolatorSetSpectrumEntryEmpty(
     _Inout_ PSPECTRUM_LIST_ENTRY entry
@@ -283,6 +307,7 @@ ColorExtrapolatorFindReflectorEntry(
 }
 
 static
+inline
 void
 ColorExtrapolatorInsertSpectrum(
     _Inout_updates_(list_size) PSPECTRUM_LIST_ENTRY list,
@@ -311,6 +336,7 @@ ColorExtrapolatorInsertSpectrum(
 }
 
 static
+inline
 void
 ColorExtrapolatorInsertReflector(
     _Inout_updates_(list_size) PREFLECTOR_LIST_ENTRY list,
@@ -432,30 +458,6 @@ ColorExtrapolatorGrowReflectorHashTable(
         ColorExtrapolatorComputeUsableCapacity(new_capacity);
 
     return ISTATUS_SUCCESS;
-}
-
-static
-inline
-bool
-ColorExtrapolatorSpectrumListFull(
-    _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator
-    )
-{
-    size_t size = color_extrapolator->spectrum_list_size;
-    size_t capacity = color_extrapolator->spectrum_list_usable_capacity;
-    return size == capacity;
-}
-
-static
-inline
-bool
-ColorExtrapolatorReflectorListFull(
-    _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator
-    )
-{
-    size_t size = color_extrapolator->reflector_list_size;
-    size_t capacity = color_extrapolator->reflector_list_usable_capacity;
-    return size == capacity;
 }
 
 //
@@ -608,6 +610,10 @@ ColorExtrapolatorComputeSpectrum(
         return status;
     }
 
+    color_extrapolator->spectrum_list_size += 1;
+    entry->spectrum = result;
+    entry->color = color;
+
     if (ColorExtrapolatorSpectrumListFull(color_extrapolator))
     {
         ISTATUS status =
@@ -615,22 +621,9 @@ ColorExtrapolatorComputeSpectrum(
 
         if (status != ISTATUS_SUCCESS)
         {
-            SpectrumRelease(result);
             return status;
         }
-
-        ColorExtrapolatorInsertSpectrum(color_extrapolator->spectrum_list,
-                                        color_extrapolator->spectrum_list_capacity,
-                                        color,
-                                        result);
     }
-    else
-    {
-        entry->color = color;
-        entry->spectrum = result;
-    }
-
-    color_extrapolator->spectrum_list_size += 1;
 
     SpectrumRetain(result);
     *spectrum = result;
@@ -688,6 +681,10 @@ ColorExtrapolatorComputeReflector(
         return status;
     }
 
+    color_extrapolator->reflector_list_size += 1;
+    entry->reflector = result;
+    entry->color = color;
+
     if (ColorExtrapolatorReflectorListFull(color_extrapolator))
     {
         ISTATUS status =
@@ -695,22 +692,9 @@ ColorExtrapolatorComputeReflector(
 
         if (status != ISTATUS_SUCCESS)
         {
-            ReflectorRelease(result);
             return status;
         }
-
-        ColorExtrapolatorInsertReflector(color_extrapolator->reflector_list,
-                                         color_extrapolator->reflector_list_capacity,
-                                         color,
-                                         result);
     }
-    else
-    {
-        entry->color = color;
-        entry->reflector = result;
-    }
-
-    color_extrapolator->reflector_list_size += 1;
 
     ReflectorRetain(result);
     *reflector = result;
