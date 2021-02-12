@@ -167,17 +167,17 @@ ColorExtrapolatorFindSpectrum(
         color_extrapolator->spectrum_list_capacity, color);
     for (;;)
     {
+        if (ColorExtrapolatorIsSpectrumEntryEmpty(color_extrapolator->spectrum_list + *index))
+        {
+            return false;
+        }
+
         if (color_extrapolator->spectrum_list[*index].color.values[0] == color.values[0] &&
             color_extrapolator->spectrum_list[*index].color.values[1] == color.values[1] &&
             color_extrapolator->spectrum_list[*index].color.values[2] == color.values[2] &&
             color_extrapolator->spectrum_list[*index].color.color_space == color.color_space)
         {
             return true;
-        }
-
-        if (ColorExtrapolatorIsSpectrumEntryEmpty(color_extrapolator->spectrum_list + *index))
-        {
-            return false;
         }
 
         *index += 1;
@@ -205,17 +205,17 @@ ColorExtrapolatorFindReflector(
         color_extrapolator->reflector_list_capacity, color);
     for (;;)
     {
+        if (ColorExtrapolatorIsReflectorEntryEmpty(color_extrapolator->reflector_list + *index))
+        {
+            return false;
+        }
+
         if (color_extrapolator->reflector_list[*index].color.values[0] == color.values[0] &&
             color_extrapolator->reflector_list[*index].color.values[1] == color.values[1] &&
             color_extrapolator->reflector_list[*index].color.values[2] == color.values[2] &&
             color_extrapolator->reflector_list[*index].color.color_space == color.color_space)
         {
             return true;
-        }
-
-        if (ColorExtrapolatorIsReflectorEntryEmpty(color_extrapolator->reflector_list + *index))
-        {
-            return false;
         }
 
         *index += 1;
@@ -430,7 +430,7 @@ ColorExtrapolatorAvailableSpectrumSlots(
     }
     else 
     {
-        usable_slots = usable_slots - usable_slots / 8;
+        usable_slots = usable_slots - usable_slots / 4;
     }
 
     return usable_slots - color_extrapolator->spectrum_list_size;
@@ -450,7 +450,7 @@ ColorExtrapolatorAvailableReflectorSlots(
     }
     else 
     {
-        usable_slots = usable_slots - usable_slots / 8;
+        usable_slots = usable_slots - usable_slots / 4;
     }
 
     return usable_slots - color_extrapolator->reflector_list_size;
