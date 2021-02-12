@@ -31,6 +31,8 @@ static const float_t tau = (float_t)2.0;
 // Static Functions
 //
 
+static
+inline
 float_t
 Lanczos(
     _In_ float_t x
@@ -276,6 +278,7 @@ LanczosUpscaleColors(
 
     for (size_t i = 0; i < height; i++)
     {
+        size_t converted_max = 0;
         for (size_t j = 0; j < *new_width; j++)
         {
             size_t start_index;
@@ -288,15 +291,20 @@ LanczosUpscaleColors(
                            weights,
                            &valid_weights);
 
+            for (; converted_max < start_index + valid_weights; converted_max++)
+            {
+                texels[i * width + converted_max] =
+                    ColorConvert(texels[i * width + converted_max],
+                                 target_color_space);
+            }
+
             float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
-                COLOR3 converted =
-                    ColorConvert(texels[i * width + start_index + k],
-                                 target_color_space);
-                values[0] = fma(converted.values[0], weights[k], values[0]);
-                values[1] = fma(converted.values[1], weights[k], values[1]);
-                values[2] = fma(converted.values[2], weights[k], values[2]);
+                PCOLOR3 texel = &texels[i * width + start_index + k];
+                values[0] = fma(texel->values[0], weights[k], values[0]);
+                values[1] = fma(texel->values[1], weights[k], values[1]);
+                values[2] = fma(texel->values[2], weights[k], values[2]);
             }
 
             values[0] = fmax(values[0], (float_t)0.0);
@@ -325,12 +333,11 @@ LanczosUpscaleColors(
             float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
-                COLOR3 converted =
-                    ColorConvert(staging_buffer[(start_index + k) * *new_width + i],
-                                 target_color_space);
-                values[0] = fma(converted.values[0], weights[k], values[0]);
-                values[1] = fma(converted.values[1], weights[k], values[1]);
-                values[2] = fma(converted.values[2], weights[k], values[2]);
+                PCOLOR3 texel =
+                    &staging_buffer[(start_index + k) * *new_width + i];
+                values[0] = fma(texel->values[0], weights[k], values[0]);
+                values[1] = fma(texel->values[1], weights[k], values[1]);
+                values[2] = fma(texel->values[2], weights[k], values[2]);
             }
 
             values[0] = fmax(values[0], (float_t)0.0);
