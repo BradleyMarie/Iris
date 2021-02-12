@@ -236,7 +236,7 @@ bool
 ColorExtrapolatorFindSpectrumEntry(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
     _In_ COLOR3 color,
-    _Out_ PCSPECTRUM_LIST_ENTRY *entry
+    _Out_ PSPECTRUM_LIST_ENTRY *entry
     )
 {
     size_t index;
@@ -255,7 +255,7 @@ bool
 ColorExtrapolatorFindReflectorEntry(
     _In_ PCCOLOR_EXTRAPOLATOR color_extrapolator,
     _In_ COLOR3 color,
-    _Out_ PCREFLECTOR_LIST_ENTRY *entry
+    _Out_ PREFLECTOR_LIST_ENTRY *entry
     )
 {
     size_t index;
@@ -580,7 +580,7 @@ ColorExtrapolatorComputeSpectrum(
         return ISTATUS_SUCCESS;
     }
 
-    PCSPECTRUM_LIST_ENTRY entry;
+    PSPECTRUM_LIST_ENTRY entry;
     bool found = ColorExtrapolatorFindSpectrumEntry(color_extrapolator,
                                                     color,
                                                     &entry);
@@ -600,6 +600,8 @@ ColorExtrapolatorComputeSpectrum(
         {
             return status;
         }
+
+        entry = NULL;
     }
 
     PSPECTRUM result;
@@ -612,10 +614,18 @@ ColorExtrapolatorComputeSpectrum(
         return status;
     }
 
-    ColorExtrapolatorInsertSpectrum(color_extrapolator->spectrum_list,
-                                    color_extrapolator->spectrum_list_capacity,
-                                    color,
-                                    result);
+    if (entry == NULL)
+    {
+        ColorExtrapolatorInsertSpectrum(color_extrapolator->spectrum_list,
+                                        color_extrapolator->spectrum_list_capacity,
+                                        color,
+                                        result);
+    }
+    else
+    {
+        entry->color = color;
+        entry->spectrum = result;
+    }
 
     color_extrapolator->spectrum_list_size += 1;
 
@@ -653,7 +663,7 @@ ColorExtrapolatorComputeReflector(
         return ISTATUS_SUCCESS;
     }
 
-    PCREFLECTOR_LIST_ENTRY entry;
+    PREFLECTOR_LIST_ENTRY entry;
     bool found = ColorExtrapolatorFindReflectorEntry(color_extrapolator,
                                                      color,
                                                      &entry);
@@ -673,6 +683,8 @@ ColorExtrapolatorComputeReflector(
         {
             return status;
         }
+
+        entry = NULL;
     }
 
     PREFLECTOR result;
@@ -685,10 +697,18 @@ ColorExtrapolatorComputeReflector(
         return status;
     }
 
-    ColorExtrapolatorInsertReflector(color_extrapolator->reflector_list,
-                                     color_extrapolator->reflector_list_capacity,
-                                     color,
-                                     result);
+    if (entry == NULL)
+    {
+        ColorExtrapolatorInsertReflector(color_extrapolator->reflector_list,
+                                        color_extrapolator->reflector_list_capacity,
+                                        color,
+                                        result);
+    }
+    else
+    {
+        entry->color = color;
+        entry->reflector = result;
+    }
 
     color_extrapolator->reflector_list_size += 1;
 
