@@ -269,7 +269,6 @@ ColorExtrapolatorFindReflectorEntry(
 }
 
 static
-inline
 void
 ColorExtrapolatorInsertSpectrum(
     _Inout_updates_(list_size) PSPECTRUM_LIST_ENTRY list,
@@ -298,7 +297,6 @@ ColorExtrapolatorInsertSpectrum(
 }
 
 static
-inline
 void
 ColorExtrapolatorInsertReflector(
     _Inout_updates_(list_size) PREFLECTOR_LIST_ENTRY list,
@@ -580,19 +578,6 @@ ColorExtrapolatorComputeSpectrum(
         return ISTATUS_SUCCESS;
     }
 
-    if (ColorExtrapolatorAvailableSpectrumSlots(color_extrapolator) == 0)
-    {
-        ISTATUS status =
-            ColorExtrapolatorGrowSpectrumHashTable(color_extrapolator);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-
-        entry = NULL;
-    }
-
     PSPECTRUM result;
     ISTATUS status =
         color_extrapolator->vtable->compute_spectrum_routine(
@@ -603,8 +588,17 @@ ColorExtrapolatorComputeSpectrum(
         return status;
     }
 
-    if (entry == NULL)
+    if (ColorExtrapolatorAvailableSpectrumSlots(color_extrapolator) == 0)
     {
+        ISTATUS status =
+            ColorExtrapolatorGrowSpectrumHashTable(color_extrapolator);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            SpectrumRelease(result);
+            return status;
+        }
+
         ColorExtrapolatorInsertSpectrum(color_extrapolator->spectrum_list,
                                         color_extrapolator->spectrum_list_capacity,
                                         color,
@@ -664,19 +658,6 @@ ColorExtrapolatorComputeReflector(
         return ISTATUS_SUCCESS;
     }
 
-    if (ColorExtrapolatorAvailableReflectorSlots(color_extrapolator) == 0)
-    {
-        ISTATUS status =
-            ColorExtrapolatorGrowReflectorHashTable(color_extrapolator);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            return status;
-        }
-
-        entry = NULL;
-    }
-
     PREFLECTOR result;
     ISTATUS status =
         color_extrapolator->vtable->compute_reflector_routine(
@@ -687,8 +668,17 @@ ColorExtrapolatorComputeReflector(
         return status;
     }
 
-    if (entry == NULL)
+    if (ColorExtrapolatorAvailableReflectorSlots(color_extrapolator) == 0)
     {
+        ISTATUS status =
+            ColorExtrapolatorGrowReflectorHashTable(color_extrapolator);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            ReflectorRelease(result);
+            return status;
+        }
+
         ColorExtrapolatorInsertReflector(color_extrapolator->reflector_list,
                                          color_extrapolator->reflector_list_capacity,
                                          color,
