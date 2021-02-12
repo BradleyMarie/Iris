@@ -700,9 +700,9 @@ ColorExtrapolatorComputeReflector(
     if (entry == NULL)
     {
         ColorExtrapolatorInsertReflector(color_extrapolator->reflector_list,
-                                        color_extrapolator->reflector_list_capacity,
-                                        color,
-                                        result);
+                                         color_extrapolator->reflector_list_capacity,
+                                         color,
+                                         result);
     }
     else
     {
