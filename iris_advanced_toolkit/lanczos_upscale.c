@@ -277,32 +277,35 @@ LanczosUpscaleColors(
 
     COLOR_SPACE target_color_space = texels[0].color_space;
 
-    for (size_t i = 0; i < height; i++)
+    size_t converted_max = 0;
+    for (size_t i = 0; i < *new_width; i++)
     {
-        size_t converted_max = 0;
-        for (size_t j = 0; j < *new_width; j++)
+        size_t start_index;
+        float_t weights[4];
+        size_t valid_weights;
+        ComputeWeights(width,
+                       *new_width,
+                       i,
+                       &start_index,
+                       weights,
+                       &valid_weights);
+
+        for (; converted_max < start_index + valid_weights; converted_max++)
         {
-            size_t start_index;
-            float_t weights[4];
-            size_t valid_weights;
-            ComputeWeights(width,
-                           *new_width,
-                           j,
-                           &start_index,
-                           weights,
-                           &valid_weights);
-
-            for (; converted_max < start_index + valid_weights; converted_max++)
+            for (size_t j = 0; j < height; j++)
             {
-                texels[i * width + converted_max] =
-                    ColorConvert(texels[i * width + converted_max],
-                                 target_color_space);
+                texels[j * width + converted_max] =
+                    ColorConvert(texels[j * width + converted_max],
+                                    target_color_space);
             }
+        }
 
+        for (size_t j = 0; j < height; j++)
+        {
             float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
-                PCOLOR3 texel = &texels[i * width + start_index + k];
+                PCOLOR3 texel = &texels[j * width + start_index + k];
                 values[0] = fma(texel->values[0], weights[k], values[0]);
                 values[1] = fma(texel->values[1], weights[k], values[1]);
                 values[2] = fma(texel->values[2], weights[k], values[2]);
@@ -312,30 +315,30 @@ LanczosUpscaleColors(
             values[1] = fmax(values[1], (float_t)0.0);
             values[2] = fmax(values[2], (float_t)0.0);
 
-            staging_buffer[i * *new_width + j] =
+            staging_buffer[j * *new_width + i] =
                 ColorCreate(target_color_space, values);
         }
     }
 
-    for (size_t i = 0; i < *new_width; i++)
+    for (size_t i = 0; i < *new_height; i++)
     {
-        for (size_t j = 0; j < *new_height; j++)
-        {
-            size_t start_index;
-            float_t weights[4];
-            size_t valid_weights;
-            ComputeWeights(height,
-                           *new_height,
-                           j,
-                           &start_index,
-                           weights,
-                           &valid_weights);
+        size_t start_index;
+        float_t weights[4];
+        size_t valid_weights;
+        ComputeWeights(height,
+                       *new_height,
+                       i,
+                       &start_index,
+                       weights,
+                       &valid_weights);
 
+        for (size_t j = 0; j < *new_width; j++)
+        {
             float_t values[3] = {(float_t)0.0, (float_t)0.0, (float_t)0.0};
             for (size_t k = 0; k < valid_weights; k++)
             {
                 PCOLOR3 texel =
-                    &staging_buffer[(start_index + k) * *new_width + i];
+                    &staging_buffer[(start_index + k) * *new_width + j];
                 values[0] = fma(texel->values[0], weights[k], values[0]);
                 values[1] = fma(texel->values[1], weights[k], values[1]);
                 values[2] = fma(texel->values[2], weights[k], values[2]);
@@ -345,7 +348,7 @@ LanczosUpscaleColors(
             values[1] = fmax(values[1], (float_t)0.0);
             values[2] = fmax(values[2], (float_t)0.0);
 
-            new_texels_buffer[j * *new_width + i] =
+            new_texels_buffer[i * *new_width + j] =
                 ColorCreate(target_color_space, values);
         }
     }
@@ -453,56 +456,56 @@ LanczosUpscaleFloats(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    for (size_t i = 0; i < height; i++)
+    for (size_t i = 0; i < *new_width; i++)
     {
-        for (size_t j = 0; j < *new_width; j++)
-        {
-            size_t start_index;
-            float_t weights[4];
-            size_t valid_weights;
-            ComputeWeights(width,
-                           *new_width,
-                           j,
-                           &start_index,
-                           weights,
-                           &valid_weights);
+        size_t start_index;
+        float_t weights[4];
+        size_t valid_weights;
+        ComputeWeights(width,
+                       *new_width,
+                       i,
+                       &start_index,
+                       weights,
+                       &valid_weights);
 
+        for (size_t j = 0; j < height; j++)
+        {
             float_t new_value = (float_t)0.0;
             for (size_t k = 0; k < valid_weights; k++)
             {
-                new_value = fma(texels[i * width + start_index + k],
+                new_value = fma(texels[j * width + start_index + k],
                                 weights[k],
                                 new_value);
             }
 
-            staging_buffer[i * *new_width + j] = new_value;
+            staging_buffer[j * *new_width + i] = new_value;
         }
     }
 
-    for (size_t i = 0; i < *new_width; i++)
+    for (size_t i = 0; i < *new_height; i++)
     {
-        for (size_t j = 0; j < *new_height; j++)
-        {
-            size_t start_index;
-            float_t weights[4];
-            size_t valid_weights;
-            ComputeWeights(height,
-                           *new_height,
-                           j,
-                           &start_index,
-                           weights,
-                           &valid_weights);
+        size_t start_index;
+        float_t weights[4];
+        size_t valid_weights;
+        ComputeWeights(height,
+                       *new_height,
+                       i,
+                       &start_index,
+                       weights,
+                       &valid_weights);
 
+        for (size_t j = 0; j < *new_width; j++)
+        {
             float_t new_value = (float_t)0.0;
             for (size_t k = 0; k < valid_weights; k++)
             {
                 new_value =
-                    fma(staging_buffer[(start_index + k) * *new_width + i],
+                    fma(staging_buffer[(start_index + k) * *new_width + j],
                         weights[k],
                         new_value);
             }
 
-            new_texels_buffer[j * *new_width + i] = new_value;
+            new_texels_buffer[i * *new_width + j] = new_value;
         }
     }
 
