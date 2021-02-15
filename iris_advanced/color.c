@@ -58,20 +58,10 @@ ColorToXyzInline(
     return result;
 }
 
-//
-// Functions
-//
-
+static
+inline
 COLOR3
-ColorToXyz(
-    _In_ COLOR3 color
-    )
-{
-    return ColorToXyzInline(color);
-}
-
-COLOR3
-ColorConvert(
+ColorConvertInline(
     _In_ COLOR3 color,
     _In_ COLOR_SPACE target
     )
@@ -122,6 +112,27 @@ ColorConvert(
     return result;
 }
 
+//
+// Functions
+//
+
+COLOR3
+ColorToXyz(
+    _In_ COLOR3 color
+    )
+{
+    return ColorToXyzInline(color);
+}
+
+COLOR3
+ColorConvert(
+    _In_ COLOR3 color,
+    _In_ COLOR_SPACE target
+    )
+{
+    return ColorConvertInline(color, target);
+}
+
 COLOR3
 ColorAdd(
     _In_ COLOR3 addend0,
@@ -129,41 +140,30 @@ ColorAdd(
     _In_ COLOR_SPACE sum_color_space
     )
 {
-    if (addend0.color_space == addend1.color_space)
+    if (addend0.color_space != addend1.color_space)
     {
-        COLOR3 sum;
-        sum.values[0] = addend0.values[0] + addend1.values[0];
-        sum.values[1] = addend0.values[1] + addend1.values[1];
-        sum.values[2] = addend0.values[2] + addend1.values[2];
-        sum.color_space = addend0.color_space;
-        return ColorConvert(sum, sum_color_space);
-    }
-
-    COLOR_SPACE intermediate_color_space;
-    if (addend0.color_space == sum_color_space)
-    {
-        addend1 = ColorConvert(addend1, sum_color_space);
-        intermediate_color_space = sum_color_space;
-    }
-    else if (addend1.color_space == sum_color_space)
-    {
-        addend0 = ColorConvert(addend0, sum_color_space);
-        intermediate_color_space = sum_color_space;
-    }
-    else
-    {
-        addend0 = ColorToXyz(addend0);
-        addend1 = ColorToXyz(addend1);
-        intermediate_color_space = COLOR_SPACE_XYZ;
+        if (addend0.color_space == sum_color_space)
+        {
+            addend1 = ColorConvert(addend1, sum_color_space);
+        }
+        else if (addend1.color_space == sum_color_space)
+        {
+            addend0 = ColorConvert(addend0, sum_color_space);
+        }
+        else
+        {
+            addend0 = ColorToXyz(addend0);
+            addend1 = ColorToXyz(addend1);
+        }
     }
 
     COLOR3 sum;
     sum.values[0] = addend0.values[0] + addend1.values[0];
     sum.values[1] = addend0.values[1] + addend1.values[1];
     sum.values[2] = addend0.values[2] + addend1.values[2];
-    sum.color_space = intermediate_color_space;
+    sum.color_space = addend0.color_space;
 
-    return ColorConvert(sum, sum_color_space);
+    return ColorConvertInline(sum, sum_color_space);
 }
 
 float_t
