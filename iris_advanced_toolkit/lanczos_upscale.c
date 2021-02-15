@@ -148,7 +148,7 @@ ComputeWeights(
 
     for (size_t i = 0; i < num_weights; i++)
     {
-        if (start_index + (float_t)i <= old_resolution)
+        if (start_index + (float_t)i >= old_resolution)
         {
             num_weights -= 1;
         }
