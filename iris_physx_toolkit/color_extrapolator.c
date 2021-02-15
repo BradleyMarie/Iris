@@ -401,7 +401,7 @@ ColorExtrapolatorResizeSpectrumHashTable(
     color_extrapolator->spectrum_list = new_list;
     color_extrapolator->spectrum_list_capacity = new_capacity;
 
-    color_extrapolator->reflector_list_usable_capacity =
+    color_extrapolator->spectrum_list_usable_capacity =
         ColorExtrapolatorComputeUsableCapacity(new_capacity);
 
     return ISTATUS_SUCCESS;
