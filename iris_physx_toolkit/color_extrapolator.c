@@ -210,10 +210,9 @@ ColorExtrapolatorFindSpectrum(
             return false;
         }
 
-        if (color_extrapolator->spectrum_list[*index].color.values[0] == color.values[0] &&
-            color_extrapolator->spectrum_list[*index].color.values[1] == color.values[1] &&
-            color_extrapolator->spectrum_list[*index].color.values[2] == color.values[2] &&
-            color_extrapolator->spectrum_list[*index].color.color_space == color.color_space)
+        if (memcmp(&color_extrapolator->spectrum_list[*index].color,
+                   &color,
+                   sizeof(COLOR3)) == 0)
         {
             return true;
         }
@@ -248,10 +247,9 @@ ColorExtrapolatorFindReflector(
             return false;
         }
 
-        if (color_extrapolator->reflector_list[*index].color.values[0] == color.values[0] &&
-            color_extrapolator->reflector_list[*index].color.values[1] == color.values[1] &&
-            color_extrapolator->reflector_list[*index].color.values[2] == color.values[2] &&
-            color_extrapolator->reflector_list[*index].color.color_space == color.color_space)
+        if (memcmp(&color_extrapolator->reflector_list[*index].color,
+                   &color,
+                   sizeof(COLOR3)) == 0)
         {
             return true;
         }
