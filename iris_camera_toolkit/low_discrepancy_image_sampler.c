@@ -337,6 +337,8 @@ LowDiscrepancyImageSamplerNext(
         }
     }
 
+    image_sampler->sample_index += 1;
+
     return ISTATUS_SUCCESS;
 }
 
