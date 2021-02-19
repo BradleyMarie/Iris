@@ -94,16 +94,9 @@ VisibilityTesterTestAnyDistance(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    *visible = true;
-    ISTATUS status = RayTracerTraceClosestHit(
-        visibility_tester->ray_tracer,
-        ray,
-        visibility_tester->epsilon,
-        INFINITY,
-        visibility_tester->trace_routine,
-        visibility_tester->trace_context,
-        VisibilityTesterProcessHit,
-        visible);
+    ISTATUS status = VisibilityTesterTestAnyDistanceInline(visibility_tester,
+                                                           ray,
+                                                           visible);
 
     return status;
 }

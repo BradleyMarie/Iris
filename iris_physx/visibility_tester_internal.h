@@ -129,6 +129,32 @@ VisibilityTesterTestInline(
 
 static
 inline
+ISTATUS
+VisibilityTesterTestAnyDistanceInline(
+    _Inout_ PVISIBILITY_TESTER visibility_tester,
+    _In_ RAY ray,
+    _Out_ bool *visible
+    )
+{
+    assert(visibility_tester != NULL);
+    assert(RayValidate(ray));
+    assert(visible != NULL);
+
+    *visible = true;
+    ISTATUS status = RayTracerTraceClosestHit(visibility_tester->ray_tracer,
+                                              ray,
+                                              visibility_tester->epsilon,
+                                              INFINITY,
+                                              visibility_tester->trace_routine,
+                                              visibility_tester->trace_context,
+                                              VisibilityTesterProcessHit,
+                                              visible);
+
+    return status;
+}
+
+static
+inline
 void
 VisibilityTesterDestroy(
     _Inout_ struct _VISIBILITY_TESTER *visibility_tester

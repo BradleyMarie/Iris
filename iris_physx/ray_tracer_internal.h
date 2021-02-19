@@ -17,6 +17,7 @@ Abstract:
 
 #include "iris_physx/bsdf_allocator.h"
 #include "iris_physx/bsdf_allocator_internal.h"
+#include "iris_physx/emissive_material.h"
 #include "iris_physx/reflector_compositor.h"
 #include "iris_physx/reflector_compositor_internal.h"
 #include "iris_physx/texture_coordinate_allocator.h"
@@ -31,6 +32,7 @@ struct _SHAPE_RAY_TRACER {
     PRAY_TRACER_TRACE_ROUTINE trace_routine;
     const void *trace_context;
     float_t minimum_distance;
+    PCEMISSIVE_MATERIAL background;
     REFLECTOR_COMPOSITOR reflector_compositor;
     BSDF_ALLOCATOR bsdf_allocator;
     TEXTURE_COORDINATE_ALLOCATOR texture_coordinate_allocator;
@@ -85,7 +87,8 @@ ShapeRayTracerConfigure(
     _Inout_ struct _SHAPE_RAY_TRACER *shape_ray_tracer,
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
-    _In_ float_t minimum_distance
+    _In_ float_t minimum_distance,
+    _In_opt_ PCEMISSIVE_MATERIAL background
     )
 {
     assert(shape_ray_tracer != NULL);
@@ -95,6 +98,7 @@ ShapeRayTracerConfigure(
     shape_ray_tracer->trace_routine = trace_routine;
     shape_ray_tracer->trace_context = trace_context;
     shape_ray_tracer->minimum_distance = minimum_distance;
+    shape_ray_tracer->background = background;
 
     ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
     BsdfAllocatorClear(&shape_ray_tracer->bsdf_allocator);

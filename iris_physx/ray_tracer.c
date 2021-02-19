@@ -31,6 +31,7 @@ typedef struct _SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT {
     POINT3 hit_point;
     VECTOR3 surface_normal;
     VECTOR3 shading_normal;
+    bool triggered;
 } SHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT, *PSHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT;
 
 //
@@ -50,6 +51,8 @@ ShapeRayTracerProcessHit(
         (PSHAPE_RAY_TRACER_PROCESS_HIT_CONTEXT)context;
 
     PSHAPE shape = (PSHAPE)hit_context->data;
+
+    process_context->triggered = true;
 
     if (shape->vtable->get_emissive_material_routine != NULL &&
         shape->vtable->sample_face_routine != NULL &&
@@ -242,6 +245,7 @@ ShapeRayTracerTrace(
     context.shape_ray_tracer = ray_tracer;
     context.light = NULL;
     context.bsdf = NULL;
+    context.triggered = false;
 
     ISTATUS status =
         RayTracerTraceClosestHitWithCoordinates(ray_tracer->ray_tracer,
@@ -255,6 +259,20 @@ ShapeRayTracerTrace(
 
     if (status != ISTATUS_SUCCESS)
     {
+        return status;
+    }
+
+    if (!context.triggered && ray_tracer->background != NULL)
+    {
+        POINT3 direction = PointCreate(ray_differential.ray.direction.x,
+                                       ray_differential.ray.direction.y,
+                                       ray_differential.ray.direction.z);
+
+        status = EmissiveMaterialSample(ray_tracer->background,
+                                        direction,
+                                        NULL,
+                                        light);
+
         return status;
     }
 

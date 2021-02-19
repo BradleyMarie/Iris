@@ -15,6 +15,7 @@ Abstract:
 #ifndef _IRIS_PHYSX_SCENE_
 #define _IRIS_PHYSX_SCENE_
 
+#include "iris_physx/light.h"
 #include "iris_physx/scene_vtable.h"
 
 //
@@ -31,10 +32,12 @@ typedef const SCENE *PCSCENE;
 ISTATUS
 SceneAllocate(
     _In_ PCSCENE_VTABLE vtable,
+    _In_opt_ PEMISSIVE_MATERIAL background,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PSCENE *scene
+    _Out_ PSCENE *scene,
+    _Out_ PLIGHT *background_light
     );
 
 void

@@ -94,7 +94,8 @@ IntegratorIntegrateInternal(
     ShapeRayTracerConfigure(&integrator->shape_ray_tracer,
                             scene->vtable->trace_routine,
                             scene->data,
-                            epsilon);
+                            epsilon,
+                            scene->background);
 
     VisibilityTesterConfigure(&integrator->visibility_tester,
                               scene->vtable->trace_routine,
