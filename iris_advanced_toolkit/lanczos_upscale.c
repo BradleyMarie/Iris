@@ -139,18 +139,19 @@ ComputeWeights(
 
     float_t start_index = floor(center - filter_width + (float_t)0.5);
 
-    size_t num_weights = 4;
-    for (size_t i = 0; start_index < (float_t)0.0 && num_weights != 0; i++)
+    size_t max_weights = 4;
+    for (size_t i = 0; start_index < (float_t)0.0 && max_weights != 0; i++)
     {
         start_index += (float_t)1.0;
-        num_weights -= 1;
+        max_weights -= 1;
     }
 
-    for (size_t i = 0; i < num_weights; i++)
+    size_t num_weights = 0;
+    for (size_t i = 0; i < max_weights; i++)
     {
-        if (start_index + (float_t)i >= old_resolution)
+        if (start_index + (float_t)i < old_resolution)
         {
-            num_weights -= 1;
+            num_weights += 1;
         }
     }
 
