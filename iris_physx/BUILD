@@ -122,6 +122,36 @@ cc_library(
 )
 
 cc_library(
+    name = "environmental_light",
+    srcs = ["environmental_light.c"],
+    hdrs = ["environmental_light.h"],
+    deps = [
+        ":environmental_light_internal",
+        ":environmental_light_vtable",
+        ":light",
+        ":visibility_tester_internal",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "environmental_light_internal",
+    hdrs = ["environmental_light_internal.h"],
+    deps = [
+        ":environmental_light_vtable",
+    ],
+)
+
+cc_library(
+    name = "environmental_light_vtable",
+    hdrs = ["environmental_light_vtable.h"],
+    deps = [
+        ":spectrum_compositor",
+        "//iris_advanced",
+    ],
+)
+
+cc_library(
     name = "hit_allocator",
     hdrs = ["hit_allocator.h"],
     deps = [
@@ -181,6 +211,7 @@ cc_library(
         ":bsdf_allocator",
         ":color_integrator",
         ":emissive_material",
+        ":environmental_light",
         ":hit_allocator",
         ":hit_tester",
         ":integrator",
@@ -351,6 +382,7 @@ cc_library(
     hdrs = ["ray_tracer.h"],
     deps = [
         ":bsdf",
+        ":environmental_light_internal",
         ":light",
         ":material_internal",
         ":ray_tracer_internal",
@@ -364,6 +396,8 @@ cc_library(
     hdrs = ["ray_tracer_internal.h"],
     deps = [
         ":bsdf_allocator",
+        ":emissive_material_internal",
+        ":environmental_light",
         ":light",
         ":reflector_compositor",
         ":reflector_compositor_internal",
@@ -456,6 +490,7 @@ cc_library(
     srcs = ["scene.c"],
     hdrs = ["scene.h"],
     deps = [
+        ":environmental_light",
         ":scene_internal",
         ":scene_vtable",
         "//common:alloc",
@@ -466,6 +501,7 @@ cc_library(
     name = "scene_internal",
     hdrs = ["scene_internal.h"],
     deps = [
+        ":environmental_light",
         ":scene_vtable",
     ],
 )

@@ -1720,14 +1720,12 @@ KdTreeSceneAllocate(
         }
     }
 
-    PLIGHT background_light;
     status = SceneAllocate(vtable,
-                           NULL,
                            &result,
                            sizeof(KD_TREE_SCENE),
                            alignof(KD_TREE_SCENE),
-                           scene,
-                           &background_light);
+                           NULL,
+                           scene);
 
     if (status != ISTATUS_SUCCESS)
     {

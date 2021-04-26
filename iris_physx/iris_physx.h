@@ -26,6 +26,7 @@ extern "C" {
 #include "iris_physx/bsdf_allocator.h"
 #include "iris_physx/color_integrator.h"
 #include "iris_physx/emissive_material.h"
+#include "iris_physx/environmental_light.h"
 #include "iris_physx/hit_allocator.h"
 #include "iris_physx/hit_tester.h"
 #include "iris_physx/integrator.h"

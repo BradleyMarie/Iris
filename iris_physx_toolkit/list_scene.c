@@ -365,12 +365,11 @@ ListSceneAllocate(
 
     PLIGHT background_light;
     ISTATUS status = SceneAllocate(&list_scene_vtable,
-                                   NULL,
                                    &result,
                                    sizeof(LIST_SCENE),
                                    alignof(LIST_SCENE),
-                                   scene,
-                                   &background_light);
+                                   NULL,
+                                   scene);
 
     if (status != ISTATUS_SUCCESS)
     {

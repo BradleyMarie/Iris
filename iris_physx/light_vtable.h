@@ -25,7 +25,7 @@ Abstract:
 
 typedef
 ISTATUS
-(*LIGHT_SAMPLE_ROUTINE)(
+(*PLIGHT_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _In_ POINT3 hit_point,
     _In_ VECTOR3 surface_normal,
@@ -59,7 +59,7 @@ ISTATUS
     );
 
 typedef struct _LIGHT_VTABLE {
-    LIGHT_SAMPLE_ROUTINE sample_routine;
+    PLIGHT_SAMPLE_ROUTINE sample_routine;
     PLIGHT_COMPUTE_EMISSIVE_ROUTINE compute_emissive_routine;
     PLIGHT_COMPUTE_EMISSIVE_WITH_PDF_ROUTINE compute_emissive_with_pdf_routine;
     PFREE_ROUTINE free_routine;

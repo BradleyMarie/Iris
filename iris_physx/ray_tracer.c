@@ -13,6 +13,7 @@ Abstract:
 --*/
 
 #include "iris_physx/emissive_material_internal.h"
+#include "iris_physx/environmental_light_internal.h"
 #include "iris_physx/material_internal.h"
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
@@ -262,16 +263,12 @@ ShapeRayTracerTrace(
         return status;
     }
 
-    if (!context.triggered && ray_tracer->background != NULL)
+    if (!context.triggered && ray_tracer->environment != NULL)
     {
-        POINT3 direction = PointCreate(ray_differential.ray.direction.x,
-                                       ray_differential.ray.direction.y,
-                                       ray_differential.ray.direction.z);
-
-        status = EmissiveMaterialSample(ray_tracer->background,
-                                        direction,
-                                        NULL,
-                                        light);
+        status = EnvironmentalLightComputeEmissive(ray_tracer->environment,
+                                                   ray_differential.ray.direction,
+                                                   &ray_tracer->spectrum_compositor,
+                                                   light);
 
         return status;
     }

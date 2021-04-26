@@ -17,9 +17,11 @@ Abstract:
 
 #include "iris_physx/bsdf_allocator.h"
 #include "iris_physx/bsdf_allocator_internal.h"
-#include "iris_physx/emissive_material.h"
+#include "iris_physx/environmental_light.h"
 #include "iris_physx/reflector_compositor.h"
 #include "iris_physx/reflector_compositor_internal.h"
+#include "iris_physx/spectrum_compositor.h"
+#include "iris_physx/spectrum_compositor_internal.h"
 #include "iris_physx/texture_coordinate_allocator.h"
 #include "iris_physx/texture_coordinate_allocator_internal.h"
 
@@ -32,7 +34,8 @@ struct _SHAPE_RAY_TRACER {
     PRAY_TRACER_TRACE_ROUTINE trace_routine;
     const void *trace_context;
     float_t minimum_distance;
-    PCEMISSIVE_MATERIAL background;
+    PCENVIRONMENTAL_LIGHT environment;
+    SPECTRUM_COMPOSITOR spectrum_compositor;
     REFLECTOR_COMPOSITOR reflector_compositor;
     BSDF_ALLOCATOR bsdf_allocator;
     TEXTURE_COORDINATE_ALLOCATOR texture_coordinate_allocator;
@@ -64,11 +67,21 @@ ShapeRayTracerInitialize(
     shape_ray_tracer->trace_context = NULL;
     shape_ray_tracer->minimum_distance = (float_t)0.0;
 
-    bool success = 
+    bool success =
+        SpectrumCompositorInitialize(&shape_ray_tracer->spectrum_compositor);
+
+    if (!success)
+    {
+        RayTracerFree(shape_ray_tracer->ray_tracer);
+        return false;
+    }
+
+    success =
         ReflectorCompositorInitialize(&shape_ray_tracer->reflector_compositor);
 
     if (!success)
     {
+        SpectrumCompositorDestroy(&shape_ray_tracer->spectrum_compositor);
         RayTracerFree(shape_ray_tracer->ray_tracer);
         return false;
     }
@@ -88,7 +101,7 @@ ShapeRayTracerConfigure(
     _In_ PRAY_TRACER_TRACE_ROUTINE trace_routine,
     _In_opt_ const void *trace_context,
     _In_ float_t minimum_distance,
-    _In_opt_ PCEMISSIVE_MATERIAL background
+    _In_opt_ PCENVIRONMENTAL_LIGHT environment
     )
 {
     assert(shape_ray_tracer != NULL);
@@ -98,12 +111,25 @@ ShapeRayTracerConfigure(
     shape_ray_tracer->trace_routine = trace_routine;
     shape_ray_tracer->trace_context = trace_context;
     shape_ray_tracer->minimum_distance = minimum_distance;
-    shape_ray_tracer->background = background;
+    shape_ray_tracer->environment = environment;
 
+    SpectrumCompositorClear(&shape_ray_tracer->spectrum_compositor);
     ReflectorCompositorClear(&shape_ray_tracer->reflector_compositor);
     BsdfAllocatorClear(&shape_ray_tracer->bsdf_allocator);
     TextureCoordinateAllocatorClear(
         &shape_ray_tracer->texture_coordinate_allocator);
+}
+
+static
+inline
+PSPECTRUM_COMPOSITOR
+ShapeRayTracerGetSpectrumCompositor(
+    _Inout_ struct _SHAPE_RAY_TRACER *shape_ray_tracer
+    )
+{
+    assert(shape_ray_tracer != NULL);
+
+    return &shape_ray_tracer->spectrum_compositor;
 }
 
 static
@@ -128,6 +154,7 @@ ShapeRayTracerDestroy(
     assert(shape_ray_tracer != NULL);
 
     RayTracerFree(shape_ray_tracer->ray_tracer);
+    SpectrumCompositorDestroy(&shape_ray_tracer->spectrum_compositor);
     ReflectorCompositorDestroy(&shape_ray_tracer->reflector_compositor);
     BsdfAllocatorDestroy(&shape_ray_tracer->bsdf_allocator);
     TextureCoordinateAllocatorDestroy(

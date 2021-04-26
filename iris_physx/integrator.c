@@ -23,8 +23,6 @@ Abstract:
 #include "iris_physx/ray_tracer.h"
 #include "iris_physx/ray_tracer_internal.h"
 #include "iris_physx/scene_internal.h"
-#include "iris_physx/spectrum_compositor.h"
-#include "iris_physx/spectrum_compositor_internal.h"
 #include "iris_physx/visibility_tester_internal.h"
 
 //
@@ -36,7 +34,6 @@ struct _INTEGRATOR {
     SHAPE_RAY_TRACER shape_ray_tracer;
     LIGHT_SAMPLE_LIST light_sample_list;
     VISIBILITY_TESTER visibility_tester;
-    SPECTRUM_COMPOSITOR spectrum_compositor;
     PSCENE scene;
     PLIGHT_SAMPLER light_sampler;
     PCOLOR_INTEGRATOR color_integrator;
@@ -95,7 +92,7 @@ IntegratorIntegrateInternal(
                             scene->vtable->trace_routine,
                             scene->data,
                             epsilon,
-                            scene->background);
+                            scene->environment);
 
     VisibilityTesterConfigure(&integrator->visibility_tester,
                               scene->vtable->trace_routine,
@@ -103,7 +100,9 @@ IntegratorIntegrateInternal(
                               epsilon);
 
     LightSampleListClear(&integrator->light_sample_list);
-    SpectrumCompositorClear(&integrator->spectrum_compositor);
+
+    PSPECTRUM_COMPOSITOR spectrum_compositor =
+        ShapeRayTracerGetSpectrumCompositor(&integrator->shape_ray_tracer);
 
     PREFLECTOR_COMPOSITOR reflector_compositor =
         ShapeRayTracerGetReflectorCompositor(&integrator->shape_ray_tracer);
@@ -115,7 +114,7 @@ IntegratorIntegrateInternal(
                                               &integrator->light_sample_list,
                                               &integrator->shape_ray_tracer,
                                               &integrator->visibility_tester,
-                                              &integrator->spectrum_compositor,
+                                              spectrum_compositor,
                                               reflector_compositor,
                                               rng,
                                               spectrum);
@@ -210,17 +209,6 @@ IntegratorAllocate(
     {
         ShapeRayTracerDestroy(&result->shape_ray_tracer);
         LightSampleListDestroy(&result->light_sample_list);
-        free(result);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    success = SpectrumCompositorInitialize(&result->spectrum_compositor);
-    
-    if (!success)
-    {
-        ShapeRayTracerDestroy(&result->shape_ray_tracer);
-        LightSampleListDestroy(&result->light_sample_list);
-        VisibilityTesterDestroy(&result->visibility_tester);
         free(result);
         return ISTATUS_ALLOCATION_FAILED;
     }
@@ -358,7 +346,6 @@ IntegratorFree(
     ShapeRayTracerDestroy(&integrator->shape_ray_tracer);
     LightSampleListDestroy(&integrator->light_sample_list);
     VisibilityTesterDestroy(&integrator->visibility_tester);
-    SpectrumCompositorDestroy(&integrator->spectrum_compositor);
 
     if (integrator->vtable->free_routine != NULL)
     {

@@ -17,6 +17,7 @@ Abstract:
 
 #include <stdatomic.h>
 
+#include "iris_physx/environmental_light.h"
 #include "iris_physx/scene_vtable.h"
 
 //
@@ -26,7 +27,7 @@ Abstract:
 struct _SCENE {
     PCSCENE_VTABLE vtable;
     void *data;
-    PEMISSIVE_MATERIAL background;
+    PENVIRONMENTAL_LIGHT environment;
     atomic_uintmax_t reference_count;
 };
 
