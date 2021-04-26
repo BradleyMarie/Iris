@@ -317,6 +317,7 @@ EnvironmentalLightAllocate(
     if (status != ISTATUS_SUCCESS)
     {
         free(*environmental_light);
+        *environmental_light = NULL;
     }
 
     return status;
