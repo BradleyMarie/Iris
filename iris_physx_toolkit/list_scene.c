@@ -297,6 +297,7 @@ ListSceneAllocate(
     _In_reads_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
+    _In_opt_ PENVIRONMENTAL_LIGHT environment,
     _Out_ PSCENE *scene
     )
 {
@@ -317,7 +318,7 @@ ListSceneAllocate(
 
     if (scene == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     LIST_SCENE result;
@@ -363,12 +364,11 @@ ListSceneAllocate(
         }
     }
 
-    PLIGHT background_light;
     ISTATUS status = SceneAllocate(&list_scene_vtable,
                                    &result,
                                    sizeof(LIST_SCENE),
                                    alignof(LIST_SCENE),
-                                   NULL,
+                                   environment,
                                    scene);
 
     if (status != ISTATUS_SUCCESS)

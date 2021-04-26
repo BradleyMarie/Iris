@@ -1532,6 +1532,7 @@ KdTreeSceneAllocate(
     _In_reads_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
+    _In_opt_ PENVIRONMENTAL_LIGHT environment,
     _Out_ PSCENE *scene
     )
 {
@@ -1560,7 +1561,7 @@ KdTreeSceneAllocate(
 
     if (scene == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_04;
+        return ISTATUS_INVALID_ARGUMENT_05;
     }
 
     float_t max_depth =
@@ -1724,7 +1725,7 @@ KdTreeSceneAllocate(
                            &result,
                            sizeof(KD_TREE_SCENE),
                            alignof(KD_TREE_SCENE),
-                           NULL,
+                           environment,
                            scene);
 
     if (status != ISTATUS_SUCCESS)

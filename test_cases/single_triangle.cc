@@ -277,6 +277,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -371,6 +372,7 @@ TEST(SingleTriangleTest, TestXYTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -465,6 +467,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -559,6 +562,7 @@ TEST(SingleTriangleTest, TestXYTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -653,6 +657,7 @@ TEST(SingleTriangleTest, TestXYTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -747,6 +752,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -841,6 +847,7 @@ TEST(SingleTriangleTest, TestXZTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -935,6 +942,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1029,6 +1037,7 @@ TEST(SingleTriangleTest, TestXZTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1123,6 +1132,7 @@ TEST(SingleTriangleTest, TestXZTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1217,6 +1227,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1311,6 +1322,7 @@ TEST(SingleTriangleTest, TestYZTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1405,6 +1417,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1499,6 +1512,7 @@ TEST(SingleTriangleTest, TestYZTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1593,6 +1607,7 @@ TEST(SingleTriangleTest, TestYZTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1689,6 +1704,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1785,6 +1801,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1881,6 +1898,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -1977,6 +1995,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2073,6 +2092,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2149,6 +2169,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2219,6 +2240,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleFrontNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2292,6 +2314,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2362,6 +2385,7 @@ TEST(SingleEmissiveTriangleTest, TestXYTriangleBackNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2455,6 +2479,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2551,6 +2576,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2647,6 +2673,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2743,6 +2770,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2819,6 +2847,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2889,6 +2918,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleFrontNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -2962,6 +2992,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3032,6 +3063,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBackNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3125,6 +3157,7 @@ TEST(SingleEmissiveTriangleTest, TestXZTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3221,6 +3254,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3317,6 +3351,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3413,6 +3448,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3509,6 +3545,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoMaterial)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3605,6 +3642,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBehind)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3681,6 +3719,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3751,6 +3790,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleFrontNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3824,6 +3864,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackWithLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -3894,6 +3935,7 @@ TEST(SingleEmissiveTriangleTest, TestYZTriangleBackNoLight)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

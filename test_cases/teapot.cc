@@ -178,6 +178,7 @@ TEST(TeapotTest, FlatShadedTeapot)
                                  transforms,
                                  premultiplied,
                                  triangles_allocated,
+                                 nullptr,
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -266,6 +267,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
                                  transforms,
                                  premultiplied,
                                  triangles_allocated,
+                                 nullptr,
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

@@ -402,6 +402,7 @@ TEST(CornellBoxDielectricTest, CornellBox)
                                  transforms,
                                  premultiplied,
                                  shapes.size(),
+                                 nullptr,
                                  &scene);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
 

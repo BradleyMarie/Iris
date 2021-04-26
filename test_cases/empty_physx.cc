@@ -62,6 +62,7 @@ TEST(EmptyPhysx, ListScene)
                                &matrix,
                                &premultiplied,
                                0,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -154,6 +155,7 @@ TEST(EmptyPhysx, KdTreeScene)
                                  &matrix,
                                  &premultiplied,
                                  0,
+                                 nullptr,
                                  &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

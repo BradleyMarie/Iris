@@ -156,6 +156,7 @@ TEST(SingleSphereTest, TestReflectorRedWorldSphere)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -229,6 +230,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedAwaySphere)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -303,6 +305,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedUpSphere)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -377,6 +380,7 @@ TEST(SingleSphereTest, TestReflectorRedTransformedRightSphere)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 

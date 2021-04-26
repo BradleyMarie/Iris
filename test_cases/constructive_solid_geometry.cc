@@ -305,6 +305,7 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -407,6 +408,7 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -509,6 +511,7 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
                                &matrix,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
@@ -620,6 +623,7 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
                                &matrix2,
                                &premultiplied,
                                1,
+                               nullptr,
                                &scene);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
