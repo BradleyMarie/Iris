@@ -40,6 +40,34 @@ EnvironmentalLightAllocate(
     _Out_ PLIGHT *light
     );
 
+ISTATUS
+EnvironmentalLightSample(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ PVECTOR3 to_light,
+    _Out_ float_t *pdf
+    );
+
+ISTATUS
+EnvironmentalLightComputeEmissive(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 to_light,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    );
+
+ISTATUS
+EnvironmentalLightComputeEmissiveWithPdf(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 to_light,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ float_t *pdf
+    );
+
 void
 EnvironmentalLightRetain(
     _In_opt_ PENVIRONMENTAL_LIGHT environmental_light

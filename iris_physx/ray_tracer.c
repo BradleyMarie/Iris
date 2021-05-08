@@ -265,10 +265,10 @@ ShapeRayTracerTrace(
 
     if (!context.triggered && ray_tracer->environment != NULL)
     {
-        status = EnvironmentalLightComputeEmissive(ray_tracer->environment,
-                                                   ray_differential.ray.direction,
-                                                   &ray_tracer->spectrum_compositor,
-                                                   light);
+        status = EnvironmentalLightComputeEmissiveInternal(ray_tracer->environment,
+                                                           ray_differential.ray.direction,
+                                                           &ray_tracer->spectrum_compositor,
+                                                           light);
 
         return status;
     }

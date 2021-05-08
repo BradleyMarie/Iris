@@ -103,10 +103,10 @@ EnvironmentalLightWrapperComputeEmissive(
     PCENVIRONMENTAL_LIGHT_WRAPPER environmental_light_wrapper = (PCENVIRONMENTAL_LIGHT_WRAPPER)context;
     PCENVIRONMENTAL_LIGHT light = environmental_light_wrapper->environment;
 
-    ISTATUS status = EnvironmentalLightComputeEmissive(light,
-                                                       to_light->direction,
-                                                       compositor,
-                                                       spectrum);
+    ISTATUS status = EnvironmentalLightComputeEmissiveInternal(light,
+                                                               to_light->direction,
+                                                               compositor,
+                                                               spectrum);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -321,6 +321,163 @@ EnvironmentalLightAllocate(
     }
 
     return status;
+}
+
+ISTATUS
+EnvironmentalLightSample(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ PVECTOR3 to_light,
+    _Out_ float_t *pdf
+    )
+{
+    if (light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!VectorValidate(surface_normal))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (to_light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    ISTATUS status = light->vtable->sample_routine(light->data,
+                                                   surface_normal,
+                                                   rng,
+                                                   compositor,
+                                                   spectrum,
+                                                   to_light,
+                                                   pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (*pdf == INFINITY)
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+EnvironmentalLightComputeEmissive(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 to_light,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    if (light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!VectorValidate(to_light))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    ISTATUS status = EnvironmentalLightComputeEmissiveInternal(light,
+                                                               to_light,
+                                                               compositor,
+                                                               spectrum);
+
+    return status;
+}
+
+ISTATUS
+EnvironmentalLightComputeEmissiveWithPdf(
+    _In_ PCENVIRONMENTAL_LIGHT light,
+    _In_ VECTOR3 to_light,
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum,
+    _Out_ float_t *pdf
+    )
+{
+    if (light == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!VectorValidate(to_light))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    ISTATUS status =
+        light->vtable->compute_emissive_with_pdf_routine(light->data,
+                                                         to_light,
+                                                         compositor,
+                                                         spectrum,
+                                                         pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (*pdf == INFINITY)
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 void

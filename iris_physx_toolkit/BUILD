@@ -12,6 +12,15 @@ cc_library(
 )
 
 cc_library(
+    name = "aggregate_environmental_light",
+    srcs = ["aggregate_environmental_light.c"],
+    hdrs = ["aggregate_environmental_light.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "all_light_sampler",
     srcs = ["all_light_sampler.c"],
     hdrs = ["all_light_sampler.h"],

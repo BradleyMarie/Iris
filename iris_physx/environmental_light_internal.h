@@ -37,7 +37,7 @@ struct _ENVIRONMENTAL_LIGHT {
 static
 inline
 ISTATUS
-EnvironmentalLightComputeEmissive(
+EnvironmentalLightComputeEmissiveInternal(
     _In_ const struct _ENVIRONMENTAL_LIGHT *environmental_light,
     _In_ VECTOR3 to_light,
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
