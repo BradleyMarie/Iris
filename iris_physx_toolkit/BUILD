@@ -396,6 +396,23 @@ cc_library(
 )
 
 cc_library(
+    name = "spectrum_texture_vtable",
+    hdrs = ["spectrum_texture_vtable.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "spectrum_texture",
+    srcs = ["spectrum_texture.c"],
+    hdrs = ["spectrum_texture.h"],
+    deps = [
+        ":spectrum_texture_vtable",
+    ],
+)
+
+cc_library(
     name = "sphere",
     srcs = ["sphere.c"],
     hdrs = ["sphere.h"],

@@ -1,19 +1,19 @@
 /*++
 
-Copyright (c) 2020 Brad Weinberger
+Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    float_texture.c
+    spectrum_texture.c
 
 Abstract:
 
-    Interface representing a texture of floats.
+    Interface representing a texture of spectrums.
 
 --*/
 
 #include "common/alloc.h"
-#include "iris_physx_toolkit/float_texture.h"
+#include "iris_physx_toolkit/spectrum_texture.h"
 
 #include <stdalign.h>
 #include <stdatomic.h>
@@ -23,8 +23,8 @@ Abstract:
 // Types
 //
 
-struct _FLOAT_TEXTURE {
-    PCFLOAT_TEXTURE_VTABLE vtable;
+struct _SPECTRUM_TEXTURE {
+    PCSPECTRUM_TEXTURE_VTABLE vtable;
     void *data;
     atomic_uintmax_t reference_count;
 };
@@ -34,12 +34,12 @@ struct _FLOAT_TEXTURE {
 //
 
 ISTATUS
-FloatTextureAllocate(
-    _In_ PCFLOAT_TEXTURE_VTABLE vtable,
+SpectrumTextureAllocate(
+    _In_ PCSPECTRUM_TEXTURE_VTABLE vtable,
     _In_reads_bytes_opt_(data_size) const void *data,
     _In_ size_t data_size,
     _In_ size_t data_alignment,
-    _Out_ PFLOAT_TEXTURE *texture
+    _Out_ PSPECTRUM_TEXTURE *texture
     )
 {
     if (vtable == NULL)
@@ -72,8 +72,8 @@ FloatTextureAllocate(
     }
 
     void *data_allocation;
-    bool success = AlignedAllocWithHeader(sizeof(FLOAT_TEXTURE),
-                                          alignof(FLOAT_TEXTURE),
+    bool success = AlignedAllocWithHeader(sizeof(SPECTRUM_TEXTURE),
+                                          alignof(SPECTRUM_TEXTURE),
                                           (void **)texture,
                                           data_size,
                                           data_alignment,
@@ -97,17 +97,28 @@ FloatTextureAllocate(
 }
 
 ISTATUS
-FloatTextureSample(
-    _In_opt_ PCFLOAT_TEXTURE texture,
-    _In_ POINT3 model_hit_point,
-    _In_opt_ const void *additional_data,
-    _In_opt_ const void *texture_coordinates,
-    _Out_ float_t *value
+SpectrumTextureSample(
+    _In_opt_ PCSPECTRUM_TEXTURE texture,
+    _In_ VECTOR3 direction,
+    _In_opt_ VECTOR3 dxdy[2],
+    _Inout_ PSPECTRUM_COMPOSITOR spectrum_compositor,
+    _Out_ PCSPECTRUM *value
     )
 {
-    if (!PointValidate(model_hit_point))
+    if (!VectorValidate(direction))
     {
         return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (dxdy != NULL &&
+        (!VectorValidate(dxdy[0]) || !VectorValidate(dxdy[1])))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (spectrum_compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (value == NULL)
@@ -117,22 +128,22 @@ FloatTextureSample(
 
     if (texture == NULL)
     {
-        *value = (float_t)0.0;
+        *value = NULL;
         return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = texture->vtable->sample_routine(texture->data,
-                                                     model_hit_point,
-                                                     additional_data,
-                                                     texture_coordinates,
+                                                     direction,
+                                                     dxdy,
+                                                     spectrum_compositor,
                                                      value);
 
     return status;
 }
 
 void
-FloatTextureRetain(
-    _In_opt_ PFLOAT_TEXTURE texture
+SpectrumTextureRetain(
+    _In_opt_ PSPECTRUM_TEXTURE texture
     )
 {
     if (texture == NULL)
@@ -144,8 +155,8 @@ FloatTextureRetain(
 }
 
 void
-FloatTextureRelease(
-    _In_opt_ _Post_invalid_ PFLOAT_TEXTURE texture
+SpectrumTextureRelease(
+    _In_opt_ _Post_invalid_ PSPECTRUM_TEXTURE texture
     )
 {
     if (texture == NULL)

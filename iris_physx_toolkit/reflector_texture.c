@@ -108,7 +108,7 @@ ReflectorTextureSample(
 {
     if (!PointValidate(model_hit_point))
     {
-        return ISTATUS_INVALID_ARGUMENT_00;
+        return ISTATUS_INVALID_ARGUMENT_01;
     }
 
     if (reflector_compositor == NULL)
