@@ -154,6 +154,25 @@ cc_library(
 )
 
 cc_library(
+    name = "fresnel_bsdf",
+    srcs = ["fresnel_bsdf.c"],
+    hdrs = ["fresnel_bsdf.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
+    name = "image_spectrum_texture",
+    srcs = ["image_spectrum_texture.c"],
+    hdrs = ["image_spectrum_texture.h"],
+    deps = [
+        ":spectrum_texture",
+        ":mipmap",
+    ],
+)
+
+cc_library(
     name = "image_texture",
     srcs = ["image_texture.c"],
     hdrs = ["image_texture.h"],
@@ -162,15 +181,6 @@ cc_library(
         ":mipmap",
         ":reflector_texture",
         ":uv_texture_coordinate",
-    ],
-)
-
-cc_library(
-    name = "fresnel_bsdf",
-    srcs = ["fresnel_bsdf.c"],
-    hdrs = ["fresnel_bsdf.h"],
-    deps = [
-        "//iris_physx",
     ],
 )
 

@@ -22,6 +22,7 @@ Abstract:
 // Data
 //
 
+extern const float_t iris_inv_two_pi;
 extern const float_t iris_inv_pi;
 extern const float_t iris_pi;
 extern const float_t iris_two_pi;
