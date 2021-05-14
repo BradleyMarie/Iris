@@ -50,6 +50,15 @@ SpectrumCompositorAttenuateSpectrum(
     );
 
 ISTATUS
+SpectrumCompositorAttenuatedAddSpectra(
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_ PCSPECTRUM added_spectrum,
+    _In_ PCSPECTRUM attenuated_spectrum,
+    _In_ float_t attenuation,
+    _Out_ PCSPECTRUM *result
+    );
+
+ISTATUS
 SpectrumCompositorAttenuateReflection(
     _Inout_ PSPECTRUM_COMPOSITOR compositor,
     _In_opt_ PCSPECTRUM spectrum,

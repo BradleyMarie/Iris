@@ -42,6 +42,56 @@ typedef enum _WRAP_MODE {
 // Types
 //
 
+typedef struct _SPECTRUM_MIPMAP SPECTRUM_MIPMAP, *PSPECTRUM_MIPMAP;
+typedef const SPECTRUM_MIPMAP *PCSPECTRUM_MIPMAP;
+
+//
+// Functions
+//
+
+ISTATUS
+SpectrumMipmapAllocate(
+    _In_reads_(height * width) const COLOR3 texels[],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
+    _In_ WRAP_MODE wrap_mode,
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PSPECTRUM_MIPMAP *mipmap
+    );
+
+ISTATUS
+SpectrumMipmapLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    );
+
+ISTATUS
+SpectrumMipmapFilteredLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    );
+
+void
+SpectrumMipmapFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
+    );
+
+//
+// Types
+//
+
 typedef struct _REFLECTOR_MIPMAP REFLECTOR_MIPMAP, *PREFLECTOR_MIPMAP;
 typedef const REFLECTOR_MIPMAP *PCREFLECTOR_MIPMAP;
 

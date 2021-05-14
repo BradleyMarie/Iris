@@ -95,6 +95,59 @@ TEST(SpectrumCompositorTest, SpectrumCompositorAttenateSpectrumErrors)
     SpectrumCompositorFree(compositor);
 }
 
+TEST(SpectrumCompositorTest, SpectrumCompositorAttenatedAddSpectraErrors)
+{
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PSPECTRUM spectrum = (PSPECTRUM)(void*)(uintptr_t)1;
+
+    PCSPECTRUM output;
+    ISTATUS status = SpectrumCompositorAttenuatedAddSpectra(NULL,
+                                                            spectrum,
+                                                            spectrum,
+                                                            2.0,
+                                                            &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_00, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum,
+                                                    spectrum,
+                                                    -1.0,
+                                                    &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum,
+                                                    spectrum,
+                                                    INFINITY,
+                                                    &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum,
+                                                    spectrum,
+                                                    -INFINITY,
+                                                    &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum,
+                                                    spectrum,
+                                                    std::numeric_limits<float_t>::quiet_NaN(),
+                                                    &output);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_03, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum,
+                                                    spectrum,
+                                                    2.0,
+                                                    NULL);
+    EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_04, status);
+
+    SpectrumCompositorFree(compositor);
+}
+
 TEST(SpectrumCompositorTest, SpectrumCompositorAttenuateReflectionErrors)
 {
     PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
@@ -484,6 +537,118 @@ TEST(SpectrumCompositor, SpectrumCompositorAttenuateSpectrum)
 
     SpectrumRelease(root_spectrum0);
     ReflectorRelease(root_reflector0);
+
+    SpectrumCompositorFree(compositor);
+}
+
+TEST(SpectrumCompositor, SpectrumCompositorAttenuatedAddSpectra)
+{
+    PSPECTRUM_COMPOSITOR compositor = SpectrumCompositorAllocate();
+    ASSERT_TRUE(compositor != NULL);
+
+    PSPECTRUM root_spectrum0 = CutoffSpectrumCreate((float_t)1.0,
+                                                    (float_t)1.5);
+    ASSERT_TRUE(NULL != root_spectrum0);
+
+    PSPECTRUM root_spectrum1 = CutoffSpectrumCreate((float_t)2.0,
+                                                    (float_t)2.5);
+    ASSERT_TRUE(NULL != root_spectrum1);
+
+    PCSPECTRUM result;
+    ISTATUS status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                            NULL,
+                                                            NULL,
+                                                            (float_t)0.5,
+                                                            &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    NULL,
+                                                    root_spectrum1,
+                                                    (float_t)0.0,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    root_spectrum0,
+                                                    NULL,
+                                                    (float_t)0.5,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(root_spectrum0, result);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    root_spectrum0,
+                                                    root_spectrum1,
+                                                    (float_t)0.0,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(root_spectrum0, result);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    NULL,
+                                                    root_spectrum1,
+                                                    (float_t)1.0,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(root_spectrum1, result);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    root_spectrum0,
+                                                    root_spectrum1,
+                                                    (float_t)0.5,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t value;
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)2.0, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.0, value);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    NULL,
+                                                    root_spectrum0,
+                                                    (float_t)0.5,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.5, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.0, value);
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 root_spectrum1,
+                                                 (float_t)0.5,
+                                                 &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    root_spectrum0,
+                                                    result,
+                                                    (float_t)0.5,
+                                                    &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = SpectrumSample(result, (float_t)1.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)1.5, value);
+
+    status = SpectrumSample(result, (float_t)2.0, &value);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    EXPECT_EQ((float_t)0.5, value);
+
+    SpectrumRelease(root_spectrum0);
+    SpectrumRelease(root_spectrum1);
 
     SpectrumCompositorFree(compositor);
 }

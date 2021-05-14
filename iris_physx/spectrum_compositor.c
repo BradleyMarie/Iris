@@ -85,6 +85,42 @@ SumSpectrumSample(
 
 static
 ISTATUS
+AttenuatedSumSpectrumReflect(
+    _In_ const void *context,
+    _In_ float_t wavelength,
+    _Out_ float_t *intensity
+    )
+{
+    PCATTENUATED_SUM_SPECTRUM spectrum = (PCATTENUATED_SUM_SPECTRUM)context;
+
+    float_t added_intensity;
+    ISTATUS status = SpectrumSampleInline(spectrum->added_spectrum,
+                                          wavelength,
+                                          &added_intensity);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float_t attenuated_intensity;
+    status = SpectrumSampleInline(spectrum->attenuated_spectrum,
+                                  wavelength,
+                                  &attenuated_intensity);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *intensity =
+        added_intensity + attenuated_intensity * spectrum->attenuation;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 AttenuatedReflectionSpectrumSample(
     _In_ const void *context,
     _In_ float_t wavelength,
@@ -130,6 +166,11 @@ const static SPECTRUM_VTABLE sum_spectrum_vtable = {
 
 const static SPECTRUM_VTABLE attenuated_spectrum_vtable = {
     AttenuatedSpectrumSample,
+    NULL
+};
+
+const static SPECTRUM_VTABLE attenuated_sum_spectrum_vtable = {
+    AttenuatedSumSpectrumReflect,
     NULL
 };
 
@@ -358,6 +399,92 @@ SpectrumCompositorAttenuateSpectrum(
                                                 attenuated_spectrum);
 
     return status;
+}
+
+ISTATUS
+SpectrumCompositorAttenuatedAddSpectra(
+    _Inout_ PSPECTRUM_COMPOSITOR compositor,
+    _In_ PCSPECTRUM added_spectrum,
+    _In_ PCSPECTRUM attenuated_spectrum,
+    _In_ float_t attenuation,
+    _Out_ PCSPECTRUM *result
+    )
+{
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if(!isfinite(attenuation) || attenuation < (float_t)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (added_spectrum == NULL)
+    {
+        if (attenuated_spectrum == NULL)
+        {
+            *result = NULL;
+            return ISTATUS_SUCCESS;
+        }
+
+        ISTATUS status = AttenuatedSpectrumAllocate(compositor,
+                                                    attenuated_spectrum,
+                                                    attenuation,
+                                                    result);
+
+        return status;
+    }
+
+    if (attenuated_spectrum == NULL)
+    {
+        *result = added_spectrum;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (attenuated_spectrum->vtable == (const void*)&attenuated_spectrum_vtable)
+    {
+        PCATTENUATED_SPECTRUM spectrum0 =
+            (PCATTENUATED_SPECTRUM)attenuated_spectrum;
+
+        attenuated_spectrum = spectrum0->spectrum;
+        attenuation *= spectrum0->attenuation;
+    }
+
+    if (attenuation == (float_t)0.0)
+    {
+        *result = added_spectrum;
+        return ISTATUS_SUCCESS;
+    }
+
+    void *allocation;
+    bool success = StaticMemoryAllocatorAllocate(
+        &compositor->attenuated_sum_spectrum_allocator, &allocation);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PATTENUATED_SUM_SPECTRUM allocated_spectrum =
+        (PATTENUATED_SUM_SPECTRUM)allocation;
+
+    InternalSpectrumInitialize(&allocated_spectrum->header,
+                               &attenuated_sum_spectrum_vtable,
+                               allocated_spectrum);
+
+    allocated_spectrum->added_spectrum = added_spectrum;
+    allocated_spectrum->attenuated_spectrum = attenuated_spectrum;
+    allocated_spectrum->attenuation = attenuation;
+
+    *result = &allocated_spectrum->header;
+
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS

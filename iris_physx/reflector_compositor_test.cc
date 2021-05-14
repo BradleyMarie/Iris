@@ -371,7 +371,7 @@ TEST(ReflectorCompositor, ReflectorCompositorAttenuatedAddReflectors)
     EXPECT_EQ((float_t)0.125, value);
 
     ReflectorRelease(root_reflector0);
-    ReflectorRelease(root_reflector0);
+    ReflectorRelease(root_reflector1);
 
     ReflectorCompositorFree(compositor);
 }

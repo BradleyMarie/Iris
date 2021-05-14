@@ -27,31 +27,6 @@ Abstract:
 #define EWA_LUT_SIZE 128
 
 //
-// Types
-//
-
-typedef struct _REFLECTOR_MIPMAP_LEVEL {
-    _Field_size_(width * height) PREFLECTOR *texels;
-    size_t width;
-    size_t height;
-    float_t width_fp;
-    float_t height_fp;
-    float_t texel_width;
-    float_t texel_height;
-} REFLECTOR_MIPMAP_LEVEL, *PREFLECTOR_MIPMAP_LEVEL;
-
-typedef const struct REFLECTOR_MIPMAP_LEVEL *PCREFLECTOR_MIPMAP_LEVEL;
-
-struct _REFLECTOR_MIPMAP {
-    _Field_size_(num_levels) PREFLECTOR_MIPMAP_LEVEL levels;
-    size_t num_levels;
-    TEXTURE_FILTERING_ALGORITHM texture_filtering;
-    WRAP_MODE wrap_mode;
-    float_t max_anisotropy;
-    float_t last_level_index_fp;
-};
-
-//
 // Static Data
 //
 
@@ -277,6 +252,984 @@ DownsampleColors(
 
     return colors;
 }
+
+//
+// Spectrum Mipmap Types
+//
+
+typedef struct _SPECTRUM_MIPMAP_LEVEL {
+    _Field_size_(width * height) PSPECTRUM *texels;
+    size_t width;
+    size_t height;
+    float_t width_fp;
+    float_t height_fp;
+    float_t texel_width;
+    float_t texel_height;
+} SPECTRUM_MIPMAP_LEVEL, *PSPECTRUM_MIPMAP_LEVEL;
+
+typedef const struct SPECTRUM_MIPMAP_LEVEL *PCSPECTRUM_MIPMAP_LEVEL;
+
+struct _SPECTRUM_MIPMAP {
+    _Field_size_(num_levels) PSPECTRUM_MIPMAP_LEVEL levels;
+    size_t num_levels;
+    TEXTURE_FILTERING_ALGORITHM texture_filtering;
+    WRAP_MODE wrap_mode;
+    float_t max_anisotropy;
+    float_t last_level_index_fp;
+};
+
+//
+// Spectrum Mipmap Static Functions
+//
+
+static
+PCSPECTRUM
+SpectrumMipmapLookupTexel(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t
+    )
+{
+    if (mipmap->wrap_mode == WRAP_MODE_REPEAT)
+    {
+#if FLT_EVAL_METHOD	== 0
+        float s_intpart, t_intpart;
+        s = modff(s, &s_intpart);
+        t = modff(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 1
+        double s_intpart, t_intpart;
+        s = modf(s, &s_intpart);
+        t = modf(t, &t_intpart);
+#elif FLT_EVAL_METHOD == 2
+        long double s_intpart, t_intpart;
+        s = modfl(s, &s_intpart);
+        t = modfl(t, &t_intpart);
+#endif
+
+        if (s < (float_t)0.0)
+        {
+            s = (float_t)1.0 + s;
+        }
+
+        if (t < (float_t)0.0)
+        {
+            t = (float_t)1.0 + t;
+        }
+    }
+    else if (mipmap->wrap_mode == WRAP_MODE_CLAMP)
+    {
+        s = IMin(IMax((float_t)0.0, s), (float_t)1.0);
+        t = IMin(IMax((float_t)0.0, t), (float_t)1.0);
+    }
+    else if (s < (float_t)0.0 || (float_t)1.0 < s ||
+             t < (float_t)0.0 || (float_t)1.0 < t)
+    {
+        assert(mipmap->wrap_mode == WRAP_MODE_BLACK);
+        return NULL;
+    }
+
+    size_t x = (size_t)floor(mipmap->levels[level].width_fp * s);
+
+    if (x == mipmap->levels[level].width)
+    {
+        x -= 1;
+    }
+
+    size_t y = (size_t)floor(mipmap->levels[level].height_fp * t);
+
+    if (y == mipmap->levels[level].height)
+    {
+        y -= 1;
+    }
+
+    return mipmap->levels[level].texels[y * mipmap->levels[level].width + x];
+}
+
+static
+ISTATUS
+SpectrumMipmapLookupWithTriangleFilter(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    if (mipmap->num_levels <= level)
+    {
+        level = mipmap->num_levels - 1;
+    }
+
+    float_t scaled_s = s * mipmap->levels[level].width_fp;
+    float_t scaled_t = t * mipmap->levels[level].height_fp;
+
+    float_t scaled_s0 = floor(scaled_s - (float_t)0.5) + (float_t)0.5;
+    float_t scaled_t0 = floor(scaled_t - (float_t)0.5) + (float_t)0.5;
+
+    float_t s0 = scaled_s0 * mipmap->levels[level].texel_width;
+    float_t t0 = scaled_t0 * mipmap->levels[level].texel_height;
+
+    float_t ds = scaled_s - scaled_s0;
+    float_t dt = scaled_t - scaled_t0;
+
+    ds = IMax((float_t)0.0, IMin(ds, (float_t)1.0));
+    dt = IMax((float_t)0.0, IMin(dt, (float_t)1.0));
+
+    float_t one_minus_ds = (float_t)1.0 - ds;
+    float_t one_minus_dt = (float_t)1.0 - dt;
+
+    float_t s1 = s0 + mipmap->levels[level].texel_width;
+    float_t t1 = t0 + mipmap->levels[level].texel_height;
+
+    PCSPECTRUM texel = SpectrumMipmapLookupTexel(mipmap, level, s0, t0);
+
+    PCSPECTRUM result;
+    ISTATUS status =
+        SpectrumCompositorAttenuateSpectrum(compositor,
+                                            texel,
+                                            one_minus_ds * one_minus_dt,
+                                            &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = SpectrumMipmapLookupTexel(mipmap, level, s0, t1);
+
+    status =
+        SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                               result,
+                                               texel,
+                                               one_minus_ds * dt,
+                                               &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = SpectrumMipmapLookupTexel(mipmap, level, s1, t0);
+
+    status =
+        SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                               result,
+                                               texel,
+                                               ds * one_minus_dt,
+                                               &result);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    texel = SpectrumMipmapLookupTexel(mipmap, level, s1, t1);
+
+    status =
+        SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                               result,
+                                               texel,
+                                               ds * dt,
+                                               spectrum);
+
+    return status;
+}
+
+ISTATUS
+SpectrumMipmapLookupTextureFilteringNone(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    *spectrum = SpectrumMipmapLookupTexel(mipmap, 0, s, t);
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+SpectrumMipmapLookupTextureFilteringTrilinear(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    dsdx = fabs(dsdx);
+    dsdy = fabs(dsdy);
+    dtdx = fabs(dtdx);
+    dtdy = fabs(dtdy);
+
+    float_t max = IMax(dsdx, IMax(dsdy, IMax(dtdx, dtdy)));
+    float_t level =
+        mipmap->last_level_index_fp + FloatTLog2(IMax(max, (float_t)1e-8));
+
+    if (level < (float_t)0.0)
+    {
+        ISTATUS status =
+            SpectrumMipmapLookupWithTriangleFilter(mipmap,
+                                                   0,
+                                                   s,
+                                                   t,
+                                                   compositor,
+                                                   spectrum);
+
+        return status;
+    }
+
+    if (level >= mipmap->last_level_index_fp)
+    {
+        ISTATUS status =
+            SpectrumMipmapLookupWithTriangleFilter(mipmap,
+                                                   mipmap->num_levels - 1,
+                                                   s,
+                                                   t,
+                                                   compositor,
+                                                   spectrum);
+
+        return status;
+    }
+
+#if FLT_EVAL_METHOD	== 0
+    float delta, level0;
+    delta = modff(level, &level0);
+#elif FLT_EVAL_METHOD == 1
+    double delta, level0;
+    delta = modf(level, &level0);
+#elif FLT_EVAL_METHOD == 2
+    long double delta, level0;
+    delta = modfl(level, &level0);
+#endif
+
+    PCSPECTRUM spectrum0;
+    ISTATUS status =
+        SpectrumMipmapLookupWithTriangleFilter(mipmap,
+                                               (size_t)level0,
+                                               s,
+                                               t,
+                                               compositor,
+                                               &spectrum0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PCSPECTRUM spectrum1;
+    status =
+        SpectrumMipmapLookupWithTriangleFilter(mipmap,
+                                               (size_t)level0 + 1,
+                                               s,
+                                               t,
+                                               compositor,
+                                               &spectrum1);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 spectrum0,
+                                                 delta,
+                                                 &spectrum0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    spectrum0,
+                                                    spectrum1,
+                                                    (float_t)1.0 - delta,
+                                                    spectrum);
+
+    return status;
+}
+
+static
+ISTATUS
+SpectrumMipmapEwa(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ const float_t cdst0[2],
+    _In_ const float_t cdst1[2],
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    if (mipmap->num_levels <= level)
+    {
+        *spectrum = SpectrumMipmapLookupTexel(mipmap,
+                                              mipmap->num_levels - 1,
+                                              s,
+                                              t);
+
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t dst0[2] = { cdst0[0], cdst0[1] };
+    float_t dst1[2] = { cdst1[0], cdst1[1] };
+
+    s = s * mipmap->levels[level].width_fp - (float_t)0.5;
+    t = t * mipmap->levels[level].height_fp - (float_t)0.5;
+    dst0[0] *= mipmap->levels[level].width_fp;
+    dst0[1] *= mipmap->levels[level].height_fp;
+    dst1[0] *= mipmap->levels[level].width_fp;
+    dst1[1] *= mipmap->levels[level].height_fp;
+
+    float_t a = dst0[1] * dst0[1] + dst1[1] * dst1[1] + (float_t)1.0;
+    float_t b = (float_t)-2.0 * (dst0[0] * dst0[1] + dst1[0] * dst1[1]);
+    float_t c = dst0[0] * dst0[0] + dst1[0] * dst1[0] + (float_t)1.0;
+    float_t inv_f = (float_t)1.0 / (a * c - b * b * (float_t)0.25);
+
+    a *= inv_f;
+    b *= inv_f;
+    c *= inv_f;
+
+    float_t det = -b * b + (float_t)4.0 * a * c;
+    float_t inv_det = (float_t)1.0 / det;
+
+    float_t u_sqrt = sqrt(det * c);
+    float_t v_sqrt = sqrt(a * det);
+
+    int s0 = (int)ceil(s - (float_t)2.0 * inv_det * u_sqrt);
+    int s1 = (int)floor(s + (float_t)2.0 * inv_det * u_sqrt);
+    int t0 = (int)ceil(t - (float_t)2.0 * inv_det * v_sqrt);
+    int t1 = (int)floor(t + (float_t)2.0 * inv_det * v_sqrt);
+
+    PCSPECTRUM sum = NULL;
+    float_t sum_weights = (float_t)0.0;
+    for (int it = t0; it <= t1; it += 1)
+    {
+        float_t tt = (float_t)(it - t);
+        for (int is = s0; is <= s1; is += 1)
+        {
+            float_t ss = (float_t)(is - s);
+            float_t r2 = a * ss * ss + b * ss * tt + c * tt * tt;
+
+            if (r2 < (float_t)1.0)
+            {
+                assert ((float_t)0.0 <= r2);
+
+                size_t index = (size_t)(r2 * (float_t)EWA_LUT_SIZE);
+                if (index == EWA_LUT_SIZE)
+                {
+                    index = EWA_LUT_SIZE - 1;
+                }
+
+                float_t sample_s =
+                    (float_t)is * mipmap->levels[level].texel_width;
+                float_t sample_t =
+                    (float_t)it * mipmap->levels[level].texel_height;
+
+                PCSPECTRUM value = SpectrumMipmapLookupTexel(mipmap,
+                                                             level,
+                                                             sample_s,
+                                                             sample_t);
+
+                float_t weight = ewa_lookup_table[index];
+
+                ISTATUS status =
+                    SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                           sum,
+                                                           value,
+                                                           weight,
+                                                           &sum);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+
+                sum_weights += weight;
+            }
+        }
+    }
+
+    ISTATUS status =
+        SpectrumCompositorAttenuateSpectrum(compositor,
+                                            sum,
+                                            (float_t)1.0 / sum_weights,
+                                            spectrum);
+
+    return status;
+}
+
+static
+ISTATUS
+SpectrumMipmapLookupTextureFilteringEwa(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    float_t dst0[2] = { dsdx, dtdx };
+    float_t dst1[2] = { dsdy, dtdy };
+
+    float_t len_dst0_sq = dst0[0] * dst0[0] + dst0[1] * dst0[1];
+    float_t len_dst1_sq = dst1[0] * dst1[0] + dst1[1] * dst1[1];
+
+    if (len_dst0_sq < len_dst1_sq)
+    {
+        float_t temp;
+        temp = dst0[0];
+        dst0[0] = dst1[0];
+        dst1[0] = temp;
+
+        temp = dst0[1];
+        dst0[1] = dst1[1];
+        dst1[1] = temp;
+
+        temp = len_dst0_sq;
+        len_dst0_sq = len_dst1_sq;
+        len_dst1_sq = temp;
+    }
+
+    float_t major_length = sqrt(len_dst0_sq);
+    float_t minor_length = sqrt(len_dst1_sq);
+
+    float_t scaled_minor_length = minor_length * mipmap->max_anisotropy;
+    if (scaled_minor_length < major_length && (float_t)0.0 < minor_length)
+    {
+        float_t scale = major_length / scaled_minor_length;
+        dsdx *= scale;
+        dsdy *= scale;
+        minor_length *= scale;
+    }
+
+    if (minor_length == (float_t)0.0)
+    {
+        *spectrum = SpectrumMipmapLookupTexel(mipmap, 0, s, t);
+        return ISTATUS_SUCCESS;
+    }
+
+    float_t lod = IMax((float_t)0.0,
+                        mipmap->last_level_index_fp + FloatTLog2(minor_length));
+    float_t lod_floor = floor(lod);
+    size_t level = (size_t)lod_floor;
+
+    PCSPECTRUM v0;
+    ISTATUS status = SpectrumMipmapEwa(mipmap,
+                                       level,
+                                       s,
+                                       t,
+                                       dst0,
+                                       dst1,
+                                       compositor,
+                                       &v0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    PCSPECTRUM v1;
+    status = SpectrumMipmapEwa(mipmap,
+                               level + 1,
+                               s,
+                               t,
+                               dst0,
+                               dst1,
+                               compositor,
+                               &v1);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float_t delta = lod - lod_floor;
+
+    status = SpectrumCompositorAttenuateSpectrum(compositor,
+                                                 v0,
+                                                 (float_t)1.0 - delta,
+                                                 &v0);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = SpectrumCompositorAttenuatedAddSpectra(compositor,
+                                                    v0,
+                                                    v1,
+                                                    delta,
+                                                    spectrum);
+
+    return status;
+}
+
+static
+bool
+SpectrumMipmapAllocateInternal(
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
+    _In_ WRAP_MODE wrap_mode,
+    _Out_ PSPECTRUM_MIPMAP *mipmap
+    )
+{
+    assert(width != 0);
+    assert(height != 0);
+    assert(mipmap != NULL);
+    assert(texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR ||
+           texture_filtering == TEXTURE_FILTERING_ALGORITHM_EWA);
+    assert(isfinite(max_anisotropy) && (float_t)0.0 < max_anisotropy);
+    assert(wrap_mode == WRAP_MODE_REPEAT ||
+           wrap_mode == WRAP_MODE_BLACK ||
+           wrap_mode == WRAP_MODE_CLAMP);
+
+    size_t num_pixels;
+    bool success = CheckedMultiplySizeT(width, height, &num_pixels);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    PSPECTRUM_MIPMAP result =
+        (PSPECTRUM_MIPMAP)malloc(sizeof(SPECTRUM_MIPMAP));
+
+    if (result == NULL)
+    {
+        return false;
+    }
+
+    size_t width_log_2 = SizeTLog2(width);
+    size_t height_log_2 = SizeTLog2(height);
+
+    size_t num_levels = 1;
+    if (width_log_2 < height_log_2)
+    {
+        num_levels += width_log_2;
+    }
+    else
+    {
+        num_levels += height_log_2;
+    }
+
+    PSPECTRUM_MIPMAP_LEVEL levels =
+        (PSPECTRUM_MIPMAP_LEVEL)calloc(num_levels, sizeof(SPECTRUM_MIPMAP_LEVEL));
+
+    if (levels == NULL)
+    {
+        free(result);
+        return false;
+    }
+
+    result->levels = levels;
+    result->num_levels = num_levels;
+    result->texture_filtering = texture_filtering;
+    result->wrap_mode = wrap_mode;
+    result->max_anisotropy = max_anisotropy;
+    result->last_level_index_fp = num_levels - 1;
+
+    for (size_t i = 0; i < num_levels; i++)
+    {
+        PSPECTRUM *texels =
+            (PSPECTRUM*)calloc(width * height, sizeof(PSPECTRUM));
+
+        if (texels == NULL)
+        {
+            SpectrumMipmapFree(result);
+            return false;
+        }
+
+        levels[i].texels = texels;
+        levels[i].width = width;
+        levels[i].height = height;
+        levels[i].width_fp = (float_t)width;
+        levels[i].height_fp = (float_t)height;
+        levels[i].texel_width = (float_t)1.0 / (float_t)width;
+        levels[i].texel_height = (float_t)1.0 / (float_t)height;
+
+        width /= 2;
+        height /= 2;
+    }
+
+    *mipmap = result;
+
+    return true;
+}
+
+//
+// Spectrum Mipmap Functions
+//
+
+ISTATUS
+SpectrumMipmapAllocate(
+    _In_reads_(height * width) const COLOR3 texels[],
+    _In_ size_t width,
+    _In_ size_t height,
+    _In_ TEXTURE_FILTERING_ALGORITHM texture_filtering,
+    _In_ float_t max_anisotropy,
+    _In_ WRAP_MODE wrap_mode,
+    _Inout_ PCOLOR_EXTRAPOLATOR color_extrapolator,
+    _Out_ PSPECTRUM_MIPMAP *mipmap
+    )
+{
+    if (texels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (width == 0 || (width & (width - 1)) != 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (height == 0 || (height & (height - 1)) != 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (texture_filtering != TEXTURE_FILTERING_ALGORITHM_NONE &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_TRILINEAR &&
+        texture_filtering != TEXTURE_FILTERING_ALGORITHM_EWA)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (!isfinite(max_anisotropy) || max_anisotropy <= (float_t)0.0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (wrap_mode != WRAP_MODE_REPEAT &&
+        wrap_mode != WRAP_MODE_BLACK &&
+        wrap_mode != WRAP_MODE_CLAMP)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (color_extrapolator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    PSPECTRUM_MIPMAP result;
+    bool success = SpectrumMipmapAllocateInternal(width,
+                                                  height,
+                                                  texture_filtering,
+                                                  max_anisotropy,
+                                                  wrap_mode,
+                                                  &result);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    ISTATUS status =
+        ColorExtrapolatorPrepareToComputeSpectra(color_extrapolator,
+                                                 width * height);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        SpectrumMipmapFree(result);
+        return status;
+    }
+
+    for (size_t i = 0; i < width * height; i++)
+    {
+        if (!ColorValidate(texels[i]))
+        {
+            SpectrumMipmapFree(result);
+            return ISTATUS_INVALID_ARGUMENT_00;
+        }
+
+        status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                                  texels[i],
+                                                  result->levels[0].texels + i);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            SpectrumMipmapFree(result);
+            return status;
+        }
+    }
+
+    PCOLOR3 working = NULL;
+    PCCOLOR3 working_const = texels;
+    for (size_t i = 1; i < result->num_levels; i++)
+    {
+        PCOLOR3 new_working = DownsampleColors(working_const,
+                                               result->levels[i - 1].width,
+                                               result->levels[i - 1].height,
+                                               &result->levels[i].width,
+                                               &result->levels[i].height);
+
+        free(working);
+
+        if (new_working == NULL)
+        {
+            SpectrumMipmapFree(result);
+            return ISTATUS_ALLOCATION_FAILED;
+        }
+
+        working_const = new_working;
+        working = new_working;
+
+        size_t num_samples = result->levels[i].height * result->levels[i].width;
+
+        status =
+            ColorExtrapolatorPrepareToComputeSpectra(color_extrapolator,
+                                                     num_samples);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            free(working);
+            SpectrumMipmapFree(result);
+            return status;
+        }
+
+        for (size_t j = 0; j < num_samples; j++)
+        {
+            status =
+                ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                                 working[j],
+                                                 result->levels[i].texels + j);
+
+            if (status != ISTATUS_SUCCESS)
+            {
+                free(working);
+                SpectrumMipmapFree(result);
+                return status;
+            }
+        }
+    }
+
+    free(working);
+
+    *mipmap = result;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+SpectrumMipmapLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(s))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(t))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    ISTATUS status =
+        SpectrumMipmapLookupTextureFilteringNone(mipmap,
+                                                 s,
+                                                 t,
+                                                 compositor,
+                                                 spectrum);
+
+    return status;
+}
+
+ISTATUS
+SpectrumMipmapFilteredLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ float_t s,
+    _In_ float_t t,
+    _In_ float_t dsdx,
+    _In_ float_t dsdy,
+    _In_ float_t dtdx,
+    _In_ float_t dtdy,
+    _In_ PSPECTRUM_COMPOSITOR compositor,
+    _Out_ PCSPECTRUM *spectrum
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!isfinite(s))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!isfinite(t))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (!isfinite(dsdx))
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (!isfinite(dsdy))
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (!isfinite(dtdx))
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (!isfinite(dtdy))
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_NONE)
+    {
+        ISTATUS status =
+            SpectrumMipmapLookupTextureFilteringNone(mipmap,
+                                                     s,
+                                                     t,
+                                                     compositor,
+                                                     spectrum);
+
+        return status;
+    }
+    else if (mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_TRILINEAR)
+    {
+        ISTATUS status =
+            SpectrumMipmapLookupTextureFilteringTrilinear(mipmap,
+                                                          s,
+                                                          t,
+                                                          dsdx,
+                                                          dsdy,
+                                                          dtdx,
+                                                          dtdy,
+                                                          compositor,
+                                                          spectrum);
+
+        return status;
+    }
+
+    assert(mipmap->texture_filtering == TEXTURE_FILTERING_ALGORITHM_EWA);
+    ISTATUS status =
+        SpectrumMipmapLookupTextureFilteringEwa(mipmap,
+                                                s,
+                                                t,
+                                                dsdx,
+                                                dsdy,
+                                                dtdx,
+                                                dtdy,
+                                                compositor,
+                                                spectrum);
+
+    return status;
+}
+
+void
+SpectrumMipmapFree(
+    _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
+    )
+{
+    if (mipmap == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < mipmap->num_levels; i++)
+    {
+        for (size_t j = 0;
+             j < mipmap->levels[i].height * mipmap->levels[i].width;
+             j++)
+        {
+            SpectrumRelease(mipmap->levels[i].texels[j]);
+        }
+
+        free(mipmap->levels[i].texels);
+    }
+
+    free(mipmap->levels);
+    free(mipmap);
+}
+
+//
+// Reflector Mipmap Types
+//
+
+typedef struct _REFLECTOR_MIPMAP_LEVEL {
+    _Field_size_(width * height) PREFLECTOR *texels;
+    size_t width;
+    size_t height;
+    float_t width_fp;
+    float_t height_fp;
+    float_t texel_width;
+    float_t texel_height;
+} REFLECTOR_MIPMAP_LEVEL, *PREFLECTOR_MIPMAP_LEVEL;
+
+typedef const struct REFLECTOR_MIPMAP_LEVEL *PCREFLECTOR_MIPMAP_LEVEL;
+
+struct _REFLECTOR_MIPMAP {
+    _Field_size_(num_levels) PREFLECTOR_MIPMAP_LEVEL levels;
+    size_t num_levels;
+    TEXTURE_FILTERING_ALGORITHM texture_filtering;
+    WRAP_MODE wrap_mode;
+    float_t max_anisotropy;
+    float_t last_level_index_fp;
+};
+
+//
+// Reflector Static Functions
+//
 
 static
 PCREFLECTOR
@@ -870,7 +1823,7 @@ ReflectorMipmapAllocateInternal(
 }
 
 //
-// Functions
+// Reflector Mipmap Functions
 //
 
 ISTATUS
@@ -1199,7 +2152,7 @@ ReflectorMipmapFree(
 }
 
 //
-// Types
+// Float Mipmap Types
 //
 
 typedef struct _FLOAT_MIPMAP_LEVEL {
@@ -1224,7 +2177,7 @@ struct _FLOAT_MIPMAP {
 };
 
 //
-// Static Functions
+// Float Mipmap Static Functions
 //
 
 static
@@ -1703,7 +2656,7 @@ FloatMipmapLookupTextureFilteringEwa(
 }
 
 //
-// Functions
+// Float Mipmap Functions
 //
 
 ISTATUS
