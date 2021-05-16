@@ -142,6 +142,30 @@ cc_test(
 )
 
 cc_test(
+    name = "environmental_light",
+    srcs = ["environmental_light.cc"],
+    data = [
+        "//test_results:blue.pfm",
+    ],
+    deps = [
+        "//iris_advanced_toolkit:pcg_random",
+        "//iris_camera_toolkit:grid_image_sampler",
+        "//iris_camera_toolkit:pinhole_camera",
+        "//iris_physx_toolkit:all_light_sampler",
+        "//iris_physx_toolkit:constant_spectrum_texture",
+        "//iris_physx_toolkit:infinite_environmental_light",
+        "//iris_physx_toolkit:kd_tree_scene",
+        "//iris_physx_toolkit:list_scene",
+        "//iris_physx_toolkit:path_tracer",
+        "//iris_physx_toolkit:sample_tracer",
+        "//iris_physx_toolkit:spectrum_texture",
+        "//test_util:pfm",
+        "//test_util:spectra",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "single_sphere",
     srcs = ["single_sphere.cc"],
     data = [
