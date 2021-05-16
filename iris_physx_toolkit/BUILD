@@ -109,6 +109,15 @@ cc_library(
 )
 
 cc_library(
+    name = "constant_spectrum_texture",
+    srcs = ["constant_spectrum_texture.c"],
+    hdrs = ["constant_spectrum_texture.h"],
+    deps = [
+        ":spectrum_texture",
+    ],
+)
+
+cc_library(
     name = "constant_texture",
     srcs = ["constant_texture.c"],
     hdrs = ["constant_texture.h"],
