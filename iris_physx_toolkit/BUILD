@@ -194,6 +194,17 @@ cc_library(
 )
 
 cc_library(
+    name = "infinite_environmental_light",
+    srcs = ["infinite_environmental_light.c"],
+    hdrs = ["infinite_environmental_light.h"],
+    deps = [
+        ":spectrum_texture",
+        "//iris_advanced_toolkit:sample_geometry",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "interpolated_spectrum",
     srcs = ["interpolated_spectrum.c"],
     hdrs = ["interpolated_spectrum.h"],

@@ -29,6 +29,13 @@ SampleHemisphereWithCosineWeighting(
     );
 
 ISTATUS
+SampleHemisphereUniformly(
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Out_ PVECTOR3 result
+    );
+
+ISTATUS
 SampleSphereUniformly(
     _In_ float_t radius,
     _Inout_ PRANDOM rng,

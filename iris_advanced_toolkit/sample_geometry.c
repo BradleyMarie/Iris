@@ -103,6 +103,61 @@ SampleHemisphereWithCosineWeighting(
 }
 
 ISTATUS
+SampleHemisphereUniformly(
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Out_ PVECTOR3 result
+    )
+{
+    if (!VectorValidate(surface_normal))
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (result == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    float_t z;
+    ISTATUS status = RandomGenerateFloat(rng,
+                                         (float_t)0.0,
+                                         (float_t)1.0,
+                                         &z);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float_t theta;
+    status = RandomGenerateFloat(rng, -iris_pi, iris_pi, &theta);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    float_t radius = sqrt((float_t)1.0 - z * z);
+
+    float_t sin_theta, cos_theta;
+    SinCos(theta, &sin_theta, &cos_theta);
+
+    float_t x = radius * cos_theta;
+    float_t y = radius * sin_theta;
+
+    *result = VectorCreate(x, y, z);
+    *result = TransformVector(surface_normal, *result);
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
 SampleSphereUniformly(
     _In_ float_t radius,
     _Inout_ PRANDOM rng,
