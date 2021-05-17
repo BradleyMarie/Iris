@@ -16,7 +16,6 @@ Abstract:
 
 #include "iris/multiply_internal.h"
 
-//IRISAPI
 VECTOR3
 VectorMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -31,7 +30,6 @@ VectorMatrixMultiply(
     return VectorMatrixMultiplyInline(matrix, vector);
 }
 
-//IRISAPI
 VECTOR3
 VectorMatrixTransposedMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -46,7 +44,6 @@ VectorMatrixTransposedMultiply(
     return VectorMatrixTransposedMultiplyInline(matrix, vector);
 }
 
-//IRISAPI
 VECTOR3
 VectorMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -61,7 +58,6 @@ VectorMatrixInverseMultiply(
     return VectorMatrixInverseMultiplyInline(matrix, vector);
 }
 
-//IRISAPI
 VECTOR3
 VectorMatrixInverseTransposedMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -76,7 +72,6 @@ VectorMatrixInverseTransposedMultiply(
     return VectorMatrixInverseTransposedMultiplyInline(matrix, vector);
 }
 
-//IRISAPI
 POINT3
 PointMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -91,7 +86,6 @@ PointMatrixMultiply(
     return PointMatrixMultiplyInline(matrix, point);
 }
 
-//IRISAPI
 POINT3
 PointMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -106,7 +100,6 @@ PointMatrixInverseMultiply(
     return PointMatrixInverseMultiplyInline(matrix, point);
 }
 
-//IRISAPI
 RAY
 RayMatrixMultiply(
     _In_opt_ PCMATRIX matrix,
@@ -121,7 +114,6 @@ RayMatrixMultiply(
     return RayMatrixMultiplyInline(matrix, ray);
 }
 
-//IRISAPI
 RAY
 RayMatrixInverseMultiply(
     _In_opt_ PCMATRIX matrix,

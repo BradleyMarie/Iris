@@ -23,6 +23,7 @@ Abstract:
 
 typedef struct _INFINITE_LIGHT {
     PSPECTRUM_TEXTURE texture;
+    PMATRIX light_to_world;
 } INFINITE_LIGHT, *PINFINITE_LIGHT;
 
 typedef const INFINITE_LIGHT *PCINFINITE_LIGHT;
@@ -45,9 +46,14 @@ InfiniteEnvironmentalLightSample(
 {
     PCINFINITE_LIGHT infinite_light = (PCINFINITE_LIGHT)context;
 
-    ISTATUS status = SampleHemisphereUniformly(surface_normal,
+    VECTOR3 model_normal =
+        VectorMatrixTransposedMultiply(infinite_light->light_to_world,
+                                       surface_normal);
+
+    VECTOR3 model_to_light;
+    ISTATUS status = SampleHemisphereUniformly(model_normal,
                                                rng,
-                                               to_light);
+                                               &model_to_light);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -55,14 +61,21 @@ InfiniteEnvironmentalLightSample(
     }
 
     status = SpectrumTextureSample(infinite_light->texture,
-                                   *to_light,
+                                   model_to_light,
                                    NULL,
                                    compositor,
                                    spectrum);
 
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *to_light = VectorMatrixMultiply(infinite_light->light_to_world,
+                                     model_to_light);
     *pdf = iris_inv_two_pi;
 
-    return status;
+    return ISTATUS_SUCCESS;
 }
 
 static
@@ -76,8 +89,12 @@ InfiniteEnvironmentalLightComputeEmissive(
 {
     PCINFINITE_LIGHT infinite_light = (PCINFINITE_LIGHT)context;
 
+    VECTOR3 model_to_light =
+        VectorMatrixInverseMultiply(infinite_light->light_to_world,
+                                    to_light);
+
     ISTATUS status = SpectrumTextureSample(infinite_light->texture,
-                                           to_light,
+                                           model_to_light,
                                            NULL,
                                            compositor,
                                            spectrum);
@@ -97,8 +114,12 @@ InfiniteEnvironmentalLightComputeEmissiveWithPdf(
 {
     PCINFINITE_LIGHT infinite_light = (PCINFINITE_LIGHT)context;
 
+    VECTOR3 model_to_light =
+        VectorMatrixInverseMultiply(infinite_light->light_to_world,
+                                    to_light);
+
     ISTATUS status = SpectrumTextureSample(infinite_light->texture,
-                                           to_light,
+                                           model_to_light,
                                            NULL,
                                            compositor,
                                            spectrum);
@@ -117,6 +138,7 @@ InfiniteEnvironmentalLightFree(
     PINFINITE_LIGHT infinite_light = (PINFINITE_LIGHT)context;
 
     SpectrumTextureRelease(infinite_light->texture);
+    MatrixRelease(infinite_light->light_to_world);
 }
 
 //
@@ -137,6 +159,7 @@ static const ENVIRONMENTAL_LIGHT_VTABLE infinite_light_vtable = {
 ISTATUS
 InfiniteEnvironmentalLightAllocate(
     _In_ PSPECTRUM_TEXTURE texture,
+    _In_opt_ PMATRIX light_to_world,
     _Out_ PENVIRONMENTAL_LIGHT *environmental_light,
     _Out_ PLIGHT *light
     )
@@ -148,16 +171,17 @@ InfiniteEnvironmentalLightAllocate(
 
     if (environmental_light == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_01;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (light == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     INFINITE_LIGHT infinite_light;
     infinite_light.texture = texture;
+    infinite_light.light_to_world = light_to_world;
 
     ISTATUS status = EnvironmentalLightAllocate(&infinite_light_vtable,
                                                 &infinite_light,
@@ -172,6 +196,7 @@ InfiniteEnvironmentalLightAllocate(
     }
 
     SpectrumTextureRetain(texture);
+    MatrixRetain(light_to_world);
 
     return ISTATUS_SUCCESS;
 }

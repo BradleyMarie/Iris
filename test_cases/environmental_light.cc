@@ -45,6 +45,7 @@ TEST(EnvironmentalLight, ListScene)
     PENVIRONMENTAL_LIGHT environmental_light;
     PLIGHT light;
     status = InfiniteEnvironmentalLightAllocate(texture,
+                                                NULL,
                                                 &environmental_light,
                                                 &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -160,6 +161,7 @@ TEST(EnvironmentalLight, KdTreeScene)
     PENVIRONMENTAL_LIGHT environmental_light;
     PLIGHT light;
     status = InfiniteEnvironmentalLightAllocate(texture,
+                                                NULL,
                                                 &environmental_light,
                                                 &light);
     ASSERT_EQ(status, ISTATUS_SUCCESS);

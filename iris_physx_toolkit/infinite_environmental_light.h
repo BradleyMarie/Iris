@@ -29,6 +29,7 @@ extern "C" {
 ISTATUS
 InfiniteEnvironmentalLightAllocate(
     _In_ PSPECTRUM_TEXTURE texture,
+    _In_opt_ PMATRIX light_to_world,
     _Out_ PENVIRONMENTAL_LIGHT *environmental_light,
     _Out_ PLIGHT *light
     );
