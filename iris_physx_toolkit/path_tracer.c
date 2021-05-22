@@ -171,7 +171,7 @@ PathTracerIntegrate(
             break;
         }
 
-        bool transmitted;
+        BSDF_SAMPLE_TYPE type;
         VECTOR3 next_direction;
         float_t bsdf_pdf;
         status = BsdfSample(bsdf,
@@ -180,7 +180,7 @@ PathTracerIntegrate(
                             rng,
                             allocator,
                             path_tracer->reflectors + bounces,
-                            &transmitted,
+                            &type,
                             &next_direction,
                             &bsdf_pdf);
 
@@ -208,6 +208,7 @@ PathTracerIntegrate(
         float_t attenuation;
         if (isfinite(bsdf_pdf))
         {
+            bool transmitted = BsdfSampleIsTransmission(type);
             attenuation = VectorPositiveDotProduct(shading_normal,
                                                    next_direction,
                                                    transmitted);
@@ -249,7 +250,7 @@ PathTracerIntegrate(
 
         path_tracer->attenuations[bounces] = attenuation;
 
-        if (isinf(bsdf_pdf))
+        if (BsdfSampleContainsSpecular(type))
         {
             add_light_emissions = true;
         }

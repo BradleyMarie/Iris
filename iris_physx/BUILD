@@ -55,9 +55,15 @@ cc_library(
 )
 
 cc_library(
+    name = "bsdf_sample_type",
+    hdrs = ["bsdf_sample_type.h"],
+)
+
+cc_library(
     name = "bsdf_vtable",
     hdrs = ["bsdf_vtable.h"],
     deps = [
+        ":bsdf_sample_type",
         ":reflector_compositor",
         "//iris",
         "//iris_advanced",

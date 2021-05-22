@@ -328,7 +328,7 @@ SampleDirectLighting(
     }
 
     PCREFLECTOR bsdf_sampled_reflector;
-    bool bsdf_sampled_transmitted;
+    BSDF_SAMPLE_TYPE bsdf_sampled_type;
     VECTOR3 bsdf_sampled_direction;
     float_t bsdf_sampled_pdf;
     status = BsdfSampleDiffuse(bsdf,
@@ -337,7 +337,7 @@ SampleDirectLighting(
                                rng,
                                reflector_compositor,
                                &bsdf_sampled_reflector,
-                               &bsdf_sampled_transmitted,
+                               &bsdf_sampled_type,
                                &bsdf_sampled_direction,
                                &bsdf_sampled_pdf);
 
@@ -361,6 +361,8 @@ SampleDirectLighting(
 
         return status;
     }
+
+    bool bsdf_sampled_transmitted = BsdfSampleIsTransmission(bsdf_sampled_type);
 
     if (light_sampled_pdf <= (float_t)0.0)
     {

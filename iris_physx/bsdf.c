@@ -92,7 +92,7 @@ BsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -127,7 +127,7 @@ BsdfSample(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (transmitted == NULL)
+    if (type == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -148,7 +148,7 @@ BsdfSample(
                                                   rng,
                                                   compositor,
                                                   reflector,
-                                                  transmitted,
+                                                  type,
                                                   outgoing,
                                                   pdf);
 
@@ -173,7 +173,7 @@ BsdfSampleDiffuse(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -208,7 +208,7 @@ BsdfSampleDiffuse(
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (transmitted == NULL)
+    if (type == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
@@ -235,7 +235,7 @@ BsdfSampleDiffuse(
                                                           rng,
                                                           compositor,
                                                           reflector,
-                                                          transmitted,
+                                                          type,
                                                           outgoing,
                                                           pdf);
 
@@ -244,7 +244,8 @@ BsdfSampleDiffuse(
         return status;
     }
 
-    if ((float_t)0.0 <= *pdf && isinf(*pdf))
+    if ((float_t)0.0 <= *pdf &&
+        (isinf(*pdf) || BsdfSampleContainsSpecular(*type)))
     {
         return ISTATUS_INVALID_RESULT;
     }

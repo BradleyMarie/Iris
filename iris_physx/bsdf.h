@@ -45,7 +45,7 @@ BsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     );
@@ -58,7 +58,7 @@ BsdfSampleDiffuse(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     );

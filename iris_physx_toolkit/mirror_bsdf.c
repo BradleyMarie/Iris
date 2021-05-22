@@ -39,7 +39,7 @@ MirrorBsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -47,7 +47,7 @@ MirrorBsdfSample(
     PCMIRROR_BSDF mirror_bsdf = (PCMIRROR_BSDF)context;
 
     *reflector = mirror_bsdf->reflector;
-    *transmitted = false;
+    *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
     *outgoing = VectorReflect(incoming, normal);
     *pdf = INFINITY;
 

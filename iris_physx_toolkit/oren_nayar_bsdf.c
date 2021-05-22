@@ -110,7 +110,7 @@ OrenNayarBsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -140,7 +140,7 @@ OrenNayarBsdfSample(
         return status;
     }
 
-    *transmitted = false;
+    *type = BSDF_SAMPLE_TYPE_REFLECTION_DIFFUSE_ONLY;
     *pdf = VectorBoundedDotProduct(*outgoing, normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;

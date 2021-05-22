@@ -55,7 +55,7 @@ AggregateBsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -78,7 +78,7 @@ AggregateBsdfSample(
                         rng,
                         compositor,
                         reflector,
-                        transmitted,
+                        type,
                         outgoing,
                         pdf);
 
@@ -87,6 +87,7 @@ AggregateBsdfSample(
         return status;
     }
 
+    bool transmitted = BsdfSampleIsTransmission(*type);
     bool specular = isinf(*pdf);
 
     size_t matching_bsdfs = 1;
@@ -103,7 +104,7 @@ AggregateBsdfSample(
                                                incoming,
                                                normal,
                                                *outgoing,
-                                               *transmitted,
+                                               transmitted,
                                                compositor,
                                                &bsdf_reflector,
                                                &bsdf_pdf);
@@ -122,7 +123,7 @@ AggregateBsdfSample(
         {
             float_t falloff = VectorPositiveDotProduct(normal,
                                                        *outgoing,
-                                                       *transmitted);
+                                                       transmitted);
 
             if (falloff <= (float_t)0.0)
             {
@@ -177,7 +178,7 @@ AggregateBsdfSampleDiffuse(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -200,7 +201,7 @@ AggregateBsdfSampleDiffuse(
                                rng,
                                compositor,
                                reflector,
-                               transmitted,
+                               type,
                                outgoing,
                                pdf);
 
@@ -208,6 +209,8 @@ AggregateBsdfSampleDiffuse(
     {
         return status;
     }
+
+    bool transmitted = BsdfSampleIsTransmission(*type);
 
     size_t matching_bsdfs = 1;
     for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
@@ -223,7 +226,7 @@ AggregateBsdfSampleDiffuse(
                                                incoming,
                                                normal,
                                                *outgoing,
-                                               *transmitted,
+                                               transmitted,
                                                compositor,
                                                &bsdf_reflector,
                                                &bsdf_pdf);

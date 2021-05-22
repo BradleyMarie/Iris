@@ -17,6 +17,7 @@ Abstract:
 
 #include "iris/iris.h"
 #include "iris_advanced/iris_advanced.h"
+#include "iris_physx/bsdf_sample_type.h"
 #include "iris_physx/reflector_compositor.h"
 
 //
@@ -32,7 +33,7 @@ ISTATUS
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     );
@@ -46,7 +47,7 @@ ISTATUS
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     );

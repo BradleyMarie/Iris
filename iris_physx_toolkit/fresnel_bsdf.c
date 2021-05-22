@@ -44,7 +44,7 @@ SpecularDielectricBsdfSample(
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
-    _Out_ bool *transmitted,
+    _Out_ PBSDF_SAMPLE_TYPE type,
     _Out_ PVECTOR3 outgoing,
     _Out_ float_t *pdf
     )
@@ -62,7 +62,7 @@ SpecularDielectricBsdfSample(
     if ((float_t)1.0 <= sin_squared_theta_transmitted)
     {
         *reflector = specular_dielectric->reflected;
-        *transmitted = false;
+        *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
         *outgoing = VectorReflect(incoming, normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
@@ -96,14 +96,14 @@ SpecularDielectricBsdfSample(
     if (random_value < proportion_reflected)
     {
         *reflector = specular_dielectric->reflected;
-        *transmitted = false;
+        *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
         *outgoing = VectorReflect(incoming, normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
     }
 
     *reflector = specular_dielectric->transmitted;
-    *transmitted = true;
+    *type = BSDF_SAMPLE_TYPE_TRANSMISSION_CONTAINS_SPECULAR;
 
     incoming = VectorScale(incoming, specular_dielectric->refractive_ratio);
 
