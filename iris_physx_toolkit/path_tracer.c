@@ -189,8 +189,7 @@ PathTracerIntegrate(
             return status;
         }
 
-        if (path_tracer->reflectors[bounces] == NULL ||
-            bsdf_pdf <= (float_t)0.0)
+        if (path_tracer->reflectors[bounces] == NULL)
         {
             break;
         }
