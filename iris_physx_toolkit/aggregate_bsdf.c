@@ -89,6 +89,7 @@ AggregateBsdfSample(
 
     bool specular = isinf(*pdf);
 
+    size_t matching_bsdfs = 1;
     for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
     {
         if (i == sampled_index)
@@ -155,9 +156,14 @@ AggregateBsdfSample(
         {
             return status;
         }
+
+        matching_bsdfs += 1;
     }
 
-    *pdf /= aggregate_bsdf->num_bsdfs;
+    if (matching_bsdfs != 1)
+    {
+        *pdf /= matching_bsdfs;
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -203,7 +209,8 @@ AggregateBsdfSampleDiffuse(
         return status;
     }
 
-    for (size_t i = 0; i < aggregate_bsdf->num_diffuse; i++)
+    size_t matching_bsdfs = 1;
+    for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
     {
         if (i == sampled_index)
         {
@@ -231,8 +238,6 @@ AggregateBsdfSampleDiffuse(
             continue;
         }
 
-        *pdf += bsdf_pdf;
-
         status = ReflectorCompositorAddReflectors(compositor,
                                                   *reflector,
                                                   bsdf_reflector,
@@ -242,9 +247,12 @@ AggregateBsdfSampleDiffuse(
         {
             return status;
         }
+
+        *pdf += bsdf_pdf;
+        matching_bsdfs += 1;
     }
 
-    *pdf /= (float_t)aggregate_bsdf->num_diffuse;
+    *pdf /= (float_t)matching_bsdfs;
 
     return ISTATUS_SUCCESS;
 }
