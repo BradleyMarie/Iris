@@ -170,6 +170,7 @@ SpecularDielectricBsdfFree(
 
 static const BSDF_VTABLE perfect_specular_reflector_vtable = {
     SpecularDielectricBsdfSample,
+    NULL,
     SpecularDielectricBsdfComputeReflectance,
     SpecularDielectricBsdfComputeReflectanceWithPdf,
     SpecularDielectricBsdfFree

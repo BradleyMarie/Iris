@@ -154,6 +154,7 @@ LambertianBsdfFree(
 
 static const BSDF_VTABLE lambertian_bsdf_vtable = {
     LambertianBsdfSample,
+    LambertianBsdfSample,
     LambertianBsdfComputeReflectance,
     LambertianBsdfComputeReflectanceWithPdf,
     LambertianBsdfFree

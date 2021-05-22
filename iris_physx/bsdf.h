@@ -51,6 +51,19 @@ BsdfSample(
     );
 
 ISTATUS
+BsdfSampleDiffuse(
+    _In_ PCBSDF bsdf,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
+    _Out_ PVECTOR3 outgoing,
+    _Out_ float_t *pdf
+    );
+
+ISTATUS
 BsdfComputeReflectance(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
@@ -71,6 +84,12 @@ BsdfComputeReflectanceWithPdf(
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
     _Out_ float_t *pdf
+    );
+
+ISTATUS
+BsdfIsDiffuse(
+    _In_ PCBSDF bsdf,
+    _Out_ bool *is_diffuse
     );
 
 void

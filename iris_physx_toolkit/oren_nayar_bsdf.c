@@ -239,6 +239,7 @@ OrenNayarBsdfFree(
 
 static const BSDF_VTABLE oren_nayar_bsdf_vtable = {
     OrenNayarBsdfSample,
+    OrenNayarBsdfSample,
     OrenNayarBsdfComputeReflectance,
     OrenNayarBsdfComputeReflectanceWithPdf,
     OrenNayarBsdfFree

@@ -682,6 +682,7 @@ TrowbridgeReitzDielectricReflectionBsdfFree(
 
 static const BSDF_VTABLE microfacet_bsdf_vtable = {
     TrowbridgeReitzDielectricReflectionBsdfSample,
+    TrowbridgeReitzDielectricReflectionBsdfSample,
     TrowbridgeReitzDielectricReflectionBsdfComputeReflectance,
     TrowbridgeReitzDielectricReflectionBsdfComputeReflectanceWithPdf,
     TrowbridgeReitzDielectricReflectionBsdfFree

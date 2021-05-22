@@ -152,7 +152,104 @@ BsdfSample(
                                                   outgoing,
                                                   pdf);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (*pdf <= (float_t)0.0)
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+BsdfSampleDiffuse(
+    _In_ PCBSDF bsdf,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 surface_normal,
+    _Inout_ PRANDOM rng,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ bool *transmitted,
+    _Out_ PVECTOR3 outgoing,
+    _Out_ float_t *pdf
+    )
+{
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!VectorValidate(incoming))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (!VectorValidate(surface_normal))
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (rng == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (transmitted == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    if (outgoing == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (bsdf->vtable->sample_diffuse_routine == NULL)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
+    ISTATUS status = bsdf->vtable->sample_diffuse_routine(bsdf->data,
+                                                          incoming,
+                                                          surface_normal,
+                                                          rng,
+                                                          compositor,
+                                                          reflector,
+                                                          transmitted,
+                                                          outgoing,
+                                                          pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if ((float_t)0.0 <= *pdf && isinf(*pdf))
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 ISTATUS
@@ -273,6 +370,27 @@ BsdfComputeReflectanceWithPdf(
     {
         return ISTATUS_INVALID_RESULT;
     }
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+BsdfIsDiffuse(
+    _In_ PCBSDF bsdf,
+    _Out_ bool *is_diffuse
+    )
+{
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (is_diffuse == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *is_diffuse = bsdf->vtable->sample_diffuse_routine;
 
     return ISTATUS_SUCCESS;
 }

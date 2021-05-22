@@ -106,6 +106,7 @@ MirrorBsdfFree(
 
 static const BSDF_VTABLE mirror_bsdf_vtable = {
     MirrorBsdfSample,
+    NULL,
     MirrorBsdfComputeReflectance,
     MirrorBsdfComputeReflectanceWithPdf,
     MirrorBsdfFree
