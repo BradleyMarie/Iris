@@ -39,12 +39,30 @@ cc_test(
 )
 
 cc_library(
+    name = "intersection",
+    hdrs = ["intersection.h"],
+    deps = [
+        ":ray_differential",
+    ],
+)
+
+cc_test(
+    name = "intersection_test",
+    srcs = ["intersection_test.cc"],
+    deps = [
+        ":intersection",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "iris_advanced",
     hdrs = ["iris_advanced.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":bounding_box",
         ":color",
+        ":intersection",
         ":math",
         ":random",
         ":ray_differential",
