@@ -402,6 +402,14 @@ static const BSDF_VTABLE aggregate_bsdf_vtable = {
     AggregateBsdfFree
 };
 
+static const BSDF_VTABLE aggregate_specular_bsdf_vtable = {
+    AggregateBsdfSample,
+    NULL,
+    AggregateBsdfComputeReflectance,
+    AggregateBsdfComputeReflectanceWithPdf,
+    AggregateBsdfFree
+};
+
 //
 // Functions
 //
@@ -500,7 +508,17 @@ AggregateBsdfAllocate(
     aggregate_bsdf->num_bsdfs = inserted_bsdfs;
     aggregate_bsdf->num_diffuse = num_diffuse;
 
-    ISTATUS status = BsdfAllocate(&aggregate_bsdf_vtable,
+    PCBSDF_VTABLE vtable;
+    if (num_diffuse == 0)
+    {
+        vtable = &aggregate_specular_bsdf_vtable;
+    }
+    else
+    {
+        vtable = &aggregate_bsdf_vtable;
+    }
+
+    ISTATUS status = BsdfAllocate(vtable,
                                   aggregate_bsdf,
                                   sizeof(PBSDF) * (1 + inserted_bsdfs),
                                   alignof(AGGREGATE_BSDF),
