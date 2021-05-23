@@ -30,6 +30,17 @@ cc_library(
 )
 
 cc_library(
+    name = "alpha_material",
+    srcs = ["alpha_material.c"],
+    hdrs = ["alpha_material.h"],
+    deps = [
+        ":float_texture",
+        ":uniform_reflector",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "attenuated_reflector",
     srcs = ["attenuated_reflector.c"],
     hdrs = ["attenuated_reflector.h"],

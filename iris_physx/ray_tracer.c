@@ -151,13 +151,14 @@ ShapeRayTracerProcessHit(
         return ISTATUS_INVALID_RESULT;
     }
 
-    status = MaterialSample(material,
-                            model_hit_point,
-                            hit_context->additional_data,
-                            texture_coordinates,
-                            &process_context->shape_ray_tracer->bsdf_allocator,
-                            &process_context->shape_ray_tracer->reflector_compositor,
-                            &process_context->bsdf);
+    status =
+        MaterialSampleInternal(material,
+                               model_hit_point,
+                               hit_context->additional_data,
+                               texture_coordinates,
+                               &process_context->shape_ray_tracer->bsdf_allocator,
+                               &process_context->shape_ray_tracer->reflector_compositor,
+                               &process_context->bsdf);
 
     if (status != ISTATUS_SUCCESS)
     {

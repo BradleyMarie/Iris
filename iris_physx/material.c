@@ -87,6 +87,53 @@ MaterialAllocate(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+MaterialSample(
+    _In_ PCMATERIAL material,
+    _In_ POINT3 model_hit_point,
+    _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
+    _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
+    _Out_ PCBSDF *bsdf
+    )
+{
+    if (material == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (!PointValidate(model_hit_point))
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (bsdf_allocator == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (reflector_compositor == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (bsdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
+    }
+
+    ISTATUS status = MaterialSampleInternal(material,
+                                            model_hit_point,
+                                            additional_data,
+                                            texture_coordinates,
+                                            bsdf_allocator,
+                                            reflector_compositor,
+                                            bsdf);
+
+    return status;
+}
+
 void
 MaterialRetain(
     _In_opt_ PMATERIAL material

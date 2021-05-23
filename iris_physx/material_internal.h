@@ -37,7 +37,7 @@ struct _MATERIAL {
 static
 inline
 ISTATUS
-MaterialSample(
+MaterialSampleInternal(
     _In_ const struct _MATERIAL *material,
     _In_ POINT3 model_hit_point,
     _In_ const void *additional_data,
