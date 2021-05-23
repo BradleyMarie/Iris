@@ -26,13 +26,13 @@ extern "C" {
 //
 
 ISTATUS
-MirrorReflectorAllocate(
+MirrorBsdfAllocate(
     _In_opt_ PREFLECTOR reflector,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-MirrorReflectorAllocateWithAllocator(
+MirrorBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_opt_ PCREFLECTOR reflector,
     _Out_ PCBSDF *bsdf

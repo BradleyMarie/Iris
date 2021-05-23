@@ -304,6 +304,17 @@ cc_library(
 )
 
 cc_library(
+    name = "mirror_material",
+    srcs = ["mirror_material.c"],
+    hdrs = ["mirror_material.h"],
+    deps = [
+        ":mirror_bsdf",
+        ":reflector_texture",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "one_light_sampler",
     srcs = ["one_light_sampler.c"],
     hdrs = ["one_light_sampler.h"],
