@@ -53,25 +53,25 @@ TriangleMeshNormalMapCompute(
     PCTRIANGLE_MESH_ADDITIONAL_DATA hit_data =
         (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
 
-    if (normal_map->num_vertices < hit_data->mesh_vertex_indices[0] ||
-        normal_map->num_vertices < hit_data->mesh_vertex_indices[1] ||
-        normal_map->num_vertices < hit_data->mesh_vertex_indices[2])
+    if (normal_map->num_vertices < hit_data->vertex_indices[0] ||
+        normal_map->num_vertices < hit_data->vertex_indices[1] ||
+        normal_map->num_vertices < hit_data->vertex_indices[2])
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     *shading_normal =
-        VectorScale(normal_map->normals[hit_data->mesh_vertex_indices[0]],
+        VectorScale(normal_map->normals[hit_data->vertex_indices[0]],
                     hit_data->barycentric_coordinates[0]);
 
     *shading_normal =
         VectorAddScaled(*shading_normal,
-                        normal_map->normals[hit_data->mesh_vertex_indices[1]],
+                        normal_map->normals[hit_data->vertex_indices[1]],
                         hit_data->barycentric_coordinates[1]);
 
     *shading_normal =
         VectorAddScaled(*shading_normal,
-                        normal_map->normals[hit_data->mesh_vertex_indices[2]],
+                        normal_map->normals[hit_data->vertex_indices[2]],
                         hit_data->barycentric_coordinates[2]);
 
     *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);

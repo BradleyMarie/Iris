@@ -540,6 +540,8 @@ cc_library(
     hdrs = ["shape_internal.h"],
     deps = [
         ":shape_vtable",
+        ":normal_map_internal",
+        ":texture_coordinate_map_internal",
     ],
 )
 
@@ -552,6 +554,7 @@ cc_library(
         ":material",
         ":normal_map",
         ":texture_coordinate_allocator",
+        ":texture_coordinate_map",
     ],
 )
 

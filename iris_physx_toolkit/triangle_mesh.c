@@ -18,7 +18,6 @@ Abstract:
 #include <string.h>
 
 #include "iris_physx_toolkit/triangle_mesh.h"
-#include "iris_physx_toolkit/uv_texture_coordinate.h"
 
 //
 // Constants
@@ -32,7 +31,7 @@ Abstract:
 
 typedef struct _TRIANGLE_MESH {
     PPOINT3 vertices;
-    float_t (*texture_coordinates)[2];
+    PTEXTURE_COORDINATE_MAP texture_coordinate_maps[2];
     PNORMAL_MAP normal_maps[2];
     PMATERIAL materials[2];
     PEMISSIVE_MATERIAL emissive_materials[2];
@@ -213,9 +212,10 @@ TriangleMeshTriangleTrace(
     data.barycentric_coordinates[0] = b0 * inverse_determinant;
     data.barycentric_coordinates[1] = b1 * inverse_determinant;
     data.barycentric_coordinates[2] = b2 * inverse_determinant;
-    data.mesh_vertex_indices[0] = (size_t)triangle->v0;
-    data.mesh_vertex_indices[1] = (size_t)triangle->v1;
-    data.mesh_vertex_indices[2] = (size_t)triangle->v2;
+    data.vertex_indices[0] = (size_t)triangle->v0;
+    data.vertex_indices[1] = (size_t)triangle->v1;
+    data.vertex_indices[2] = (size_t)triangle->v2;
+    data.vertices = triangle->mesh->vertices;
 
     float_t dp = VectorDotProduct(ray->direction, triangle->surface_normal);
 
@@ -307,6 +307,25 @@ TriangleMeshTriangleComputeNormal(
 
 static
 ISTATUS
+TriangleMeshTriangleGetTextureCoordinateMap(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCTEXTURE_COORDINATE_MAP *texture_coordinate_map
+    )
+{
+    if (face_hit > TRIANGLE_MESH_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    PCTRIANGLE triangle = (PCTRIANGLE)context;
+    *texture_coordinate_map = triangle->mesh->texture_coordinate_maps[face_hit];
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 TriangleMeshTriangleGetMaterial(
     _In_opt_ const void *context,
     _In_ uint32_t face_hit,
@@ -343,106 +362,6 @@ TriangleMeshTriangleGetNormalMap(
     return ISTATUS_SUCCESS;
 }
 
-ISTATUS
-TriangleMeshTriangleComputeTextureCoordinates(
-    _In_opt_ const void *context,
-    _In_ POINT3 hit_point,
-    _In_opt_ const VECTOR3 dpdx_dpdy[2],
-    _In_ uint32_t face_hit,
-    _In_ const void *additional_data,
-    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
-    _Out_ void **texture_coordinates
-    )
-{
-    PCTRIANGLE triangle = (PCTRIANGLE)context;
-    PCTRIANGLE_MESH mesh = triangle->mesh;
-    PCTRIANGLE_MESH_ADDITIONAL_DATA hit_data =
-        (PCTRIANGLE_MESH_ADDITIONAL_DATA)additional_data;
-
-    ISTATUS status =
-        TextureCoordinateAllocatorAllocate(allocator,
-                                           sizeof(UV_TEXTURE_COORDINATE),
-                                           alignof(UV_TEXTURE_COORDINATE),
-                                           texture_coordinates);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    PUV_TEXTURE_COORDINATE uv_coordinates =
-        (PUV_TEXTURE_COORDINATE)*texture_coordinates;
-
-    float_t uv[2];
-    uv[0] = mesh->texture_coordinates[triangle->v0][0] *
-            hit_data->barycentric_coordinates[0];
-
-    uv[1] = mesh->texture_coordinates[triangle->v0][1] *
-            hit_data->barycentric_coordinates[0];
-
-    uv[0] += mesh->texture_coordinates[triangle->v1][0] *
-             hit_data->barycentric_coordinates[1];
-
-    uv[1] += mesh->texture_coordinates[triangle->v1][1] *
-             hit_data->barycentric_coordinates[1];
-
-    uv[0] += mesh->texture_coordinates[triangle->v2][0] *
-             hit_data->barycentric_coordinates[2];
-
-    uv[1] += mesh->texture_coordinates[triangle->v2][1] *
-             hit_data->barycentric_coordinates[2];
-
-    if (dpdx_dpdy == NULL)
-    {
-        UVTextureCoordinateInitializeWithoutDerivatives(uv_coordinates, uv);
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t duv02[2];
-    duv02[0] = mesh->texture_coordinates[triangle->v0][0] -
-               mesh->texture_coordinates[triangle->v2][0];
-    duv02[1] = mesh->texture_coordinates[triangle->v0][1] -
-               mesh->texture_coordinates[triangle->v2][1];
-
-    float_t duv12[2];
-    duv12[0] = mesh->texture_coordinates[triangle->v1][0] -
-               mesh->texture_coordinates[triangle->v2][0];
-    duv12[1] = mesh->texture_coordinates[triangle->v1][1] -
-               mesh->texture_coordinates[triangle->v2][1];
-
-    float_t determinant = duv02[0] * duv12[1] - duv02[1] * duv12[0];
-    if (fabs(determinant) < (float_t)0.0000001)
-    {
-        UVTextureCoordinateInitializeWithoutDerivatives(uv_coordinates, uv);
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 dp02 = PointSubtract(mesh->vertices[triangle->v0],
-                                 mesh->vertices[triangle->v2]);
-
-    VECTOR3 dp12 = PointSubtract(mesh->vertices[triangle->v1],
-                                 mesh->vertices[triangle->v2]);
-
-    float_t inverse_determinant = (float_t)1.0 / determinant;
-
-    VECTOR3 dp_du = VectorSubtract(VectorScale(dp02, duv12[1]),
-                                   VectorScale(dp12, duv02[1]));
-    dp_du = VectorScale(dp_du, inverse_determinant);
-
-    VECTOR3 dp_dv = VectorSubtract(VectorScale(dp12, duv02[0]),
-                                   VectorScale(dp02, duv12[0]));
-    dp_dv = VectorScale(dp_dv, inverse_determinant);
-
-    UVTextureCoordinateInitialize(uv_coordinates,
-                                  uv,
-                                  dp_du,
-                                  dp_dv,
-                                  dpdx_dpdy[0],
-                                  dpdx_dpdy[1]);
-
-    return ISTATUS_SUCCESS;
-}
-
 static
 void
 TriangleMeshFree(
@@ -450,7 +369,8 @@ TriangleMeshFree(
     )
 {
     free(mesh->vertices);
-    free(mesh->texture_coordinates);
+    TextureCoordinateMapRelease(mesh->texture_coordinate_maps[0]);
+    TextureCoordinateMapRelease(mesh->texture_coordinate_maps[1]);
     NormalMapRelease(mesh->normal_maps[0]);
     NormalMapRelease(mesh->normal_maps[1]);
     MaterialRelease(mesh->materials[0]);
@@ -618,9 +538,9 @@ static const SHAPE_VTABLE triangle_vtable = {
     TriangleMeshTriangleTrace,
     TriangleMeshTriangleComputeBounds,
     TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetTextureCoordinateMap,
     TriangleMeshTriangleGetNormalMap,
     TriangleMeshTriangleGetMaterial,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -631,38 +551,12 @@ static const SHAPE_VTABLE emissive_triangle_vtable = {
     TriangleMeshTriangleTrace,
     TriangleMeshTriangleComputeBounds,
     TriangleMeshTriangleComputeNormal,
+    TriangleMeshTriangleGetTextureCoordinateMap,
     TriangleMeshTriangleGetNormalMap,
     TriangleMeshTriangleGetMaterial,
     EmissiveTriangleMeshTriangleGetEmissiveMaterial,
     EmissiveTriangleMeshTriangleSampleFace,
     EmissiveTriangleMeshTriangleComputePdfBySolidArea,
-    NULL,
-    TriangleMeshTriangleFree
-};
-
-static const SHAPE_VTABLE triangle_uvs_vtable = {
-    TriangleMeshTriangleTrace,
-    TriangleMeshTriangleComputeBounds,
-    TriangleMeshTriangleComputeNormal,
-    TriangleMeshTriangleGetNormalMap,
-    TriangleMeshTriangleGetMaterial,
-    NULL,
-    NULL,
-    NULL,
-    TriangleMeshTriangleComputeTextureCoordinates,
-    TriangleMeshTriangleFree
-};
-
-static const SHAPE_VTABLE emissive_triangle_uvs_vtable = {
-    TriangleMeshTriangleTrace,
-    TriangleMeshTriangleComputeBounds,
-    TriangleMeshTriangleComputeNormal,
-    TriangleMeshTriangleGetNormalMap,
-    TriangleMeshTriangleGetMaterial,
-    EmissiveTriangleMeshTriangleGetEmissiveMaterial,
-    EmissiveTriangleMeshTriangleSampleFace,
-    EmissiveTriangleMeshTriangleComputePdfBySolidArea,
-    TriangleMeshTriangleComputeTextureCoordinates,
     TriangleMeshTriangleFree
 };
 
@@ -674,7 +568,6 @@ static
 ISTATUS
 TriangleMeshValidate(
     _In_reads_(num_vertices) const POINT3 vertices[],
-    _In_reads_opt_(num_vertices) const float_t texture_coordinates[][2],
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles
@@ -687,14 +580,14 @@ TriangleMeshValidate(
 
     if (vertex_indices == NULL && num_triangles != 0)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     for (size_t i = 0; i < num_triangles; i++)
     {
         if (num_vertices <= vertex_indices[i][0])
         {
-            return ISTATUS_INVALID_ARGUMENT_03;
+            return ISTATUS_INVALID_ARGUMENT_02;
         }
 
         if (!PointValidate(vertices[vertex_indices[i][0]]))
@@ -702,16 +595,9 @@ TriangleMeshValidate(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        if (texture_coordinates != NULL &&
-            (!isfinite(texture_coordinates[vertex_indices[i][0]][0]) ||
-             !isfinite(texture_coordinates[vertex_indices[i][0]][1])))
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
         if (num_vertices <= vertex_indices[i][1])
         {
-            return ISTATUS_INVALID_ARGUMENT_03;
+            return ISTATUS_INVALID_ARGUMENT_02;
         }
         
         if(!PointValidate(vertices[vertex_indices[i][1]]))
@@ -719,28 +605,14 @@ TriangleMeshValidate(
             return ISTATUS_INVALID_ARGUMENT_00;
         }
 
-        if (texture_coordinates != NULL &&
-            (!isfinite(texture_coordinates[vertex_indices[i][1]][0]) ||
-             !isfinite(texture_coordinates[vertex_indices[i][1]][1])))
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
-        }
-
         if (num_vertices <= vertex_indices[i][2])
         {
-            return ISTATUS_INVALID_ARGUMENT_03;
+            return ISTATUS_INVALID_ARGUMENT_02;
         }
 
         if (!PointValidate(vertices[vertex_indices[i][2]]))
         {
             return ISTATUS_INVALID_ARGUMENT_00;
-        }
-
-        if (texture_coordinates != NULL &&
-            (!isfinite(texture_coordinates[vertex_indices[i][2]][0]) ||
-             !isfinite(texture_coordinates[vertex_indices[i][2]][1])))
-        {
-            return ISTATUS_INVALID_ARGUMENT_01;
         }
 
         if (vertex_indices[i][0] == vertex_indices[i][1] ||
@@ -759,8 +631,9 @@ static
 ISTATUS
 TriangleMeshAllocateInternal(
     _In_reads_(num_vertices) const POINT3 vertices[],
-    _In_reads_opt_(num_vertices) const float_t texture_coordinates[][2],
     _In_ size_t num_vertices,
+    _In_opt_ PTEXTURE_COORDINATE_MAP front_texture_coordinate_map,
+    _In_opt_ PTEXTURE_COORDINATE_MAP back_texture_coordinate_map,
     _In_opt_ PNORMAL_MAP front_normal_map,
     _In_opt_ PNORMAL_MAP back_normal_map,
     _In_opt_ PMATERIAL front_material,
@@ -788,29 +661,10 @@ TriangleMeshAllocateInternal(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    if (texture_coordinates != NULL)
-    {
-        (*mesh)->texture_coordinates =
-            (float_t(*)[2])calloc(num_vertices, sizeof(float_t[2]));
-
-        if ((*mesh)->texture_coordinates == NULL)
-        {
-            free((*mesh)->vertices);
-            free(*mesh);
-            return ISTATUS_ALLOCATION_FAILED;
-        }
-
-        memcpy((*mesh)->texture_coordinates,
-               texture_coordinates,
-               sizeof(float_t[2]) * num_vertices);
-    }
-    else
-    {
-        (*mesh)->texture_coordinates = NULL;
-    }
-
     memcpy((*mesh)->vertices, vertices, sizeof(POINT3) * num_vertices);
 
+    (*mesh)->texture_coordinate_maps[0] = front_texture_coordinate_map;
+    (*mesh)->texture_coordinate_maps[1] = back_texture_coordinate_map;
     (*mesh)->normal_maps[0] = front_normal_map;
     (*mesh)->normal_maps[1] = back_normal_map;
     (*mesh)->materials[0] = front_material;
@@ -851,17 +705,7 @@ TriangleAllocateInternal(
         return ISTATUS_SUCCESS;
     }
 
-    PCSHAPE_VTABLE vtable;
-    if (mesh->texture_coordinates != NULL)
-    {
-        vtable = &triangle_uvs_vtable;
-    }
-    else
-    {
-        vtable = &triangle_vtable;
-    }
-
-    ISTATUS status = ShapeAllocate(vtable,
+    ISTATUS status = ShapeAllocate(&triangle_vtable,
                                    &triangle,
                                    sizeof(TRIANGLE),
                                    alignof(TRIANGLE),
@@ -896,17 +740,7 @@ EmissiveTriangleAllocateInternal(
         return ISTATUS_SUCCESS;
     }
 
-    PCSHAPE_VTABLE vtable;
-    if (mesh->texture_coordinates != NULL)
-    {
-        vtable = &emissive_triangle_uvs_vtable;
-    }
-    else
-    {
-        vtable = &emissive_triangle_vtable;
-    }
-
-    ISTATUS status = ShapeAllocate(vtable,
+    ISTATUS status = ShapeAllocate(&emissive_triangle_vtable,
                                    &emissive_triangle,
                                    sizeof(EMISSIVE_TRIANGLE),
                                    alignof(EMISSIVE_TRIANGLE),
@@ -935,10 +769,11 @@ ShapeListFree(
 ISTATUS
 TriangleMeshAllocate(
     _In_reads_(num_vertices) const POINT3 vertices[],
-    _In_reads_opt_(num_vertices) const float_t texture_coordinates[][2],
     _In_ size_t num_vertices,
     _In_reads_(num_triangles) const size_t vertex_indices[][3],
     _In_ size_t num_triangles,
+    _In_opt_ PTEXTURE_COORDINATE_MAP front_texture_coordinate_map,
+    _In_opt_ PTEXTURE_COORDINATE_MAP back_texture_coordinate_map,
     _In_opt_ PNORMAL_MAP front_normal_map,
     _In_opt_ PNORMAL_MAP back_normal_map,
     _In_opt_ PMATERIAL front_material,
@@ -950,7 +785,6 @@ TriangleMeshAllocate(
     )
 {
     ISTATUS status = TriangleMeshValidate(vertices,
-                                          texture_coordinates,
                                           num_vertices,
                                           vertex_indices,
                                           num_triangles);
@@ -962,18 +796,19 @@ TriangleMeshAllocate(
 
     if (num_triangles != 0 && shapes == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_11;
+        return ISTATUS_INVALID_ARGUMENT_12;
     }
 
     if (triangles_allocated == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_12;
+        return ISTATUS_INVALID_ARGUMENT_13;
     }
 
     PTRIANGLE_MESH mesh;
     status = TriangleMeshAllocateInternal(vertices,
-                                          texture_coordinates,
                                           num_vertices,
+                                          front_texture_coordinate_map,
+                                          back_texture_coordinate_map,
                                           front_normal_map,
                                           back_normal_map,
                                           front_material,
@@ -1044,6 +879,8 @@ TriangleMeshAllocate(
         return ISTATUS_SUCCESS;
     }
 
+    TextureCoordinateMapRetain(front_texture_coordinate_map);
+    TextureCoordinateMapRetain(back_texture_coordinate_map);
     NormalMapRetain(front_normal_map);
     NormalMapRetain(back_normal_map);
     MaterialRetain(front_material);

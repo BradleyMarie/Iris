@@ -159,10 +159,11 @@ TEST(TeapotTest, FlatShadedTeapot)
     size_t triangles_allocated;
     status = TriangleMeshAllocate(
         teapot_vertices,
-        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
+        nullptr,
+        nullptr,
         nullptr,
         nullptr,
         material,
@@ -248,10 +249,11 @@ TEST(TeapotTest, SmoothShadedTeapot)
     size_t triangles_allocated;
     status = TriangleMeshAllocate(
         teapot_vertices,
-        nullptr,
         TEAPOT_VERTEX_COUNT,
         teapot_face_vertices,
         TEAPOT_FACE_COUNT,
+        nullptr,
+        nullptr,
         front_normal_map,
         nullptr,
         material,

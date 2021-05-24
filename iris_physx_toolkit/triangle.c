@@ -54,10 +54,11 @@ TriangleAllocate(
 
     size_t triangles_allocated;
     ISTATUS status = TriangleMeshAllocate(vertices,
-                                          NULL,
                                           3,
                                           vertex_indices,
                                           1,
+                                          NULL,
+                                          NULL,
                                           NULL,
                                           NULL,
                                           front_material,
@@ -117,10 +118,11 @@ EmissiveTriangleAllocate(
 
     size_t triangles_allocated;
     ISTATUS status = TriangleMeshAllocate(vertices,
-                                          NULL,
                                           3,
                                           vertex_indices,
                                           1,
+                                          NULL,
+                                          NULL,
                                           NULL,
                                           NULL,
                                           front_material,

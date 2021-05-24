@@ -133,11 +133,11 @@ BumpMapCompute(
     }
 
     displacement_u = (displacement_u - displacement) / du;
-    VECTOR3 dp_du = VectorAdd(uv_coordinates->dp_du,
+    VECTOR3 dp_du = VectorAdd(uv_coordinates->dmodel_hit_point_du,
                               VectorScale(model_geometry_normal, displacement_u));
 
     displacement_v = (displacement_v - displacement) / dv;
-    VECTOR3 dp_dv = VectorAdd(uv_coordinates->dp_dv,
+    VECTOR3 dp_dv = VectorAdd(uv_coordinates->dmodel_hit_point_dv,
                               VectorScale(model_geometry_normal, displacement_v));
 
     *shading_normal = VectorCrossProduct(dp_du, dp_dv);

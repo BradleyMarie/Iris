@@ -20,6 +20,7 @@ Abstract:
 
 #include "iris_physx/light.h"
 #include "iris_physx/normal_map_internal.h"
+#include "iris_physx/texture_coordinate_map_internal.h"
 #include "iris_physx/shape_vtable.h"
 
 //
@@ -114,6 +115,99 @@ ShapeComputeNormal(
 static
 inline
 ISTATUS
+ShapeComputeTextureCoordinates(
+    _In_ PCSHAPE shape,
+    _In_ PCINTERSECTION intersection,
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ uint32_t face_hit,
+    _In_ const void *additional_data,
+    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
+    _Out_ void **texture_coordinates
+    )
+{
+    assert(shape != NULL);
+    assert(intersection != NULL);
+    assert(allocator != NULL);
+    assert(texture_coordinates != NULL);
+
+    const void* data = ShapeGetData(shape);
+
+    PCTEXTURE_COORDINATE_MAP texture_coordinate_map;
+    ISTATUS status =
+        shape->vtable->get_texture_coordinate_map_routine(data,
+                                                          face_hit,
+                                                          &texture_coordinate_map);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = TextureCoordinateMapCompute(texture_coordinate_map,
+                                         intersection,
+                                         model_to_world,
+                                         additional_data,
+                                         allocator,
+                                         texture_coordinates);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
+ShapeComputeShadingNormal(
+    _In_ PCSHAPE shape,
+    _In_ PCINTERSECTION intersection,
+    _In_ VECTOR3 model_geometry_normal,
+    _In_ VECTOR3 world_geometry_normal,
+    _In_ uint32_t face_hit,
+    _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
+    _Out_ PVECTOR3 shading_normal,
+    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
+    )
+{
+    assert(shape != NULL);
+    assert(intersection != NULL);
+    assert(VectorValidate(model_geometry_normal));
+    assert(VectorValidate(world_geometry_normal));
+    assert(shading_normal != NULL);
+
+    const void* data = ShapeGetData(shape);
+
+    PCNORMAL_MAP normal_map;
+    ISTATUS status = shape->vtable->get_normal_map_routine(data,
+                                                           face_hit,
+                                                           &normal_map);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (normal_map == NULL)
+    {
+        *shading_normal = world_geometry_normal;
+        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
+        return ISTATUS_SUCCESS;
+    }
+
+    status = NormalMapCompute(normal_map,
+                              intersection,
+                              model_geometry_normal,
+                              world_geometry_normal,
+                              additional_data,
+                              texture_coordinates,
+                              shading_normal,
+                              coordinate_space);
+
+    return status;
+}
+
+static
+inline
+ISTATUS
 ShapeGetMaterial(
     _In_ const struct _SHAPE *shape,
     _In_ uint32_t face_hit,
@@ -203,108 +297,6 @@ ShapeComputePdfBySolidAngle(
                                                           pdf);
 
     return status;
-}
-
-static
-inline
-ISTATUS
-ShapeComputeShadingNormal(
-    _In_ PCSHAPE shape,
-    _In_ PCINTERSECTION intersection,
-    _In_ VECTOR3 model_geometry_normal,
-    _In_ VECTOR3 world_geometry_normal,
-    _In_ uint32_t face_hit,
-    _In_ const void *additional_data,
-    _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 shading_normal,
-    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
-    )
-{
-    assert(shape != NULL);
-    assert(intersection != NULL);
-    assert(VectorValidate(model_geometry_normal));
-    assert(VectorValidate(world_geometry_normal));
-    assert(shading_normal != NULL);
-
-    const void* data = ShapeGetData(shape);
-
-    PCNORMAL_MAP normal_map;
-    ISTATUS status = shape->vtable->get_normal_map_routine(data,
-                                                           face_hit,
-                                                           &normal_map);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (normal_map == NULL)
-    {
-        *shading_normal = world_geometry_normal;
-        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
-        return ISTATUS_SUCCESS;
-    }
-
-    status = NormalMapCompute(normal_map,
-                              intersection,
-                              model_geometry_normal,
-                              world_geometry_normal,
-                              additional_data,
-                              texture_coordinates,
-                              shading_normal,
-                              coordinate_space);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
-ShapeComputeTextureCoordinates(
-    _In_ PCSHAPE shape,
-    _In_ PCINTERSECTION intersection,
-    _In_ uint32_t face_hit,
-    _In_ const void *additional_data,
-    _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
-    _Out_ void **texture_coordinates
-    )
-{
-    assert(shape != NULL);
-    assert(intersection != NULL);
-    assert(allocator != NULL);
-    assert(texture_coordinates != NULL);
-
-    if (shape->vtable->compute_texture_coordinates != NULL)
-    {
-        VECTOR3 dpdx_dpdy_storage[2];
-        PCVECTOR3 dpdx_dpdy;
-        if (intersection->has_derivatives)
-        {
-            dpdx_dpdy_storage[0] = intersection->model_dp_dx;
-            dpdx_dpdy_storage[1] = intersection->model_dp_dy;
-            dpdx_dpdy = dpdx_dpdy_storage;
-        }
-        else
-        {
-            dpdx_dpdy = NULL;
-        }
-
-        const void* data = ShapeGetData(shape);
-        ISTATUS status =
-            shape->vtable->compute_texture_coordinates(data,
-                                                       intersection->model_hit_point,
-                                                       dpdx_dpdy,
-                                                       face_hit,
-                                                       additional_data,
-                                                       allocator,
-                                                       texture_coordinates);
-
-        return status;
-    }
-
-    *texture_coordinates = NULL;
-
-    return ISTATUS_SUCCESS;
 }
 
 #endif // _IRIS_PHYSX_SHAPE_INTERNAL_

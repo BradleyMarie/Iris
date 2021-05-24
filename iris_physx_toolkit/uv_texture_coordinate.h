@@ -23,8 +23,10 @@ Abstract:
 
 typedef struct _UV_TEXTURE_COORDINATE {
     float_t uv[2];
-    VECTOR3 dp_du;
-    VECTOR3 dp_dv;
+    VECTOR3 dmodel_hit_point_du;
+    VECTOR3 dmodel_hit_point_dv;
+    VECTOR3 dworld_hit_point_du;
+    VECTOR3 dworld_hit_point_dv;
     float_t du_dx;
     float_t du_dy;
     float_t dv_dx;
@@ -44,27 +46,25 @@ void
 UVTextureCoordinateInitialize(
     _Inout_ PUV_TEXTURE_COORDINATE coordinate,
     _In_ const float uv[2],
-    _In_ VECTOR3 dp_du,
-    _In_ VECTOR3 dp_dv,
-    _In_ VECTOR3 dp_dx,
-    _In_ VECTOR3 dp_dy
+    _In_ PCMATRIX model_to_world,
+    _In_ VECTOR3 dmodel_hit_point_du,
+    _In_ VECTOR3 dmodel_hit_point_dv,
+    _In_ VECTOR3 dmodel_hit_point_dx,
+    _In_ VECTOR3 dmodel_hit_point_dy
     )
 {
     assert(coordinate != NULL);
     assert(uv != NULL);
     assert(isfinite(uv[0]) && isfinite(uv[1]));
-    assert(VectorValidate(dp_du));
-    assert(VectorValidate(dp_dv));
-    assert(VectorValidate(dp_dx));
-    assert(VectorValidate(dp_dy));
+    assert(VectorValidate(dmodel_hit_point_du));
+    assert(VectorValidate(dmodel_hit_point_dv));
+    assert(VectorValidate(dmodel_hit_point_dx));
+    assert(VectorValidate(dmodel_hit_point_dy));
 
     coordinate->uv[0] = uv[0];
     coordinate->uv[1] = uv[1];
-    coordinate->dp_du = dp_du;
-    coordinate->dp_dv = dp_dv;
-    coordinate->has_derivatives = true;
 
-    VECTOR_AXIS diminished_axis = VectorDiminishedAxis(dp_dx);
+    VECTOR_AXIS diminished_axis = VectorDiminishedAxis(dmodel_hit_point_du);
 
     float_t a[2][2];
     float_t b_x[2];
@@ -72,44 +72,41 @@ UVTextureCoordinateInitialize(
     switch (diminished_axis)
     {
         case VECTOR_X_AXIS:
-            a[0][0] = dp_du.y;
-            a[0][1] = dp_dv.y;
-            a[1][0] = dp_du.z;
-            a[1][1] = dp_dv.z;
-            b_x[0] = dp_dx.y;
-            b_x[1] = dp_dx.z;
-            b_y[0] = dp_dy.y;
-            b_y[1] = dp_dy.z;
+            a[0][0] = dmodel_hit_point_du.y;
+            a[0][1] = dmodel_hit_point_dv.y;
+            a[1][0] = dmodel_hit_point_du.z;
+            a[1][1] = dmodel_hit_point_dv.z;
+            b_x[0] = dmodel_hit_point_dx.y;
+            b_x[1] = dmodel_hit_point_dx.z;
+            b_y[0] = dmodel_hit_point_dy.y;
+            b_y[1] = dmodel_hit_point_dy.z;
             break;
         case VECTOR_Y_AXIS:
-            a[0][0] = dp_du.x;
-            a[0][1] = dp_dv.x;
-            a[1][0] = dp_du.z;
-            a[1][1] = dp_dv.z;
-            b_x[0] = dp_dx.x;
-            b_x[1] = dp_dx.z;
-            b_y[0] = dp_dy.x;
-            b_y[1] = dp_dy.z;
+            a[0][0] = dmodel_hit_point_du.x;
+            a[0][1] = dmodel_hit_point_dv.x;
+            a[1][0] = dmodel_hit_point_du.z;
+            a[1][1] = dmodel_hit_point_dv.z;
+            b_x[0] = dmodel_hit_point_dx.x;
+            b_x[1] = dmodel_hit_point_dx.z;
+            b_y[0] = dmodel_hit_point_dy.x;
+            b_y[1] = dmodel_hit_point_dy.z;
             break;
         case VECTOR_Z_AXIS:
-            a[0][0] = dp_du.x;
-            a[0][1] = dp_dv.x;
-            a[1][0] = dp_du.y;
-            a[1][1] = dp_dv.y;
-            b_x[0] = dp_dx.x;
-            b_x[1] = dp_dx.y;
-            b_y[0] = dp_dy.x;
-            b_y[1] = dp_dy.y;
+            a[0][0] = dmodel_hit_point_du.x;
+            a[0][1] = dmodel_hit_point_dv.x;
+            a[1][0] = dmodel_hit_point_du.y;
+            a[1][1] = dmodel_hit_point_dv.y;
+            b_x[0] = dmodel_hit_point_dx.x;
+            b_x[1] = dmodel_hit_point_dx.y;
+            b_y[0] = dmodel_hit_point_dy.x;
+            b_y[1] = dmodel_hit_point_dy.y;
             break;
     }
 
     float_t determinant = a[0][0] * a[1][1] - a[0][1] * a[1][0];
     if (fabs(determinant) < (float_t)0.0000001)
     {
-        coordinate->du_dx = (float_t)0.0;
-        coordinate->dv_dx = (float_t)0.0;
-        coordinate->du_dy = (float_t)0.0;
-        coordinate->dv_dy = (float_t)0.0;
+        coordinate->has_derivatives = false;
         return;
     }
 
@@ -140,6 +137,14 @@ UVTextureCoordinateInitialize(
         coordinate->du_dy = du_dy;
         coordinate->dv_dy = dv_dy;
     }
+
+    coordinate->dmodel_hit_point_du = dmodel_hit_point_du;
+    coordinate->dmodel_hit_point_dv = dmodel_hit_point_dv;
+    coordinate->dworld_hit_point_du =
+        VectorMatrixTransposedMultiply(model_to_world, dmodel_hit_point_du);
+    coordinate->dworld_hit_point_dv =
+        VectorMatrixTransposedMultiply(model_to_world, dmodel_hit_point_dv);
+    coordinate->has_derivatives = true;
 }
 
 static

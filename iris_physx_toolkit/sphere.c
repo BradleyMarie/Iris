@@ -189,6 +189,23 @@ SphereComputeNormal(
     return ISTATUS_SUCCESS;
 }
 
+ISTATUS
+SphereGetTextureCoordinateMap(
+    _In_opt_ const void *context,
+    _In_ uint32_t face_hit,
+    _Outptr_ PCTEXTURE_COORDINATE_MAP *texture_coordinate_map
+    )
+{
+    if (face_hit > SPHERE_BACK_FACE)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    *texture_coordinate_map = NULL;
+
+    return ISTATUS_SUCCESS;
+}
+
 static
 ISTATUS
 SphereGetNormalMap(
@@ -339,9 +356,9 @@ static const SHAPE_VTABLE sphere_vtable = {
     SphereTrace,
     SphereComputeBounds,
     SphereComputeNormal,
+    SphereGetTextureCoordinateMap,
     SphereGetNormalMap,
     SphereGetMaterial,
-    NULL,
     NULL,
     NULL,
     NULL,
@@ -352,12 +369,12 @@ static const SHAPE_VTABLE emissive_sphere_vtable = {
     SphereTrace,
     SphereComputeBounds,
     SphereComputeNormal,
+    SphereGetTextureCoordinateMap,
     SphereGetNormalMap,
     SphereGetMaterial,
     EmissiveSphereGetEmissiveMaterial,
     EmissiveSphereSampleFace,
     EmissiveSphereComputePdfBySolidArea,
-    NULL,
     EmissiveSphereFree
 };
 

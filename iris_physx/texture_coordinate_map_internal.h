@@ -37,21 +37,28 @@ static
 inline
 ISTATUS
 TextureCoordinateMapCompute(
-    _In_ const struct _TEXTURE_COORDINATE_MAP *texture_coordinate_map,
+    _In_opt_ const struct _TEXTURE_COORDINATE_MAP *texture_coordinate_map,
     _In_ PCINTERSECTION intersection,
+    _In_opt_ PCMATRIX model_to_world,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
     _Out_ void **texture_coordinates
     )
 {
-    assert(texture_coordinate_map != NULL);
     assert(intersection != NULL);
     assert(intersection != NULL);
     assert(texture_coordinates != NULL);
 
+    if (texture_coordinate_map == NULL)
+    {
+        *texture_coordinates = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status =
         texture_coordinate_map->vtable->compute_routine(texture_coordinate_map->data,
                                                         intersection,
+                                                        model_to_world,
                                                         additional_data,
                                                         allocator,
                                                         texture_coordinates);

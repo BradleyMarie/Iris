@@ -28,6 +28,7 @@ ISTATUS
 (*PTEXTURE_COORDINATE_MAP_COMPUTE_ROUTINE)(
     _In_ const void *context,
     _In_ PCINTERSECTION intersection,
+    _In_opt_ PCMATRIX model_to_world,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
     _Out_ void **texture_coordinates

@@ -138,6 +138,7 @@ ShapeRayTracerProcessHit(
     void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
                                             &intersection,
+                                            model_to_world,
                                             hit_context->front_face,
                                             hit_context->additional_data,
                                             &process_context->shape_ray_tracer->texture_coordinate_allocator,

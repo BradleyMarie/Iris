@@ -495,11 +495,21 @@ cc_library(
 )
 
 cc_library(
+    name = "triangle_mesh_texture_coordinate_map",
+    srcs = ["triangle_mesh_texture_coordinate_map.c"],
+    hdrs = ["triangle_mesh_texture_coordinate_map.h"],
+    deps = [
+        ":triangle_mesh",
+        ":uv_texture_coordinate",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "triangle_mesh",
     srcs = ["triangle_mesh.c"],
     hdrs = ["triangle_mesh.h"],
     deps = [
-        ":uv_texture_coordinate",
         "//iris_physx",
     ],
 )
