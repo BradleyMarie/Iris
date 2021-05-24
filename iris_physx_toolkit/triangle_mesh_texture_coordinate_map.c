@@ -213,7 +213,7 @@ TriangleMeshTextureCoordinateMapAllocate(
     ISTATUS status =
         TextureCoordinateMapAllocate(&triangle_mesh_texture_coordinate_map_vtable,
                                      map,
-                                     sizeof(TRIANGLE_MESH_TEXTURE_COORDINATE_MAP),
+                                     size,
                                      alignof(TRIANGLE_MESH_TEXTURE_COORDINATE_MAP),
                                      texture_coordinate_map);
 
