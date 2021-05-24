@@ -157,11 +157,6 @@ BsdfSample(
         return status;
     }
 
-    if (*pdf <= (float_t)0.0)
-    {
-        return ISTATUS_INVALID_RESULT;
-    }
-
     return ISTATUS_SUCCESS;
 }
 
