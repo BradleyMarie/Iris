@@ -148,25 +148,6 @@ ShapeRayTracerProcessHit(
         return status;
     }
 
-    VECTOR3 model_shading_normal;
-    status = ShapeComputeShadingNormal(shape,
-                                       model_hit_point,
-                                       model_surface_normal,
-                                       hit_context->front_face,
-                                       hit_context->additional_data,
-                                       texture_coordinates,
-                                       &model_shading_normal);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (!VectorValidate(model_shading_normal))
-    {
-        return ISTATUS_INVALID_RESULT;
-    }
-
     status =
         MaterialSampleInternal(material,
                                &intersection,
@@ -181,29 +162,34 @@ ShapeRayTracerProcessHit(
         return status;
     }
 
+    VECTOR3 shading_normal;
+    NORMAL_COORDINATE_SPACE coordinate_space;
+    status = ShapeComputeShadingNormal(shape,
+                                       &intersection,
+                                       model_surface_normal,
+                                       process_context->surface_normal,
+                                       hit_context->front_face,
+                                       hit_context->additional_data,
+                                       texture_coordinates,
+                                       &shading_normal,
+                                       &coordinate_space);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
     // TODO: Make this a function in multiply
-    if (model_to_world != NULL)
+    if (coordinate_space == NORMAL_MODEL_COORDINATE_SPACE &&
+        model_to_world != NULL)
     {
-        VECTOR3 world_surface_normal, world_shading_normal;
-        world_surface_normal =
-            VectorMatrixInverseTransposedMultiply(model_to_world,
-                                                  model_surface_normal);
-        world_shading_normal =
-            VectorMatrixInverseTransposedMultiply(model_to_world,
-                                                  model_shading_normal);
-        process_context->surface_normal = VectorNormalize(world_surface_normal,
-                                                          NULL,
-                                                          NULL);
-        process_context->shading_normal = VectorNormalize(world_shading_normal,
-                                                          NULL,
-                                                          NULL);
+        shading_normal = VectorMatrixInverseTransposedMultiply(model_to_world,
+                                                               shading_normal);
+        shading_normal = VectorNormalize(shading_normal, NULL, NULL);
     }
-    else
-    {
-        // TODO: Decide if it is safe to assume this is pre-normalized
-        process_context->surface_normal = model_surface_normal;
-        process_context->shading_normal = model_shading_normal;
-    }
+
+    // TODO: Decide if it is safe to assume this is pre-normalized
+    process_context->shading_normal = shading_normal;
 
     return ISTATUS_SUCCESS;
 }

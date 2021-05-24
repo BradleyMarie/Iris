@@ -378,7 +378,7 @@ cc_library(
     hdrs = ["normal_map_vtable.h"],
     deps = [
         "//common:free_routine",
-        "//iris",
+        "//iris_advanced",
     ],
 )
 

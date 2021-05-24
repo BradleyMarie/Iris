@@ -210,17 +210,20 @@ inline
 ISTATUS
 ShapeComputeShadingNormal(
     _In_ PCSHAPE shape,
-    _In_ POINT3 hit_point,
-    _In_ VECTOR3 geometry_normal,
+    _In_ PCINTERSECTION intersection,
+    _In_ VECTOR3 model_geometry_normal,
+    _In_ VECTOR3 world_geometry_normal,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 shading_normal
+    _Out_ PVECTOR3 shading_normal,
+    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
     )
 {
     assert(shape != NULL);
-    assert(PointValidate(hit_point));
-    assert(VectorValidate(geometry_normal));
+    assert(intersection != NULL);
+    assert(VectorValidate(model_geometry_normal));
+    assert(VectorValidate(world_geometry_normal));
     assert(shading_normal != NULL);
 
     const void* data = ShapeGetData(shape);
@@ -237,16 +240,19 @@ ShapeComputeShadingNormal(
 
     if (normal_map == NULL)
     {
-        *shading_normal = geometry_normal;
+        *shading_normal = world_geometry_normal;
+        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
         return ISTATUS_SUCCESS;
     }
 
     status = NormalMapCompute(normal_map,
-                              hit_point,
-                              geometry_normal,
+                              intersection,
+                              model_geometry_normal,
+                              world_geometry_normal,
                               additional_data,
                               texture_coordinates,
-                              shading_normal);
+                              shading_normal,
+                              coordinate_space);
 
     return status;
 }

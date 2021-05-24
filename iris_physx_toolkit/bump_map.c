@@ -41,11 +41,13 @@ static
 ISTATUS
 BumpMapCompute(
     _In_ const void *context,
-    _In_ POINT3 hit_point,
-    _In_ VECTOR3 geometry_normal,
+    _In_ PCINTERSECTION intersection,
+    _In_ VECTOR3 model_geometry_normal,
+    _In_ VECTOR3 world_geometry_normal,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
-    _Out_ PVECTOR3 shading_normal
+    _Out_ PVECTOR3 shading_normal,
+    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
     )
 {
     PCBUMP_MAP bump_map = (PBUMP_MAP)context;
@@ -54,16 +56,14 @@ BumpMapCompute(
 
     if (!uv_coordinates->has_derivatives)
     {
-        *shading_normal = geometry_normal;
+        *shading_normal = world_geometry_normal;
+        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
         return ISTATUS_SUCCESS;
     }
 
-    // TODO: Fix intersection
-    INTERSECTION intersection0;
-
     float_t displacement;
     ISTATUS status = FloatTextureSample(bump_map->texture,
-                                        &intersection0,
+                                        intersection,
                                         NULL,
                                         texture_coordinates,
                                         &displacement);
@@ -89,11 +89,11 @@ BumpMapCompute(
     modified_coords.uv[0] = uv_coordinates->uv[0] + du;
 
     // TODO: Fix intersection
-    INTERSECTION intersection1;
+    INTERSECTION local_intersection = *intersection;
 
     float_t displacement_u;
     status = FloatTextureSample(bump_map->texture,
-                                &intersection1,
+                                &local_intersection,
                                 NULL,
                                 &modified_coords,
                                 &displacement_u);
@@ -119,11 +119,10 @@ BumpMapCompute(
     modified_coords.uv[1] = uv_coordinates->uv[1] + dv;
 
     // TODO: Fix intersection
-    INTERSECTION intersection2;
 
     float_t displacement_v;
     status = FloatTextureSample(bump_map->texture,
-                                &intersection2,
+                                &local_intersection,
                                 NULL,
                                 &modified_coords,
                                 &displacement_v);
@@ -135,19 +134,21 @@ BumpMapCompute(
 
     displacement_u = (displacement_u - displacement) / du;
     VECTOR3 dp_du = VectorAdd(uv_coordinates->dp_du,
-                              VectorScale(geometry_normal, displacement_u));
+                              VectorScale(model_geometry_normal, displacement_u));
 
     displacement_v = (displacement_v - displacement) / dv;
     VECTOR3 dp_dv = VectorAdd(uv_coordinates->dp_dv,
-                              VectorScale(geometry_normal, displacement_v));
+                              VectorScale(model_geometry_normal, displacement_v));
 
     *shading_normal = VectorCrossProduct(dp_du, dp_dv);
     *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);
 
-    if (VectorDotProduct(geometry_normal, *shading_normal) < (float_t)0.0)
+    if (VectorDotProduct(model_geometry_normal, *shading_normal) < (float_t)0.0)
     {
         *shading_normal = VectorNegate(*shading_normal);
     }
+
+    *coordinate_space = NORMAL_MODEL_COORDINATE_SPACE;
 
     return ISTATUS_SUCCESS;
 }
