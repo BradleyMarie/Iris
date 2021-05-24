@@ -181,7 +181,7 @@ TriangleMeshTextureCoordinateMapAllocate(
 
     size_t size;
     bool success = CheckedMultiplySizeT(sizeof(float_t) * 2,
-                                        sizeof(num_vertices),
+                                        num_vertices,
                                         &size);
 
     if (!success)
