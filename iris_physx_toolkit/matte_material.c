@@ -37,7 +37,7 @@ static
 ISTATUS
 MatteMaterialSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
@@ -49,7 +49,7 @@ MatteMaterialSample(
 
     PCREFLECTOR reflector;
     ISTATUS status = ReflectorTextureSample(matte_material->diffuse,
-                                            model_hit_point,
+                                            intersection->model_hit_point,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,
@@ -62,7 +62,7 @@ MatteMaterialSample(
 
     float_t sigma;
     status = FloatTextureSample(matte_material->sigma,
-                                model_hit_point,
+                                intersection->model_hit_point,
                                 additional_data,
                                 texture_coordinates,
                                 &sigma);

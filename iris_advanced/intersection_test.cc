@@ -39,35 +39,37 @@ CreateWorldRay(
     return RayDifferentialCreate(ray0, ray1, ray2);
 }
 
-RAY_DIFFERENTIAL
-CreateModelRay(
+POINT3
+CreateModelHitPoint(
     void
     )
 {
-    POINT3 origin = PointCreate((float_t)0.0, (float_t)0.0, (float_t)0.0);
-    VECTOR3 direction = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-2.0);
-    VECTOR3 rx = VectorCreate((float_t)1.0, (float_t)0.0, (float_t)-1.0);
-    rx = VectorNormalize(rx, NULL, NULL);
-    rx = VectorScale(rx, (float_t)2.0);
-    VECTOR3 ry = VectorCreate((float_t)0.0, (float_t)1.0, (float_t)-1.0);
-    ry = VectorNormalize(ry, NULL, NULL);
-    ry = VectorScale(ry, (float_t)2.0);
-
-    RAY ray0 = RayCreate(origin, direction);
-    RAY ray1 = RayCreate(origin, rx);
-    RAY ray2 = RayCreate(origin, ry);
-
-    return RayDifferentialCreate(ray0, ray1, ray2);
+    return PointCreate((float_t)0.0, (float_t)0.0, (float_t)-2.0);
 }
 
-TEST(IntersectionTest, IntersectionCreateModel)
+POINT3
+CreateWorldHitPoint(
+    void
+    )
 {
+    return PointCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
+}
+
+TEST(IntersectionTest, IntersectionCreate)
+{
+    PMATRIX matrix;
+    ISTATUS status =  MatrixAllocateScalar((float_t)2.0,
+                                           (float_t)2.0,
+                                           (float_t)-2.0,
+                                           &matrix);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
     VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
-    INTERSECTION actual = IntersectionCreate(CreateModelRay(),
-                                             CreateWorldRay(),
-                                             normal,
-                                             NORMAL_MODEL_COORDINATE_SPACE,
-                                             (float_t)1.0);
+    INTERSECTION actual = IntersectionCreate(CreateWorldRay(),
+                                             matrix,
+                                             CreateModelHitPoint(),
+                                             CreateWorldHitPoint(),
+                                             normal);
 
     EXPECT_NEAR(actual.model_hit_point.x, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.model_hit_point.y, (float_t)0.0, (float_t)0.001);
@@ -88,51 +90,28 @@ TEST(IntersectionTest, IntersectionCreateModel)
     EXPECT_NEAR(actual.world_dp_dy.x, (float_t)0.0, (float_t)0.0001);
     EXPECT_NEAR(actual.world_dp_dy.y, (float_t)1.0, (float_t)0.0001);
     EXPECT_NEAR(actual.world_dp_dy.z, (float_t)0.0, (float_t)0.0001);
-}
 
-TEST(IntersectionTest, IntersectionCreateWorld)
-{
-    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0);
-    INTERSECTION actual = IntersectionCreate(CreateModelRay(),
-                                             CreateWorldRay(),
-                                             normal,
-                                             NORMAL_WORLD_COORDINATE_SPACE,
-                                             (float_t)1.0);
-
-    EXPECT_NEAR(actual.model_hit_point.x, (float_t)0.0, (float_t)0.001);
-    EXPECT_NEAR(actual.model_hit_point.y, (float_t)0.0, (float_t)0.001);
-    EXPECT_NEAR(actual.model_hit_point.z, (float_t)-2.0, (float_t)0.001);
-    EXPECT_NEAR(actual.world_hit_point.x, (float_t)0.0, (float_t)0.001);
-    EXPECT_NEAR(actual.world_hit_point.y, (float_t)0.0, (float_t)0.001);
-    EXPECT_NEAR(actual.world_hit_point.z, (float_t)1.0, (float_t)0.001);
-    EXPECT_TRUE(actual.has_derivatives);
-    EXPECT_NEAR(actual.model_dp_dx.x, (float_t)2.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.model_dp_dx.y, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.model_dp_dx.z, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.model_dp_dy.x, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.model_dp_dy.y, (float_t)2.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dy.z, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dx.x, (float_t)1.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dx.y, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dx.z, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dy.x, (float_t)0.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dy.y, (float_t)1.0, (float_t)0.0001);
-    EXPECT_NEAR(actual.world_dp_dy.z, (float_t)0.0, (float_t)0.0001);
+    MatrixRelease(matrix);
 }
 
 TEST(IntersectionTest, IntersectionCreateNoDifferentials)
 {
-    RAY_DIFFERENTIAL model_ray = CreateModelRay();
-    model_ray.has_differentials = false;
+    PMATRIX matrix;
+    ISTATUS status =  MatrixAllocateScalar((float_t)2.0,
+                                           (float_t)2.0,
+                                           (float_t)-2.0,
+                                           &matrix);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
     RAY_DIFFERENTIAL world_ray = CreateWorldRay();
     world_ray.has_differentials = false;
 
-    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)-1.0);
-    INTERSECTION actual = IntersectionCreate(model_ray,
-                                             world_ray,
-                                             normal,
-                                             NORMAL_WORLD_COORDINATE_SPACE,
-                                             (float_t)1.0);
+    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
+    INTERSECTION actual = IntersectionCreate(world_ray,
+                                             matrix,
+                                             CreateModelHitPoint(),
+                                             CreateWorldHitPoint(),
+                                             normal);
 
     EXPECT_NEAR(actual.model_hit_point.x, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.model_hit_point.y, (float_t)0.0, (float_t)0.001);
@@ -141,20 +120,25 @@ TEST(IntersectionTest, IntersectionCreateNoDifferentials)
     EXPECT_NEAR(actual.world_hit_point.y, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.world_hit_point.z, (float_t)1.0, (float_t)0.001);
     EXPECT_FALSE(actual.has_derivatives);
+
+    MatrixRelease(matrix);
 }
 
 TEST(IntersectionTest, IntersectionCreateInfiniteTx)
 {
-    RAY_DIFFERENTIAL model_ray = CreateModelRay();
-    model_ray.rx.direction.y = (float)1.0;
-    model_ray.rx.direction.z = (float)0.0;
+    PMATRIX matrix;
+    ISTATUS status =  MatrixAllocateScalar((float_t)2.0,
+                                           (float_t)2.0,
+                                           (float_t)-2.0,
+                                           &matrix);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
-    INTERSECTION actual = IntersectionCreate(model_ray,
-                                             CreateWorldRay(),
-                                             normal,
-                                             NORMAL_MODEL_COORDINATE_SPACE,
-                                             (float_t)1.0);
+    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)1.0, (float_t)0.0);
+    INTERSECTION actual = IntersectionCreate(CreateWorldRay(),
+                                             matrix,
+                                             CreateModelHitPoint(),
+                                             CreateWorldHitPoint(),
+                                             normal);
 
     EXPECT_NEAR(actual.model_hit_point.x, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.model_hit_point.y, (float_t)0.0, (float_t)0.001);
@@ -163,20 +147,25 @@ TEST(IntersectionTest, IntersectionCreateInfiniteTx)
     EXPECT_NEAR(actual.world_hit_point.y, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.world_hit_point.z, (float_t)1.0, (float_t)0.001);
     EXPECT_FALSE(actual.has_derivatives);
+
+    MatrixRelease(matrix);
 }
 
 TEST(IntersectionTest, IntersectionCreateInfiniteTy)
 {
-    RAY_DIFFERENTIAL model_ray = CreateModelRay();
-    model_ray.ry.direction.y = (float)1.0;
-    model_ray.ry.direction.z = (float)0.0;
+    PMATRIX matrix;
+    ISTATUS status =  MatrixAllocateScalar((float_t)2.0,
+                                           (float_t)2.0,
+                                           (float_t)-2.0,
+                                           &matrix);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
 
-    VECTOR3 normal = VectorCreate((float_t)0.0, (float_t)0.0, (float_t)1.0);
-    INTERSECTION actual = IntersectionCreate(model_ray,
-                                             CreateWorldRay(),
-                                             normal,
-                                             NORMAL_MODEL_COORDINATE_SPACE,
-                                             (float_t)1.0);
+    VECTOR3 normal = VectorCreate((float_t)1.0, (float_t)0.0, (float_t)0.0);
+    INTERSECTION actual = IntersectionCreate(CreateWorldRay(),
+                                             matrix,
+                                             CreateModelHitPoint(),
+                                             CreateWorldHitPoint(),
+                                             normal);
 
     EXPECT_NEAR(actual.model_hit_point.x, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.model_hit_point.y, (float_t)0.0, (float_t)0.001);
@@ -185,4 +174,6 @@ TEST(IntersectionTest, IntersectionCreateInfiniteTy)
     EXPECT_NEAR(actual.world_hit_point.y, (float_t)0.0, (float_t)0.001);
     EXPECT_NEAR(actual.world_hit_point.z, (float_t)1.0, (float_t)0.001);
     EXPECT_FALSE(actual.has_derivatives);
+
+    MatrixRelease(matrix);
 }

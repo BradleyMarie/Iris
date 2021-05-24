@@ -98,7 +98,17 @@ ShapeComputeNormal(
                                                            face_hit,
                                                            surface_normal);
 
-    return status;
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (!VectorValidate(*surface_normal))
+    {
+        return ISTATUS_INVALID_RESULT;
+    }
+
+    return ISTATUS_SUCCESS;
 }
 
 static

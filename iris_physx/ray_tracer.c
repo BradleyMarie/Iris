@@ -111,10 +111,29 @@ ShapeRayTracerProcessHit(
         return status;
     }
 
-    if (!VectorValidate(model_surface_normal))
+    // TODO: Make this a function in multiply
+    if (model_to_world != NULL)
     {
-        return ISTATUS_INVALID_RESULT;
+        VECTOR3 world_surface_normal;
+        world_surface_normal =
+            VectorMatrixInverseTransposedMultiply(model_to_world,
+                                                  model_surface_normal);
+        process_context->surface_normal = VectorNormalize(world_surface_normal,
+                                                          NULL,
+                                                          NULL);
     }
+    else
+    {
+        // TODO: Decide if it is safe to assume this is pre-normalized
+        process_context->surface_normal = model_surface_normal;
+    }
+
+    INTERSECTION intersection =
+        IntersectionCreate(*process_context->ray_differential,
+                           model_to_world,
+                           model_hit_point,
+                           world_hit_point,
+                           process_context->surface_normal);
 
     void *texture_coordinates;
     status = ShapeComputeTextureCoordinates(shape,
@@ -153,7 +172,7 @@ ShapeRayTracerProcessHit(
 
     status =
         MaterialSampleInternal(material,
-                               model_hit_point,
+                               &intersection,
                                hit_context->additional_data,
                                texture_coordinates,
                                &process_context->shape_ray_tracer->bsdf_allocator,
@@ -169,7 +188,7 @@ ShapeRayTracerProcessHit(
     if (model_to_world != NULL)
     {
         VECTOR3 world_surface_normal, world_shading_normal;
-        world_surface_normal = 
+        world_surface_normal =
             VectorMatrixInverseTransposedMultiply(model_to_world,
                                                   model_surface_normal);
         world_shading_normal =

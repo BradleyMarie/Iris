@@ -90,7 +90,7 @@ MaterialAllocate(
 ISTATUS
 MaterialSample(
     _In_ PCMATERIAL material,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
@@ -103,7 +103,7 @@ MaterialSample(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!PointValidate(model_hit_point))
+    if (intersection == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -124,7 +124,7 @@ MaterialSample(
     }
 
     ISTATUS status = MaterialSampleInternal(material,
-                                            model_hit_point,
+                                            intersection,
                                             additional_data,
                                             texture_coordinates,
                                             bsdf_allocator,

@@ -42,7 +42,7 @@ MaterialAllocate(
 ISTATUS
 MaterialSample(
     _In_ PCMATERIAL material,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,

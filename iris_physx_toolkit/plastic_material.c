@@ -40,7 +40,7 @@ static
 ISTATUS
 PlasticMaterialSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
@@ -52,7 +52,7 @@ PlasticMaterialSample(
 
     PCREFLECTOR diffuse;
     ISTATUS status = ReflectorTextureSample(plastic_material->diffuse,
-                                            model_hit_point,
+                                            intersection->model_hit_point,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,
@@ -65,7 +65,7 @@ PlasticMaterialSample(
 
     PCREFLECTOR specular;
     status = ReflectorTextureSample(plastic_material->specular,
-                                    model_hit_point,
+                                    intersection->model_hit_point,
                                     additional_data,
                                     texture_coordinates,
                                     reflector_compositor,
@@ -78,7 +78,7 @@ PlasticMaterialSample(
 
     float_t roughness;
     status = FloatTextureSample(plastic_material->roughness,
-                                model_hit_point,
+                                intersection->model_hit_point,
                                 additional_data,
                                 texture_coordinates,
                                 &roughness);

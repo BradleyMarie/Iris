@@ -323,7 +323,7 @@ static
 ISTATUS
 AlphaMaterialSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
@@ -335,7 +335,7 @@ AlphaMaterialSample(
 
     PCBSDF base_bsdf;
     ISTATUS status = MaterialSample(alpha_material->base,
-                                    model_hit_point,
+                                    intersection,
                                     additional_data,
                                     texture_coordinates,
                                     bsdf_allocator,
@@ -349,7 +349,7 @@ AlphaMaterialSample(
 
     float_t alpha;
     status = FloatTextureSample(alpha_material->alpha,
-                                model_hit_point,
+                                intersection->model_hit_point,
                                 additional_data,
                                 texture_coordinates,
                                 &alpha);

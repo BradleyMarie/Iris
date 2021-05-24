@@ -34,11 +34,6 @@ typedef struct _INTERSECTION {
 
 typedef const INTERSECTION *PCINTERSECTION;
 
-typedef enum _NORMAL_COORDINATE_SPACE {
-    NORMAL_MODEL_COORDINATE_SPACE = 0,
-    NORMAL_WORLD_COORDINATE_SPACE = 1
-} NORMAL_COORDINATE_SPACE;
-
 //
 // Functions
 //
@@ -47,55 +42,39 @@ static
 inline
 INTERSECTION
 IntersectionCreate(
-    _In_ RAY_DIFFERENTIAL model_ray,
     _In_ RAY_DIFFERENTIAL world_ray,
-    _In_ VECTOR3 normal,
-    _In_ NORMAL_COORDINATE_SPACE normal_coordinate_space,
-    _In_ float_t distance
+    _In_opt_ PCMATRIX model_to_world,
+    _In_ POINT3 model_hit_point,
+    _In_ POINT3 world_hit_point,
+    _In_ VECTOR3 world_normal
     )
 {
-    assert(RayDifferentialValidate(model_ray));
     assert(RayDifferentialValidate(world_ray));
-    assert(model_ray.has_differentials == world_ray.has_differentials);
-    assert(VectorValidate(normal));
-    assert(normal_coordinate_space == NORMAL_MODEL_COORDINATE_SPACE ||
-           normal_coordinate_space == NORMAL_WORLD_COORDINATE_SPACE);
-    assert(isfinite(distance));
+    assert(PointValidate(model_hit_point));
+    assert(PointValidate(world_hit_point));
+    assert(VectorValidate(world_normal));
 
     INTERSECTION result;
-    result.model_hit_point = RayEndpoint(model_ray.ray, distance);
-    result.world_hit_point = RayEndpoint(world_ray.ray, distance);
+    result.model_hit_point = model_hit_point;
+    result.world_hit_point = world_hit_point;
 
-    if (!model_ray.has_differentials)
+    if (!world_ray.has_differentials)
     {
         result.has_derivatives = false;
         return result;
     }
 
-    PCRAY_DIFFERENTIAL differential;
-    VECTOR3 to_origin;
-    if (normal_coordinate_space == NORMAL_MODEL_COORDINATE_SPACE)
-    {
-        differential = &model_ray;
-        to_origin = VectorCreate(result.model_hit_point.x,
-                                 result.model_hit_point.y,
-                                 result.model_hit_point.z);
-    }
-    else
-    {
-        differential = &world_ray;
-        to_origin = VectorCreate(result.world_hit_point.x,
-                                 result.world_hit_point.y,
-                                 result.world_hit_point.z);
-    }
+    VECTOR3 to_origin = VectorCreate(world_hit_point.x,
+                                     world_hit_point.y,
+                                     world_hit_point.z);
 
-    distance = VectorDotProduct(normal, to_origin);
+    float_t distance = VectorDotProduct(world_normal, to_origin);
 
-    to_origin = VectorCreate(differential->rx.origin.x,
-                             differential->rx.origin.y,
-                             differential->rx.origin.z);
-    float_t tx = -(VectorDotProduct(normal, to_origin) - distance) /
-                   VectorDotProduct(normal, differential->rx.direction);
+    to_origin = VectorCreate(world_ray.rx.origin.x,
+                             world_ray.rx.origin.y,
+                             world_ray.rx.origin.z);
+    float_t tx = -(VectorDotProduct(world_normal, to_origin) - distance) /
+                   VectorDotProduct(world_normal, world_ray.rx.direction);
 
     if (!isfinite(tx))
     {
@@ -103,11 +82,11 @@ IntersectionCreate(
         return result;
     }
 
-    to_origin = VectorCreate(differential->ry.origin.x,
-                             differential->ry.origin.y,
-                             differential->ry.origin.z);
-    float_t ty = -(VectorDotProduct(normal, to_origin) - distance) /
-                   VectorDotProduct(normal, differential->ry.direction);
+    to_origin = VectorCreate(world_ray.ry.origin.x,
+                             world_ray.ry.origin.y,
+                             world_ray.ry.origin.z);
+    float_t ty = -(VectorDotProduct(world_normal, to_origin) - distance) /
+                   VectorDotProduct(world_normal, world_ray.ry.direction);
 
     if (!isfinite(ty))
     {
@@ -115,17 +94,17 @@ IntersectionCreate(
         return result;
     }
 
-    POINT3 model_rx_hit = RayEndpoint(model_ray.rx, tx);
-    result.model_dp_dx = PointSubtract(model_rx_hit, result.model_hit_point);
-
-    POINT3 model_ry_hit = RayEndpoint(model_ray.ry, ty);
-    result.model_dp_dy = PointSubtract(model_ry_hit, result.model_hit_point);
-
     POINT3 world_rx_hit = RayEndpoint(world_ray.rx, tx);
-    result.world_dp_dx = PointSubtract(world_rx_hit, result.world_hit_point);
+    result.world_dp_dx = PointSubtract(world_rx_hit, world_hit_point);
 
     POINT3 world_ry_hit = RayEndpoint(world_ray.ry, ty);
-    result.world_dp_dy = PointSubtract(world_ry_hit, result.world_hit_point);
+    result.world_dp_dy = PointSubtract(world_ry_hit, world_hit_point);
+
+    result.model_dp_dx = VectorMatrixTransposedMultiply(model_to_world,
+                                                        result.world_dp_dx);
+
+    result.model_dp_dy = VectorMatrixTransposedMultiply(model_to_world,
+                                                        result.world_dp_dy);
 
     result.has_derivatives = true;
 
