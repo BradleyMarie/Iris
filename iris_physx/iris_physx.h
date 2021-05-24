@@ -43,6 +43,7 @@ extern "C" {
 #include "iris_physx/spectrum.h"
 #include "iris_physx/spectrum_compositor.h"
 #include "iris_physx/texture_coordinate_allocator.h"
+#include "iris_physx/texture_coordinate_map.h"
 #include "iris_physx/visibility_tester.h"
 
 #if __cplusplus 

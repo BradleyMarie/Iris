@@ -234,6 +234,7 @@ cc_library(
         ":spectrum",
         ":spectrum_compositor",
         ":texture_coordinate_allocator",
+        ":texture_coordinate_map",
         ":visibility_tester",
         "//iris_advanced",
     ],
@@ -656,6 +657,35 @@ cc_library(
         "//common:dynamic_allocator",
         "//common:sal",
         "//common:status",
+    ],
+)
+
+cc_library(
+    name = "texture_coordinate_map",
+    srcs = ["texture_coordinate_map.c"],
+    hdrs = ["texture_coordinate_map.h"],
+    deps = [
+        ":texture_coordinate_map_internal",
+        ":texture_coordinate_map_vtable",
+        "//common:alloc",
+    ],
+)
+
+cc_library(
+    name = "texture_coordinate_map_internal",
+    hdrs = ["texture_coordinate_map_internal.h"],
+    deps = [
+        ":texture_coordinate_map_vtable",
+    ],
+)
+
+cc_library(
+    name = "texture_coordinate_map_vtable",
+    hdrs = ["texture_coordinate_map_vtable.h"],
+    deps = [
+        ":texture_coordinate_allocator",
+        "//common:free_routine",
+        "//iris_advanced",
     ],
 )
 
