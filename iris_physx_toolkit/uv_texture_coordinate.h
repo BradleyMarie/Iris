@@ -46,9 +46,8 @@ UVTextureCoordinateInitialize(
     _In_ const float uv[2],
     _In_ VECTOR3 dp_du,
     _In_ VECTOR3 dp_dv,
-    _In_ RAY_DIFFERENTIAL ray_differential,
-    _In_ POINT3 hit_point,
-    _In_ VECTOR3 surface_normal
+    _In_ VECTOR3 dp_dx,
+    _In_ VECTOR3 dp_dy
     )
 {
     assert(coordinate != NULL);
@@ -56,9 +55,8 @@ UVTextureCoordinateInitialize(
     assert(isfinite(uv[0]) && isfinite(uv[1]));
     assert(VectorValidate(dp_du));
     assert(VectorValidate(dp_dv));
-    assert(RayDifferentialValidate(ray_differential));
-    assert(ray_differential.has_differentials);
-    assert(VectorValidate(surface_normal));
+    assert(VectorValidate(dp_dx));
+    assert(VectorValidate(dp_dy));
 
     coordinate->uv[0] = uv[0];
     coordinate->uv[1] = uv[1];
@@ -66,81 +64,42 @@ UVTextureCoordinateInitialize(
     coordinate->dp_dv = dp_dv;
     coordinate->has_derivatives = true;
 
-    VECTOR3 to_origin = VectorCreate(hit_point.x, hit_point.y, hit_point.z);
-    float_t distance = VectorDotProduct(surface_normal, to_origin);
-
-    to_origin = VectorCreate(ray_differential.rx.origin.x,
-                             ray_differential.rx.origin.y,
-                             ray_differential.rx.origin.z);
-    float_t tx =
-        -(VectorDotProduct(surface_normal, to_origin) - distance) /
-        VectorDotProduct(surface_normal, ray_differential.rx.direction);
-
-    if (!isfinite(tx))
-    {
-        coordinate->du_dx = (float_t)0.0;
-        coordinate->dv_dx = (float_t)0.0;
-        coordinate->du_dy = (float_t)0.0;
-        coordinate->dv_dy = (float_t)0.0;
-        return;
-    }
-
-    POINT3 px = RayEndpoint(ray_differential.rx, tx);
-
-    to_origin = VectorCreate(ray_differential.ry.origin.x,
-                             ray_differential.ry.origin.y,
-                             ray_differential.ry.origin.z);
-    float_t ty =
-        -(VectorDotProduct(surface_normal, to_origin) - distance) /
-        VectorDotProduct(surface_normal, ray_differential.ry.direction);
-
-    if (!isfinite(ty))
-    {
-        coordinate->du_dx = (float_t)0.0;
-        coordinate->dv_dx = (float_t)0.0;
-        coordinate->du_dy = (float_t)0.0;
-        coordinate->dv_dy = (float_t)0.0;
-        return;
-    }
-
-    POINT3 py = RayEndpoint(ray_differential.ry, ty);
-
-    VECTOR_AXIS dominant_axis = VectorDominantAxis(surface_normal);
+    VECTOR_AXIS diminished_axis = VectorDiminishedAxis(dp_dx);
 
     float_t a[2][2];
     float_t b_x[2];
     float_t b_y[2];
-    switch (dominant_axis)
+    switch (diminished_axis)
     {
         case VECTOR_X_AXIS:
             a[0][0] = dp_du.y;
             a[0][1] = dp_dv.y;
             a[1][0] = dp_du.z;
             a[1][1] = dp_dv.z;
-            b_x[0] = px.y - hit_point.y;
-            b_x[1] = px.z - hit_point.z;
-            b_y[0] = py.y - hit_point.y;
-            b_y[1] = py.z - hit_point.z;
+            b_x[0] = dp_dx.y;
+            b_x[1] = dp_dx.z;
+            b_y[0] = dp_dy.y;
+            b_y[1] = dp_dy.z;
             break;
         case VECTOR_Y_AXIS:
             a[0][0] = dp_du.x;
             a[0][1] = dp_dv.x;
             a[1][0] = dp_du.z;
             a[1][1] = dp_dv.z;
-            b_x[0] = px.x - hit_point.x;
-            b_x[1] = px.z - hit_point.z;
-            b_y[0] = py.x - hit_point.x;
-            b_y[1] = py.z - hit_point.z;
+            b_x[0] = dp_dx.x;
+            b_x[1] = dp_dx.z;
+            b_y[0] = dp_dy.x;
+            b_y[1] = dp_dy.z;
             break;
         case VECTOR_Z_AXIS:
             a[0][0] = dp_du.x;
             a[0][1] = dp_dv.x;
             a[1][0] = dp_du.y;
             a[1][1] = dp_dv.y;
-            b_x[0] = px.x - hit_point.x;
-            b_x[1] = px.y - hit_point.y;
-            b_y[0] = py.x - hit_point.x;
-            b_y[1] = py.y - hit_point.y;
+            b_x[0] = dp_dx.x;
+            b_x[1] = dp_dx.y;
+            b_y[0] = dp_dy.x;
+            b_y[1] = dp_dy.y;
             break;
     }
 

@@ -98,9 +98,8 @@ typedef
 ISTATUS
 (*PSHAPE_COMPUTE_TEXTURE_COORDINATES)(
     _In_opt_ const void *context,
-    _In_ PCPOINT3 hit_point,
-    _In_ PCVECTOR3 surface_normal,
-    _In_ PCRAY_DIFFERENTIAL ray_differential,
+    _In_ POINT3 hit_point,
+    _In_opt_ const VECTOR3 dpdx_dpdy[2],
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,

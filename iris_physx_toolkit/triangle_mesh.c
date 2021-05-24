@@ -346,9 +346,8 @@ TriangleMeshTriangleGetNormalMap(
 ISTATUS
 TriangleMeshTriangleComputeTextureCoordinates(
     _In_opt_ const void *context,
-    _In_ PCPOINT3 hit_point,
-    _In_ PCVECTOR3 surface_normal,
-    _In_ PCRAY_DIFFERENTIAL ray_differential,
+    _In_ POINT3 hit_point,
+    _In_opt_ const VECTOR3 dpdx_dpdy[2],
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
@@ -393,7 +392,7 @@ TriangleMeshTriangleComputeTextureCoordinates(
     uv[1] += mesh->texture_coordinates[triangle->v2][1] *
              hit_data->barycentric_coordinates[2];
 
-    if (!ray_differential->has_differentials)
+    if (dpdx_dpdy == NULL)
     {
         UVTextureCoordinateInitializeWithoutDerivatives(uv_coordinates, uv);
         return ISTATUS_SUCCESS;
@@ -438,9 +437,8 @@ TriangleMeshTriangleComputeTextureCoordinates(
                                   uv,
                                   dp_du,
                                   dp_dv,
-                                  *ray_differential,
-                                  *hit_point,
-                                  *surface_normal);
+                                  dpdx_dpdy[0],
+                                  dpdx_dpdy[1]);
 
     return ISTATUS_SUCCESS;
 }

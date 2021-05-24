@@ -256,10 +256,7 @@ inline
 ISTATUS
 ShapeComputeTextureCoordinates(
     _In_ PCSHAPE shape,
-    _In_ PCMATRIX model_to_world,
-    _In_ POINT3 model_hit_point,
-    _In_ VECTOR3 model_surface_normal,
-    _In_ RAY_DIFFERENTIAL world_ray_differential,
+    _In_ PCINTERSECTION intersection,
     _In_ uint32_t face_hit,
     _In_ const void *additional_data,
     _Inout_ PTEXTURE_COORDINATE_ALLOCATOR allocator,
@@ -267,23 +264,30 @@ ShapeComputeTextureCoordinates(
     )
 {
     assert(shape != NULL);
-    assert(PointValidate(model_hit_point));
-    assert(VectorValidate(model_surface_normal));
+    assert(intersection != NULL);
     assert(allocator != NULL);
     assert(texture_coordinates != NULL);
 
     if (shape->vtable->compute_texture_coordinates != NULL)
     {
-        RAY_DIFFERENTIAL model_ray_differential =
-            RayDifferentialMatrixInverseMultiply(model_to_world,
-                                                 world_ray_differential);
+        VECTOR3 dpdx_dpdy_storage[2];
+        PCVECTOR3 dpdx_dpdy;
+        if (intersection->has_derivatives)
+        {
+            dpdx_dpdy_storage[0] = intersection->model_dp_dx;
+            dpdx_dpdy_storage[1] = intersection->model_dp_dy;
+            dpdx_dpdy = dpdx_dpdy_storage;
+        }
+        else
+        {
+            dpdx_dpdy = NULL;
+        }
 
         const void* data = ShapeGetData(shape);
         ISTATUS status =
             shape->vtable->compute_texture_coordinates(data,
-                                                       &model_hit_point,
-                                                       &model_surface_normal,
-                                                       &model_ray_differential,
+                                                       intersection->model_hit_point,
+                                                       dpdx_dpdy,
                                                        face_hit,
                                                        additional_data,
                                                        allocator,
