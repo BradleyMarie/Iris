@@ -349,7 +349,7 @@ AlphaMaterialSample(
 
     float_t alpha;
     status = FloatTextureSample(alpha_material->alpha,
-                                intersection->model_hit_point,
+                                intersection,
                                 additional_data,
                                 texture_coordinates,
                                 &alpha);

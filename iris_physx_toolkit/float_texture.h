@@ -44,7 +44,7 @@ FloatTextureAllocate(
 ISTATUS
 FloatTextureSample(
     _In_opt_ PCFLOAT_TEXTURE texture,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_opt_ const void *additional_data,
     _In_opt_ const void *texture_coordinates,
     _Out_ float_t *value

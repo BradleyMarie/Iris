@@ -47,7 +47,7 @@ MirrorMaterialSample(
 
     PCREFLECTOR reflector;
     ISTATUS status = ReflectorTextureSample(mirror_material->reflectance,
-                                            intersection->model_hit_point,
+                                            intersection,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,

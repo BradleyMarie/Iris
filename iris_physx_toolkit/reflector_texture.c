@@ -99,14 +99,14 @@ ReflectorTextureAllocate(
 ISTATUS
 ReflectorTextureSample(
     _In_opt_ PCREFLECTOR_TEXTURE texture,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
     _Out_ PCREFLECTOR *value
     )
 {
-    if (!PointValidate(model_hit_point))
+    if (intersection == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
@@ -128,7 +128,7 @@ ReflectorTextureSample(
     }
 
     ISTATUS status = texture->vtable->sample_routine(texture->data,
-                                                     model_hit_point,
+                                                     intersection,
                                                      additional_data,
                                                      texture_coordinates,
                                                      reflector_compositor,

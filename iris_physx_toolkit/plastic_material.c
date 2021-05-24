@@ -52,7 +52,7 @@ PlasticMaterialSample(
 
     PCREFLECTOR diffuse;
     ISTATUS status = ReflectorTextureSample(plastic_material->diffuse,
-                                            intersection->model_hit_point,
+                                            intersection,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,
@@ -65,7 +65,7 @@ PlasticMaterialSample(
 
     PCREFLECTOR specular;
     status = ReflectorTextureSample(plastic_material->specular,
-                                    intersection->model_hit_point,
+                                    intersection,
                                     additional_data,
                                     texture_coordinates,
                                     reflector_compositor,
@@ -78,7 +78,7 @@ PlasticMaterialSample(
 
     float_t roughness;
     status = FloatTextureSample(plastic_material->roughness,
-                                intersection->model_hit_point,
+                                intersection,
                                 additional_data,
                                 texture_coordinates,
                                 &roughness);

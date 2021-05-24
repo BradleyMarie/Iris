@@ -58,9 +58,12 @@ BumpMapCompute(
         return ISTATUS_SUCCESS;
     }
 
+    // TODO: Fix intersection
+    INTERSECTION intersection0;
+
     float_t displacement;
     ISTATUS status = FloatTextureSample(bump_map->texture,
-                                        hit_point,
+                                        &intersection0,
                                         NULL,
                                         texture_coordinates,
                                         &displacement);
@@ -85,12 +88,12 @@ BumpMapCompute(
     UV_TEXTURE_COORDINATE modified_coords = *uv_coordinates;
     modified_coords.uv[0] = uv_coordinates->uv[0] + du;
 
-    POINT3 hit_point1 =
-        PointVectorAddScaled(hit_point, uv_coordinates->dp_du, du);
+    // TODO: Fix intersection
+    INTERSECTION intersection1;
 
     float_t displacement_u;
     status = FloatTextureSample(bump_map->texture,
-                                hit_point1,
+                                &intersection1,
                                 NULL,
                                 &modified_coords,
                                 &displacement_u);
@@ -115,12 +118,12 @@ BumpMapCompute(
     modified_coords.uv[0] = uv_coordinates->uv[0];
     modified_coords.uv[1] = uv_coordinates->uv[1] + dv;
 
-    POINT3 hit_point2 =
-        PointVectorAddScaled(hit_point, uv_coordinates->dp_dv, dv);
+    // TODO: Fix intersection
+    INTERSECTION intersection2;
 
     float_t displacement_v;
     status = FloatTextureSample(bump_map->texture,
-                                hit_point2,
+                                &intersection2,
                                 NULL,
                                 &modified_coords,
                                 &displacement_v);

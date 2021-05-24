@@ -49,7 +49,7 @@ MatteMaterialSample(
 
     PCREFLECTOR reflector;
     ISTATUS status = ReflectorTextureSample(matte_material->diffuse,
-                                            intersection->model_hit_point,
+                                            intersection,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,
@@ -62,7 +62,7 @@ MatteMaterialSample(
 
     float_t sigma;
     status = FloatTextureSample(matte_material->sigma,
-                                intersection->model_hit_point,
+                                intersection,
                                 additional_data,
                                 texture_coordinates,
                                 &sigma);

@@ -36,7 +36,7 @@ static
 ISTATUS
 ProductFloatTextureSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Out_ float_t *value
@@ -46,7 +46,7 @@ ProductFloatTextureSample(
 
     float_t multiplicand;
     ISTATUS status = FloatTextureSample(texture->multiplicand0,
-                                        model_hit_point,
+                                        intersection,
                                         additional_data,
                                         texture_coordinates,
                                         &multiplicand);
@@ -57,7 +57,7 @@ ProductFloatTextureSample(
     }
 
     status = FloatTextureSample(texture->multiplicand1,
-                                model_hit_point,
+                                intersection,
                                 additional_data,
                                 texture_coordinates,
                                 value);
@@ -154,7 +154,7 @@ static
 ISTATUS
 ProductReflectorTextureSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
@@ -166,7 +166,7 @@ ProductReflectorTextureSample(
 
     PCREFLECTOR multiplicand0;
     ISTATUS status = ReflectorTextureSample(texture->multiplicand0,
-                                            model_hit_point,
+                                            intersection,
                                             additional_data,
                                             texture_coordinates,
                                             reflector_compositor,
@@ -179,7 +179,7 @@ ProductReflectorTextureSample(
 
     PCREFLECTOR multiplicand1;
     status = ReflectorTextureSample(texture->multiplicand1,
-                                    model_hit_point,
+                                    intersection,
                                     additional_data,
                                     texture_coordinates,
                                     reflector_compositor,

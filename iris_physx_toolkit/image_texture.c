@@ -40,7 +40,7 @@ static
 ISTATUS
 ImageFloatTextureSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Out_ float_t *value
@@ -176,7 +176,7 @@ static
 ISTATUS
 ImageReflectorTextureSample(
     _In_ const void *context,
-    _In_ POINT3 model_hit_point,
+    _In_ PCINTERSECTION intersection,
     _In_ const void *additional_data,
     _In_ const void *texture_coordinates,
     _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
