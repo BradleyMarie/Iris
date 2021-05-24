@@ -482,14 +482,6 @@ AggregateBsdfAllocate(
         aggregate_bsdf->bsdfs[inserted_bsdfs++] = bsdfs[i];
     }
 
-    for (size_t i = 0; i < num_bsdfs; i++)
-    {
-        if (bsdfs[i] != NULL)
-        {
-            aggregate_bsdf->bsdfs[inserted_bsdfs++] = bsdfs[i];
-        }
-    }
-
     if (inserted_bsdfs == 0)
     {
         free(aggregate_bsdf);
@@ -572,16 +564,45 @@ AggregateBsdfAllocateWithAllocator(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    size_t temporary_space[1 + NUM_SUPPORTED_BSDFS];
+    size_t temporary_space[2 + NUM_SUPPORTED_BSDFS];
     PAGGREGATE_BSDF aggregate_bsdf = (PAGGREGATE_BSDF)(void *)&temporary_space;
 
+    size_t num_diffuse = 0;
     size_t inserted_bsdfs = 0;
     for (size_t i = 0; i < num_bsdfs; i++)
     {
-        if (bsdfs[i] != NULL)
+        if (bsdfs[i] == NULL)
         {
-            aggregate_bsdf->bsdfs[inserted_bsdfs++] = (PBSDF)bsdfs[i];
+            continue;
         }
+
+        bool is_diffuse;
+        BsdfIsDiffuse(bsdfs[i], &is_diffuse);
+
+        if (is_diffuse)
+        {
+            num_diffuse += 1;
+        }
+
+        aggregate_bsdf->bsdfs[inserted_bsdfs++] = (PBSDF)bsdfs[i];
+    }
+
+    for (size_t i = 0; i < num_bsdfs; i++)
+    {
+        if (bsdfs[i] == NULL)
+        {
+            continue;
+        }
+
+        bool is_diffuse;
+        BsdfIsDiffuse(bsdfs[i], &is_diffuse);
+
+        if (is_diffuse)
+        {
+            continue;
+        }
+
+        aggregate_bsdf->bsdfs[inserted_bsdfs++] = (PBSDF)bsdfs[i];
     }
 
     if (inserted_bsdfs == 0)
@@ -597,11 +618,21 @@ AggregateBsdfAllocateWithAllocator(
     }
 
     aggregate_bsdf->num_bsdfs = inserted_bsdfs;
-    aggregate_bsdf->num_diffuse = 0;
+    aggregate_bsdf->num_diffuse = num_diffuse;
+
+    PCBSDF_VTABLE vtable;
+    if (num_diffuse == 0)
+    {
+        vtable = &aggregate_specular_bsdf_vtable;
+    }
+    else
+    {
+        vtable = &aggregate_bsdf_vtable;
+    }
 
     size_t struct_size = 2 * sizeof(size_t) + num_bsdfs * sizeof(PBSDF);
     ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
-                                           &aggregate_bsdf_vtable,
+                                           vtable,
                                            aggregate_bsdf,
                                            struct_size,
                                            alignof(AGGREGATE_BSDF),
