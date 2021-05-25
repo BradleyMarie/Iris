@@ -215,7 +215,7 @@ FractionalBrownianNoise(
 }
 
 //
-// Types
+// Windy Float Texture Type
 //
 
 typedef struct _FLOAT_WINDY_TEXTURE {
@@ -225,7 +225,7 @@ typedef struct _FLOAT_WINDY_TEXTURE {
 typedef const FLOAT_WINDY_TEXTURE *PCFLOAT_WINDY_TEXTURE;
 
 //
-// Static Functions
+// Windy Float Texture Static Functions
 //
 
 static
@@ -282,7 +282,7 @@ WindyFloatFree(
 }
 
 //
-// Static Variables
+// Windy Float Texture Static Variables
 //
 
 static const FLOAT_TEXTURE_VTABLE float_windy_texture_vtable = {
@@ -291,11 +291,94 @@ static const FLOAT_TEXTURE_VTABLE float_windy_texture_vtable = {
 };
 
 //
+// Windy Reflector Texture Type
+//
+
+typedef struct _REFLECTOR_WINDY_TEXTURE {
+    PMATRIX texture_to_world;
+    PREFLECTOR reflector;
+} REFLECTOR_WINDY_TEXTURE, *PREFLECTOR_WINDY_TEXTURE;
+
+typedef const REFLECTOR_WINDY_TEXTURE *PCREFLECTOR_WINDY_TEXTURE;
+
+//
+// Windy Reflector Texture Static Functions
+//
+
+static
+ISTATUS
+WindyReflectorSample(
+    _In_ const void *context,
+    _In_ PCINTERSECTION intersection,
+    _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
+    _Inout_ PREFLECTOR_COMPOSITOR reflector_compositor,
+    _Out_ PCREFLECTOR *value
+    )
+{
+    PREFLECTOR_WINDY_TEXTURE texture = (PREFLECTOR_WINDY_TEXTURE)context;
+
+    POINT3 p = PointMatrixInverseMultiply(texture->texture_to_world,
+                                          intersection->world_hit_point);
+    p.x *= (float_t)0.1;
+    p.y *= (float_t)0.1;
+    p.z *= (float_t)0.1;
+
+    VECTOR3 dp_dx = VectorMatrixTransposedMultiply(texture->texture_to_world,
+                                                   intersection->model_dp_dx);
+    dp_dx = VectorScale(dp_dx, (float_t)0.1);
+
+    VECTOR3 dp_dy = VectorMatrixTransposedMultiply(texture->texture_to_world,
+                                                   intersection->model_dp_dy);
+    dp_dy = VectorScale(dp_dy, (float_t)0.1);
+
+    float_t wind_strength = FractionalBrownianNoise(p,
+                                                    dp_dx,
+                                                    dp_dy,
+                                                    (float_t)0.5,
+                                                    3);
+
+    float_t wave_height = FractionalBrownianNoise(p,
+                                                  dp_dx,
+                                                  dp_dy,
+                                                  (float_t)0.5,
+                                                  6);
+
+    float_t modulation = fabs(wind_strength) * wave_height;
+    ISTATUS status = ReflectorCompositorAttenuateReflector(reflector_compositor,
+                                                           texture->reflector,
+                                                           modulation,
+                                                           value);
+
+    return status;
+}
+
+static
+void
+WindyReflectorFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PREFLECTOR_WINDY_TEXTURE texture = (PREFLECTOR_WINDY_TEXTURE)context;
+    MatrixRelease(texture->texture_to_world);
+    ReflectorRelease(texture->reflector);
+}
+
+//
+// Windy Reflector Texture Static Variables
+//
+
+static const REFLECTOR_TEXTURE_VTABLE reflector_windy_texture_vtable = {
+    WindyReflectorSample,
+    WindyReflectorFree
+};
+
+//
 // Functions
 //
 
 ISTATUS
-WindyFloatAllocate(
+WindyFloatTextureAllocate(
     _In_opt_ PMATRIX texture_to_world,
     _Out_ PFLOAT_TEXTURE *texture
     )
@@ -320,6 +403,39 @@ WindyFloatAllocate(
     }
 
     MatrixRetain(texture_to_world);
+
+    return status;
+}
+
+ISTATUS
+WindyReflectorTextureAllocate(
+    _In_opt_ PMATRIX texture_to_world,
+    _In_opt_ PREFLECTOR reflector,
+    _Out_ PREFLECTOR_TEXTURE *texture
+    )
+{
+    if (texture == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    REFLECTOR_WINDY_TEXTURE windy_texture;
+    windy_texture.texture_to_world = texture_to_world;
+    windy_texture.reflector = reflector;
+
+    ISTATUS status = ReflectorTextureAllocate(&reflector_windy_texture_vtable,
+                                              &windy_texture,
+                                              sizeof(REFLECTOR_WINDY_TEXTURE),
+                                              alignof(REFLECTOR_WINDY_TEXTURE),
+                                              texture);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    MatrixRetain(texture_to_world);
+    ReflectorRetain(reflector);
 
     return status;
 }

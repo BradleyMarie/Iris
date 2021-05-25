@@ -16,6 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_TOOLKIT_PERLIN_TEXTURE_
 
 #include "iris_physx_toolkit/float_texture.h"
+#include "iris_physx_toolkit/reflector_texture.h"
 
 #if __cplusplus 
 extern "C" {
@@ -29,6 +30,13 @@ ISTATUS
 WindyFloatTextureAllocate(
     _In_opt_ PMATRIX texture_to_world,
     _Out_ PFLOAT_TEXTURE *texture
+    );
+
+ISTATUS
+WindyReflectorTextureAllocate(
+    _In_opt_ PMATRIX texture_to_world,
+    _In_opt_ PREFLECTOR reflector,
+    _Out_ PREFLECTOR_TEXTURE *texture
     );
 
 #if __cplusplus 

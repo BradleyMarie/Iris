@@ -350,6 +350,7 @@ cc_library(
     hdrs = ["perlin_textures.h"],
     deps = [
         ":float_texture",
+        ":reflector_texture",
         "//iris_physx",
     ],
 )
