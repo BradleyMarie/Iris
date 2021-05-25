@@ -345,6 +345,16 @@ cc_library(
 )
 
 cc_library(
+    name = "perlin_textures",
+    srcs = ["perlin_textures.c"],
+    hdrs = ["perlin_textures.h"],
+    deps = [
+        ":float_texture",
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "plastic_material",
     srcs = ["plastic_material.c"],
     hdrs = ["plastic_material.h"],
