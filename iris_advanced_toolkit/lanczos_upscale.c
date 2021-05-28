@@ -479,6 +479,8 @@ LanczosUpscaleFloats(
                                 new_value);
             }
 
+            new_value = fmax(new_value, (float_t)0.0);
+
             staging_buffer[j * *new_width + i] = new_value;
         }
     }
@@ -505,6 +507,8 @@ LanczosUpscaleFloats(
                         weights[k],
                         new_value);
             }
+
+            new_value = fmax(new_value, (float_t)0.0);
 
             new_texels_buffer[i * *new_width + j] = new_value;
         }
