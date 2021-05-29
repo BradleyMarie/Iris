@@ -248,7 +248,7 @@ BoundingBoxIntersect(
         *second_hit = max;
     }
 
-    return min < max;
+    return min <= max;
 }
 
 #endif // _IRIS_ADVANCED_BOUNDING_BOX_
