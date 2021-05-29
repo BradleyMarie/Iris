@@ -46,7 +46,7 @@ ImageSpectrumToUV(
     direction = VectorNormalize(direction, NULL, NULL);
 
     float_t clamped_z =
-        IMin(IMax(direction.z, (float_t)0.0), (float_t)1.0);
+        IMin(IMax(direction.z, (float_t)-1.0), (float_t)1.0);
     float_t theta = acos(clamped_z);
 
     float_t phi = atan2(direction.y, direction.x);
