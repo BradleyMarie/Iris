@@ -406,7 +406,7 @@ ISTATUS
 UncompressedKdTreeBuildImpl(
     _In_ const BOUNDING_BOX all_bounds[],
     _In_ BOUNDING_BOX node_bounds,
-    _In_reads_(num_indices) const size_t shape_indices[],
+    _In_reads_(num_indices) _Post_invalid_ size_t shape_indices[],
     _In_ size_t num_indices,
     _In_ size_t depth_remaining,
     _Out_ PUNCOMPRESSED_NODE *node,
@@ -419,6 +419,8 @@ UncompressedKdTreeBuildImpl(
         ISTATUS status = UncompressedKdTreeLeafAllocate(node,
                                                         shape_indices,
                                                         num_indices);
+
+        free(shape_indices);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -454,6 +456,7 @@ UncompressedKdTreeBuildImpl(
 
         if (status != ISTATUS_SUCCESS)
         {
+            free(shape_indices);
             return status;
         }
 
@@ -489,6 +492,8 @@ UncompressedKdTreeBuildImpl(
         ISTATUS status = UncompressedKdTreeLeafAllocate(node,
                                                         shape_indices,
                                                         num_indices);
+
+        free(shape_indices);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -527,6 +532,7 @@ UncompressedKdTreeBuildImpl(
     if (below_indices == NULL)
     {
         free(best_edges);
+        free(shape_indices);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -535,6 +541,7 @@ UncompressedKdTreeBuildImpl(
     {
         free(best_edges);
         free(below_indices);
+        free(shape_indices);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -555,6 +562,8 @@ UncompressedKdTreeBuildImpl(
             above_indices[above_index++] = best_edges[i].primitive;
         }
     }
+
+    free(shape_indices);
 
     float_t split = best_edges[best_split].value;
 
@@ -589,8 +598,6 @@ UncompressedKdTreeBuildImpl(
                                                  num_nodes,
                                                  index_slots);
 
-    free(below_indices);
-
     if (status != ISTATUS_SUCCESS)
     {
         free(above_indices);
@@ -606,8 +613,6 @@ UncompressedKdTreeBuildImpl(
                                          &above_node,
                                          num_nodes,
                                          index_slots);
-
-    free(above_indices);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -693,7 +698,6 @@ UncompressedKdTreeBuild(
                                          num_indices);
 
     free(all_bounds);
-    free(indices);
 
     return status;
 }
