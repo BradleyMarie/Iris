@@ -43,9 +43,16 @@ ImageSpectrumToUV(
     _Out_ float uv[2]
     )
 {
-    float_t r = VectorLength(direction);
-    float_t theta = acos(direction.z / r);
+    direction = VectorNormalize(direction, NULL, NULL);
+
+    float_t clamped_z =
+        IMin(IMax(direction.z, (float_t)0.0), (float_t)1.0);
+    float_t theta = acos(clamped_z);
+
     float_t phi = atan2(direction.y, direction.x);
+    if (phi < (float_t)0.0) {
+        phi += iris_two_pi;
+    }
 
     uv[0] = phi * iris_inv_two_pi;
     uv[1] = theta * iris_inv_pi;
