@@ -274,7 +274,14 @@ ShapeRayTracerTrace(
                                                            &ray_tracer->spectrum_compositor,
                                                            light);
 
-        return status;
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *bsdf = NULL;
+
+        return ISTATUS_SUCCESS;
     }
 
     *light = context.light;
