@@ -39,6 +39,7 @@ typedef struct _HALTON_SEQUENCE {
     unsigned base_index;
     unsigned index;
     unsigned dimension;
+    float_t scale_factor[2];
 } HALTON_SEQUENCE, *PHALTON_SEQUENCE;
 
 //
@@ -77,6 +78,10 @@ HaltonSequenceComputeIndex(
         halton_sequence->enumerator = halton_enum(num_columns, num_rows);
         halton_sequence->num_columns = num_columns;
         halton_sequence->num_rows = num_rows;
+        halton_sequence->scale_factor[0] =
+            halton_sequence->enumerator.m_scale_x / (float_t)num_columns;
+        halton_sequence->scale_factor[1] =
+            halton_sequence->enumerator.m_scale_y / (float_t)num_rows;
         recompute = true;
     }
     else
@@ -146,6 +151,12 @@ HaltonSequenceNextFloat(
         return ISTATUS_OUT_OF_ENTROPY;
     }
 
+    if (halton_sequence->dimension < 2)
+    {
+        as_float *= halton_sequence->scale_factor[halton_sequence->dimension];
+        as_float = IMin(IMax(as_float, (float_t)0.0), (float_t)1.0);
+    }
+
     halton_sequence->dimension += 1;
     *value = as_float;
 
@@ -170,6 +181,12 @@ HaltonSequenceNextDouble(
     if (!success)
     {
         return ISTATUS_OUT_OF_ENTROPY;
+    }
+
+    if (halton_sequence->dimension < 2)
+    {
+        as_float *= halton_sequence->scale_factor[halton_sequence->dimension];
+        as_float = IMin(IMax(as_float, (float_t)0.0), (float_t)1.0);
     }
 
     halton_sequence->dimension += 1;
