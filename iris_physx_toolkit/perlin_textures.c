@@ -189,7 +189,7 @@ FractionalBrownianNoise(
     uint32_t n_floor_int = (uint32_t)n_floor;
 
     float_t sum = (float_t)0.0;
-    float_t lambda = (float_t)0.0;
+    float_t lambda = (float_t)1.0;
     float_t o = (float_t)1.0;
 
     for (uint32_t i = 0; i < n_floor_int; i++)
@@ -242,16 +242,23 @@ WindyFloatSample(
 
     POINT3 p = PointMatrixInverseMultiply(texture->texture_to_world,
                                           intersection->world_hit_point);
+
+    VECTOR3 dp_dx = VectorMatrixMultiply(texture->texture_to_world,
+                                         intersection->world_dp_dx);
+
+    VECTOR3 dp_dy = VectorMatrixMultiply(texture->texture_to_world,
+                                         intersection->world_dp_dy);
+
+    float_t wave_height = FractionalBrownianNoise(p,
+                                                  dp_dx,
+                                                  dp_dy,
+                                                  (float_t)0.5,
+                                                  6);
+
     p.x *= (float_t)0.1;
     p.y *= (float_t)0.1;
     p.z *= (float_t)0.1;
-
-    VECTOR3 dp_dx = VectorMatrixTransposedMultiply(texture->texture_to_world,
-                                                   intersection->model_dp_dx);
     dp_dx = VectorScale(dp_dx, (float_t)0.1);
-
-    VECTOR3 dp_dy = VectorMatrixTransposedMultiply(texture->texture_to_world,
-                                                   intersection->model_dp_dy);
     dp_dy = VectorScale(dp_dy, (float_t)0.1);
 
     float_t wind_strength = FractionalBrownianNoise(p,
@@ -259,12 +266,6 @@ WindyFloatSample(
                                                     dp_dy,
                                                     (float_t)0.5,
                                                     3);
-
-    float_t wave_height = FractionalBrownianNoise(p,
-                                                  dp_dx,
-                                                  dp_dy,
-                                                  (float_t)0.5,
-                                                  6);
 
     *value = fabs(wind_strength) * wave_height;
 
