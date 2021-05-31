@@ -54,7 +54,7 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PBSDF_COMPUTE_REFLECTANCE_ROUTINE)(
+(*PBSDF_COMPUTE_DIFFUSE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -66,7 +66,7 @@ ISTATUS
 
 typedef
 ISTATUS
-(*PBSDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE)(
+(*PBSDF_COMPUTE_DIFFUSE_WITH_PDF_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -80,8 +80,8 @@ ISTATUS
 typedef struct _BSDF_VTABLE {
     PBSDF_SAMPLE_ROUTINE sample_routine;
     PBSDF_SAMPLE_DIFFUSE_ROUTINE sample_diffuse_routine;
-    PBSDF_COMPUTE_REFLECTANCE_ROUTINE compute_reflectance_routine;
-    PBSDF_COMPUTE_REFLECTANCE_WITH_PDF_ROUTINE compute_reflectance_with_pdf_routine;
+    PBSDF_COMPUTE_DIFFUSE_ROUTINE compute_diffuse_routine;
+    PBSDF_COMPUTE_DIFFUSE_WITH_PDF_ROUTINE compute_diffuse_with_pdf_routine;
     PFREE_ROUTINE free_routine;
 } BSDF_VTABLE, *PBSDF_VTABLE;
 

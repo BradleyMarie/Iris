@@ -249,7 +249,7 @@ BsdfSampleDiffuse(
 }
 
 ISTATUS
-BsdfComputeReflectance(
+BsdfComputeDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
@@ -289,25 +289,25 @@ BsdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (bsdf->vtable->compute_reflectance_routine == NULL)
+    if (bsdf->vtable->compute_diffuse_routine == NULL)
     {
         *reflector = NULL;
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status = bsdf->vtable->compute_reflectance_routine(bsdf->data,
-                                                               incoming,
-                                                               surface_normal,
-                                                               outgoing,
-                                                               transmitted,
-                                                               compositor,
-                                                               reflector);
+    ISTATUS status = bsdf->vtable->compute_diffuse_routine(bsdf->data,
+                                                           incoming,
+                                                           surface_normal,
+                                                           outgoing,
+                                                           transmitted,
+                                                           compositor,
+                                                           reflector);
 
     return status;
 }
 
 ISTATUS
-BsdfComputeReflectanceWithPdf(
+BsdfComputeDiffuseWithPdf(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
@@ -353,21 +353,21 @@ BsdfComputeReflectanceWithPdf(
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (bsdf->vtable->compute_reflectance_with_pdf_routine == NULL)
+    if (bsdf->vtable->compute_diffuse_with_pdf_routine == NULL)
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = 
-        bsdf->vtable->compute_reflectance_with_pdf_routine(bsdf->data,
-                                                           incoming,
-                                                           surface_normal,
-                                                           outgoing,
-                                                           transmitted,
-                                                           compositor,
-                                                           reflector,
-                                                           pdf);
+        bsdf->vtable->compute_diffuse_with_pdf_routine(bsdf->data,
+                                                       incoming,
+                                                       surface_normal,
+                                                       outgoing,
+                                                       transmitted,
+                                                       compositor,
+                                                       reflector,
+                                                       pdf);
 
     if (status != ISTATUS_SUCCESS)
     {

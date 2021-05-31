@@ -100,14 +100,14 @@ AggregateBsdfSample(
 
         PCREFLECTOR bsdf_reflector;
         float_t bsdf_pdf;
-        status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
-                                               incoming,
-                                               normal,
-                                               *outgoing,
-                                               transmitted,
-                                               compositor,
-                                               &bsdf_reflector,
-                                               &bsdf_pdf);
+        status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
+                                           incoming,
+                                           normal,
+                                           *outgoing,
+                                           transmitted,
+                                           compositor,
+                                           &bsdf_reflector,
+                                           &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -222,14 +222,14 @@ AggregateBsdfSampleDiffuse(
 
         PCREFLECTOR bsdf_reflector;
         float_t bsdf_pdf;
-        status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
-                                               incoming,
-                                               normal,
-                                               *outgoing,
-                                               transmitted,
-                                               compositor,
-                                               &bsdf_reflector,
-                                               &bsdf_pdf);
+        status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
+                                           incoming,
+                                           normal,
+                                           *outgoing,
+                                           transmitted,
+                                           compositor,
+                                           &bsdf_reflector,
+                                           &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -262,7 +262,7 @@ AggregateBsdfSampleDiffuse(
 
 static
 ISTATUS
-AggregateBsdfComputeReflectance(
+AggregateBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -279,14 +279,14 @@ AggregateBsdfComputeReflectance(
     {
         PCREFLECTOR bsdf_reflector;
         float_t bsdf_pdf;
-        ISTATUS status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
-                                                       incoming,
-                                                       normal,
-                                                       outgoing,
-                                                       transmitted,
-                                                       compositor,
-                                                       &bsdf_reflector,
-                                                       &bsdf_pdf);
+        ISTATUS status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
+                                                   incoming,
+                                                   normal,
+                                                   outgoing,
+                                                   transmitted,
+                                                   compositor,
+                                                   &bsdf_reflector,
+                                                   &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -314,7 +314,7 @@ AggregateBsdfComputeReflectance(
 
 static
 ISTATUS
-AggregateBsdfComputeReflectanceWithPdf(
+AggregateBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -334,14 +334,14 @@ AggregateBsdfComputeReflectanceWithPdf(
     {
         PCREFLECTOR bsdf_reflector;
         float_t bsdf_pdf;
-        ISTATUS status = BsdfComputeReflectanceWithPdf(aggregate_bsdf->bsdfs[i],
-                                                       incoming,
-                                                       normal,
-                                                       outgoing,
-                                                       transmitted,
-                                                       compositor,
-                                                       &bsdf_reflector,
-                                                       &bsdf_pdf);
+        ISTATUS status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
+                                                   incoming,
+                                                   normal,
+                                                   outgoing,
+                                                   transmitted,
+                                                   compositor,
+                                                   &bsdf_reflector,
+                                                   &bsdf_pdf);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -397,16 +397,16 @@ AggregateBsdfFree(
 static const BSDF_VTABLE aggregate_bsdf_vtable = {
     AggregateBsdfSample,
     AggregateBsdfSampleDiffuse,
-    AggregateBsdfComputeReflectance,
-    AggregateBsdfComputeReflectanceWithPdf,
+    AggregateBsdfComputeDiffuse,
+    AggregateBsdfComputeDiffuseWithPdf,
     AggregateBsdfFree
 };
 
 static const BSDF_VTABLE aggregate_specular_bsdf_vtable = {
     AggregateBsdfSample,
     NULL,
-    AggregateBsdfComputeReflectance,
-    AggregateBsdfComputeReflectanceWithPdf,
+    AggregateBsdfComputeDiffuse,
+    AggregateBsdfComputeDiffuseWithPdf,
     AggregateBsdfFree
 };
 

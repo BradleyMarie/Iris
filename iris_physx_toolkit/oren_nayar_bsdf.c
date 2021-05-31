@@ -53,7 +53,7 @@ OrenNayarInitialize(
 static
 inline
 float_t
-OrenNayarComputeReflectance(
+OrenNayarComputeDiffuse(
     _In_ PCOREN_NAYAR_BSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -124,10 +124,10 @@ OrenNayarBsdfSample(
         return status;
     }
 
-    float_t reflectance = OrenNayarComputeReflectance(oren_nayar_bsdf,
-                                                      incoming,
-                                                      normal,
-                                                      *outgoing);
+    float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
+                                                  incoming,
+                                                  normal,
+                                                  *outgoing);
 
     status =
         ReflectorCompositorAttenuateReflector(compositor,
@@ -148,7 +148,7 @@ OrenNayarBsdfSample(
 
 static
 ISTATUS
-OrenNayarBsdfComputeReflectance(
+OrenNayarBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -166,10 +166,10 @@ OrenNayarBsdfComputeReflectance(
 
     PCOREN_NAYAR_BSDF oren_nayar_bsdf = (PCOREN_NAYAR_BSDF)context;
 
-    float_t reflectance = OrenNayarComputeReflectance(oren_nayar_bsdf,
-                                                      incoming,
-                                                      normal,
-                                                      outgoing);
+    float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
+                                                  incoming,
+                                                  normal,
+                                                  outgoing);
 
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
@@ -182,7 +182,7 @@ OrenNayarBsdfComputeReflectance(
 
 static
 ISTATUS
-OrenNayarBsdfComputeReflectanceWithPdf(
+OrenNayarBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -201,10 +201,10 @@ OrenNayarBsdfComputeReflectanceWithPdf(
 
     PCOREN_NAYAR_BSDF oren_nayar_bsdf = (PCOREN_NAYAR_BSDF)context;
 
-    float_t reflectance = OrenNayarComputeReflectance(oren_nayar_bsdf,
-                                                      incoming,
-                                                      normal,
-                                                      outgoing);
+    float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
+                                                  incoming,
+                                                  normal,
+                                                  outgoing);
 
     ISTATUS status =
         ReflectorCompositorAttenuateReflector(compositor,
@@ -240,8 +240,8 @@ OrenNayarBsdfFree(
 static const BSDF_VTABLE oren_nayar_bsdf_vtable = {
     OrenNayarBsdfSample,
     OrenNayarBsdfSample,
-    OrenNayarBsdfComputeReflectance,
-    OrenNayarBsdfComputeReflectanceWithPdf,
+    OrenNayarBsdfComputeDiffuse,
+    OrenNayarBsdfComputeDiffuseWithPdf,
     OrenNayarBsdfFree
 };
 

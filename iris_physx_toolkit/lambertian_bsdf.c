@@ -73,7 +73,7 @@ LambertianBsdfSample(
 
 static
 ISTATUS
-LambertianBsdfComputeReflectance(
+LambertianBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -102,7 +102,7 @@ LambertianBsdfComputeReflectance(
 
 static
 ISTATUS
-LambertianBsdfComputeReflectanceWithPdf(
+LambertianBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -155,8 +155,8 @@ LambertianBsdfFree(
 static const BSDF_VTABLE lambertian_bsdf_vtable = {
     LambertianBsdfSample,
     LambertianBsdfSample,
-    LambertianBsdfComputeReflectance,
-    LambertianBsdfComputeReflectanceWithPdf,
+    LambertianBsdfComputeDiffuse,
+    LambertianBsdfComputeDiffuseWithPdf,
     LambertianBsdfFree
 };
 

@@ -172,7 +172,7 @@ AlphaBsdfSampleDiffuse(
 
 static
 ISTATUS
-AlphaBsdfComputeReflectance(
+AlphaBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -190,13 +190,13 @@ AlphaBsdfComputeReflectance(
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status = BsdfComputeReflectance(alpha_bsdf->base,
-                                            incoming,
-                                            normal,
-                                            outgoing,
-                                            transmitted,
-                                            compositor,
-                                            reflector);
+    ISTATUS status = BsdfComputeDiffuse(alpha_bsdf->base,
+                                        incoming,
+                                        normal,
+                                        outgoing,
+                                        transmitted,
+                                        compositor,
+                                        reflector);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -213,7 +213,7 @@ AlphaBsdfComputeReflectance(
 
 static
 ISTATUS
-AlphaBsdfComputeReflectanceWithPdf(
+AlphaBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -232,14 +232,14 @@ AlphaBsdfComputeReflectanceWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    ISTATUS status = BsdfComputeReflectanceWithPdf(alpha_bsdf->base,
-                                                   incoming,
-                                                   normal,
-                                                   outgoing,
-                                                   transmitted,
-                                                   compositor,
-                                                   reflector,
-                                                   pdf);
+    ISTATUS status = BsdfComputeDiffuseWithPdf(alpha_bsdf->base,
+                                               incoming,
+                                               normal,
+                                               outgoing,
+                                               transmitted,
+                                               compositor,
+                                               reflector,
+                                               pdf);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -263,8 +263,8 @@ AlphaBsdfComputeReflectanceWithPdf(
 static const BSDF_VTABLE alpha_bsdf_vtable = {
     AlphaBsdfSample,
     AlphaBsdfSampleDiffuse,
-    AlphaBsdfComputeReflectance,
-    AlphaBsdfComputeReflectanceWithPdf,
+    AlphaBsdfComputeDiffuse,
+    AlphaBsdfComputeDiffuseWithPdf,
     NULL
 };
 

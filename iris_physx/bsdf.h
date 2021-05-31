@@ -64,7 +64,7 @@ BsdfSampleDiffuse(
     );
 
 ISTATUS
-BsdfComputeReflectance(
+BsdfComputeDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
@@ -75,7 +75,7 @@ BsdfComputeReflectance(
     );
 
 ISTATUS
-BsdfComputeReflectanceWithPdf(
+BsdfComputeDiffuseWithPdf(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,

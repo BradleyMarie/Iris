@@ -465,7 +465,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
 static
 ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfComputeReflectance(
+TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -558,7 +558,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeReflectance(
 
 static
 ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfComputeReflectanceWithPdf(
+TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 normal,
@@ -683,8 +683,8 @@ TrowbridgeReitzDielectricReflectionBsdfFree(
 static const BSDF_VTABLE microfacet_bsdf_vtable = {
     TrowbridgeReitzDielectricReflectionBsdfSample,
     TrowbridgeReitzDielectricReflectionBsdfSample,
-    TrowbridgeReitzDielectricReflectionBsdfComputeReflectance,
-    TrowbridgeReitzDielectricReflectionBsdfComputeReflectanceWithPdf,
+    TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse,
+    TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf,
     TrowbridgeReitzDielectricReflectionBsdfFree
 };
 

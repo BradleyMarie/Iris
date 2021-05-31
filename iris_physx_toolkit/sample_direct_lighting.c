@@ -79,13 +79,13 @@ DeltaLightLighting(
     }
 
     PCREFLECTOR reflector;
-    ISTATUS status = BsdfComputeReflectance(bsdf,
-                                            to_hit_point,
-                                            surface_normal,
-                                            to_light,
-                                            transmitted,
-                                            reflector_compositor,
-                                            &reflector);
+    ISTATUS status = BsdfComputeDiffuse(bsdf,
+                                        to_hit_point,
+                                        surface_normal,
+                                        to_light,
+                                        transmitted,
+                                        reflector_compositor,
+                                        &reflector);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -147,14 +147,14 @@ LightLighting(
 
     PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
-    ISTATUS status = BsdfComputeReflectanceWithPdf(bsdf,
-                                                   to_hit_point,
-                                                   surface_normal,
-                                                   to_light,
-                                                   bsdf_computed_transmitted,
-                                                   reflector_compositor,
-                                                   &bsdf_computed_reflector,
-                                                   &bsdf_computed_pdf);
+    ISTATUS status = BsdfComputeDiffuseWithPdf(bsdf,
+                                               to_hit_point,
+                                               surface_normal,
+                                               to_light,
+                                               bsdf_computed_transmitted,
+                                               reflector_compositor,
+                                               &bsdf_computed_reflector,
+                                               &bsdf_computed_pdf);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -400,14 +400,14 @@ SampleDirectLighting(
 
     PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
-    status = BsdfComputeReflectanceWithPdf(bsdf,
-                                           to_hit_point,
-                                           surface_normal,
-                                           light_sampled_direction,
-                                           bsdf_computed_transmitted,
-                                           reflector_compositor,
-                                           &bsdf_computed_reflector,
-                                           &bsdf_computed_pdf);
+    status = BsdfComputeDiffuseWithPdf(bsdf,
+                                       to_hit_point,
+                                       surface_normal,
+                                       light_sampled_direction,
+                                       bsdf_computed_transmitted,
+                                       reflector_compositor,
+                                       &bsdf_computed_reflector,
+                                       &bsdf_computed_pdf);
 
     if (status != ISTATUS_SUCCESS)
     {
