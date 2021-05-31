@@ -55,41 +55,6 @@ MirrorBsdfSample(
 }
 
 static
-ISTATUS
-MirrorBsdfComputeReflectance(
-    _In_ const void *context,
-    _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 outgoing,
-    _In_ bool transmitted,
-    _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
-    )
-{
-    *reflector = NULL;
-
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
-MirrorBsdfComputeReflectanceWithPdf(
-    _In_ const void *context,
-    _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 outgoing,
-    _In_ bool transmitted,
-    _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector,
-    _Out_ float_t *pdf
-    )
-{
-    *pdf = (float_t)0.0;
-
-    return ISTATUS_SUCCESS;
-}
-
-static
 void
 MirrorBsdfFree(
     _In_opt_ _Post_invalid_ void *context
@@ -107,8 +72,8 @@ MirrorBsdfFree(
 static const BSDF_VTABLE mirror_bsdf_vtable = {
     MirrorBsdfSample,
     NULL,
-    MirrorBsdfComputeReflectance,
-    MirrorBsdfComputeReflectanceWithPdf,
+    NULL,
+    NULL,
     MirrorBsdfFree
 };
 

@@ -32,7 +32,7 @@ BsdfAllocate(
     _Out_ PBSDF *bsdf
     )
 {
-    if (vtable == NULL)
+    if (vtable == NULL || vtable->sample_routine == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
     }
@@ -289,6 +289,12 @@ BsdfComputeReflectance(
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
+    if (bsdf->vtable->compute_reflectance_routine == NULL)
+    {
+        *reflector = NULL;
+        return ISTATUS_SUCCESS;
+    }
+
     ISTATUS status = bsdf->vtable->compute_reflectance_routine(bsdf->data,
                                                                incoming,
                                                                surface_normal,
@@ -345,6 +351,12 @@ BsdfComputeReflectanceWithPdf(
     if (pdf == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
+    }
+
+    if (bsdf->vtable->compute_reflectance_with_pdf_routine == NULL)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
     }
 
     ISTATUS status = 
