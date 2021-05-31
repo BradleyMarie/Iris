@@ -219,22 +219,7 @@ PathTracerIntegrate(
         }
         else
         {
-            bool bump_mapped = surface_normal.x != shading_normal.x ||
-                               surface_normal.y != shading_normal.y ||
-                               surface_normal.z != shading_normal.z;
-
-            if (bump_mapped)
-            {
-                bool transmitted = BsdfSampleIsTransmission(type);
-                attenuation = VectorPositiveDotProduct(shading_normal,
-                                                       next_direction,
-                                                       transmitted);
-                path_throughput *= attenuation;
-            }
-            else
-            {
-                attenuation = (float_t)1.0;
-            }
+            attenuation = (float_t)1.0;
         }
 
         if (path_tracer->min_bounces < bounces &&
