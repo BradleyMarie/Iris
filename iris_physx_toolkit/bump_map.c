@@ -39,7 +39,7 @@ typedef const BUMP_MAP *PCBUMP_MAP;
 
 static
 ISTATUS
-BumpMapCompute(
+BumpMapComputeWithTextureCoordinates(
     _In_ const void *context,
     _In_ PCINTERSECTION intersection,
     _In_ VECTOR3 model_geometry_normal,
@@ -53,13 +53,6 @@ BumpMapCompute(
     PCBUMP_MAP bump_map = (PBUMP_MAP)context;
     PCUV_TEXTURE_COORDINATE uv_coordinates =
         (PCUV_TEXTURE_COORDINATE)texture_coordinates;
-
-    if (!uv_coordinates->has_derivatives)
-    {
-        *shading_normal = world_geometry_normal;
-        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
-        return ISTATUS_SUCCESS;
-    }
 
     float_t displacement;
     ISTATUS status = FloatTextureSample(bump_map->texture,
@@ -151,6 +144,147 @@ BumpMapCompute(
     *coordinate_space = NORMAL_MODEL_COORDINATE_SPACE;
 
     return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+BumpMapComputeWithoutTextureCoordinates(
+    _In_ const void *context,
+    _In_ PCINTERSECTION intersection,
+    _In_ VECTOR3 model_geometry_normal,
+    _In_ VECTOR3 world_geometry_normal,
+    _In_ const void *additional_data,
+    _Out_ PVECTOR3 shading_normal,
+    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
+    )
+{
+    PCBUMP_MAP bump_map = (PBUMP_MAP)context;
+
+    float_t displacement;
+    ISTATUS status = FloatTextureSample(bump_map->texture,
+                                        intersection,
+                                        NULL,
+                                        NULL,
+                                        &displacement);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    INTERSECTION local_intersection = *intersection;
+    local_intersection.model_hit_point =
+        PointVectorAddScaled(local_intersection.model_hit_point,
+                             local_intersection.model_dp_dx,
+                             (float_t)0.5);
+    local_intersection.world_hit_point =
+        PointVectorAddScaled(local_intersection.world_hit_point,
+                             local_intersection.world_dp_dx,
+                             (float_t)0.5);
+
+    float_t displacement_x;
+    status = FloatTextureSample(bump_map->texture,
+                                &local_intersection,
+                                NULL,
+                                NULL,
+                                &displacement_x);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    displacement_x = (displacement_x - displacement) / (float_t)0.5;
+
+    local_intersection.model_hit_point =
+        PointVectorAddScaled(intersection->model_hit_point,
+                             local_intersection.model_dp_dy,
+                             (float_t)0.5);
+    local_intersection.world_hit_point =
+        PointVectorAddScaled(intersection->world_hit_point,
+                             local_intersection.world_dp_dy,
+                             (float_t)0.5);
+
+    float_t displacement_y;
+    status = FloatTextureSample(bump_map->texture,
+                                &local_intersection,
+                                NULL,
+                                NULL,
+                                &displacement_y);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    displacement_y = (displacement_y - displacement) / (float_t)0.5;
+
+    VECTOR3 dp_dx = VectorAddScaled(intersection->world_dp_dx,
+                                    world_geometry_normal,
+                                    displacement_x);
+
+    VECTOR3 dp_dy = VectorAddScaled(intersection->world_dp_dy,
+                                    world_geometry_normal,
+                                    displacement_y);
+
+    *shading_normal = VectorCrossProduct(dp_dx, dp_dy);
+    *shading_normal = VectorNormalize(*shading_normal, NULL, NULL);
+
+    if (VectorDotProduct(world_geometry_normal, *shading_normal) < (float_t)0.0)
+    {
+        *shading_normal = VectorNegate(*shading_normal);
+    }
+
+    *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+BumpMapCompute(
+    _In_ const void *context,
+    _In_ PCINTERSECTION intersection,
+    _In_ VECTOR3 model_geometry_normal,
+    _In_ VECTOR3 world_geometry_normal,
+    _In_ const void *additional_data,
+    _In_ const void *texture_coordinates,
+    _Out_ PVECTOR3 shading_normal,
+    _Out_ PNORMAL_COORDINATE_SPACE coordinate_space
+    )
+{
+    if (!intersection->has_derivatives)
+    {
+        *shading_normal = world_geometry_normal;
+        *coordinate_space = NORMAL_WORLD_COORDINATE_SPACE;
+        return ISTATUS_SUCCESS;
+    }
+
+    if (texture_coordinates == NULL)
+    {
+        ISTATUS status =
+            BumpMapComputeWithoutTextureCoordinates(context,
+                                                    intersection,
+                                                    model_geometry_normal,
+                                                    world_geometry_normal,
+                                                    additional_data,
+                                                    shading_normal,
+                                                    coordinate_space);
+
+        return status;
+    }
+
+    ISTATUS status =
+        BumpMapComputeWithTextureCoordinates(context,
+                                             intersection,
+                                             model_geometry_normal,
+                                             world_geometry_normal,
+                                             additional_data,
+                                             texture_coordinates,
+                                             shading_normal,
+                                             coordinate_space);
+
+    return status;
 }
 
 static
