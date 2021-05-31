@@ -35,7 +35,8 @@ ISTATUS
 MirrorBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -48,7 +49,7 @@ MirrorBsdfSample(
 
     *reflector = mirror_bsdf->reflector;
     *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
-    *outgoing = VectorReflect(incoming, normal);
+    *outgoing = VectorReflect(incoming, shading_normal);
     *pdf = INFINITY;
 
     return ISTATUS_SUCCESS;

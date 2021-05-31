@@ -29,7 +29,8 @@ ISTATUS
 (*PBSDF_SAMPLE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -43,7 +44,8 @@ ISTATUS
 (*PBSDF_SAMPLE_DIFFUSE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -57,7 +59,7 @@ ISTATUS
 (*PBSDF_COMPUTE_DIFFUSE_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -69,7 +71,7 @@ ISTATUS
 (*PBSDF_COMPUTE_DIFFUSE_WITH_PDF_ROUTINE)(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,

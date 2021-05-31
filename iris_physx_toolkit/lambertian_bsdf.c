@@ -36,7 +36,8 @@ ISTATUS
 LambertianBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -47,7 +48,9 @@ LambertianBsdfSample(
 {
     PCLAMBERTIAN_BSDF lambertian_bsdf = (PCLAMBERTIAN_BSDF)context;
 
-    ISTATUS status = SampleHemisphereWithCosineWeighting(normal, rng, outgoing);
+    ISTATUS status = SampleHemisphereWithCosineWeighting(shading_normal,
+                                                         rng,
+                                                         outgoing);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -66,7 +69,7 @@ LambertianBsdfSample(
     }
 
     *type = BSDF_SAMPLE_TYPE_REFLECTION_DIFFUSE_ONLY;
-    *pdf = VectorBoundedDotProduct(*outgoing, normal) * iris_inv_pi;
+    *pdf = VectorBoundedDotProduct(*outgoing, shading_normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }
@@ -76,7 +79,7 @@ ISTATUS
 LambertianBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -105,7 +108,7 @@ ISTATUS
 LambertianBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -132,7 +135,7 @@ LambertianBsdfComputeDiffuseWithPdf(
         return status;
     }
 
-    *pdf = VectorBoundedDotProduct(outgoing, normal) * iris_inv_pi;
+    *pdf = VectorBoundedDotProduct(outgoing, shading_normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }

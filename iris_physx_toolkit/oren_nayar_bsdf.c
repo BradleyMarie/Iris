@@ -56,14 +56,14 @@ float_t
 OrenNayarComputeDiffuse(
     _In_ PCOREN_NAYAR_BSDF bsdf,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing
     )
 {
-    VECTOR3 perpendicular = VectorCreateOrthogonal(normal);
+    VECTOR3 perpendicular = VectorCreateOrthogonal(shading_normal);
 
-    float_t cosine_theta_i = VectorDotProduct(incoming, normal);
-    float_t cosine_theta_o = VectorDotProduct(outgoing, normal);
+    float_t cosine_theta_i = VectorDotProduct(incoming, shading_normal);
+    float_t cosine_theta_o = VectorDotProduct(outgoing, shading_normal);
 
     float_t sine_theta_i = (float_t)1.0 - cosine_theta_i * cosine_theta_i;
     float_t sine_theta_o = (float_t)1.0 - cosine_theta_o * cosine_theta_o;
@@ -106,7 +106,8 @@ ISTATUS
 OrenNayarBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -117,7 +118,9 @@ OrenNayarBsdfSample(
 {
     PCOREN_NAYAR_BSDF oren_nayar_bsdf = (PCOREN_NAYAR_BSDF)context;
 
-    ISTATUS status = SampleHemisphereWithCosineWeighting(normal, rng, outgoing);
+    ISTATUS status = SampleHemisphereWithCosineWeighting(shading_normal,
+                                                         rng,
+                                                         outgoing);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -126,7 +129,7 @@ OrenNayarBsdfSample(
 
     float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
                                                   incoming,
-                                                  normal,
+                                                  shading_normal,
                                                   *outgoing);
 
     status =
@@ -141,7 +144,7 @@ OrenNayarBsdfSample(
     }
 
     *type = BSDF_SAMPLE_TYPE_REFLECTION_DIFFUSE_ONLY;
-    *pdf = VectorBoundedDotProduct(*outgoing, normal) * iris_inv_pi;
+    *pdf = VectorBoundedDotProduct(*outgoing, shading_normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }
@@ -151,7 +154,7 @@ ISTATUS
 OrenNayarBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -168,7 +171,7 @@ OrenNayarBsdfComputeDiffuse(
 
     float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
                                                   incoming,
-                                                  normal,
+                                                  shading_normal,
                                                   outgoing);
 
     ISTATUS status =
@@ -185,7 +188,7 @@ ISTATUS
 OrenNayarBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -203,7 +206,7 @@ OrenNayarBsdfComputeDiffuseWithPdf(
 
     float_t reflectance = OrenNayarComputeDiffuse(oren_nayar_bsdf,
                                                   incoming,
-                                                  normal,
+                                                  shading_normal,
                                                   outgoing);
 
     ISTATUS status =
@@ -217,7 +220,7 @@ OrenNayarBsdfComputeDiffuseWithPdf(
         return status;
     }
 
-    *pdf = VectorBoundedDotProduct(outgoing, normal) * iris_inv_pi;
+    *pdf = VectorBoundedDotProduct(outgoing, shading_normal) * iris_inv_pi;
 
     return ISTATUS_SUCCESS;
 }

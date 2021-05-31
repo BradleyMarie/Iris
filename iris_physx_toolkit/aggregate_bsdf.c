@@ -51,7 +51,8 @@ ISTATUS
 AggregateBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -74,7 +75,8 @@ AggregateBsdfSample(
 
     status = BsdfSample(aggregate_bsdf->bsdfs[sampled_index],
                         incoming,
-                        normal,
+                        surface_normal,
+                        shading_normal,
                         rng,
                         compositor,
                         reflector,
@@ -87,7 +89,11 @@ AggregateBsdfSample(
         return status;
     }
 
-    bool transmitted = BsdfSampleIsTransmission(*type);
+    bool below_surface =
+        VectorDotProduct(surface_normal, *outgoing) < (float_t)0.0;
+    bool sampled_transmission = BsdfSampleIsTransmission(*type);
+    bool compute_transmission = below_surface || sampled_transmission;
+
     bool specular = isinf(*pdf);
 
     size_t matching_bsdfs = 1;
@@ -102,9 +108,9 @@ AggregateBsdfSample(
         float_t bsdf_pdf;
         status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
                                            incoming,
-                                           normal,
+                                           shading_normal,
                                            *outgoing,
-                                           transmitted,
+                                           compute_transmission,
                                            compositor,
                                            &bsdf_reflector,
                                            &bsdf_pdf);
@@ -121,9 +127,9 @@ AggregateBsdfSample(
 
         if (specular)
         {
-            float_t falloff = VectorPositiveDotProduct(normal,
+            float_t falloff = VectorPositiveDotProduct(shading_normal,
                                                        *outgoing,
-                                                       transmitted);
+                                                       sampled_transmission);
 
             if (falloff <= (float_t)0.0)
             {
@@ -174,7 +180,8 @@ ISTATUS
 AggregateBsdfSampleDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -197,7 +204,8 @@ AggregateBsdfSampleDiffuse(
 
     status = BsdfSampleDiffuse(aggregate_bsdf->bsdfs[sampled_index],
                                incoming,
-                               normal,
+                               surface_normal,
+                               shading_normal,
                                rng,
                                compositor,
                                reflector,
@@ -210,7 +218,10 @@ AggregateBsdfSampleDiffuse(
         return status;
     }
 
-    bool transmitted = BsdfSampleIsTransmission(*type);
+    bool below_surface =
+        VectorDotProduct(surface_normal, *outgoing) < (float_t)0.0;
+    bool sampled_transmission = BsdfSampleIsTransmission(*type);
+    bool compute_transmission = below_surface || sampled_transmission;
 
     size_t matching_bsdfs = 1;
     for (size_t i = 0; i < aggregate_bsdf->num_bsdfs; i++)
@@ -224,9 +235,9 @@ AggregateBsdfSampleDiffuse(
         float_t bsdf_pdf;
         status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
                                            incoming,
-                                           normal,
+                                           shading_normal,
                                            *outgoing,
-                                           transmitted,
+                                           compute_transmission,
                                            compositor,
                                            &bsdf_reflector,
                                            &bsdf_pdf);
@@ -265,7 +276,7 @@ ISTATUS
 AggregateBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -281,7 +292,7 @@ AggregateBsdfComputeDiffuse(
         float_t bsdf_pdf;
         ISTATUS status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
                                                    incoming,
-                                                   normal,
+                                                   shading_normal,
                                                    outgoing,
                                                    transmitted,
                                                    compositor,
@@ -317,7 +328,7 @@ ISTATUS
 AggregateBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -336,7 +347,7 @@ AggregateBsdfComputeDiffuseWithPdf(
         float_t bsdf_pdf;
         ISTATUS status = BsdfComputeDiffuseWithPdf(aggregate_bsdf->bsdfs[i],
                                                    incoming,
-                                                   normal,
+                                                   shading_normal,
                                                    outgoing,
                                                    transmitted,
                                                    compositor,

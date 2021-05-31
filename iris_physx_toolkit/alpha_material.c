@@ -38,7 +38,8 @@ ISTATUS
 AlphaBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -62,7 +63,9 @@ AlphaBsdfSample(
 
     if (alpha_bsdf->alpha < value)
     {
-        float_t falloff = VectorPositiveDotProduct(normal, incoming, true);
+        float_t falloff = VectorPositiveDotProduct(shading_normal,
+                                                   incoming,
+                                                   true);
         float_t inv_falloff = (float_t)1.0 / falloff;
 
         float_t passthrough_amount = (float_t)1.0 - alpha_bsdf->alpha;
@@ -85,7 +88,8 @@ AlphaBsdfSample(
 
     status = BsdfSample(alpha_bsdf->base,
                         incoming,
-                        normal,
+                        surface_normal,
+                        shading_normal,
                         rng,
                         compositor,
                         reflector,
@@ -130,7 +134,8 @@ ISTATUS
 AlphaBsdfSampleDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -149,7 +154,8 @@ AlphaBsdfSampleDiffuse(
 
     ISTATUS status = BsdfSampleDiffuse(alpha_bsdf->base,
                                        incoming,
-                                       normal,
+                                       surface_normal,
+                                       shading_normal,
                                        rng,
                                        compositor,
                                        reflector,
@@ -175,7 +181,7 @@ ISTATUS
 AlphaBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -192,7 +198,7 @@ AlphaBsdfComputeDiffuse(
 
     ISTATUS status = BsdfComputeDiffuse(alpha_bsdf->base,
                                         incoming,
-                                        normal,
+                                        shading_normal,
                                         outgoing,
                                         transmitted,
                                         compositor,
@@ -216,7 +222,7 @@ ISTATUS
 AlphaBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -234,7 +240,7 @@ AlphaBsdfComputeDiffuseWithPdf(
 
     ISTATUS status = BsdfComputeDiffuseWithPdf(alpha_bsdf->base,
                                                incoming,
-                                               normal,
+                                               shading_normal,
                                                outgoing,
                                                transmitted,
                                                compositor,

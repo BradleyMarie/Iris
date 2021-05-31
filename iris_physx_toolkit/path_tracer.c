@@ -177,6 +177,7 @@ PathTracerIntegrate(
         status = BsdfSample(bsdf,
                             trace_ray_differential.ray.direction,
                             surface_normal,
+                            shading_normal,
                             rng,
                             allocator,
                             path_tracer->reflectors + bounces,

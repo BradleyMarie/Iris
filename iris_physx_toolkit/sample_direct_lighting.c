@@ -65,23 +65,13 @@ DeltaLightLighting(
         return ISTATUS_SUCCESS;
     }
 
-    float_t falloff = VectorDotProduct(shading_normal, to_light);
-
-    bool transmitted;
-    if (falloff < (float_t)0.0)
-    {
-        falloff = -falloff;
-        transmitted = true;
-    }
-    else
-    {
-        transmitted = false;
-    }
+    bool transmitted =
+        VectorDotProduct(surface_normal, to_light) < (float_t)0.0;
 
     PCREFLECTOR reflector;
     ISTATUS status = BsdfComputeDiffuse(bsdf,
                                         to_hit_point,
-                                        surface_normal,
+                                        shading_normal,
                                         to_light,
                                         transmitted,
                                         reflector_compositor,
@@ -92,6 +82,7 @@ DeltaLightLighting(
         return status;
     }
 
+    float_t falloff = fabs(VectorDotProduct(shading_normal, to_light));
     status = SpectrumCompositorAttenuateReflection(spectrum_compositor,
                                                    light_spectrum,
                                                    reflector,
@@ -132,24 +123,14 @@ LightLighting(
         return ISTATUS_SUCCESS;
     }
 
-    float_t light_sample_falloff = VectorDotProduct(shading_normal, to_light);
-
-    bool bsdf_computed_transmitted;
-    if (light_sample_falloff < (float_t)0.0)
-    {
-        light_sample_falloff = -light_sample_falloff;
-        bsdf_computed_transmitted = true;
-    }
-    else
-    {
-        bsdf_computed_transmitted = false;
-    }
+    bool bsdf_computed_transmitted =
+        VectorDotProduct(surface_normal, to_light) < (float_t)0.0;
 
     PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
     ISTATUS status = BsdfComputeDiffuseWithPdf(bsdf,
                                                to_hit_point,
-                                               surface_normal,
+                                               shading_normal,
                                                to_light,
                                                bsdf_computed_transmitted,
                                                reflector_compositor,
@@ -163,7 +144,11 @@ LightLighting(
 
     if ((float_t)0.0 < bsdf_computed_pdf)
     {
-        float_t light_sample_weight = PowerHeuristic(light_pdf, bsdf_computed_pdf);
+        float_t light_sample_weight =
+            PowerHeuristic(light_pdf, bsdf_computed_pdf);
+
+        float_t light_sample_falloff =
+            fabs(VectorDotProduct(shading_normal, to_light));\
 
         float_t light_sample_attenuation =
             (light_sample_falloff * light_sample_weight) / light_pdf;
@@ -187,7 +172,7 @@ ISTATUS
 BsdfLighting(
     _In_ PCLIGHT light,
     _In_opt_ PCREFLECTOR bsdf_sampled_reflector,
-    _In_ bool bsdf_sampled_transmitted,
+    _In_ bool bsdf_sampled_transmission,
     _In_ VECTOR3 bsdf_sampled_direction,
     _In_ float_t bsdf_sampled_pdf,
     _In_ POINT3 hit_point,
@@ -242,7 +227,7 @@ BsdfLighting(
         float_t bsdf_sample_falloff =
             VectorPositiveDotProduct(shading_normal,
                                      bsdf_sampled_direction,
-                                     bsdf_sampled_transmitted);
+                                     bsdf_sampled_transmission);
 
         float_t bsdf_sample_weight = PowerHeuristic(bsdf_sampled_pdf,
                                                     light_computed_pdf);
@@ -334,6 +319,7 @@ SampleDirectLighting(
     status = BsdfSampleDiffuse(bsdf,
                                to_hit_point,
                                surface_normal,
+                               shading_normal,
                                rng,
                                reflector_compositor,
                                &bsdf_sampled_reflector,
@@ -362,13 +348,18 @@ SampleDirectLighting(
         return status;
     }
 
-    bool bsdf_sampled_transmitted = BsdfSampleIsTransmission(bsdf_sampled_type);
+    bool bsdf_sampled_below_surface =
+        VectorDotProduct(surface_normal, bsdf_sampled_direction) < (float_t)0.0;
+    bool bsdf_sampled_transmission =
+        BsdfSampleIsTransmission(bsdf_sampled_type);
+    bool bsdf_compute_transmission =
+        bsdf_sampled_below_surface || bsdf_sampled_transmission;
 
     if (light_sampled_pdf <= (float_t)0.0)
     {
         status = BsdfLighting(light,
                               bsdf_sampled_reflector,
-                              bsdf_sampled_transmitted,
+                              bsdf_sampled_transmission,
                               bsdf_sampled_direction,
                               bsdf_sampled_pdf,
                               hit_point,
@@ -404,7 +395,7 @@ SampleDirectLighting(
                                        to_hit_point,
                                        surface_normal,
                                        light_sampled_direction,
-                                       bsdf_computed_transmitted,
+                                       bsdf_compute_transmission,
                                        reflector_compositor,
                                        &bsdf_computed_reflector,
                                        &bsdf_computed_pdf);
@@ -464,7 +455,7 @@ SampleDirectLighting(
         float_t bsdf_sample_falloff =
             VectorPositiveDotProduct(shading_normal,
                                      bsdf_sampled_direction,
-                                     bsdf_sampled_transmitted);
+                                     bsdf_sampled_transmission);
 
         float_t bsdf_sample_weight = PowerHeuristic(bsdf_sampled_pdf,
                                                     light_computed_pdf);

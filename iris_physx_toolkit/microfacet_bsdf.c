@@ -171,13 +171,13 @@ TrowbridgeReitzLambda(
     _In_ float_t alpha_x,
     _In_ float_t alpha_y,
     _In_ VECTOR3 vector,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 orthogonal
     )
 {
     float_t cos_theta, tan_theta;
     VectorCodirectionalAngleProperties(vector,
-                                       normal,
+                                       shading_normal,
                                        &cos_theta,
                                        NULL,
                                        NULL,
@@ -248,13 +248,13 @@ TrowbridgeReitzD(
     _In_ float_t alpha_x,
     _In_ float_t alpha_y,
     _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 orthogonal
     )
 {
     float_t cos_squared_theta, tan_theta;
     VectorCodirectionalAngleProperties(half_angle,
-                                       normal,
+                                       shading_normal,
                                        NULL,
                                        &cos_squared_theta,
                                        NULL,
@@ -295,7 +295,8 @@ ISTATUS
 TrowbridgeReitzDielectricReflectionBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -327,7 +328,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
     float_t cos_theta_i, tan_theta_i;
     VectorCodirectionalAngleProperties(incoming,
-                                       normal,
+                                       shading_normal,
                                        &cos_theta_i,
                                        NULL,
                                        NULL,
@@ -342,8 +343,8 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     float_t slope_x, slope_y;
     TrowbridgeReitzSample11(cos_theta_i, tan_theta_i, u, v, &slope_x, &slope_y);
 
-    VECTOR3 orthogonal = VectorCreateOrthogonal(normal);
-    VECTOR3 cross_product = VectorCrossProduct(normal, orthogonal);
+    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
+    VECTOR3 cross_product = VectorCrossProduct(shading_normal, orthogonal);
 
     float_t cos_phi, sin_phi;
     VectorAngleProperties(incoming,
@@ -372,15 +373,15 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
     float_t x = orthogonal.x * slope_x + 
                 cross_product.x * slope_y +
-                normal.x * slope_z;
+                shading_normal.x * slope_z;
 
     float_t y = orthogonal.y * slope_x + 
                 cross_product.y * slope_y +
-                normal.y * slope_z;
+                shading_normal.y * slope_z;
 
     float_t z = orthogonal.z * slope_x + 
                 cross_product.z * slope_y +
-                normal.z * slope_z;
+                shading_normal.z * slope_z;
 
     VECTOR3 half_angle = VectorCreate(x, y, z);
     half_angle = VectorNormalize(half_angle, NULL, NULL);
@@ -395,7 +396,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
 
     *outgoing = VectorReflect(original_incoming, half_angle);
 
-    float_t cos_theta_o = VectorBoundedDotProduct(*outgoing, normal);
+    float_t cos_theta_o = VectorBoundedDotProduct(*outgoing, shading_normal);
 
     if (cos_theta_o == (float_t)0.0)
     {
@@ -406,13 +407,13 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              *outgoing,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
                                             microfacet_bsdf->alpha_y,
                                             half_angle,
-                                            normal,
+                                            shading_normal,
                                             orthogonal);
 
     float_t half_angle_cos_theta_o = VectorBoundedDotProduct(*outgoing,
@@ -439,7 +440,7 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              incoming,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,
@@ -468,7 +469,7 @@ ISTATUS
 TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -485,7 +486,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
 
     incoming = VectorNegate(incoming);
 
-    float_t cos_theta_i = VectorBoundedDotProduct(incoming, normal);
+    float_t cos_theta_i = VectorBoundedDotProduct(incoming, shading_normal);
 
     if (cos_theta_i == (float_t)0.0)
     {
@@ -493,7 +494,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
         return ISTATUS_SUCCESS;
     }
 
-    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, normal);
+    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, shading_normal);
 
     if (cos_theta_o == (float_t)0.0)
     {
@@ -511,7 +512,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
         return ISTATUS_SUCCESS;
     }
 
-    VECTOR3 orthogonal = VectorCreateOrthogonal(normal);
+    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
 
     float_t half_angle_cos_theta_i = VectorBoundedDotProduct(incoming,
                                                              half_angle);
@@ -519,13 +520,13 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
     float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              incoming,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              outgoing,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,
@@ -535,7 +536,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
     float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
                                             microfacet_bsdf->alpha_y,
                                             half_angle,
-                                            normal,
+                                            shading_normal,
                                             orthogonal);
 
     float_t microfacet_g = TrowbridgeReitzG(microfacet_bsdf->alpha_x,
@@ -561,7 +562,7 @@ ISTATUS
 TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -579,7 +580,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
 
     incoming = VectorNegate(incoming);
 
-    float_t cos_theta_i = VectorBoundedDotProduct(incoming, normal);
+    float_t cos_theta_i = VectorBoundedDotProduct(incoming, shading_normal);
 
     if (cos_theta_i == (float_t)0.0)
     {
@@ -587,7 +588,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, normal);
+    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, shading_normal);
 
     if (cos_theta_o == (float_t)0.0)
     {
@@ -605,18 +606,18 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    VECTOR3 orthogonal = VectorCreateOrthogonal(normal);
+    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
 
     float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              outgoing,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
                                             microfacet_bsdf->alpha_y,
                                             half_angle,
-                                            normal,
+                                            shading_normal,
                                             orthogonal);
 
     float_t half_angle_cos_theta_o = VectorBoundedDotProduct(outgoing,
@@ -640,7 +641,7 @@ TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
     float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
                                              microfacet_bsdf->alpha_y,
                                              incoming,
-                                             normal,
+                                             shading_normal,
                                              orthogonal);
 
     float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,

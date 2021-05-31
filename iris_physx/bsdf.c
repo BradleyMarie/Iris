@@ -89,6 +89,7 @@ BsdfSample(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -112,39 +113,45 @@ BsdfSample(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (rng == NULL)
+    if (!VectorValidate(shading_normal))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (compositor == NULL)
+    if (rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (reflector == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (type == NULL)
+    if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (outgoing == NULL)
+    if (type == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (pdf == NULL)
+    if (outgoing == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     ISTATUS status = bsdf->vtable->sample_routine(bsdf->data,
                                                   incoming,
                                                   surface_normal,
+                                                  shading_normal,
                                                   rng,
                                                   compositor,
                                                   reflector,
@@ -165,6 +172,7 @@ BsdfSampleDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -188,34 +196,39 @@ BsdfSampleDiffuse(
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (rng == NULL)
+    if (!VectorValidate(shading_normal))
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (compositor == NULL)
+    if (rng == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_04;
     }
 
-    if (reflector == NULL)
+    if (compositor == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_05;
     }
 
-    if (type == NULL)
+    if (reflector == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_06;
     }
 
-    if (outgoing == NULL)
+    if (type == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_07;
     }
 
-    if (pdf == NULL)
+    if (outgoing == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_08;
+    }
+
+    if (pdf == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_09;
     }
 
     if (bsdf->vtable->sample_diffuse_routine == NULL)
@@ -227,6 +240,7 @@ BsdfSampleDiffuse(
     ISTATUS status = bsdf->vtable->sample_diffuse_routine(bsdf->data,
                                                           incoming,
                                                           surface_normal,
+                                                          shading_normal,
                                                           rng,
                                                           compositor,
                                                           reflector,
@@ -252,7 +266,7 @@ ISTATUS
 BsdfComputeDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -269,7 +283,7 @@ BsdfComputeDiffuse(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!VectorValidate(surface_normal))
+    if (!VectorValidate(shading_normal))
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -297,7 +311,7 @@ BsdfComputeDiffuse(
 
     ISTATUS status = bsdf->vtable->compute_diffuse_routine(bsdf->data,
                                                            incoming,
-                                                           surface_normal,
+                                                           shading_normal,
                                                            outgoing,
                                                            transmitted,
                                                            compositor,
@@ -310,7 +324,7 @@ ISTATUS
 BsdfComputeDiffuseWithPdf(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -328,7 +342,7 @@ BsdfComputeDiffuseWithPdf(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (!VectorValidate(surface_normal))
+    if (!VectorValidate(shading_normal))
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -362,7 +376,7 @@ BsdfComputeDiffuseWithPdf(
     ISTATUS status = 
         bsdf->vtable->compute_diffuse_with_pdf_routine(bsdf->data,
                                                        incoming,
-                                                       surface_normal,
+                                                       shading_normal,
                                                        outgoing,
                                                        transmitted,
                                                        compositor,

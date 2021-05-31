@@ -40,7 +40,8 @@ ISTATUS
 SpecularDielectricBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
+    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -51,7 +52,7 @@ SpecularDielectricBsdfSample(
 {
     PCSPECULAR_DIELECTRIC specular_dielectric = (PCSPECULAR_DIELECTRIC)context;
 
-    float_t cos_theta_incident = -VectorDotProduct(incoming, normal);
+    float_t cos_theta_incident = -VectorDotProduct(incoming, shading_normal);
     float_t sin_squared_theta_incident =
         IMax((float_t)0.0, (float_t)1.0 - cos_theta_incident * cos_theta_incident);
 
@@ -63,7 +64,7 @@ SpecularDielectricBsdfSample(
     {
         *reflector = specular_dielectric->reflected;
         *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
-        *outgoing = VectorReflect(incoming, normal);
+        *outgoing = VectorReflect(incoming, shading_normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
     }
@@ -97,7 +98,7 @@ SpecularDielectricBsdfSample(
     {
         *reflector = specular_dielectric->reflected;
         *type = BSDF_SAMPLE_TYPE_REFLECTION_CONTIANS_SPECULAR;
-        *outgoing = VectorReflect(incoming, normal);
+        *outgoing = VectorReflect(incoming, shading_normal);
         *pdf = INFINITY;
         return ISTATUS_SUCCESS;
     }
@@ -109,9 +110,9 @@ SpecularDielectricBsdfSample(
 
     float_t coeff = specular_dielectric->refractive_ratio * cos_theta_incident -
                     cos_theta_transmitted;
-    normal = VectorScale(normal, coeff);
+    shading_normal = VectorScale(shading_normal, coeff);
 
-    *outgoing = VectorAdd(incoming, normal);
+    *outgoing = VectorAdd(incoming, shading_normal);
     *pdf = INFINITY;
 
     return ISTATUS_SUCCESS;

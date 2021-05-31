@@ -42,6 +42,7 @@ BsdfSample(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -55,6 +56,7 @@ BsdfSampleDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _Inout_ PRANDOM rng,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector,
@@ -67,7 +69,7 @@ ISTATUS
 BsdfComputeDiffuse(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
@@ -78,7 +80,7 @@ ISTATUS
 BsdfComputeDiffuseWithPdf(
     _In_ PCBSDF bsdf,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 surface_normal,
+    _In_ VECTOR3 shading_normal,
     _In_ VECTOR3 outgoing,
     _In_ bool transmitted,
     _Inout_ PREFLECTOR_COMPOSITOR compositor,
