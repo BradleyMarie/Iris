@@ -253,7 +253,7 @@ BsdfSampleDiffuse(
         return status;
     }
 
-    if ((float_t)0.0 <= *pdf &&
+    if ((float_t)0.0 < *pdf &&
         (isinf(*pdf) || BsdfSampleContainsSpecular(*type)))
     {
         return ISTATUS_INVALID_RESULT;
