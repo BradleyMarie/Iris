@@ -148,7 +148,7 @@ LightLighting(
             PowerHeuristic(light_pdf, bsdf_computed_pdf);
 
         float_t light_sample_falloff =
-            fabs(VectorDotProduct(shading_normal, to_light));\
+            fabs(VectorDotProduct(shading_normal, to_light));
 
         float_t light_sample_attenuation =
             (light_sample_falloff * light_sample_weight) / light_pdf;
@@ -375,20 +375,6 @@ SampleDirectLighting(
         return status;
     }
 
-    float_t light_sample_falloff = VectorDotProduct(shading_normal,
-                                                    light_sampled_direction);
-
-    bool bsdf_computed_transmitted;
-    if (light_sample_falloff < (float_t)0.0)
-    {
-        light_sample_falloff = -light_sample_falloff;
-        bsdf_computed_transmitted = true;
-    }
-    else
-    {
-        bsdf_computed_transmitted = false;
-    }
-
     PCREFLECTOR bsdf_computed_reflector;
     float_t bsdf_computed_pdf;
     status = BsdfComputeDiffuseWithPdf(bsdf,
@@ -408,9 +394,7 @@ SampleDirectLighting(
     if ((float_t)0.0 < bsdf_computed_pdf)
     {
         float_t light_sample_falloff =
-            VectorPositiveDotProduct(shading_normal,
-                                     light_sampled_direction,
-                                     bsdf_computed_transmitted);
+            fabs(VectorDotProduct(shading_normal, light_sampled_direction));
 
         float_t light_sample_weight = PowerHeuristic(light_sampled_pdf,
                                                      bsdf_computed_pdf);
