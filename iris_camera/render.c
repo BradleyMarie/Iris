@@ -592,7 +592,7 @@ IrisCameraRender(
 
     for (size_t i = 0; i < number_of_threads; i++)
     {
-        if (thread_contexts[i].local.status == ISTATUS_SUCCESS)
+        if (thread_contexts[i].local.status != ISTATUS_SUCCESS)
         {
             status = thread_contexts[i].local.status;
             break;
