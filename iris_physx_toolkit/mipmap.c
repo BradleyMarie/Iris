@@ -2282,8 +2282,8 @@ DownsampleFloats(
     _In_reads_(width * height) const float_t *texels,
     _In_ size_t width,
     _In_ size_t height,
-    _Out_ size_t* new_height,
-    _Out_ size_t* new_width
+    _Out_ size_t* new_width,
+    _Out_ size_t* new_height
     )
 {
     assert(texels != NULL);
