@@ -335,6 +335,16 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
                                        NULL,
                                        &tan_theta_i);
 
+    // TODO: After the change to using shading_normal instead of surface_normal,
+    //       these angles are no longer guaranteed to be codirectional. This
+    //       means that cos_theta_i may be 0.0 often. This code should be
+    //       reworked to handle this more gracefully so this triggers less.
+    if (cos_theta_i == (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
+
     incoming.x *= microfacet_bsdf->alpha_x;
     incoming.y *= microfacet_bsdf->alpha_y;
 
