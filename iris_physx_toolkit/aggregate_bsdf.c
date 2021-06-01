@@ -89,6 +89,11 @@ AggregateBsdfSample(
         return status;
     }
 
+    if (*pdf == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     bool below_surface =
         VectorDotProduct(surface_normal, *outgoing) < (float_t)0.0;
     bool sampled_transmission = BsdfSampleIsTransmission(*type);
@@ -216,6 +221,11 @@ AggregateBsdfSampleDiffuse(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
+    }
+
+    if (*pdf == (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
     }
 
     bool below_surface =
