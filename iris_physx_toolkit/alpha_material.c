@@ -107,7 +107,7 @@ AlphaBsdfSample(
     }
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   *reflector,
+                                                   alpha_bsdf->reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
@@ -168,7 +168,7 @@ AlphaBsdfSampleDiffuse(
     }
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   *reflector,
+                                                   alpha_bsdf->reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
@@ -209,7 +209,7 @@ AlphaBsdfComputeDiffuse(
     }
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   *reflector,
+                                                   alpha_bsdf->reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
@@ -254,7 +254,7 @@ AlphaBsdfComputeDiffuseWithPdf(
     *pdf *= alpha_bsdf->alpha;
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   *reflector,
+                                                   alpha_bsdf->reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
