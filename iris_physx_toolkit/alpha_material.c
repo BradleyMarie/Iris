@@ -364,10 +364,15 @@ AlphaMaterialSample(
         return status;
     }
 
-    if (alpha == (float_t)1.0)
+    if (alpha >= (float_t)1.0)
     {
         *bsdf = base_bsdf;
         return ISTATUS_SUCCESS;
+    }
+
+    if (alpha < (float_t)0.0)
+    {
+        alpha = (float_t)0.0;
     }
 
     status = AlphaBsdfAllocateWithAllocator(bsdf_allocator,
