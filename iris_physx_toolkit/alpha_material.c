@@ -63,9 +63,8 @@ AlphaBsdfSample(
 
     if (alpha_bsdf->alpha < value)
     {
-        float_t falloff = VectorPositiveDotProduct(shading_normal,
-                                                   incoming,
-                                                   true);
+        float_t falloff =
+            fabs(VectorDotProduct(shading_normal, incoming));
         float_t inv_falloff = (float_t)1.0 / falloff;
 
         float_t passthrough_amount = (float_t)1.0 - alpha_bsdf->alpha;
@@ -252,12 +251,12 @@ AlphaBsdfComputeDiffuseWithPdf(
         return status;
     }
 
+    *pdf *= alpha_bsdf->alpha;
+
     status = ReflectorCompositorAttenuateReflector(compositor,
                                                    *reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
-
-    *pdf *= alpha_bsdf->alpha;
 
     return ISTATUS_SUCCESS;
 }
@@ -291,7 +290,7 @@ AlphaBsdfAllocateWithAllocator(
 {
     assert(bsdf_allocator != NULL);
     assert(base_bsdf != NULL);
-    assert((float_t)0.0 <= alpha && alpha <= (float_t)1.0);
+    assert((float_t)0.0 <= alpha && alpha < (float_t)1.0);
     assert(bsdf != NULL);
 
     ALPHA_BSDF alpha_bsdf;
@@ -363,6 +362,12 @@ AlphaMaterialSample(
     if (status != ISTATUS_SUCCESS)
     {
         return status;
+    }
+
+    if (alpha == (float_t)1.0)
+    {
+        *bsdf = base_bsdf;
+        return ISTATUS_SUCCESS;
     }
 
     status = AlphaBsdfAllocateWithAllocator(bsdf_allocator,
