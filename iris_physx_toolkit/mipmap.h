@@ -83,6 +83,23 @@ SpectrumMipmapFilteredLookup(
     _Out_ PCSPECTRUM *spectrum
     );
 
+ISTATUS
+SpectrumMipmapGetDimensions(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    );
+
+ISTATUS
+SpectrumMipmapTexelLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ size_t levels,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ PCSPECTRUM* spectrum
+    );
+
 void
 SpectrumMipmapFree(
     _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
@@ -131,6 +148,23 @@ ReflectorMipmapFilteredLookup(
     _In_ float_t dtdy,
     _In_ PREFLECTOR_COMPOSITOR compositor,
     _Out_ PCREFLECTOR *reflector
+    );
+
+ISTATUS
+ReflectorMipmapGetDimensions(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    );
+
+ISTATUS
+ReflectorMipmapTexelLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ size_t levels,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ PCREFLECTOR* reflector
     );
 
 void
@@ -189,6 +223,23 @@ FloatMipmapFilteredLookup(
     _In_ float_t dtdx,
     _In_ float_t dtdy,
     _Out_ float_t *value
+    );
+
+ISTATUS
+FloatMipmapGetDimensions(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    );
+
+ISTATUS
+FloatMipmapTexelLookup(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ size_t levels,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ float_t* value
     );
 
 void

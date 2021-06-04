@@ -1176,6 +1176,81 @@ SpectrumMipmapFilteredLookup(
     return status;
 }
 
+ISTATUS
+SpectrumMipmapGetDimensions(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (levels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    *levels = mipmap->num_levels;
+    *width = mipmap->levels[0].height;
+    *width = mipmap->levels[0].width;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+SpectrumMipmapTexelLookup(
+    _In_ PCSPECTRUM_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ PCSPECTRUM* spectrum
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (level < mipmap->num_levels)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width < mipmap->levels[level].width)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height < mipmap->levels[level].height)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (spectrum == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    size_t level_width = mipmap->levels[level].width;
+    *spectrum = mipmap->levels[level].texels[width + level_width * height];
+
+    return ISTATUS_SUCCESS;
+}
+
 void
 SpectrumMipmapFree(
     _In_opt_ _Post_invalid_ PSPECTRUM_MIPMAP mipmap
@@ -2125,6 +2200,81 @@ ReflectorMipmapFilteredLookup(
     return status;
 }
 
+ISTATUS
+ReflectorMipmapGetDimensions(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (levels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    *levels = mipmap->num_levels;
+    *width = mipmap->levels[0].height;
+    *width = mipmap->levels[0].width;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+ReflectorMipmapTexelLookup(
+    _In_ PCREFLECTOR_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ PCREFLECTOR* reflector
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (level < mipmap->num_levels)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width < mipmap->levels[level].width)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height < mipmap->levels[level].height)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (reflector == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    size_t level_width = mipmap->levels[level].width;
+    *reflector = mipmap->levels[level].texels[width + level_width * height];
+
+    return ISTATUS_SUCCESS;
+}
+
 void
 ReflectorMipmapFree(
     _In_opt_ _Post_invalid_ PREFLECTOR_MIPMAP mipmap
@@ -2997,6 +3147,81 @@ FloatMipmapFilteredLookup(
                                              dtdy,
                                              value);
     }
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapGetDimensions(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _Out_ size_t* levels,
+    _Out_ size_t* width,
+    _Out_ size_t* height
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (levels == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    *levels = mipmap->num_levels;
+    *width = mipmap->levels[0].height;
+    *width = mipmap->levels[0].width;
+
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+FloatMipmapTexelLookup(
+    _In_ PCFLOAT_MIPMAP mipmap,
+    _In_ size_t level,
+    _In_ size_t width,
+    _In_ size_t height,
+    _Out_ float_t* value
+    )
+{
+    if (mipmap == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (level < mipmap->num_levels)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (width < mipmap->levels[level].width)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (height < mipmap->levels[level].height)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (value == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    size_t level_width = mipmap->levels[level].width;
+    *value = mipmap->levels[level].texels[width + level_width * height];
 
     return ISTATUS_SUCCESS;
 }
