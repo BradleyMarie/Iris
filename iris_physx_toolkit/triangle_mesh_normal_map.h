@@ -29,8 +29,7 @@ ISTATUS
 TriangleMeshNormalMapAllocate(
     _In_reads_(num_vertices) const VECTOR3 normals[],
     _In_ size_t num_vertices,
-    _Out_opt_ PNORMAL_MAP *front_normal_map,
-    _Out_opt_ PNORMAL_MAP *back_normal_map
+    _Out_opt_ PNORMAL_MAP *normal_map
     );
 
 #if __cplusplus 

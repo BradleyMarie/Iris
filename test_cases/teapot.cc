@@ -239,11 +239,10 @@ TEST(TeapotTest, SmoothShadedTeapot)
     PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
     bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
-    PNORMAL_MAP front_normal_map;
+    PNORMAL_MAP normal_map;
     status = TriangleMeshNormalMapAllocate(teapot_normals,
                                            TEAPOT_VERTEX_COUNT,
-                                           &front_normal_map,
-                                           nullptr);
+                                           &normal_map);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     size_t triangles_allocated;
@@ -254,7 +253,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
         TEAPOT_FACE_COUNT,
         nullptr,
         nullptr,
-        front_normal_map,
+        normal_map,
         nullptr,
         material,
         nullptr,
@@ -285,7 +284,7 @@ TEST(TeapotTest, SmoothShadedTeapot)
     SpectrumRelease(spectrum);
     ReflectorRelease(reflector);
     BsdfRelease(bsdf);
-    NormalMapRelease(front_normal_map);
+    NormalMapRelease(normal_map);
     MaterialRelease(material);
     LightRelease(light);
     SceneRelease(scene);
