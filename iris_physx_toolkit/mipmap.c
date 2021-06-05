@@ -1206,7 +1206,7 @@ SpectrumMipmapGetDimensions(
 
     *levels = mipmap->num_levels;
     *width = mipmap->levels[0].height;
-    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].width;
 
     return ISTATUS_SUCCESS;
 }
@@ -1225,17 +1225,17 @@ SpectrumMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (level < mipmap->num_levels)
+    if (mipmap->num_levels < level)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width < mipmap->levels[level].width)
+    if (mipmap->levels[level].width < width)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height < mipmap->levels[level].height)
+    if (mipmap->levels[level].height < height)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -2230,7 +2230,7 @@ ReflectorMipmapGetDimensions(
 
     *levels = mipmap->num_levels;
     *width = mipmap->levels[0].height;
-    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].width;
 
     return ISTATUS_SUCCESS;
 }
@@ -2249,17 +2249,17 @@ ReflectorMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (level < mipmap->num_levels)
+    if (mipmap->num_levels < level)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width < mipmap->levels[level].width)
+    if (mipmap->levels[level].width < width)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height < mipmap->levels[level].height)
+    if (mipmap->levels[level].height < height)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
@@ -3181,7 +3181,7 @@ FloatMipmapGetDimensions(
 
     *levels = mipmap->num_levels;
     *width = mipmap->levels[0].height;
-    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].width;
 
     return ISTATUS_SUCCESS;
 }
@@ -3200,17 +3200,17 @@ FloatMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (level < mipmap->num_levels)
+    if (mipmap->num_levels < level)
     {
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (width < mipmap->levels[level].width)
+    if (mipmap->levels[level].width < width)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (height < mipmap->levels[level].height)
+    if (mipmap->levels[level].height < height)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }

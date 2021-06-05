@@ -16,7 +16,7 @@ Abstract:
 #define _IRIS_PHYSX_TOOLKIT_INFINITE_LIGHT_
 
 #include "iris_physx/iris_physx.h"
-#include "iris_physx_toolkit/spectrum_texture.h"
+#include "iris_physx_toolkit/mipmap.h"
 
 #if __cplusplus 
 extern "C" {
@@ -28,8 +28,9 @@ extern "C" {
 
 ISTATUS
 InfiniteEnvironmentalLightAllocate(
-    _In_ PSPECTRUM_TEXTURE texture,
+    _In_ PSPECTRUM_MIPMAP mipmap,
     _In_opt_ PMATRIX light_to_world,
+    _In_ PCOLOR_INTEGRATOR color_integrator,
     _Out_ PENVIRONMENTAL_LIGHT *environmental_light,
     _Out_ PLIGHT *light
     );

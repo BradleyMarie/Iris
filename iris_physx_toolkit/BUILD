@@ -120,15 +120,6 @@ cc_library(
 )
 
 cc_library(
-    name = "constant_spectrum_texture",
-    srcs = ["constant_spectrum_texture.c"],
-    hdrs = ["constant_spectrum_texture.h"],
-    deps = [
-        ":spectrum_texture",
-    ],
-)
-
-cc_library(
     name = "constant_texture",
     srcs = ["constant_texture.c"],
     hdrs = ["constant_texture.h"],
@@ -183,16 +174,6 @@ cc_library(
 )
 
 cc_library(
-    name = "image_spectrum_texture",
-    srcs = ["image_spectrum_texture.c"],
-    hdrs = ["image_spectrum_texture.h"],
-    deps = [
-        ":spectrum_texture",
-        ":mipmap",
-    ],
-)
-
-cc_library(
     name = "image_texture",
     srcs = ["image_texture.c"],
     hdrs = ["image_texture.h"],
@@ -209,8 +190,8 @@ cc_library(
     srcs = ["infinite_environmental_light.c"],
     hdrs = ["infinite_environmental_light.h"],
     deps = [
-        ":spectrum_texture",
-        "//iris_advanced_toolkit:sample_geometry",
+        ":mipmap",
+        "//common:safe_math",
         "//iris_physx",
     ],
 )
@@ -455,23 +436,6 @@ cc_library(
         ":color_extrapolator",
         ":interpolated_spectrum",
         "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "spectrum_texture_vtable",
-    hdrs = ["spectrum_texture_vtable.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "spectrum_texture",
-    srcs = ["spectrum_texture.c"],
-    hdrs = ["spectrum_texture.h"],
-    deps = [
-        ":spectrum_texture_vtable",
     ],
 )
 
