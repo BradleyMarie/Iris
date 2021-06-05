@@ -2461,8 +2461,8 @@ DownsampleFloats(
             float_t value =
                 texels[source_row * width + source_column] +
                 texels[source_row * width + source_column + 1] +
-                texels[source_row * (width + 1) + source_column] +
-                texels[source_row * (width + 1) + source_column + 1];
+                texels[(source_row + 1) * width + source_column] +
+                texels[(source_row + 1) * width + source_column + 1];
 
             values[i * *new_width + j] = value * (float_t)0.25;
         }
