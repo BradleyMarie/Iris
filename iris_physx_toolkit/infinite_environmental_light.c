@@ -361,7 +361,7 @@ InfiniteEnvironmentalLightAllocate(
 
     infinite_light.num_texels = texel_list_size;
 
-    float_t total = (float_t)0.0;
+    float_t running_total = (float_t)0.0;
     for (size_t y = 0; y < height; y++)
     {
         float_t theta =
@@ -390,21 +390,26 @@ InfiniteEnvironmentalLightAllocate(
             color = ColorConvert(color, COLOR_SPACE_XYZ);
             float_t luma = color.values[1] * sin_theta;
 
-            infinite_light.pdf[x + y * width] = luma / total;
+            infinite_light.cdf[x + y * width] = running_total;
+            infinite_light.pdf[x + y * width] = luma;
             infinite_light.texel_base_u[x + y * width] =
                 (float_t)x / (float_t)width;
             infinite_light.texel_base_v[x + y * width] =
                 (float_t)y / (float_t)height;
 
-            total += luma;
+            running_total += luma;
         }
     }
 
-    float_t running_total = (float_t)0.0;
+    if (running_total == (float_t)0.0)
+    {
+        running_total = (float_t)1.0;
+    }
+
     for (size_t i = 0; i < num_texels; i++)
     {
-        infinite_light.cdf[i] = running_total / total;
-        running_total += infinite_light.cdf[i];
+        infinite_light.cdf[i] /= running_total;
+        infinite_light.pdf[i] /= running_total;
     }
 
     infinite_light.cdf[texel_list_size - 1] = (float_t)1.0;
