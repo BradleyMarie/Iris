@@ -189,6 +189,7 @@ InfiniteEnvironmentalLightComputeEmissive(
     VECTOR3 model_to_light =
         VectorMatrixInverseMultiply(infinite_light->light_to_world,
                                     to_light);
+    model_to_light = VectorNormalize(model_to_light, NULL, NULL);
 
     float_t uv[2];
     DirectionToUV(model_to_light, uv);
@@ -218,6 +219,14 @@ InfiniteEnvironmentalLightComputeEmissiveWithPdf(
     VECTOR3 model_to_light =
         VectorMatrixInverseMultiply(infinite_light->light_to_world,
                                     to_light);
+    model_to_light = VectorNormalize(model_to_light, NULL, NULL);
+
+    if (model_to_light.z <= (float_t)-1.0 ||
+        model_to_light.z >= (float_t)1.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t uv[2];
     DirectionToUV(model_to_light, uv);
