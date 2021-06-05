@@ -81,9 +81,9 @@ DirectionToUV(
 {
     direction = VectorNormalize(direction, NULL, NULL);
 
-    float_t clamped_z =
+    float_t cos_theta =
         IMin(IMax(direction.z, (float_t)-1.0), (float_t)1.0);
-    float_t theta = acos(clamped_z);
+    float_t theta = acos(cos_theta);
 
     float_t phi = atan2(direction.y, direction.x);
     if (phi < (float_t)0.0) {
@@ -155,7 +155,7 @@ InfiniteEnvironmentalLightSample(
     }
 
     float_t phi = u * iris_two_pi;
-    float_t theta = (v - (float_t)0.5) * iris_pi;
+    float_t theta = v * iris_pi;
 
     float_t sin_phi, cos_phi;
     SinCos(phi, &sin_phi, &cos_phi);
@@ -169,7 +169,8 @@ InfiniteEnvironmentalLightSample(
 
     *to_light = VectorMatrixMultiply(infinite_light->light_to_world,
                                      model_to_light);
-    *pdf = infinite_light->pdf[index];
+    *pdf = infinite_light->pdf[index] /
+        ((float_t)2.0 * iris_pi * iris_pi * sin_theta);
 
     return ISTATUS_SUCCESS;
 }
@@ -236,7 +237,12 @@ InfiniteEnvironmentalLightComputeEmissiveWithPdf(
     size_t x = uv[0] * infinite_light->width_fp;
     size_t y = uv[1] * infinite_light->height_fp;
 
-    *pdf = infinite_light->pdf[x + y * infinite_light->row_width];
+    float_t cos_theta =
+        IMin(IMax(model_to_light.z, (float_t)-1.0), (float_t)1.0);
+    float_t sin_theta = sqrt((float_t)1.0 - cos_theta *cos_theta);
+
+    *pdf = infinite_light->pdf[x + y * infinite_light->row_width] /
+        ((float_t)2.0 * iris_pi * iris_pi * sin_theta);
 
     return status;
 }
@@ -361,7 +367,7 @@ InfiniteEnvironmentalLightAllocate(
 
     infinite_light.num_texels = texel_list_size;
 
-    float_t running_total = (float_t)0.0;
+    float_t total_cdf = (float_t)0.0;
     for (size_t y = 0; y < height; y++)
     {
         float_t theta =
@@ -388,28 +394,29 @@ InfiniteEnvironmentalLightAllocate(
             }
 
             color = ColorConvert(color, COLOR_SPACE_XYZ);
-            float_t luma = color.values[1] * sin_theta;
+            float_t luma = color.values[1];
+            float_t texel_cdf = luma * sin_theta / (float_t)num_texels;
 
-            infinite_light.cdf[x + y * width] = running_total;
+            infinite_light.cdf[x + y * width] = total_cdf;
             infinite_light.pdf[x + y * width] = luma;
+            total_cdf += texel_cdf;
+
             infinite_light.texel_base_u[x + y * width] =
                 (float_t)x / (float_t)width;
             infinite_light.texel_base_v[x + y * width] =
                 (float_t)y / (float_t)height;
-
-            running_total += luma;
         }
     }
 
-    if (running_total == (float_t)0.0)
+    if (total_cdf == (float_t)0.0)
     {
-        running_total = (float_t)1.0;
+        total_cdf = (float_t)1.0;
     }
 
     for (size_t i = 0; i < num_texels; i++)
     {
-        infinite_light.cdf[i] /= running_total;
-        infinite_light.pdf[i] /= running_total;
+        infinite_light.cdf[i] /= total_cdf;
+        infinite_light.pdf[i] /= total_cdf;
     }
 
     infinite_light.cdf[texel_list_size - 1] = (float_t)1.0;
