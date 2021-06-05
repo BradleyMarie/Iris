@@ -1205,8 +1205,8 @@ SpectrumMipmapGetDimensions(
     }
 
     *levels = mipmap->num_levels;
-    *width = mipmap->levels[0].height;
-    *height = mipmap->levels[0].width;
+    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].height;
 
     return ISTATUS_SUCCESS;
 }
@@ -1215,8 +1215,8 @@ ISTATUS
 SpectrumMipmapTexelLookup(
     _In_ PCSPECTRUM_MIPMAP mipmap,
     _In_ size_t level,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ PCSPECTRUM* spectrum
     )
 {
@@ -1230,14 +1230,14 @@ SpectrumMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (mipmap->levels[level].width < width)
+    if (mipmap->levels[level].width < x)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap->levels[level].height < height)
+    if (mipmap->levels[level].height < y)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (spectrum == NULL)
@@ -1246,7 +1246,7 @@ SpectrumMipmapTexelLookup(
     }
 
     size_t level_width = mipmap->levels[level].width;
-    *spectrum = mipmap->levels[level].texels[width + level_width * height];
+    *spectrum = mipmap->levels[level].texels[x + level_width * y];
 
     return ISTATUS_SUCCESS;
 }
@@ -2229,8 +2229,8 @@ ReflectorMipmapGetDimensions(
     }
 
     *levels = mipmap->num_levels;
-    *width = mipmap->levels[0].height;
-    *height = mipmap->levels[0].width;
+    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].height;
 
     return ISTATUS_SUCCESS;
 }
@@ -2239,8 +2239,8 @@ ISTATUS
 ReflectorMipmapTexelLookup(
     _In_ PCREFLECTOR_MIPMAP mipmap,
     _In_ size_t level,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ PCREFLECTOR* reflector
     )
 {
@@ -2254,14 +2254,14 @@ ReflectorMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (mipmap->levels[level].width < width)
+    if (mipmap->levels[level].width < x)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap->levels[level].height < height)
+    if (mipmap->levels[level].height < y)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (reflector == NULL)
@@ -2270,7 +2270,7 @@ ReflectorMipmapTexelLookup(
     }
 
     size_t level_width = mipmap->levels[level].width;
-    *reflector = mipmap->levels[level].texels[width + level_width * height];
+    *reflector = mipmap->levels[level].texels[x + level_width * y];
 
     return ISTATUS_SUCCESS;
 }
@@ -3180,8 +3180,8 @@ FloatMipmapGetDimensions(
     }
 
     *levels = mipmap->num_levels;
-    *width = mipmap->levels[0].height;
-    *height = mipmap->levels[0].width;
+    *width = mipmap->levels[0].width;
+    *height = mipmap->levels[0].height;
 
     return ISTATUS_SUCCESS;
 }
@@ -3190,8 +3190,8 @@ ISTATUS
 FloatMipmapTexelLookup(
     _In_ PCFLOAT_MIPMAP mipmap,
     _In_ size_t level,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ float_t* value
     )
 {
@@ -3205,14 +3205,14 @@ FloatMipmapTexelLookup(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (mipmap->levels[level].width < width)
+    if (mipmap->levels[level].width < x)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (mipmap->levels[level].height < height)
+    if (mipmap->levels[level].height < y)
     {
-        return ISTATUS_INVALID_ARGUMENT_02;
+        return ISTATUS_INVALID_ARGUMENT_03;
     }
 
     if (value == NULL)
@@ -3221,7 +3221,7 @@ FloatMipmapTexelLookup(
     }
 
     size_t level_width = mipmap->levels[level].width;
-    *value = mipmap->levels[level].texels[width + level_width * height];
+    *value = mipmap->levels[level].texels[x + level_width * y];
 
     return ISTATUS_SUCCESS;
 }

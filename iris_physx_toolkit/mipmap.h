@@ -94,9 +94,9 @@ SpectrumMipmapGetDimensions(
 ISTATUS
 SpectrumMipmapTexelLookup(
     _In_ PCSPECTRUM_MIPMAP mipmap,
-    _In_ size_t levels,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t level,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ PCSPECTRUM* spectrum
     );
 
@@ -161,9 +161,9 @@ ReflectorMipmapGetDimensions(
 ISTATUS
 ReflectorMipmapTexelLookup(
     _In_ PCREFLECTOR_MIPMAP mipmap,
-    _In_ size_t levels,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t level,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ PCREFLECTOR* reflector
     );
 
@@ -236,9 +236,9 @@ FloatMipmapGetDimensions(
 ISTATUS
 FloatMipmapTexelLookup(
     _In_ PCFLOAT_MIPMAP mipmap,
-    _In_ size_t levels,
-    _In_ size_t width,
-    _In_ size_t height,
+    _In_ size_t level,
+    _In_ size_t x,
+    _In_ size_t y,
     _Out_ float_t* value
     );
 
