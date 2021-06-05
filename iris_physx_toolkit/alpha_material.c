@@ -63,15 +63,10 @@ AlphaBsdfSample(
 
     if (alpha_bsdf->alpha < value)
     {
-        float_t falloff =
-            fabs(VectorDotProduct(shading_normal, incoming));
-        float_t inv_falloff = (float_t)1.0 / falloff;
-
         float_t passthrough_amount = (float_t)1.0 - alpha_bsdf->alpha;
-
         status = ReflectorCompositorAttenuateReflector(compositor,
                                                        alpha_bsdf->reflector,
-                                                       passthrough_amount * inv_falloff,
+                                                       passthrough_amount,
                                                        reflector);
 
         if (status != ISTATUS_SUCCESS)
@@ -81,7 +76,8 @@ AlphaBsdfSample(
 
         *type = BSDF_SAMPLE_TYPE_TRANSMISSION_CONTAINS_SPECULAR;
         *outgoing = incoming;
-        *pdf = passthrough_amount;
+        *pdf = INFINITY;
+
         return ISTATUS_SUCCESS;
     }
 
@@ -106,24 +102,12 @@ AlphaBsdfSample(
         return ISTATUS_SUCCESS;
     }
 
+    *pdf *= alpha_bsdf->alpha;
+
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   alpha_bsdf->reflector,
+                                                   *reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    if (isinf(*pdf))
-    {
-        *pdf = alpha_bsdf->alpha;
-    }
-    else
-    {
-        *pdf *= alpha_bsdf->alpha;
-    }
 
     return status;
 }
@@ -167,8 +151,10 @@ AlphaBsdfSampleDiffuse(
         return status;
     }
 
+    *pdf *= alpha_bsdf->alpha;
+
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   alpha_bsdf->reflector,
+                                                   *reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
@@ -209,7 +195,7 @@ AlphaBsdfComputeDiffuse(
     }
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   alpha_bsdf->reflector,
+                                                   *reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
@@ -251,14 +237,19 @@ AlphaBsdfComputeDiffuseWithPdf(
         return status;
     }
 
+    if (*pdf <= (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     *pdf *= alpha_bsdf->alpha;
 
     status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   alpha_bsdf->reflector,
+                                                   *reflector,
                                                    alpha_bsdf->alpha,
                                                    reflector);
 
-    return ISTATUS_SUCCESS;
+    return status;
 }
 
 //
