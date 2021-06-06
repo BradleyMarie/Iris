@@ -44,7 +44,8 @@ cc_library(
     srcs = ["microfacet.c"],
     hdrs = ["microfacet.h"],
     deps = [
-        "//iris_physx",
+        "//iris_physx_toolkit/bsdfs/fresnels:fresnel",
+        "//iris_physx_toolkit/bsdfs/microfacet_distributions:microfacet_distribution",
     ],
 )
 

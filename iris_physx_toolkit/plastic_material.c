@@ -18,6 +18,8 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/aggregate.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/bsdfs/microfacet.h"
+#include "iris_physx_toolkit/bsdfs/fresnels/dielectric.h"
+#include "iris_physx_toolkit/bsdfs/microfacet_distributions/trowbridge_reitz.h"
 
 //
 // Types
@@ -88,11 +90,6 @@ PlasticMaterialSample(
         return status;
     }
 
-    if (plastic_material->remap_roughness)
-    {
-        roughness = TrowbridgeReitzRoughnessToAlpha(roughness);
-    }
-
     PCBSDF bsdfs[2];
     status = LambertianBsdfAllocateWithAllocator(bsdf_allocator,
                                                  diffuse,
@@ -103,14 +100,32 @@ PlasticMaterialSample(
         return status;
     }
 
-    status =
-        TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(bsdf_allocator,
-                                                                     specular,
-                                                                     roughness,
-                                                                     roughness,
-                                                                     (float_t)1.5,
-                                                                     (float_t)1.0,
-                                                                     &bsdfs[1]);
+    FRESNEL fresnel;
+    status = DielectricFresnelCreate((float_t)1.5, (float_t)1.0, &fresnel);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (plastic_material->remap_roughness)
+    {
+        roughness = TrowbridgeReitzRoughnessToAlpha(roughness);
+    }
+
+    MICROFACET_DISTRIBUTION distribution;
+    status = TrowbridgeReitzCreate(roughness, roughness, &distribution);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = MicrofacetReflectionBsdfAllocateWithAllocator(bsdf_allocator,
+                                                           specular,
+                                                           &distribution,
+                                                           &fresnel,
+                                                           &bsdfs[1]);
 
     if (status != ISTATUS_SUCCESS)
     {

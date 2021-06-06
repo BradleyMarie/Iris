@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    Implements the microfacet BSDFs.
+    Implements the microfacet BSDF.
 
 --*/
 
@@ -20,15 +20,13 @@ Abstract:
 // Types
 //
 
-typedef struct _TR_DIELECTRIC {
+typedef struct _MICROFACET_BSDF {
     PREFLECTOR reflector;
-    float_t alpha_x;
-    float_t alpha_y;
-    float_t eta_i;
-    float_t eta_t;
-} TR_DIELECTRIC, *PTR_DIELECTRIC;
+    MICROFACET_DISTRIBUTION microfacet_distribution;
+    FRESNEL fresnel_function;
+} MICROFACET_BSDF, *PMICROFACET_BSDF;
 
-typedef const TR_DIELECTRIC *PCTR_DIELECTRIC;
+typedef const MICROFACET_BSDF *PCMICROFACET_BSDF;
 
 //
 // Static Functions
@@ -37,262 +35,172 @@ typedef const TR_DIELECTRIC *PCTR_DIELECTRIC;
 static
 inline
 void
-VectorAngleProperties(
-    _In_ VECTOR3 operand0,
-    _In_ VECTOR3 operand1,
-    _Out_opt_ float_t *cosine,
-    _Out_opt_ float_t *cosine_squared,
-    _Out_opt_ float_t *sine,
-    _Out_opt_ float_t *sine_squared,
-    _Out_opt_ float_t *tangent
+MicrofacetBsdfCreateCoordinateSystem(
+    _In_ VECTOR3 up,
+    _Out_ PVECTOR3 forward,
+    _Out_ PVECTOR3 right
     )
 {
-    float_t working_value = VectorDotProduct(operand0, operand1);
-    float_t cosine_temp = working_value;
-
-    if (cosine != NULL)
-    {
-        *cosine = working_value;
-    }
-
-    working_value *= working_value;
-
-    if (cosine_squared != NULL)
-    {
-        *cosine_squared = working_value;
-    }
-
-    working_value = (float_t)1.0 - working_value;
-
-    if (sine_squared != NULL)
-    {
-        *sine_squared = working_value;
-    }
-
-    working_value = sqrt(working_value);
-
-    if (sine != NULL)
-    {
-        *sine = working_value;
-    }
-
-    if (tangent != NULL)
-    {
-        *tangent = working_value / cosine_temp;
-    }
-}
-
-static
-float_t
-FresnelDielectric(
-    _In_ float_t cos_theta_i,
-    _In_ float_t eta_i,
-    _In_ float_t eta_t
-    )
-{
-    assert((float_t)0.0 <= cos_theta_i);
-    assert(isfinite(eta_i));
-    assert((float_t)0.0 < eta_i);
-    assert(isfinite(eta_t));
-    assert((float_t)0.0 < eta_t);
-
-    cos_theta_i = IMin(cos_theta_i, (float_t)1.0);
-    float_t sin_theta_i = sqrt((float_t)1.0 - cos_theta_i * cos_theta_i);
-    float_t sin_theta_t = eta_i / eta_t * sin_theta_i;
-
-    if ((float_t)1.0 <= sin_theta_t)
-    {
-        return (float_t)1.0;
-    }
-
-    float_t cos_theta_t = sqrt((float_t)1.0 - sin_theta_t * sin_theta_t);
-
-    float_t product0 = eta_t * cos_theta_i;
-    float_t product1 = eta_i * cos_theta_t;
-    float_t parallel = (product0 - product1) / (product0 + product1);
-
-    float_t product2 = eta_i * cos_theta_i;
-    float_t product3 = eta_t * cos_theta_t;
-    float_t perpendicular = (product2 - product3) / (product2 + product3);
-
-    return (parallel * parallel + perpendicular * perpendicular) * (float_t)0.5;
-}
-
-static
-void
-TrowbridgeReitzSample11(
-    _In_ float_t cos_theta,
-    _In_ float_t tan_theta,
-    _In_ float_t u,
-    _In_ float_t v,
-    _Out_ float_t *slope_x,
-    _Out_ float_t *slope_y
-    )
-{
-    if (cos_theta > (float_t)0.9999)
-    {
-        float_t r = sqrt(u / ((float_t)1.0 - u));
-        float_t phi = iris_pi * v;
-        float_t sin_phi, cos_phi;
-        SinCos(phi, &sin_phi, &cos_phi);
-        *slope_x = r * cos_phi;
-        *slope_y = r * sin_phi;
-        return;
-    }
-
-    float_t a = (float_t)1.0 / tan_theta;
-    float_t g1 = (float_t)2.0 / ((float_t)1.0 + sqrt((float_t)1.0 + (float_t)1.0 / (a * a)));
-
-    float_t A = 2 * u / g1 - (float_t)1.0;
-    float_t tmp = IMin((float_t)1.0 / (A * A - (float_t)1.0), (float_t)1e10);
-
-    float_t b = tan_theta;
-    float_t d = sqrt(
-        IMax(b * b * tmp * tmp - (A * A - b * b) * tmp, (float_t)0.0));
-
-    *slope_x = b * tmp + d;
-    if (A < (float_t)0.0 || *slope_x > (float_t)1.0 / tan_theta)
-    {
-        *slope_x = b * tmp - d;
-    }
-
-    float_t sv = (float_t)2.0 * fabs(v);
-
-    float_t z =
-        (sv * (sv * (sv * (float_t)0.27385 - (float_t)0.73369) + (float_t)0.46341)) /
-        (sv * (sv * (sv * (float_t)0.093073 + (float_t)0.309420) - (float_t)1.000000) + (float_t)0.597999);
-    *slope_y = copysign(z * sqrt((float_t)1.0 + *slope_x * *slope_x), v);
+    *forward = VectorCreateOrthogonal(up);
+    *right = VectorCrossProduct(up, *forward);
+    *right = VectorNormalize(*right, NULL, NULL);
 }
 
 static
 inline
-float_t
-TrowbridgeReitzLambda(
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ VECTOR3 vector,
+ISTATUS
+MicrofacetReflectionBsdfComputeDiffuseWithPdf(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
     _In_ VECTOR3 shading_normal,
-    _In_ VECTOR3 orthogonal
-    )
-{
-    float_t cos_theta, tan_theta;
-    VectorCodirectionalAngleProperties(vector,
-                                       shading_normal,
-                                       &cos_theta,
-                                       NULL,
-                                       NULL,
-                                       NULL,
-                                       &tan_theta);
-
-    if (cos_theta == (float_t)0.0)
-    {
-        return (float_t)0.0;
-    }
-
-    float_t cos_squared_phi, sin_squared_phi;
-    VectorAngleProperties(vector,
-                          orthogonal,
-                          NULL,
-                          &cos_squared_phi,
-                          NULL,
-                          &sin_squared_phi,
-                          NULL);
-
-    float_t alpha_squared =
-        cos_squared_phi * alpha_x * alpha_x +
-        sin_squared_phi * alpha_y * alpha_y;
-    float_t alpha = sqrt(alpha_squared);
-
-    float_t alpha_tan_theta = alpha * tan_theta;
-    float_t numerator =
-        (float_t)-1.0 + sqrt((float_t)1.0 + alpha_tan_theta * alpha_tan_theta);
-
-    return (float_t)0.5 * numerator;
-}
-
-static
-inline
-float_t
-TrowbridgeReitzPdf(
     _In_ VECTOR3 outgoing,
-    _In_ VECTOR3 half_angle,
-    _In_ float_t cos_theta_o,
-    _In_ float_t half_angle_cos_theta_o,
-    _In_ float_t lambda_o,
-    _In_ float_t d
+    _In_ bool transmitted,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector,
+    _Out_ float_t *pdf
     )
 {
-    assert((float_t)0.0 < half_angle_cos_theta_o);
 
-    float_t g1 = (float_t)1.0 / ((float_t)1.0 + lambda_o);
-    return d * g1 * half_angle_cos_theta_o / cos_theta_o;
-}
+    PCMICROFACET_BSDF microfacet_bsdf = (PCMICROFACET_BSDF)context;
 
-static
-inline
-float_t
-TrowbridgeReitzG(
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ float_t lambda_i,
-    _In_ float_t lambda_o
-    )
-{
-    return (float_t)1.0 / ((float_t)1.0 + lambda_i + lambda_o);
-}
-
-static
-inline
-float_t
-TrowbridgeReitzD(
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 shading_normal,
-    _In_ VECTOR3 orthogonal
-    )
-{
-    float_t cos_squared_theta, tan_theta;
-    VectorCodirectionalAngleProperties(half_angle,
-                                       shading_normal,
-                                       NULL,
-                                       &cos_squared_theta,
-                                       NULL,
-                                       NULL,
-                                       &tan_theta);
-
-    if (!isfinite(tan_theta))
+    if (transmitted)
     {
-        return (float_t)0.0;
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
     }
 
-    float_t tan_squared_theta = tan_theta * tan_theta;
-    float_t cos_4_theta = cos_squared_theta * cos_squared_theta;
+    float_t cos_theta_i = VectorDotProduct(shading_normal, incoming);
+    float_t cos_theta_o = VectorDotProduct(shading_normal, outgoing);
+    if ((cos_theta_i < (float_t)0.0) != (cos_theta_o < (float_t)0.0))
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
 
-    float_t cos_squared_phi, sin_squared_phi;
-    VectorAngleProperties(half_angle,
-                          orthogonal,
-                          NULL,
-                          &cos_squared_phi,
-                          NULL,
-                          &sin_squared_phi,
-                          NULL);
+    float_t abs_cos_theta_i = fabs(cos_theta_i);
+    float_t abs_cos_theta_o = fabs(cos_theta_o);
+    if (abs_cos_theta_i == (float_t)0.0 || abs_cos_theta_o == (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
 
-    float_t exponent = tan_squared_theta;
-    exponent *= (cos_squared_phi / (alpha_x * alpha_x)) +
-                (sin_squared_phi / (alpha_y * alpha_y));
+    VECTOR3 half_angle = VectorHalfAngle(incoming, outgoing);
+    if (half_angle.x == (float_t)0.0 &&
+        half_angle.y == (float_t)0.0 &&
+        half_angle.z == (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
 
-    float_t one_plus_e = (float_t)1.0 + exponent;
-    float_t one_plus_e_squared = one_plus_e * one_plus_e;
-    float_t denomimator =
-        iris_pi * alpha_x * alpha_y * cos_4_theta * one_plus_e_squared;
+    half_angle = VectorNormalize(half_angle, NULL, NULL);
 
-    return (float_t)1.0 / denomimator;
+    float_t cos_theta_half_angle = VectorDotProduct(half_angle, shading_normal);
+    if (cos_theta_half_angle < (float_t)0.0)
+    {
+        cos_theta_half_angle = -cos_theta_half_angle;
+    }
+
+    ISTATUS status = FresnelCompute(&microfacet_bsdf->fresnel_function,
+                                    cos_theta_half_angle,
+                                    compositor,
+                                    reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    VECTOR3 forward, right;
+    MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
+
+    float_t d = MicrofacetD(&microfacet_bsdf->microfacet_distribution,
+                            half_angle,
+                            shading_normal,
+                            forward,
+                            right);
+
+    float_t g = MicrofacetG(&microfacet_bsdf->microfacet_distribution,
+                            incoming,
+                            outgoing,
+                            shading_normal,
+                            forward,
+                            right);
+
+    float_t attenuation =
+        d * g / ((float_t)4.0 * abs_cos_theta_i * abs_cos_theta_o);
+    status = ReflectorCompositorAttenuateReflector(compositor,
+                                                   *reflector,
+                                                   attenuation,
+                                                   reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   microfacet_bsdf->reflector,
+                                                   *reflector,
+                                                   reflector);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    *pdf = MicrofacetPdf(&microfacet_bsdf->microfacet_distribution,
+                         incoming,
+                         half_angle,
+                         shading_normal,
+                         forward,
+                         right);
+
+    *pdf /= (float_t)4.0 * VectorDotProduct(incoming, half_angle);
+
+    return ISTATUS_SUCCESS;
 }
 
 static
 ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfSample(
+MicrofacetReflectionBsdfComputeDiffuse(
+    _In_ const void *context,
+    _In_ VECTOR3 incoming,
+    _In_ VECTOR3 shading_normal,
+    _In_ VECTOR3 outgoing,
+    _In_ bool transmitted,
+    _Inout_ PREFLECTOR_COMPOSITOR compositor,
+    _Out_ PCREFLECTOR *reflector
+    )
+{
+    float_t pdf;
+    ISTATUS status =
+        MicrofacetReflectionBsdfComputeDiffuseWithPdf(context,
+                                                      incoming,
+                                                      shading_normal,
+                                                      outgoing,
+                                                      transmitted,
+                                                      compositor,
+                                                      reflector,
+                                                      &pdf);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (pdf <= (float_t)0.0)
+    {
+        *reflector = NULL;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+MicrofacetReflectionBsdfSample(
     _In_ const void *context,
     _In_ VECTOR3 incoming,
     _In_ VECTOR3 surface_normal,
@@ -305,10 +213,14 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
     _Out_ float_t *pdf
     )
 {
-    PCTR_DIELECTRIC microfacet_bsdf = (PCTR_DIELECTRIC)context;
+    PCMICROFACET_BSDF microfacet_bsdf = (PCMICROFACET_BSDF)context;
 
-    VECTOR3 original_incoming = incoming;
-    incoming = VectorNegate(incoming);
+    float_t cos_theta_i = VectorDotProduct(shading_normal, incoming);
+    if (cos_theta_i == (float_t)0.0)
+    {
+        *pdf = (float_t)0.0;
+        return ISTATUS_SUCCESS;
+    }
 
     float_t u;
     ISTATUS status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &u);
@@ -326,363 +238,54 @@ TrowbridgeReitzDielectricReflectionBsdfSample(
         return status;
     }
 
-    float_t cos_theta_i, tan_theta_i;
-    VectorCodirectionalAngleProperties(incoming,
-                                       shading_normal,
-                                       &cos_theta_i,
-                                       NULL,
-                                       NULL,
-                                       NULL,
-                                       &tan_theta_i);
+    VECTOR3 forward, right;
+    MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
 
-    // TODO: After the change to using shading_normal instead of surface_normal,
-    //       these angles are no longer guaranteed to be codirectional. This
-    //       means that cos_theta_i may be 0.0 often. This code should be
-    //       reworked to handle this more gracefully so this triggers less.
-    if (cos_theta_i == (float_t)0.0)
+    VECTOR3 half_angle =
+        MicrofacetSample(&microfacet_bsdf->microfacet_distribution,
+                         incoming,
+                         shading_normal,
+                         forward,
+                         right,
+                         u,
+                         v);
+
+    if (VectorDotProduct(incoming, *outgoing) < (float_t)0.0)
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
-    incoming.x *= microfacet_bsdf->alpha_x;
-    incoming.y *= microfacet_bsdf->alpha_y;
+    *outgoing = VectorReflect(incoming, half_angle);
 
-    incoming = VectorNormalize(incoming, NULL, NULL);
-
-    float_t slope_x, slope_y;
-    TrowbridgeReitzSample11(cos_theta_i, tan_theta_i, u, v, &slope_x, &slope_y);
-
-    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
-    VECTOR3 cross_product = VectorCrossProduct(shading_normal, orthogonal);
-
-    float_t cos_phi, sin_phi;
-    VectorAngleProperties(incoming,
-                          orthogonal,
-                          &cos_phi,
-                          NULL,
-                          &sin_phi,
-                          NULL,
-                          NULL);
-
-    if (VectorDotProduct(incoming, cross_product) < (float_t)0.0)
-    {
-        sin_phi = -sin_phi;
-    }
-
-    float_t tmp = cos_phi * slope_x - sin_phi * slope_y;
-    slope_y = sin_phi * slope_x + cos_phi * slope_y;
-    slope_x = tmp;
-
-    slope_x *= microfacet_bsdf->alpha_x;
-    slope_y *= microfacet_bsdf->alpha_y;
-
-    slope_x = -slope_x;
-    slope_y = -slope_y;
-    float_t slope_z = (float_t)1.0;
-
-    float_t x = orthogonal.x * slope_x + 
-                cross_product.x * slope_y +
-                shading_normal.x * slope_z;
-
-    float_t y = orthogonal.y * slope_x + 
-                cross_product.y * slope_y +
-                shading_normal.y * slope_z;
-
-    float_t z = orthogonal.z * slope_x + 
-                cross_product.z * slope_y +
-                shading_normal.z * slope_z;
-
-    VECTOR3 half_angle = VectorCreate(x, y, z);
-    half_angle = VectorNormalize(half_angle, NULL, NULL);
-
-    if (half_angle.x == (float_t)0.0 ||
-        half_angle.y == (float_t)0.0 ||
-        half_angle.z == (float_t)0.0)
+    float_t cos_theta_o = VectorDotProduct(shading_normal, *outgoing);
+    if ((cos_theta_i < (float_t)0.0) != (cos_theta_o < (float_t)0.0))
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
-    *outgoing = VectorReflect(original_incoming, half_angle);
-
-    float_t cos_theta_o = VectorBoundedDotProduct(*outgoing, shading_normal);
-
-    if (cos_theta_o == (float_t)0.0)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             *outgoing,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            half_angle,
-                                            shading_normal,
-                                            orthogonal);
-
-    float_t half_angle_cos_theta_o = VectorBoundedDotProduct(*outgoing,
-                                                             half_angle);
-
-    *pdf = TrowbridgeReitzPdf(*outgoing,
-                              half_angle,
-                              cos_theta_o,
-                              half_angle_cos_theta_o,
-                              lambda_o,
-                              microfacet_d);
+    status = MicrofacetReflectionBsdfComputeDiffuseWithPdf(context,
+                                                           incoming,
+                                                           shading_normal,
+                                                           *outgoing,
+                                                           false,
+                                                           compositor,
+                                                           reflector,
+                                                           pdf);
 
     *type = BSDF_SAMPLE_TYPE_REFLECTION_DIFFUSE_ONLY;
-
-    if (*pdf == (float_t)0.0 || cos_theta_i <= (float_t)0.0)
-    {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t half_angle_cos_theta_i = VectorBoundedDotProduct(incoming,
-                                                             half_angle);
-
-    float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             incoming,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,
-                                              microfacet_bsdf->eta_i,
-                                              microfacet_bsdf->eta_t);
-
-    float_t microfacet_g = TrowbridgeReitzG(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            lambda_i,
-                                            lambda_o);
-
-    float_t attenuation =
-        microfacet_d * microfacet_g * fresnel_coeff /
-        ((float_t)4.0 * cos_theta_i * cos_theta_o);
-
-    status = ReflectorCompositorAttenuateReflector(compositor,
-                                                   microfacet_bsdf->reflector,
-                                                   attenuation,
-                                                   reflector);
-
-    return status;
-}
-
-static
-ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse(
-    _In_ const void *context,
-    _In_ VECTOR3 incoming,
-    _In_ VECTOR3 shading_normal,
-    _In_ VECTOR3 outgoing,
-    _In_ bool transmitted,
-    _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector
-    )
-{
-    PCTR_DIELECTRIC microfacet_bsdf = (PCTR_DIELECTRIC)context;
-
-    if (transmitted)
-    {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    incoming = VectorNegate(incoming);
-
-    float_t cos_theta_i = VectorBoundedDotProduct(incoming, shading_normal);
-
-    if (cos_theta_i == (float_t)0.0)
-    {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, shading_normal);
-
-    if (cos_theta_o == (float_t)0.0)
-    {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 half_angle = VectorHalfAngle(incoming, outgoing);
-
-    if (half_angle.x == (float_t)0.0 ||
-        half_angle.y == (float_t)0.0 ||
-        half_angle.z == (float_t)0.0)
-    {
-        *reflector = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
-
-    float_t half_angle_cos_theta_i = VectorBoundedDotProduct(incoming,
-                                                             half_angle);
-
-    float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             incoming,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             outgoing,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,
-                                              microfacet_bsdf->eta_i,
-                                              microfacet_bsdf->eta_t);
-
-    float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            half_angle,
-                                            shading_normal,
-                                            orthogonal);
-
-    float_t microfacet_g = TrowbridgeReitzG(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            lambda_i,
-                                            lambda_o);
-
-    float_t attenuation =
-        microfacet_d * microfacet_g * fresnel_coeff /
-        ((float_t)4.0 * cos_theta_i * cos_theta_o);
-
-    ISTATUS status =
-        ReflectorCompositorAttenuateReflector(compositor,
-                                              microfacet_bsdf->reflector,
-                                              attenuation,
-                                              reflector);
-
-    return status;
-}
-
-static
-ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf(
-    _In_ const void *context,
-    _In_ VECTOR3 incoming,
-    _In_ VECTOR3 shading_normal,
-    _In_ VECTOR3 outgoing,
-    _In_ bool transmitted,
-    _Inout_ PREFLECTOR_COMPOSITOR compositor,
-    _Out_ PCREFLECTOR *reflector,
-    _Out_ float_t *pdf
-    )
-{
-    PCTR_DIELECTRIC microfacet_bsdf = (PCTR_DIELECTRIC)context;
-
-    if (transmitted)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    incoming = VectorNegate(incoming);
-
-    float_t cos_theta_i = VectorBoundedDotProduct(incoming, shading_normal);
-
-    if (cos_theta_i == (float_t)0.0)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t cos_theta_o = VectorBoundedDotProduct(outgoing, shading_normal);
-
-    if (cos_theta_o == (float_t)0.0)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 half_angle = VectorHalfAngle(incoming, outgoing);
-
-    if (half_angle.x == (float_t)0.0 ||
-        half_angle.y == (float_t)0.0 ||
-        half_angle.z == (float_t)0.0)
-    {
-        *pdf = (float_t)0.0;
-        return ISTATUS_SUCCESS;
-    }
-
-    VECTOR3 orthogonal = VectorCreateOrthogonal(shading_normal);
-
-    float_t lambda_o = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             outgoing,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t microfacet_d = TrowbridgeReitzD(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            half_angle,
-                                            shading_normal,
-                                            orthogonal);
-
-    float_t half_angle_cos_theta_o = VectorBoundedDotProduct(outgoing,
-                                                             half_angle);
-
-    *pdf = TrowbridgeReitzPdf(outgoing,
-                              half_angle,
-                              cos_theta_o,
-                              half_angle_cos_theta_o,
-                              lambda_o,
-                              microfacet_d);
-
-    if (*pdf <= (float_t)0.0)
-    {
-        return ISTATUS_SUCCESS;
-    }
-
-    float_t half_angle_cos_theta_i = VectorBoundedDotProduct(incoming,
-                                                             half_angle);
-
-    float_t lambda_i = TrowbridgeReitzLambda(microfacet_bsdf->alpha_x,
-                                             microfacet_bsdf->alpha_y,
-                                             incoming,
-                                             shading_normal,
-                                             orthogonal);
-
-    float_t fresnel_coeff = FresnelDielectric(half_angle_cos_theta_i,
-                                              microfacet_bsdf->eta_i,
-                                              microfacet_bsdf->eta_t);
-
-    float_t microfacet_g = TrowbridgeReitzG(microfacet_bsdf->alpha_x,
-                                            microfacet_bsdf->alpha_y,
-                                            lambda_i,
-                                            lambda_o);
-
-    float_t attenuation =
-        microfacet_d * microfacet_g * fresnel_coeff /
-        ((float_t)4.0 * cos_theta_i * cos_theta_o);
-
-    ISTATUS status =
-        ReflectorCompositorAttenuateReflector(compositor,
-                                              microfacet_bsdf->reflector,
-                                              attenuation,
-                                              reflector);
 
     return status;
 }
 
 static
 void
-TrowbridgeReitzDielectricReflectionBsdfFree(
+MicrofacetReflectionBsdfFree(
     _In_opt_ _Post_invalid_ void *context
     )
 {
-    PTR_DIELECTRIC microfacet_bsdf = (PTR_DIELECTRIC)context;
+    PMICROFACET_BSDF microfacet_bsdf = (PMICROFACET_BSDF)context;
 
     ReflectorRelease(microfacet_bsdf->reflector);
 }
@@ -692,11 +295,11 @@ TrowbridgeReitzDielectricReflectionBsdfFree(
 //
 
 static const BSDF_VTABLE microfacet_bsdf_vtable = {
-    TrowbridgeReitzDielectricReflectionBsdfSample,
-    TrowbridgeReitzDielectricReflectionBsdfSample,
-    TrowbridgeReitzDielectricReflectionBsdfComputeDiffuse,
-    TrowbridgeReitzDielectricReflectionBsdfComputeDiffuseWithPdf,
-    TrowbridgeReitzDielectricReflectionBsdfFree
+    MicrofacetReflectionBsdfSample,
+    MicrofacetReflectionBsdfSample,
+    MicrofacetReflectionBsdfComputeDiffuse,
+    MicrofacetReflectionBsdfComputeDiffuseWithPdf,
+    MicrofacetReflectionBsdfFree
 };
 
 //
@@ -704,77 +307,11 @@ static const BSDF_VTABLE microfacet_bsdf_vtable = {
 //
 
 ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfAllocate(
-    _In_opt_ PREFLECTOR reflector,
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ float_t eta_i,
-    _In_ float_t eta_t,
-    _Out_ PBSDF *bsdf
-    )
-{
-    if (!isfinite(alpha_x))
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (!isfinite(alpha_y))
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
-    }
-
-    if (!isfinite(eta_i) || eta_i <= (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_03;
-    }
-
-    if (!isfinite(eta_t) || eta_t <= (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (bsdf == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
-
-    if (reflector == NULL)
-    {
-        *bsdf = NULL;
-        return ISTATUS_SUCCESS;
-    }
-
-    TR_DIELECTRIC microfacet_bsdf;
-    microfacet_bsdf.reflector = reflector;
-    microfacet_bsdf.alpha_x = alpha_x;
-    microfacet_bsdf.alpha_y = alpha_y;
-    microfacet_bsdf.eta_i = eta_i;
-    microfacet_bsdf.eta_t = eta_t;
-
-    ISTATUS status = BsdfAllocate(&microfacet_bsdf_vtable,
-                                  &microfacet_bsdf,
-                                  sizeof(TR_DIELECTRIC),
-                                  alignof(TR_DIELECTRIC),
-                                  bsdf);
-
-    if (status != ISTATUS_SUCCESS)
-    {
-        return status;
-    }
-
-    ReflectorRetain(reflector);
-
-    return status;
-}
-
-ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
+MicrofacetReflectionBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_opt_ PCREFLECTOR reflector,
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ float_t eta_i,
-    _In_ float_t eta_t,
+    _In_ PCMICROFACET_DISTRIBUTION microfacet_distribution,
+    _In_ PCFRESNEL fresnel_function,
     _Out_ PCBSDF *bsdf
     )
 {
@@ -783,29 +320,19 @@ TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
         return ISTATUS_INVALID_ARGUMENT_00;
     }
 
-    if (!isfinite(alpha_x))
+    if (microfacet_distribution == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
 
-    if (!isfinite(alpha_y))
+    if (fresnel_function == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_03;
     }
 
-    if (!isfinite(eta_i) || eta_i <= (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_04;
-    }
-
-    if (!isfinite(eta_t) || eta_t <= (float_t)0.0)
-    {
-        return ISTATUS_INVALID_ARGUMENT_05;
-    }
-
     if (bsdf == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_06;
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     if (reflector == NULL)
@@ -814,39 +341,17 @@ TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
         return ISTATUS_SUCCESS;
     }
 
-    TR_DIELECTRIC microfacet_bsdf;
+    MICROFACET_BSDF microfacet_bsdf;
     microfacet_bsdf.reflector = (PREFLECTOR)reflector;
-    microfacet_bsdf.alpha_x = alpha_x;
-    microfacet_bsdf.alpha_y = alpha_y;
-    microfacet_bsdf.eta_i = eta_i;
-    microfacet_bsdf.eta_t = eta_t;
+    microfacet_bsdf.microfacet_distribution = *microfacet_distribution;
+    microfacet_bsdf.fresnel_function = *fresnel_function;
 
     ISTATUS status = BsdfAllocatorAllocate(bsdf_allocator,
                                            &microfacet_bsdf_vtable,
                                            &microfacet_bsdf,
-                                           sizeof(TR_DIELECTRIC),
-                                           alignof(TR_DIELECTRIC),
+                                           sizeof(MICROFACET_BSDF),
+                                           alignof(MICROFACET_BSDF),
                                            bsdf);
+
     return status;
-}
-
-float_t
-TrowbridgeReitzRoughnessToAlpha(
-    _In_ float_t roughness
-    )
-{
-    roughness = IMax(roughness, (float_t)1e-3);
-    float_t x = log(roughness);
-    float_t x_2 = x * x;
-    float_t x_3 = x_2 * x;
-    float_t x_4 = x_2 * x_2;
-
-    float_t result =
-        (float_t)1.62142 +
-        (float_t)0.819955 * x +
-        (float_t)0.1734 * x_2 +
-        (float_t)0.0171201 * x_3 +
-        (float_t)0.000640711 * x_4;
-
-    return result;
 }

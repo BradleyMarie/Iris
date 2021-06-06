@@ -291,6 +291,8 @@ cc_library(
         "//iris_physx_toolkit/bsdfs:aggregate",
         "//iris_physx_toolkit/bsdfs:lambertian",
         "//iris_physx_toolkit/bsdfs:microfacet",
+        "//iris_physx_toolkit/bsdfs/fresnels:dielectric",
+        "//iris_physx_toolkit/bsdfs/microfacet_distributions:trowbridge_reitz",
     ],
 )
 

@@ -8,14 +8,15 @@ Module Name:
 
 Abstract:
 
-    Creates the microfacet BSDFs.
+    Creates the microfacet BSDF.
 
 --*/
 
 #ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_
 #define _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_
 
-#include "iris_physx/iris_physx.h"
+#include "iris_physx_toolkit/bsdfs/fresnels/fresnel.h"
+#include "iris_physx_toolkit/bsdfs/microfacet_distributions/microfacet_distribution.h"
 
 #if __cplusplus 
 extern "C" {
@@ -26,29 +27,12 @@ extern "C" {
 //
 
 ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfAllocate(
-    _In_opt_ PREFLECTOR reflector,
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ float_t eta_i,
-    _In_ float_t eta_t,
-    _Out_ PBSDF *bsdf
-    );
-
-ISTATUS
-TrowbridgeReitzDielectricReflectionBsdfAllocateWithAllocator(
+MicrofacetReflectionBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_opt_ PCREFLECTOR reflector,
-    _In_ float_t alpha_x,
-    _In_ float_t alpha_y,
-    _In_ float_t eta_i,
-    _In_ float_t eta_t,
+    _In_ PCMICROFACET_DISTRIBUTION microfacet_distribution,
+    _In_ PCFRESNEL fresnel_function,
     _Out_ PCBSDF *bsdf
-    );
-
-float_t
-TrowbridgeReitzRoughnessToAlpha(
-    _In_ float_t roughness
     );
 
 #if __cplusplus 

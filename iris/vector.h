@@ -258,8 +258,8 @@ VectorClampedDotProduct(
     _In_ VECTOR3 operand1
     )
 {
-    float_t dp = VectorBoundedDotProduct(operand0, operand1);
-    return IMin(dp, (float_t)1.0);
+    float_t dp = VectorDotProduct(operand0, operand1);
+    return IMax((float_t)-1.0, IMin(dp, (float_t)1.0));
 }
 
 static
@@ -279,54 +279,6 @@ VectorPositiveDotProduct(
     }
 
     return IMax((float_t)0.0, dp);
-}
-
-static
-inline
-void
-VectorCodirectionalAngleProperties(
-    _In_ VECTOR3 operand0,
-    _In_ VECTOR3 operand1,
-    _Out_opt_ float_t *cosine,
-    _Out_opt_ float_t *cosine_squared,
-    _Out_opt_ float_t *sine,
-    _Out_opt_ float_t *sine_squared,
-    _Out_opt_ float_t *tangent
-    )
-{
-    float_t working_value = VectorClampedDotProduct(operand0, operand1);
-    float_t cosine_temp = working_value;
-
-    if (cosine != NULL)
-    {
-        *cosine = working_value;
-    }
-
-    working_value *= working_value;
-
-    if (cosine_squared != NULL)
-    {
-        *cosine_squared = working_value;
-    }
-
-    working_value = (float_t)1.0 - working_value;
-
-    if (sine_squared != NULL)
-    {
-        *sine_squared = working_value;
-    }
-
-    working_value = sqrt(working_value);
-
-    if (sine != NULL)
-    {
-        *sine = working_value;
-    }
-
-    if (tangent != NULL)
-    {
-        *tangent = working_value / cosine_temp;
-    }
 }
 
 static
