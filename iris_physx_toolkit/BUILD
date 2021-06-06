@@ -26,7 +26,7 @@ cc_library(
     hdrs = ["alpha_material.h"],
     deps = [
         ":float_texture",
-        ":uniform_reflector",
+        "//iris_physx_toolkit/bsdfs:alpha",
         "//iris_physx",
     ],
 )

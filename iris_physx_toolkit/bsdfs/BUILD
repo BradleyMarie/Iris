@@ -12,6 +12,15 @@ cc_library(
 )
 
 cc_library(
+    name = "alpha",
+    srcs = ["alpha.c"],
+    hdrs = ["alpha.h"],
+    deps = [
+        "//iris_physx",
+    ],
+)
+
+cc_library(
     name = "fresnel",
     srcs = ["fresnel.c"],
     hdrs = ["fresnel.h"],
