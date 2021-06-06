@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    microfacet_bsdf.c
+    microfacet.c
 
 Abstract:
 
@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/microfacet_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/microfacet.h"
 
 //
 // Types

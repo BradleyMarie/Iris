@@ -3,15 +3,6 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "aggregate_bsdf",
-    srcs = ["aggregate_bsdf.c"],
-    hdrs = ["aggregate_bsdf.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "aggregate_environmental_light",
     srcs = ["aggregate_environmental_light.c"],
     hdrs = ["aggregate_environmental_light.h"],
@@ -165,15 +156,6 @@ cc_library(
 )
 
 cc_library(
-    name = "fresnel_bsdf",
-    srcs = ["fresnel_bsdf.c"],
-    hdrs = ["fresnel_bsdf.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "image_texture",
     srcs = ["image_texture.c"],
     hdrs = ["image_texture.h"],
@@ -206,16 +188,6 @@ cc_library(
 )
 
 cc_library(
-    name = "lambertian_bsdf",
-    srcs = ["lambertian_bsdf.c"],
-    hdrs = ["lambertian_bsdf.h"],
-    deps = [
-        "//iris_advanced_toolkit:sample_geometry",
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "list_scene",
     srcs = ["list_scene.c"],
     hdrs = ["list_scene.h"],
@@ -240,9 +212,9 @@ cc_library(
     hdrs = ["matte_material.h"],
     deps = [
         ":float_texture",
-        ":lambertian_bsdf",
-        ":oren_nayar_bsdf",
         ":reflector_texture",
+        "//iris_physx_toolkit/bsdfs:lambertian",
+        "//iris_physx_toolkit/bsdfs:oren_nayar",
     ],
 )
 
@@ -267,31 +239,13 @@ cc_library(
 )
 
 cc_library(
-    name = "microfacet_bsdf",
-    srcs = ["microfacet_bsdf.c"],
-    hdrs = ["microfacet_bsdf.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "mirror_bsdf",
-    srcs = ["mirror_bsdf.c"],
-    hdrs = ["mirror_bsdf.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "mirror_material",
     srcs = ["mirror_material.c"],
     hdrs = ["mirror_material.h"],
     deps = [
-        ":mirror_bsdf",
         ":reflector_texture",
         "//iris_physx",
+        "//iris_physx_toolkit/bsdfs:mirror",
     ],
 )
 
@@ -300,16 +254,6 @@ cc_library(
     srcs = ["one_light_sampler.c"],
     hdrs = ["one_light_sampler.h"],
     deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "oren_nayar_bsdf",
-    srcs = ["oren_nayar_bsdf.c"],
-    hdrs = ["oren_nayar_bsdf.h"],
-    deps = [
-        "//iris_advanced_toolkit:sample_geometry",
         "//iris_physx",
     ],
 )
@@ -341,12 +285,12 @@ cc_library(
     srcs = ["plastic_material.c"],
     hdrs = ["plastic_material.h"],
     deps = [
-        ":aggregate_bsdf",
         ":float_texture",
-        ":lambertian_bsdf",
-        ":microfacet_bsdf",
         ":reflector_texture",
         "//iris_physx",
+        "//iris_physx_toolkit/bsdfs:aggregate",
+        "//iris_physx_toolkit/bsdfs:lambertian",
+        "//iris_physx_toolkit/bsdfs:microfacet",
     ],
 )
 

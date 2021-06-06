@@ -15,8 +15,8 @@ Abstract:
 #include <stdalign.h>
 
 #include "iris_physx_toolkit/matte_material.h"
-#include "iris_physx_toolkit/lambertian_bsdf.h"
-#include "iris_physx_toolkit/oren_nayar_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/lambertian.h"
+#include "iris_physx_toolkit/bsdfs/oren_nayar.h"
 
 //
 // Types

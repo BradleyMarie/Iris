@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    fresnel_bsdf.c
+    fresnel.c
 
 Abstract:
 
@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/fresnel_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/fresnel.h"
 
 //
 // Types

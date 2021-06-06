@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 
 #include "iris_physx_toolkit/mirror_material.h"
-#include "iris_physx_toolkit/mirror_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/mirror.h"
 
 //
 // Types

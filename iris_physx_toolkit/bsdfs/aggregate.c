@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    aggregate_bsdf.c
+    aggregate.c
 
 Abstract:
 
@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 #include <stdlib.h>
 
-#include "iris_physx_toolkit/aggregate_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/aggregate.h"
 
 //
 // Defines

@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    microfacet_bsdf.h
+    microfacet.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_MICROFACET_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_MICROFACET_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_
+#define _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_
 
 #include "iris_physx/iris_physx.h"
 
@@ -55,4 +55,4 @@ TrowbridgeReitzRoughnessToAlpha(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_MICROFACET_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_

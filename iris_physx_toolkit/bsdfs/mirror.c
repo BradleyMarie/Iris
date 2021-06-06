@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    mirror_bsdf.c
+    mirror.c
 
 Abstract:
 
@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/mirror_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/mirror.h"
 
 //
 // Types

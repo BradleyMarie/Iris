@@ -14,10 +14,10 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/aggregate_bsdf.h"
-#include "iris_physx_toolkit/lambertian_bsdf.h"
-#include "iris_physx_toolkit/microfacet_bsdf.h"
 #include "iris_physx_toolkit/plastic_material.h"
+#include "iris_physx_toolkit/bsdfs/aggregate.h"
+#include "iris_physx_toolkit/bsdfs/lambertian.h"
+#include "iris_physx_toolkit/bsdfs/microfacet.h"
 
 //
 // Types

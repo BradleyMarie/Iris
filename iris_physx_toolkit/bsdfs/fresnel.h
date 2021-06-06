@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    lambertian_bsdf.h
+    lambertian.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_FRESNEL_
+#define _IRIS_PHYSX_TOOLKIT_BSDFS_FRESNEL_
 
 #include "iris_physx/iris_physx.h"
 
@@ -48,4 +48,4 @@ SpecularDielectricBsdfAllocateWithAllocator(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_FRESNEL_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_BSDFS_FRESNEL_

@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    oren_nayar_bsdf.c
+    oren_nayar.c
 
 Abstract:
 
@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 
 #include "iris_advanced_toolkit/sample_geometry.h"
-#include "iris_physx_toolkit/oren_nayar_bsdf.h"
+#include "iris_physx_toolkit/bsdfs/oren_nayar.h"
 
 //
 // Types

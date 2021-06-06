@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    lambertian_bsdf.h
+    lambertian.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_LAMBERTIAN_
+#define _IRIS_PHYSX_TOOLKIT_BSDFS_LAMBERTIAN_
 
 #include "iris_physx/iris_physx.h"
 
@@ -42,4 +42,4 @@ LambertianBsdfAllocateWithAllocator(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_LAMBERTIAN_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_BSDFS_LAMBERTIAN_

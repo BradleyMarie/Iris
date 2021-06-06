@@ -4,16 +4,16 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    mirror_bsdf.h
+    oren_nayar.h
 
 Abstract:
 
-    Creates a mirror BSDF.
+    Creates a Oren-Nayar BSDF.
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_MIRROR_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_MIRROR_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_OREN_NAYAR_
+#define _IRIS_PHYSX_TOOLKIT_BSDFS_OREN_NAYAR_
 
 #include "iris_physx/iris_physx.h"
 
@@ -26,15 +26,17 @@ extern "C" {
 //
 
 ISTATUS
-MirrorBsdfAllocate(
+OrenNayarBsdfAllocate(
     _In_opt_ PREFLECTOR reflector,
+    _In_ float_t sigma,
     _Out_ PBSDF *bsdf
     );
 
 ISTATUS
-MirrorBsdfAllocateWithAllocator(
+OrenNayarBsdfAllocateWithAllocator(
     _Inout_ PBSDF_ALLOCATOR bsdf_allocator,
     _In_opt_ PCREFLECTOR reflector,
+    _In_ float_t sigma,
     _Out_ PCBSDF *bsdf
     );
 
@@ -42,4 +44,4 @@ MirrorBsdfAllocateWithAllocator(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_MIRROR_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_BSDFS_OREN_NAYAR_

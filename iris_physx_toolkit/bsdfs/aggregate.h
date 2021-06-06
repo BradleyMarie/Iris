@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    aggregate_bsdf.h
+    aggregate.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_AGGREGATE_BSDF_
-#define _IRIS_PHYSX_TOOLKIT_AGGREGATE_BSDF_
+#ifndef _IRIS_PHYSX_TOOLKIT_BSDFS_AGGREGATE_
+#define _IRIS_PHYSX_TOOLKIT_BSDFS_AGGREGATE_
 
 #include "iris_physx/iris_physx.h"
 
@@ -44,4 +44,4 @@ AggregateBsdfAllocateWithAllocator(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_AGGREGATE_BSDF_
+#endif // _IRIS_PHYSX_TOOLKIT_BSDFS_AGGREGATE_
