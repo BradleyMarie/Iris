@@ -22,7 +22,7 @@ Abstract:
 //
 
 ISTATUS
-DielectricFresnelCreate(
+FresnelDielectricInitialize(
     _In_ float_t eta_i,
     _In_ float_t eta_t,
     _Out_ PFRESNEL function

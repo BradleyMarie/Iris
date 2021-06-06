@@ -63,7 +63,7 @@ FresnelDielectricCoefficient(
 }
 
 ISTATUS
-DielectricFresnelCompute(
+FresnelDielectricCompute(
     _In_ PCFRESNEL function,
     _In_ float_t cosine_theta_incoming,
     _In_ PREFLECTOR_COMPOSITOR compositor,
@@ -88,7 +88,7 @@ DielectricFresnelCompute(
 //
 
 static const FRESNEL_VTABLE dielectric_fresnel_vtable = {
-    DielectricFresnelCompute
+    FresnelDielectricCompute
 };
 
 //
@@ -96,7 +96,7 @@ static const FRESNEL_VTABLE dielectric_fresnel_vtable = {
 //
 
 ISTATUS
-DielectricFresnelCreate(
+FresnelDielectricInitialize(
     _In_ float_t eta_i,
     _In_ float_t eta_t,
     _Out_ PFRESNEL function

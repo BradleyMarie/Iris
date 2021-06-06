@@ -22,7 +22,7 @@ Abstract:
 //
 
 ISTATUS
-TrowbridgeReitzCreate(
+TrowbridgeReitzInitialize(
     _In_ float_t alpha_x,
     _In_ float_t alpha_y,
     _Out_ PMICROFACET_DISTRIBUTION distribution

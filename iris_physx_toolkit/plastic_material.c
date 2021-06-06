@@ -101,7 +101,7 @@ PlasticMaterialSample(
     }
 
     FRESNEL fresnel;
-    status = DielectricFresnelCreate((float_t)1.5, (float_t)1.0, &fresnel);
+    status = FresnelDielectricInitialize((float_t)1.5, (float_t)1.0, &fresnel);
 
     if (status != ISTATUS_SUCCESS)
     {
@@ -114,7 +114,7 @@ PlasticMaterialSample(
     }
 
     MICROFACET_DISTRIBUTION distribution;
-    status = TrowbridgeReitzCreate(roughness, roughness, &distribution);
+    status = TrowbridgeReitzInitialize(roughness, roughness, &distribution);
 
     if (status != ISTATUS_SUCCESS)
     {
