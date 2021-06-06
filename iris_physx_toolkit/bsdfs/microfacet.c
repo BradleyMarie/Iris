@@ -231,7 +231,7 @@ MicrofacetReflectionBsdfSample(
     }
 
     float_t v;
-    status = RandomGenerateFloat(rng, (float_t)-0.5, (float_t)0.5, &v);
+    status = RandomGenerateFloat(rng, (float_t)0.0, (float_t)1.0, &v);
 
     if (status != ISTATUS_SUCCESS)
     {
