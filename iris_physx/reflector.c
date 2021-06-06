@@ -20,6 +20,49 @@ Abstract:
 #include "iris_physx/reflector_internal.h"
 
 //
+// Static Functions
+//
+
+ISTATUS
+PerfectReflectorGetReflectance(
+    _In_ const void *context,
+    _In_ float_t wavelength,
+    _Out_ float_t *reflectance
+    )
+{
+    *reflectance = (float_t)1.0;
+    return ISTATUS_SUCCESS;
+}
+
+ISTATUS
+PerfectReflectorGetAlbedo(
+    _In_ const void *context,
+    _Out_ float_t *albedo
+    )
+{
+    *albedo = (float_t)1.0;
+    return ISTATUS_SUCCESS;
+}
+
+//
+// Static Data
+//
+
+static const REFLECTOR_VTABLE perfect_reflector_vtable = {
+    PerfectReflectorGetReflectance,
+    PerfectReflectorGetAlbedo,
+    NULL
+};
+
+static const REFLECTOR perfect_reflector = {
+    &perfect_reflector_vtable,
+    NULL,
+    0
+};
+
+const REFLECTOR *const iris_physx_perfect_reflector = &perfect_reflector;
+
+//
 // Functions
 //
 

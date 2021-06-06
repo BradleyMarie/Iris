@@ -27,6 +27,12 @@ typedef struct _REFLECTOR REFLECTOR, *PREFLECTOR;
 typedef const REFLECTOR *PCREFLECTOR;
 
 //
+// Data
+//
+
+extern const REFLECTOR *const iris_physx_perfect_reflector;
+
+//
 // Functions
 //
 

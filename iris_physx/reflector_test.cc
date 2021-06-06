@@ -350,3 +350,18 @@ TEST(ReflectorTest, ReflectorFree)
     ReflectorRelease(reflector);
     EXPECT_TRUE(freed);
 }
+
+TEST(ReflectorTest, PerfectReflector)
+{
+    float_t reflectance;
+    ISTATUS status = ReflectorReflect(iris_physx_perfect_reflector,
+                                      (float_t)1.0,
+                                      &reflectance);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ((float_t)1.0, reflectance);
+
+    float_t albedo;
+    status = ReflectorGetAlbedo(iris_physx_perfect_reflector, &albedo);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ((float_t)1.0, albedo);
+}
