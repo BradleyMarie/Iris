@@ -151,5 +151,5 @@ MirrorBsdfAllocateWithAllocator(
                                            alignof(MIRROR_BSDF),
                                            bsdf);
 
-    return status;   
+    return status;
 }
