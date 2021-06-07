@@ -27,11 +27,11 @@ FresnelDielectricCoefficient(
     _In_ float_t eta_t
     )
 {
-    assert((float_t)0.0 <= cos_theta_i && cos_theta_i <= (float_t)1.0);
+    assert((float_t)-1.0 <= cos_theta_i && cos_theta_i <= (float_t)1.0);
     assert(isfinite(eta_i) && (float_t)0.0 < eta_i);
     assert(isfinite(eta_t) && (float_t)0.0 < eta_t);
 
-    if (cos_theta_i > (float_t)0.0)
+    if (cos_theta_i < (float_t)0.0)
     {
         float_t tmp = eta_i;
         eta_i = eta_t;
@@ -42,7 +42,7 @@ FresnelDielectricCoefficient(
     float_t sin_theta_i = sqrt((float_t)1.0 - cos_theta_i * cos_theta_i);
     float_t sin_theta_t = eta_i / eta_t * sin_theta_i;
 
-    if (sin_theta_t == (float_t)1.0)
+    if (sin_theta_t >= (float_t)1.0)
     {
         return (float_t)1.0;
     }

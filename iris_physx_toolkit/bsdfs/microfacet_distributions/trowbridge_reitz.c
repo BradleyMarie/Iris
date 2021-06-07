@@ -145,9 +145,8 @@ TrowbridgeReitzComputeLambda(
     float_t cos2_theta = cos_theta * cos_theta;
     float_t sin2_theta = (float_t)1.0 - cos2_theta;
     float_t tan2_theta = sin2_theta / cos2_theta;
-    float_t tan_theta = sqrt(tan2_theta);
 
-    if (isinf(tan_theta))
+    if (isinf(tan2_theta))
     {
         return (float_t)0.0;
     }
@@ -173,24 +172,10 @@ TrowbridgeReitzComputeLambda(
     float_t alpha2 =
         cos2_phi * distribution->alpha_x * distribution->alpha_x +
         sin2_phi * distribution->alpha_y * distribution->alpha_y;
-    float_t alpha = sqrt(alpha2);
-
-    float_t a = (float_t)1.0 / (alpha * tan_theta);
-
-    if (a >= (float_t)1.6)
-    {
-        return (float_t)0.0;
-    }
-
-    float_t a0_numerator = (float_t)1.0;
-    float_t a1_numerator = (float_t)-1.259f * a;
-    float_t a2_numerator = (float_t)0.396f * a * a;
-    float_t a1_denominator = (float_t)3.535 * a;
-    float_t a2_denominator = (float_t) 2.181 * a * a;
 
     float_t result =
-        (a0_numerator + a1_numerator + a2_numerator) /
-        (a1_denominator + a2_denominator);
+        (float_t)-1.0 + sqrt((float_t)1.0 + alpha2 * tan2_theta);
+    result *= (float_t)0.5;
 
     return result;
 }

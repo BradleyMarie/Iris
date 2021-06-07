@@ -60,7 +60,7 @@ FresnelCompute(
     _Out_ PCREFLECTOR *reflector
     )
 {
-    assert((float_t)0.0 <= cosine_theta_incoming);
+    assert((float_t)-1.0 <= cosine_theta_incoming);
     assert(cosine_theta_incoming <= (float_t)1.0);
     ISTATUS status = function->vtable->compute_routine(function,
                                                        cosine_theta_incoming,

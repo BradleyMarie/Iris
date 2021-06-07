@@ -181,7 +181,7 @@ MicrofacetPdf(
     float_t g1 = MicrofacetG1(distribution, incoming);
     float_t dot = fabs(VectorDotProduct(half_angle, incoming));
     float_t abs_cos_theta_i = fabs(incoming.z);
-    return d * g1 * dot * abs_cos_theta_i;
+    return d * g1 * dot / abs_cos_theta_i;
 }
 
 #endif // _IRIS_PHYSX_TOOLKIT_BSDFS_MICROFACET_DISTRIBUTIONS_MICROFACET_DISTRIBUTION_

@@ -98,7 +98,6 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
     _Out_ float_t *pdf
     )
 {
-
     PCMICROFACET_BSDF microfacet_bsdf = (PCMICROFACET_BSDF)context;
 
     if (transmitted)
@@ -106,6 +105,8 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
+
+    incoming = VectorNegate(incoming);
 
     VECTOR3 forward, right;
     MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
@@ -115,7 +116,7 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
                                                    forward,
                                                    right);
 
-    VECTOR3 local_outgoing = MicrofacetBsdfToModel(outgoing,
+    VECTOR3 local_outgoing = MicrofacetBsdfToLocal(outgoing,
                                                    shading_normal,
                                                    forward,
                                                    right);
@@ -254,6 +255,9 @@ MicrofacetReflectionBsdfSample(
 {
     PCMICROFACET_BSDF microfacet_bsdf = (PCMICROFACET_BSDF)context;
 
+    VECTOR3 original_incoming = incoming;
+    incoming = VectorNegate(incoming);
+
     float_t cos_theta_i = VectorDotProduct(shading_normal, incoming);
     if (cos_theta_i == (float_t)0.0)
     {
@@ -302,7 +306,7 @@ MicrofacetReflectionBsdfSample(
         return ISTATUS_SUCCESS;
     }
 
-    *outgoing = VectorReflect(incoming, half_angle);
+    *outgoing = VectorReflect(original_incoming, half_angle);
 
     float_t cos_theta_o = VectorDotProduct(shading_normal, *outgoing);
     if ((cos_theta_i < (float_t)0.0) != (cos_theta_o < (float_t)0.0))
@@ -312,7 +316,7 @@ MicrofacetReflectionBsdfSample(
     }
 
     status = MicrofacetReflectionBsdfComputeDiffuseWithPdf(context,
-                                                           incoming,
+                                                           original_incoming,
                                                            shading_normal,
                                                            *outgoing,
                                                            false,
