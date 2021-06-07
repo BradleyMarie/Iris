@@ -72,7 +72,7 @@ AlphaMaterialSample(
         return status;
     }
 
-    alpha = IMax((float_t)0.0, IMax(alpha, (float_t)1.0));
+    alpha = IMax((float_t)0.0, IMin(alpha, (float_t)1.0));
     status = AlphaBsdfAllocateWithAllocator(bsdf_allocator,
                                             base_bsdf,
                                             alpha,
@@ -123,7 +123,7 @@ AlphaMaterialAllocate(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (alpha_texture == NULL)
+    if (material == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_02;
     }
