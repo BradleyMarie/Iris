@@ -27,9 +27,9 @@ typedef struct _SOBOL_SEQUENCE {
     double to_first_dimension;
     double to_second_dimension;
     uint64_t logical_resolution_log2;
+    unsigned long long index;
     unsigned num_columns;
     unsigned num_rows;
-    unsigned index;
     unsigned dimension;
 } SOBOL_SEQUENCE, *PSOBOL_SEQUENCE;
 
@@ -204,11 +204,6 @@ SobolSequenceStart(
     _In_ uint64_t index
     )
 {
-    if (UINT32_MAX < index)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
     PSOBOL_SEQUENCE sobol_sequence = (PSOBOL_SEQUENCE)context;
 
     sobol_sequence->index = index;
