@@ -57,7 +57,7 @@ static const REFLECTOR_VTABLE perfect_reflector_vtable = {
 static const REFLECTOR perfect_reflector = {
     &perfect_reflector_vtable,
     NULL,
-    0
+    PERFECT_REFLECTOR_TYPE
 };
 
 const REFLECTOR *const iris_physx_perfect_reflector = &perfect_reflector;

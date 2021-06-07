@@ -537,6 +537,21 @@ TEST(ReflectorCompositor, ReflectorCompositorMultiplyReflectors)
     ASSERT_EQ(ISTATUS_SUCCESS, status);
     EXPECT_EQ((float_t)0.0, value);
 
+    float_t minimum = std::numeric_limits<float_t>::min();
+    PCREFLECTOR epsilon_reflector;
+    status = ReflectorCompositorAttenuateReflector(compositor,
+                                                   root_reflector,
+                                                   minimum,
+                                                   &epsilon_reflector);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    status = ReflectorCompositorMultiplyReflectors(compositor,
+                                                   epsilon_reflector,
+                                                   epsilon_reflector,
+                                                   &result);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+    ASSERT_EQ(NULL, result);
+
     ReflectorRelease(root_reflector);
 
     ReflectorCompositorFree(compositor);
