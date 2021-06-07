@@ -92,13 +92,10 @@ TrowbridgeReitzSample11(
 float_t
 TrowbridgeReitzComputeD(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
-    _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 half_angle
     )
 {
-    float_t cos_theta = VectorClampedDotProduct(half_angle, normal);
+    float_t cos_theta = half_angle.z;
     float_t cos2_theta = cos_theta * cos_theta;
     float_t sin2_theta = (float_t)1.0 - cos2_theta;
     float_t tan2_theta = sin2_theta / cos2_theta;
@@ -117,10 +114,12 @@ TrowbridgeReitzComputeD(
     }
     else
     {
-        float_t cos_phi = VectorClampedDotProduct(half_angle, forward);
+        float_t cos_phi =
+            IMax((float_t)-1.0, IMin(half_angle.x / sin_theta, (float_t)1.0));
         cos_phi /= sin_theta;
 
-        float_t sin_phi = VectorClampedDotProduct(half_angle, right);
+        float_t sin_phi =
+            IMax((float_t)-1.0, IMin(half_angle.y / sin_theta, (float_t)1.0));
         sin_phi /= sin_theta;
 
         sin2_phi = sin_phi * sin_phi;
@@ -142,13 +141,10 @@ TrowbridgeReitzComputeD(
 float_t
 TrowbridgeReitzComputeLambda(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
-    _In_ VECTOR3 vector,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 vector
     )
 {
-    float_t cos_theta = VectorClampedDotProduct(vector, normal);
+    float_t cos_theta = vector.z;
     float_t cos2_theta = cos_theta * cos_theta;
     float_t sin2_theta = (float_t)1.0 - cos2_theta;
     float_t tan2_theta = sin2_theta / cos2_theta;
@@ -168,10 +164,12 @@ TrowbridgeReitzComputeLambda(
     }
     else
     {
-        float_t cos_phi = VectorClampedDotProduct(vector, forward);
+        float_t cos_phi =
+            IMax((float_t)-1.0, IMin(vector.x / sin_theta, (float_t)1.0));
         cos_phi /= sin_theta;
 
-        float_t sin_phi = VectorClampedDotProduct(vector, right);
+        float_t sin_phi =
+            IMax((float_t)-1.0, IMin(vector.y / sin_theta, (float_t)1.0));
         sin_phi /= sin_theta;
 
         sin2_phi = sin_phi * sin_phi;
@@ -207,15 +205,12 @@ VECTOR3
 TrowbridgeReitzSampleHalfAngle(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right,
     _In_ float_t u,
     _In_ float_t v
     )
 {
     bool flip;
-    if (VectorDotProduct(incoming, normal) < (float_t)0.0)
+    if (incoming.z < (float_t)0.0)
     {
         incoming = VectorNegate(incoming);
         flip = true;
@@ -231,7 +226,7 @@ TrowbridgeReitzSampleHalfAngle(
     stretched = VectorNormalize(stretched, NULL, NULL);
 
     float_t slope_x, slope_y;
-    float_t cos_stretched_theta = VectorBoundedDotProduct(normal, stretched);
+    float_t cos_stretched_theta = stretched.z;
     TrowbridgeReitzSample11(cos_stretched_theta, u, v, &slope_x, &slope_y);
 
     float_t cos2_stretched_theta = cos_stretched_theta * cos_stretched_theta;
@@ -246,10 +241,12 @@ TrowbridgeReitzSampleHalfAngle(
     }
     else
     {
-        cos_stretched_phi = VectorClampedDotProduct(incoming, forward);
+        cos_stretched_phi =
+            IMax((float_t)-1.0, IMin(stretched.x / sin_stretched_theta, (float_t)1.0));
         cos_stretched_phi /= sin_stretched_theta;
 
-        sin_stretched_phi = VectorClampedDotProduct(incoming, right);
+        sin_stretched_phi =
+            IMax((float_t)-1.0, IMin(stretched.y / sin_stretched_theta, (float_t)1.0));
         sin_stretched_phi /= sin_stretched_theta;
     }
 
@@ -260,13 +257,7 @@ TrowbridgeReitzSampleHalfAngle(
     slope_x = distribution->alpha_x * slope_x;
     slope_y = distribution->alpha_y * slope_y;
 
-    VECTOR3 local_outgoing = VectorCreate(-slope_x, -slope_y, (float_t)1.0);
-    local_outgoing = VectorNormalize(local_outgoing, NULL, NULL);
-
-    float_t x = VectorDotProduct(forward, local_outgoing);
-    float_t y = VectorDotProduct(right, local_outgoing);
-    float_t z = VectorDotProduct(normal, local_outgoing);
-    VECTOR3 result = VectorCreate(x, y, z);
+    VECTOR3 result = VectorCreate(-slope_x, -slope_y, (float_t)1.0);
     result = VectorNormalize(result, NULL, NULL);
 
     if (flip)

@@ -8,7 +8,13 @@ Module Name:
 
 Abstract:
 
-    Defines an abstract microfacet distribution.
+    Defines an abstract microfacet distribution. Microfacet distributions
+    are defined to use their own local coordinate space for vectors where
+    up (parallel to the surface normal) is the positive z-axis, forward is the
+    positive x-axis, and right is the positive y-axis.
+
+    It is the responsibility of callers to translate vectors provided to and
+    returned from these routines into and out of this coordinate space.
 
 --*/
 
@@ -27,10 +33,7 @@ typedef
 float_t
 (*PMICROFACET_DISTRIBUTION_COMPUTE_D_ROUTINE)(
     _In_ const struct _MICROFACET_DISTRIBUTION* distribution,
-    _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 half_angle
     );
 
 typedef
@@ -38,20 +41,14 @@ float_t
 (*PMICROFACET_DISTRIBUTION_COMPUTE_G_ROUTINE)(
     _In_ const struct _MICROFACET_DISTRIBUTION* distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 outgoing,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 outgoing
     );
 
 typedef
 float_t
 (*PMICROFACET_DISTRIBUTION_COMPUTE_LAMBDA_ROUTINE)(
     _In_ const struct _MICROFACET_DISTRIBUTION* distribution,
-    _In_ VECTOR3 vector,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 vector
     );
 
 typedef
@@ -59,9 +56,6 @@ VECTOR3
 (*PMICROFACET_DISTRIBUTION_SAMPLE_HALF_ANGLE_ROUTINE)(
     _In_ const struct _MICROFACET_DISTRIBUTION* distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right,
     _In_ float_t u,
     _In_ float_t v
     );
@@ -92,17 +86,11 @@ inline
 float_t
 MicrofacetLambda(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
-    _In_ VECTOR3 vector,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 vector
     )
 {
     float_t result = distribution->vtable->compute_lambda_routine(distribution,
-                                                                  vector,
-                                                                  normal,
-                                                                  forward,
-                                                                  right);
+                                                                  vector);
     return result;
 }
 
@@ -112,35 +100,23 @@ float_t
 MicrofacetG(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 outgoing,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 outgoing
     )
 {
     if (distribution->vtable->compute_g_routine != NULL)
     {
         float_t result = distribution->vtable->compute_g_routine(distribution,
                                                                  incoming,
-                                                                 outgoing,
-                                                                 normal,
-                                                                 forward,
-                                                                 right);
+                                                                 outgoing);
 
         return result;
     }
 
     float_t lambda_incoming = MicrofacetLambda(distribution,
-                                               incoming,
-                                               normal,
-                                               forward,
-                                               right);
+                                               incoming);
 
     float_t lambda_outgoing = MicrofacetLambda(distribution,
-                                               outgoing,
-                                               normal,
-                                               forward,
-                                               right);
+                                               outgoing);
 
     return (float_t)1.0 / ((float_t)1.0 + lambda_incoming + lambda_outgoing);
 }
@@ -150,17 +126,11 @@ inline
 float_t
 MicrofacetG1(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
-    _In_ VECTOR3 vector,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 vector
     )
 {
     float_t lambda = MicrofacetLambda(distribution,
-                                      vector,
-                                      normal,
-                                      forward,
-                                      right);
+                                      vector);
 
     return (float_t)1.0 / ((float_t)1.0 + lambda);
 }
@@ -170,17 +140,11 @@ inline
 float_t
 MicrofacetD(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
-    _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 half_angle
     )
 {
     float_t result = distribution->vtable->compute_d_routine(distribution,
-                                                             half_angle,
-                                                             normal,
-                                                             forward,
-                                                             right);
+                                                             half_angle);
 
     return result;
 }
@@ -191,9 +155,6 @@ VECTOR3
 MicrofacetSample(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right,
     _In_ float_t u,
     _In_ float_t v
     )
@@ -201,9 +162,6 @@ MicrofacetSample(
     VECTOR3 result =
         distribution->vtable->sample_half_angle_routine(distribution,
                                                         incoming,
-                                                        normal,
-                                                        forward,
-                                                        right,
                                                         u,
                                                         v);
 
@@ -216,28 +174,13 @@ float_t
 MicrofacetPdf(
     _In_ PCMICROFACET_DISTRIBUTION distribution,
     _In_ VECTOR3 incoming,
-    _In_ VECTOR3 half_angle,
-    _In_ VECTOR3 normal,
-    _In_ VECTOR3 forward,
-    _In_ VECTOR3 right
+    _In_ VECTOR3 half_angle
     )
 {
-    float_t d = MicrofacetD(distribution,
-                            half_angle,
-                            normal,
-                            forward,
-                            right);
-
-    float_t g1 = MicrofacetG1(distribution,
-                              incoming,
-                              normal,
-                              forward,
-                              right);
-
+    float_t d = MicrofacetD(distribution, half_angle);
+    float_t g1 = MicrofacetG1(distribution, incoming);
     float_t dot = fabs(VectorDotProduct(half_angle, incoming));
-
-    float_t abs_cos_theta_i = fabs(VectorDotProduct(normal, incoming));
-
+    float_t abs_cos_theta_i = fabs(incoming.z);
     return d * g1 * dot * abs_cos_theta_i;
 }
 

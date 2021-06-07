@@ -48,6 +48,44 @@ MicrofacetBsdfCreateCoordinateSystem(
 
 static
 inline
+VECTOR3
+MicrofacetBsdfToLocal(
+    _In_ VECTOR3 vector,
+    _In_ VECTOR3 up,
+    _In_ VECTOR3 forward,
+    _In_ VECTOR3 right
+    )
+{
+    float_t x = VectorDotProduct(vector, forward);
+    float_t y = VectorDotProduct(vector, right);
+    float_t z = VectorDotProduct(vector, up);
+    return VectorCreate(x, y, z);
+}
+
+static
+inline
+VECTOR3
+MicrofacetBsdfToModel(
+    _In_ VECTOR3 vector,
+    _In_ VECTOR3 up,
+    _In_ VECTOR3 forward,
+    _In_ VECTOR3 right
+    )
+{
+    float_t x = vector.x * forward.x +
+                vector.y * right.x +
+                vector.z * up.x;
+    float_t y = vector.x * forward.y +
+                vector.y * right.y +
+                vector.z * up.y;
+    float_t z = vector.x * forward.z +
+                vector.y * right.z +
+                vector.z * up.z;
+    return VectorCreate(x, y, z);
+}
+
+static
+inline
 ISTATUS
 MicrofacetReflectionBsdfComputeDiffuseWithPdf(
     _In_ const void *context,
@@ -69,8 +107,21 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    float_t cos_theta_i = VectorDotProduct(shading_normal, incoming);
-    float_t cos_theta_o = VectorDotProduct(shading_normal, outgoing);
+    VECTOR3 forward, right;
+    MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
+
+    VECTOR3 local_incoming = MicrofacetBsdfToLocal(incoming,
+                                                   shading_normal,
+                                                   forward,
+                                                   right);
+
+    VECTOR3 local_outgoing = MicrofacetBsdfToModel(outgoing,
+                                                   shading_normal,
+                                                   forward,
+                                                   right);
+
+    float_t cos_theta_i = local_incoming.z;
+    float_t cos_theta_o = local_outgoing.z;
     if ((cos_theta_i < (float_t)0.0) != (cos_theta_o < (float_t)0.0))
     {
         *pdf = (float_t)0.0;
@@ -85,18 +136,18 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
         return ISTATUS_SUCCESS;
     }
 
-    VECTOR3 half_angle = VectorHalfAngle(incoming, outgoing);
-    if (half_angle.x == (float_t)0.0 &&
-        half_angle.y == (float_t)0.0 &&
-        half_angle.z == (float_t)0.0)
+    VECTOR3 local_half_angle = VectorHalfAngle(local_incoming, local_outgoing);
+    if (local_half_angle.x == (float_t)0.0 &&
+        local_half_angle.y == (float_t)0.0 &&
+        local_half_angle.z == (float_t)0.0)
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
     }
 
-    half_angle = VectorNormalize(half_angle, NULL, NULL);
+    local_half_angle = VectorNormalize(local_half_angle, NULL, NULL);
 
-    float_t cos_theta_half_angle = VectorDotProduct(half_angle, shading_normal);
+    float_t cos_theta_half_angle = local_half_angle.z;
     if (cos_theta_half_angle < (float_t)0.0)
     {
         cos_theta_half_angle = -cos_theta_half_angle;
@@ -112,21 +163,12 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
         return status;
     }
 
-    VECTOR3 forward, right;
-    MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
-
     float_t d = MicrofacetD(&microfacet_bsdf->microfacet_distribution,
-                            half_angle,
-                            shading_normal,
-                            forward,
-                            right);
+                            local_half_angle);
 
     float_t g = MicrofacetG(&microfacet_bsdf->microfacet_distribution,
-                            incoming,
-                            outgoing,
-                            shading_normal,
-                            forward,
-                            right);
+                            local_incoming,
+                            local_outgoing);
 
     float_t attenuation =
         d * g / ((float_t)4.0 * abs_cos_theta_i * abs_cos_theta_o);
@@ -151,13 +193,10 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
     }
 
     *pdf = MicrofacetPdf(&microfacet_bsdf->microfacet_distribution,
-                         incoming,
-                         half_angle,
-                         shading_normal,
-                         forward,
-                         right);
+                         local_incoming,
+                         local_half_angle);
 
-    *pdf /= (float_t)4.0 * VectorDotProduct(incoming, half_angle);
+    *pdf /= (float_t)4.0 * VectorDotProduct(local_incoming, local_half_angle);
 
     return ISTATUS_SUCCESS;
 }
@@ -241,14 +280,21 @@ MicrofacetReflectionBsdfSample(
     VECTOR3 forward, right;
     MicrofacetBsdfCreateCoordinateSystem(shading_normal, &forward, &right);
 
-    VECTOR3 half_angle =
+    VECTOR3 local_incoming = MicrofacetBsdfToLocal(incoming,
+                                                   shading_normal,
+                                                   forward,
+                                                   right);
+
+    VECTOR3 local_half_angle =
         MicrofacetSample(&microfacet_bsdf->microfacet_distribution,
-                         incoming,
-                         shading_normal,
-                         forward,
-                         right,
+                         local_incoming,
                          u,
                          v);
+
+    VECTOR3 half_angle = MicrofacetBsdfToModel(local_half_angle,
+                                               shading_normal,
+                                               forward,
+                                               right);
 
     if (VectorDotProduct(incoming, *outgoing) < (float_t)0.0)
     {
