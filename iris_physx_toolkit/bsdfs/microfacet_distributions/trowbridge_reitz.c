@@ -116,11 +116,8 @@ TrowbridgeReitzComputeD(
     {
         float_t cos_phi =
             IMax((float_t)-1.0, IMin(half_angle.x / sin_theta, (float_t)1.0));
-        cos_phi /= sin_theta;
-
         float_t sin_phi =
             IMax((float_t)-1.0, IMin(half_angle.y / sin_theta, (float_t)1.0));
-        sin_phi /= sin_theta;
 
         sin2_phi = sin_phi * sin_phi;
         cos2_phi = cos_phi * cos_phi;
@@ -166,11 +163,8 @@ TrowbridgeReitzComputeLambda(
     {
         float_t cos_phi =
             IMax((float_t)-1.0, IMin(vector.x / sin_theta, (float_t)1.0));
-        cos_phi /= sin_theta;
-
         float_t sin_phi =
             IMax((float_t)-1.0, IMin(vector.y / sin_theta, (float_t)1.0));
-        sin_phi /= sin_theta;
 
         sin2_phi = sin_phi * sin_phi;
         cos2_phi = cos_phi * cos_phi;
@@ -241,13 +235,13 @@ TrowbridgeReitzSampleHalfAngle(
     }
     else
     {
+        cos_stretched_phi = stretched.x / sin_stretched_theta;
         cos_stretched_phi =
-            IMax((float_t)-1.0, IMin(stretched.x / sin_stretched_theta, (float_t)1.0));
-        cos_stretched_phi /= sin_stretched_theta;
+            IMax((float_t)-1.0, IMin(cos_stretched_phi, (float_t)1.0));
 
+        sin_stretched_phi = stretched.y / sin_stretched_theta;
         sin_stretched_phi =
-            IMax((float_t)-1.0, IMin(stretched.y / sin_stretched_theta, (float_t)1.0));
-        sin_stretched_phi /= sin_stretched_theta;
+            IMax((float_t)-1.0, IMin(sin_stretched_phi, (float_t)1.0));
     }
 
     float_t tmp = cos_stretched_phi * slope_x - sin_stretched_phi * slope_y;
