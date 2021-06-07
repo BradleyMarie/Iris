@@ -167,6 +167,11 @@ AlphaBsdfSampleDiffuse(
         return status;
     }
 
+    if (*pdf <= (float_t)0.0)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
     *pdf *= alpha_bsdf->alpha;
 
     status = ReflectorCompositorAttenuateReflector(compositor,
