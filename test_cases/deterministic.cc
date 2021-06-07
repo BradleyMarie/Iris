@@ -16,8 +16,11 @@ Abstract:
 #include <thread>
 #include <vector>
 
+#include "iris_advanced_toolkit/halton_sequence.h"
 #include "iris_advanced_toolkit/pcg_random.h"
+#include "iris_advanced_toolkit/sobol_sequence.h"
 #include "iris_camera_toolkit/grid_image_sampler.h"
+#include "iris_camera_toolkit/low_discrepancy_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
@@ -34,101 +37,6 @@ Abstract:
 #include "test_util/cornell_box.h"
 #include "test_util/equality.h"
 #include "test_util/quad.h"
-
-void
-TestRender(
-    _In_ PCCAMERA camera,
-    _In_ PSCENE scene,
-    _In_ PLIGHT_SAMPLER light_sampler,
-    _In_ PCOLOR_INTEGRATOR color_integrator
-    )
-{
-    PIMAGE_SAMPLER pixel_sampler;
-    ISTATUS status =
-        GridImageSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PINTEGRATOR path_tracer;
-    status = PathTracerAllocate(3, 5, (float_t)0.05, INFINITY, &path_tracer);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PSAMPLE_TRACER sample_tracer;
-    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = IntegratorPrepare(path_tracer,
-                               scene,
-                               light_sampler,
-                               color_integrator);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PRANDOM rng0;
-    status = PermutedCongruentialRandomAllocate(
-        0x853c49e6748fea9bULL,
-        0xda3e39cb94b95bdbULL,
-        &rng0);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PFRAMEBUFFER framebuffer0;
-    status = FramebufferAllocate(100, 100, &framebuffer0);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    status = IrisCameraRenderSingleThreaded(camera,
-                                            nullptr,
-                                            pixel_sampler,
-                                            sample_tracer,
-                                            rng0,
-                                            framebuffer0,
-                                            nullptr,
-                                            (float_t)0.01);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PRANDOM rng1;
-    status = PermutedCongruentialRandomAllocate(
-        0x853c49e6748fea9bULL,
-        0xda3e39cb94b95bdbULL,
-        &rng1);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    PFRAMEBUFFER framebuffer1;
-    status = FramebufferAllocate(100, 100, &framebuffer1);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    size_t num_threads = std::max(2u, std::thread::hardware_concurrency());
-    status = IrisCameraRender(camera,
-                              nullptr,
-                              pixel_sampler,
-                              sample_tracer,
-                              rng1,
-                              framebuffer1,
-                              nullptr,
-                              (float_t)0.01,
-                              num_threads);
-    ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-    for (size_t i = 0; i < 100; i++)
-    {
-        for (size_t j = 0; j < 100; j++)
-        {
-            COLOR3 color0;
-            status = FramebufferGetPixel(framebuffer0, i, j, &color0);
-            ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-            COLOR3 color1;
-            status = FramebufferGetPixel(framebuffer1, i, j, &color1);
-            ASSERT_EQ(status, ISTATUS_SUCCESS);
-
-            EXPECT_EQ(color0, color1);
-        }
-    }
-
-    ImageSamplerFree(pixel_sampler);
-    SampleTracerFree(sample_tracer);
-    RandomFree(rng0);
-    RandomFree(rng1);
-    FramebufferFree(framebuffer0);
-    FramebufferFree(framebuffer1);
-}
 
 static
 void
@@ -160,8 +68,14 @@ AddQuadToScene(
     shapes->push_back(shape1);
 }
 
-TEST(DeterministicTest, CornellBox)
+void
+TestRender(
+    _In_ PRANDOM rng0,
+    _In_ PRANDOM rng1,
+    _In_ PIMAGE_SAMPLER image_sampler
+    )
 {
+
     PCOLOR_INTEGRATOR color_integrator;
     ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -357,7 +271,69 @@ TEST(DeterministicTest, CornellBox)
         &camera);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    TestRender(camera, scene, light_sampler, color_integrator);
+    PINTEGRATOR path_tracer;
+    status = PathTracerAllocate(3, 5, (float_t)0.05, INFINITY, &path_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSAMPLE_TRACER sample_tracer;
+    status = PhysxSampleTracerAllocate(path_tracer, &sample_tracer);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IntegratorPrepare(path_tracer,
+                               scene,
+                               light_sampler,
+                               color_integrator);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PFRAMEBUFFER framebuffer0;
+    status = FramebufferAllocate(100, 100, &framebuffer0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    status = IrisCameraRenderSingleThreaded(camera,
+                                            nullptr,
+                                            image_sampler,
+                                            sample_tracer,
+                                            rng0,
+                                            framebuffer0,
+                                            nullptr,
+                                            (float_t)0.01);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PFRAMEBUFFER framebuffer1;
+    status = FramebufferAllocate(100, 100, &framebuffer1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    size_t num_threads = std::max(2u, std::thread::hardware_concurrency());
+    status = IrisCameraRender(camera,
+                              nullptr,
+                              image_sampler,
+                              sample_tracer,
+                              rng1,
+                              framebuffer1,
+                              nullptr,
+                              (float_t)0.01,
+                              num_threads);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    for (size_t i = 0; i < 100; i++)
+    {
+        for (size_t j = 0; j < 100; j++)
+        {
+            COLOR3 color0;
+            status = FramebufferGetPixel(framebuffer0, i, j, &color0);
+            ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+            COLOR3 color1;
+            status = FramebufferGetPixel(framebuffer1, i, j, &color1);
+            ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+            EXPECT_EQ(color0, color1);
+        }
+    }
+
+    SampleTracerFree(sample_tracer);
+    FramebufferFree(framebuffer0);
+    FramebufferFree(framebuffer1);
 
     for (PSHAPE shape : shapes)
     {
@@ -384,4 +360,96 @@ TEST(DeterministicTest, CornellBox)
     LightSamplerRelease(light_sampler);
     CameraFree(camera);
     ColorIntegratorRelease(color_integrator);
+}
+
+TEST(DeterministicTest, PcgGridSampler)
+{
+    PRANDOM rng0;
+    ISTATUS status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PRANDOM rng1;
+    status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PIMAGE_SAMPLER pixel_sampler;
+    status =
+        GridImageSamplerAllocate(1, 1, false, 1, 1, false, &pixel_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRender(rng0, rng1, pixel_sampler);
+
+    RandomFree(rng0);
+    RandomFree(rng1);
+    ImageSamplerFree(pixel_sampler);
+}
+
+TEST(DeterministicTest, PcgHalton)
+{
+    PRANDOM rng0;
+    ISTATUS status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PRANDOM rng1;
+    status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLOW_DISCREPANCY_SEQUENCE sequence;
+    status = HaltonSequenceAllocate(&sequence);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PIMAGE_SAMPLER pixel_sampler;
+    status =
+        LowDiscrepancyImageSamplerAllocate(sequence, 1, &pixel_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRender(rng0, rng1, pixel_sampler);
+
+    RandomFree(rng0);
+    RandomFree(rng1);
+    ImageSamplerFree(pixel_sampler);
+}
+
+TEST(DeterministicTest, PcgSobol)
+{
+    PRANDOM rng0;
+    ISTATUS status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng0);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PRANDOM rng1;
+    status = PermutedCongruentialRandomAllocate(
+        0x853c49e6748fea9bULL,
+        0xda3e39cb94b95bdbULL,
+        &rng1);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLOW_DISCREPANCY_SEQUENCE sequence;
+    status = SobolSequenceAllocate(&sequence);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PIMAGE_SAMPLER pixel_sampler;
+    status =
+        LowDiscrepancyImageSamplerAllocate(sequence, 1, &pixel_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRender(rng0, rng1, pixel_sampler);
+
+    RandomFree(rng0);
+    RandomFree(rng1);
+    ImageSamplerFree(pixel_sampler);
 }

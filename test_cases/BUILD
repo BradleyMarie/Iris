@@ -99,8 +99,11 @@ cc_test(
     name = "deterministic",
     srcs = ["deterministic.cc"],
     deps = [
+        "//iris_advanced_toolkit:halton_sequence",
         "//iris_advanced_toolkit:pcg_random",
+        "//iris_advanced_toolkit:sobol_sequence",
         "//iris_camera_toolkit:grid_image_sampler",
+        "//iris_camera_toolkit:low_discrepancy_image_sampler",
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit/bsdfs:lambertian",
         "//iris_physx_toolkit:attenuated_reflector",
