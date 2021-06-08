@@ -90,9 +90,11 @@ LowDiscrepancyRandomGenerateIndex(
         return status;
     }
 
-    value *= (float_t)upper_bound;
-
-    *result = (size_t)value;
+    *result = value * (float_t)upper_bound;
+    if (*result == upper_bound)
+    {
+        *result -= 1;
+    }
 
     return ISTATUS_SUCCESS;
 }
