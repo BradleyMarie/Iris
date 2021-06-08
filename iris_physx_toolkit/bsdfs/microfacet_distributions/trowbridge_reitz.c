@@ -285,7 +285,7 @@ TrowbridgeReitzInitialize(
 
     if (distribution == NULL)
     {
-        return ISTATUS_INVALID_ARGUMENT_03;
+        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     distribution->vtable = &trowbridge_reitz_vtable;
