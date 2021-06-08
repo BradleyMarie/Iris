@@ -302,7 +302,7 @@ MicrofacetReflectionBsdfSample(
                                                forward,
                                                right);
 
-    if (VectorDotProduct(incoming, *outgoing) < (float_t)0.0)
+    if (VectorDotProduct(incoming, half_angle) < (float_t)0.0)
     {
         *pdf = (float_t)0.0;
         return ISTATUS_SUCCESS;
