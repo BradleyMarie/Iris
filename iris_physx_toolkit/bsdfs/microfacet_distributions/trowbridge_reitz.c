@@ -35,7 +35,8 @@ TrowbridgeReitzSample11(
     assert(slope_x != NULL);
     assert(slope_y != NULL);
 
-    if (cos_theta > (float_t)0.9999) {
+    if (cos_theta > (float_t)0.9999)
+    {
         float_t r = sqrt(u / ((float_t)1.0 - u));
         float_t phi = iris_two_pi * v;
         SinCos(phi, slope_y, slope_x);
@@ -74,10 +75,13 @@ TrowbridgeReitzSample11(
     assert(isfinite(*slope_x));
 
     float_t s;
-    if (v > (float_t)0.5) {
+    if (v > (float_t)0.5)
+    {
         s = (float_t)1.0;
         v = (float_t)2.0 * (v - (float_t)0.5);
-    } else {
+    }
+    else
+    {
         s = (float_t)-1.0;
         v = (float_t)2.0 * ((float_t)0.5 - v);
     }

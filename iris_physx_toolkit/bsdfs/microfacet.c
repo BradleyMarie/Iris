@@ -148,8 +148,10 @@ MicrofacetReflectionBsdfComputeDiffuseWithPdf(
 
     local_half_angle = VectorNormalize(local_half_angle, NULL, NULL);
 
-    float_t cos_theta_half_angle = local_half_angle.z;
-    if (cos_theta_half_angle < (float_t)0.0)
+    float_t cos_half_angle = local_half_angle.z;
+    float_t cos_theta_half_angle =
+        VectorDotProduct(local_outgoing, local_half_angle);
+    if (cos_half_angle < (float_t)0.0)
     {
         cos_theta_half_angle = -cos_theta_half_angle;
     }
