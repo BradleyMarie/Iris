@@ -315,8 +315,16 @@ EmissiveSphereComputePdfBySolidArea(
 
     if (face_hit == SPHERE_BACK_FACE)
     {
+        POINT3 hit_point = RayEndpoint(*to_shape, distance);
+        VECTOR3 reversed_surface_normal =
+            PointSubtract(hit_point, sphere->sphere.center);
+        reversed_surface_normal =
+            VectorNormalize(reversed_surface_normal, NULL, NULL);
+        VECTOR3 incoming = VectorNormalize(to_shape->direction, NULL, NULL);
+        float_t dot_product =
+            VectorBoundedDotProduct(reversed_surface_normal, incoming);
         float_t area = (float_t)4.0 * iris_pi * sphere->sphere.radius_squared;
-        *pdf = (float_t)1.0 / area;
+        *pdf = (distance * distance) / (dot_product * area);
         return ISTATUS_SUCCESS;
     }
 
