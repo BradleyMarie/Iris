@@ -102,6 +102,29 @@ EdgeCompare(
 }
 
 static
+int
+SizeTCompare(
+    _In_ const void *left_ptr,
+    _In_ const void *right_ptr
+    )
+{
+    const size_t *left = (const size_t*)left_ptr;
+    const size_t *right = (const size_t*)right_ptr;
+
+    if (*left < *right)
+    {
+        return -1;
+    }
+
+    if (*left > *right)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+static
 VECTOR_AXIS
 NextAxis(
     _In_ VECTOR_AXIS axis
@@ -167,8 +190,10 @@ ComputeBounds(
     _In_reads_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
-    _Out_writes_(num_shapes) BOUNDING_BOX bounds[],
-    _Out_ PBOUNDING_BOX total_bounds
+    _Out_ PBOUNDING_BOX total_bounds,
+    _Out_writes_(num_shapes * 2) EDGE x_edges[],
+    _Out_writes_(num_shapes * 2) EDGE y_edges[],
+    _Out_writes_(num_shapes * 2) EDGE z_edges[]
     )
 {
     if (num_shapes == 0)
@@ -188,80 +213,73 @@ ComputeBounds(
         return status;
     }
 
-    bounds[0] = *total_bounds;
+    x_edges[0].is_start = true;
+    x_edges[0].primitive = 0;
+    x_edges[0].value = total_bounds->corners[0].x;
+
+    x_edges[1].is_start = false;
+    x_edges[1].primitive = 0;
+    x_edges[1].value = total_bounds->corners[1].x;
+
+    y_edges[0].is_start = true;
+    y_edges[0].primitive = 0;
+    y_edges[0].value = total_bounds->corners[0].y;
+
+    y_edges[1].is_start = false;
+    y_edges[1].primitive = 0;
+    y_edges[1].value = total_bounds->corners[1].y;
+
+    z_edges[0].is_start = true;
+    z_edges[0].primitive = 0;
+    z_edges[0].value = total_bounds->corners[0].z;
+
+    z_edges[1].is_start = false;
+    z_edges[1].primitive = 0;
+    z_edges[1].value = total_bounds->corners[1].z;
 
     for (size_t i = 1; i < num_shapes; i++)
     {
+        BOUNDING_BOX shape_bounds;
         transform = premultiplied[i] ? NULL : transforms[i];
         status = ShapeComputeBounds(shapes[i],
                                     transform,
-                                    bounds + i);
+                                    &shape_bounds);
 
         if (status != ISTATUS_SUCCESS)
         {
             return status;
         }
 
-        *total_bounds = BoundingBoxUnion(*total_bounds, bounds[i]);
+        *total_bounds = BoundingBoxUnion(*total_bounds, shape_bounds);
+
+        x_edges[2 * i].is_start = true;
+        x_edges[2 * i].primitive = i;
+        x_edges[2 * i].value = shape_bounds.corners[0].x;
+
+        x_edges[2 * i + 1].is_start = false;
+        x_edges[2 * i + 1].primitive = i;
+        x_edges[2 * i + 1].value = shape_bounds.corners[1].x;
+
+        y_edges[2 * i].is_start = true;
+        y_edges[2 * i].primitive = i;
+        y_edges[2 * i].value = shape_bounds.corners[0].y;
+
+        y_edges[2 * i + 1].is_start = false;
+        y_edges[2 * i + 1].primitive = i;
+        y_edges[2 * i + 1].value = shape_bounds.corners[1].y;
+
+        z_edges[2 * i].is_start = true;
+        z_edges[2 * i].primitive = i;
+        z_edges[2 * i].value = shape_bounds.corners[0].z;
+
+        z_edges[2 * i + 1].is_start = false;
+        z_edges[2 * i + 1].primitive = i;
+        z_edges[2 * i + 1].value = shape_bounds.corners[1].z;
     }
 
-    return ISTATUS_SUCCESS;
-}
-
-static
-ISTATUS
-AllocateEdges(
-    _In_ const BOUNDING_BOX all_bounds[],
-    _In_reads_(num_indices) const size_t shape_indices[],
-    _In_ size_t num_indices,
-    _In_ VECTOR_AXIS axis,
-    _Outptr_result_buffer_(2 * num_indices) PEDGE *edges
-    )
-{
-    size_t num_entries;
-    bool success = CheckedMultiplySizeT(num_indices, 2, &num_entries);
-
-    if (!success)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    *edges = calloc(num_entries, sizeof(EDGE));
-
-    if (*edges == NULL)
-    {
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    for (size_t i = 0; i < num_indices; i++)
-    {
-        float_t min, max;
-        switch (axis)
-        {
-            case VECTOR_X_AXIS:
-                min = all_bounds[shape_indices[i]].corners[0].x;
-                max = all_bounds[shape_indices[i]].corners[1].x;
-                break;
-            case VECTOR_Y_AXIS:
-                min = all_bounds[shape_indices[i]].corners[0].y;
-                max = all_bounds[shape_indices[i]].corners[1].y;
-                break;
-            default: // VECTOR_Z_AXIS
-                min = all_bounds[shape_indices[i]].corners[0].z;
-                max = all_bounds[shape_indices[i]].corners[1].z;
-                break;
-        }
-
-        (*edges)[2 * i].is_start = true;
-        (*edges)[2 * i].primitive = shape_indices[i];
-        (*edges)[2 * i].value = min;
-
-        (*edges)[2 * i + 1].is_start = false;
-        (*edges)[2 * i + 1].primitive = shape_indices[i];
-        (*edges)[2 * i + 1].value = max;
-    }
-
-    qsort(*edges, num_entries, sizeof(EDGE), EdgeCompare);
+    qsort(x_edges, num_shapes * 2, sizeof(EDGE), EdgeCompare);
+    qsort(y_edges, num_shapes * 2, sizeof(EDGE), EdgeCompare);
+    qsort(z_edges, num_shapes * 2, sizeof(EDGE), EdgeCompare);
 
     return ISTATUS_SUCCESS;
 }
@@ -354,8 +372,9 @@ static
 ISTATUS
 UncompressedKdTreeLeafAllocate(
     _Out_ PUNCOMPRESSED_NODE *node,
-    _In_reads_(num_indices) const size_t shape_indices[],
-    _In_ size_t num_indices
+    _In_reads_(2 * num_indices) const EDGE edges[],
+    _In_ size_t num_indices,
+    _In_ bool is_below
     )
 {
     size_t *indices = calloc(num_indices, sizeof(size_t));
@@ -373,7 +392,14 @@ UncompressedKdTreeLeafAllocate(
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    memcpy(indices, shape_indices, sizeof(size_t) * num_indices);
+    size_t insert_index = 0;
+    for (size_t i = 0; i < 2 * num_indices; i++)
+    {
+        if (edges[i].is_start == is_below)
+        {
+            indices[insert_index++] = edges[i].primitive;
+        }
+    }
 
     (*node)->is_leaf = true;
     (*node)->data.leaf.indices = indices;
@@ -404,11 +430,11 @@ UncompressedKdTreeFree(
 static
 ISTATUS
 UncompressedKdTreeBuildImpl(
-    _In_ const BOUNDING_BOX all_bounds[],
-    _In_ BOUNDING_BOX node_bounds,
-    _In_reads_(num_indices) _Post_invalid_ size_t shape_indices[],
+    _In_ PEDGE edges[3],
     _In_ size_t num_indices,
+    _In_ BOUNDING_BOX node_bounds,
     _In_ size_t depth_remaining,
+    _In_ bool is_below,
     _Out_ PUNCOMPRESSED_NODE *node,
     _Out_ size_t *num_nodes,
     _Out_ size_t *index_slots
@@ -417,10 +443,9 @@ UncompressedKdTreeBuildImpl(
     if (num_indices <= TARGET_LEAF_SIZE || depth_remaining == 0)
     {
         ISTATUS status = UncompressedKdTreeLeafAllocate(node,
-                                                        shape_indices,
-                                                        num_indices);
-
-        free(shape_indices);
+                                                        edges[0],
+                                                        num_indices,
+                                                        is_below);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -434,35 +459,25 @@ UncompressedKdTreeBuildImpl(
             *index_slots += num_indices;
         }
 
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+
         return ISTATUS_SUCCESS;
     }
 
     float_t best_cost = (float_t)num_indices * INTERSECTION_COST;
     VECTOR_AXIS best_axis = VECTOR_X_AXIS;
     size_t best_split = 0;
-    PEDGE best_edges = NULL;
     bool should_split = false;
 
     VECTOR_AXIS axis = BoundingBoxDominantAxis(node_bounds);
 
     for (size_t i = 0; i < 3; i++)
     {
-        PEDGE edges = NULL;
-        ISTATUS status = AllocateEdges(all_bounds,
-                                       shape_indices,
-                                       num_indices,
-                                       axis,
-                                       &edges);
-
-        if (status != ISTATUS_SUCCESS)
-        {
-            free(shape_indices);
-            return status;
-        }
-
         float_t cost;
         size_t split;
-        bool success = EvaluateSplitsOnAxis(edges,
+        bool success = EvaluateSplitsOnAxis(edges[axis],
                                             num_indices * 2,
                                             node_bounds,
                                             axis,
@@ -472,16 +487,10 @@ UncompressedKdTreeBuildImpl(
         if (success && cost < best_cost)
         {
             should_split = true;
-            free(best_edges);
 
             best_cost = cost;
             best_axis = axis;
             best_split = split;
-            best_edges = edges;
-        }
-        else
-        {
-            free(edges);
         }
 
         axis = NextAxis(axis);
@@ -490,10 +499,9 @@ UncompressedKdTreeBuildImpl(
     if (!should_split)
     {
         ISTATUS status = UncompressedKdTreeLeafAllocate(node,
-                                                        shape_indices,
-                                                        num_indices);
-
-        free(shape_indices);
+                                                        edges[0],
+                                                        num_indices,
+                                                        is_below);
 
         if (status != ISTATUS_SUCCESS)
         {
@@ -507,13 +515,17 @@ UncompressedKdTreeBuildImpl(
             *index_slots += num_indices;
         }
 
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+
         return ISTATUS_SUCCESS;
     }
 
     size_t below_shapes = 0;
     for (size_t i = 0; i < best_split; i++)
     {
-        if (best_edges[i].is_start)
+        if (edges[best_axis][i].is_start)
         {
             below_shapes += 1;
         }
@@ -522,7 +534,7 @@ UncompressedKdTreeBuildImpl(
     size_t above_shapes = 0;
     for (size_t i = best_split; i < num_indices * 2; i++)
     {
-        if (!best_edges[i].is_start)
+        if (!edges[best_axis][i].is_start)
         {
             above_shapes += 1;
         }
@@ -531,43 +543,124 @@ UncompressedKdTreeBuildImpl(
     size_t *below_indices = calloc(below_shapes, sizeof(size_t));
     if (below_indices == NULL)
     {
-        free(best_edges);
-        free(shape_indices);
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
     size_t *above_indices = calloc(above_shapes, sizeof(size_t));
     if (above_indices == NULL)
     {
-        free(best_edges);
         free(below_indices);
-        free(shape_indices);
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
     size_t below_index = 0;
     for (size_t i = 0; i < best_split; i++)
     {
-        if (best_edges[i].is_start)
+        if (edges[best_axis][i].is_start)
         {
-            below_indices[below_index++] = best_edges[i].primitive;
+            below_indices[below_index++] = edges[best_axis][i].primitive;
         }
+    }
+
+    qsort(below_indices, below_shapes, sizeof(size_t), SizeTCompare);
+
+    PEDGE below_edges[3] = { NULL, NULL, NULL };
+    below_edges[0] = calloc(below_shapes * 2, sizeof(EDGE));
+    below_edges[1] = calloc(below_shapes * 2, sizeof(EDGE));
+    below_edges[2] = calloc(below_shapes * 2, sizeof(EDGE));
+
+    if (below_edges[0] == NULL ||
+        below_edges[1] == NULL ||
+        below_edges[2] == NULL)
+    {
+        free(below_edges[0]);
+        free(below_edges[1]);
+        free(below_edges[2]);
+        free(above_indices);
+        free(below_indices);
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     size_t above_index = 0;
     for (size_t i = best_split; i < num_indices * 2; i++)
     {
-        if (!best_edges[i].is_start)
+        if (!edges[best_axis][i].is_start)
         {
-            above_indices[above_index++] = best_edges[i].primitive;
+            above_indices[above_index++] = edges[best_axis][i].primitive;
         }
     }
 
-    free(shape_indices);
+    qsort(above_indices, above_shapes, sizeof(size_t), SizeTCompare);
 
-    float_t split = best_edges[best_split].value;
+    PEDGE above_edges[3] = { NULL, NULL, NULL };
+    above_edges[0] = calloc(above_shapes * 2, sizeof(EDGE));
+    above_edges[1] = calloc(above_shapes * 2, sizeof(EDGE));
+    above_edges[2] = calloc(above_shapes * 2, sizeof(EDGE));
 
-    free(best_edges);
+    if (above_edges[0] == NULL ||
+        above_edges[1] == NULL ||
+        above_edges[2] == NULL)
+    {
+        free(above_edges[0]);
+        free(above_edges[1]);
+        free(above_edges[2]);
+        free(below_edges[0]);
+        free(below_edges[1]);
+        free(below_edges[2]);
+        free(above_indices);
+        free(below_indices);
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        size_t below_insert_index = 0;
+        size_t above_insert_index = 0;
+        for (size_t j = 0; j < num_indices * 2; j++)
+        {
+            bool found_below = bsearch(&edges[i][j].primitive,
+                                       below_indices,
+                                       below_shapes,
+                                       sizeof(size_t),
+                                       SizeTCompare);
+
+            if (found_below)
+            {
+                below_edges[i][below_insert_index++] = edges[i][j];
+            }
+
+            bool found_above = bsearch(&edges[i][j].primitive,
+                                       above_indices,
+                                       above_shapes,
+                                       sizeof(size_t),
+                                       SizeTCompare);
+
+            if (found_above)
+            {
+                above_edges[i][above_insert_index++] = edges[i][j];
+            }
+        }
+    }
+
+    float_t split = edges[best_axis][best_split].value;
+
+    free(above_indices);
+    free(below_indices);
+    free(edges[0]);
+    free(edges[1]);
+    free(edges[2]);
 
     BOUNDING_BOX below_bounds = node_bounds;
     BOUNDING_BOX above_bounds = node_bounds;
@@ -589,27 +682,29 @@ UncompressedKdTreeBuildImpl(
     }
 
     PUNCOMPRESSED_NODE below_node;
-    ISTATUS status = UncompressedKdTreeBuildImpl(all_bounds,
-                                                 below_bounds,
-                                                 below_indices,
+    ISTATUS status = UncompressedKdTreeBuildImpl(below_edges,
                                                  below_shapes,
+                                                 below_bounds,
                                                  depth_remaining - 1,
+                                                 true,
                                                  &below_node,
                                                  num_nodes,
                                                  index_slots);
 
     if (status != ISTATUS_SUCCESS)
     {
-        free(above_indices);
+        free(above_edges[0]);
+        free(above_edges[1]);
+        free(above_edges[2]);
         return status;
     }
 
     PUNCOMPRESSED_NODE above_node;
-    status = UncompressedKdTreeBuildImpl(all_bounds,
-                                         above_bounds,
-                                         above_indices,
+    status = UncompressedKdTreeBuildImpl(above_edges,
                                          above_shapes,
+                                         above_bounds,
                                          depth_remaining - 1,
+                                         false,
                                          &above_node,
                                          num_nodes,
                                          index_slots);
@@ -654,10 +749,24 @@ UncompressedKdTreeBuild(
     _Out_ size_t *num_indices
     )
 {
-    PBOUNDING_BOX all_bounds = calloc(num_shapes, sizeof(BOUNDING_BOX));
+    size_t num_edges;
+    bool success = CheckedMultiplySizeT(num_shapes, 2, &num_edges);
 
-    if (all_bounds == NULL)
+    if (!success)
     {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    PEDGE edges[3] = { NULL, NULL, NULL };
+    edges[0] = calloc(num_edges, sizeof(EDGE));
+    edges[1] = calloc(num_edges, sizeof(EDGE));
+    edges[2] = calloc(num_edges, sizeof(EDGE));
+
+    if (edges[0] == NULL || edges[1] == NULL || edges[2] == NULL)
+    {
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
@@ -665,39 +774,29 @@ UncompressedKdTreeBuild(
                                    transforms,
                                    premultiplied,
                                    num_shapes,
-                                   all_bounds,
-                                   scene_bounds);
+                                   scene_bounds,
+                                   edges[0],
+                                   edges[1],
+                                   edges[2]);
 
     if (status != ISTATUS_SUCCESS)
     {
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
         return status;
     }
-
-    size_t *indices = calloc(num_shapes, sizeof(size_t));
-
-    if (indices == NULL)
-    {
-        free(all_bounds);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    for (size_t i = 0; i < num_shapes; i++)
-    {
-        indices[i] = i;
-    }
-
+    
     *num_nodes = 0;
     *num_indices = 0;
-    status = UncompressedKdTreeBuildImpl(all_bounds,
-                                         *scene_bounds,
-                                         indices,
+    status = UncompressedKdTreeBuildImpl(edges,
                                          num_shapes,
+                                         *scene_bounds,
                                          max_depth,
+                                         true,
                                          uncompressed_tree,
                                          num_nodes,
                                          num_indices);
-
-    free(all_bounds);
 
     return status;
 }
@@ -1347,7 +1446,7 @@ KdTreeWorldSceneTrace(
     PCKD_TREE_SCENE kd_tree = (PCKD_TREE_SCENE)context;
     PCKD_TREE_NODE node = kd_tree->nodes;
     const uint32_t *all_indices = kd_tree->indices;
-    SHAPE **const shapes = kd_tree->shapes.shapes;\
+    SHAPE **const shapes = kd_tree->shapes.shapes;
 
     VECTOR3 inverse_direction;
     float_t node_min, node_max;
