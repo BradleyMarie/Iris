@@ -104,6 +104,7 @@ HashSetFindEntryIndex(
     hashed_key ^= hashed_key >> 16;
 
     size_t index = hashed_key % hash_set->num_entries;
+    size_t start_index = index;
     for (;;)
     {
         if (hash_set->entries[index] == 0 ||
@@ -117,6 +118,11 @@ HashSetFindEntryIndex(
         if (index == hash_set->num_entries)
         {
             index = 0;
+        }
+
+        if (index == start_index)
+        {
+            break;
         }
     }
 
@@ -133,6 +139,7 @@ HashSetInsert(
 {
     key += 1;
     size_t index = HashSetFindEntryIndex(hash_set, key);
+    assert(hash_set->entries[index] == 0);
     hash_set->entries[index] = key;
 }
 
@@ -404,7 +411,9 @@ EvaluateSplitsOnAxis(
     _In_ BOUNDING_BOX node_bound,
     _In_ VECTOR_AXIS axis,
     _Out_ float_t *best_cost,
-    _Out_ size_t *best_split
+    _Out_ size_t *best_split,
+    _Out_ uint32_t *best_above_shapes,
+    _Out_ uint32_t *best_below_shapes
     )
 {
     *best_cost = INFINITY;
@@ -428,8 +437,8 @@ EvaluateSplitsOnAxis(
     float_t other_sum = other_axis0 + other_axis1;
     float_t side_face_area = other_axis0 * other_axis1;
 
-    size_t num_above = num_edges / 2;
-    size_t num_below = 0;
+    uint32_t num_above = (uint32_t)(num_edges / 2);
+    uint32_t num_below = 0;
 
     for (size_t i = 0; i < num_edges; i++)
     {
@@ -465,9 +474,13 @@ EvaluateSplitsOnAxis(
 
             if (cost < *best_cost)
             {
+                assert(num_above != 0 || num_below != 0);
+
                 result = true;
                 *best_cost = cost;
                 *best_split = i;
+                *best_above_shapes = num_above;
+                *best_below_shapes = num_below;
             }
         }
 
@@ -541,6 +554,152 @@ UncompressedKdTreeFree(
 
 static
 ISTATUS
+UncompressedKdTreePartitionEdges(
+    _Inout_ _Post_invalid_ PEDGE edges[3],
+    _In_ size_t num_edges,
+    _In_ VECTOR_AXIS split_axis,
+    _In_ size_t split_index,
+    _In_ uint32_t above_shapes,
+    _In_ uint32_t below_shapes,
+    _Out_ PEDGE above_edges[3],
+    _Out_ PEDGE below_edges[3]
+    )
+{
+    uint32_t hash_map_size;
+    if (below_shapes < above_shapes)
+    {
+        hash_map_size = above_shapes;
+    }
+    else
+    {
+        hash_map_size = below_shapes;
+    }
+
+    HASH_SET hash_set;
+    bool success = HashSetInitialize(&hash_set, (size_t)hash_map_size);
+
+    if (!success)
+    {
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < split_index; i++)
+    {
+        if (edges[split_axis][i].is_start)
+        {
+            HashSetInsert(&hash_set, edges[split_axis][i].primitive);
+        }
+    }
+
+    size_t below_alloc_size = (size_t)below_shapes * 2 * sizeof(EDGE);
+    below_edges[0] = (PEDGE)malloc(below_alloc_size);
+    below_edges[1] = (PEDGE)malloc(below_alloc_size);
+    below_edges[2] = (PEDGE)malloc(below_alloc_size);
+
+    if (below_edges[0] == NULL ||
+        below_edges[1] == NULL ||
+        below_edges[2] == NULL)
+    {
+        free(below_edges[0]);
+        free(below_edges[1]);
+        free(below_edges[2]);
+        HashSetDestroy(&hash_set);
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        size_t below_insert_index = 0;
+        for (size_t j = 0; j < num_edges; j++)
+        {
+            if (HashSetContains(&hash_set, edges[i][j].primitive))
+            {
+                below_edges[i][below_insert_index++] = edges[i][j];
+            }
+        }
+    }
+
+    HashSetClear(&hash_set);
+
+    for (size_t i = split_index; i < num_edges; i++)
+    {
+        if (!edges[split_axis][i].is_start)
+        {
+            if (i == split_index)
+            {
+                continue;
+            }
+
+            HashSetInsert(&hash_set, edges[split_axis][i].primitive);
+        }
+    }
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        size_t above_insert_index = 0;
+        for (size_t j = 0; j < num_edges; j++)
+        {
+            if (HashSetContains(&hash_set, edges[i][j].primitive))
+            {
+                edges[i][above_insert_index++] = edges[i][j];
+            }
+        }
+    }
+
+    HashSetDestroy(&hash_set);
+
+    size_t above_alloc_size = (size_t)above_shapes * 2 * sizeof(EDGE);
+    above_edges[0] = (PEDGE)realloc(edges[0], above_alloc_size);
+    above_edges[1] = (PEDGE)realloc(edges[1], above_alloc_size);
+    above_edges[2] = (PEDGE)realloc(edges[2], above_alloc_size);
+    if (above_edges[0] == NULL ||
+        above_edges[1] == NULL ||
+        above_edges[2] == NULL)
+    {
+        if (above_edges[0] == NULL)
+        {
+            free(edges[0]);
+        }
+        else
+        {
+            free(above_edges[0]);
+        }
+
+        if (above_edges[1] == NULL)
+        {
+            free(edges[1]);
+        }
+        else
+        {
+            free(above_edges[1]);
+        }
+
+        if (above_edges[2] == NULL)
+        {
+            free(edges[2]);
+        }
+        else
+        {
+            free(above_edges[2]);
+        }
+
+        free(below_edges[0]);
+        free(below_edges[1]);
+        free(below_edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
 UncompressedKdTreeBuildImpl(
     _In_ PEDGE edges[3],
     _In_ uint32_t num_indices,
@@ -578,9 +737,11 @@ UncompressedKdTreeBuildImpl(
         return ISTATUS_SUCCESS;
     }
 
-    float_t best_cost = (float_t)num_indices * INTERSECTION_COST;
+    float_t best_cost = INFINITY;
     VECTOR_AXIS best_axis = VECTOR_X_AXIS;
     size_t best_split = 0;
+    uint32_t best_above_shapes = num_indices;
+    uint32_t best_below_shapes = num_indices;
     bool should_split = false;
 
     VECTOR_AXIS axis = BoundingBoxDominantAxis(node_bounds);
@@ -589,12 +750,15 @@ UncompressedKdTreeBuildImpl(
     {
         float_t cost;
         size_t split;
+        uint32_t num_above, num_below;
         bool success = EvaluateSplitsOnAxis(edges[axis],
                                             (size_t)num_indices * 2,
                                             node_bounds,
                                             axis,
                                             &cost,
-                                            &split);
+                                            &split,
+                                            &num_above,
+                                            &num_below);
 
         if (success && cost < best_cost)
         {
@@ -603,6 +767,8 @@ UncompressedKdTreeBuildImpl(
             best_cost = cost;
             best_axis = axis;
             best_split = split;
+            best_above_shapes = num_above;
+            best_below_shapes = num_below;
         }
 
         axis = NextAxis(axis);
@@ -655,131 +821,47 @@ UncompressedKdTreeBuildImpl(
             break;
     }
 
-    HASH_SET hash_set;
-    bool success = HashSetInitialize(&hash_set, (size_t)num_indices);
-
-    if (!success)
+    PEDGE above_edges[3];
+    PEDGE below_edges[3];
+    if (best_below_shapes == 0)
     {
-        free(edges[0]);
-        free(edges[1]);
-        free(edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
+        above_edges[0] = edges[0];
+        above_edges[1] = edges[1];
+        above_edges[2] = edges[2];
+        below_edges[0] = NULL;
+        below_edges[1] = NULL;
+        below_edges[2] = NULL;
     }
-
-    uint32_t below_shapes = 0;
-    for (size_t i = 0; i < best_split; i++)
+    else if (best_above_shapes == 0)
     {
-        if (edges[best_axis][i].is_start)
-        {
-            HashSetInsert(&hash_set, edges[best_axis][i].primitive);
-            below_shapes += 1;
-        }
+        above_edges[0] = NULL;
+        above_edges[1] = NULL;
+        above_edges[2] = NULL;
+        below_edges[0] = edges[0];
+        below_edges[1] = edges[1];
+        below_edges[2] = edges[2];
     }
-
-    PEDGE below_edges[3] = { NULL, NULL, NULL };
-    below_edges[0] = (PEDGE)malloc((size_t)below_shapes * 2 * sizeof(EDGE));
-    below_edges[1] = (PEDGE)malloc((size_t)below_shapes * 2 * sizeof(EDGE));
-    below_edges[2] = (PEDGE)malloc((size_t)below_shapes * 2 * sizeof(EDGE));
-
-    if (below_edges[0] == NULL ||
-        below_edges[1] == NULL ||
-        below_edges[2] == NULL)
+    else
     {
-        free(below_edges[0]);
-        free(below_edges[1]);
-        free(below_edges[2]);
-        HashSetDestroy(&hash_set);
-        free(edges[0]);
-        free(edges[1]);
-        free(edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
+        ISTATUS status =
+            UncompressedKdTreePartitionEdges(edges,
+                                             (size_t)num_indices * 2,
+                                             best_axis,
+                                             best_split,
+                                             best_above_shapes,
+                                             best_below_shapes,
+                                             above_edges,
+                                             below_edges);
 
-    for (size_t i = 0; i < 3; i++)
-    {
-        size_t below_insert_index = 0;
-        for (size_t j = 0; j < (size_t)num_indices * 2; j++)
+        if (status != ISTATUS_SUCCESS)
         {
-            if (HashSetContains(&hash_set, edges[i][j].primitive))
-            {
-                below_edges[i][below_insert_index++] = edges[i][j];
-            }
+            return status;
         }
-    }
-
-    HashSetClear(&hash_set);
-
-    uint32_t above_shapes = 0;
-    for (size_t i = best_split; i < (size_t)num_indices * 2; i++)
-    {
-        if (!edges[best_axis][i].is_start)
-        {
-            HashSetInsert(&hash_set, edges[best_axis][i].primitive);
-            above_shapes += 1;
-        }
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        size_t above_insert_index = 0;
-        for (size_t j = 0; j < (size_t)num_indices * 2; j++)
-        {
-            if (HashSetContains(&hash_set, edges[i][j].primitive))
-            {
-                edges[i][above_insert_index++] = edges[i][j];
-            }
-        }
-    }
-
-    HashSetDestroy(&hash_set);
-
-    PEDGE above_edges[3] = { NULL, NULL, NULL };
-    above_edges[0] =
-        (PEDGE)realloc(edges[0], (size_t)above_shapes * 2 * sizeof(EDGE));
-    above_edges[1] =
-        (PEDGE)realloc(edges[1], (size_t)above_shapes * 2 * sizeof(EDGE));
-    above_edges[2] =
-        (PEDGE)realloc(edges[2], (size_t)above_shapes * 2 * sizeof(EDGE));
-    if (above_edges[0] == NULL ||
-        above_edges[1] == NULL ||
-        above_edges[2] == NULL)
-    {
-        if (above_edges[0] == NULL)
-        {
-            free(edges[0]);
-        }
-        else
-        {
-            free(above_edges[0]);
-        }
-
-        if (above_edges[1] == NULL)
-        {
-            free(edges[1]);
-        }
-        else
-        {
-            free(above_edges[1]);
-        }
-
-        if (above_edges[2] == NULL)
-        {
-            free(edges[2]);
-        }
-        else
-        {
-            free(above_edges[2]);
-        }
-
-        free(below_edges[0]);
-        free(below_edges[1]);
-        free(below_edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
     }
 
     PUNCOMPRESSED_NODE below_node;
     ISTATUS status = UncompressedKdTreeBuildImpl(below_edges,
-                                                 below_shapes,
+                                                 best_below_shapes,
                                                  below_bounds,
                                                  depth_remaining - 1,
                                                  true,
@@ -797,7 +879,7 @@ UncompressedKdTreeBuildImpl(
 
     PUNCOMPRESSED_NODE above_node;
     status = UncompressedKdTreeBuildImpl(above_edges,
-                                         above_shapes,
+                                         best_above_shapes,
                                          above_bounds,
                                          depth_remaining - 1,
                                          false,
