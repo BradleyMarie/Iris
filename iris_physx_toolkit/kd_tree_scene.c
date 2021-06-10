@@ -20,6 +20,136 @@ Abstract:
 #include "iris_physx_toolkit/kd_tree_scene.h"
 
 //
+// Primitive Hash Set
+//
+
+typedef struct _HASH_SET {
+    _Field_size_(num_entries) uint32_t *entries;
+    size_t num_entries;
+} HASH_SET, *PHASH_SET;
+
+typedef const HASH_SET *PCHASH_SET;
+
+static
+inline
+bool
+HashSetInitialize(
+    _In_ PHASH_SET hash_set,
+    _In_ size_t max_num_entries
+    )
+{
+    bool success = CheckedMultiplySizeT(max_num_entries, 4, &max_num_entries);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    max_num_entries /= 3;
+
+    if (UINT32_MAX < max_num_entries)
+    {
+        return false;
+    }
+
+    hash_set->entries = (uint32_t*)calloc(max_num_entries, sizeof(uint32_t));
+
+    if (hash_set->entries == NULL)
+    {
+        return false;
+    }
+
+    hash_set->num_entries = max_num_entries;
+
+    return true;
+}
+
+static
+inline
+void
+HashSetClear(
+    _Inout_ PHASH_SET hash_set
+    )
+{
+    memset(hash_set->entries, 0, sizeof(uint32_t) * hash_set->num_entries);
+}
+
+static
+inline
+void
+HashSetDestroy(
+    _Inout_ _Post_invalid_ PHASH_SET hash_set
+    )
+{
+    free(hash_set->entries);
+    hash_set->entries = NULL;
+}
+
+static
+inline
+size_t
+HashSetFindEntryIndex(
+    _In_ PCHASH_SET hash_set,
+    _In_ size_t key
+    )
+{
+    assert(key < UINT32_MAX - 1);
+    assert(key != 0);
+
+    size_t hashed_key = key;
+    hashed_key ^= hashed_key >> 16;
+    hashed_key *= 0x85ebca6b;
+    hashed_key ^= hashed_key >> 13;
+    hashed_key *= 0xc2b2ae35;
+    hashed_key ^= hashed_key >> 16;
+
+    size_t index = hashed_key % hash_set->num_entries;
+    for (;;)
+    {
+        if (hash_set->entries[index] == 0 ||
+            hash_set->entries[index] == (uint32_t)key)
+        {
+            break;
+        }
+
+        index += 1;
+
+        if (index == hash_set->num_entries)
+        {
+            index = 0;
+        }
+    }
+
+    return index;
+}
+
+static
+inline
+void
+HashSetInsert(
+    _In_ PHASH_SET hash_set,
+    _In_ size_t key
+    )
+{
+    key += 1;
+    size_t index = HashSetFindEntryIndex(hash_set, key);
+    hash_set->entries[index] = key;
+}
+
+static
+inline
+bool
+HashSetContains(
+    _In_ PCHASH_SET hash_set,
+    _In_ size_t key
+    )
+{
+    key += 1;
+    size_t index = HashSetFindEntryIndex(hash_set, key);
+    return hash_set->entries[index] == (uint32_t)key;
+}
+
+//
 // Uncompressed Tree Defines
 //
 
@@ -99,29 +229,6 @@ EdgeCompare(
     }
 
     return 1;
-}
-
-static
-int
-SizeTCompare(
-    _In_ const void *left_ptr,
-    _In_ const void *right_ptr
-    )
-{
-    const size_t *left = (const size_t*)left_ptr;
-    const size_t *right = (const size_t*)right_ptr;
-
-    if (*left < *right)
-    {
-        return -1;
-    }
-
-    if (*left > *right)
-    {
-        return 1;
-    }
-
-    return 0;
 }
 
 static
@@ -522,53 +629,26 @@ UncompressedKdTreeBuildImpl(
         return ISTATUS_SUCCESS;
     }
 
+    HASH_SET hash_set;
+    bool success = HashSetInitialize(&hash_set, num_indices);
+
+    if (!success)
+    {
+        free(edges[0]);
+        free(edges[1]);
+        free(edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
     size_t below_shapes = 0;
     for (size_t i = 0; i < best_split; i++)
     {
         if (edges[best_axis][i].is_start)
         {
+            HashSetInsert(&hash_set, edges[best_axis][i].primitive);
             below_shapes += 1;
         }
     }
-
-    size_t above_shapes = 0;
-    for (size_t i = best_split; i < num_indices * 2; i++)
-    {
-        if (!edges[best_axis][i].is_start)
-        {
-            above_shapes += 1;
-        }
-    }
-
-    size_t *below_indices = calloc(below_shapes, sizeof(size_t));
-    if (below_indices == NULL)
-    {
-        free(edges[0]);
-        free(edges[1]);
-        free(edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    size_t *above_indices = calloc(above_shapes, sizeof(size_t));
-    if (above_indices == NULL)
-    {
-        free(below_indices);
-        free(edges[0]);
-        free(edges[1]);
-        free(edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
-    size_t below_index = 0;
-    for (size_t i = 0; i < best_split; i++)
-    {
-        if (edges[best_axis][i].is_start)
-        {
-            below_indices[below_index++] = edges[best_axis][i].primitive;
-        }
-    }
-
-    qsort(below_indices, below_shapes, sizeof(size_t), SizeTCompare);
 
     PEDGE below_edges[3] = { NULL, NULL, NULL };
     below_edges[0] = calloc(below_shapes * 2, sizeof(EDGE));
@@ -582,24 +662,36 @@ UncompressedKdTreeBuildImpl(
         free(below_edges[0]);
         free(below_edges[1]);
         free(below_edges[2]);
-        free(above_indices);
-        free(below_indices);
+        HashSetDestroy(&hash_set);
         free(edges[0]);
         free(edges[1]);
         free(edges[2]);
         return ISTATUS_ALLOCATION_FAILED;
     }
 
-    size_t above_index = 0;
+    for (size_t i = 0; i < 3; i++)
+    {
+        size_t below_insert_index = 0;
+        for (size_t j = 0; j < num_indices * 2; j++)
+        {
+            if (HashSetContains(&hash_set, edges[i][j].primitive))
+            {
+                below_edges[i][below_insert_index++] = edges[i][j];
+            }
+        }
+    }
+
+    HashSetClear(&hash_set);
+
+    size_t above_shapes = 0;
     for (size_t i = best_split; i < num_indices * 2; i++)
     {
         if (!edges[best_axis][i].is_start)
         {
-            above_indices[above_index++] = edges[best_axis][i].primitive;
+            HashSetInsert(&hash_set, edges[best_axis][i].primitive);
+            above_shapes += 1;
         }
     }
-
-    qsort(above_indices, above_shapes, sizeof(size_t), SizeTCompare);
 
     PEDGE above_edges[3] = { NULL, NULL, NULL };
     above_edges[0] = calloc(above_shapes * 2, sizeof(EDGE));
@@ -616,8 +708,7 @@ UncompressedKdTreeBuildImpl(
         free(below_edges[0]);
         free(below_edges[1]);
         free(below_edges[2]);
-        free(above_indices);
-        free(below_indices);
+        HashSetDestroy(&hash_set);
         free(edges[0]);
         free(edges[1]);
         free(edges[2]);
@@ -626,28 +717,10 @@ UncompressedKdTreeBuildImpl(
 
     for (size_t i = 0; i < 3; i++)
     {
-        size_t below_insert_index = 0;
         size_t above_insert_index = 0;
         for (size_t j = 0; j < num_indices * 2; j++)
         {
-            bool found_below = bsearch(&edges[i][j].primitive,
-                                       below_indices,
-                                       below_shapes,
-                                       sizeof(size_t),
-                                       SizeTCompare);
-
-            if (found_below)
-            {
-                below_edges[i][below_insert_index++] = edges[i][j];
-            }
-
-            bool found_above = bsearch(&edges[i][j].primitive,
-                                       above_indices,
-                                       above_shapes,
-                                       sizeof(size_t),
-                                       SizeTCompare);
-
-            if (found_above)
+            if (HashSetContains(&hash_set, edges[i][j].primitive))
             {
                 above_edges[i][above_insert_index++] = edges[i][j];
             }
@@ -656,8 +729,7 @@ UncompressedKdTreeBuildImpl(
 
     float_t split = edges[best_axis][best_split].value;
 
-    free(above_indices);
-    free(below_indices);
+    HashSetDestroy(&hash_set);
     free(edges[0]);
     free(edges[1]);
     free(edges[2]);
