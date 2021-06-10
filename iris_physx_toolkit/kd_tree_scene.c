@@ -47,6 +47,13 @@ HashSetInitialize(
 
     max_num_entries /= 3;
 
+    success = CheckedAddSizeT(max_num_entries, 1, &max_num_entries);
+
+    if (!success)
+    {
+        return false;
+    }
+
     if (UINT32_MAX < max_num_entries)
     {
         return false;
@@ -104,7 +111,6 @@ HashSetFindEntryIndex(
     hashed_key ^= hashed_key >> 16;
 
     size_t index = hashed_key % hash_set->num_entries;
-    size_t start_index = index;
     for (;;)
     {
         if (hash_set->entries[index] == 0 ||
@@ -118,11 +124,6 @@ HashSetFindEntryIndex(
         if (index == hash_set->num_entries)
         {
             index = 0;
-        }
-
-        if (index == start_index)
-        {
-            break;
         }
     }
 
@@ -153,6 +154,7 @@ HashSetContains(
 {
     key += 1;
     size_t index = HashSetFindEntryIndex(hash_set, key);
+    assert(hash_set->entries[index] == 0 || hash_set->entries[index] == key);
     return hash_set->entries[index] == (uint32_t)key;
 }
 
@@ -449,7 +451,7 @@ EvaluateSplitsOnAxis(
 
         if (lower_bound < edges[i].value && edges[i].value < upper_bound)
         {
-            float_t below_area =(float_t)2.0 *
+            float_t below_area = (float_t)2.0 *
                 (side_face_area + (edges[i].value - lower_bound) * other_sum);
             float_t above_area = (float_t)2.0 *
                 (side_face_area + (upper_bound - edges[i].value) * other_sum);
