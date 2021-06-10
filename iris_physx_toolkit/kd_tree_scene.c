@@ -629,6 +629,27 @@ UncompressedKdTreeBuildImpl(
         return ISTATUS_SUCCESS;
     }
 
+    float_t split = edges[best_axis][best_split].value;
+
+    BOUNDING_BOX below_bounds = node_bounds;
+    BOUNDING_BOX above_bounds = node_bounds;
+
+    switch (best_axis)
+    {
+        case VECTOR_X_AXIS:
+            below_bounds.corners[1].x = split;
+            above_bounds.corners[0].x = split;
+            break;
+        case VECTOR_Y_AXIS:
+            below_bounds.corners[1].y = split;
+            above_bounds.corners[0].y = split;
+            break;
+        default:
+            below_bounds.corners[1].z = split;
+            above_bounds.corners[0].z = split;
+            break;
+    }
+
     HASH_SET hash_set;
     bool success = HashSetInitialize(&hash_set, num_indices);
 
@@ -651,9 +672,9 @@ UncompressedKdTreeBuildImpl(
     }
 
     PEDGE below_edges[3] = { NULL, NULL, NULL };
-    below_edges[0] = calloc(below_shapes * 2, sizeof(EDGE));
-    below_edges[1] = calloc(below_shapes * 2, sizeof(EDGE));
-    below_edges[2] = calloc(below_shapes * 2, sizeof(EDGE));
+    below_edges[0] = (PEDGE)malloc(below_shapes * 2 * sizeof(EDGE));
+    below_edges[1] = (PEDGE)malloc(below_shapes * 2 * sizeof(EDGE));
+    below_edges[2] = (PEDGE)malloc(below_shapes * 2 * sizeof(EDGE));
 
     if (below_edges[0] == NULL ||
         below_edges[1] == NULL ||
@@ -693,28 +714,6 @@ UncompressedKdTreeBuildImpl(
         }
     }
 
-    PEDGE above_edges[3] = { NULL, NULL, NULL };
-    above_edges[0] = calloc(above_shapes * 2, sizeof(EDGE));
-    above_edges[1] = calloc(above_shapes * 2, sizeof(EDGE));
-    above_edges[2] = calloc(above_shapes * 2, sizeof(EDGE));
-
-    if (above_edges[0] == NULL ||
-        above_edges[1] == NULL ||
-        above_edges[2] == NULL)
-    {
-        free(above_edges[0]);
-        free(above_edges[1]);
-        free(above_edges[2]);
-        free(below_edges[0]);
-        free(below_edges[1]);
-        free(below_edges[2]);
-        HashSetDestroy(&hash_set);
-        free(edges[0]);
-        free(edges[1]);
-        free(edges[2]);
-        return ISTATUS_ALLOCATION_FAILED;
-    }
-
     for (size_t i = 0; i < 3; i++)
     {
         size_t above_insert_index = 0;
@@ -722,35 +721,52 @@ UncompressedKdTreeBuildImpl(
         {
             if (HashSetContains(&hash_set, edges[i][j].primitive))
             {
-                above_edges[i][above_insert_index++] = edges[i][j];
+                edges[i][above_insert_index++] = edges[i][j];
             }
         }
     }
 
-    float_t split = edges[best_axis][best_split].value;
-
     HashSetDestroy(&hash_set);
-    free(edges[0]);
-    free(edges[1]);
-    free(edges[2]);
 
-    BOUNDING_BOX below_bounds = node_bounds;
-    BOUNDING_BOX above_bounds = node_bounds;
-
-    switch (best_axis)
+    PEDGE above_edges[3] = { NULL, NULL, NULL };
+    above_edges[0] = (PEDGE)realloc(edges[0], above_shapes * 2 * sizeof(EDGE));
+    above_edges[1] = (PEDGE)realloc(edges[1], above_shapes * 2 * sizeof(EDGE));
+    above_edges[2] = (PEDGE)realloc(edges[2], above_shapes * 2 * sizeof(EDGE));
+    if (above_edges[0] == NULL ||
+        above_edges[1] == NULL ||
+        above_edges[2] == NULL)
     {
-        case VECTOR_X_AXIS:
-            below_bounds.corners[1].x = split;
-            above_bounds.corners[0].x = split;
-            break;
-        case VECTOR_Y_AXIS:
-            below_bounds.corners[1].y = split;
-            above_bounds.corners[0].y = split;
-            break;
-        default:
-            below_bounds.corners[1].z = split;
-            above_bounds.corners[0].z = split;
-            break;
+        if (above_edges[0] == NULL)
+        {
+            free(edges[0]);
+        }
+        else
+        {
+            free(above_edges[0]);
+        }
+
+        if (above_edges[1] == NULL)
+        {
+            free(edges[1]);
+        }
+        else
+        {
+            free(above_edges[1]);
+        }
+
+        if (above_edges[2] == NULL)
+        {
+            free(edges[2]);
+        }
+        else
+        {
+            free(above_edges[2]);
+        }
+
+        free(below_edges[0]);
+        free(below_edges[1]);
+        free(below_edges[2]);
+        return ISTATUS_ALLOCATION_FAILED;
     }
 
     PUNCOMPRESSED_NODE below_node;
