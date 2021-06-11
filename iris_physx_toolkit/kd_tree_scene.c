@@ -1035,7 +1035,7 @@ UncompressedKdTreeBuildImpl(
     }
 
     PUNCOMPRESSED_NODE below_node, above_node;
-    if (best_below_shapes < best_above_shapes)
+    if (best_above_shapes < best_below_shapes)
     {
         ISTATUS status = UncompressedKdTreeBuildImpl(&below_edges,
                                                      below_bounds,
