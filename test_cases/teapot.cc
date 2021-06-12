@@ -153,8 +153,6 @@ TEST(TeapotTest, FlatShadedTeapot)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
-    PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
-    bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
     size_t triangles_allocated;
     status = TriangleMeshAllocate(
@@ -176,8 +174,8 @@ TEST(TeapotTest, FlatShadedTeapot)
 
     PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
-                                 transforms,
-                                 premultiplied,
+                                 nullptr,
+                                 nullptr,
                                  triangles_allocated,
                                  nullptr,
                                  &scene);
@@ -236,8 +234,6 @@ TEST(TeapotTest, SmoothShadedTeapot)
     ConstantMaterialAllocate(bsdf, &material);
 
     PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
-    PMATRIX transforms[TEAPOT_FACE_COUNT] = { nullptr };
-    bool premultiplied[TEAPOT_FACE_COUNT] = { false };
 
     PNORMAL_MAP normal_map;
     status = TriangleMeshNormalMapAllocate(teapot_normals,
@@ -265,8 +261,8 @@ TEST(TeapotTest, SmoothShadedTeapot)
 
     PSCENE scene;
     status = KdTreeSceneAllocate(shapes,
-                                 transforms,
-                                 premultiplied,
+                                 nullptr,
+                                 nullptr,
                                  triangles_allocated,
                                  nullptr,
                                  &scene);

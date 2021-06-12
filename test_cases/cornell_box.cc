@@ -359,18 +359,10 @@ TEST(CornellBoxTest, CornellBox)
             &shapes);
     }
 
-    PMATRIX *transforms = new PMATRIX[shapes.size()];
-    bool *premultiplied = new bool[shapes.size()];
-    for (size_t i = 0; i < shapes.size(); i++)
-    {
-        transforms[i] = nullptr;
-        premultiplied[i] = false;
-    }
-
     PSCENE scene;
     status = KdTreeSceneAllocate(shapes.data(),
-                                 transforms,
-                                 premultiplied,
+                                 nullptr,
+                                 nullptr,
                                  shapes.size(),
                                  nullptr,
                                  &scene);
@@ -396,9 +388,6 @@ TEST(CornellBoxTest, CornellBox)
     {
         ShapeRelease(shape);
     }
-
-    delete[] transforms;
-    delete[] premultiplied;
 
     EmissiveMaterialRelease(light_material);
     SpectrumRelease(light_spectrum);

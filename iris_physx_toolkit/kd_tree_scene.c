@@ -1274,8 +1274,8 @@ static
 ISTATUS
 KdTreeSortEdges(
     _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
-    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_reads_opt_(num_shapes) const PMATRIX transforms[],
+    _In_reads_opt_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _Out_ PEDGES_3D edges,
     _Out_ PBOUNDING_BOX total_bounds
@@ -1293,7 +1293,15 @@ KdTreeSortEdges(
         return ISTATUS_SUCCESS;
     }
 
-    PCMATRIX transform = premultiplied[0] ? NULL : transforms[0];
+    PCMATRIX transform = NULL;
+    if (transforms != NULL && transforms[0] != NULL)
+    {
+        if (premultiplied == NULL || !premultiplied[0])
+        {
+            transform = transforms[0];
+        }
+    }
+
     ISTATUS status = ShapeComputeBounds(shapes[0],
                                         transform,
                                         total_bounds);
@@ -1318,8 +1326,16 @@ KdTreeSortEdges(
 
     for (uint32_t i = 1; i < (uint32_t)num_shapes; i++)
     {
+        transform = NULL;
+        if (transforms != NULL && transforms[i] != NULL)
+        {
+            if (premultiplied == NULL || !premultiplied[i])
+            {
+                transform = transforms[i];
+            }
+        }
+
         BOUNDING_BOX shape_bounds;
-        transform = premultiplied[i] ? NULL : transforms[i];
         status = ShapeComputeBounds(shapes[i],
                                     transform,
                                     &shape_bounds);
@@ -1356,8 +1372,8 @@ static
 ISTATUS
 KdTreeBuild(
     _Inout_ PNODE_BUILDER node_builder,
-    _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
+    _In_reads_opt_(num_shapes) const PSHAPE shapes[],
+    _In_reads_opt_(num_shapes) const PMATRIX transforms[],
     _In_reads_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _In_ size_t max_depth,
@@ -1966,8 +1982,8 @@ Log2(
 ISTATUS
 KdTreeSceneAllocate(
     _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
-    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_reads_opt_(num_shapes) const PMATRIX transforms[],
+    _In_reads_opt_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _In_opt_ PENVIRONMENTAL_LIGHT environment,
     _Out_ PSCENE *scene
@@ -1984,16 +2000,6 @@ KdTreeSceneAllocate(
         {
             return ISTATUS_INVALID_ARGUMENT_00;
         }
-    }
-
-    if (transforms == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (premultiplied == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (scene == NULL)
@@ -2028,24 +2034,39 @@ KdTreeSceneAllocate(
         return status;
     }
 
-    bool premultiply_needed = false;
-    bool transform_needed = false;
-    for (size_t i = 0; i < num_shapes; i++)
+    bool premultiply_needed;
+    if (premultiplied != NULL)
     {
-        if (premultiplied[i])
+        for (size_t i = 0; i < num_shapes; i++)
         {
-            premultiply_needed = true;
+            if (premultiplied[i])
+            {
+                premultiply_needed = true;
+                break;
+            }
+        }
+    }
+    else
+    {
+        premultiply_needed = false;
+    }
+
+    bool transform_needed;
+    if (transforms != NULL)
+    {
+        for (size_t i = 0; i < num_shapes; i++)
+        {
+            if (transforms[i] != NULL)
+            {
+                transform_needed = true;
+                break;
+            }
         }
 
-        if (transforms[i] != NULL)
-        {
-            transform_needed = true;
-        }
-
-        if (premultiply_needed && transform_needed)
-        {
-            break;
-        }
+    }
+    else
+    {
+        transform_needed = false;
     }
 
     KD_TREE_SCENE result;
@@ -2127,7 +2148,14 @@ KdTreeSceneAllocate(
     for (size_t i = 0; i < num_shapes; i++)
     {
         ShapeRetain(shapes[i]);
-        MatrixRetain(transforms[i]);
+    }
+
+    if (transform_needed)
+    {
+        for (size_t i = 0; i < num_shapes; i++)
+        {
+            MatrixRetain(transforms[i]);
+        }
     }
 
     return ISTATUS_SUCCESS;

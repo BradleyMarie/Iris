@@ -28,8 +28,8 @@ extern "C" {
 ISTATUS
 KdTreeSceneAllocate(
     _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
-    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_reads_opt_(num_shapes) const PMATRIX transforms[],
+    _In_reads_opt_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _In_opt_ PENVIRONMENTAL_LIGHT environment,
     _Out_ PSCENE *scene
