@@ -58,30 +58,6 @@ ShapeGetData(
 static
 inline
 ISTATUS
-ShapeTrace(
-    _In_ const struct _SHAPE *shape,
-    _In_ PCRAY ray,
-    _In_ PSHAPE_HIT_ALLOCATOR allocator,
-    _Out_ PHIT *hit
-    )
-{
-    assert(shape != NULL);
-    assert(ray != NULL);
-    assert(allocator != NULL);
-    assert(hit != NULL);
-
-    const void* data = ShapeGetData(shape);
-    ISTATUS status = shape->vtable->trace_routine(data,
-                                                  ray,
-                                                  allocator,
-                                                  hit);
-
-    return status;
-}
-
-static
-inline
-ISTATUS
 ShapeComputeNormal(
     _In_ const struct _SHAPE *shape,
     _In_ POINT3 hit_point,

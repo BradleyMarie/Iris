@@ -35,6 +35,8 @@ ISTATUS
 DifferenceShapeTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )
@@ -44,6 +46,8 @@ DifferenceShapeTrace(
     PHIT hits0;
     ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
                                                    csg_shape->shapes[0],
+                                                   -INFINITY,
+                                                   INFINITY,
                                                    &hits0);
 
     if (status == ISTATUS_NO_INTERSECTION)
@@ -59,6 +63,8 @@ DifferenceShapeTrace(
     PHIT hits1;
     status = ShapeHitTesterTestNestedShape(allocator,
                                            csg_shape->shapes[1],
+                                           -INFINITY,
+                                           INFINITY,
                                            &hits1);
 
     if (status == ISTATUS_NO_INTERSECTION)
@@ -224,6 +230,8 @@ ISTATUS
 IntersectionShapeTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )
@@ -233,6 +241,8 @@ IntersectionShapeTrace(
     PHIT hits0;
     ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
                                                    csg_shape->shapes[0],
+                                                   -INFINITY,
+                                                   INFINITY,
                                                    &hits0);
 
     if (status != ISTATUS_SUCCESS)
@@ -243,6 +253,8 @@ IntersectionShapeTrace(
     PHIT hits1;
     status = ShapeHitTesterTestNestedShape(allocator,
                                            csg_shape->shapes[1],
+                                           -INFINITY,
+                                           INFINITY,
                                            &hits1);
 
     if (status != ISTATUS_SUCCESS)
@@ -398,6 +410,8 @@ ISTATUS
 UnionShapeTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )
@@ -407,6 +421,8 @@ UnionShapeTrace(
     PHIT hits0;
     ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
                                                    csg_shape->shapes[0],
+                                                   -INFINITY,
+                                                   INFINITY,
                                                    &hits0);
 
     if (status == ISTATUS_NO_INTERSECTION)
@@ -421,6 +437,8 @@ UnionShapeTrace(
     PHIT hits1;
     status = ShapeHitTesterTestNestedShape(allocator,
                                            csg_shape->shapes[1],
+                                           -INFINITY,
+                                           INFINITY,
                                            &hits1);
 
     if (status == ISTATUS_NO_INTERSECTION)

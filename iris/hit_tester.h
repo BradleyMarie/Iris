@@ -66,6 +66,8 @@ ISTATUS
 (*PHIT_TESTER_TEST_GEOMETRY_ROUTINE)(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     );
@@ -162,6 +164,8 @@ HitTesterTestNestedGeometry(
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Out_ PHIT *hits
     );
 

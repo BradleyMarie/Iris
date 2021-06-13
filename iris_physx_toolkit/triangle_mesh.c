@@ -122,6 +122,8 @@ ISTATUS
 TriangleMeshTriangleTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )

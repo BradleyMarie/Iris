@@ -267,6 +267,8 @@ ISTATUS
 ShapeHitTesterTestNestedShape(
     _Inout_ PSHAPE_HIT_ALLOCATOR hit_allocator,
     _In_ PCSHAPE shape,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Out_ PHIT *hits
     )
 {
@@ -275,9 +277,19 @@ ShapeHitTesterTestNestedShape(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (hits == NULL)
+    if (isnan(minimum_distance))
     {
         return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    if (isnan(maximum_distance))
+    {
+        return ISTATUS_INVALID_ARGUMENT_03;
+    }
+
+    if (hits == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_04;
     }
 
     PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine =
@@ -287,6 +299,8 @@ ShapeHitTesterTestNestedShape(
                                                  test_routine,
                                                  context,
                                                  shape,
+                                                 minimum_distance,
+                                                 maximum_distance,
                                                  hits);
 
     return status;

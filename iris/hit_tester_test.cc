@@ -28,6 +28,8 @@ extern "C" {
 struct NestedParams {
     const void *data;
     RAY ray;
+    float_t minimum_distance;
+    float_t maximum_distance;
     ISTATUS status_to_return;
     bool *triggered;
     std::vector<float> distances;
@@ -39,6 +41,8 @@ ISTATUS
 NestedCheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )
@@ -46,6 +50,8 @@ NestedCheckGeometryContext(
     const NestedParams* param = static_cast<const NestedParams *>(data);
     EXPECT_EQ(param->data, data);
     EXPECT_EQ(param->ray, *ray);
+    EXPECT_EQ(param->minimum_distance, minimum_distance);
+    EXPECT_EQ(param->maximum_distance, maximum_distance);
     *param->triggered = true;
 
     *hits = NULL;
@@ -61,6 +67,8 @@ NestedCheckGeometryContext(
                                                          NestedCheckGeometryContext,
                                                          data,
                                                          nullptr,
+                                                         minimum_distance,
+                                                         maximum_distance,
                                                          &next_hit);
             if (param->status_to_return != ISTATUS_SUCCESS)
             {
@@ -96,6 +104,8 @@ NestedCheckGeometryContext(
 struct ValidationParams {
     const void *data;
     RAY ray;
+    float_t minimum_distance;
+    float_t maximum_distance;
     ISTATUS status_to_return;
     bool *triggered;
 };
@@ -104,12 +114,16 @@ ISTATUS
 CheckGeometryContext(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )
 {
     const ValidationParams* param = static_cast<const ValidationParams *>(data);
     EXPECT_EQ(param->data, data);
+    EXPECT_EQ(param->minimum_distance, minimum_distance);
+    EXPECT_EQ(param->maximum_distance, maximum_distance);
     EXPECT_EQ(param->ray, *ray);
     EXPECT_TRUE(hit_allocator);
 
@@ -119,6 +133,8 @@ CheckGeometryContext(
     NestedParams nested_params;
     nested_params.data = &nested_params;
     nested_params.ray = param->ray;
+    nested_params.minimum_distance = 1.0;
+    nested_params.maximum_distance = 2.0;
     nested_params.triggered = &triggered;
 
     PHIT nested_hits;
@@ -127,6 +143,8 @@ CheckGeometryContext(
                                                  NestedCheckGeometryContext,
                                                  &nested_params,
                                                  nullptr,
+                                                 nested_params.minimum_distance,
+                                                 nested_params.maximum_distance,
                                                  &nested_hits);
     EXPECT_EQ(ISTATUS_NO_INTERSECTION, status);
     EXPECT_TRUE(triggered);
@@ -137,6 +155,8 @@ CheckGeometryContext(
                                          NestedCheckGeometryContext,
                                          &nested_params,
                                          nullptr,
+                                         nested_params.minimum_distance,
+                                         nested_params.maximum_distance,
                                          &nested_hits);
     EXPECT_EQ(ISTATUS_INVALID_ARGUMENT_COMBINATION_30, status);
     EXPECT_TRUE(triggered);
@@ -151,10 +171,12 @@ CheckGeometryContext(
                                          NestedCheckGeometryContext,
                                          &nested_params,
                                          nullptr,
+                                         nested_params.minimum_distance,
+                                         nested_params.maximum_distance,
                                          &nested_hits);
     EXPECT_EQ(nested_params.status_to_return, status);
     EXPECT_EQ(4u, nest_count);
-    
+
     float number = 0.0f;
     int num_hits = 0;
     while (nested_hits != NULL)
@@ -222,6 +244,8 @@ TEST(HitTesterTest, HitTesterTestWorldGeometry)
     bool triggered = false;
     ValidationParams params;
     params.ray = ray;
+    params.minimum_distance = 0.0;
+    params.maximum_distance = INFINITY;
     params.data = &params;
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
@@ -314,6 +338,8 @@ TEST(HitTesterTest, HitTesterTestPremultipliedGeometry)
     bool triggered = false;
     ValidationParams params;
     params.ray = ray;
+    params.minimum_distance = 0.0;
+    params.maximum_distance = INFINITY;
     params.data = &params;
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
@@ -441,6 +467,8 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     bool triggered = false;
     ValidationParams params;
     params.ray = ray;
+    params.minimum_distance = 0.0;
+    params.maximum_distance = INFINITY;
     params.data = &params;
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;
@@ -518,15 +546,19 @@ TEST(HitTesterTest, HitTesterTestTransformedGeometry)
     MatrixRelease(model_to_world);
 }
 
-ISTATUS 
-AllocateHitAtDistance(
+ISTATUS
+AllocateHitAtDistanceCheckMaximumDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )
 {
     const float_t* distance = (const float_t*)data;
+    EXPECT_EQ((float_t)0.0, minimum_distance);
+    EXPECT_EQ(*distance + (float_t)1.0, maximum_distance);
     ISTATUS status = HitAllocatorAllocate(hit_allocator,
                                           NULL,
                                           *distance,
@@ -550,14 +582,14 @@ TEST(HitTesterTest, HitTesterSortHits)
                                      (float_t) 6.0);
     RAY ray = RayCreate(origin, direction);
 
-    HitTesterReset(&tester, ray, (float_t)0.0, INFINITY);
+    HitTesterReset(&tester, ray, (float_t)0.0, (float_t)1001.0);
 
     int hit_data = 0;
     for (int i = 1; i <= 1000; i++)
     {
         float_t distance = (float_t)(1001 - i);
         ISTATUS status = HitTesterTestWorldGeometry(&tester,
-                                                    AllocateHitAtDistance,
+                                                    AllocateHitAtDistanceCheckMaximumDistance,
                                                     &distance,
                                                     &hit_data);
         EXPECT_EQ(ISTATUS_SUCCESS, status);
@@ -569,6 +601,29 @@ TEST(HitTesterTest, HitTesterSortHits)
     EXPECT_EQ((float_t)1.0, closest_hit);
 
     HitTesterDestroy(&tester);
+}
+
+ISTATUS
+AllocateHitAtDistance(
+    _In_opt_ const void *data,
+    _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
+    _Inout_ PHIT_ALLOCATOR hit_allocator,
+    _Out_ PHIT *hits
+    )
+{
+    const float_t* distance = (const float_t*)data;
+    ISTATUS status = HitAllocatorAllocate(hit_allocator,
+                                          NULL,
+                                          *distance,
+                                          1,
+                                          2,
+                                          nullptr,
+                                          0,
+                                          0,
+                                          hits);
+    return status;
 }
 
 TEST(HitTesterTest, HitTesterRejectHits)
@@ -614,6 +669,8 @@ ISTATUS
 AllocateTwoHitAtDistance(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )
@@ -645,6 +702,8 @@ ISTATUS
 AllocateNoHits(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )
@@ -1131,6 +1190,8 @@ TEST(HitTesterTest, HitTesterTestGeometryErrors)
     bool triggered = false;
     ValidationParams params;
     params.ray = ray;
+    params.minimum_distance = 0.0;
+    params.maximum_distance = INFINITY;
     params.data = &params;
     params.status_to_return = ISTATUS_SUCCESS;
     params.triggered = &triggered;

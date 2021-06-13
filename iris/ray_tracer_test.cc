@@ -33,6 +33,8 @@ ISTATUS
 AllocateHitRoutine(
     _In_opt_ const void *data, 
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Inout_ PHIT_ALLOCATOR hit_allocator,
     _Out_ PHIT *hits
     )

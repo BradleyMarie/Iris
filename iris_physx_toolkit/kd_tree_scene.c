@@ -2206,6 +2206,8 @@ ISTATUS
 KdTreeAggregateTraceShape(
     _In_ PCSHAPE shape,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _Inout_ float_t *maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit_list,
     _Out_ ISTATUS *return_status
@@ -2214,6 +2216,8 @@ KdTreeAggregateTraceShape(
     PHIT hit;
     ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
                                                    shape,
+                                                   minimum_distance,
+                                                   *maximum_distance,
                                                    &hit);
 
     if (status == ISTATUS_NO_INTERSECTION)
@@ -2226,14 +2230,18 @@ KdTreeAggregateTraceShape(
         return status;
     }
 
-    PHIT last_hit = hit;
-    while (last_hit->next != NULL) {
-        last_hit = last_hit->next;
-    }
+    while (hit != NULL)
+    {
+        if (minimum_distance < hit->distance &&
+            hit->distance < *maximum_distance)
+        {
+            *maximum_distance = hit->distance;
+            *hit_list = hit;
+            *return_status = ISTATUS_SUCCESS;
+        }
 
-    last_hit->next = *hit_list;
-    *hit_list = hit;
-    *return_status = ISTATUS_SUCCESS;
+        hit = hit->next;
+    }
 
     return ISTATUS_SUCCESS;
 }
@@ -2243,6 +2251,8 @@ ISTATUS
 KdTreeAggregateTrace(
     _In_ const void *context,
     _In_ PCRAY ray,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
     _Out_ PHIT *hit
     )
@@ -2271,8 +2281,10 @@ KdTreeAggregateTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        // TODO: Consider breaking if closest_hit_distance < node_min
-        //       Will improve performance; however, requires epsilon
+        if (maximum_distance < node_min)
+        {
+            break;
+        }
 
         if (KdTreeNodeIsLeaf(node))
         {
@@ -2284,6 +2296,8 @@ KdTreeAggregateTrace(
                 ISTATUS status =
                     KdTreeAggregateTraceShape(aggregate->shapes[index],
                                               ray,
+                                              minimum_distance,
+                                              &maximum_distance,
                                               allocator,
                                               hit,
                                               &return_status);
@@ -2303,6 +2317,8 @@ KdTreeAggregateTrace(
                     ISTATUS status =
                         KdTreeAggregateTraceShape(shape,
                                                   ray,
+                                                  minimum_distance,
+                                                  &maximum_distance,
                                                   allocator,
                                                   hit,
                                                   &return_status);

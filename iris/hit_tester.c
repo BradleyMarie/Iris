@@ -63,6 +63,8 @@ HitTesterTestGeometryInternal(
     PHIT hit;
     ISTATUS status = test_routine(geometry_data,
                                   trace_ray,
+                                  hit_tester->minimum_distance,
+                                  hit_tester->maximum_distance,
                                   &hit_tester->hit_allocator,
                                   &hit);
 
@@ -297,6 +299,8 @@ HitTesterTestNestedGeometry(
     _In_ PHIT_TESTER_TEST_GEOMETRY_ROUTINE test_routine,
     _In_opt_ const void *geometry_data,
     _In_opt_ const void *hit_data,
+    _In_ float_t minimum_distance,
+    _In_ float_t maximum_distance,
     _Out_ PHIT *hits
     )
 {
@@ -310,9 +314,24 @@ HitTesterTestNestedGeometry(
         return ISTATUS_INVALID_ARGUMENT_01;
     }
 
-    if (hits == NULL)
+    if (isnan(minimum_distance))
     {
         return ISTATUS_INVALID_ARGUMENT_04;
+    }
+
+    if (isnan(maximum_distance))
+    {
+        return ISTATUS_INVALID_ARGUMENT_05;
+    }
+
+    if (minimum_distance > maximum_distance)
+    {
+        return ISTATUS_INVALID_ARGUMENT_COMBINATION_00;
+    }
+
+    if (hits == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_06;
     }
 
     PCRAY model_ray = HitAllocatorGetRay(hit_allocator);
@@ -322,6 +341,8 @@ HitTesterTestNestedGeometry(
 
     ISTATUS status = test_routine(geometry_data,
                                   model_ray,
+                                  minimum_distance,
+                                  maximum_distance,
                                   hit_allocator,
                                   hits);
 
