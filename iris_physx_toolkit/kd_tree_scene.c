@@ -2207,8 +2207,7 @@ KdTreeAggregateTraceShape(
     _In_ PCSHAPE shape,
     _In_ PCRAY ray,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
-    _Inout_ float_t *closest_hit_distance,
-    _Out_ PHIT *closest_hit,
+    _Out_ PHIT *hit_list,
     _Out_ ISTATUS *return_status
     )
 {
@@ -2227,12 +2226,14 @@ KdTreeAggregateTraceShape(
         return status;
     }
 
-    if (hit->distance < *closest_hit_distance)
-    {
-        *closest_hit_distance = hit->distance;
-        *closest_hit = hit;
-        *return_status = ISTATUS_SUCCESS;
+    PHIT last_hit = hit;
+    while (last_hit->next != NULL) {
+        last_hit = last_hit->next;
     }
+
+    last_hit->next = *hit_list;
+    *hit_list = hit;
+    *return_status = ISTATUS_SUCCESS;
 
     return ISTATUS_SUCCESS;
 }
@@ -2263,7 +2264,6 @@ KdTreeAggregateTrace(
         return ISTATUS_NO_INTERSECTION;
     }
 
-    float_t closest_hit_distance = INFINITY;
     ISTATUS return_status = ISTATUS_NO_INTERSECTION;
     *hit = NULL;
 
@@ -2271,10 +2271,8 @@ KdTreeAggregateTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        if (closest_hit_distance < node_min)
-        {
-            break;
-        }
+        // TODO: Consider breaking if closest_hit_distance < node_min
+        //       Will improve performance; however, requires epsilon
 
         if (KdTreeNodeIsLeaf(node))
         {
@@ -2287,7 +2285,6 @@ KdTreeAggregateTrace(
                     KdTreeAggregateTraceShape(aggregate->shapes[index],
                                               ray,
                                               allocator,
-                                              &closest_hit_distance,
                                               hit,
                                               &return_status);
 
@@ -2307,7 +2304,6 @@ KdTreeAggregateTrace(
                         KdTreeAggregateTraceShape(shape,
                                                   ray,
                                                   allocator,
-                                                  &closest_hit_distance,
                                                   hit,
                                                   &return_status);
 

@@ -359,11 +359,17 @@ TEST(CornellBoxTest, CornellBox)
             &shapes);
     }
 
+    PSHAPE aggregate;
+    status = KdTreeAggregateAllocate(shapes.data(),
+                                     shapes.size(),
+                                     &aggregate);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
     PSCENE scene;
-    status = KdTreeSceneAllocate(shapes.data(),
+    status = KdTreeSceneAllocate(&aggregate,
                                  nullptr,
                                  nullptr,
-                                 shapes.size(),
+                                 1,
                                  nullptr,
                                  &scene);
     EXPECT_EQ(ISTATUS_SUCCESS, status);
@@ -388,6 +394,8 @@ TEST(CornellBoxTest, CornellBox)
     {
         ShapeRelease(shape);
     }
+
+    ShapeRelease(aggregate);
 
     EmissiveMaterialRelease(light_material);
     SpectrumRelease(light_spectrum);
