@@ -469,7 +469,7 @@ KdTreeNodeChildIndex(
 // Node Builder Defines
 //
 
-#define DESIRED_ALIGNMENT 2097152 // 2MB
+#define DESIRED_ALIGNMENT 4096
 #define INITIAL_NODES 512
 #define INITIAL_INDICIES 1024
 
@@ -507,8 +507,7 @@ NodeBuilderInitialize(
     node_builder->nodes_capacity = INITIAL_NODES;
     node_builder->nodes_size = 0;
 
-    node_builder->indices = aligned_alloc(DESIRED_ALIGNMENT,
-                                          INITIAL_INDICIES * sizeof(uint32_t));
+    node_builder->indices = malloc(INITIAL_INDICIES * sizeof(uint32_t));
 
     if (node_builder->indices == NULL)
     {
@@ -520,6 +519,40 @@ NodeBuilderInitialize(
     node_builder->indices_size = 0;
 
     return true;
+}
+
+static
+void
+NodeBuilderResizeToFit(
+    _Inout_ PNODE_BUILDER node_builder
+    )
+{
+    size_t nodes_size = node_builder->nodes_size * sizeof(KD_TREE_NODE);
+    void *nodes_allocation = aligned_alloc(DESIRED_ALIGNMENT, nodes_size);
+    if (nodes_allocation != NULL)
+    {
+        memcpy(nodes_allocation, node_builder->nodes, nodes_size);
+        free(node_builder->nodes);
+        node_builder->nodes = (PKD_TREE_NODE)nodes_allocation;
+        node_builder->nodes_capacity = node_builder->nodes_size;
+    }
+
+    if (node_builder->indices_size == 0)
+    {
+        free(node_builder->indices);
+        node_builder->indices = NULL;
+        node_builder->indices_capacity = 0;
+    }
+    else
+    {
+        size_t indices_size = node_builder->indices_size * sizeof(uint32_t);
+        void *indices_allocation = realloc(node_builder->indices, indices_size);
+        if (indices_allocation != NULL)
+        {
+            node_builder->indices = (uint32_t*)indices_allocation;
+            node_builder->indices_capacity = node_builder->indices_size;
+        }
+    }
 }
 
 static
@@ -600,18 +633,13 @@ NodeBuilderGrowIndices(
     }
 
     uint32_t *new_indices =
-        (uint32_t*)aligned_alloc(DESIRED_ALIGNMENT, bytes);
+        (uint32_t*)realloc(node_builder->indices, bytes);
 
     if (new_indices == NULL)
     {
         return false;
     }
 
-    memcpy(new_indices,
-           node_builder->indices,
-           node_builder->indices_capacity * sizeof(uint32_t));
-
-    free(node_builder->indices);
     node_builder->indices = new_indices;
     node_builder->indices_capacity = new_capacity;
 
@@ -2034,6 +2062,8 @@ KdTreeSceneAllocate(
         return status;
     }
 
+    NodeBuilderResizeToFit(&node_builder);
+
     bool premultiply_needed = false;
     if (premultiplied != NULL)
     {
@@ -2469,6 +2499,8 @@ KdTreeAggregateAllocate(
     {
         NodeBuilderDestroy(&node_builder);
     }
+
+    NodeBuilderResizeToFit(&node_builder);
 
     kd_aggregate.shapes = (PSHAPE*)calloc(num_shapes, sizeof(PSHAPE));
 
