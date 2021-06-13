@@ -4,16 +4,16 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    kd_tree_scene.h
+    list.h
 
 Abstract:
 
-    Creates a kd-tree scene.
+    Creates scene which tests a ray against all of the geometry it contains.
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_KD_TREE_SCENE_
-#define _IRIS_PHYSX_TOOLKIT_KD_TREE_SCENE_
+#ifndef _IRIS_PHYSX_TOOLKIT_SCENES_LIST_
+#define _IRIS_PHYSX_TOOLKIT_SCENES_LIST_
 
 #include "iris_physx/iris_physx.h"
 
@@ -26,7 +26,7 @@ extern "C" {
 //
 
 ISTATUS
-KdTreeSceneAllocate(
+ListSceneAllocate(
     _In_reads_(num_shapes) const PSHAPE shapes[],
     _In_reads_opt_(num_shapes) const PMATRIX transforms[],
     _In_reads_opt_(num_shapes) const bool premultiplied[],
@@ -35,15 +35,8 @@ KdTreeSceneAllocate(
     _Out_ PSCENE *scene
     );
 
-ISTATUS
-KdTreeAggregateAllocate(
-    _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_ size_t num_shapes,
-    _Out_ PSHAPE *aggregate
-    );
-
 #if __cplusplus 
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_KD_TREE_SCENE_
+#endif // _IRIS_PHYSX_TOOLKIT_SCENES_LIST_

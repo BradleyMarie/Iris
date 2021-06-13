@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    kd_tree_scene.c
+    kd_tree.c
 
 Abstract:
 
@@ -17,7 +17,7 @@ Abstract:
 
 #include "common/pointer_list.h"
 #include "common/safe_math.h"
-#include "iris_physx_toolkit/kd_tree_scene.h"
+#include "iris_physx_toolkit/scenes/kd_tree.h"
 
 //
 // Hash Set Type

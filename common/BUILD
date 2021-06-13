@@ -8,7 +8,7 @@ package(
         "//iris_camera:__pkg__",
         "//iris_camera_toolkit:__pkg__",
         "//iris_physx:__pkg__",
-        "//iris_physx_toolkit:__pkg__",
+        "//iris_physx_toolkit:__subpackages__",
         "//iris_spectrum:__pkg__",
     ],
 )

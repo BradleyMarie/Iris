@@ -18,12 +18,12 @@ Abstract:
 #include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
-#include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/materials/constant.h"
+#include "iris_physx_toolkit/scenes/list.h"
 #include "iris_physx_toolkit/shapes/constructive_solid_geometry.h"
 #include "iris_physx_toolkit/shapes/sphere.h"
+#include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/color_spectra.h"
-#include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
@@ -313,13 +313,10 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     status = DifferenceAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PMATRIX matrix = nullptr;
-    bool premultiplied = false;
-
     PSCENE scene;
     status = ListSceneAllocate(&shape2,
-                               &matrix,
-                               &premultiplied,
+                               nullptr,
+                               nullptr,
                                1,
                                nullptr,
                                &scene);
@@ -433,13 +430,10 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     status = IntersectionAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PMATRIX matrix = nullptr;
-    bool premultiplied = false;
-
     PSCENE scene;
     status = ListSceneAllocate(&shape2,
-                               &matrix,
-                               &premultiplied,
+                               nullptr,
+                               nullptr,
                                1,
                                nullptr,
                                &scene);
@@ -553,13 +547,10 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     status = UnionAllocate(shape0, shape1, &shape2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    PMATRIX matrix = nullptr;
-    bool premultiplied = false;
-
     PSCENE scene;
     status = ListSceneAllocate(&shape2,
-                               &matrix,
-                               &premultiplied,
+                               nullptr,
+                               nullptr,
                                1,
                                nullptr,
                                &scene);
@@ -683,12 +674,10 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     status = MatrixAllocateProduct(matrix0, matrix1, &matrix2);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
-    bool premultiplied = false;
-
     PSCENE scene;
     status = ListSceneAllocate(&shape2,
                                &matrix2,
-                               &premultiplied,
+                               nullptr,
                                1,
                                nullptr,
                                &scene);

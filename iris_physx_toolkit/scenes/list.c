@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    list_scene.c
+    list.c
 
 Abstract:
 
@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 
 #include "common/pointer_list.h"
-#include "iris_physx_toolkit/list_scene.h"
+#include "iris_physx_toolkit/scenes/list.h"
 
 //
 // Types
@@ -294,8 +294,8 @@ static const SCENE_VTABLE list_scene_vtable = {
 ISTATUS
 ListSceneAllocate(
     _In_reads_(num_shapes) const PSHAPE shapes[],
-    _In_reads_(num_shapes) const PMATRIX transforms[],
-    _In_reads_(num_shapes) const bool premultiplied[],
+    _In_reads_opt_(num_shapes) const PMATRIX transforms[],
+    _In_reads_opt_(num_shapes) const bool premultiplied[],
     _In_ size_t num_shapes,
     _In_opt_ PENVIRONMENTAL_LIGHT environment,
     _Out_ PSCENE *scene
@@ -304,16 +304,6 @@ ListSceneAllocate(
     if (shapes == NULL)
     {
         return ISTATUS_INVALID_ARGUMENT_00;
-    }
-
-    if (transforms == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_01;
-    }
-
-    if (premultiplied == NULL)
-    {
-        return ISTATUS_INVALID_ARGUMENT_02;
     }
 
     if (scene == NULL)
@@ -343,18 +333,19 @@ ListSceneAllocate(
 
     for (size_t i = 0; i < num_shapes; i++)
     {
+        PMATRIX transform = (transforms != NULL) ? transforms[i] : NULL;
         ISTATUS status;
-        if (premultiplied[i])
+        if (premultiplied != NULL && premultiplied[i])
         {
             status = ListSceneAddPremultipliedShape(&result,
                                                     shapes[i],
-                                                    transforms[i]);
+                                                    transform);
         }
         else
         {
             status = ListSceneAddTransformedShape(&result,
                                                   shapes[i],
-                                                  transforms[i]);
+                                                  transform);
         }
 
         if (status != ISTATUS_SUCCESS)

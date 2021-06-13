@@ -16,11 +16,10 @@ Abstract:
 #include "iris_advanced_toolkit/pcg_random.h"
 #include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
+#include "iris_physx_toolkit/scenes/list.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/infinite_environmental_light.h"
-#include "iris_physx_toolkit/kd_tree_scene.h"
-#include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/mipmap.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
@@ -89,13 +88,11 @@ TEST(EnvironmentalLight, Blue)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSHAPE shape = nullptr;
-    PMATRIX matrix = nullptr;
-    bool premultiplied = false;
 
     PSCENE scene;
     status = ListSceneAllocate(&shape,
-                               &matrix,
-                               &premultiplied,
+                               nullptr,
+                               nullptr,
                                0,
                                environmental_light,
                                &scene);

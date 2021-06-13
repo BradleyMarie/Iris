@@ -159,25 +159,6 @@ cc_library(
 )
 
 cc_library(
-    name = "list_scene",
-    srcs = ["list_scene.c"],
-    hdrs = ["list_scene.h"],
-    deps = [
-        "//common:pointer_list",
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "kd_tree_scene",
-    srcs = ["kd_tree_scene.c"],
-    hdrs = ["kd_tree_scene.h"],
-    deps = [
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "mipmap",
     srcs = ["mipmap.c"],
     hdrs = ["mipmap.h"],
