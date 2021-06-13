@@ -286,3 +286,96 @@ TEST(TeapotTest, SmoothShadedTeapot)
     SceneRelease(scene);
     LightSamplerRelease(light_sampler);
 }
+
+TEST(TeapotTest, SmoothShadedTeapotAggregate)
+{
+    PSPECTRUM spectrum;
+    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
+                                         (float_t)0.0,
+                                         (float_t)0.0,
+                                         &spectrum);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PREFLECTOR reflector;
+    status = XyzReflectorAllocate((float_t)1.0,
+                                  (float_t)0.0,
+                                  (float_t)0.0,
+                                  &reflector);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PBSDF bsdf;
+    status = LambertianBsdfAllocate(reflector, &bsdf);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT light;
+    status = PointLightAllocate(
+        PointCreate((float_t)0.0, (float_t)0.0, (float_t)-5.0),
+        spectrum,
+        &light);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PLIGHT_SAMPLER light_sampler;
+    status = AllLightSamplerAllocate(&light, 1, &light_sampler);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PMATERIAL material;
+    ConstantMaterialAllocate(bsdf, &material);
+
+    PSHAPE shapes[TEAPOT_FACE_COUNT] = { nullptr };
+
+    PNORMAL_MAP normal_map;
+    status = TriangleMeshNormalMapAllocate(teapot_normals,
+                                           TEAPOT_VERTEX_COUNT,
+                                           &normal_map);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    size_t triangles_allocated;
+    status = TriangleMeshAllocate(
+        teapot_vertices,
+        TEAPOT_VERTEX_COUNT,
+        teapot_face_vertices,
+        TEAPOT_FACE_COUNT,
+        nullptr,
+        nullptr,
+        normal_map,
+        nullptr,
+        material,
+        nullptr,
+        nullptr,
+        nullptr,
+        shapes,
+        &triangles_allocated);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSHAPE aggregate;
+    status = KdTreeAggregateAllocate(shapes, triangles_allocated, &aggregate);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    PSCENE scene;
+    status = KdTreeSceneAllocate(&aggregate,
+                                 nullptr,
+                                 nullptr,
+                                 1,
+                                 nullptr,
+                                 &scene);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    TestRenderSingleThreaded(scene,
+                             light_sampler,
+                             "test_results/teapot_smooth.pfm");
+
+    for (size_t i = 0; i < triangles_allocated; i++)
+    {
+        ShapeRelease(shapes[i]);
+    }
+
+    ShapeRelease(aggregate);
+    SpectrumRelease(spectrum);
+    ReflectorRelease(reflector);
+    BsdfRelease(bsdf);
+    NormalMapRelease(normal_map);
+    MaterialRelease(material);
+    LightRelease(light);
+    SceneRelease(scene);
+    LightSamplerRelease(light_sampler);
+}

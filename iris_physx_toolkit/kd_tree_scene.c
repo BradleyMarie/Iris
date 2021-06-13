@@ -2160,3 +2160,356 @@ KdTreeSceneAllocate(
 
     return ISTATUS_SUCCESS;
 }
+
+//
+// KD Tree Aggregate Type
+//
+
+typedef struct _KD_TREE_AGGREGATE {
+    BOUNDING_BOX bounds;
+    KD_TREE_NODE *nodes;
+    uint32_t *indices;
+    _Field_size_(num_shapes) PSHAPE *shapes;
+    size_t num_shapes;
+} KD_TREE_AGGREGATE, *PKD_TREE_AGGREGATE;
+
+typedef const KD_TREE_AGGREGATE *PCKD_TREE_AGGREGATE;
+
+//
+// KD Tree Aggregate Static Functions
+//
+
+static
+inline
+ISTATUS
+KdTreeAggregateTraceShape(
+    _In_ PCSHAPE shape,
+    _In_ PCRAY ray,
+    _In_ PSHAPE_HIT_ALLOCATOR allocator,
+    _Inout_ float_t *closest_hit_distance,
+    _Out_ PHIT *closest_hit,
+    _Out_ ISTATUS *return_status
+    )
+{
+    PHIT hit;
+    ISTATUS status = ShapeHitTesterTestNestedShape(allocator,
+                                                   shape,
+                                                   &hit);
+
+    if (status == ISTATUS_NO_INTERSECTION)
+    {
+        return ISTATUS_SUCCESS;
+    }
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (hit->distance < *closest_hit_distance)
+    {
+        *closest_hit_distance = hit->distance;
+        *closest_hit = hit;
+        *return_status = ISTATUS_SUCCESS;
+    }
+
+    return ISTATUS_SUCCESS;
+}
+
+static
+ISTATUS
+KdTreeAggregateTrace(
+    _In_ const void *context,
+    _In_ PCRAY ray,
+    _In_ PSHAPE_HIT_ALLOCATOR allocator,
+    _Out_ PHIT *hit
+    )
+{
+    PCKD_TREE_AGGREGATE aggregate = (PCKD_TREE_AGGREGATE)context;
+    PCKD_TREE_NODE node = aggregate->nodes;
+    const uint32_t *all_indices = aggregate->indices;
+
+    VECTOR3 inverse_direction;
+    float_t node_min, node_max;
+    bool intersects = BoundingBoxIntersect(aggregate->bounds,
+                                           *ray,
+                                           &inverse_direction,
+                                           &node_min,
+                                           &node_max);
+
+    if (!intersects)
+    {
+        return ISTATUS_NO_INTERSECTION;
+    }
+
+    float_t closest_hit_distance = INFINITY;
+    ISTATUS return_status = ISTATUS_NO_INTERSECTION;
+    *hit = NULL;
+
+    WORK_ITEM work_queue[MAX_TREE_DEPTH];
+    size_t queue_size = 0;
+    for (;;)
+    {
+        if (closest_hit_distance < node_min)
+        {
+            break;
+        }
+
+        if (KdTreeNodeIsLeaf(node))
+        {
+            uint32_t num_shapes = KdTreeNodeLeafSize(node);
+
+            if (num_shapes == 1)
+            {
+                uint32_t index = node->split_or_index.index;
+                ISTATUS status =
+                    KdTreeAggregateTraceShape(aggregate->shapes[index],
+                                              ray,
+                                              allocator,
+                                              &closest_hit_distance,
+                                              hit,
+                                              &return_status);
+
+                if (status != ISTATUS_SUCCESS)
+                {
+                    return status;
+                }
+            }
+            else if (num_shapes != 0)
+            {
+                uint32_t index = node->split_or_index.index;
+                const uint32_t *node_indices = all_indices + index;
+                for (uint32_t i = 0; i < num_shapes; i++)
+                {
+                    PCSHAPE shape = aggregate->shapes[node_indices[i]];
+                    ISTATUS status =
+                        KdTreeAggregateTraceShape(shape,
+                                                  ray,
+                                                  allocator,
+                                                  &closest_hit_distance,
+                                                  hit,
+                                                  &return_status);
+
+                    if (status != ISTATUS_SUCCESS)
+                    {
+                        return status;
+                    }
+                }
+            }
+
+            if (queue_size == 0)
+            {
+                break;
+            }
+
+            queue_size -= 1;
+            node = work_queue[queue_size].node;
+            node_min = work_queue[queue_size].min;
+            node_max = work_queue[queue_size].max;
+            continue;
+        }
+
+        uint32_t split_axis = KdTreeNodeType(node);
+        float_t origin = PointGetElement(ray->origin, split_axis);
+        float_t direction = VectorGetElement(inverse_direction, split_axis);
+
+        float_t split = KdTreeNodeSplit(node);
+        float_t plane_distance = (split - origin) * direction;
+
+        PCKD_TREE_NODE below_child = node + 1;
+        PCKD_TREE_NODE above_child = node + KdTreeNodeChildIndex(node);
+
+        PCKD_TREE_NODE close_child, far_child;
+        if (origin < split || (origin == split && direction <= (float_t)0.0))
+        {
+            close_child = below_child;
+            far_child = above_child;
+        }
+        else
+        {
+            close_child = above_child;
+            far_child = below_child;
+        }
+
+        if (node_max < plane_distance || plane_distance <= (float_t)0.0)
+        {
+            node = close_child;
+        }
+        else if (plane_distance < node_min)
+        {
+            node = far_child;
+        }
+        else
+        {
+            work_queue[queue_size].node = far_child;
+            work_queue[queue_size].min = plane_distance;
+            work_queue[queue_size].max = node_max;
+            queue_size += 1;
+
+            node = close_child;
+            node_max = plane_distance;
+        }
+    }
+
+    return return_status;
+}
+
+static
+ISTATUS
+KdTreeAggregateComputeBounds(
+    _In_ const void *context,
+    _In_opt_ PCMATRIX model_to_world,
+    _Out_ PBOUNDING_BOX world_bounds
+    )
+{
+    PCKD_TREE_AGGREGATE aggregate = (PCKD_TREE_AGGREGATE)context;
+
+    ISTATUS status = ShapeComputeBounds(aggregate->shapes[0],
+                                        model_to_world,
+                                        world_bounds);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    for (size_t i = 1; i < aggregate->num_shapes; i++)
+    {
+        BOUNDING_BOX bounds;
+        status = ShapeComputeBounds(aggregate->shapes[i],
+                                    model_to_world,
+                                    &bounds);
+
+        if (status != ISTATUS_SUCCESS)
+        {
+            return status;
+        }
+
+        *world_bounds = BoundingBoxUnion(*world_bounds, bounds);
+    }
+
+    return status;
+}
+
+static
+void
+KdTreeAggregateFree(
+    _In_opt_ _Post_invalid_ void *context
+    )
+{
+    PKD_TREE_AGGREGATE aggregate = (PKD_TREE_AGGREGATE)context;
+
+    for (size_t i = 0; i < aggregate->num_shapes; i++)
+    {
+        ShapeRelease(aggregate->shapes[i]);
+    }
+
+    free(aggregate->shapes);
+    free(aggregate->nodes);
+    free(aggregate->indices);
+}
+
+//
+// KD Tree Aggregate Static Data
+//
+
+static const SHAPE_VTABLE kd_tree_aggregate_vtable = {
+    KdTreeAggregateTrace,
+    KdTreeAggregateComputeBounds,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    KdTreeAggregateFree
+};
+
+//
+// KD Tree Aggregate Functions
+//
+
+ISTATUS
+KdTreeAggregateAllocate(
+    _In_reads_(num_shapes) const PSHAPE shapes[],
+    _In_ size_t num_shapes,
+    _Out_ PSHAPE *aggregate
+    )
+{
+    if (shapes == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_00;
+    }
+
+    if (num_shapes == 0)
+    {
+        return ISTATUS_INVALID_ARGUMENT_01;
+    }
+
+    if (aggregate == NULL)
+    {
+        return ISTATUS_INVALID_ARGUMENT_02;
+    }
+
+    float_t max_depth =
+        round((float_t)8.0 + (float_t)1.3 * (float_t)Log2(num_shapes));
+    max_depth = IMin((float_t)MAX_TREE_DEPTH, max_depth);
+
+    NODE_BUILDER node_builder;
+    bool success = NodeBuilderInitialize(&node_builder);
+
+    if (!success)
+    {
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    KD_TREE_AGGREGATE kd_aggregate;
+
+    ISTATUS status = KdTreeBuild(&node_builder,
+                                 shapes,
+                                 NULL,
+                                 NULL,
+                                 num_shapes,
+                                 (size_t)max_depth,
+                                 &kd_aggregate.bounds);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        NodeBuilderDestroy(&node_builder);
+    }
+
+    kd_aggregate.shapes = (PSHAPE*)calloc(num_shapes, sizeof(PSHAPE));
+
+    if (kd_aggregate.shapes == NULL)
+    {
+        NodeBuilderDestroy(&node_builder);
+        return ISTATUS_ALLOCATION_FAILED;
+    }
+
+    memcpy(kd_aggregate.shapes, shapes, num_shapes * sizeof(PSHAPE));
+
+    kd_aggregate.num_shapes = num_shapes;
+
+    kd_aggregate.nodes = node_builder.nodes;
+    kd_aggregate.indices = node_builder.indices;
+
+    status = ShapeAllocate(&kd_tree_aggregate_vtable,
+                           &kd_aggregate,
+                           sizeof(KD_TREE_AGGREGATE),
+                           alignof(KD_TREE_AGGREGATE),
+                           aggregate);
+
+    if (status != ISTATUS_SUCCESS)
+    {
+        free(kd_aggregate.shapes);
+        NodeBuilderDestroy(&node_builder);
+    }
+
+    for (size_t i = 0; i < num_shapes; i++)
+    {
+        ShapeRetain(shapes[i]);
+    }
+
+    return ISTATUS_SUCCESS;
+}

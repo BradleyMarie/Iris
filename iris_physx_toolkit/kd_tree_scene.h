@@ -35,6 +35,13 @@ KdTreeSceneAllocate(
     _Out_ PSCENE *scene
     );
 
+ISTATUS
+KdTreeAggregateAllocate(
+    _In_reads_(num_shapes) const PSHAPE shapes[],
+    _In_ size_t num_shapes,
+    _Out_ PSHAPE *aggregate
+    );
+
 #if __cplusplus 
 }
 #endif // __cplusplus
