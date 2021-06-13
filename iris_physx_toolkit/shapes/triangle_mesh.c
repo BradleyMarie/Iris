@@ -17,7 +17,7 @@ Abstract:
 #include <stdlib.h>
 #include <string.h>
 
-#include "iris_physx_toolkit/triangle_mesh.h"
+#include "iris_physx_toolkit/shapes/triangle_mesh.h"
 
 //
 // Constants

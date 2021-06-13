@@ -18,7 +18,7 @@ Abstract:
 
 #include "common/safe_math.h"
 #include "iris_physx_toolkit/triangle_mesh_texture_coordinate_map.h"
-#include "iris_physx_toolkit/triangle_mesh.h"
+#include "iris_physx_toolkit/shapes/triangle_mesh.h"
 #include "iris_physx_toolkit/uv_texture_coordinate.h"
 
 //

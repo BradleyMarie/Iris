@@ -17,7 +17,7 @@ Abstract:
 #include <string.h>
 
 #include "iris_physx_toolkit/triangle_mesh_normal_map.h"
-#include "iris_physx_toolkit/triangle_mesh.h"
+#include "iris_physx_toolkit/shapes/triangle_mesh.h"
 
 //
 // Types

@@ -12,7 +12,7 @@ Abstract:
 
 --*/
 
-#include "iris_physx_toolkit/triangle.h"
+#include "iris_physx_toolkit/shapes/triangle.h"
 
 //
 // Functions

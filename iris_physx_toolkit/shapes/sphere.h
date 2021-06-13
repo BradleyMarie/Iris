@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_SPHERE_
-#define _IRIS_PHYSX_TOOLKIT_SPHERE_
+#ifndef _IRIS_PHYSX_TOOLKIT_SHAPES_SPHERE_
+#define _IRIS_PHYSX_TOOLKIT_SHAPES_SPHERE_
 
 #include "iris_physx/iris_physx.h"
 
@@ -56,4 +56,4 @@ EmissiveSphereAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_SPHERE_
+#endif // _IRIS_PHYSX_TOOLKIT_SHAPES_SPHERE_

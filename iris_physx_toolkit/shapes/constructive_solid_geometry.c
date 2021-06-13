@@ -8,13 +8,13 @@ Module Name:
 
 Abstract:
 
-    Implements a constructive solid geometry.
+    Implements constructive solid geometry.
 
 --*/
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/constructive_solid_geometry.h"
+#include "iris_physx_toolkit/shapes/constructive_solid_geometry.h"
 
 //
 // Types

@@ -48,7 +48,7 @@ cc_library(
     hdrs = ["quad.h"],
     deps = [
         "//iris_physx",
-        "//iris_physx_toolkit:triangle",
+        "//iris_physx_toolkit/shapes:triangle",
     ],
 )
 

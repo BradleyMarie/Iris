@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_TRIANGLE_
-#define _IRIS_PHYSX_TOOLKIT_TRIANGLE_
+#ifndef _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_
+#define _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_
 
 #include "iris_physx/iris_physx.h"
 
@@ -68,4 +68,4 @@ EmissiveTriangleAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_TRIANGLE_
+#endif // _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_

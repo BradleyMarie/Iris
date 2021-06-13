@@ -19,6 +19,7 @@ Abstract:
 #include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/orthographic_camera.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
+#include "iris_physx_toolkit/shapes/triangle.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/color_spectra.h"
@@ -27,7 +28,6 @@ Abstract:
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/sample_tracer.h"
-#include "iris_physx_toolkit/triangle.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
 

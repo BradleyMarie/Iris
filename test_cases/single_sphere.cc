@@ -18,6 +18,7 @@ Abstract:
 #include "iris_camera_toolkit/grid_image_sampler.h"
 #include "iris_camera_toolkit/pinhole_camera.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
+#include "iris_physx_toolkit/shapes/sphere.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/materials/constant.h"
 #include "iris_physx_toolkit/color_spectra.h"
@@ -25,7 +26,6 @@ Abstract:
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
 #include "iris_physx_toolkit/sample_tracer.h"
-#include "iris_physx_toolkit/sphere.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
 

@@ -15,7 +15,7 @@ Abstract:
 #include <stdalign.h>
 
 #include "iris_advanced_toolkit/sample_geometry.h"
-#include "iris_physx_toolkit/sphere.h"
+#include "iris_physx_toolkit/shapes/sphere.h"
 
 //
 // Types

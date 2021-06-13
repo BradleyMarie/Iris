@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_TRIANGLE_MESH_
-#define _IRIS_PHYSX_TOOLKIT_TRIANGLE_MESH_
+#ifndef _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_MESH_
+#define _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_MESH_
 
 #include "iris_physx/iris_physx.h"
 
@@ -66,4 +66,4 @@ TriangleMeshAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_TRIANGLE_MESH_
+#endif // _IRIS_PHYSX_TOOLKIT_SHAPES_TRIANGLE_MESH_
