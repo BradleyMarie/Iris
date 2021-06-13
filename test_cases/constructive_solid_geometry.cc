@@ -20,6 +20,7 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/materials/constant.h"
+#include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/constructive_solid_geometry.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
@@ -29,7 +30,6 @@ Abstract:
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
-#include "test_util/spectra.h"
 
 void
 AllocateCubeFace(
@@ -191,7 +191,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = XyzColorIntegratorAllocate(&color_integrator);
+    status = ColorColorIntegratorAllocate(COLOR_SPACE_XYZ, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -237,25 +237,41 @@ TestRenderSingleThreaded(
 
 TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)1.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)0.0,
-                                         (float_t)1.0,
-                                         (float_t)1.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    float_t reflector0_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)0.0 };
+    COLOR3 reflector0_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector0_color_values);
 
     PREFLECTOR reflector0;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)0.0,
-                                  &reflector0);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector0_color,
+                                               &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector1_color_values[3] =
+        { (float_t)0.0, (float_t)0.0, (float_t)1.0 };
+    COLOR3 reflector1_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector1_color_values);
+
     PREFLECTOR reflector1;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)0.0,
-                                  (float_t)1.0,
-                                  &reflector1);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector1_color,
+                                               &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
@@ -330,29 +346,46 @@ TEST(ConstructiveSolidGeometryTest, CubeSphereDifference)
     ShapeRelease(shape0);
     ShapeRelease(shape1);
     ShapeRelease(shape2);
+    ColorExtrapolatorFree(color_extrapolator);
 }
 
 TEST(ConstructiveSolidGeometryTest, SphereIntersection)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)1.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)0.0,
-                                         (float_t)1.0,
-                                         (float_t)1.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    float_t reflector0_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)0.0 };
+    COLOR3 reflector0_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector0_color_values);
 
     PREFLECTOR reflector0;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)0.0,
-                                  &reflector0);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector0_color,
+                                               &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector1_color_values[3] =
+        { (float_t)0.0, (float_t)0.0, (float_t)1.0 };
+    COLOR3 reflector1_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector1_color_values);
+
     PREFLECTOR reflector1;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)0.0,
-                                  (float_t)1.0,
-                                  &reflector1);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector1_color,
+                                               &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
@@ -433,29 +466,46 @@ TEST(ConstructiveSolidGeometryTest, SphereIntersection)
     ShapeRelease(shape0);
     ShapeRelease(shape1);
     ShapeRelease(shape2);
+    ColorExtrapolatorFree(color_extrapolator);
 }
 
 TEST(ConstructiveSolidGeometryTest, SphereUnion)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)1.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)0.0,
-                                         (float_t)1.0,
-                                         (float_t)1.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    float_t reflector0_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)0.0 };
+    COLOR3 reflector0_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector0_color_values);
 
     PREFLECTOR reflector0;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)0.0,
-                                  &reflector0);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector0_color,
+                                               &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector1_color_values[3] =
+        { (float_t)0.0, (float_t)0.0, (float_t)1.0 };
+    COLOR3 reflector1_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector1_color_values);
+
     PREFLECTOR reflector1;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)0.0,
-                                  (float_t)1.0,
-                                  &reflector1);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector1_color,
+                                               &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
@@ -536,29 +586,46 @@ TEST(ConstructiveSolidGeometryTest, SphereUnion)
     ShapeRelease(shape0);
     ShapeRelease(shape1);
     ShapeRelease(shape2);
+    ColorExtrapolatorFree(color_extrapolator);
 }
 
 TEST(ConstructiveSolidGeometryTest, RoundedCube)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)1.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)0.0,
-                                         (float_t)1.0,
-                                         (float_t)1.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
+
+    float_t reflector0_color_values[3] =
+        { (float_t)0.0, (float_t)1.0, (float_t)0.0 };
+    COLOR3 reflector0_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector0_color_values);
 
     PREFLECTOR reflector0;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)1.0,
-                                  (float_t)0.0,
-                                  &reflector0);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector0_color,
+                                               &reflector0);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector1_color_values[3] =
+        { (float_t)0.0, (float_t)0.0, (float_t)1.0 };
+    COLOR3 reflector1_color = ColorCreate(COLOR_SPACE_XYZ,
+                                          reflector1_color_values);
+
     PREFLECTOR reflector1;
-    status = XyzReflectorAllocate((float_t)0.0,
-                                  (float_t)0.0,
-                                  (float_t)1.0,
-                                  &reflector1);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector1_color,
+                                               &reflector1);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf0;
@@ -651,4 +718,5 @@ TEST(ConstructiveSolidGeometryTest, RoundedCube)
     MatrixRelease(matrix0);
     MatrixRelease(matrix1);
     MatrixRelease(matrix2);
+    ColorExtrapolatorFree(color_extrapolator);
 }

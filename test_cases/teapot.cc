@@ -23,6 +23,7 @@ Abstract:
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/materials/constant.h"
+#include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/kd_tree_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
@@ -32,7 +33,6 @@ Abstract:
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/teapot.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
 
 //
 // Tests
@@ -72,7 +72,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = XyzColorIntegratorAllocate(&color_integrator);
+    status = ColorColorIntegratorAllocate(COLOR_SPACE_XYZ, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
@@ -119,18 +119,30 @@ TestRenderSingleThreaded(
 
 TEST(TeapotTest, FlatShadedTeapot)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)32.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector_color_values[3] =
+        { (float_t)1.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 reflector_color = ColorCreate(COLOR_SPACE_XYZ,
+                                         reflector_color_values);
+
     PREFLECTOR reflector;
-    status = XyzReflectorAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector_color,
+                                               &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
@@ -197,22 +209,35 @@ TEST(TeapotTest, FlatShadedTeapot)
     LightRelease(light);
     SceneRelease(scene);
     LightSamplerRelease(light_sampler);
+    ColorExtrapolatorFree(color_extrapolator);
 }
 
 TEST(TeapotTest, SmoothShadedTeapot)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)32.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector_color_values[3] =
+        { (float_t)1.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 reflector_color = ColorCreate(COLOR_SPACE_XYZ,
+                                         reflector_color_values);
+
     PREFLECTOR reflector;
-    status = XyzReflectorAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector_color,
+                                               &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
@@ -285,22 +310,35 @@ TEST(TeapotTest, SmoothShadedTeapot)
     LightRelease(light);
     SceneRelease(scene);
     LightSamplerRelease(light_sampler);
+    ColorExtrapolatorFree(color_extrapolator);
 }
 
 TEST(TeapotTest, SmoothShadedTeapotAggregate)
 {
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                                    &color_extrapolator);
+    ASSERT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t spectrum_color_values[3] =
+        { (float_t)32.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 spectrum_color = ColorCreate(COLOR_SPACE_XYZ, spectrum_color_values);
+
     PSPECTRUM spectrum;
-    ISTATUS status = XyzSpectrumAllocate((float_t)32.0,
-                                         (float_t)0.0,
-                                         (float_t)0.0,
-                                         &spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              spectrum_color,
+                                              &spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    float_t reflector_color_values[3] =
+        { (float_t)1.0, (float_t)0.0, (float_t)0.0 };
+    COLOR3 reflector_color = ColorCreate(COLOR_SPACE_XYZ,
+                                         reflector_color_values);
+
     PREFLECTOR reflector;
-    status = XyzReflectorAllocate((float_t)1.0,
-                                  (float_t)0.0,
-                                  (float_t)0.0,
-                                  &reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               reflector_color,
+                                               &reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PBSDF bsdf;
@@ -378,4 +416,5 @@ TEST(TeapotTest, SmoothShadedTeapotAggregate)
     LightRelease(light);
     SceneRelease(scene);
     LightSamplerRelease(light_sampler);
+    ColorExtrapolatorFree(color_extrapolator);
 }

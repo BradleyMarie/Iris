@@ -20,6 +20,7 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/materials/constant.h"
+#include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/list_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"
@@ -27,7 +28,42 @@ Abstract:
 #include "iris_physx_toolkit/sphere.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
+
+ISTATUS
+XyzSpectrumAllocate(
+    _In_ float_t x,
+    _In_ float_t y,
+    _In_ float_t z,
+    _Out_ PSPECTRUM *spectrum
+    )
+{
+    PCOLOR_EXTRAPOLATOR extra;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ, &extra);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t values[3] = { x, y, z };
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+
+    return ColorExtrapolatorComputeSpectrum(extra, color, spectrum);
+}
+
+ISTATUS
+XyzReflectorAllocate(
+    _In_ float_t x,
+    _In_ float_t y,
+    _In_ float_t z,
+    _Out_ PREFLECTOR *reflector
+    )
+{
+    PCOLOR_EXTRAPOLATOR extra;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ, &extra);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t values[3] = { x, y, z };
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+
+    return ColorExtrapolatorComputeReflector(extra, color, reflector);
+}
 
 void
 TestRenderSingleThreaded(
@@ -64,7 +100,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = XyzColorIntegratorAllocate(&color_integrator);
+    status = ColorColorIntegratorAllocate(COLOR_SPACE_XYZ, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;

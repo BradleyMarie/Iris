@@ -22,6 +22,7 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/cie_color_integrator.h"
+#include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/materials/constant.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
@@ -36,7 +37,6 @@ Abstract:
 #include "test_util/cornell_box.h"
 #include "test_util/pfm.h"
 #include "test_util/quad.h"
-#include "test_util/spectra.h"
 
 void
 TestRenderSingleThreaded(
@@ -63,7 +63,7 @@ TestRenderSingleThreaded(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = XyzColorIntegratorAllocate(&color_integrator);
+    status = ColorColorIntegratorAllocate(COLOR_SPACE_XYZ, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     status = IntegratorPrepare(path_tracer,
@@ -142,6 +142,11 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ISTATUS status = CieColorIntegratorAllocate(&color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
+    PCOLOR_EXTRAPOLATOR color_extrapolator;
+    status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ,
+                                            &color_extrapolator);
+    ASSERT_EQ(status, ISTATUS_SUCCESS);
+
     PREFLECTOR perfect_reflector;
     status = UniformReflectorAllocate((float_t)1.0, &perfect_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
@@ -184,10 +189,9 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR white_reflector;
-    status = XyzReflectorAllocate(color.values[0],
-                                  color.values[1],
-                                  color.values[2],
-                                  &white_reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               color,
+                                               &white_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_white_reflector);
@@ -213,10 +217,9 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR red_reflector;
-    status = XyzReflectorAllocate(color.values[0],
-                                  color.values[1],
-                                  color.values[2],
-                                  &red_reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               color,
+                                               &red_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_red_reflector);
@@ -242,10 +245,9 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PREFLECTOR green_reflector;
-    status = XyzReflectorAllocate(color.values[0],
-                                  color.values[1],
-                                  color.values[2],
-                                  &green_reflector);
+    status = ColorExtrapolatorComputeReflector(color_extrapolator,
+                                               color,
+                                               &green_reflector);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     ReflectorRelease(interpolated_green_reflector);
@@ -271,10 +273,9 @@ TEST(CornellBoxDielectricTest, CornellBox)
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSPECTRUM light_spectrum;
-    status = XyzSpectrumAllocate(color.values[0],
-                                  color.values[1],
-                                  color.values[2],
-                                  &light_spectrum);
+    status = ColorExtrapolatorComputeSpectrum(color_extrapolator,
+                                              color,
+                                              &light_spectrum);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     SpectrumRelease(interpolated_light_spectrum);
@@ -440,5 +441,6 @@ TEST(CornellBoxDielectricTest, CornellBox)
     SceneRelease(scene);
     LightSamplerRelease(light_sampler);
     CameraFree(camera);
+    ColorExtrapolatorFree(color_extrapolator);
     ColorIntegratorRelease(color_integrator);
 }

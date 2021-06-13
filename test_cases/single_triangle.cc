@@ -21,6 +21,7 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
+#include "iris_physx_toolkit/color_spectra.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
 #include "iris_physx_toolkit/directional_light.h"
 #include "iris_physx_toolkit/list_scene.h"
@@ -29,7 +30,6 @@ Abstract:
 #include "iris_physx_toolkit/triangle.h"
 #include "googletest/include/gtest/gtest.h"
 #include "test_util/pfm.h"
-#include "test_util/spectra.h"
 
 //
 // Triangle Material
@@ -138,6 +138,42 @@ TriangleMaterialAllocate(
 // Test Functions
 //
 
+ISTATUS
+XyzSpectrumAllocate(
+    _In_ float_t x,
+    _In_ float_t y,
+    _In_ float_t z,
+    _Out_ PSPECTRUM *spectrum
+    )
+{
+    PCOLOR_EXTRAPOLATOR extra;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ, &extra);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t values[3] = { x, y, z };
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+
+    return ColorExtrapolatorComputeSpectrum(extra, color, spectrum);
+}
+
+ISTATUS
+XyzReflectorAllocate(
+    _In_ float_t x,
+    _In_ float_t y,
+    _In_ float_t z,
+    _Out_ PREFLECTOR *reflector
+    )
+{
+    PCOLOR_EXTRAPOLATOR extra;
+    ISTATUS status = ColorColorExtrapolatorAllocate(COLOR_SPACE_XYZ, &extra);
+    EXPECT_EQ(ISTATUS_SUCCESS, status);
+
+    float_t values[3] = { x, y, z };
+    COLOR3 color = ColorCreate(COLOR_SPACE_XYZ, values);
+
+    return ColorExtrapolatorComputeReflector(extra, color, reflector);
+}
+
 void
 TestRender(
     _In_ PCCAMERA camera,
@@ -164,7 +200,7 @@ TestRender(
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PCOLOR_INTEGRATOR color_integrator;
-    status = XyzColorIntegratorAllocate(&color_integrator);
+    status = ColorColorIntegratorAllocate(COLOR_SPACE_XYZ, &color_integrator);
     ASSERT_EQ(status, ISTATUS_SUCCESS);
 
     PSAMPLE_TRACER sample_tracer;
