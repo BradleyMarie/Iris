@@ -2034,7 +2034,7 @@ KdTreeSceneAllocate(
         return status;
     }
 
-    bool premultiply_needed;
+    bool premultiply_needed = false;
     if (premultiplied != NULL)
     {
         for (size_t i = 0; i < num_shapes; i++)
@@ -2046,12 +2046,8 @@ KdTreeSceneAllocate(
             }
         }
     }
-    else
-    {
-        premultiply_needed = false;
-    }
 
-    bool transform_needed;
+    bool transform_needed = false;
     if (transforms != NULL)
     {
         for (size_t i = 0; i < num_shapes; i++)
@@ -2062,11 +2058,6 @@ KdTreeSceneAllocate(
                 break;
             }
         }
-
-    }
-    else
-    {
-        transform_needed = false;
     }
 
     KD_TREE_SCENE result;
