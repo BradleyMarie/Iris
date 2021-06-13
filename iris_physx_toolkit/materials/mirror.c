@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    mirror_material.c
+    mirror.c
 
 Abstract:
 
@@ -14,8 +14,8 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/mirror_material.h"
 #include "iris_physx_toolkit/bsdfs/mirror.h"
+#include "iris_physx_toolkit/materials/mirror.h"
 
 //
 // Types

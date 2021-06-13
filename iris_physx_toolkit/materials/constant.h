@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    constant_material.h
+    constant.h
 
 Abstract:
 
@@ -13,8 +13,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_CONSTANT_MATERIAL_
-#define _IRIS_PHYSX_TOOLKIT_CONSTANT_MATERIAL_
+#ifndef _IRIS_PHYSX_TOOLKIT_MATERIALS_CONSTANT_
+#define _IRIS_PHYSX_TOOLKIT_MATERIALS_CONSTANT_
 
 #include "iris_physx/iris_physx.h"
 
@@ -36,4 +36,4 @@ ConstantMaterialAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_CONSTANT_MATERIAL_
+#endif // _IRIS_PHYSX_TOOLKIT_MATERIALS_CONSTANT_

@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    alpha_material.h
+    alpha.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_ALPHA_MATERIAL_
-#define _IRIS_PHYSX_TOOLKIT_ALPHA_MATERIAL_
+#ifndef _IRIS_PHYSX_TOOLKIT_MATERIALS_ALPHA_
+#define _IRIS_PHYSX_TOOLKIT_MATERIALS_ALPHA_
 
 #include "iris_physx_toolkit/float_texture.h"
 
@@ -36,4 +36,4 @@ AlphaMaterialAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_ALPHA_MATERIAL_
+#endif // _IRIS_PHYSX_TOOLKIT_MATERIALS_ALPHA_

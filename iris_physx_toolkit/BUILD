@@ -21,17 +21,6 @@ cc_library(
 )
 
 cc_library(
-    name = "alpha_material",
-    srcs = ["alpha_material.c"],
-    hdrs = ["alpha_material.h"],
-    deps = [
-        ":float_texture",
-        "//iris_physx_toolkit/bsdfs:alpha",
-        "//iris_physx",
-    ],
-)
-
-cc_library(
     name = "attenuated_reflector",
     srcs = ["attenuated_reflector.c"],
     hdrs = ["attenuated_reflector.h"],
@@ -97,15 +86,6 @@ cc_library(
     hdrs = ["color_spectra.h"],
     deps = [
         ":color_extrapolator",
-        "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "constant_material",
-    srcs = ["constant_material.c"],
-    hdrs = ["constant_material.h"],
-    deps = [
         "//iris_physx",
     ],
 )
@@ -207,18 +187,6 @@ cc_library(
 )
 
 cc_library(
-    name = "matte_material",
-    srcs = ["matte_material.c"],
-    hdrs = ["matte_material.h"],
-    deps = [
-        ":float_texture",
-        ":reflector_texture",
-        "//iris_physx_toolkit/bsdfs:lambertian",
-        "//iris_physx_toolkit/bsdfs:oren_nayar",
-    ],
-)
-
-cc_library(
     name = "mipmap",
     srcs = ["mipmap.c"],
     hdrs = ["mipmap.h"],
@@ -235,17 +203,6 @@ cc_library(
     hdrs = ["metric_black_body.h"],
     deps = [
         "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "mirror_material",
-    srcs = ["mirror_material.c"],
-    hdrs = ["mirror_material.h"],
-    deps = [
-        ":reflector_texture",
-        "//iris_physx",
-        "//iris_physx_toolkit/bsdfs:mirror",
     ],
 )
 
@@ -277,22 +234,6 @@ cc_library(
         ":float_texture",
         ":reflector_texture",
         "//iris_physx",
-    ],
-)
-
-cc_library(
-    name = "plastic_material",
-    srcs = ["plastic_material.c"],
-    hdrs = ["plastic_material.h"],
-    deps = [
-        ":float_texture",
-        ":reflector_texture",
-        "//iris_physx",
-        "//iris_physx_toolkit/bsdfs:aggregate",
-        "//iris_physx_toolkit/bsdfs:lambertian",
-        "//iris_physx_toolkit/bsdfs:microfacet",
-        "//iris_physx_toolkit/bsdfs/fresnels:dielectric",
-        "//iris_physx_toolkit/bsdfs/microfacet_distributions:trowbridge_reitz",
     ],
 )
 

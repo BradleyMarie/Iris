@@ -22,7 +22,7 @@ Abstract:
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/all_light_sampler.h"
 #include "iris_physx_toolkit/attenuated_reflector.h"
-#include "iris_physx_toolkit/constant_material.h"
+#include "iris_physx_toolkit/materials/constant.h"
 #include "iris_physx_toolkit/kd_tree_scene.h"
 #include "iris_physx_toolkit/path_tracer.h"
 #include "iris_physx_toolkit/point_light.h"

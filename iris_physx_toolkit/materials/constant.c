@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    constant_material.c
+    constant.c
 
 Abstract:
 
@@ -14,7 +14,7 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/constant_material.h"
+#include "iris_physx_toolkit/materials/constant.h"
 
 //
 // Types

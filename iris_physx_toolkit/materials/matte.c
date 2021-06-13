@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    matte_material.c
+    matte.c
 
 Abstract:
 
@@ -14,9 +14,9 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/matte_material.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/bsdfs/oren_nayar.h"
+#include "iris_physx_toolkit/materials/matte.h"
 
 //
 // Types

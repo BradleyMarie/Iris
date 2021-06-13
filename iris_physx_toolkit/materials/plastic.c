@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    plastic_material.c
+    plastic.c
 
 Abstract:
 
@@ -14,12 +14,12 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/plastic_material.h"
 #include "iris_physx_toolkit/bsdfs/aggregate.h"
 #include "iris_physx_toolkit/bsdfs/lambertian.h"
 #include "iris_physx_toolkit/bsdfs/microfacet.h"
 #include "iris_physx_toolkit/bsdfs/fresnels/dielectric.h"
 #include "iris_physx_toolkit/bsdfs/microfacet_distributions/trowbridge_reitz.h"
+#include "iris_physx_toolkit/materials/plastic.h"
 
 //
 // Types

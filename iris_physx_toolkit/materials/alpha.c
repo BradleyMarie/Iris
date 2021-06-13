@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    alpha_material.c
+    alpha.c
 
 Abstract:
 
@@ -14,8 +14,8 @@ Abstract:
 
 #include <stdalign.h>
 
-#include "iris_physx_toolkit/alpha_material.h"
 #include "iris_physx_toolkit/bsdfs/alpha.h"
+#include "iris_physx_toolkit/materials/alpha.h"
 
 //
 // Types

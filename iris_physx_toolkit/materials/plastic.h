@@ -4,16 +4,16 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    matte_material.h
+    plastic.h
 
 Abstract:
 
-    Re-implementation of pbrt's matte material.
+    Re-implementation of pbrt's plastic material.
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_MATTE_MATERIAL_
-#define _IRIS_PHYSX_TOOLKIT_MATTE_MATERIAL_
+#ifndef _IRIS_PHYSX_TOOLKIT_MATERIALS_PLASTIC_
+#define _IRIS_PHYSX_TOOLKIT_MATERIALS_PLASTIC_
 
 #include "iris_physx_toolkit/float_texture.h"
 #include "iris_physx_toolkit/reflector_texture.h"
@@ -27,9 +27,11 @@ extern "C" {
 //
 
 ISTATUS
-MatteMaterialAllocate(
+PlasticMaterialAllocate(
     _In_opt_ PREFLECTOR_TEXTURE diffuse,
-    _In_opt_ PFLOAT_TEXTURE sigma,
+    _In_opt_ PREFLECTOR_TEXTURE specular,
+    _In_opt_ PFLOAT_TEXTURE roughness,
+    _In_ bool remap_roughness,
     _Out_ PMATERIAL *material
     );
 
@@ -37,4 +39,4 @@ MatteMaterialAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_MATTE_MATERIAL_
+#endif // _IRIS_PHYSX_TOOLKIT_MATERIALS_PLASTIC_

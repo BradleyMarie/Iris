@@ -26,7 +26,7 @@ Abstract:
 #include "iris_physx_toolkit/attenuated_reflector.h"
 #include "iris_physx_toolkit/cie_color_integrator.h"
 #include "iris_physx_toolkit/constant_emissive_material.h"
-#include "iris_physx_toolkit/constant_material.h"
+#include "iris_physx_toolkit/materials/constant.h"
 #include "iris_physx_toolkit/interpolated_spectrum.h"
 #include "iris_physx_toolkit/kd_tree_scene.h"
 #include "iris_physx_toolkit/one_light_sampler.h"

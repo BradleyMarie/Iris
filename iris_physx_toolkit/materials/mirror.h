@@ -4,7 +4,7 @@ Copyright (c) 2021 Brad Weinberger
 
 Module Name:
 
-    mirror_material.h
+    mirror.h
 
 Abstract:
 
@@ -12,8 +12,8 @@ Abstract:
 
 --*/
 
-#ifndef _IRIS_PHYSX_TOOLKIT_MIRROR_MATERIAL_
-#define _IRIS_PHYSX_TOOLKIT_MIRROR_MATERIAL_
+#ifndef _IRIS_PHYSX_TOOLKIT_MATERIALS_MIRROR_
+#define _IRIS_PHYSX_TOOLKIT_MATERIALS_MIRROR_
 
 #include "iris_physx_toolkit/reflector_texture.h"
 
@@ -35,4 +35,4 @@ MirrorMaterialAllocate(
 }
 #endif // __cplusplus
 
-#endif // _IRIS_PHYSX_TOOLKIT_MIRROR_MATERIAL_
+#endif // _IRIS_PHYSX_TOOLKIT_MATERIALS_MIRROR_
