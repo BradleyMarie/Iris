@@ -1170,6 +1170,7 @@ BvhSceneAllocate(
     {
         vtable = &bvh_transformed_scene_vtable;
         result.transforms = calloc(num_shapes, sizeof(PMATRIX));
+        result.premultiplied = NULL;
 
         if (result.transforms == NULL)
         {
