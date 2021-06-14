@@ -238,6 +238,7 @@ cc_test(
         "//iris_camera_toolkit:pinhole_camera",
         "//iris_physx_toolkit/bsdfs:lambertian",
         "//iris_physx_toolkit/materials:constant",
+        "//iris_physx_toolkit/scenes:bvh",
         "//iris_physx_toolkit/scenes:kd_tree",
         "//iris_physx_toolkit/shapes:triangle_mesh",
         "//iris_physx_toolkit:all_light_sampler",

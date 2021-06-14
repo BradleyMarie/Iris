@@ -112,7 +112,6 @@ BvhNodeInitializeLeaf(
     _In_ size_t num_shapes
     )
 {
-    assert(offset < MAX_CHILD_OFFSET);
     assert(offset < MAX_PRIMITIVE_OFFSET);
     assert(num_shapes < MAX_LEAF_SIZE);
 
@@ -133,7 +132,6 @@ BvhNodeInitializeInterior(
     )
 {
     assert(offset < MAX_CHILD_OFFSET);
-    assert(offset < MAX_PRIMITIVE_OFFSET);
 
     node->bounds = bounds;
     node->offset = offset;
@@ -395,6 +393,8 @@ BvhEvaluateSplitsOnAxis(
     _In_ VECTOR_AXIS axis
     )
 {
+    assert(num_shapes != 0);
+
     BVH_SPLIT splits[SPLITS_TO_EVALUATE];
     for (size_t i = 0; i < SPLITS_TO_EVALUATE; i++)
     {
@@ -432,31 +432,77 @@ BvhEvaluateSplitsOnAxis(
     }
 
     float_t below_cost[SPLITS_TO_EVALUATE - 1];
-    BOUNDING_BOX cumulative_bounds = splits[0].bounds;
+    BOUNDING_BOX cumulative_bounds;
     size_t cumulative_shapes = splits[0].num_shapes;
-    below_cost[0] = BvhComputeNodeCost(cumulative_bounds,
-                                       cumulative_shapes);
+    if (cumulative_shapes != 0)
+    {
+        cumulative_bounds = splits[0].bounds;
+        below_cost[0] = BvhComputeNodeCost(cumulative_bounds,
+                                           cumulative_shapes);
+    }
+    else
+    {
+        below_cost[0] = (float_t)0.0;
+    }
+
     for (size_t i = 1; i < SPLITS_TO_EVALUATE - 1; i++)
     {
-        cumulative_bounds = BoundingBoxUnion(cumulative_bounds,
-                                             shape_bounds[i].bounds);
+        if (splits[i].num_shapes == 0)
+        {
+            below_cost[i] = below_cost[i - 1];
+            continue;
+        }
+
+        if (cumulative_shapes != 0)
+        {
+            cumulative_bounds = BoundingBoxUnion(cumulative_bounds,
+                                                 splits[i].bounds);
+        }
+        else
+        {
+            cumulative_bounds = splits[i].bounds;
+        }
+
         cumulative_shapes += splits[i].num_shapes;
         below_cost[i] = BvhComputeNodeCost(cumulative_bounds,
                                            cumulative_shapes);
     }
 
     float_t above_cost[SPLITS_TO_EVALUATE - 1];
-    cumulative_bounds = splits[SPLITS_TO_EVALUATE - 2].bounds;
-    cumulative_shapes = splits[SPLITS_TO_EVALUATE - 2].num_shapes;
-    above_cost[SPLITS_TO_EVALUATE - 2] = BvhComputeNodeCost(cumulative_bounds,
-                                                            cumulative_shapes);
-    for (size_t i = SPLITS_TO_EVALUATE - 2; i >= 0; i--)
+    cumulative_shapes = splits[SPLITS_TO_EVALUATE - 1].num_shapes;
+    if (cumulative_shapes != 0)
     {
-        cumulative_bounds = BoundingBoxUnion(cumulative_bounds,
-                                             shape_bounds[i].bounds);
-        cumulative_shapes += splits[i].num_shapes;
-        below_cost[i] = BvhComputeNodeCost(cumulative_bounds,
-                                           cumulative_shapes);
+        cumulative_bounds = splits[SPLITS_TO_EVALUATE - 1].bounds;
+        above_cost[SPLITS_TO_EVALUATE - 2] =
+            BvhComputeNodeCost(cumulative_bounds, cumulative_shapes);
+    }
+    else
+    {
+        above_cost[SPLITS_TO_EVALUATE - 2] = (float_t)0.0;
+    }
+
+    for (size_t i = 1; i < SPLITS_TO_EVALUATE - 1; i++)
+    {
+        size_t index = SPLITS_TO_EVALUATE - 2 - i;
+        if (splits[index].num_shapes == 0)
+        {
+            above_cost[index] = above_cost[index + 1];
+            continue;
+        }
+
+        if (cumulative_shapes != 0)
+        {
+            cumulative_bounds = BoundingBoxUnion(cumulative_bounds,
+                                                 splits[index].bounds);
+        }
+        else
+        {
+            cumulative_bounds = splits[index].bounds;
+        }
+
+        cumulative_shapes += splits[index].num_shapes;
+        above_cost[index] = BvhComputeNodeCost(cumulative_bounds,
+                                               cumulative_shapes);
     }
 
     float_t node_surface_area = BoundingBoxSurfaceArea(node_bounds);
@@ -541,7 +587,7 @@ BvhBuildImpl(
     for (size_t i = 1; i < num_shapes; i++)
     {
         centroid_bounds = BoundingBoxEnvelop(centroid_bounds,
-                                             shape_bounds[1].bounds_centroid);
+                                             shape_bounds[i].bounds_centroid);
     }
 
     VECTOR3 centroid_diagonal = PointSubtract(centroid_bounds.corners[1],
@@ -562,32 +608,24 @@ BvhBuildImpl(
         return success;
     }
 
-    bool success = NodeBuilderAllocateNode(node_builder, index);
-
-    if (!success)
-    {
-        return false;
-    }
-
     PSHAPE_BOUNDS above_bounds, below_bounds;
     size_t above_bounds_size, below_bounds_size;
     if (num_shapes == 2)
     {
         float_t shape0 = PointGetElement(shape_bounds[0].bounds_centroid, axis);
         float_t shape1 = PointGetElement(shape_bounds[1].bounds_centroid, axis);
-        if (shape0 < shape1)
+        if (shape1 < shape0)
         {
-            above_bounds = &shape_bounds[1];
-            below_bounds = &shape_bounds[0];
-        }
-        else
-        {
-            above_bounds = &shape_bounds[0];
-            below_bounds = &shape_bounds[1];
+            SHAPE_BOUNDS tmp = shape_bounds[0];
+            shape_bounds[0] = shape_bounds[1];
+            shape_bounds[1] = tmp;
         }
 
-        above_bounds_size = 1;
+        below_bounds = &shape_bounds[0];
+        above_bounds = &shape_bounds[1];
+
         below_bounds_size = 1;
+        above_bounds_size = 1;
     }
     else
     {
@@ -604,6 +642,24 @@ BvhBuildImpl(
                            &above_bounds_size,
                            &below_bounds,
                            &below_bounds_size);
+    }
+
+    if (above_bounds_size == 0 || below_bounds_size == 0)
+    {
+        bool success = NodeBuilderAllocateLeafNode(node_builder,
+                                                   node_bounds,
+                                                   shape_offset,
+                                                   num_shapes,
+                                                   index);
+
+        return success;
+    }
+
+    bool success = NodeBuilderAllocateNode(node_builder, index);
+
+    if (!success)
+    {
+        return false;
     }
 
     size_t unused_below_index;
@@ -629,7 +685,7 @@ BvhBuildImpl(
                            above_node_bounds,
                            above_bounds,
                            above_bounds_size,
-                           shape_offset + (above_bounds - shape_bounds),
+                           shape_offset + below_bounds_size,
                            depth_remaining - 1,
                            &above_index);
 
@@ -708,7 +764,7 @@ BvhBuild(
                                 *shape_bounds,
                                 num_shapes,
                                 0,
-                                max_depth,
+                                max_depth - 1,
                                 &unused_index);
 
     if (!success)
@@ -764,7 +820,7 @@ BvhSceneTrace(
     {
         float_t min;
         if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            closest_hit < min)
+            min <= closest_hit)
         {
             if (current->num_shapes == 0)
             {
@@ -772,12 +828,12 @@ BvhSceneTrace(
                     VectorGetElement(ray.direction, current->axis);
                 if (direction < (float_t)0.0)
                 {
-                    work_list[queue_size] = current + 1;
-                    current = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + 1;
+                    current = current + current->offset;
                 }
                 else
                 {
-                    work_list[queue_size] = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + current->offset;
                     current = current + 1;
                 }
                 continue;
@@ -787,10 +843,14 @@ BvhSceneTrace(
             for (size_t i = 0; i < current->num_shapes; i++)
             {
                 PCSHAPE shape = bvh_scene->shapes[offset + i];
+                PCMATRIX matrix = bvh_scene->transforms[offset + i];
+                bool premultiplied = bvh_scene->premultiplied[offset + i];
                 ISTATUS status =
-                    ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
-                                                          shape,
-                                                          &closest_hit);
+                    ShapeHitTesterTestShapeWithLimit(hit_tester,
+                                                     shape,
+                                                     matrix,
+                                                     premultiplied,
+                                                     &closest_hit);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -831,7 +891,7 @@ BvhTransformedSceneTrace(
     {
         float_t min;
         if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            closest_hit < min)
+            min <= closest_hit)
         {
             if (current->num_shapes == 0)
             {
@@ -839,12 +899,12 @@ BvhTransformedSceneTrace(
                     VectorGetElement(ray.direction, current->axis);
                 if (direction < (float_t)0.0)
                 {
-                    work_list[queue_size] = current + 1;
-                    current = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + 1;
+                    current = current + current->offset;
                 }
                 else
                 {
-                    work_list[queue_size] = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + current->offset;
                     current = current + 1;
                 }
                 continue;
@@ -900,7 +960,7 @@ BvhWorldSceneTrace(
     {
         float_t min;
         if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            closest_hit < min)
+            min <= closest_hit)
         {
             if (current->num_shapes == 0)
             {
@@ -908,12 +968,12 @@ BvhWorldSceneTrace(
                     VectorGetElement(ray.direction, current->axis);
                 if (direction < (float_t)0.0)
                 {
-                    work_list[queue_size] = current + 1;
-                    current = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + 1;
+                    current = current + current->offset;
                 }
                 else
                 {
-                    work_list[queue_size] = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + current->offset;
                     current = current + 1;
                 }
                 continue;
@@ -923,14 +983,10 @@ BvhWorldSceneTrace(
             for (size_t i = 0; i < current->num_shapes; i++)
             {
                 PCSHAPE shape = bvh_scene->shapes[offset + i];
-                PCMATRIX matrix = bvh_scene->transforms[offset + i];
-                bool premultiplied = bvh_scene->premultiplied[offset + i];
                 ISTATUS status =
-                    ShapeHitTesterTestShapeWithLimit(hit_tester,
-                                                     shape,
-                                                     matrix,
-                                                     premultiplied,
-                                                     &closest_hit);
+                    ShapeHitTesterTestWorldShapeWithLimit(hit_tester,
+                                                          shape,
+                                                          &closest_hit);
 
                 if (status != ISTATUS_SUCCESS)
                 {
@@ -1074,7 +1130,7 @@ BvhSceneAllocate(
 
     for (size_t i = 0; i < num_shapes; i++)
     {
-        result.shapes[i] = shapes[i];
+        result.shapes[i] = shape_bounds[i].shape;
     }
 
     bool premultiply_needed = false;
@@ -1125,7 +1181,7 @@ BvhSceneAllocate(
 
         for (size_t i = 0; i < num_shapes; i++)
         {
-            result.transforms[i] = transforms[i];
+            result.transforms[i] = shape_bounds[i].model_to_world;
         }
     }
     else
@@ -1146,8 +1202,8 @@ BvhSceneAllocate(
 
         for (size_t i = 0; i < num_shapes; i++)
         {
-            result.transforms[i] = transforms[i];
-            result.premultiplied[i] = premultiplied[i];
+            result.transforms[i] = shape_bounds[i].model_to_world;
+            result.premultiplied[i] = shape_bounds[i].premultiplied;
         }
     }
 
@@ -1268,7 +1324,7 @@ BvhAggregateTrace(
     {
         float_t near;
         if (BoundingBoxIntersect(current->bounds, *ray, NULL, &near, NULL) &&
-            maximum_distance < near)
+            near <= maximum_distance)
         {
             if (current->num_shapes == 0)
             {
@@ -1276,12 +1332,12 @@ BvhAggregateTrace(
                     VectorGetElement(ray->direction, current->axis);
                 if (direction < (float_t)0.0)
                 {
-                    work_list[queue_size] = current + 1;
-                    current = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + 1;
+                    current = current + current->offset;
                 }
                 else
                 {
-                    work_list[queue_size] = bvh_scene->nodes + current->offset;
+                    work_list[queue_size++] = current + current->offset;
                     current = current + 1;
                 }
                 continue;
@@ -1455,7 +1511,7 @@ BvhAggregateAllocate(
 
     for (size_t i = 0; i < num_shapes; i++)
     {
-        result.shapes[i] = shapes[i];
+        result.shapes[i] = shape_bounds[i].shape;
     }
 
     free(shape_bounds);
