@@ -50,13 +50,13 @@ ShapeBoundsInitialize(
     if (premultiplied)
     {
         status = ShapeComputeBounds(shape,
-                                    model_to_world,
+                                    NULL,
                                     &bounds->bounds);
     }
     else
     {
         status = ShapeComputeBounds(shape,
-                                    NULL,
+                                    model_to_world,
                                     &bounds->bounds);
     }
 
