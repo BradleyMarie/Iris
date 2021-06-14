@@ -793,70 +793,6 @@ NextAxis(
 }
 
 static
-float_t
-VectorGetElementByAxis(
-    _In_ VECTOR3 vector,
-    _In_ VECTOR_AXIS axis
-    )
-{
-    if (axis == VECTOR_X_AXIS)
-    {
-        return vector.x;
-    }
-
-    if (axis == VECTOR_Y_AXIS)
-    {
-        return vector.y;
-    }
-
-    return vector.z;
-}
-
-static
-float_t
-PointGetElementByAxis(
-    _In_ POINT3 point,
-    _In_ VECTOR_AXIS axis
-    )
-{
-    if (axis == VECTOR_X_AXIS)
-    {
-        return point.x;
-    }
-
-    if (axis == VECTOR_Y_AXIS)
-    {
-        return point.y;
-    }
-
-    return point.z;
-}
-
-static
-inline
-float_t
-PointGetElement(
-    _In_ POINT3 point,
-    _In_ uint32_t axis
-    )
-{
-    const float_t *elements = &point.x;
-    return elements[axis];
-}
-
-static
-inline
-float_t
-VectorGetElement(
-    _In_ VECTOR3 vector,
-    _In_ uint32_t axis
-    )
-{
-    const float_t *elements = &vector.x;
-    return elements[axis];
-}
-
-static
 bool
 KdTreeEvaluateSplitsOnAxis(
     _In_ PCEDGES_3D edges,
@@ -875,8 +811,8 @@ KdTreeEvaluateSplitsOnAxis(
     float_t box_surface_area = BoundingBoxSurfaceArea(node_bound);
     float_t inv_surface_area = (float_t)1.0 / box_surface_area;
 
-    float_t lower_bound = PointGetElementByAxis(node_bound.corners[0], axis);
-    float_t upper_bound = PointGetElementByAxis(node_bound.corners[1], axis);
+    float_t lower_bound = PointGetElement(node_bound.corners[0], axis);
+    float_t upper_bound = PointGetElement(node_bound.corners[1], axis);
 
     VECTOR3 diagonal = PointSubtract(node_bound.corners[1],
                                      node_bound.corners[0]);
@@ -884,8 +820,8 @@ KdTreeEvaluateSplitsOnAxis(
     VECTOR_AXIS next_axis = NextAxis(axis);
     VECTOR_AXIS next_next_axis = NextAxis(next_axis);
 
-    float_t other_axis0 = VectorGetElementByAxis(diagonal, next_axis);
-    float_t other_axis1 = VectorGetElementByAxis(diagonal, next_next_axis);
+    float_t other_axis0 = VectorGetElement(diagonal, next_axis);
+    float_t other_axis1 = VectorGetElement(diagonal, next_next_axis);
     float_t other_sum = other_axis0 + other_axis1;
     float_t side_face_area = other_axis0 * other_axis1;
 
@@ -1344,12 +1280,12 @@ KdTreeSortEdges(
         edges->edges[j].edges[0].is_start = true;
         edges->edges[j].edges[0].primitive = 0;
         edges->edges[j].edges[0].value =
-            PointGetElement(total_bounds->corners[0], j);
+            PointGetElement(total_bounds->corners[0], (VECTOR_AXIS)j);
 
         edges->edges[j].edges[1].is_start = false;
         edges->edges[j].edges[1].primitive = 0;
         edges->edges[j].edges[1].value =
-            PointGetElement(total_bounds->corners[1], j);
+            PointGetElement(total_bounds->corners[1], (VECTOR_AXIS)j);
     }
 
     for (uint32_t i = 1; i < (uint32_t)num_shapes; i++)
@@ -1380,12 +1316,12 @@ KdTreeSortEdges(
             edges->edges[j].edges[2 * i].is_start = true;
             edges->edges[j].edges[2 * i].primitive = i;
             edges->edges[j].edges[2 * i].value =
-                PointGetElement(shape_bounds.corners[0], j);
+                PointGetElement(shape_bounds.corners[0], (VECTOR_AXIS)j);
 
             edges->edges[j].edges[2 * i + 1].is_start = false;
             edges->edges[j].edges[2 * i + 1].primitive = i;
             edges->edges[j].edges[2 * i + 1].value =
-                PointGetElement(shape_bounds.corners[1], j);
+                PointGetElement(shape_bounds.corners[1], (VECTOR_AXIS)j);
         }
     }
 
@@ -1597,8 +1533,9 @@ KdTreeSceneTrace(
         }
 
         uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray.origin, split_axis);
-        float_t direction = VectorGetElement(inverse_direction, split_axis);
+        float_t origin = PointGetElement(ray.origin, (VECTOR_AXIS)split_axis);
+        float_t direction =
+            VectorGetElement(inverse_direction, (VECTOR_AXIS)split_axis);
 
         float_t split = KdTreeNodeSplit(node);
         float_t plane_distance = (split - origin) * direction;
@@ -1750,8 +1687,9 @@ KdTreeTransformedSceneTrace(
         }
 
         uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray.origin, split_axis);
-        float_t direction = VectorGetElement(inverse_direction, split_axis);
+        float_t origin = PointGetElement(ray.origin, (VECTOR_AXIS)split_axis);
+        float_t direction =
+            VectorGetElement(inverse_direction, (VECTOR_AXIS)split_axis);
 
         float_t split = KdTreeNodeSplit(node);
         float_t plane_distance = (split - origin) * direction;
@@ -1899,8 +1837,9 @@ KdTreeWorldSceneTrace(
         }
 
         uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray.origin, split_axis);
-        float_t direction = VectorGetElement(inverse_direction, split_axis);
+        float_t origin = PointGetElement(ray.origin, (VECTOR_AXIS)split_axis);
+        float_t direction =
+            VectorGetElement(inverse_direction, (VECTOR_AXIS)split_axis);
 
         float_t split = KdTreeNodeSplit(node);
         float_t plane_distance = (split - origin) * direction;
@@ -2343,8 +2282,9 @@ KdTreeAggregateTrace(
         }
 
         uint32_t split_axis = KdTreeNodeType(node);
-        float_t origin = PointGetElement(ray->origin, split_axis);
-        float_t direction = VectorGetElement(inverse_direction, split_axis);
+        float_t origin = PointGetElement(ray->origin, (VECTOR_AXIS)split_axis);
+        float_t direction =
+            VectorGetElement(inverse_direction, (VECTOR_AXIS)split_axis);
 
         float_t split = KdTreeNodeSplit(node);
         float_t plane_distance = (split - origin) * direction;

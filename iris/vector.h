@@ -76,6 +76,22 @@ VectorCreate(
 
 static
 inline
+float_t
+VectorGetElement(
+    _In_ VECTOR3 vector,
+    _In_ VECTOR_AXIS axis
+    )
+{
+    assert(axis == VECTOR_X_AXIS ||
+           axis == VECTOR_Y_AXIS ||
+           axis == VECTOR_Z_AXIS);
+
+    const float_t *as_array = &vector.x;
+    return as_array[axis];
+}
+
+static
+inline
 VECTOR3
 VectorNegate(
     _In_ VECTOR3 vector

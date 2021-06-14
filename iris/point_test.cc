@@ -33,6 +33,14 @@ TEST(PointTest, PointCreate)
     EXPECT_EQ(expected, actual);
 }
 
+TEST(PointTest, PointGetElement)
+{
+    POINT3 point = PointCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    EXPECT_EQ((float_t) 1.0, PointGetElement(point, VECTOR_X_AXIS));
+    EXPECT_EQ((float_t) 2.0, PointGetElement(point, VECTOR_Y_AXIS));
+    EXPECT_EQ((float_t) 3.0, PointGetElement(point, VECTOR_Z_AXIS));
+}
+
 TEST(PointTest, PointSubtract)
 {
     POINT3 origin = PointCreate((float_t) 0.0, (float_t) 0.0, (float_t) 0.0);

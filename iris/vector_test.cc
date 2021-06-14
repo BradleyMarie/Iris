@@ -33,6 +33,14 @@ TEST(VectorTest, VectorCreate)
     EXPECT_EQ(expected, actual);
 }
 
+TEST(VectorTest, VectorGetElement)
+{
+    VECTOR3 vector = VectorCreate((float_t) 1.0, (float_t) 2.0, (float_t) 3.0);
+    EXPECT_EQ((float_t) 1.0, VectorGetElement(vector, VECTOR_X_AXIS));
+    EXPECT_EQ((float_t) 2.0, VectorGetElement(vector, VECTOR_Y_AXIS));
+    EXPECT_EQ((float_t) 3.0, VectorGetElement(vector, VECTOR_Z_AXIS));
+}
+
 TEST(VectorTest, VectorNegate)
 {
     VECTOR3 v0 = VectorCreate((float_t) -1.0, (float_t) -2.0, (float_t) -3.0);

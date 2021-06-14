@@ -56,6 +56,22 @@ PointCreate(
 
 static
 inline
+float_t
+PointGetElement(
+    _In_ POINT3 point,
+    _In_ VECTOR_AXIS axis
+    )
+{
+    assert(axis == VECTOR_X_AXIS ||
+           axis == VECTOR_Y_AXIS ||
+           axis == VECTOR_Z_AXIS);
+
+    const float_t *as_array = &point.x;
+    return as_array[axis];
+}
+
+static
+inline
 VECTOR3
 PointSubtract(
     _In_ POINT3 minuend,
