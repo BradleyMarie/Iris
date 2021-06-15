@@ -20,12 +20,6 @@ Abstract:
 #include "iris_physx_toolkit/shapes/triangle_mesh.h"
 
 //
-// Constants
-//
-
-#define TRIANGLE_DEGENERATE_THRESHOLD (float_t)0.000001
-
-//
 // Types
 //
 
@@ -422,7 +416,7 @@ TriangleMeshTriangleInitialize(
 
     triangle->surface_normal = VectorCrossProduct(v0_to_v1, v0_to_v2);
     float_t surface_normal_length = VectorLength(triangle->surface_normal);
-    if (surface_normal_length <= TRIANGLE_DEGENERATE_THRESHOLD)
+    if (surface_normal_length == (float_t)0.0)
     {
         return false;
     }
