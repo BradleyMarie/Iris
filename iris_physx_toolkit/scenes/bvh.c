@@ -341,6 +341,7 @@ NodeBuilderInitializeInteriorNode(
 //
 
 #define SPLITS_TO_EVALUATE 12
+#define MAX_SHAPES_PER_NODE 4
 
 //
 // BVH Build Types
@@ -385,12 +386,14 @@ BvhComputeNodeCost(
 }
 
 static
-float_t
+bool
 BvhEvaluateSplitsOnAxis(
     _In_ BOUNDING_BOX node_bounds,
+    _In_ BOUNDING_BOX centroid_bounds,
     _In_reads_(num_shapes) PCSHAPE_BOUNDS shape_bounds,
     _In_ size_t num_shapes,
-    _In_ VECTOR_AXIS axis
+    _In_ VECTOR_AXIS axis,
+    _Out_ float_t *split
     )
 {
     assert(num_shapes != 0);
@@ -401,8 +404,8 @@ BvhEvaluateSplitsOnAxis(
         splits[i].num_shapes = 0;
     }
 
-    float_t min = PointGetElement(node_bounds.corners[0], axis);
-    float_t max = PointGetElement(node_bounds.corners[1], axis);
+    float_t min = PointGetElement(centroid_bounds.corners[0], axis);
+    float_t max = PointGetElement(centroid_bounds.corners[1], axis);
     float_t range = max - min;
 
     for (size_t i = 0; i < num_shapes; i++)
@@ -507,12 +510,12 @@ BvhEvaluateSplitsOnAxis(
 
     float_t node_surface_area = BoundingBoxSurfaceArea(node_bounds);
     float_t best_cost =
-        ((float_t)1.0 + above_cost[0] + below_cost[0]) / node_surface_area;
+        (float_t)1.0 + (above_cost[0] + below_cost[0]) / node_surface_area;
     size_t best_split = 0;
     for (size_t i = 1; i < SPLITS_TO_EVALUATE - 2; i++)
     {
         float_t cost =
-            ((float_t)1.0 + above_cost[i] + below_cost[i]) / node_surface_area;
+            (float_t)1.0 + (above_cost[i] + below_cost[i]) / node_surface_area;
         if (cost < best_cost)
         {
             best_cost = cost;
@@ -520,9 +523,16 @@ BvhEvaluateSplitsOnAxis(
         }
     }
 
+    if (num_shapes <= MAX_SHAPES_PER_NODE && (float_t)num_shapes < best_cost)
+    {
+        return false;
+    }
+
     float_t relative_split =
         (float_t)(1 + best_split) / (float_t)SPLITS_TO_EVALUATE;
-    return min + range * relative_split;
+    *split = min + range * relative_split;
+
+    return true;
 }
 
 static
@@ -629,10 +639,24 @@ BvhBuildImpl(
     }
     else
     {
-        float_t split = BvhEvaluateSplitsOnAxis(node_bounds,
-                                                shape_bounds,
-                                                num_shapes,
-                                                axis);
+        float_t split;
+        bool success = BvhEvaluateSplitsOnAxis(node_bounds,
+                                               centroid_bounds,
+                                               shape_bounds,
+                                               num_shapes,
+                                               axis,
+                                               &split);
+
+        if (!success)
+        {
+            bool success = NodeBuilderAllocateLeafNode(node_builder,
+                                                       node_bounds,
+                                                       shape_offset,
+                                                       num_shapes,
+                                                       index);
+
+            return success;
+        }
 
         BvhPartitionShapes(shape_bounds,
                            num_shapes,
@@ -642,17 +666,6 @@ BvhBuildImpl(
                            &above_bounds_size,
                            &below_bounds,
                            &below_bounds_size);
-    }
-
-    if (above_bounds_size == 0 || below_bounds_size == 0)
-    {
-        bool success = NodeBuilderAllocateLeafNode(node_builder,
-                                                   node_bounds,
-                                                   shape_offset,
-                                                   num_shapes,
-                                                   index);
-
-        return success;
     }
 
     bool success = NodeBuilderAllocateNode(node_builder, index);
