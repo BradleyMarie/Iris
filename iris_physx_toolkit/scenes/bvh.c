@@ -831,9 +831,10 @@ BvhSceneTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        float_t min;
-        if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            min <= closest_hit)
+        float_t near, far;
+        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, &far) &&
+            near <= closest_hit &&
+            (float_t)0.0 <= far)
         {
             if (current->num_shapes == 0)
             {
@@ -902,9 +903,10 @@ BvhTransformedSceneTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        float_t min;
-        if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            min <= closest_hit)
+        float_t near, far;
+        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, &far) &&
+            near <= closest_hit &&
+            (float_t)0.0 <= far)
         {
             if (current->num_shapes == 0)
             {
@@ -971,9 +973,10 @@ BvhWorldSceneTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        float_t min;
-        if (BoundingBoxIntersect(current->bounds, ray, NULL, &min, NULL) &&
-            min <= closest_hit)
+        float_t near, far;
+        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, &far) &&
+            near <= closest_hit &&
+            (float_t)0.0 <= far)
         {
             if (current->num_shapes == 0)
             {
@@ -1336,9 +1339,10 @@ BvhAggregateTrace(
     size_t queue_size = 0;
     for (;;)
     {
-        float_t near;
-        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, NULL) &&
-            near <= maximum_distance)
+        float_t near, far;
+        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, &far) &&
+            near <= maximum_distance &&
+            minimum_distance <= far)
         {
             if (current->num_shapes == 0)
             {
