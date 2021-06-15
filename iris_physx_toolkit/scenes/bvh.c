@@ -1276,7 +1276,6 @@ inline
 ISTATUS
 BvhAggregateTraceShape(
     _In_ PCSHAPE shape,
-    _In_ PCRAY ray,
     _In_ float_t minimum_distance,
     _Inout_ float_t *maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
@@ -1321,7 +1320,7 @@ static
 ISTATUS
 BvhAggregateTrace(
     _In_ const void *context,
-    _In_ PCRAY ray,
+    _In_ PCRAY ray_ptr,
     _In_ float_t minimum_distance,
     _In_ float_t maximum_distance,
     _In_ PSHAPE_HIT_ALLOCATOR allocator,
@@ -1330,6 +1329,7 @@ BvhAggregateTrace(
 {
     PCBVH_SCENE bvh_scene = (PCBVH_SCENE)context;
 
+    RAY ray = *ray_ptr;
     ISTATUS return_status = ISTATUS_NO_INTERSECTION;
     PCBVH_NODE work_list[MAX_TREE_DEPTH];
     PCBVH_NODE current = bvh_scene->nodes;
@@ -1337,13 +1337,13 @@ BvhAggregateTrace(
     for (;;)
     {
         float_t near;
-        if (BoundingBoxIntersect(current->bounds, *ray, NULL, &near, NULL) &&
+        if (BoundingBoxIntersect(current->bounds, ray, NULL, &near, NULL) &&
             near <= maximum_distance)
         {
             if (current->num_shapes == 0)
             {
                 float_t direction =
-                    VectorGetElement(ray->direction, current->axis);
+                    VectorGetElement(ray.direction, current->axis);
                 if (direction < (float_t)0.0)
                 {
                     work_list[queue_size++] = current + 1;
@@ -1363,7 +1363,6 @@ BvhAggregateTrace(
                 PCSHAPE shape = bvh_scene->shapes[offset + i];
                 ISTATUS status =
                     BvhAggregateTraceShape(shape,
-                                           ray,
                                            minimum_distance,
                                            &maximum_distance,
                                            allocator,
